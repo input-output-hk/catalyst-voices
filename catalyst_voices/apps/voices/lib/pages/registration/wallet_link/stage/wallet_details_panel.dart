@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
-import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_connection_status.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_summary.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -104,7 +103,7 @@ class _BlocNavigation extends StatelessWidget {
       selector: (state) => state.hasEnoughBalance,
       builder: (context, state) {
         if (state) {
-          return const RegistrationBackNextNavigation();
+          return const _RegistrationTextBackNextNavigation();
         } else {
           return const _NotEnoughBalanceNavigation();
         }
@@ -122,6 +121,29 @@ class _NotEnoughBalanceNavigation extends StatelessWidget {
       leading: VoicesAssets.icons.wallet.buildIcon(),
       onTap: () => RegistrationCubit.of(context).previousStep(),
       child: Text(context.l10n.chooseOtherWallet),
+    );
+  }
+}
+
+class _RegistrationTextBackNextNavigation extends StatelessWidget {
+  const _RegistrationTextBackNextNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        VoicesNextButton(
+          onTap: () => RegistrationCubit.of(context).nextStep(),
+        ),
+        const SizedBox(height: 10),
+        VoicesOutlinedButton(
+          onTap: () => RegistrationCubit.of(context).previousStep(),
+          child: Text(
+            context.l10n.connectDifferentWallet,
+          ),
+        ),
+      ],
     );
   }
 }
