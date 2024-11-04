@@ -1,4 +1,4 @@
-//! Frontend configuration objects.
+//! Search objects for the legacy service.
 
 use poem_openapi::{types::Example, Object};
 
@@ -74,4 +74,18 @@ pub(crate) enum SearchColumn {
     Desc,
     Author,
     Funds,
+}
+
+#[derive(Object)]
+#[oai(example = true)]
+pub(crate) struct BadRequest {
+    error: String,
+}
+
+impl Example for BadRequest {
+    fn example() -> Self {
+        Self {
+            error: "Invalid search".to_string(),
+        }
+    }
 }
