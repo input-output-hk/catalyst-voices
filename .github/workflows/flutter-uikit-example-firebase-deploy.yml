@@ -38,7 +38,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst_voices/uikit_example
+          earthfile: ./catalyst_voices/utilities/uikit_example
           flags: --allow-privileged
           targets: local-build-web
           target_flags:
