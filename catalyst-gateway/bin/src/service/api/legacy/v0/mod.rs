@@ -51,6 +51,8 @@ impl V0Api {
     }
 
     /// Get settings.
+    ///
+    /// Get settings.
     #[oai(
         path = "/settings",
         method = "get",
@@ -61,6 +63,8 @@ impl V0Api {
         settings_get::endpoint().await
     }
 
+    /// Get fund.
+    ///
     /// Get fund.
     #[oai(
         path = "/fund/",
@@ -73,6 +77,8 @@ impl V0Api {
     }
 
     /// Get list of proposals.
+    ///
+    /// Get list of proposals
     #[oai(
         path = "/proposals",
         method = "get",
@@ -83,11 +89,14 @@ impl V0Api {
         proposals_get::endpoint().await
     }
 
+    /// Get list of proposals.
+    ///
     /// Get list of proposals according to the filter options.
+    /// This is a POST method, only to send the filter data over the HTTP body.
     #[oai(
         path = "/proposals",
         method = "post",
-        operation_id = "GetProposalById",
+        operation_id = "GetProposalsByFilter",
         deprecated = true
     )]
     async fn proposals_post(
@@ -96,7 +105,9 @@ impl V0Api {
         proposals_post::endpoint(message.0).await
     }
 
-    /// Get a proposal by its ID.
+    /// Get a proposal.
+    ///
+    /// Get a proposal by its ID
     #[oai(
         path = "/proposals/:id",
         method = "get",
@@ -107,7 +118,9 @@ impl V0Api {
         proposal_by_id_get::endpoint(id.0).await
     }
 
-    /// Get proposal reviews by proposal ID.
+    /// Get proposal reviews.
+    ///
+    /// Get proposal reviews by proposal ID
     #[oai(
         path = "/reviews/:proposal_id",
         method = "get",

@@ -1,15 +1,14 @@
 //! Implementation of the GET /setting endpoint
 use poem_openapi::{payload::Json, ApiResponse};
 
-use super::proposals_get;
-use crate::service::common::responses::WithErrorResponses;
+use crate::service::common::{objects::legacy::proposal::Proposal, responses::WithErrorResponses};
 
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
     /// The default success response.
     #[oai(status = 200)]
-    Ok(Json<Vec<proposals_get::dto::Proposal>>),
+    Ok(Json<Vec<Proposal>>),
 }
 
 /// All responses
