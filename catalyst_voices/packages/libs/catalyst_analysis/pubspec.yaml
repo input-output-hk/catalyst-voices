@@ -1,7 +1,7 @@
 name: catalyst_analysis
 version: 2.0.0
 description: Lint rules for Dart and Flutter used internally at Catalyst.
-repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_analysis
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_analysis
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [lints, analyzer, analysis]
 

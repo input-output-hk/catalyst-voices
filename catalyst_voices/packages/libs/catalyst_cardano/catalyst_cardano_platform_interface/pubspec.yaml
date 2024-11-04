@@ -1,6 +1,6 @@
 name: catalyst_cardano_platform_interface
 description: A common platform interface for the catalyst_cardano plugin.
-repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano/catalyst_cardano_platform_interface
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano_platform_interface
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
 version: 0.3.0

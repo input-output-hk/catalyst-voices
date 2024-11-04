@@ -1,6 +1,6 @@
 name: catalyst_cardano_serialization
 description: Dart package providing serialization/deserialization for common structures for Cardano blockchain.
-repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano_serialization
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_cardano_serialization
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
 version: 0.4.0

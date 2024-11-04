@@ -1,6 +1,6 @@
 name: catalyst_compression_platform_interface
 description: A common platform interface for the catalyst_compression plugin.
-repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_compression/catalyst_compression_platform_interface
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_compression/catalyst_compression_platform_interface
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [compression, codec]
 version: 0.2.0

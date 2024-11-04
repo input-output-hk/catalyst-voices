@@ -1,6 +1,6 @@
 name: catalyst_compression
 description: A Flutter plugin exposing Brotli and zstd compression algorithms.
-repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_compression/catalyst_compression
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_compression/catalyst_compression
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [compression, codec]
 version: 0.3.0
