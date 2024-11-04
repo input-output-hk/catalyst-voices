@@ -180,7 +180,7 @@
         "catalyst_voices/utilities/remote_widgets/example/**/**",
         "catalyst_voices/utilities/poc_local_storage/**/**",
         "**/*.svg",
-        "catalyst_voices_packages/catalyst_key_derivation/lib/src/rust/**",
+        "catalyst_voices/packages/libs/catalyst_key_derivation/lib/src/rust/**",
     ],
     "enableFiletypes": [
         "earthfile",
