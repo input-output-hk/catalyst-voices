@@ -15,3 +15,4 @@ pub(crate) mod voter_info;
 pub(crate) mod voter_registration;
 pub(crate) mod voting_public_key;
 pub(crate) mod search;
+pub(crate) mod challenges;
