@@ -45,7 +45,7 @@ and select the appropriate history.
 >On Ubuntu you might be required to start chromedriver.
 >In a separate terminal run: `chromedriver --port=4444`
 
-Navigate to `catalyst_voices` and run:
+Navigate to `catalyst_voices/apps/voices` and run:
 
 ```sh
 flutter drive --driver=test_driver/integration_test.dart \
@@ -58,7 +58,7 @@ flutter drive --driver=test_driver/integration_test.dart \
 
 ##### Run integration test in Xcode
 
-Navigate to `catalyst_voices`
+Navigate to `catalyst_voices/apps/voices`
 
 Build the integration test for iOS
 
@@ -70,7 +70,7 @@ Open iOS app in Xcode, select appropriate schema and run the integration test ta
 
 ##### Run integration test from command line
 
-Navigate to `catalyst_voices`
+Navigate to `catalyst_voices/apps/voices`
 
 Start iOS Simulator or connect iOS device and run:
 
@@ -82,7 +82,7 @@ flutter test integration_test/main.dart --flavor development
 
 ##### Run integration test in Android Studio
 
-Navigate to `catalyst_voices/android` start Android Emulator or connect Android device and run:
+Navigate to `catalyst_voices/apps/voices/android` start Android Emulator or connect Android device and run:
 
 ```sh
 ./gradlew app:connectedAndroidTest -Ptarget=`pwd`/../integration_test/main.dart
@@ -97,7 +97,7 @@ Navigate to `catalyst_voices/android` start Android Emulator or connect Android 
 
 ##### Run integration test from command line
 
-Navigate to `catalyst_voices` start Android Emulator or connect Android device and run:
+Navigate to `catalyst_voices/apps/voices` start Android Emulator or connect Android device and run:
 
 ```sh
 flutter test integration_test/main.dart --flavor development
