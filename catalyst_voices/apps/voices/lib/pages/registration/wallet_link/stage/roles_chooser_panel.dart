@@ -28,7 +28,6 @@ class RolesChooserPanel extends StatelessWidget {
         const _BlocRolesChooserContainer(),
         const Spacer(),
         const RegistrationBackNextNavigation(),
-        const SizedBox(height: 10),
       ],
     );
   }
