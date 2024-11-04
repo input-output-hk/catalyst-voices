@@ -103,7 +103,7 @@ class _BlocNavigation extends StatelessWidget {
       selector: (state) => state.hasEnoughBalance,
       builder: (context, state) {
         if (state) {
-          return const _RegistraionTextBackNextNavigation();
+          return const _RegistrationTextBackNextNavigation();
         } else {
           return const _NotEnoughBalanceNavigation();
         }
@@ -125,8 +125,8 @@ class _NotEnoughBalanceNavigation extends StatelessWidget {
   }
 }
 
-class _RegistraionTextBackNextNavigation extends StatelessWidget {
-  const _RegistraionTextBackNextNavigation();
+class _RegistrationTextBackNextNavigation extends StatelessWidget {
+  const _RegistrationTextBackNextNavigation();
 
   @override
   Widget build(BuildContext context) {
