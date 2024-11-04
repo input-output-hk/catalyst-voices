@@ -48,8 +48,8 @@ jobs:
         run: melos build:pub_get:all
 
       - name: 🤖 Run Android Integration Tests
-        run: ./scripts/flutter_android_integration_test.sh
+        run: ./catalyst_voices/scripts/flutter_android_integration_test.sh
 
       # TODO: https://github.com/input-output-hk/catalyst-voices/issues/135
       # - name: 📱 Run iOS Integration Tests
-      #   run: ./scripts/flutter_ios_integration_test.sh
+      #   run: ./catalyst_voices/scripts/flutter_ios_integration_test.sh

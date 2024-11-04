@@ -39,6 +39,8 @@ dependencies:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.2.4
   flutter_bloc: ^8.1.5
+  # TODO(dtscalac): depend on latest stable version when https://github.com/deakjahn/flutter_dropzone/issues/95 is solved,
+  # don't depend on flutter_dropzone_platform_interface and flutter_dropzone_web, they should be pulled in transitively
   flutter_dropzone: 4.0.3
   flutter_dropzone_platform_interface: 2.0.6
   flutter_dropzone_web: 4.0.2

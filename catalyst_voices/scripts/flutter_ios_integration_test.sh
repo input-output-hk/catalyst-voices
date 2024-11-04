@@ -4,7 +4,7 @@ set -e
 output="../build/ios_integ"
 product="build/ios_integ/Build/Products"
 
-pushd catalyst_voices
+pushd catalyst_voices/apps/voices
 flutter build ios integration_test/main.dart --release --flavor development
 
 pushd ios
