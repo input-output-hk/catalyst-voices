@@ -1,4 +1,4 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/keychain/vault_keychain_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -29,7 +29,7 @@ void main() {
       // Given
       final id = const Uuid().v4();
       const lockFactor = PasswordLockFactor('Test1234');
-      final key = Ed25519PrivateKey.fromHex(
+      final key = Ed25519ExtendedPrivateKey.fromHex(
         '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
       );
 

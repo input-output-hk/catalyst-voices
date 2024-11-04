@@ -1,13 +1,29 @@
 import 'package:catalyst_cardano_serialization/src/rbac/x509_certificate.dart';
-import 'package:catalyst_cardano_serialization/src/signature.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+import 'x509_certificate_test.mocks.dart';
+
+@GenerateNiceMocks([
+  MockSpec<Ed25519ExtendedPrivateKey>(),
+  MockSpec<Ed25519ExtendedPublicKey>(),
+  MockSpec<Ed25519ExtendedSignature>(),
+])
 void main() {
   group(X509Certificate, () {
-    test('generateSelfSigned X509 certificate', () async {
-      final seed = List.filled(Ed25519PrivateKey.length, 0);
-      final keyPair = await Ed25519KeyPair.fromSeed(seed);
+    final privateKey = MockEd25519ExtendedPrivateKey();
+    final publicKey = MockEd25519ExtendedPublicKey();
+    final signature = MockEd25519ExtendedSignature();
 
+    setUp(() {
+      // ignore: discarded_futures
+      when(privateKey.sign(any)).thenAnswer((_) async => signature);
+      when(signature.bytes).thenReturn([1, 2, 3]);
+    });
+
+    test('generateSelfSigned X509 certificate', () async {
       /* cSpell:disable */
       const issuer = X509DistinguishedName(
         countryName: 'US',
@@ -20,7 +36,7 @@ void main() {
 
       final tbs = X509TBSCertificate(
         serialNumber: 1,
-        subjectPublicKey: keyPair.publicKey,
+        subjectPublicKey: publicKey,
         issuer: issuer,
         validityNotBefore: DateTime.now().toUtc(),
         validityNotAfter: X509TBSCertificate.foreverValid,
@@ -38,7 +54,7 @@ void main() {
 
       final certificate = await X509Certificate.generateSelfSigned(
         tbsCertificate: tbs,
-        keyPair: keyPair,
+        privateKey: privateKey,
       );
 
       expect(certificate.tbsCertificate, equals(tbs));

@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
@@ -104,7 +105,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
   ///
   /// The signature is calculated over this unsigned data, and the
   /// pre-allocated signature storage is replaced with the signature itself.
-  final Ed25519Signature validationSignature;
+  final Ed25519ExtendedSignature validationSignature;
 
   /// The default constructor for [X509MetadataEnvelope].
   const X509MetadataEnvelope({
@@ -117,13 +118,14 @@ final class X509MetadataEnvelope<T> extends Equatable {
 
   /// Constructs a [X509MetadataEnvelope] that is not signed yet.
   ///
-  /// A [Ed25519PrivateKey] can be used to sign the envelope with [sign] method.
+  /// A [Ed25519ExtendedSignature] can be used to sign
+  /// the envelope with [sign] method.
   X509MetadataEnvelope.unsigned({
     required this.purpose,
     required this.txInputsHash,
     this.previousTransactionId,
     this.chunkedData,
-  }) : validationSignature = Ed25519Signature.seeded(0);
+  }) : validationSignature = Ed25519ExtendedSignature.seeded(0);
 
   /// Deserializes the type from cbor.
   ///
@@ -148,7 +150,8 @@ final class X509MetadataEnvelope<T> extends Equatable {
           ? TransactionHash.fromCbor(previousTransactionId)
           : null,
       chunkedData: chunkedData != null ? deserializer(chunkedData) : null,
-      validationSignature: Ed25519Signature.fromCbor(validationSignature),
+      validationSignature:
+          Ed25519ExtendedSignature.fromCbor(validationSignature),
     );
   }
 
@@ -181,7 +184,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
   ///
   /// The [serializer] in most cases is going to be [RegistrationData.toCbor].
   Future<X509MetadataEnvelope<T>> sign({
-    required Ed25519PrivateKey privateKey,
+    required Ed25519ExtendedPrivateKey privateKey,
     required ChunkedDataSerializer<T> serializer,
   }) async {
     final bytes = cbor.encode(await toCbor(serializer: serializer));
@@ -194,19 +197,20 @@ final class X509MetadataEnvelope<T> extends Equatable {
   ///
   /// The [serializer] in most cases is going to be [RegistrationData.toCbor].
   Future<bool> verifySignature({
-    required Ed25519Signature signature,
-    required Ed25519PublicKey publicKey,
+    required Ed25519ExtendedSignature signature,
+    required Ed25519ExtendedPublicKey publicKey,
     required ChunkedDataSerializer<T> serializer,
   }) async {
-    final envelope = withValidationSignature(Ed25519Signature.seeded(0));
+    final envelope =
+        withValidationSignature(Ed25519ExtendedSignature.seeded(0));
     final bytes = cbor.encode(await envelope.toCbor(serializer: serializer));
-    return signature.verify(bytes, publicKey: publicKey);
+    return publicKey.verify(bytes, signature: signature);
   }
 
   /// Returns a copy of this [X509MetadataEnvelope]
   /// with given [validationSignature].
   X509MetadataEnvelope<T> withValidationSignature(
-    Ed25519Signature validationSignature,
+    Ed25519ExtendedSignature validationSignature,
   ) {
     return X509MetadataEnvelope(
       purpose: purpose,

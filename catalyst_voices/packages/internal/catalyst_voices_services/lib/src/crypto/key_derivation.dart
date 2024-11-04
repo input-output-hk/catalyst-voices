@@ -1,42 +1,43 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:ed25519_hd_key/ed25519_hd_key.dart';
 
 /// Derives key pairs from a seed phrase.
 final class KeyDerivation {
-  const KeyDerivation();
+  final CatalystKeyDerivation _keyDerivation;
 
-  /// Derives an [Ed25519KeyPair] from a [seedPhrase] and [path].
-  ///
-  /// Example [path]: m/0'/2147483647'
-  ///
-  // TODO(dtscalac): this takes around 2.5s to execute, optimize it
-  // or move to a JS web worker.
-  Future<Ed25519KeyPair> deriveKeyPair({
+  const KeyDerivation(this._keyDerivation);
+
+  Future<Ed25519ExtendedPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
-    required String path,
-  }) async {
-    final masterKey = await ED25519_HD_KEY.derivePath(
-      path,
-      seedPhrase.uint8ListSeed,
-    );
-
-    final privateKey = masterKey.key;
-    final publicKey = await ED25519_HD_KEY.getPublicKey(privateKey, false);
-
-    return Ed25519KeyPair(
-      publicKey: Ed25519PublicKey.fromBytes(publicKey),
-      privateKey: Ed25519PrivateKey.fromBytes(privateKey),
+  }) {
+    return _keyDerivation.deriveMasterKey(
+      mnemonic: seedPhrase.mnemonic,
     );
   }
 
-  /// Derives the [Ed25519KeyPair] for the [role] from a [seedPhrase].
-  Future<Ed25519KeyPair> deriveAccountRoleKeyPair({
-    required SeedPhrase seedPhrase,
+  /// Derives an [Ed25519KeyPair] from a [masterKey] and [path].
+  ///
+  /// Example [path]: m/0'/2147483647'
+  Future<Ed25519ExtendedKeyPair> deriveKeyPair({
+    required Ed25519ExtendedPrivateKey masterKey,
+    required String path,
+  }) async {
+    final privateKey = await masterKey.derivePrivateKey(path: path);
+    final publicKey = await privateKey.derivePublicKey();
+
+    return Ed25519ExtendedKeyPair(
+      publicKey: publicKey,
+      privateKey: privateKey,
+    );
+  }
+
+  /// Derives the [Ed25519KeyPair] for the [role] from a [masterKey].
+  Future<Ed25519ExtendedKeyPair> deriveAccountRoleKeyPair({
+    required Ed25519ExtendedPrivateKey masterKey,
     required AccountRole role,
   }) async {
     return deriveKeyPair(
-      seedPhrase: seedPhrase,
+      masterKey: masterKey,
       path: _roleKeyDerivationPath(role),
     );
   }

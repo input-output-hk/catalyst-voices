@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// The transaction metadata used for registration.
@@ -17,7 +18,7 @@ final class RegistrationTransactionBuilder {
   final TransactionBuilderConfig transactionConfig;
 
   /// The key pair used to sign the user registration certificate.
-  final Ed25519KeyPair keyPair;
+  final Ed25519ExtendedKeyPair keyPair;
 
   /// The network ID where the transaction will be submitted.
   final NetworkId networkId;
@@ -130,7 +131,7 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<X509Certificate> _generateX509Certificate({
-    required Ed25519KeyPair keyPair,
+    required Ed25519ExtendedKeyPair keyPair,
   }) async {
     // TODO(dtscalac): once serial number generation is defined come up with
     // a better solution than assigning a random number
@@ -167,7 +168,7 @@ final class RegistrationTransactionBuilder {
 
     return X509Certificate.generateSelfSigned(
       tbsCertificate: tbs,
-      keyPair: keyPair,
+      privateKey: keyPair.privateKey,
     );
   }
 

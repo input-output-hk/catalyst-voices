@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:test/test.dart';
 
@@ -6,6 +7,10 @@ import '../test_utils/test_data.dart';
 
 void main() {
   group(RegistrationData, () {
+    setUpAll(() async {
+      await CatalystKeyDerivation.init();
+    });
+
     test('from and to cbor', () {
       final derCert = X509DerCertificate.fromHex(derCertHex);
       final c509Cert = C509Certificate.fromHex(c509CertHex);
@@ -13,7 +18,7 @@ void main() {
       final original = RegistrationData(
         derCerts: [derCert],
         cborCerts: [c509Cert],
-        publicKeys: [Ed25519PublicKey.seeded(0)],
+        publicKeys: [Ed25519ExtendedPublicKey.seeded(0)],
         revocationSet: [
           CertificateHash.fromX509DerCertificate(derCert),
           CertificateHash.fromC509Certificate(c509Cert),

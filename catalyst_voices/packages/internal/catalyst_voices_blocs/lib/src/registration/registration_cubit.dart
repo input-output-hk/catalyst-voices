@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart';
@@ -27,7 +28,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _progressNotifier;
 
-  Ed25519KeyPair? _keyPair;
+  Ed25519ExtendedPrivateKey? _masterKey;
   Transaction? _transaction;
 
   /// Returns [RegistrationCubit] if found in widget tree. Does not add
@@ -168,20 +169,18 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final wallet = _walletLinkCubit.selectedWallet!;
       final roles = _walletLinkCubit.roles;
 
-      final keyPair = await _registrationService.deriveAccountRoleKeyPair(
-        seedPhrase: seedPhrase,
-        roles: roles,
-      );
+      final masterKey =
+          await _registrationService.deriveMasterKey(seedPhrase: seedPhrase);
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
         // TODO(dtscalac): inject the networkId
         networkId: NetworkId.testnet,
-        keyPair: keyPair,
+        masterKey: masterKey,
         roles: roles,
       );
 
-      _keyPair = keyPair;
+      _masterKey = masterKey;
       _transaction = transaction;
 
       final fee = transaction.body.fee;
@@ -197,7 +196,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     } on RegistrationException catch (error, stackTrace) {
       _logger.severe('Prepare registration', error, stackTrace);
 
-      _keyPair = null;
+      _masterKey?.drop();
+      _masterKey = null;
       _transaction = null;
 
       final exception = LocalizedRegistrationException.from(error);
@@ -220,7 +220,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
       );
 
-      final keyPair = _keyPair!;
+      final masterKey = _masterKey!;
       final transaction = _transaction!;
 
       final password = _keychainCreationCubit.password;
@@ -234,8 +234,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         unsignedTx: transaction,
         roles: roles,
         lockFactor: lockFactor,
-        // TODO(dtscalac): Update key value when derivation is final.
-        keyPair: keyPair,
+        masterKey: masterKey,
       );
 
       await _userService.useAccount(account);
