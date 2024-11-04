@@ -200,7 +200,7 @@ pinenacl
 plpgsql
 podfile
 podhelper
-podspec
+Podspec
 postcss
 Pozhylenkov
 Precache
@@ -276,7 +276,6 @@ Toastify
 todos
 toggleable
 tojunit
-toolsets
 Traceback
 traefik
 trailings
@@ -317,9 +316,5 @@ xcodeproj
 xctest
 xctestrun
 xcworkspace
-xprivate
-xprv
-xpub
-xpublic
 xvfb
 yoroi
