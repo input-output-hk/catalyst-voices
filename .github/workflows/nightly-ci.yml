@@ -67,7 +67,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst_voices_packages/catalyst_cardano/catalyst_cardano/wallet-automation/
+            earthfile: ./catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/wallet-automation/
             flags: --allow-privileged
             targets: nightly-test
             target_flags:

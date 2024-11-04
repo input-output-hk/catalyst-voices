@@ -2,7 +2,7 @@
 
 /catalyst_voices/ @minikin
 
-/catalyst_voices_packages/ @minikin @stevenj
+/catalyst_voices/packages/libs/ @minikin @stevenj
 
 /catalyst-gateway/ @stevenj @Mr-Leshiy @FelipeRosa @cong-or @saibatizoku @minikin
 
