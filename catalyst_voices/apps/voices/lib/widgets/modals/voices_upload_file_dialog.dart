@@ -261,9 +261,9 @@ class _UploadContainerState extends State<_UploadContainer> {
                   onCreated: (DropzoneViewController ctrl) => setState(() {
                     _dropzoneController = ctrl;
                   }),
-                  onDropFile: (file) async {
-                    final bytes = await _dropzoneController.getFileData(file);
-                    final name = await _dropzoneController.getFilename(file);
+                  onDrop: (ev) async {
+                    final bytes = await _dropzoneController.getFileData(ev);
+                    final name = await _dropzoneController.getFilename(ev);
                     widget.onFileSelected?.call(
                       VoicesFile(
                         name: name,
