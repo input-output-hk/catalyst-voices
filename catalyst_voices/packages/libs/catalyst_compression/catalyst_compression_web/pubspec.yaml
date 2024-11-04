@@ -1,0 +1,35 @@
+name: catalyst_compression_web
+description: Web platform implementation of catalyst_compression. Exposes a JS wrapper around Brotli and zstd compression algorithms.
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_compression/catalyst_compression_web
+issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
+topics: [compression, codec]
+version: 0.3.0
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.1"
+
+flutter:
+  plugin:
+    implements: catalyst_compression
+    platforms:
+      web:
+        pluginClass: CatalystCompressionWeb
+        fileName: catalyst_compression_web.dart
+
+  assets:
+    - assets/js/
+
+dependencies:
+  catalyst_compression_platform_interface: ^0.2.0
+  convert: ^3.1.1
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  web: ^1.1.0
+
+dev_dependencies:
+  catalyst_analysis: ^2.0.0
+  flutter_test:
+    sdk: flutter

@@ -200,7 +200,6 @@ pinenacl
 plpgsql
 podfile
 podhelper
-podspec
 Podspec
 postcss
 Pozhylenkov
@@ -317,9 +316,5 @@ xcodeproj
 xctest
 xctestrun
 xcworkspace
-xprivate
-xprv
-xpub
-xpublic
 xvfb
 yoroi

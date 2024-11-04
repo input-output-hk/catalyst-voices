@@ -1,0 +1,16 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:feat/add-flutter-rust-bridge AS flutter_rust_bridge
+
+builder:
+    FROM flutter_rust_bridge+builder
+    COPY . .
+
+# Generated necessary files for running Flutter web locally and save it locally.
+code-generator:
+    FROM +builder
+    DO flutter_rust_bridge+CODE_GENERATOR_WEB
+
+    SAVE ARTIFACT ./web/pkg AS LOCAL ./example/web/pkg
+    SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
+    SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src

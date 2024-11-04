@@ -1,0 +1,37 @@
+name: catalyst_cardano_web
+description: Web platform implementation of catalyst_cardano. Allows to communicate with the Cardano Wallet Extension via js_interop integration.
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano_web
+issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
+topics: [blockchain, cardano, cryptocurrency, wallet]
+version: 0.3.0
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.1"
+
+flutter:
+  plugin:
+    implements: catalyst_cardano
+    platforms:
+      web:
+        pluginClass: CatalystCardanoWeb
+        fileName: catalyst_cardano_web.dart
+
+  assets:
+    - assets/js/
+
+dependencies:
+  catalyst_cardano_platform_interface: ^0.3.0
+  catalyst_cardano_serialization: ^0.4.0
+  cbor: ^6.2.0
+  convert: ^3.1.1
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  web: ^1.1.0
+
+dev_dependencies:
+  catalyst_analysis: ^2.0.0
+  flutter_test:
+    sdk: flutter
