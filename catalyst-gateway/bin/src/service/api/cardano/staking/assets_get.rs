@@ -1,11 +1,11 @@
-//! Implementation of the GET `/staked_ada` endpoint
+//! Implementation of the GET `../assets` endpoint
 use std::collections::HashMap;
 
 use anyhow::anyhow;
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use super::types::SlotNumber;
+use super::SlotNumber;
 use crate::{
     db::index::{
         queries::staked_ada::{
