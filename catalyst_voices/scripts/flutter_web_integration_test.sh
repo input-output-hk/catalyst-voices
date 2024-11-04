@@ -6,9 +6,9 @@ set -e
 # Wait for 5 seconds to allow ChromeDriver to start
 sleep 5
 
-cd ./catalyst_voices
+cd ./catalyst_voices/apps/voices
 
-flutter drive --driver=test_driver/integration_test.dart \
+flutter drive --driver=test_driver/integration_tests.dart \
 --target=integration_test/main.dart \
 --flavor development \
 -d web-server \

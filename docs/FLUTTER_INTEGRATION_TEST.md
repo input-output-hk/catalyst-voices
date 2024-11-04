@@ -48,7 +48,7 @@ and select the appropriate history.
 Navigate to `catalyst_voices/apps/voices` and run:
 
 ```sh
-flutter drive --driver=test_driver/integration_test.dart \
+flutter drive --driver=test_driver/integration_tests.dart \
 --target=integration_test/main.dart \
 --flavor development \
 -d chrome
@@ -108,13 +108,13 @@ flutter test integration_test/main.dart --flavor development
 Android:
 
 ```sh
-./scripts/flutter_android_integration_test.sh
+./catalyst_voices/scripts/flutter_android_integration_test.sh
 ```
 
 iOS:
 
 ```sh
-./scripts/flutter_ios_integration_test.sh
+./catalyst_voices/scripts/flutter_ios_integration_test.sh
 ```
 
 ## Gcloud CLI
