@@ -50,4 +50,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.UIKIT_FIREBASE_SERVICE_ACCOUNT }}"
           projectId: "${{ secrets.UIKIT_FIREBASE_PROJECT_ID }}"
           channelId: live
-          entryPoint: catalyst_voices/uikit_example
+          entryPoint: catalyst_voices/utilities/uikit_example
