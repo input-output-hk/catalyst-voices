@@ -261,7 +261,7 @@ class _UploadContainerState extends State<_UploadContainer> {
                   onCreated: (DropzoneViewController ctrl) => setState(() {
                     _dropzoneController = ctrl;
                   }),
-                  onDropFile: (ev) async {
+                  onDrop: (ev) async {
                     final bytes = await _dropzoneController.getFileData(ev);
                     final name = await _dropzoneController.getFilename(ev);
                     widget.onFileSelected?.call(
