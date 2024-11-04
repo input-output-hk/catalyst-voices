@@ -971,5 +971,9 @@
   "incorrectUploadDialogSubtitle": "CATALYST KEY INCORRECT",
   "incorrectUploadDialogContent": "The Catalyst keychain that you entered or uploaded is incorrect, please try again.",
   "incorrectUploadDialogTryAgainButton": "Try again",
-  "finishAccountCreation": "Finish account creation"
+  "finishAccountCreation": "Finish account creation",
+  "connectDifferentWallet": "Connect a different wallet",
+  "@connectDifferentWallet": {
+    "description": "A button label to connect a different wallet in wallet detail panel."
+  }
 }

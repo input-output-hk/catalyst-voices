@@ -994,4 +994,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get finishAccountCreation => 'Finish account creation';
+
+  @override
+  String get connectDifferentWallet => 'Connect a different wallet';
 }
