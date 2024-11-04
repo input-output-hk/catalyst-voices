@@ -10,7 +10,7 @@ use std::{
 
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
-    types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 use serde_json::Value;
 
@@ -57,9 +57,9 @@ impl_string_types!(
     is_valid
 );
 
-impl Ed25519HexEncodedPublicKey {
+impl Example for Ed25519HexEncodedPublicKey {
     /// An example 32 bytes ED25519 Public Key.
-    pub(crate) fn example() -> Self {
+    fn example() -> Self {
         Self(EXAMPLE.to_owned())
     }
 }
@@ -74,10 +74,14 @@ impl TryFrom<Vec<u8>> for Ed25519HexEncodedPublicKey {
     }
 }
 
-impl TryInto<ed25519_dalek::VerifyingKey> for Ed25519HexEncodedPublicKey {
-    type Error = anyhow::Error;
-
-    fn try_into(self) -> Result<ed25519_dalek::VerifyingKey, Self::Error> {
-        ed25519::verifying_key_from_hex(&self.0)
+// Because it is impossible for the Encoded Key to not be a valid Verifying Key, we can
+// ensure this method is infallible.
+// All creation of this type should come from TryFrom<Vec<u8>>, or one of the
+// deserialization methods.
+impl From<Ed25519HexEncodedPublicKey> for ed25519_dalek::VerifyingKey {
+    fn from(val: Ed25519HexEncodedPublicKey) -> Self {
+        #[allow(clippy::expect_used)]
+        ed25519::verifying_key_from_hex(&val.0)
+            .expect("This can only fail if the type was invalidly constructed.")
     }
 }

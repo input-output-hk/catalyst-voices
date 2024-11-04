@@ -132,12 +132,7 @@ impl Api {
         _auth: NoneOrRBAC,
     ) -> cip36::SingleRegistrationResponse {
         let hex_key = stake_pub_key.0;
-        let pub_key: VerifyingKey = match hex_key.try_into() {
-            Ok(key) => key,
-            Err(_) => {
-                return cip36::ResponseSingleRegistration::NotFound.into();
-            },
-        };
+        let pub_key: VerifyingKey = hex_key.into();
 
         cip36::get_latest_registration_from_stake_addr(&pub_key, true).await
     }
