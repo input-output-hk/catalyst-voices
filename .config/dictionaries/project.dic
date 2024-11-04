@@ -2,6 +2,7 @@ aapt
 aarch
 abnf
 addr
+addrof
 addrr
 adminer
 afinet
@@ -10,6 +11,7 @@ anypolicy
 appbar
 appspot
 Arbritrary
+ARCHS
 ARGB
 Arissara
 asmjs
@@ -28,8 +30,10 @@ bluefireteam
 BROTLI
 canvaskit
 cardano
+cargokit
 carryforward
 Catalyst
+cbindgen
 CBOR
 cborg
 cborseq
@@ -78,6 +82,7 @@ earthfile
 Easterling
 eddsa
 Edgedriver
+Embedder
 emurgo
 encryptor
 endfunction
@@ -115,6 +120,7 @@ interps
 inversed
 iohk
 iphoneos
+iphonesimulator
 jdbc
 jetbrains
 Joaquín
@@ -124,6 +130,7 @@ Jörmungandr
 jsonschema
 junitreport
 junitxml
+Justfile
 keychains
 Keyhash
 keyserver
@@ -139,12 +146,14 @@ libasound
 libatk
 libatspi
 libavcodec
+libcatalyst
 libdrm
 libflutter
 libgbm
 libnss
 libxkbcommon
 libxshmfence
+Lifetimeable
 lintfix
 localizable
 loguru
@@ -160,6 +169,7 @@ miniaturizable
 minicbor
 mithril
 mitigations
+mocktail
 moderations
 moka
 msedgedriver
@@ -190,6 +200,7 @@ pinenacl
 plpgsql
 podfile
 podhelper
+Podspec
 postcss
 Pozhylenkov
 Precache
@@ -238,8 +249,10 @@ servernum
 serviceworker
 slotno
 sqlfluff
+SRCROOT
 sslmode
 sstableinfo
+staticlib
 Stefano
 stevenj
 stringzilla
@@ -305,17 +318,3 @@ xctestrun
 xcworkspace
 xvfb
 yoroi
-Pbkdf2
-Embedder
-Podspec
-podspec
-ARCHS
-iphonesimulator
-cargokit
-SRCROOT
-libcatalyst
-staticlib
-addrof
-Lifetimeable
-cbindgen
-mocktail

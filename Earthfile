@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.2.21 AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.2.21 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.21 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.2.22 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.2.22 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.22 AS postgresql-ci
 
 FROM debian:stable-slim
 
@@ -40,25 +40,5 @@ repo-docs:
 
     WORKDIR /repo
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
-
-    SAVE ARTIFACT /repo repo
-
-# repo-catalyst-voices-packages - Create artifacts of catalyst_voices_packages
-# we need to refer to in other earthly targets.
-repo-catalyst-voices-packages:
-    FROM scratch
-
-    WORKDIR /repo
-    COPY --dir catalyst_voices_packages .
-
-    SAVE ARTIFACT /repo repo
-
-# repo-catalyst-voices-all - Creates artifacts of all configuration files,
-# packages and folders related to catalyst_voices frontend.
-repo-catalyst-voices-all:
-    FROM scratch
-
-    WORKDIR /repo
-    COPY --dir catalyst_voices catalyst_voices_packages utilities melos.yaml pubspec.yaml  .
 
     SAVE ARTIFACT /repo repo
