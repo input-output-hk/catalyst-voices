@@ -21,7 +21,7 @@ updates:
       - "minikin"
 
   - package-ecosystem: "pub"
-    directory: "/catalyst_voices_packages"
+    directory: "/catalyst_voices/packages/libs"
     schedule:
       interval: "monthly"
     assignees:
