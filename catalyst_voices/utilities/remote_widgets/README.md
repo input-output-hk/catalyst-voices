@@ -5,4 +5,4 @@
 This package provides a set of widgets that can be used to build remote data-driven UIs.
 
 For  more navigate to the
-[example](/catalyst_voices/packages/catalyst_voices_remote_widgets/example/README.md)
+[example](/catalyst_voices/utilities/remote_widgets/example/README.md)
