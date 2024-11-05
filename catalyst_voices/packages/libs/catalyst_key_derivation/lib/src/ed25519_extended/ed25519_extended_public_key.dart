@@ -9,14 +9,14 @@ import 'package:equatable/equatable.dart';
 
 /// The ED25519 public key that is 256 bits long.
 class Ed25519ExtendedPublicKey extends Equatable {
-  final rust.XPubBytes _bytes;
+  final rust.Bip32Ed25519XPublicKey _bytes;
 
   /// The default constructor for [Ed25519ExtendedPublicKey].
   const Ed25519ExtendedPublicKey(this._bytes);
 
   /// Constructs [Ed25519ExtendedPublicKey] from a byte list.
   Ed25519ExtendedPublicKey.fromBytes(List<int> bytes)
-      : _bytes = rust.XPubBytes(
+      : _bytes = rust.Bip32Ed25519XPublicKey(
           xpubBytes: rust.U8Array64(Uint8List.fromList(bytes)),
         );
 
@@ -56,7 +56,7 @@ class Ed25519ExtendedPublicKey extends Equatable {
   }) async {
     return _bytes.verifySignature(
       data: message,
-      signature: rust.SignatureBytes(
+      signature: rust.Bip32Ed25519Signature(
         sigBytes: rust.U8Array64(
           Uint8List.fromList(signature.bytes),
         ),

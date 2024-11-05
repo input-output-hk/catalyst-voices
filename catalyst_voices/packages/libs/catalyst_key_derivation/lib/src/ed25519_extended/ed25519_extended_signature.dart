@@ -8,14 +8,14 @@ import 'package:equatable/equatable.dart';
 
 /// The witness signature of the transaction.
 class Ed25519ExtendedSignature extends Equatable {
-  final rust.SignatureBytes _bytes;
+  final rust.Bip32Ed25519Signature _bytes;
 
   /// The default constructor for [Ed25519ExtendedSignature].
   const Ed25519ExtendedSignature(this._bytes);
 
   /// Constructs [Ed25519ExtendedSignature] from a byte list.
   Ed25519ExtendedSignature.fromBytes(List<int> bytes)
-      : _bytes = rust.SignatureBytes(
+      : _bytes = rust.Bip32Ed25519Signature(
           sigBytes: rust.U8Array64(Uint8List.fromList(bytes)),
         );
 
