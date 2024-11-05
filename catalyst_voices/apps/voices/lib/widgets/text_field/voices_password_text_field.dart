@@ -13,6 +13,9 @@ final class VoicesPasswordTextField extends StatelessWidget {
   /// Emits new value when widget input changes.
   final ValueChanged<String>? onChanged;
 
+  /// Calls event to end some actions using for example enter key
+  final ValueChanged<String>? onSubmitted;
+
   /// Optional decoration. See [VoicesTextField] for more details.
   final VoicesTextFieldDecoration? decoration;
 
@@ -21,6 +24,7 @@ final class VoicesPasswordTextField extends StatelessWidget {
     this.controller,
     this.textInputAction = TextInputAction.done,
     this.onChanged,
+    this.onSubmitted,
     this.decoration,
   });
 
@@ -32,6 +36,7 @@ final class VoicesPasswordTextField extends StatelessWidget {
       obscureText: true,
       textInputAction: textInputAction,
       onChanged: onChanged,
+      onFieldSubmitted: onSubmitted,
       decoration: decoration,
       inputFormatters: [
         FilteringTextInputFormatter.singleLineFormatter,
