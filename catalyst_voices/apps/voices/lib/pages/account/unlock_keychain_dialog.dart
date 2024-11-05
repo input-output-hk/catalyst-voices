@@ -141,9 +141,9 @@ class _UnlockPasswordPanel extends StatelessWidget {
 }
 
 class _UnlockPassword extends StatelessWidget {
-  final VoidCallback onUnlock;
   final TextEditingController controller;
   final LocalizedException? error;
+  final VoidCallback onUnlock;
 
   const _UnlockPassword({
     required this.controller,
@@ -160,7 +160,7 @@ class _UnlockPassword extends StatelessWidget {
         errorText: error?.message(context),
         hintText: context.l10n.passwordLabelText,
       ),
-      onSubmitted: (val) => onUnlock.call(),
+      onSubmitted: (val) => onUnlock(),
     );
   }
 }
