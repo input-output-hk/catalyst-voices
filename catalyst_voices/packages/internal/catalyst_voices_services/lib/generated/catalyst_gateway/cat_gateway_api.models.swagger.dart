@@ -116,7 +116,7 @@ extension $BlockDateExtension on BlockDate {
 @JsonSerializable(explicitToJson: true)
 class Cip36Info {
   const Cip36Info({
-    required this.stakeAddress,
+    required this.stakePubKey,
     required this.nonce,
     required this.slotNo,
     required this.txn,
@@ -132,8 +132,8 @@ class Cip36Info {
   static const toJsonFactory = _$Cip36InfoToJson;
   Map<String, dynamic> toJson() => _$Cip36InfoToJson(this);
 
-  @JsonKey(name: 'stake_address')
-  final String stakeAddress;
+  @JsonKey(name: 'stake_pub_key')
+  final String stakePubKey;
   @JsonKey(name: 'nonce')
   final int nonce;
   @JsonKey(name: 'slot_no')
@@ -154,9 +154,9 @@ class Cip36Info {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is Cip36Info &&
-            (identical(other.stakeAddress, stakeAddress) ||
+            (identical(other.stakePubKey, stakePubKey) ||
                 const DeepCollectionEquality()
-                    .equals(other.stakeAddress, stakeAddress)) &&
+                    .equals(other.stakePubKey, stakePubKey)) &&
             (identical(other.nonce, nonce) ||
                 const DeepCollectionEquality().equals(other.nonce, nonce)) &&
             (identical(other.slotNo, slotNo) ||
@@ -181,7 +181,7 @@ class Cip36Info {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(stakeAddress) ^
+      const DeepCollectionEquality().hash(stakePubKey) ^
       const DeepCollectionEquality().hash(nonce) ^
       const DeepCollectionEquality().hash(slotNo) ^
       const DeepCollectionEquality().hash(txn) ^
@@ -194,7 +194,7 @@ class Cip36Info {
 
 extension $Cip36InfoExtension on Cip36Info {
   Cip36Info copyWith(
-      {String? stakeAddress,
+      {String? stakePubKey,
       int? nonce,
       int? slotNo,
       int? txn,
@@ -203,7 +203,7 @@ extension $Cip36InfoExtension on Cip36Info {
       bool? isPayable,
       bool? cip36}) {
     return Cip36Info(
-        stakeAddress: stakeAddress ?? this.stakeAddress,
+        stakePubKey: stakePubKey ?? this.stakePubKey,
         nonce: nonce ?? this.nonce,
         slotNo: slotNo ?? this.slotNo,
         txn: txn ?? this.txn,
@@ -214,7 +214,7 @@ extension $Cip36InfoExtension on Cip36Info {
   }
 
   Cip36Info copyWithWrapped(
-      {Wrapped<String>? stakeAddress,
+      {Wrapped<String>? stakePubKey,
       Wrapped<int>? nonce,
       Wrapped<int>? slotNo,
       Wrapped<int>? txn,
@@ -223,8 +223,8 @@ extension $Cip36InfoExtension on Cip36Info {
       Wrapped<bool>? isPayable,
       Wrapped<bool>? cip36}) {
     return Cip36Info(
-        stakeAddress:
-            (stakeAddress != null ? stakeAddress.value : this.stakeAddress),
+        stakePubKey:
+            (stakePubKey != null ? stakePubKey.value : this.stakePubKey),
         nonce: (nonce != null ? nonce.value : this.nonce),
         slotNo: (slotNo != null ? slotNo.value : this.slotNo),
         txn: (txn != null ? txn.value : this.txn),
@@ -1802,7 +1802,7 @@ extension $StakeInfoExtension on StakeInfo {
 class StakedNativeTokenInfo {
   const StakedNativeTokenInfo({
     required this.policyHash,
-    required this.policyName,
+    required this.assetName,
     required this.amount,
   });
 
@@ -1814,8 +1814,8 @@ class StakedNativeTokenInfo {
 
   @JsonKey(name: 'policy_hash')
   final String policyHash;
-  @JsonKey(name: 'policy_name')
-  final String policyName;
+  @JsonKey(name: 'asset_name')
+  final String assetName;
   @JsonKey(name: 'amount')
   final int amount;
   static const fromJsonFactory = _$StakedNativeTokenInfoFromJson;
@@ -1827,9 +1827,9 @@ class StakedNativeTokenInfo {
             (identical(other.policyHash, policyHash) ||
                 const DeepCollectionEquality()
                     .equals(other.policyHash, policyHash)) &&
-            (identical(other.policyName, policyName) ||
+            (identical(other.assetName, assetName) ||
                 const DeepCollectionEquality()
-                    .equals(other.policyName, policyName)) &&
+                    .equals(other.assetName, assetName)) &&
             (identical(other.amount, amount) ||
                 const DeepCollectionEquality().equals(other.amount, amount)));
   }
@@ -1840,27 +1840,27 @@ class StakedNativeTokenInfo {
   @override
   int get hashCode =>
       const DeepCollectionEquality().hash(policyHash) ^
-      const DeepCollectionEquality().hash(policyName) ^
+      const DeepCollectionEquality().hash(assetName) ^
       const DeepCollectionEquality().hash(amount) ^
       runtimeType.hashCode;
 }
 
 extension $StakedNativeTokenInfoExtension on StakedNativeTokenInfo {
   StakedNativeTokenInfo copyWith(
-      {String? policyHash, String? policyName, int? amount}) {
+      {String? policyHash, String? assetName, int? amount}) {
     return StakedNativeTokenInfo(
         policyHash: policyHash ?? this.policyHash,
-        policyName: policyName ?? this.policyName,
+        assetName: assetName ?? this.assetName,
         amount: amount ?? this.amount);
   }
 
   StakedNativeTokenInfo copyWithWrapped(
       {Wrapped<String>? policyHash,
-      Wrapped<String>? policyName,
+      Wrapped<String>? assetName,
       Wrapped<int>? amount}) {
     return StakedNativeTokenInfo(
         policyHash: (policyHash != null ? policyHash.value : this.policyHash),
-        policyName: (policyName != null ? policyName.value : this.policyName),
+        assetName: (assetName != null ? assetName.value : this.assetName),
         amount: (amount != null ? amount.value : this.amount));
   }
 }

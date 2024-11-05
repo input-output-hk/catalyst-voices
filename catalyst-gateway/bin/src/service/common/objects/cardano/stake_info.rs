@@ -2,20 +2,22 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::service::api::cardano::types::{SlotNumber, StakeAmount};
+use crate::service::{
+    api::cardano::types::{SlotNumber, StakeAmount},
+    common::types::cardano::{
+        asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28,
+    },
+};
 
 /// User's staked native token info.
 #[derive(Object)]
 pub(crate) struct StakedNativeTokenInfo {
     /// Token policy hash.
-    #[oai(validator(max_length = "256", pattern = "^0x[a-f0-9]+$"))]
-    pub(crate) policy_hash: String,
-    /// Token policy name.
-    #[oai(validator(max_length = "256", pattern = ".*"))]
-    pub(crate) policy_name: String,
-    /// Token amount.
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub(crate) amount: StakeAmount,
+    pub(crate) policy_hash: HexEncodedHash28,
+    /// Token policies Asset Name.
+    pub(crate) asset_name: AssetName,
+    /// Token Asset Value.
+    pub(crate) amount: AssetValue,
 }
 
 /// User's cardano stake info.
