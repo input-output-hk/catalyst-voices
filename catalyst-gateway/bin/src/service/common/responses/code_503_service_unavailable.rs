@@ -26,6 +26,11 @@ impl ServiceUnavailable {
 
         Self { id, msg }
     }
+
+    /// Get the id of this Server Error.
+    pub(crate) fn id(&self) -> Uuid {
+        self.id
+    }
 }
 
 impl Example for ServiceUnavailable {

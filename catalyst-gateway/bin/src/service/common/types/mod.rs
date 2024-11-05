@@ -9,5 +9,6 @@
 //! or integer.
 
 pub(crate) mod cardano;
+pub(crate) mod generic;
 pub(crate) mod headers;
 pub(crate) mod string_types;

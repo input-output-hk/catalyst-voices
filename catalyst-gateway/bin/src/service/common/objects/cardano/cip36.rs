@@ -2,6 +2,8 @@
 
 use poem_openapi::{types::Example, Object};
 
+use crate::service::common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey;
+
 /// List of CIP36 Registration Data as found on-chain.
 #[derive(Object, Default)]
 #[oai(example = true)]
@@ -60,12 +62,11 @@ impl Example for Cip36Reporting {
 }
 
 /// CIP36 Registration Data as found on-chain.
-#[derive(Object, Default)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Cip36Info {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-    pub stake_address: String,
+    pub stake_pub_key: Ed25519HexEncodedPublicKey, // Validation provided by type
     /// Nonce value after normalization.
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub nonce: u64,
@@ -90,8 +91,7 @@ pub(crate) struct Cip36Info {
 impl Example for Cip36Info {
     fn example() -> Self {
         Self {
-            stake_address: "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee"
-                .to_string(),
+            stake_pub_key: Ed25519HexEncodedPublicKey::example(),
             nonce: 0,
             slot_no: 12345,
             txn: 0,
@@ -105,15 +105,14 @@ impl Example for Cip36Info {
 }
 
 /// Invalid registration error reporting.
-#[derive(Object, Default)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct InvalidRegistrationsReport {
     /// Error report
     #[oai(validator(max_items = "100000", max_length = "100", pattern = ".*"))]
     pub error_report: Vec<String>,
-    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-    pub stake_address: String,
+    /// Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
+    pub stake_address: Ed25519HexEncodedPublicKey, // Validation provided by the type.
     /// Voting Public Key
     #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
     pub vote_key: String,
@@ -130,7 +129,7 @@ impl Example for InvalidRegistrationsReport {
     fn example() -> Self {
         Self {
             error_report: vec!["Invalid registration".to_string()],
-            stake_address: "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee".to_string(),
+            stake_address: Ed25519HexEncodedPublicKey::example(),
             vote_key: "0xa6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663".to_string(),
             payment_address: "0x00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee47b60edc7772855324c85033c638364214cbfc6627889f81c4".to_string(),
             is_payable: false,
