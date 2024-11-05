@@ -31,7 +31,7 @@ Map<String, dynamic> _$BlockDateToJson(BlockDate instance) => <String, dynamic>{
     };
 
 Cip36Info _$Cip36InfoFromJson(Map<String, dynamic> json) => Cip36Info(
-      stakeAddress: json['stake_address'] as String,
+      stakePubKey: json['stake_pub_key'] as String,
       nonce: (json['nonce'] as num).toInt(),
       slotNo: (json['slot_no'] as num).toInt(),
       txn: (json['txn'] as num).toInt(),
@@ -42,7 +42,7 @@ Cip36Info _$Cip36InfoFromJson(Map<String, dynamic> json) => Cip36Info(
     );
 
 Map<String, dynamic> _$Cip36InfoToJson(Cip36Info instance) => <String, dynamic>{
-      'stake_address': instance.stakeAddress,
+      'stake_pub_key': instance.stakePubKey,
       'nonce': instance.nonce,
       'slot_no': instance.slotNo,
       'txn': instance.txn,
@@ -436,7 +436,7 @@ StakedNativeTokenInfo _$StakedNativeTokenInfoFromJson(
         Map<String, dynamic> json) =>
     StakedNativeTokenInfo(
       policyHash: json['policy_hash'] as String,
-      policyName: json['policy_name'] as String,
+      assetName: json['asset_name'] as String,
       amount: (json['amount'] as num).toInt(),
     );
 
@@ -444,7 +444,7 @@ Map<String, dynamic> _$StakedNativeTokenInfoToJson(
         StakedNativeTokenInfo instance) =>
     <String, dynamic>{
       'policy_hash': instance.policyHash,
-      'policy_name': instance.policyName,
+      'asset_name': instance.assetName,
       'amount': instance.amount,
     };
 
