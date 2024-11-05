@@ -2,6 +2,7 @@
 
 use std::{cmp::Reverse, sync::Arc};
 
+use anyhow::anyhow;
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 use tracing::error;
@@ -9,7 +10,7 @@ use tracing::error;
 use crate::{
     db::index::{
         queries::registrations::{
-            get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
+            get_from_stake_addr::GetRegistrationQuery,
             get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
             get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
             get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
@@ -21,7 +22,9 @@ use crate::{
             Cip36Info, Cip36Reporting, Cip36ReportingList, InvalidRegistrationsReport,
         },
         responses::WithErrorResponses,
+        types::headers::retry_after::RetryAfterOption,
     },
+    utils::ed25519,
 };
 
 /// Endpoint responses.
@@ -51,18 +54,10 @@ pub(crate) type SingleRegistrationResponse = WithErrorResponses<ResponseSingleRe
 /// All responses voting key
 pub(crate) type MultipleRegistrationResponse = WithErrorResponses<ResponseMultipleRegistrations>;
 
-/// Get latest registration given a stake address
+/// Get latest registration given a stake public key
 pub(crate) async fn get_latest_registration_from_stake_addr(
-    stake_addr: String, persistent: bool,
+    stake_pub_key: &ed25519_dalek::VerifyingKey, persistent: bool,
 ) -> SingleRegistrationResponse {
-    let stake_addr = match hex::decode(stake_addr) {
-        Ok(stake_addr) => stake_addr,
-        Err(err) => {
-            error!(id="get_latest_registration_from_stake_addr", error=?err, "Failed to decode stake addr");
-            return ResponseSingleRegistration::NotFound.into();
-        },
-    };
-
     let Some(session) = CassandraSession::get(persistent) else {
         error!(
             id = "get_latest_registration_from_stake_addr",
@@ -72,7 +67,7 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
     };
 
     let registration =
-        match latest_registration_from_stake_addr(stake_addr.clone(), session.clone()).await {
+        match latest_registration_from_stake_addr(stake_pub_key, session.clone()).await {
             Ok(registrations) => registrations,
             Err(err) => {
                 error!(
@@ -84,13 +79,10 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
             },
         };
 
-    let invalids_report = match get_invalid_registrations(
-        registration.stake_address.clone(),
-        registration.slot_no.into(),
-        session,
-    )
-    .await
-    {
+    let raw_invalids =
+        get_invalid_registrations(stake_pub_key, registration.slot_no.into(), session).await;
+
+    let invalids_report = match raw_invalids {
         Ok(invalids) => invalids,
         Err(err) => {
             error!(
@@ -109,17 +101,19 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
 
 /// Get latest registration given a stake addr
 async fn latest_registration_from_stake_addr(
-    stake_addr: Vec<u8>, session: Arc<CassandraSession>,
+    stake_pub_key: &ed25519_dalek::VerifyingKey, session: Arc<CassandraSession>,
 ) -> anyhow::Result<Cip36Info> {
-    sort_latest_registration(get_all_registrations_from_stake_addr(session, stake_addr).await?)
+    sort_latest_registration(
+        get_all_registrations_from_stake_pub_key(session, stake_pub_key).await?,
+    )
 }
 
 /// Get all cip36 registrations for a given stake address.
-async fn get_all_registrations_from_stake_addr(
-    session: Arc<CassandraSession>, stake_addr: Vec<u8>,
+async fn get_all_registrations_from_stake_pub_key(
+    session: Arc<CassandraSession>, stake_pub_key: &ed25519_dalek::VerifyingKey,
 ) -> Result<Vec<Cip36Info>, anyhow::Error> {
     let mut registrations_iter =
-        GetRegistrationQuery::execute(&session, GetRegistrationParams::new(stake_addr)).await?;
+        GetRegistrationQuery::execute(&session, stake_pub_key.into()).await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
         let row = row?;
@@ -137,7 +131,7 @@ async fn get_all_registrations_from_stake_addr(
         };
 
         let cip36 = Cip36Info {
-            stake_address: hex::encode(row.stake_address),
+            stake_pub_key: row.stake_address.try_into()?,
             nonce,
             slot_no,
             txn: row.txn,
@@ -162,13 +156,12 @@ fn sort_latest_registration(mut registrations: Vec<Cip36Info>) -> anyhow::Result
 
 /// Get invalid registrations for stake addr after given slot no
 async fn get_invalid_registrations(
-    stake_addr: String, slot_no: num_bigint::BigInt, session: Arc<CassandraSession>,
+    stake_pub_key: &ed25519_dalek::VerifyingKey, slot_no: num_bigint::BigInt,
+    session: Arc<CassandraSession>,
 ) -> anyhow::Result<Vec<InvalidRegistrationsReport>> {
-    let stake_addr = hex::decode(stake_addr)?;
-
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
         &session,
-        GetInvalidRegistrationParams::new(stake_addr, slot_no),
+        GetInvalidRegistrationParams::new(stake_pub_key.as_bytes().to_vec(), slot_no),
     )
     .await?;
     let mut invalid_registrations = Vec::new();
@@ -177,7 +170,7 @@ async fn get_invalid_registrations(
 
         invalid_registrations.push(InvalidRegistrationsReport {
             error_report: row.error_report,
-            stake_address: hex::encode(row.stake_address),
+            stake_address: row.stake_address.try_into()?,
             vote_key: hex::encode(row.vote_key),
             payment_address: hex::encode(row.payment_address),
             is_payable: row.is_payable,
@@ -212,11 +205,9 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
-        error!(
-            id = "get_latest_registration_from_stake_key_hash_db_session",
-            "Failed to acquire db session"
-        );
-        return ResponseSingleRegistration::NotFound.into();
+        error!("Failed to acquire db session");
+        let err = anyhow::anyhow!("Failed to acquire db session");
+        return SingleRegistrationResponse::service_unavailable(&err, RetryAfterOption::Default);
     };
 
     // Get stake addr associated with give stake hash
@@ -246,8 +237,17 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             },
         };
 
+        let stake_pub_key = match ed25519::verifying_key_from_vec(&row.stake_address) {
+            Ok(v) => v,
+            Err(err) => {
+                error!(error=?err, "Invalid Stake Public Key in database.");
+                let err = anyhow!(err);
+                return SingleRegistrationResponse::internal_error(&err);
+            },
+        };
+
         let registration = match latest_registration_from_stake_addr(
-            row.stake_address.clone(),
+            &stake_pub_key,
             session.clone(),
         )
         .await
@@ -266,7 +266,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
         // include any erroneous registrations which occur AFTER the slot# of the last valid
         // registration
         let invalids_report = match get_invalid_registrations(
-            registration.stake_address.clone(),
+            &stake_pub_key,
             registration.slot_no.into(),
             session,
         )
@@ -347,12 +347,22 @@ pub(crate) async fn get_associated_vote_key_registrations(
             },
         };
 
+        let stake_pub_key = match ed25519::verifying_key_from_vec(&row.stake_address) {
+            Ok(k) => k,
+            Err(err) => {
+                error!(
+                    id="get_associated_vote_key_registrations_latest_registration",
+                    error=?err,
+                    "Not a valid staking public key"
+                );
+                return ResponseMultipleRegistrations::NotFound.into();
+            },
+        };
+
         // We have the stake addr associated with vote key, now get all registrations with the
         // stake addr.
         let registrations =
-            match get_all_registrations_from_stake_addr(session.clone(), row.stake_address.clone())
-                .await
-            {
+            match get_all_registrations_from_stake_pub_key(session.clone(), &stake_pub_key).await {
                 Ok(registration) => registration,
                 Err(err) => {
                     error!(
@@ -375,7 +385,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
 
         for registration in redacted_registrations {
             let invalids_report = match get_invalid_registrations(
-                registration.stake_address.clone(),
+                &stake_pub_key,
                 registration.slot_no.into(),
                 session.clone(),
             )
