@@ -1,4 +1,4 @@
-//! Hermes binary build info
+//! Binary build info
 
 use build_info::{self as build_info_crate};
 use local_ip_address::list_afinet_netifas;
@@ -6,7 +6,7 @@ use tracing::info;
 
 use crate::service::utilities;
 
-/// Formatted hermes binary build info
+/// Formatted Binary build info
 pub(crate) const BUILD_INFO: &str = build_info_crate::format!("
 version: {},
 git info: {{{}}}
