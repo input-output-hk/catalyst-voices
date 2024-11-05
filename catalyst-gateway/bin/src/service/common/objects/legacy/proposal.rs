@@ -1,3 +1,5 @@
+//! Define the Proposal
+
 use std::collections::HashMap;
 
 use poem_openapi::Object;
