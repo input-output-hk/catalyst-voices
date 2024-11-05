@@ -16,12 +16,15 @@ final class VoicesPasswordTextField extends StatelessWidget {
   /// Optional decoration. See [VoicesTextField] for more details.
   final VoicesTextFieldDecoration? decoration;
 
+  final ValueChanged<String>? onSubmitted;
+
   const VoicesPasswordTextField({
     super.key,
     this.controller,
     this.textInputAction = TextInputAction.done,
     this.onChanged,
     this.decoration,
+    this.onSubmitted,
   });
 
   @override
@@ -32,6 +35,7 @@ final class VoicesPasswordTextField extends StatelessWidget {
       obscureText: true,
       textInputAction: textInputAction,
       onChanged: onChanged,
+      onFieldSubmitted: onSubmitted,
       decoration: decoration,
       inputFormatters: [
         FilteringTextInputFormatter.singleLineFormatter,
