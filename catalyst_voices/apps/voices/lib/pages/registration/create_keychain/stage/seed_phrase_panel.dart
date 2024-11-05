@@ -69,7 +69,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<List<SeedPhraseWord>>(
-      selector: (state) => state.userWords,
+      selector: (state) => state.seedPhraseWords,
       builder: (context, state) => _SeedPhraseWords(state),
     );
   }
