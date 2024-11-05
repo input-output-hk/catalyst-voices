@@ -15,13 +15,5 @@ check-code:
 test-code:
     earthly +test-unit
 
-# Generates gateway services in packages/internal/catalyst_voices_services
-generate-gateway-services:
-    cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
-
-# Test generated gateway services
-test-gateway-services:
-    cd .. && earthly ./catalyst_voices+test-flutter-code-generator --platform=linux/amd64
-
 # Pre Push Checks
 pre-push: check-code

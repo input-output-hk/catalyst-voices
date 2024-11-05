@@ -20,7 +20,6 @@ check-spelling:
 pre-push: check-markdown check-spelling
     just catalyst-gateway/pre-push
     just catalyst_voices/pre-push
-    earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
 # Run cat-gateway natively on preprod
 run-cat-gateway: 
