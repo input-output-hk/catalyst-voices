@@ -1,6 +1,7 @@
 VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.22 AS rust-ci
+IMPORT ../ AS flutter-rust-bridge
 
 # builder : Setup the builder
 builder:
@@ -19,5 +20,6 @@ check:
 build:
     FROM +builder
 
+    COPY flutter-rust-bridge+code-generator/frb_generated.rs ./src/frb_generated.rs
     DO rust-ci+EXECUTE \
         --cmd="/scripts/std_build.py" \

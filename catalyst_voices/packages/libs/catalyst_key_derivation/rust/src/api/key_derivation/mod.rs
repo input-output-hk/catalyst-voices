@@ -322,12 +322,12 @@ pub async fn mnemonic_to_xprv(
 /// 2. Determine entropy that was used to generate `mnemonic`.
 /// 3. Compute `pbkdf2_result` = PBKDF2-HMAC-SHA512(password = `passphrase`, salt =
 ///    `entropy`, iterations = 4096, dkLen = 96).
-/// 4. given `pbkdf2_result` is S, modify S by assigning S[0] := S[0] & 0xf8 and S[31] :=
-///    (S[31] & 0x1f) | 0x40.
+/// 4. given `pbkdf2_result` is S, modify S by assigning S\[0\] := S\[0\] & 0xf8 and S\[31\] :=
+///    (S\[31\] & 0x1f) | 0x40.
 /// 5. The result will be
-///     - kL where S[0:32] a 256-bit integer in little-endian byte order.
-///     - kR where S[32:64]
-///     - Result in (kL, kR) as the root extended private key and c := S[64:96] as the
+///     - kL where S\[0:32\] a 256-bit integer in little-endian byte order.
+///     - kR where S\[32:64\]
+///     - Result in (kL, kR) as the root extended private key and c := S\[64:96\] as the
 ///       root chain code.
 fn mnemonic_to_xprv_helper(mnemonic: String, passphrase: Option<String>) -> anyhow::Result<XPrv> {
     /// 4096 is the number of iterations for PBKDF2.

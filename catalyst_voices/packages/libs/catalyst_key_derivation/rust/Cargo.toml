@@ -7,7 +7,7 @@ repository = "https://github.com/input-output-hk/catalyst-voices"
 license = "Apache-2.0"
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
 flutter_rust_bridge = "=2.5.1"
