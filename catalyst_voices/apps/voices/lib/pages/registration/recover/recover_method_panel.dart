@@ -19,55 +19,57 @@ class RecoverMethodPanel extends StatelessWidget {
     final colorLvl0 = theme.colors.textOnPrimaryLevel0;
     final colorLvl1 = theme.colors.textOnPrimaryLevel1;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          Text(
-            context.l10n.recoverKeychainMethodsTitle,
-            style: theme.textTheme.titleMedium?.copyWith(color: colorLvl1),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 24),
+        Text(
+          context.l10n.recoverKeychainMethodsTitle,
+          style: theme.textTheme.titleMedium?.copyWith(color: colorLvl1),
+        ),
+        const SizedBox(height: 12),
+        _BlocOnDeviceKeychains(onUnlockTap: _unlockKeychain),
+        const SizedBox(height: 12),
+        Text(
+          context.l10n.recoverKeychainMethodsSubtitle,
+          style: theme.textTheme.bodyMedium?.copyWith(color: colorLvl1),
+        ),
+        const SizedBox(height: 32),
+        Text(
+          context.l10n.recoverKeychainMethodsListTitle,
+          style: theme.textTheme.titleSmall?.copyWith(color: colorLvl0),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: RegistrationRecoverMethod.values
+                .map<Widget>(
+                  (method) {
+                    return RegistrationTile(
+                      key: ValueKey(method),
+                      icon: method._icon,
+                      title: method._getTitle(context.l10n),
+                      subtitle: method._getSubtitle(context.l10n),
+                      onTap: () {
+                        switch (method) {
+                          case RegistrationRecoverMethod.seedPhrase:
+                            RegistrationCubit.of(context)
+                                .recoverWithSeedPhrase();
+                        }
+                      },
+                    );
+                  },
+                )
+                .separatedBy(const SizedBox(height: 12))
+                .toList(),
           ),
-          const SizedBox(height: 12),
-          _BlocOnDeviceKeychains(onUnlockTap: _unlockKeychain),
-          const SizedBox(height: 12),
-          Text(
-            context.l10n.recoverKeychainMethodsSubtitle,
-            style: theme.textTheme.bodyMedium?.copyWith(color: colorLvl1),
-          ),
-          const SizedBox(height: 32),
-          Text(
-            context.l10n.recoverKeychainMethodsListTitle,
-            style: theme.textTheme.titleSmall?.copyWith(color: colorLvl0),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: RegistrationRecoverMethod.values
-                  .map<Widget>(
-                    (method) {
-                      return RegistrationTile(
-                        key: ValueKey(method),
-                        icon: method._icon,
-                        title: method._getTitle(context.l10n),
-                        subtitle: method._getSubtitle(context.l10n),
-                        onTap: () {
-                          switch (method) {
-                            case RegistrationRecoverMethod.seedPhrase:
-                              RegistrationCubit.of(context)
-                                  .recoverWithSeedPhrase();
-                          }
-                        },
-                      );
-                    },
-                  )
-                  .separatedBy(const SizedBox(height: 12))
-                  .toList(),
-            ),
-          ),
-        ],
-      ),
+        ),
+        const Spacer(),
+        VoicesBackButton(
+          onTap: () => RegistrationCubit.of(context).previousStep(),
+        ),
+      ],
     );
   }
 
