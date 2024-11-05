@@ -11,7 +11,8 @@ builder:
 check:
     FROM +builder
     # Create a dummy file just to past the CI format check
-    RUN touch ./src/frb_generated.rs
+    # Add another blank line to satisfy the cargo fmt check
+    RUN printf "\n" > ./src/frb_generated.rs
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 # build : Run build using the most efficient host tooling
