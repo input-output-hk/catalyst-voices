@@ -79,7 +79,6 @@ overrides:
       # Can't add custom properties to server list.
       owasp:api9:2023-inventory-access: off
 
-
   # Legacy Endpoints that have strange unioned properties.
   # These can not be documented
   # ONLY Legacy endpoints may be added to this override.
@@ -122,6 +121,19 @@ overrides:
     rules:
       owasp:api4:2023-string-limit: off
       owasp:api4:2023-string-restricted: off
+
+  # Legacy endpoints do not need exhaustive examples
+  - files:
+      - "**#/paths/~1api~1v1~1registration~1voter~1%7Bvoting_key%7D/get/parameters/2/schema"
+      - "**#/paths/~1api~1v0~1message/post/requestBody/content/application~1octet-stream/schema"
+      - "**#/paths/~1api~1v0~1vote~1active~1plans/get/responses"
+      - "**#/paths/~1api~1v1~1fragments~1statuses/get/parameters"
+      - "**#/paths/~1api~1v1~1fragments~1statuses/get/responses"
+    rules:
+      api-example-schema: off
+  #6737:26  warning  api-example-schema      Schema should contain example    paths./api/v0/vote/active/plans.get.responses[200].content['application/json; charset=utf-8'].schema
+  #7446:22  warning  api-example-schema      Schema should contain example    paths./api/v1/fragments/statuses.get.parameters[0].schema
+  #7552:26  warning  api-example-schema      Schema should contain example    paths./api/v1/fragments/statuses.get.responses[200].content['application/json; charset=utf-8'].schema
 
 rules:
   # A version of owasp:api4:2019-string-limit which accepts `format` without length as defining a string limit.
@@ -211,16 +223,16 @@ rules:
         # Match content type application/json should be object
         match: "object"
   api-example-schema:
-      message: "Schema should contain example"
-      given: "$..schema"
-      severity: warn
-      then:
-          field: "example"
-          function: truthy
+    message: "Schema should contain example"
+    given: "$..schema"
+    severity: warn
+    then:
+      field: "example"
+      function: truthy
   api-example-properties:
-      message: "Property should contain example"
-      given: "$..properties.*"
-      severity: warn
-      then:
-        field: "example"
-        function: truthy
+    message: "Property should contain example"
+    given: "$..properties.*"
+    severity: warn
+    then:
+      field: "example"
+      function: truthy
