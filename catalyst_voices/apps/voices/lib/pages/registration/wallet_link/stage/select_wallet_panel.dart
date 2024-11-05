@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_result_builder.dart';
@@ -11,6 +13,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Callback called when a [wallet] is selected.
 typedef _OnSelectWallet = Future<void> Function(WalletMetadata wallet);
@@ -57,7 +60,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         const SizedBox(height: 10),
         VoicesTextButton(
           trailing: VoicesAssets.icons.externalLink.buildIcon(),
-          onTap: () {},
+          onTap: () async => _launchSupportedWalletsLink(),
           child: Text(context.l10n.seeAllSupportedWallets),
         ),
       ],
@@ -74,6 +77,13 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     final success = await registration.walletLink.selectWallet(wallet);
     if (success) {
       registration.nextStep();
+    }
+  }
+
+  Future<void> _launchSupportedWalletsLink() async {
+    final url = VoicesConstants.supportedWalletsUrl.getUri();
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
     }
   }
 }
