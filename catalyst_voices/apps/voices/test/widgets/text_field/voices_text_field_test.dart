@@ -129,7 +129,8 @@ void main() {
           child: VoicesTextField(
             enabled: false,
             decoration: const VoicesTextFieldDecoration(
-                labelText: 'Disabled TextField'),
+              labelText: 'Disabled TextField',
+            ),
             onFieldSubmitted: (value) {},
           ),
         ),
