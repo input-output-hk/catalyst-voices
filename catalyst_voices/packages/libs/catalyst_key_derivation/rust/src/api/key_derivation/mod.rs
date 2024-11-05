@@ -85,7 +85,7 @@ impl Bip32Ed25519XPrivateKey {
     // &str is not supported in flutter_rust_bridge
     #[allow(clippy::needless_pass_by_value)]
     pub async fn derive_xprv(&self, path: String) -> anyhow::Result<Self> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+        let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let derive_xprv = spawn_blocking_with(
             move || derive_xprv_helper(xprv, &path),
@@ -100,13 +100,14 @@ impl Bip32Ed25519XPrivateKey {
     ///
     /// # Returns
     ///
-    /// Returns a 64 length bytes `Bip32Ed25519XPublicKey` representing the extended public key.
+    /// Returns a 64 length bytes `Bip32Ed25519XPublicKey` representing the extended
+    /// public key.
     ///
     /// # Errors
     ///
     /// Returns an error if the extended private key is invalid.
     pub async fn xpublic_key(&self) -> anyhow::Result<Bip32Ed25519XPublicKey> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+        let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let xpub = spawn_blocking_with(
             move || xpublic_key_helper(&xprv),
@@ -130,7 +131,7 @@ impl Bip32Ed25519XPrivateKey {
     ///
     /// Returns an error if the extended private key is invalid.
     pub async fn sign_data(&self, data: Vec<u8>) -> anyhow::Result<Bip32Ed25519Signature> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+        let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let signature = spawn_blocking_with(
             move || sign_data_helper(&xprv, &data),
@@ -158,12 +159,12 @@ impl Bip32Ed25519XPrivateKey {
     pub async fn verify_signature(
         &self, data: Vec<u8>, signature: &Bip32Ed25519Signature,
     ) -> anyhow::Result<bool> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+        let xprv = XPrv::from_bytes_verified(self.0)?;
         let verified_sig = Signature::from_slice(&signature.0)
             .map_err(|_| anyhow::anyhow!("Invalid signature"))?;
 
         let result = spawn_blocking_with(
-            move || verify_signature_xprv_helper(&xprv, &data, verified_sig),
+            move || verify_signature_xprv_helper(&xprv, &data, &verified_sig),
             FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
         )
         .await?;
@@ -249,12 +250,12 @@ impl Bip32Ed25519XPublicKey {
     pub async fn verify_signature(
         &self, data: Vec<u8>, signature: &Bip32Ed25519Signature,
     ) -> anyhow::Result<bool> {
-        let xpub = XPub::from_bytes(self.0.clone());
+        let xpub = XPub::from_bytes(self.0);
         let verified_sig = Signature::from_slice(&signature.0)
             .map_err(|_| anyhow::anyhow!("Invalid signature"))?;
 
         let result = spawn_blocking_with(
-            move || verify_signature_xpub_helper(&xpub, &data, verified_sig),
+            move || verify_signature_xpub_helper(&xpub, &data, &verified_sig),
             FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
         )
         .await?;
@@ -382,16 +383,16 @@ fn sign_data_helper(xprv: &XPrv, data: &[u8]) -> Signature<Bip32Ed25519Signature
 
 /// Helper function for `Bip32Ed25519XPrivateKey` `verify_signature`.
 fn verify_signature_xprv_helper(
-    xprv: &XPrv, data: &[u8], signature: Signature<Bip32Ed25519Signature>,
+    xprv: &XPrv, data: &[u8], signature: &Signature<Bip32Ed25519Signature>,
 ) -> bool {
-    xprv.verify(data, &signature)
+    xprv.verify(data, signature)
 }
 
 /// Helper function for `Bip32Ed25519XPublicKey` `verify_signature`.
 fn verify_signature_xpub_helper(
-    xpub: &XPub, data: &[u8], signature: Signature<Bip32Ed25519Signature>,
+    xpub: &XPub, data: &[u8], signature: &Signature<Bip32Ed25519Signature>,
 ) -> bool {
-    xpub.verify(data, &signature)
+    xpub.verify(data, signature)
 }
 
 #[cfg(test)]
@@ -422,12 +423,8 @@ mod test {
         let data = vec![1, 2, 3];
         let xprv = mnemonic_to_xprv_helper(MNEMONIC.to_string(), None).unwrap();
         let sign_data = sign_data_helper(&xprv, &data);
-        assert!(verify_signature_xprv_helper(
-            &xprv,
-            &data,
-            sign_data.clone()
-        ));
+        assert!(verify_signature_xprv_helper(&xprv, &data, &sign_data));
         let xpub = xpublic_key_helper(&xprv);
-        assert!(verify_signature_xpub_helper(&xpub, &data, sign_data));
+        assert!(verify_signature_xpub_helper(&xpub, &data, &sign_data));
     }
 }

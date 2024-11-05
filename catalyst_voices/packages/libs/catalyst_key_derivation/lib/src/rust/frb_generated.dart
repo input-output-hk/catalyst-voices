@@ -1354,7 +1354,8 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   ///
   /// # Returns
   ///
-  /// Returns a 64 length bytes `Bip32Ed25519XPublicKey` representing the extended public key.
+  /// Returns a 64 length bytes `Bip32Ed25519XPublicKey` representing the extended
+  /// public key.
   ///
   /// # Errors
   ///
