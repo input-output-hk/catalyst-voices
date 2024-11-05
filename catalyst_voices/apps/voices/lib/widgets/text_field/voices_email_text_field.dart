@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 final class VoicesEmailTextField extends StatelessWidget {
   /// Emits new value when widget input changes
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String> onFieldSubmitted;
 
   const VoicesEmailTextField({
     super.key,
     this.onChanged,
+    required this.onFieldSubmitted,
   });
 
   @override
@@ -18,6 +20,7 @@ final class VoicesEmailTextField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       onChanged: onChanged,
+      onFieldSubmitted: onFieldSubmitted,
       decoration: VoicesTextFieldDecoration(
         labelText: l10n.emailLabelText,
         hintText: l10n.emailHintText,

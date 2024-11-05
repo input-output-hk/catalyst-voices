@@ -8,8 +8,10 @@ void main() {
   group('VoicesTextField Widget Tests', () {
     testWidgets('renders correctly with default parameters', (tester) async {
       await tester.pumpWidget(
-        const _MaterialApp(
-          child: VoicesTextField(),
+        _MaterialApp(
+          child: VoicesTextField(
+            onFieldSubmitted: (value) {},
+          ),
         ),
       );
 
@@ -21,9 +23,10 @@ void main() {
       const labelText = 'Test Label';
 
       await tester.pumpWidget(
-        const _MaterialApp(
+        _MaterialApp(
           child: VoicesTextField(
-            decoration: VoicesTextFieldDecoration(labelText: labelText),
+            decoration: const VoicesTextFieldDecoration(labelText: labelText),
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -39,6 +42,7 @@ void main() {
         _MaterialApp(
           child: VoicesTextField(
             controller: controller,
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -55,12 +59,13 @@ void main() {
       const errorText = 'Error message';
 
       await tester.pumpWidget(
-        const _MaterialApp(
+        _MaterialApp(
           child: VoicesTextField(
-            decoration: VoicesTextFieldDecoration(
+            decoration: const VoicesTextFieldDecoration(
               hintText: hintText,
               errorText: errorText,
             ),
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -80,6 +85,7 @@ void main() {
               status: VoicesTextFieldStatus.error,
               errorMessage: errorText,
             ),
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -101,6 +107,7 @@ void main() {
         _MaterialApp(
           child: VoicesTextField(
             validator: VoicesTextFieldValidationResult.success(),
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -118,11 +125,12 @@ void main() {
 
     testWidgets('renders correctly when disabled', (tester) async {
       await tester.pumpWidget(
-        const _MaterialApp(
+        _MaterialApp(
           child: VoicesTextField(
             enabled: false,
-            decoration:
-                VoicesTextFieldDecoration(labelText: 'Disabled TextField'),
+            decoration: const VoicesTextFieldDecoration(
+                labelText: 'Disabled TextField'),
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -155,6 +163,7 @@ void main() {
         _MaterialApp(
           child: VoicesTextField(
             validator: validator,
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -186,6 +195,7 @@ void main() {
         _MaterialApp(
           child: VoicesTextField(
             validator: validator,
+            onFieldSubmitted: (value) {},
           ),
         ),
       );
@@ -222,6 +232,7 @@ void main() {
         _MaterialApp(
           child: VoicesTextField(
             validator: validator,
+            onFieldSubmitted: (value) {},
           ),
         ),
       );

@@ -18,6 +18,7 @@ final class LoginEmailTextFiled extends StatelessWidget {
         return VoicesEmailTextField(
           key: emailInputKey,
           onChanged: (email) => _onEmailChanged(context, email),
+          onFieldSubmitted: (email) => _onEmailChanged(context, email),
         );
       },
     );

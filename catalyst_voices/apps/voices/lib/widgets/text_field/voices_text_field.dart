@@ -85,7 +85,7 @@ class VoicesTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.resizable,
-    this.onFieldSubmitted,
+    required this.onFieldSubmitted,
     this.onSaved,
     this.inputFormatters,
   });
