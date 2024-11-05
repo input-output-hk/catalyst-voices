@@ -4,7 +4,7 @@
 
 pub mod api;
 #[allow(
-    clippy::missing_docs_in_private_items, 
+    clippy::missing_docs_in_private_items,
     clippy::unwrap_used,
     clippy::unreachable,
     clippy::semicolon_if_nothing_returned,
