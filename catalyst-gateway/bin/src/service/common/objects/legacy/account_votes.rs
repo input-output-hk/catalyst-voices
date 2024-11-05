@@ -25,6 +25,17 @@ impl Example for VotePlanId {
     }
 }
 
+#[derive(NewType, Deserialize)]
+#[oai(to_header = false, example = true)]
+/// Array of the proposal numbers voted for by the account ID within the vote plan.
+pub(crate) struct VotesVec(Vec<u8>);
+
+impl Example for VotesVec {
+    fn example() -> Self {
+        Self(vec![1, 3, 9, 123])
+    }
+}
+
 #[derive(Object, Deserialize)]
 #[oai(example = true)]
 /// Indexes of a proposal that the account has voted for across all active vote plans.
@@ -33,16 +44,31 @@ pub(crate) struct AccountVote {
     /// The hex-encoded ID of the vote plan.
     pub(crate) vote_plan_id: VotePlanId,
     /// Array of the proposal numbers voted for by the account ID within the vote plan.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(max_items = "500", minimum(value = "0"), maximum(value = "255")))]
-    pub(crate) votes: Vec<u8>,
+    pub(crate) votes: VotesVec,
 }
 
 impl Example for AccountVote {
     fn example() -> Self {
         Self {
             vote_plan_id: VotePlanId::example(),
-            votes: vec![1, 3, 9, 123],
+            votes: VotesVec(vec![1, 3, 9, 123]),
         }
+    }
+}
+
+#[derive(NewType, Deserialize)]
+#[oai(
+    to_header = false,
+    from_parameter = false,
+    from_multipart = false,
+    example = true
+)]
+/// Array of the proposal numbers voted for by the account ID within the vote plan.
+pub(crate) struct AccountVotesVec(Vec<AccountVote>);
+
+impl Example for AccountVotesVec {
+    fn example() -> Self {
+        Self(vec![AccountVote::example()])
     }
 }
