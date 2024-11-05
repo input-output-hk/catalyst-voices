@@ -7,3 +7,9 @@ extension StringExt on String {
     }
   }
 }
+
+extension UrlParser on String {
+  Uri getUri() {
+    return Uri.parse(this);
+  }
+}
