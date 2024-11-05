@@ -6,12 +6,12 @@ CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
     slot_no         varint,   -- slot number the txo was created in.
     txn             smallint, -- Which Transaction in the Slot is the TXO.
     txo             smallint, -- offset in the txo list of the transaction the txo is in.
-    policy_id       blob,     -- asset policy hash (id) (28 byte binary hash)
-    policy_name     text,     -- name of the policy (UTF8) TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
+    asset_id        blob,     -- asset policy hash (id) (28 byte binary hash)
+    asset_name      text,     -- name of the asset policy (UTF8) (32 bytes)
 
 
     -- None Key Data of the asset.
     value           varint,   -- Value of the asset (i128)
 
-    PRIMARY KEY (stake_address, slot_no, txn, txo, policy_id, policy_name)
+    PRIMARY KEY (stake_address, slot_no, txn, txo, asset_id, asset_name)
 );
