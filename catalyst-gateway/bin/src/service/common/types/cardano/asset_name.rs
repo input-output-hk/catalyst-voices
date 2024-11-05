@@ -1,6 +1,4 @@
-//! Hex encoded 28 byte hash.
-//!
-//! Hex encoded string which represents a 28 byte hash.
+//! Cardano Native Asset Name.
 
 use std::{
     borrow::Cow,

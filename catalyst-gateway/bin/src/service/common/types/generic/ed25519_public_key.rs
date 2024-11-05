@@ -16,18 +16,18 @@ use serde_json::Value;
 
 use crate::{service::common::types::string_types::impl_string_types, utils::ed25519};
 
-/// Stake address title.
+/// Title.
 const TITLE: &str = "Ed25519 Public Key";
-/// Stake address description.
+/// Description.
 const DESCRIPTION: &str = "This is a 32 Byte Hex encoded Ed25519 Public Key.";
-/// Stake address example.
+/// Example.
 const EXAMPLE: &str = "0x98dbd3d884068eee77e5894c22268d5d12e6484ba713e7ddd595abba308d88d3";
-/// Length of the hex encoded string;
+/// Length of the hex encoded string
 const ENCODED_LENGTH: usize = ed25519::HEX_ENCODED_LENGTH;
 /// Validation Regex Pattern
 const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
 
-/// Schema for `StakeAddress`.
+/// Schema
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     MetaSchema {
         title: Some(TITLE.to_owned()),
