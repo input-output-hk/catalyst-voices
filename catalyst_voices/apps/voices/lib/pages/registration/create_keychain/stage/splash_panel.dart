@@ -22,6 +22,10 @@ class SplashPanel extends StatelessWidget {
           child: Text(context.l10n.accountCreationSplashNextButton),
           onTap: () => RegistrationCubit.of(context).nextStep(),
         ),
+        const SizedBox(height: 10),
+        VoicesBackButton(
+          onTap: () => RegistrationCubit.of(context).previousStep(),
+        ),
       ],
     );
   }
