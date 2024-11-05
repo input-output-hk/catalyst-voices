@@ -1899,6 +1899,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Finish account creation'**
   String get finishAccountCreation;
+
+  /// A button label to connect a different wallet in wallet detail panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect a different wallet'**
+  String get connectDifferentWallet;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

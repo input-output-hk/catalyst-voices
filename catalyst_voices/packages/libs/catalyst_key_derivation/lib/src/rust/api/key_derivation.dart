@@ -27,30 +27,31 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 /// # Errors
 ///
 /// Returns an error if the mnemonic is invalid.
-Future<XPrvBytes> mnemonicToXprv(
+Future<Bip32Ed25519XPrivateKey> mnemonicToXprv(
         {required String mnemonic, String? passphrase}) =>
     RustLib.instance.api.crateApiKeyDerivationMnemonicToXprv(
         mnemonic: mnemonic, passphrase: passphrase);
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SignatureBytes>>
-abstract class SignatureBytes implements RustOpaqueInterface {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519Signature>>
+abstract class Bip32Ed25519Signature implements RustOpaqueInterface {
   /// Get the inner bytes.
   U8Array64 get inner;
 
-  /// Create a new `SignatureBytes` from the given bytes.
-  factory SignatureBytes({required U8Array64 sigBytes}) => RustLib.instance.api
-      .crateApiKeyDerivationSignatureBytesNew(sigBytes: sigBytes);
+  /// Create a new `Bip32Ed25519Signature` from the given bytes.
+  factory Bip32Ed25519Signature({required U8Array64 sigBytes}) =>
+      RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519SignatureNew(sigBytes: sigBytes);
 }
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<XPrvBytes>>
-abstract class XPrvBytes implements RustOpaqueInterface {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPrivateKey>>
+abstract class Bip32Ed25519XPrivateKey implements RustOpaqueInterface {
   /// Derive a new extended private key from the given extended private key.
   /// - V2 derivation scheme is used as it is mention in [SLIP-0023](https://github.com/satoshilabs/slips/blob/master/slip-0023.md).
   /// - More information about child key derivation can be found in [BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf).
   ///
   /// # Arguments
   ///
-  /// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
+  /// - `xprv_bytes`: An extended private key bytes of type `Bip32Ed25519XPrivateKey`.
   /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
   ///
   /// # Returns
@@ -60,7 +61,7 @@ abstract class XPrvBytes implements RustOpaqueInterface {
   /// # Errors
   ///
   /// Returns an error if the derivation path is invalid.
-  Future<XPrvBytes> deriveXprv({required String path});
+  Future<Bip32Ed25519XPrivateKey> deriveXprv({required String path});
 
   /// Drop the extended private key.
   void drop();
@@ -84,9 +85,10 @@ abstract class XPrvBytes implements RustOpaqueInterface {
   /// Get the inner bytes.
   U8Array96 get inner;
 
-  /// Create a new `XPrvBytes` from the given bytes.
-  factory XPrvBytes({required U8Array96 xprvBytes}) => RustLib.instance.api
-      .crateApiKeyDerivationXPrvBytesNew(xprvBytes: xprvBytes);
+  /// Create a new `Bip32Ed25519XPrivateKey` from the given bytes.
+  factory Bip32Ed25519XPrivateKey({required U8Array96 xprvBytes}) => RustLib
+      .instance.api
+      .crateApiKeyDerivationBip32Ed25519XPrivateKeyNew(xprvBytes: xprvBytes);
 
   /// Sign the given data with the given extended private key.
   ///
@@ -95,12 +97,12 @@ abstract class XPrvBytes implements RustOpaqueInterface {
   /// - `data`: The data to sign.
   ///
   /// # Returns
-  /// Returns a 64 length bytes `SignatureBytes` representing the signature.
+  /// Returns a 64 length bytes `Bip32Ed25519Signature` representing the signature.
   ///
   /// # Errors
   ///
   /// Returns an error if the extended private key is invalid.
-  Future<SignatureBytes> signData({required List<int> data});
+  Future<Bip32Ed25519Signature> signData({required List<int> data});
 
   /// Verify the signature on the given data using extended private key.
   ///
@@ -117,22 +119,23 @@ abstract class XPrvBytes implements RustOpaqueInterface {
   ///
   /// Returns an error if the extended private key or signature is invalid.
   Future<bool> verifySignature(
-      {required List<int> data, required SignatureBytes signature});
+      {required List<int> data, required Bip32Ed25519Signature signature});
 
   /// Get extended public key from the given extended private key.
   ///
   /// # Returns
   ///
-  /// Returns a 64 length bytes `XPubBytes` representing the extended public key.
+  /// Returns a 64 length bytes `Bip32Ed25519XPublicKey` representing the extended
+  /// public key.
   ///
   /// # Errors
   ///
   /// Returns an error if the extended private key is invalid.
-  Future<XPubBytes> xpublicKey();
+  Future<Bip32Ed25519XPublicKey> xpublicKey();
 }
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<XPubBytes>>
-abstract class XPubBytes implements RustOpaqueInterface {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPublicKey>>
+abstract class Bip32Ed25519XPublicKey implements RustOpaqueInterface {
   /// Extract the chain code from the extended public key.
   /// The chain code is the last 32 bytes of the extended public key.
   ///
@@ -152,9 +155,10 @@ abstract class XPubBytes implements RustOpaqueInterface {
   /// Returns a 32 length bytes representing the public key.
   U8Array32 get publicKey;
 
-  /// Create a new `XPubBytes` from the given bytes.
-  factory XPubBytes({required U8Array64 xpubBytes}) => RustLib.instance.api
-      .crateApiKeyDerivationXPubBytesNew(xpubBytes: xpubBytes);
+  /// Create a new `Bip32Ed25519XPublicKey` from the given bytes.
+  factory Bip32Ed25519XPublicKey({required U8Array64 xpubBytes}) =>
+      RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPublicKeyNew(xpubBytes: xpubBytes);
 
   /// Verify the signature on the given data using extended public key.
   ///
@@ -171,7 +175,7 @@ abstract class XPubBytes implements RustOpaqueInterface {
   ///
   /// Returns an error if the extended public key or signature is invalid.
   Future<bool> verifySignature(
-      {required List<int> data, required SignatureBytes signature});
+      {required List<int> data, required Bip32Ed25519Signature signature});
 }
 
 class U8Array32 extends NonGrowableListView<int> {

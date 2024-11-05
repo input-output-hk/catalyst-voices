@@ -2,31 +2,18 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.22 AS rust-ci
 
+# builder : Setup the builder
 builder:
     DO rust-ci+SETUP
     COPY --dir .cargo .config src Cargo.toml clippy.toml deny.toml rustfmt.toml .
 
-## -----------------------------------------------------------------------------
-##
-## Standard CI targets.
-##
-## These targets are discovered and executed automatically by CI.
-
 # check : Run check using the most efficient host tooling
-# CI Automated Entry point.
 check:
     FROM +builder
 
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
-# all-hosts-check : Test which runs check with all supported host tooling.
-# Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-all-hosts-check:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +check
-
 # build : Run build using the most efficient host tooling
-# CI Automated Entry point.
 build:
     FROM +builder
 

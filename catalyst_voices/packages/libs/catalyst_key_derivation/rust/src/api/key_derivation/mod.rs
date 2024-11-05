@@ -13,25 +13,25 @@ use sha2::Sha512;
 
 use crate::frb_generated::FLUTTER_RUST_BRIDGE_HANDLER;
 
-/// Extended private key bytes type.
+/// BIP32-Ed25519 extended private key bytes type.
 /// Compose of:
 /// - 64 Bytes: extended Ed25519 secret key
 /// - 32 Bytes: chain code
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[frb(opaque)]
-pub struct XPrvBytes([u8; 96]);
+pub struct Bip32Ed25519XPrivateKey([u8; 96]);
 
-impl From<XPrv> for XPrvBytes {
+impl From<XPrv> for Bip32Ed25519XPrivateKey {
     fn from(xprv: XPrv) -> Self {
-        XPrvBytes(xprv.into())
+        Bip32Ed25519XPrivateKey(xprv.into())
     }
 }
 
-impl XPrvBytes {
-    /// Create a new `XPrvBytes` from the given bytes.
+impl Bip32Ed25519XPrivateKey {
+    /// Create a new `Bip32Ed25519XPrivateKey` from the given bytes.
     #[frb(sync)]
     pub fn new(xprv_bytes: [u8; 96]) -> Self {
-        XPrvBytes(xprv_bytes)
+        Bip32Ed25519XPrivateKey(xprv_bytes)
     }
 
     /// Get the inner bytes.
@@ -72,7 +72,7 @@ impl XPrvBytes {
     ///  
     /// # Arguments
     ///
-    /// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
+    /// - `xprv_bytes`: An extended private key bytes of type `Bip32Ed25519XPrivateKey`.
     /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
     ///
     /// # Returns
@@ -85,7 +85,7 @@ impl XPrvBytes {
     // &str is not supported in flutter_rust_bridge
     #[allow(clippy::needless_pass_by_value)]
     pub async fn derive_xprv(&self, path: String) -> anyhow::Result<Self> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+        let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let derive_xprv = spawn_blocking_with(
             move || derive_xprv_helper(xprv, &path),
@@ -100,13 +100,14 @@ impl XPrvBytes {
     ///
     /// # Returns
     ///
-    /// Returns a 64 length bytes `XPubBytes` representing the extended public key.
+    /// Returns a 64 length bytes `Bip32Ed25519XPublicKey` representing the extended
+    /// public key.
     ///
     /// # Errors
     ///
     /// Returns an error if the extended private key is invalid.
-    pub async fn xpublic_key(&self) -> anyhow::Result<XPubBytes> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+    pub async fn xpublic_key(&self) -> anyhow::Result<Bip32Ed25519XPublicKey> {
+        let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let xpub = spawn_blocking_with(
             move || xpublic_key_helper(&xprv),
@@ -114,7 +115,7 @@ impl XPrvBytes {
         )
         .await?;
 
-        Ok(XPubBytes(xpub.into()))
+        Ok(Bip32Ed25519XPublicKey(xpub.into()))
     }
 
     /// Sign the given data with the given extended private key.
@@ -124,13 +125,13 @@ impl XPrvBytes {
     /// - `data`: The data to sign.
     ///
     /// # Returns
-    /// Returns a 64 length bytes `SignatureBytes` representing the signature.
+    /// Returns a 64 length bytes `Bip32Ed25519Signature` representing the signature.
     ///
     /// # Errors
     ///
     /// Returns an error if the extended private key is invalid.
-    pub async fn sign_data(&self, data: Vec<u8>) -> anyhow::Result<SignatureBytes> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+    pub async fn sign_data(&self, data: Vec<u8>) -> anyhow::Result<Bip32Ed25519Signature> {
+        let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let signature = spawn_blocking_with(
             move || sign_data_helper(&xprv, &data),
@@ -138,7 +139,7 @@ impl XPrvBytes {
         )
         .await?;
 
-        Ok(SignatureBytes(*signature.to_bytes()))
+        Ok(Bip32Ed25519Signature(*signature.to_bytes()))
     }
 
     /// Verify the signature on the given data using extended private key.
@@ -156,14 +157,14 @@ impl XPrvBytes {
     ///
     /// Returns an error if the extended private key or signature is invalid.
     pub async fn verify_signature(
-        &self, data: Vec<u8>, signature: &SignatureBytes,
+        &self, data: Vec<u8>, signature: &Bip32Ed25519Signature,
     ) -> anyhow::Result<bool> {
-        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+        let xprv = XPrv::from_bytes_verified(self.0)?;
         let verified_sig = Signature::from_slice(&signature.0)
             .map_err(|_| anyhow::anyhow!("Invalid signature"))?;
 
         let result = spawn_blocking_with(
-            move || verify_signature_xprv_helper(&xprv, &data, verified_sig),
+            move || verify_signature_xprv_helper(&xprv, &data, &verified_sig),
             FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
         )
         .await?;
@@ -181,22 +182,22 @@ impl XPrvBytes {
     }
 }
 
-/// Extended public key bytes type.
+/// BIP32-Ed25519 extended public key bytes type.
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[frb(opaque)]
-pub struct XPubBytes([u8; 64]);
+pub struct Bip32Ed25519XPublicKey([u8; 64]);
 
-impl From<XPub> for XPubBytes {
+impl From<XPub> for Bip32Ed25519XPublicKey {
     fn from(xpub: XPub) -> Self {
-        XPubBytes(xpub.into())
+        Bip32Ed25519XPublicKey(xpub.into())
     }
 }
 
-impl XPubBytes {
-    /// Create a new `XPubBytes` from the given bytes.
+impl Bip32Ed25519XPublicKey {
+    /// Create a new `Bip32Ed25519XPublicKey` from the given bytes.
     #[frb(sync)]
     pub fn new(xpub_bytes: [u8; 64]) -> Self {
-        XPubBytes(xpub_bytes)
+        Bip32Ed25519XPublicKey(xpub_bytes)
     }
 
     /// Get the inner bytes.
@@ -247,14 +248,14 @@ impl XPubBytes {
     ///
     /// Returns an error if the extended public key or signature is invalid.
     pub async fn verify_signature(
-        &self, data: Vec<u8>, signature: &SignatureBytes,
+        &self, data: Vec<u8>, signature: &Bip32Ed25519Signature,
     ) -> anyhow::Result<bool> {
-        let xpub = XPub::from_bytes(self.0.clone());
+        let xpub = XPub::from_bytes(self.0);
         let verified_sig = Signature::from_slice(&signature.0)
             .map_err(|_| anyhow::anyhow!("Invalid signature"))?;
 
         let result = spawn_blocking_with(
-            move || verify_signature_xpub_helper(&xpub, &data, verified_sig),
+            move || verify_signature_xpub_helper(&xpub, &data, &verified_sig),
             FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
         )
         .await?;
@@ -263,16 +264,16 @@ impl XPubBytes {
     }
 }
 
-/// Signature bytes type.
+/// BIP32-Ed25519 signature bytes type.
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[frb(opaque)]
-pub struct SignatureBytes([u8; 64]);
+pub struct Bip32Ed25519Signature([u8; 64]);
 
-impl SignatureBytes {
-    /// Create a new `SignatureBytes` from the given bytes.
+impl Bip32Ed25519Signature {
+    /// Create a new `Bip32Ed25519Signature` from the given bytes.
     #[frb(sync)]
     pub fn new(sig_bytes: [u8; 64]) -> Self {
-        SignatureBytes(sig_bytes)
+        Bip32Ed25519Signature(sig_bytes)
     }
 
     /// Get the inner bytes.
@@ -301,7 +302,7 @@ impl SignatureBytes {
 /// Returns an error if the mnemonic is invalid.
 pub async fn mnemonic_to_xprv(
     mnemonic: String, passphrase: Option<String>,
-) -> anyhow::Result<XPrvBytes> {
+) -> anyhow::Result<Bip32Ed25519XPrivateKey> {
     let xprv = spawn_blocking_with(
         move || mnemonic_to_xprv_helper(mnemonic, passphrase),
         FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
@@ -376,22 +377,22 @@ fn xpublic_key_helper(xprv: &XPrv) -> XPub {
 }
 
 /// Helper function for `sign_data`.
-fn sign_data_helper(xprv: &XPrv, data: &[u8]) -> Signature<SignatureBytes> {
+fn sign_data_helper(xprv: &XPrv, data: &[u8]) -> Signature<Bip32Ed25519Signature> {
     xprv.sign(data)
 }
 
-/// Helper function for `XPrvBytes` `verify_signature`.
+/// Helper function for `Bip32Ed25519XPrivateKey` `verify_signature`.
 fn verify_signature_xprv_helper(
-    xprv: &XPrv, data: &[u8], signature: Signature<SignatureBytes>,
+    xprv: &XPrv, data: &[u8], signature: &Signature<Bip32Ed25519Signature>,
 ) -> bool {
-    xprv.verify(data, &signature)
+    xprv.verify(data, signature)
 }
 
-/// Helper function for `XPubBytes` `verify_signature`.
+/// Helper function for `Bip32Ed25519XPublicKey` `verify_signature`.
 fn verify_signature_xpub_helper(
-    xpub: &XPub, data: &[u8], signature: Signature<SignatureBytes>,
+    xpub: &XPub, data: &[u8], signature: &Signature<Bip32Ed25519Signature>,
 ) -> bool {
-    xpub.verify(data, &signature)
+    xpub.verify(data, signature)
 }
 
 #[cfg(test)]
@@ -422,12 +423,8 @@ mod test {
         let data = vec![1, 2, 3];
         let xprv = mnemonic_to_xprv_helper(MNEMONIC.to_string(), None).unwrap();
         let sign_data = sign_data_helper(&xprv, &data);
-        assert!(verify_signature_xprv_helper(
-            &xprv,
-            &data,
-            sign_data.clone()
-        ));
+        assert!(verify_signature_xprv_helper(&xprv, &data, &sign_data));
         let xpub = xpublic_key_helper(&xprv);
-        assert!(verify_signature_xpub_helper(&xpub, &data, sign_data));
+        assert!(verify_signature_xpub_helper(&xpub, &data, &sign_data));
     }
 }
