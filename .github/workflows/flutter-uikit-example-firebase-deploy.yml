@@ -38,7 +38,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst_voices/uikit_example
+          earthfile: ./catalyst_voices/utilities/uikit_example
           flags: --allow-privileged
           targets: local-build-web
           target_flags:
@@ -50,4 +50,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.UIKIT_FIREBASE_SERVICE_ACCOUNT }}"
           projectId: "${{ secrets.UIKIT_FIREBASE_PROJECT_ID }}"
           channelId: live
-          entryPoint: catalyst_voices/uikit_example
+          entryPoint: catalyst_voices/utilities/uikit_example
