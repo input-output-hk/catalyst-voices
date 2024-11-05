@@ -34,6 +34,12 @@ impl Bip32Ed25519XPrivateKey {
         Bip32Ed25519XPrivateKey(xprv_bytes)
     }
 
+    /// Convert to a hex string.
+    #[frb(sync)]
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0)
+    }
+
     /// Get the inner bytes.
     #[frb(getter, sync)]
     pub fn get_inner(&self) -> [u8; 96] {
@@ -200,6 +206,12 @@ impl Bip32Ed25519XPublicKey {
         Bip32Ed25519XPublicKey(xpub_bytes)
     }
 
+    /// Convert to a hex string.
+    #[frb(sync)]
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0)
+    }
+
     /// Get the inner bytes.
     #[frb(getter, sync)]
     pub fn get_inner(&self) -> [u8; 64] {
@@ -274,6 +286,12 @@ impl Bip32Ed25519Signature {
     #[frb(sync)]
     pub fn new(sig_bytes: [u8; 64]) -> Self {
         Bip32Ed25519Signature(sig_bytes)
+    }
+
+    /// Convert to a hex string.
+    #[frb(sync)]
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0)
     }
 
     /// Get the inner bytes.
