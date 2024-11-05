@@ -24,11 +24,10 @@ pub(crate) struct GetRegistrationParams {
     pub stake_address: Vec<u8>,
 }
 
-impl GetRegistrationParams {
-    /// Create a new instance of [`GetRegistrationParams`]
-    pub(crate) fn new(stake_addr: Vec<u8>) -> GetRegistrationParams {
-        Self {
-            stake_address: stake_addr,
+impl From<&ed25519_dalek::VerifyingKey> for GetRegistrationParams {
+    fn from(value: &ed25519_dalek::VerifyingKey) -> Self {
+        GetRegistrationParams {
+            stake_address: value.as_bytes().to_vec(),
         }
     }
 }

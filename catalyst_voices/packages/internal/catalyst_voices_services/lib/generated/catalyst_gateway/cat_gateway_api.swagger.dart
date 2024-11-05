@@ -99,37 +99,6 @@ abstract class CatGatewayApi extends ChopperService {
     @Query('query_inspection') String? queryInspection,
   });
 
-  ///Get staked ADA amount.
-  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
-  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
-  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
-  Future<chopper.Response<FullStakeInfo>>
-      apiDraftCardanoStakedAdaStakeAddressGet({
-    required String? stakeAddress,
-    enums.Network? network,
-    int? slotNumber,
-  }) {
-    generatedMapping.putIfAbsent(
-        FullStakeInfo, () => FullStakeInfo.fromJsonFactory);
-
-    return _apiDraftCardanoStakedAdaStakeAddressGet(
-        stakeAddress: stakeAddress,
-        network: network?.value?.toString(),
-        slotNumber: slotNumber);
-  }
-
-  ///Get staked ADA amount.
-  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
-  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
-  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
-  @Get(path: '/api/draft/cardano/staked_ada/{stake_address}')
-  Future<chopper.Response<FullStakeInfo>>
-      _apiDraftCardanoStakedAdaStakeAddressGet({
-    @Path('stake_address') required String? stakeAddress,
-    @Query('network') String? network,
-    @Query('slot_number') int? slotNumber,
-  });
-
   ///Get registration info.
   ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
@@ -199,23 +168,23 @@ abstract class CatGatewayApi extends ChopperService {
   });
 
   ///Get latest CIP36 registrations from stake address.
-  ///@param stake_addr Stake Address to find the latest registration for.
+  ///@param stake_pub_key Stake Public Key to find the latest registration for.
   Future<chopper.Response<Cip36Reporting>>
       apiDraftCardanoCip36LatestRegistrationStakeAddrGet(
-          {required String? stakeAddr}) {
+          {required String? stakePubKey}) {
     generatedMapping.putIfAbsent(
         Cip36Reporting, () => Cip36Reporting.fromJsonFactory);
 
     return _apiDraftCardanoCip36LatestRegistrationStakeAddrGet(
-        stakeAddr: stakeAddr);
+        stakePubKey: stakePubKey);
   }
 
   ///Get latest CIP36 registrations from stake address.
-  ///@param stake_addr Stake Address to find the latest registration for.
+  ///@param stake_pub_key Stake Public Key to find the latest registration for.
   @Get(path: '/api/draft/cardano/cip36/latest_registration/stake_addr')
   Future<chopper.Response<Cip36Reporting>>
       _apiDraftCardanoCip36LatestRegistrationStakeAddrGet(
-          {@Query('stake_addr') required String? stakeAddr});
+          {@Query('stake_pub_key') required String? stakePubKey});
 
   ///Get latest CIP36 registrations from a stake key hash.
   ///@param stake_key_hash Stake Key Hash to find the latest registration for.
@@ -302,6 +271,36 @@ abstract class CatGatewayApi extends ChopperService {
   Future<chopper.Response<RbacRole0ChainRootResponse>>
       _apiDraftRbacRole0ChainRootRole0KeyGet(
           {@Path('role0_key') required String? role0Key});
+
+  ///Get staked ADA amount.
+  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
+  Future<chopper.Response<FullStakeInfo>> apiDraftCardanoAssetsStakeAddressGet({
+    required String? stakeAddress,
+    enums.Network? network,
+    int? slotNumber,
+  }) {
+    generatedMapping.putIfAbsent(
+        FullStakeInfo, () => FullStakeInfo.fromJsonFactory);
+
+    return _apiDraftCardanoAssetsStakeAddressGet(
+        stakeAddress: stakeAddress,
+        network: network?.value?.toString(),
+        slotNumber: slotNumber);
+  }
+
+  ///Get staked ADA amount.
+  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
+  @Get(path: '/api/draft/cardano/assets/{stake_address}')
+  Future<chopper.Response<FullStakeInfo>>
+      _apiDraftCardanoAssetsStakeAddressGet({
+    @Path('stake_address') required String? stakeAddress,
+    @Query('network') String? network,
+    @Query('slot_number') int? slotNumber,
+  });
 
   ///Get the configuration for the frontend.
   Future<chopper.Response<FrontendConfig>> apiDraftConfigFrontendGet() {

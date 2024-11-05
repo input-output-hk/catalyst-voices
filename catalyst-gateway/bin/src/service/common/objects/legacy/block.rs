@@ -3,12 +3,24 @@
 use poem_openapi::{types::Example, NewType, Object};
 
 #[derive(NewType)]
+#[oai(example = true)]
 /// Epoch number.
 pub(crate) struct Epoch(pub u32);
+impl Example for Epoch {
+    fn example() -> Self {
+        Self(123_456)
+    }
+}
 
 #[derive(NewType)]
+#[oai(example = true)]
 /// Slot number.
 pub(crate) struct Slot(pub u32);
+impl Example for Slot {
+    fn example() -> Self {
+        Self(987_654)
+    }
+}
 
 #[derive(Object)]
 #[oai(example = true)]

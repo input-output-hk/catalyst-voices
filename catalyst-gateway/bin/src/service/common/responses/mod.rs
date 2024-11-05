@@ -28,8 +28,9 @@ mod code_503_service_unavailable;
 use code_500_internal_server_error::InternalServerError;
 
 use super::types::headers::{
-    access_control_allow_origin::AccessControlAllowOriginHeader, ratelimit::RateLimitHeader,
-    retry_after::RetryAfterHeader,
+    access_control_allow_origin::AccessControlAllowOriginHeader,
+    ratelimit::RateLimitHeader,
+    retry_after::{RetryAfterHeader, RetryAfterOption},
 };
 
 /// Default error responses
@@ -121,18 +122,33 @@ impl<T> WithErrorResponses<T> {
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
         match err {
             err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
-                let error = ServiceUnavailable::new(None);
-                WithErrorResponses::Error(ErrorResponses::ServiceUnavailable(
-                    Json(error),
-                    Some(RetryAfterHeader::default()),
-                ))
+                Self::service_unavailable(err, RetryAfterOption::Default)
             },
-            err => {
-                let error = InternalServerError::new(None);
-                error!(id=%error.id(), error=?err);
-                WithErrorResponses::Error(ErrorResponses::ServerError(Json(error)))
-            },
+            err => Self::internal_error(err),
         }
+    }
+
+    /// Handle a 503 service unavailable error response.
+    ///
+    /// Returns a 503 Service unavailable Error response.
+    pub(crate) fn service_unavailable(err: &anyhow::Error, retry: RetryAfterOption) -> Self {
+        let error = ServiceUnavailable::new(None);
+        error!(id=%error.id(), error=?err, retry_after=?retry);
+        let retry = match retry {
+            RetryAfterOption::Default => Some(RetryAfterHeader::default()),
+            RetryAfterOption::None => None,
+            RetryAfterOption::Some(value) => Some(value),
+        };
+        WithErrorResponses::Error(ErrorResponses::ServiceUnavailable(Json(error), retry))
+    }
+
+    /// Handle a 500 internal error response.
+    ///
+    /// Returns a 500 Internal Error response.
+    pub(crate) fn internal_error(err: &anyhow::Error) -> Self {
+        let error = InternalServerError::new(None);
+        error!(id=%error.id(), error=?err);
+        WithErrorResponses::Error(ErrorResponses::ServerError(Json(error)))
     }
 
     /// Handle a 401 unauthorized response.

@@ -1,4 +1,5 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
+use anyhow::anyhow;
 use futures::StreamExt as _;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
@@ -10,7 +11,10 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::{objects::cardano::hash::Hash, responses::WithErrorResponses},
+    service::common::{
+        objects::cardano::hash::Hash, responses::WithErrorResponses,
+        types::headers::retry_after::RetryAfterOption,
+    },
 };
 
 /// GET RBAC registrations by chain root response list item.
@@ -37,9 +41,6 @@ pub(crate) enum Responses {
     /// Response for bad requests.
     #[oai(status = 400)]
     BadRequest,
-    /// Internal server error.
-    #[oai(status = 500)]
-    InternalServerError,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
@@ -48,7 +49,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
-        return Responses::InternalServerError.into();
+        let err = anyhow::anyhow!("Failed to acquire db session");
+        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
     let Ok(decoded_chain_root) = hex::decode(chain_root) else {
@@ -70,7 +72,7 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
                 error = ?err,
                 "Failed to execute get registrations by chain root query"
             );
-            return Responses::InternalServerError.into();
+            return AllResponses::internal_error(&err);
         },
     };
 
@@ -80,7 +82,8 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
             Ok(row) => row,
             Err(err) => {
                 error!(error = ?err, "Failed to parse get registrations by chain root query row");
-                return Responses::InternalServerError.into();
+                let err = anyhow!(err);
+                return AllResponses::internal_error(&err);
             },
         };
 
