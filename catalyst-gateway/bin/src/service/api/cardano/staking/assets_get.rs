@@ -78,6 +78,7 @@ struct TxoAssetInfo {
     /// Asset hash.
     id: Vec<u8>,
     /// Asset name.
+    // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
     name: String,
     /// Asset amount.
     amount: num_bigint::BigInt,
@@ -98,6 +99,7 @@ struct TxoInfo {
     /// Whether the TXO was spent.
     spent_slot_no: Option<num_bigint::BigInt>,
     /// TXO assets.
+    // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
     assets: HashMap<Vec<u8>, TxoAssetInfo>,
 }
 
@@ -272,13 +274,10 @@ fn build_stake_info(
                     i64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
 
                 for asset in txo_info.assets.into_values() {
-                    let amount = i64::try_from(asset.amount).map_err(|err| anyhow!(err))?;
-                    let hash_str = format!("0x{}", hex::encode(asset.id));
-
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
-                        policy_hash: hash_str,
-                        policy_name: asset.name,
-                        amount,
+                        policy_hash: asset.id.try_into()?,
+                        asset_name: asset.name.into(),
+                        amount: asset.amount.try_into()?,
                     });
                 }
 

@@ -8,23 +8,44 @@ use std::{
     sync::LazyLock,
 };
 
+use const_format::concatcp;
 use pallas::ledger::addresses::{Address, StakeAddress};
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
-    types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 use serde_json::Value;
 
 use crate::service::common::types::string_types::impl_string_types;
 
 /// Stake address title.
-const STAKE_TITLE: &str = "Cardano stake address";
+const TITLE: &str = "Cardano stake address";
 /// Stake address description.
-const STAKE_DESCRIPTION: &str = "Cardano stake address, also known as a reward address.";
+const DESCRIPTION: &str = "Cardano stake address, also known as a reward address.";
 /// Stake address example.
 // cSpell:disable
-const STAKE_EXAMPLE: &str = "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
+const EXAMPLE: &str = "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
 // cSpell:enable
+/// Production Stake Address Identifier
+const PROD_STAKE: &str = "stake";
+/// Test Stake Address Identifier
+const TEST_STAKE: &str = "stake_test";
+/// Regex Pattern
+const PATTERN: &str = concatcp!(
+    "(",
+    PROD_STAKE,
+    "|",
+    TEST_STAKE,
+    ")1[a,c-h,j-n,p-z,0,2-9]{53}"
+);
+/// Length of the encoded address.
+const ENCODED_ADDR_LEN: usize = 53;
+/// Length of the decoded address.
+const DECODED_ADDR_LEN: usize = 28;
+/// Minimum length
+const MIN_LENGTH: usize = PROD_STAKE.len() + 1 + ENCODED_ADDR_LEN;
+/// Minimum length
+const MAX_LENGTH: usize = TEST_STAKE.len() + 1 + ENCODED_ADDR_LEN;
 
 /// External document for Cardano addresses.
 static EXTERNAL_DOCS: LazyLock<MetaExternalDocument> = LazyLock::new(|| {
@@ -37,21 +58,36 @@ static EXTERNAL_DOCS: LazyLock<MetaExternalDocument> = LazyLock::new(|| {
 /// Schema for `StakeAddress`.
 static STAKE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     MetaSchema {
-        title: Some(STAKE_TITLE.to_owned()),
-        description: Some(STAKE_DESCRIPTION),
-        example: Some(Value::String(STAKE_EXAMPLE.to_string())),
+        title: Some(TITLE.to_owned()),
+        description: Some(DESCRIPTION),
+        example: Some(Value::String(EXAMPLE.to_string())),
         external_docs: Some(EXTERNAL_DOCS.clone()),
-        max_length: Some(64),
-        pattern: Some("(stake|stake_test)1[a,c-h,j-n,p-z,0,2-9]{53}".to_string()),
+        min_length: Some(MIN_LENGTH),
+        max_length: Some(MAX_LENGTH),
+        pattern: Some(PATTERN.to_string()),
         ..poem_openapi::registry::MetaSchema::ANY
     }
 });
+
+/// Because ALL the constraints are defined above, we do not ever need to define them in
+/// the API. BUT we do need to make a validator.
+/// This helps enforce uniform validation.
+fn is_valid(stake_addr: &str) -> bool {
+    // Just check the string can be safely converted into the type.
+    if let Ok((hrp, addr)) = bech32::decode(stake_addr) {
+        let hrp = hrp.as_str();
+        addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE)
+    } else {
+        false
+    }
+}
 
 impl_string_types!(
     Cip19StakeAddress,
     "string",
     "cardano:cip19-address",
-    Some(STAKE_SCHEMA.clone())
+    Some(STAKE_SCHEMA.clone()),
+    is_valid
 );
 
 impl Cip19StakeAddress {
@@ -78,5 +114,11 @@ impl Cip19StakeAddress {
             .to_bech32()
             .map_err(|e| anyhow::anyhow!(format!("Invalid stake address {e}")))?;
         Ok(Self(addr_str))
+    }
+}
+
+impl Example for Cip19StakeAddress {
+    fn example() -> Self {
+        Self(EXAMPLE.to_owned())
     }
 }
