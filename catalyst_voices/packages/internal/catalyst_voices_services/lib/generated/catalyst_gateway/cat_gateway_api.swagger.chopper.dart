@@ -70,26 +70,6 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<FullStakeInfo>> _apiDraftCardanoStakedAdaStakeAddressGet({
-    required String? stakeAddress,
-    String? network,
-    int? slotNumber,
-  }) {
-    final Uri $url = Uri.parse('/api/draft/cardano/staked_ada/${stakeAddress}');
-    final Map<String, dynamic> $params = <String, dynamic>{
-      'network': network,
-      'slot_number': slotNumber,
-    };
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-      parameters: $params,
-    );
-    return client.send<FullStakeInfo, FullStakeInfo>($request);
-  }
-
-  @override
   Future<Response<RegistrationInfo>>
       _apiDraftCardanoRegistrationStakeAddressGet({
     required String? stakeAddress,
@@ -146,11 +126,11 @@ final class _$CatGatewayApi extends CatGatewayApi {
   @override
   Future<Response<Cip36Reporting>>
       _apiDraftCardanoCip36LatestRegistrationStakeAddrGet(
-          {required String? stakeAddr}) {
+          {required String? stakePubKey}) {
     final Uri $url =
         Uri.parse('/api/draft/cardano/cip36/latest_registration/stake_addr');
     final Map<String, dynamic> $params = <String, dynamic>{
-      'stake_addr': stakeAddr
+      'stake_pub_key': stakePubKey
     };
     final Request $request = Request(
       'GET',
@@ -231,6 +211,26 @@ final class _$CatGatewayApi extends CatGatewayApi {
     );
     return client
         .send<RbacRole0ChainRootResponse, RbacRole0ChainRootResponse>($request);
+  }
+
+  @override
+  Future<Response<FullStakeInfo>> _apiDraftCardanoAssetsStakeAddressGet({
+    required String? stakeAddress,
+    String? network,
+    int? slotNumber,
+  }) {
+    final Uri $url = Uri.parse('/api/draft/cardano/assets/${stakeAddress}');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'network': network,
+      'slot_number': slotNumber,
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<FullStakeInfo, FullStakeInfo>($request);
   }
 
   @override

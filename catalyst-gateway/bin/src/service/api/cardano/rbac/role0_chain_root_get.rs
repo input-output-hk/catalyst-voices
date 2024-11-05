@@ -1,4 +1,5 @@
 //! Implementation of the GET `/rbac/role0_chain_root` endpoint.
+use anyhow::anyhow;
 use futures::StreamExt as _;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
@@ -10,7 +11,9 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::responses::WithErrorResponses,
+    service::common::{
+        responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption,
+    },
 };
 
 /// GET RBAC chain root response.
@@ -33,9 +36,6 @@ pub(crate) enum Responses {
     /// Response for bad requests.
     #[oai(status = 400)]
     BadRequest,
-    /// Internal server error.
-    #[oai(status = 500)]
-    InternalServerError,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
@@ -44,7 +44,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
-        return Responses::InternalServerError.into();
+        let err = anyhow::anyhow!("Failed to acquire db session");
+        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
     let Ok(decoded_role0_key) = hex::decode(role0_key) else {
@@ -63,7 +64,8 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
                     Ok(row) => row,
                     Err(err) => {
                         error!(error = ?err, "Failed to parse get chain root by role0 key query row");
-                        return Responses::InternalServerError.into();
+                        let err = anyhow!(err);
+                        return AllResponses::internal_error(&err);
                     },
                 };
 
@@ -78,7 +80,7 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
         },
         Err(err) => {
             error!(error = ?err, "Failed to execute get chain root by role0 key query");
-            Responses::InternalServerError.into()
+            AllResponses::internal_error(&err)
         },
     }
 }
