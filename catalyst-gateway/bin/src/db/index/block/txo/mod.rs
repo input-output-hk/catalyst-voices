@@ -178,10 +178,10 @@ impl TxoInsertQuery {
             }
 
             for asset in txo.non_ada_assets() {
-                let policy_id = asset.policy().to_vec();
+                let asset_id = asset.policy().to_vec();
                 for policy_asset in asset.assets() {
                     if policy_asset.is_output() {
-                        let policy_name = policy_asset.to_ascii_name().unwrap_or_default();
+                        let asset_name = policy_asset.to_ascii_name().unwrap_or_default();
                         let value = policy_asset.any_coin();
 
                         if staked {
@@ -190,8 +190,8 @@ impl TxoInsertQuery {
                                 slot_no,
                                 txn,
                                 txo_index,
-                                &policy_id,
-                                &policy_name,
+                                &asset_id,
+                                &asset_name,
                                 value,
                             );
                             self.staked_txo_asset.push(params);
@@ -199,8 +199,8 @@ impl TxoInsertQuery {
                             let params = insert_unstaked_txo_asset::Params::new(
                                 txn_hash,
                                 txo_index,
-                                &policy_id,
-                                &policy_name,
+                                &asset_id,
+                                &asset_name,
                                 slot_no,
                                 txn,
                                 value,
