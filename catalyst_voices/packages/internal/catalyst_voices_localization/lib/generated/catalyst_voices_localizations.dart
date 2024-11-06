@@ -1342,22 +1342,22 @@ abstract class VoicesLocalizations {
   /// **'Dark'**
   String get themeDark;
 
-  /// A title on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogTitle.
   ///
   /// In en, this message translates to:
   /// **'Catalyst keychain removed'**
   String get keychainDeletedDialogTitle;
 
-  /// A subtitle on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
+  /// **'Your Catalyst Keychain is removed successfully from this device.'**
   String get keychainDeletedDialogSubtitle;
 
-  /// An info on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogInfo.
   ///
   /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
+  /// **'We reverted this device to Catalyst first use.'**
   String get keychainDeletedDialogInfo;
 
   /// No description provided for @registrationCompletedTitle.

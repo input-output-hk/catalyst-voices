@@ -808,17 +808,8 @@
     "description": "Refers to a dark theme mode."
   },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
-  "@keychainDeletedDialogTitle": {
-    "description": "A title on keychain deleted dialog"
-  },
-  "keychainDeletedDialogSubtitle": "Catalyst keychain removed",
-  "@keychainDeletedDialogSubtitle": {
-    "description": "A subtitle on keychain deleted dialog"
-  },
-  "keychainDeletedDialogInfo": "Catalyst keychain removed",
-  "@keychainDeletedDialogInfo": {
-    "description": "An info on keychain deleted dialog"
-  },
+  "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.",
+  "keychainDeletedDialogInfo": "We reverted this device to Catalyst first use.",
   "registrationCompletedTitle": "Catalyst account setup",
   "registrationCompletedSubtitle": "Completed!",
   "registrationCompletedSummaryHeader": "Summary",
