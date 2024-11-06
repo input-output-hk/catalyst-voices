@@ -32,7 +32,9 @@ abstract interface class UserService {
 
   Future<void> useKeychain(String id);
 
-  Future<void> removeCurrentAccount();
+  Future<void> removeCurrentKeychain();
+
+  Future<void> removeKeychain(String id);
 
   Future<void> dispose();
 }
@@ -110,16 +112,34 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> removeCurrentAccount() async {
+  Future<void> removeCurrentKeychain() async {
     final keychain = _keychain;
     if (keychain == null) {
-      _logger.warning('Called remove account but no active keychain found');
+      _logger.warning('Called remove keychain but no active found');
       return;
     }
 
+    await removeKeychain(keychain.id);
+  }
+
+  @override
+  Future<void> removeKeychain(String id) async {
+    if (!await _keychainProvider.exists(id)) {
+      _logger.warning(
+        'Called remove keychain[$id] but no such keychain was found',
+      );
+      return;
+    }
+
+    final isCurrentKeychain = id == _keychain?.id;
+
+    final keychain = await _keychainProvider.get(id);
     await keychain.clear();
-    await _clearUser();
-    await _useKeychain(null);
+
+    if (isCurrentKeychain) {
+      await _clearUser();
+      await _useKeychain(null);
+    }
   }
 
   @override

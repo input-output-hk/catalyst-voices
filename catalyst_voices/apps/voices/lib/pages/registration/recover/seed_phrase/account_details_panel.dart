@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_connection_status.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_summary.dart';
@@ -33,11 +31,9 @@ class AccountDetailsPanel extends StatelessWidget {
           style: theme.textTheme.titleMedium?.copyWith(color: textColor),
         ),
         const SizedBox(height: 24),
-        Expanded(
+        const Expanded(
           child: SingleChildScrollView(
-            child: _BlocAccountSummery(
-              onRetry: () => unawaited(_retryAccountRestore(context)),
-            ),
+            child: _BlocAccountSummery(),
           ),
         ),
         const SizedBox(height: 24),
@@ -45,19 +41,10 @@ class AccountDetailsPanel extends StatelessWidget {
       ],
     );
   }
-
-  Future<void> _retryAccountRestore(BuildContext context) async {
-    final recover = RegistrationCubit.of(context).recover;
-    await recover.recoverAccount();
-  }
 }
 
 class _BlocAccountSummery extends StatelessWidget {
-  final VoidCallback? onRetry;
-
-  const _BlocAccountSummery({
-    this.onRetry,
-  });
+  const _BlocAccountSummery();
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +58,7 @@ class _BlocAccountSummery extends StatelessWidget {
               walletSummary: value.walletSummary,
             ),
           Failure<AccountSummaryData, LocalizedException>(:final value) =>
-            _RecoverAccountFailure(
-              exception: value,
-              onRetry: onRetry,
-            ),
+            _RecoverAccountFailure(exception: value),
           _ => const Center(child: VoicesCircularProgressIndicator()),
         };
       },
@@ -117,18 +101,19 @@ class _RecoveredAccountSummary extends StatelessWidget {
 
 class _RecoverAccountFailure extends StatelessWidget {
   final LocalizedException exception;
-  final VoidCallback? onRetry;
 
   const _RecoverAccountFailure({
     required this.exception,
-    this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesErrorIndicator(
       message: exception.message(context),
-      onRetry: onRetry,
+      onRetry: () async {
+        final recover = RegistrationCubit.of(context).recover;
+        await recover.recoverAccount();
+      },
     );
   }
 }
@@ -185,8 +170,12 @@ class _Navigation extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
-          onTap: () => RegistrationCubit.of(context).previousStep(),
-          child: Text(context.l10n.back),
+          onTap: () async {
+            final cubit = RegistrationCubit.of(context);
+            await cubit.recover.reset();
+            cubit.previousStep();
+          },
+          child: Text(context.l10n.recoverDifferentKeychain),
         ),
       ],
     );
