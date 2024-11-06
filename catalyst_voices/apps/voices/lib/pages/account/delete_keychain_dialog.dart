@@ -105,6 +105,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                     width: 300,
                     child: VoicesTextField(
                       controller: _textEditingController,
+                      onFieldSubmitted: _removeKeychain,
                       decoration: VoicesTextFieldDecoration(
                         errorText: _errorText,
                         errorMaxLines: 2,
@@ -122,7 +123,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                 children: [
                   VoicesFilledButton(
                     backgroundColor: Theme.of(context).colors.iconsError,
-                    onTap: () async => _onRemoveKeychainTap(),
+                    onTap: _removeKeychain,
                     child: Text(context.l10n.delete),
                   ),
                   const SizedBox(width: 8),
@@ -140,14 +141,17 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
     );
   }
 
-  Future<void> _onRemoveKeychainTap() async {
-    if (_textEditingController.text ==
-        context.l10n.deleteKeychainDialogRemovingPhrase) {
+  void _removeKeychain([String? value]) {
+    if (_isDeleteConfirmed(value ?? _textEditingController.text)) {
       Navigator.pop(context, true);
     } else {
       setState(() {
         _errorText = context.l10n.deleteKeychainDialogErrorText;
       });
     }
+  }
+
+  bool _isDeleteConfirmed(String value) {
+    return value == context.l10n.deleteKeychainDialogRemovingPhrase;
   }
 }

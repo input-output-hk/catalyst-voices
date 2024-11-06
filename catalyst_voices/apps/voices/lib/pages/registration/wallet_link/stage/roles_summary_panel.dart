@@ -31,7 +31,7 @@ class RolesSummaryPanel extends StatelessWidget {
           onTap: () {
             RegistrationCubit.of(context).nextStep();
           },
-          child: Text(context.l10n.walletLinkRoleSummaryButton),
+          child: Text(context.l10n.reviewRegistrationTransaction),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(

@@ -595,10 +595,6 @@
   "@walletLinkRoleSummaryContent3": {
     "description": "The last part of the message on the role summary screen in registration."
   },
-  "walletLinkRoleSummaryButton": "Confirm & Sign with wallet",
-  "@walletLinkRoleSummaryButton": {
-    "description": "A button label on the role summary screen in registration for the next step."
-  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."
@@ -967,5 +963,9 @@
   "connectDifferentWallet": "Connect a different wallet",
   "@connectDifferentWallet": {
     "description": "A button label to connect a different wallet in wallet detail panel."
+  },
+  "reviewRegistrationTransaction": "Review registration transaction",
+  "@reviewRegistrationTransaction": {
+    "description": "A button label to review the registration transaction in wallet detail panel."
   }
 }
