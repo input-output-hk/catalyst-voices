@@ -99,8 +99,7 @@ struct TxoInfo {
     /// Whether the TXO was spent.
     spent_slot_no: Option<num_bigint::BigInt>,
     /// TXO assets.
-    // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
-    assets: HashMap<Vec<u8>, TxoAssetInfo>,
+    assets: HashMap<Vec<u8>, Vec<TxoAssetInfo>>,
 }
 
 /// Calculate the stake info for a given stake address.
@@ -185,12 +184,18 @@ async fn get_txo_by_txn(
         let entry = txo_info
             .assets
             .entry(row.policy_id.clone())
-            .or_insert(TxoAssetInfo {
-                id: row.policy_id,
-                name: row.policy_name,
-                amount: num_bigint::BigInt::ZERO,
-            });
-        entry.amount += row.value;
+            .or_insert_with(Vec::new);
+
+        match entry.iter_mut().find(|x| x.id == row.policy_id) {
+            Some(item) => item.amount += row.value,
+            None => {
+                entry.push(TxoAssetInfo {
+                    id: row.policy_id,
+                    name: row.policy_name,
+                    amount: row.value,
+                });
+            },
+        }
     }
 
     let mut txos_by_txn = HashMap::new();
@@ -273,7 +278,7 @@ fn build_stake_info(
                 stake_info.ada_amount +=
                     i64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
 
-                for asset in txo_info.assets.into_values() {
+                for asset in txo_info.assets.into_values().flatten() {
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
                         policy_hash: asset.id.try_into()?,
                         asset_name: asset.name.into(),
