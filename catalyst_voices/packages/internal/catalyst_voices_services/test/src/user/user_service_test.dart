@@ -56,7 +56,7 @@ void main() {
 
       await service.useKeychain(keychainOne.id);
       await service.useKeychain(keychainTwo.id);
-      await service.removeCurrentAccount();
+      await service.removeCurrentKeychain();
 
       await service.dispose();
     });
@@ -120,7 +120,7 @@ void main() {
       // Then
       expect(service.keychain, isNotNull);
 
-      await service.removeCurrentAccount();
+      await service.removeCurrentKeychain();
 
       expect(service.keychain, isNull);
       expect(await currentKeychain.isEmpty, isTrue);

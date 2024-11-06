@@ -20,6 +20,8 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
   Future<bool> recoverAccount();
 
   Future<bool> createKeychain();
+
+  Future<void> reset();
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
@@ -29,7 +31,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
-  Account? _account;
+  Account? _recoveredAccount;
 
   RecoverCubit({
     required UserService userService,
@@ -83,7 +85,8 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       final account = await _registrationService.recoverAccount(
         seedPhrase: seedPhrase,
       );
-      _account = account;
+
+      _recoveredAccount = account;
 
       await _userService.useAccount(account);
 
@@ -108,7 +111,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     } on RegistrationException catch (error, stack) {
       _logger.severe('recover account', error, stack);
 
-      _account = null;
+      _recoveredAccount = null;
 
       final exception = LocalizedRegistrationException.from(error);
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
@@ -117,7 +120,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     } catch (error, stack) {
       _logger.severe('recover account', error, stack);
 
-      _account = null;
+      _recoveredAccount = null;
 
       const exception = LocalizedUnknownException();
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
@@ -128,7 +131,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
   @override
   Future<bool> createKeychain() async {
-    final account = _account;
+    final account = _recoveredAccount;
     final seedPhrase = _seedPhrase;
     final password = this.password;
 
@@ -153,6 +156,18 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   @override
   void onUnlockPasswordStateChanged(UnlockPasswordState data) {
     emit(state.copyWith(unlockPasswordState: data));
+  }
+
+  @override
+  Future<void> reset() async {
+    final recoveredAccount = _recoveredAccount;
+    if (recoveredAccount != null) {
+      await _userService.removeKeychain(recoveredAccount.keychainId);
+    }
+
+    _recoveredAccount = null;
+
+    setSeedPhraseWords([]);
   }
 }
 
