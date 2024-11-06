@@ -18,6 +18,8 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
   void setSeedPhraseWords(List<SeedPhraseWord> words);
 
   Future<void> recoverAccount();
+
+  Future<void> reset();
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
@@ -27,6 +29,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
+  Account? _recoveredAccount;
 
   RecoverCubit({
     required UserService userService,
@@ -84,6 +87,8 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         lockFactor: lockFactor,
       );
 
+      _recoveredAccount = account;
+
       await _userService.useAccount(account);
 
       final walletInfo = account.walletInfo;
@@ -118,6 +123,18 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   @override
   void onUnlockPasswordStateChanged(UnlockPasswordState data) {
     emit(state.copyWith(unlockPasswordState: data));
+  }
+
+  @override
+  Future<void> reset() async {
+    final recoveredAccount = _recoveredAccount;
+    if (recoveredAccount != null) {
+      await _userService.removeKeychain(recoveredAccount.keychainId);
+    }
+
+    _recoveredAccount = null;
+
+    setSeedPhraseWords([]);
   }
 }
 

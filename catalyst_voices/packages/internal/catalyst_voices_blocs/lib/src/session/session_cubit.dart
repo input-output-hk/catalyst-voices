@@ -61,7 +61,7 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   Future<void> removeKeychain() {
-    return _userService.removeCurrentAccount();
+    return _userService.removeCurrentKeychain();
   }
 
   Future<void> switchToDummyAccount() async {
