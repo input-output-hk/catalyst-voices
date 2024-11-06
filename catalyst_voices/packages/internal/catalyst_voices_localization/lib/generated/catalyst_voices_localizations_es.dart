@@ -717,10 +717,10 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override
-  String get keychainDeletedDialogSubtitle => 'Catalyst keychain removed';
+  String get keychainDeletedDialogSubtitle => 'Your Catalyst Keychain is removed successfully from this device.';
 
   @override
-  String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+  String get keychainDeletedDialogInfo => 'We reverted this device to Catalyst first use.';
 
   @override
   String get registrationCompletedTitle => 'Catalyst account setup';

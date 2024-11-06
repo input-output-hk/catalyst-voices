@@ -21,7 +21,7 @@
     },
     "homepage": "https://github.com/input-output-hk/catalyst-voices#readme",
     "devDependencies": {
-        "@playwright/test": "^1.45.3",
+        "@playwright/test": "^1.48.0",
         "@types/node": "^20.14.12"
     },
     "dependencies": {
@@ -30,7 +30,7 @@
         "fs-extra": "^11.2.0",
         "install": "^0.13.0",
         "node-fetch": "^2.6.7",
-        "playwright": "^1.45.3",
+        "playwright": "^1.48.0",
         "unzip-crx-3": "^0.2.0"
     }
 }
