@@ -479,9 +479,6 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkRoleSummaryContent3 => ' in Catalyst.';
 
   @override
-  String get walletLinkRoleSummaryButton => 'Confirm & Sign with wallet';
-
-  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
@@ -997,4 +994,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get connectDifferentWallet => 'Connect a different wallet';
+
+  @override
+  String get reviewRegistrationTransaction => 'Review registration transaction';
 }

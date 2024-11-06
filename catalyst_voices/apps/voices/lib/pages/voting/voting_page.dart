@@ -121,6 +121,7 @@ class _UnlockedHeaderActions extends StatelessWidget {
               suffixIcon:
                   VoicesAssets.icons.arrowTriangleDown.buildIcon(size: 16),
             ),
+            onFieldSubmitted: (value) {},
           ),
         ),
         const SizedBox(width: 16),
@@ -132,6 +133,7 @@ class _UnlockedHeaderActions extends StatelessWidget {
               hintText: 'Search proposals',
               prefixIcon: VoicesAssets.icons.search.buildIcon(),
             ),
+            onFieldSubmitted: (value) {},
           ),
         ),
         IconButton(
