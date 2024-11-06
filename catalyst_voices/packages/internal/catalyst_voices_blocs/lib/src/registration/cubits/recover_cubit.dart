@@ -17,7 +17,9 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
 
   void setSeedPhraseWords(List<SeedPhraseWord> words);
 
-  Future<void> recoverAccount();
+  Future<bool> recoverAccount();
+
+  Future<bool> createKeychain();
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
@@ -27,6 +29,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
+  Account? _account;
 
   RecoverCubit({
     required UserService userService,
@@ -66,23 +69,21 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   }
 
   @override
-  Future<void> recoverAccount() async {
+  Future<bool> recoverAccount() async {
     try {
       emit(state.copyWith(accountDetails: const Optional.empty()));
 
       final seedPhrase = _seedPhrase;
-      final lockFactor = PasswordLockFactor(password.value);
-
       if (seedPhrase == null) {
         const exception = LocalizedRegistrationSeedPhraseNotFoundException();
         emit(state.copyWith(accountDetails: Optional(Failure(exception))));
-        return;
+        return false;
       }
 
       final account = await _registrationService.recoverAccount(
         seedPhrase: seedPhrase,
-        lockFactor: lockFactor,
       );
+      _account = account;
 
       await _userService.useAccount(account);
 
@@ -102,17 +103,51 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       );
 
       emit(state.copyWith(accountDetails: Optional(Success(accountDetails))));
+
+      return true;
     } on RegistrationException catch (error, stack) {
       _logger.severe('recover account', error, stack);
 
+      _account = null;
+
       final exception = LocalizedRegistrationException.from(error);
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
+
+      return false;
     } catch (error, stack) {
       _logger.severe('recover account', error, stack);
 
+      _account = null;
+
       const exception = LocalizedUnknownException();
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
+
+      return false;
     }
+  }
+
+  @override
+  Future<bool> createKeychain() async {
+    final account = _account;
+    final seedPhrase = _seedPhrase;
+    final password = this.password;
+
+    if (account == null || seedPhrase == null || password.isNotValid) {
+      emitError(const LocalizedRegistrationUnknownException());
+      return false;
+    }
+
+    final lockFactor = PasswordLockFactor(password.value);
+
+    await _registrationService.createKeychainFor(
+      account: account,
+      seedPhrase: seedPhrase,
+      lockFactor: lockFactor,
+    );
+
+    await _userService.useAccount(account);
+
+    return true;
   }
 
   @override
