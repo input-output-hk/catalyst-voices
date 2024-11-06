@@ -1,4 +1,5 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
+use anyhow::anyhow;
 use der_parser::asn1_rs::ToDer;
 use futures::StreamExt as _;
 use poem_openapi::{payload::Json, ApiResponse, Object};
@@ -9,7 +10,10 @@ use crate::{
         queries::rbac::get_chain_root::{GetChainRootQuery, GetChainRootQueryParams},
         session::CassandraSession,
     },
-    service::common::{responses::WithErrorResponses, types::cardano::address::Cip19StakeAddress},
+    service::common::{
+        responses::WithErrorResponses,
+        types::{cardano::address::Cip19StakeAddress, headers::retry_after::RetryAfterOption},
+    },
 };
 
 /// GET RBAC chain root response.
@@ -29,9 +33,6 @@ pub(crate) enum Responses {
     /// No chain root found for the given stake address.
     #[oai(status = 404)]
     NotFound,
-    /// Internal server error.
-    #[oai(status = 500)]
-    InternalServerError,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
@@ -40,12 +41,14 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
-        return Responses::InternalServerError.into();
+        let err = anyhow::anyhow!("Failed to acquire db session");
+        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
     let Ok(stake_address) = stake_address.to_der_vec() else {
         error!("Failed to create stake address vec");
-        return Responses::InternalServerError.into();
+        let err = anyhow!("Failed to create stake address vec");
+        return AllResponses::internal_error(&err);
     };
 
     let query_res =
@@ -58,7 +61,8 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
                     Ok(row) => row,
                     Err(err) => {
                         error!(error = ?err, "Failed to parse get chain root by stake address query row");
-                        return Responses::InternalServerError.into();
+                        let err = anyhow!(err);
+                        return AllResponses::internal_error(&err);
                     },
                 };
 
@@ -73,7 +77,8 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
         },
         Err(err) => {
             error!(error = ?err, "Failed to execute get chain root by stake address query");
-            Responses::InternalServerError.into()
+            let err = anyhow!(err);
+            AllResponses::internal_error(&err)
         },
     }
 }

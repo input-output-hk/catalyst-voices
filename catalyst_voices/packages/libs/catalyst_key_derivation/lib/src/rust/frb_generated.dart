@@ -66,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => -1380090306;
+  int get rustContentHash => -1976079523;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -82,6 +82,9 @@ abstract class RustLibApi extends BaseApi {
 
   Bip32Ed25519Signature crateApiKeyDerivationBip32Ed25519SignatureNew(
       {required U8Array64 sigBytes});
+
+  String crateApiKeyDerivationBip32Ed25519SignatureToHex(
+      {required Bip32Ed25519Signature that});
 
   Future<Bip32Ed25519XPrivateKey>
       crateApiKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv(
@@ -106,6 +109,9 @@ abstract class RustLibApi extends BaseApi {
       crateApiKeyDerivationBip32Ed25519XPrivateKeySignData(
           {required Bip32Ed25519XPrivateKey that, required List<int> data});
 
+  String crateApiKeyDerivationBip32Ed25519XPrivateKeyToHex(
+      {required Bip32Ed25519XPrivateKey that});
+
   Future<bool> crateApiKeyDerivationBip32Ed25519XPrivateKeyVerifySignature(
       {required Bip32Ed25519XPrivateKey that,
       required List<int> data,
@@ -126,6 +132,9 @@ abstract class RustLibApi extends BaseApi {
 
   Bip32Ed25519XPublicKey crateApiKeyDerivationBip32Ed25519XPublicKeyNew(
       {required U8Array64 xpubBytes});
+
+  String crateApiKeyDerivationBip32Ed25519XPublicKeyToHex(
+      {required Bip32Ed25519XPublicKey that});
 
   Future<bool> crateApiKeyDerivationBip32Ed25519XPublicKeyVerifySignature(
       {required Bip32Ed25519XPublicKey that,
@@ -225,6 +234,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  String crateApiKeyDerivationBip32Ed25519SignatureToHex(
+      {required Bip32Ed25519Signature that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519SignatureToHexConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationBip32Ed25519SignatureToHexConstMeta =>
+      const TaskConstMeta(
+        debugName: "Bip32Ed25519Signature_to_hex",
+        argNames: ["that"],
+      );
+
+  @override
   Future<Bip32Ed25519XPrivateKey>
       crateApiKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv(
           {required Bip32Ed25519XPrivateKey that, required String path}) {
@@ -235,7 +270,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_String(path, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 3, port: port_);
+            funcId: 4, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -264,7 +299,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -291,7 +326,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_32,
@@ -319,7 +354,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_64,
@@ -347,7 +382,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_96,
@@ -373,7 +408,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_8_array_96(xprvBytes, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -403,7 +438,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_list_prim_u_8_loose(data, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
+            funcId: 10, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -424,6 +459,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
+  String crateApiKeyDerivationBip32Ed25519XPrivateKeyToHex(
+      {required Bip32Ed25519XPrivateKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPrivateKeyToHexConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyToHexConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_to_hex",
+            argNames: ["that"],
+          );
+
+  @override
   Future<bool> crateApiKeyDerivationBip32Ed25519XPrivateKeyVerifySignature(
       {required Bip32Ed25519XPrivateKey that,
       required List<int> data,
@@ -437,7 +499,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
             signature, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 10, port: port_);
+            funcId: 12, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -467,7 +529,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
             that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 11, port: port_);
+            funcId: 13, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -496,7 +558,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_32,
@@ -524,7 +586,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_64,
@@ -551,7 +613,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_32,
@@ -578,7 +640,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_8_array_64(xpubBytes, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -598,6 +660,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  String crateApiKeyDerivationBip32Ed25519XPublicKeyToHex(
+      {required Bip32Ed25519XPublicKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPublicKeyToHexConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPublicKeyToHexConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPublicKey_to_hex",
+            argNames: ["that"],
+          );
+
+  @override
   Future<bool> crateApiKeyDerivationBip32Ed25519XPublicKeyVerifySignature(
       {required Bip32Ed25519XPublicKey that,
       required List<int> data,
@@ -611,7 +700,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
             signature, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 16, port: port_);
+            funcId: 19, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -640,7 +729,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(mnemonic, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 17, port: port_);
+            funcId: 20, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -1235,6 +1324,12 @@ class Bip32Ed25519SignatureImpl extends RustOpaque
       RustLib.instance.api.crateApiKeyDerivationBip32Ed25519SignatureGetInner(
         that: this,
       );
+
+  /// Convert to a hex string.
+  String toHex() =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519SignatureToHex(
+        that: this,
+      );
 }
 
 @sealed
@@ -1329,6 +1424,12 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
       RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeySignData(
           that: this, data: data);
 
+  /// Convert to a hex string.
+  String toHex() =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeyToHex(
+        that: this,
+      );
+
   /// Verify the signature on the given data using extended private key.
   ///
   /// # Arguments
@@ -1412,6 +1513,12 @@ class Bip32Ed25519XPublicKeyImpl extends RustOpaque
   /// Returns a 32 length bytes representing the public key.
   U8Array32 get publicKey => RustLib.instance.api
           .crateApiKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(
+        that: this,
+      );
+
+  /// Convert to a hex string.
+  String toHex() =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPublicKeyToHex(
         that: this,
       );
 

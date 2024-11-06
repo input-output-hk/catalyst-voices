@@ -8,6 +8,7 @@ use poem_openapi::{
 
 use crate::service::{
     common::{
+        auth::none::NoAuthorization,
         objects::legacy::{
             event_id::EventId, voter_registration::VoterRegistration,
             voting_public_key::VotingPublicKey,
@@ -32,7 +33,7 @@ enum Responses {
 /// All responses
 type AllResponses = WithErrorResponses<Responses>;
 
-#[OpenApi(tag = "ApiTags::Registration")]
+#[OpenApi(tag = "ApiTags::Legacy")]
 impl RegistrationApi {
     /// Voter's info
     ///
@@ -66,6 +67,8 @@ impl RegistrationApi {
         /// in the response. Otherwise, it will be omitted.
         #[oai(default)]
         with_delegators: Query<bool>,
+        /// No Auth Required
+        _auth: NoAuthorization,
     ) -> AllResponses {
         Responses::Ok(Json(VoterRegistration::example())).into()
     }

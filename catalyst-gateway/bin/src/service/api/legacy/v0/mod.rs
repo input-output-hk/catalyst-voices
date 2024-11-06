@@ -2,7 +2,8 @@
 use poem_openapi::{payload::Binary, OpenApi};
 
 use crate::service::{
-    common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
+    common::{auth::none::NoAuthorization, tags::ApiTags},
+    utilities::middleware::schema_validation::schema_version_validation,
 };
 mod message_post;
 mod plans_get;
@@ -21,7 +22,9 @@ impl V0Api {
         operation_id = "Message",
         deprecated = true
     )]
-    async fn message_post(&self, message: Binary<Vec<u8>>) -> message_post::AllResponses {
+    async fn message_post(
+        &self, message: Binary<Vec<u8>>, _auth: NoAuthorization,
+    ) -> message_post::AllResponses {
         message_post::endpoint(message).await
     }
 
@@ -35,7 +38,7 @@ impl V0Api {
         transform = "schema_version_validation",
         deprecated = true
     )]
-    async fn plans_get(&self) -> plans_get::AllResponses {
+    async fn plans_get(&self, _auth: NoAuthorization) -> plans_get::AllResponses {
         plans_get::endpoint().await
     }
 }

@@ -41,6 +41,9 @@ abstract class Bip32Ed25519Signature implements RustOpaqueInterface {
   factory Bip32Ed25519Signature({required U8Array64 sigBytes}) =>
       RustLib.instance.api
           .crateApiKeyDerivationBip32Ed25519SignatureNew(sigBytes: sigBytes);
+
+  /// Convert to a hex string.
+  String toHex();
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPrivateKey>>
@@ -104,6 +107,9 @@ abstract class Bip32Ed25519XPrivateKey implements RustOpaqueInterface {
   /// Returns an error if the extended private key is invalid.
   Future<Bip32Ed25519Signature> signData({required List<int> data});
 
+  /// Convert to a hex string.
+  String toHex();
+
   /// Verify the signature on the given data using extended private key.
   ///
   /// # Arguments
@@ -159,6 +165,9 @@ abstract class Bip32Ed25519XPublicKey implements RustOpaqueInterface {
   factory Bip32Ed25519XPublicKey({required U8Array64 xpubBytes}) =>
       RustLib.instance.api
           .crateApiKeyDerivationBip32Ed25519XPublicKeyNew(xpubBytes: xpubBytes);
+
+  /// Convert to a hex string.
+  String toHex();
 
   /// Verify the signature on the given data using extended public key.
   ///

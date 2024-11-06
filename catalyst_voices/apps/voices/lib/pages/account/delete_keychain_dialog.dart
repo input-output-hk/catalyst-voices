@@ -9,14 +9,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class DeleteKeychainDialog extends StatefulWidget {
-  const DeleteKeychainDialog({
-    super.key,
-  });
+  const DeleteKeychainDialog._();
 
   static Future<bool> show(BuildContext context) async {
     final result = await VoicesDialog.show<bool>(
       context: context,
-      builder: (context) => const DeleteKeychainDialog(),
+      builder: (context) => const DeleteKeychainDialog._(),
     );
 
     return result ?? false;

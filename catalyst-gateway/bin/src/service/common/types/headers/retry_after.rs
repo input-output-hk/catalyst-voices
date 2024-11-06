@@ -13,12 +13,27 @@ use poem_openapi::{
 use serde_json::Value;
 
 /// Parameter which describes the possible choices for a Retry-After header field.
+#[derive(Debug)]
 #[allow(dead_code)] // Its OK if all these variants are not used.
 pub(crate) enum RetryAfterHeader {
     /// Http Date
     Date(DateTime<Utc>),
     /// Interval in seconds.
     Seconds(u64),
+}
+
+/// Parameter which lets us set the retry header, or use some default.
+/// Needed, because its valid to exclude the retry header specifically.
+/// This is also due to the way Poem handles optional headers.
+#[derive(Debug)]
+#[allow(dead_code)] // Its OK if all these variants are not used.
+pub(crate) enum RetryAfterOption {
+    /// Use a default Retry After header value
+    Default,
+    /// Don't include the Retry After header value in the response.
+    None,
+    /// Use a specific Retry After header value
+    Some(RetryAfterHeader),
 }
 
 impl Display for RetryAfterHeader {

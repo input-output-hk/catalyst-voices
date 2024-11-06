@@ -58,8 +58,10 @@ class MyApp extends StatelessWidget {
 
     const path = "m/1852'/1815'/0'/2/0";
     final childXprv = await xprv.derivePrivateKey(path: path);
-
     print('Derive xprv with $path: ${childXprv.toHex()}');
+
+    final childXprvHex = childXprv.toHex();
+    print('Master xprv hex $childXprvHex');
 
     xprv.drop();
     print('Master xprv dropped ${xprv.toHex()}');
