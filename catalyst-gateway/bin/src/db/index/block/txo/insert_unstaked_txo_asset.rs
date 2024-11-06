@@ -22,9 +22,9 @@ pub(super) struct Params {
     /// Transaction Output Offset inside the transaction.
     txo: i16,
     /// Policy hash of the asset
-    policy_id: Vec<u8>,
+    asset_id: Vec<u8>,
     /// Policy name of the asset
-    policy_name: String,
+    asset_name: Vec<u8>,
     /// Block Slot Number
     slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
@@ -40,14 +40,14 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
-        txn_hash: &[u8], txo: i16, policy_id: &[u8], policy_name: &str, slot_no: u64, txn: i16,
+        txn_hash: &[u8], txo: i16, asset_id: &[u8], asset_name: &str, slot_no: u64, txn: i16,
         value: i128,
     ) -> Self {
         Self {
             txn_hash: txn_hash.to_vec(),
             txo,
-            policy_id: policy_id.to_vec(),
-            policy_name: policy_name.to_owned(),
+            asset_id: asset_id.to_vec(),
+            asset_name: asset_name.as_bytes().to_vec(),
             slot_no: slot_no.into(),
             txn,
             value: value.into(),
