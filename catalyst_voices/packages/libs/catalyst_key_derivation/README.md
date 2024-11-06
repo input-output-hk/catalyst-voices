@@ -5,14 +5,13 @@
   * [References](#references)
   * [Requirements](#requirements)
   * [Install](#install)
-  * [How to run](#how-to-run)
   * [Example](#example)
   * [Support](#support)
   * [License](#license)
 
 ## Features
 
-This package expose BIP32-Ed25519 and SLIP-0023 Cardano HD Key Derivation.
+This package exposes BIP32-Ed25519 and SLIP-0023 Cardano HD Key Derivation.
 
 ## References
 
@@ -32,13 +31,45 @@ dependencies:
     catalyst_key_derivation: any # or the latest version on Pub
 ```
 
-## How to run
-
-1. just run-web
-
 ## Example
 
-TODO(dtscalac): update example
+```dart
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+
+Future<void> main() async {
+  await CatalystKeyDerivation.init();
+
+  const keyDerivation = CatalystKeyDerivation();
+
+  final xprv = await keyDerivation.deriveMasterKey(
+    mnemonic: 'prevent company field green slot measure chief'
+        ' hero apple task eagle sunset endorse dress seed',
+  );
+  print('Master xprv ${xprv.toHex()}');
+
+  final xpub = await xprv.derivePublicKey();
+  print('Master xpub ${xpub.toHex()}');
+
+  final data = [1, 2, 3, 4];
+  final sig = await xprv.sign(data);
+
+  final checkXprvSig = await xprv.verify(data, signature: sig);
+  print('Check signature by using xprv $checkXprvSig');
+
+  final checkXpubSig = await xpub.verify(data, signature: sig);
+  print('Check signature by using xpub $checkXpubSig');
+
+  const path = "m/1852'/1815'/0'/2/0";
+  final childXprv = await xprv.derivePrivateKey(path: path);
+  print('Derive xprv with $path: ${childXprv.toHex()}');
+
+  final childXprvHex = childXprv.toHex();
+  print('Master xprv hex $childXprvHex');
+
+  xprv.drop();
+  print('Master xprv dropped ${xprv.toHex()}');
+}
+```
 
 ## Support
 
