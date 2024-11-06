@@ -7,15 +7,15 @@ import 'package:test/test.dart';
 import 'x509_certificate_test.mocks.dart';
 
 @GenerateNiceMocks([
-  MockSpec<Ed25519ExtendedPrivateKey>(),
-  MockSpec<Ed25519ExtendedPublicKey>(),
-  MockSpec<Ed25519ExtendedSignature>(),
+  MockSpec<Bip32Ed25519XPrivateKey>(),
+  MockSpec<Bip32Ed25519XPublicKey>(),
+  MockSpec<Bip32Ed25519XSignature>(),
 ])
 void main() {
   group(X509Certificate, () {
-    final privateKey = MockEd25519ExtendedPrivateKey();
-    final publicKey = MockEd25519ExtendedPublicKey();
-    final signature = MockEd25519ExtendedSignature();
+    final privateKey = MockBip32Ed25519XPrivateKey();
+    final publicKey = MockBip32Ed25519XPublicKey();
+    final signature = MockBip32Ed25519XSignature();
 
     setUp(() {
       // ignore: discarded_futures
@@ -58,7 +58,7 @@ void main() {
       );
 
       expect(certificate.tbsCertificate, equals(tbs));
-      expect(certificate.signature, isNotEmpty);
+      expect(certificate.signature, equals(signature.bytes));
 
       expect(certificate.toPem(), isNotEmpty);
       expect(certificate.toDer().bytes, isNotEmpty);

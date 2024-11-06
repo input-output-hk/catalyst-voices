@@ -28,7 +28,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _progressNotifier;
 
-  Ed25519ExtendedPrivateKey? _masterKey;
+  Bip32Ed25519XPrivateKey? _masterKey;
   Transaction? _transaction;
 
   /// Returns [RegistrationCubit] if found in widget tree. Does not add

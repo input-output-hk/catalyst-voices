@@ -41,7 +41,7 @@ class X509Certificate with EquatableMixin {
   /// that is signed using the [privateKey].
   static Future<X509Certificate> generateSelfSigned({
     required X509TBSCertificate tbsCertificate,
-    required Ed25519ExtendedPrivateKey privateKey,
+    required Bip32Ed25519XPrivateKey privateKey,
   }) async {
     final encodedTbsCertificate = tbsCertificate.toASN1();
     final signature = await privateKey.sign(encodedTbsCertificate.encodedBytes);
@@ -118,7 +118,7 @@ class X509TBSCertificate with EquatableMixin {
   final X509DistinguishedName subject;
 
   /// The public key of the [subject].
-  final Ed25519ExtendedPublicKey subjectPublicKey;
+  final Bip32Ed25519XPublicKey subjectPublicKey;
 
   /// Extra extensions of the certificate.
   final X509CertificateExtensions? extensions;
@@ -182,7 +182,7 @@ class X509TBSCertificate with EquatableMixin {
       ..add(ASN1UtcTime(validityNotAfter.toUtc()));
   }
 
-  ASN1Object _createSubjectPublicKeyInfo(Ed25519ExtendedPublicKey publicKey) {
+  ASN1Object _createSubjectPublicKeyInfo(Bip32Ed25519XPublicKey publicKey) {
     return ASN1Sequence()
       ..add(
         ASN1Sequence()

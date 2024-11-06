@@ -5,11 +5,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i7;
 
-import 'package:catalyst_key_derivation/src/ed25519_extended/ed25519_extended_private_key.dart'
+import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_private_key.dart'
     as _i5;
-import 'package:catalyst_key_derivation/src/ed25519_extended/ed25519_extended_public_key.dart'
+import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_public_key.dart'
     as _i4;
-import 'package:catalyst_key_derivation/src/ed25519_extended/ed25519_extended_signature.dart'
+import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_signature.dart'
     as _i3;
 import 'package:cbor/cbor.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
@@ -38,9 +38,9 @@ class _FakeCborValue_0 extends _i1.SmartFake implements _i2.CborValue {
         );
 }
 
-class _FakeEd25519ExtendedSignature_1 extends _i1.SmartFake
-    implements _i3.Ed25519ExtendedSignature {
-  _FakeEd25519ExtendedSignature_1(
+class _FakeBip32Ed25519XSignature_1 extends _i1.SmartFake
+    implements _i3.Bip32Ed25519XSignature {
+  _FakeBip32Ed25519XSignature_1(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -49,9 +49,9 @@ class _FakeEd25519ExtendedSignature_1 extends _i1.SmartFake
         );
 }
 
-class _FakeEd25519ExtendedPublicKey_2 extends _i1.SmartFake
-    implements _i4.Ed25519ExtendedPublicKey {
-  _FakeEd25519ExtendedPublicKey_2(
+class _FakeBip32Ed25519XPublicKey_2 extends _i1.SmartFake
+    implements _i4.Bip32Ed25519XPublicKey {
+  _FakeBip32Ed25519XPublicKey_2(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -60,9 +60,9 @@ class _FakeEd25519ExtendedPublicKey_2 extends _i1.SmartFake
         );
 }
 
-class _FakeEd25519ExtendedPrivateKey_3 extends _i1.SmartFake
-    implements _i5.Ed25519ExtendedPrivateKey {
-  _FakeEd25519ExtendedPrivateKey_3(
+class _FakeBip32Ed25519XPrivateKey_3 extends _i1.SmartFake
+    implements _i5.Bip32Ed25519XPrivateKey {
+  _FakeBip32Ed25519XPrivateKey_3(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -71,11 +71,11 @@ class _FakeEd25519ExtendedPrivateKey_3 extends _i1.SmartFake
         );
 }
 
-/// A class which mocks [Ed25519ExtendedPrivateKey].
+/// A class which mocks [Bip32Ed25519XPrivateKey].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockEd25519ExtendedPrivateKey extends _i1.Mock
-    implements _i5.Ed25519ExtendedPrivateKey {
+class MockBip32Ed25519XPrivateKey extends _i1.Mock
+    implements _i5.Bip32Ed25519XPrivateKey {
   @override
   List<int> get bytes => (super.noSuchMethod(
         Invocation.getter(#bytes),
@@ -135,35 +135,34 @@ class MockEd25519ExtendedPrivateKey extends _i1.Mock
       ) as String);
 
   @override
-  _i7.Future<_i3.Ed25519ExtendedSignature> sign(List<int>? message) =>
+  _i7.Future<_i3.Bip32Ed25519XSignature> sign(List<int>? message) =>
       (super.noSuchMethod(
         Invocation.method(
           #sign,
           [message],
         ),
-        returnValue: _i7.Future<_i3.Ed25519ExtendedSignature>.value(
-            _FakeEd25519ExtendedSignature_1(
+        returnValue: _i7.Future<_i3.Bip32Ed25519XSignature>.value(
+            _FakeBip32Ed25519XSignature_1(
           this,
           Invocation.method(
             #sign,
             [message],
           ),
         )),
-        returnValueForMissingStub:
-            _i7.Future<_i3.Ed25519ExtendedSignature>.value(
-                _FakeEd25519ExtendedSignature_1(
+        returnValueForMissingStub: _i7.Future<_i3.Bip32Ed25519XSignature>.value(
+            _FakeBip32Ed25519XSignature_1(
           this,
           Invocation.method(
             #sign,
             [message],
           ),
         )),
-      ) as _i7.Future<_i3.Ed25519ExtendedSignature>);
+      ) as _i7.Future<_i3.Bip32Ed25519XSignature>);
 
   @override
   _i7.Future<bool> verify(
     List<int>? message, {
-    required _i3.Ed25519ExtendedSignature? signature,
+    required _i3.Bip32Ed25519XSignature? signature,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -176,33 +175,32 @@ class MockEd25519ExtendedPrivateKey extends _i1.Mock
       ) as _i7.Future<bool>);
 
   @override
-  _i7.Future<_i4.Ed25519ExtendedPublicKey> derivePublicKey() =>
+  _i7.Future<_i4.Bip32Ed25519XPublicKey> derivePublicKey() =>
       (super.noSuchMethod(
         Invocation.method(
           #derivePublicKey,
           [],
         ),
-        returnValue: _i7.Future<_i4.Ed25519ExtendedPublicKey>.value(
-            _FakeEd25519ExtendedPublicKey_2(
+        returnValue: _i7.Future<_i4.Bip32Ed25519XPublicKey>.value(
+            _FakeBip32Ed25519XPublicKey_2(
           this,
           Invocation.method(
             #derivePublicKey,
             [],
           ),
         )),
-        returnValueForMissingStub:
-            _i7.Future<_i4.Ed25519ExtendedPublicKey>.value(
-                _FakeEd25519ExtendedPublicKey_2(
+        returnValueForMissingStub: _i7.Future<_i4.Bip32Ed25519XPublicKey>.value(
+            _FakeBip32Ed25519XPublicKey_2(
           this,
           Invocation.method(
             #derivePublicKey,
             [],
           ),
         )),
-      ) as _i7.Future<_i4.Ed25519ExtendedPublicKey>);
+      ) as _i7.Future<_i4.Bip32Ed25519XPublicKey>);
 
   @override
-  _i7.Future<_i5.Ed25519ExtendedPrivateKey> derivePrivateKey(
+  _i7.Future<_i5.Bip32Ed25519XPrivateKey> derivePrivateKey(
           {required String? path}) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -210,8 +208,8 @@ class MockEd25519ExtendedPrivateKey extends _i1.Mock
           [],
           {#path: path},
         ),
-        returnValue: _i7.Future<_i5.Ed25519ExtendedPrivateKey>.value(
-            _FakeEd25519ExtendedPrivateKey_3(
+        returnValue: _i7.Future<_i5.Bip32Ed25519XPrivateKey>.value(
+            _FakeBip32Ed25519XPrivateKey_3(
           this,
           Invocation.method(
             #derivePrivateKey,
@@ -220,8 +218,8 @@ class MockEd25519ExtendedPrivateKey extends _i1.Mock
           ),
         )),
         returnValueForMissingStub:
-            _i7.Future<_i5.Ed25519ExtendedPrivateKey>.value(
-                _FakeEd25519ExtendedPrivateKey_3(
+            _i7.Future<_i5.Bip32Ed25519XPrivateKey>.value(
+                _FakeBip32Ed25519XPrivateKey_3(
           this,
           Invocation.method(
             #derivePrivateKey,
@@ -229,7 +227,7 @@ class MockEd25519ExtendedPrivateKey extends _i1.Mock
             {#path: path},
           ),
         )),
-      ) as _i7.Future<_i5.Ed25519ExtendedPrivateKey>);
+      ) as _i7.Future<_i5.Bip32Ed25519XPrivateKey>);
 
   @override
   void drop() => super.noSuchMethod(
@@ -241,11 +239,11 @@ class MockEd25519ExtendedPrivateKey extends _i1.Mock
       );
 }
 
-/// A class which mocks [Ed25519ExtendedPublicKey].
+/// A class which mocks [Bip32Ed25519XPublicKey].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockEd25519ExtendedPublicKey extends _i1.Mock
-    implements _i4.Ed25519ExtendedPublicKey {
+class MockBip32Ed25519XPublicKey extends _i1.Mock
+    implements _i4.Bip32Ed25519XPublicKey {
   @override
   List<int> get bytes => (super.noSuchMethod(
         Invocation.getter(#bytes),
@@ -310,7 +308,7 @@ class MockEd25519ExtendedPublicKey extends _i1.Mock
   @override
   _i7.Future<bool> verify(
     List<int>? message, {
-    required _i3.Ed25519ExtendedSignature? signature,
+    required _i3.Bip32Ed25519XSignature? signature,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -323,11 +321,11 @@ class MockEd25519ExtendedPublicKey extends _i1.Mock
       ) as _i7.Future<bool>);
 }
 
-/// A class which mocks [Ed25519ExtendedSignature].
+/// A class which mocks [Bip32Ed25519XSignature].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockEd25519ExtendedSignature extends _i1.Mock
-    implements _i3.Ed25519ExtendedSignature {
+class MockBip32Ed25519XSignature extends _i1.Mock
+    implements _i3.Bip32Ed25519XSignature {
   @override
   List<int> get bytes => (super.noSuchMethod(
         Invocation.getter(#bytes),

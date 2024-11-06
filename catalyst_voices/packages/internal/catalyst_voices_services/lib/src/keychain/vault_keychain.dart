@@ -68,15 +68,15 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   @override
-  Future<Ed25519ExtendedPrivateKey?> getMasterKey() async {
+  Future<Bip32Ed25519XPrivateKey?> getMasterKey() async {
     final encodedMasterKey = await readString(key: _rootKey);
     return encodedMasterKey != null
-        ? Ed25519ExtendedPrivateKey.fromHex(encodedMasterKey)
+        ? Bip32Ed25519XPrivateKeyFactory.instance.fromHex(encodedMasterKey)
         : null;
   }
 
   @override
-  Future<void> setMasterKey(Ed25519ExtendedPrivateKey data) async {
+  Future<void> setMasterKey(Bip32Ed25519XPrivateKey data) async {
     await writeString(data.toHex(), key: _rootKey);
   }
 

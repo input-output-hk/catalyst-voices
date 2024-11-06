@@ -44,7 +44,7 @@ abstract interface class RegistrationService {
   Future<WalletInfo> getCardanoWalletInfo(CardanoWallet wallet);
 
   /// See [KeyDerivation.deriveMasterKey].
-  Future<Ed25519ExtendedPrivateKey> deriveMasterKey({
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
   });
 
@@ -59,7 +59,7 @@ abstract interface class RegistrationService {
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
-    required Ed25519ExtendedPrivateKey masterKey,
+    required Bip32Ed25519XPrivateKey masterKey,
     required Set<AccountRole> roles,
   });
 
@@ -77,7 +77,7 @@ abstract interface class RegistrationService {
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
     required LockFactor lockFactor,
-    required Ed25519ExtendedPrivateKey masterKey,
+    required Bip32Ed25519XPrivateKey masterKey,
   });
 
   Future<Account> registerTestAccount({
@@ -120,7 +120,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
-  Future<Ed25519ExtendedPrivateKey> deriveMasterKey({
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
   }) {
     return _keyDerivation.deriveMasterKey(seedPhrase: seedPhrase);
@@ -169,7 +169,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
-    required Ed25519ExtendedPrivateKey masterKey,
+    required Bip32Ed25519XPrivateKey masterKey,
     required Set<AccountRole> roles,
   }) async {
     try {
@@ -214,7 +214,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
     required LockFactor lockFactor,
-    required Ed25519ExtendedPrivateKey masterKey,
+    required Bip32Ed25519XPrivateKey masterKey,
   }) async {
     try {
       final enabledWallet = await wallet.enable();

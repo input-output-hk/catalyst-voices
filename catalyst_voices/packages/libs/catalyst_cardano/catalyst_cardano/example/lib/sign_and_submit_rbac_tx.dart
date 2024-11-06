@@ -85,7 +85,7 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
   final privateKey = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
   final publicKey = await privateKey.derivePublicKey();
 
-  final keyPair = Ed25519ExtendedKeyPair(
+  final keyPair = Bip32Ed25519XKeyPair(
     publicKey: publicKey,
     privateKey: privateKey,
   );
@@ -193,7 +193,7 @@ Transaction _buildUnsignedRbacTx({
 }
 
 Future<X509Certificate> generateX509Certificate({
-  required Ed25519ExtendedKeyPair keyPair,
+  required Bip32Ed25519XKeyPair keyPair,
   required ShelleyAddress stakeAddress,
 }) async {
   const maxInt = 4294967296;

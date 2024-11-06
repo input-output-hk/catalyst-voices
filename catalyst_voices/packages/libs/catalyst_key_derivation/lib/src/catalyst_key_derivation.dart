@@ -1,10 +1,11 @@
-import 'package:catalyst_key_derivation/src/ed25519_extended/ed25519_extended_private_key.dart';
+import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_private_key.dart';
 import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart'
     as rust;
 import 'package:catalyst_key_derivation/src/rust/frb_generated.dart'
     show RustLib, RustLibApi;
 
-/// A Flutter plugin exposing brotli and zstd compression/decompression algorithms.
+/// A Flutter plugin exposing Cardano SLIP-0023
+/// hierarchical deterministic key derivation.
 class CatalystKeyDerivation {
   const CatalystKeyDerivation();
 
@@ -19,10 +20,12 @@ class CatalystKeyDerivation {
   }
 
   /// Derives a master key from a [mnemonic].
-  Future<Ed25519ExtendedPrivateKey> deriveMasterKey({
+  ///
+  /// The mnemonic needs to be a valid BIP-39 string of words.
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
     required String mnemonic,
   }) async {
     final key = await rust.mnemonicToXprv(mnemonic: mnemonic);
-    return Ed25519ExtendedPrivateKey(key);
+    return Bip32Ed25519XPrivateKey(key);
   }
 }

@@ -9,9 +9,9 @@ abstract interface class Keychain implements Lockable {
 
   Future<KeychainMetadata> get metadata;
 
-  Future<Ed25519ExtendedPrivateKey?> getMasterKey();
+  Future<Bip32Ed25519XPrivateKey?> getMasterKey();
 
-  Future<void> setMasterKey(Ed25519ExtendedPrivateKey key);
+  Future<void> setMasterKey(Bip32Ed25519XPrivateKey key);
 
   Future<void> clear();
 }

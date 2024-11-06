@@ -7,7 +7,7 @@ final class KeyDerivation {
 
   const KeyDerivation(this._keyDerivation);
 
-  Future<Ed25519ExtendedPrivateKey> deriveMasterKey({
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
   }) {
     return _keyDerivation.deriveMasterKey(
@@ -18,22 +18,22 @@ final class KeyDerivation {
   /// Derives an [Ed25519KeyPair] from a [masterKey] and [path].
   ///
   /// Example [path]: m/0'/2147483647'
-  Future<Ed25519ExtendedKeyPair> deriveKeyPair({
-    required Ed25519ExtendedPrivateKey masterKey,
+  Future<Bip32Ed25519XKeyPair> deriveKeyPair({
+    required Bip32Ed25519XPrivateKey masterKey,
     required String path,
   }) async {
     final privateKey = await masterKey.derivePrivateKey(path: path);
     final publicKey = await privateKey.derivePublicKey();
 
-    return Ed25519ExtendedKeyPair(
+    return Bip32Ed25519XKeyPair(
       publicKey: publicKey,
       privateKey: privateKey,
     );
   }
 
   /// Derives the [Ed25519KeyPair] for the [role] from a [masterKey].
-  Future<Ed25519ExtendedKeyPair> deriveAccountRoleKeyPair({
-    required Ed25519ExtendedPrivateKey masterKey,
+  Future<Bip32Ed25519XKeyPair> deriveAccountRoleKeyPair({
+    required Bip32Ed25519XPrivateKey masterKey,
     required AccountRole role,
   }) async {
     return deriveKeyPair(

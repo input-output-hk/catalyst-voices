@@ -18,7 +18,7 @@ final class RegistrationTransactionBuilder {
   final TransactionBuilderConfig transactionConfig;
 
   /// The key pair used to sign the user registration certificate.
-  final Ed25519ExtendedKeyPair keyPair;
+  final Bip32Ed25519XKeyPair keyPair;
 
   /// The network ID where the transaction will be submitted.
   final NetworkId networkId;
@@ -131,7 +131,7 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<X509Certificate> _generateX509Certificate({
-    required Ed25519ExtendedKeyPair keyPair,
+    required Bip32Ed25519XKeyPair keyPair,
   }) async {
     // TODO(dtscalac): once serial number generation is defined come up with
     // a better solution than assigning a random number
