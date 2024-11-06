@@ -154,17 +154,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     }
 
     final roles = {AccountRole.root};
-    // TODO(dtscalac): Update key value when derivation is final.
-    // final keyPair = await deriveAccountRoleKeyPair(
-    //   seedPhrase: seedPhrase,
-    //   roles: roles,
-    // );
-
     final keychainId = const Uuid().v4();
-    // final keychain = await _keychainProvider.create(keychainId);
-    // await keychain.setLock(lockFactor);
-    // await keychain.unlock(lockFactor);
-    // await keychain.setMasterKey(keyPair.privateKey);
 
     // Note. with rootKey query backend for account details.
     return Account(
