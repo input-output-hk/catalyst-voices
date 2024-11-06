@@ -78,8 +78,7 @@ struct TxoAssetInfo {
     /// Asset hash.
     id: Vec<u8>,
     /// Asset name.
-    // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
-    name: String,
+    name: Vec<u8>,
     /// Asset amount.
     amount: num_bigint::BigInt,
 }
@@ -183,15 +182,15 @@ async fn get_txo_by_txn(
 
         let entry = txo_info
             .assets
-            .entry(row.policy_id.clone())
+            .entry(row.asset_id.clone())
             .or_insert_with(Vec::new);
 
-        match entry.iter_mut().find(|x| x.id == row.policy_id) {
+        match entry.iter_mut().find(|x| x.id == row.asset_id) {
             Some(item) => item.amount += row.value,
             None => {
                 entry.push(TxoAssetInfo {
-                    id: row.policy_id,
-                    name: row.policy_name,
+                    id: row.asset_id,
+                    name: row.asset_name,
                     amount: row.value,
                 });
             },
