@@ -72,7 +72,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       ExternalLibraryLoaderConfig(
     stem: 'catalyst_key_derivation',
     ioDirectory: 'rust/target/release/',
-    webPrefix: '/assets/packages/catalyst_key_derivation/web/pkg/',
+    webPrefix: '/assets/packages/catalyst_key_derivation/assets/js/',
   );
 }
 
