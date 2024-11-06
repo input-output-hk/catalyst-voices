@@ -479,9 +479,6 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkRoleSummaryContent3 => ' in Catalyst.';
 
   @override
-  String get walletLinkRoleSummaryButton => 'Confirm & Sign with wallet';
-
-  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
@@ -717,10 +714,10 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override
-  String get keychainDeletedDialogSubtitle => 'Catalyst keychain removed';
+  String get keychainDeletedDialogSubtitle => 'Your Catalyst Keychain is removed successfully from this device.';
 
   @override
-  String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+  String get keychainDeletedDialogInfo => 'We reverted this device to Catalyst first use.';
 
   @override
   String get registrationCompletedTitle => 'Catalyst account setup';
@@ -997,4 +994,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get connectDifferentWallet => 'Connect a different wallet';
+
+  @override
+  String get reviewRegistrationTransaction => 'Review registration transaction';
 }

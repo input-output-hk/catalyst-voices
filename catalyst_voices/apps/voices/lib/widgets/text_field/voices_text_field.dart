@@ -85,7 +85,10 @@ class VoicesTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.resizable,
-    this.onFieldSubmitted,
+    // Making it required but nullable because default behaviour is
+    // to make some action when user taps enter. Focus next field or anything
+    // else.
+    required this.onFieldSubmitted,
     this.onSaved,
     this.inputFormatters,
   });

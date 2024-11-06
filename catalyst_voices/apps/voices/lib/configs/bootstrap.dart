@@ -88,6 +88,8 @@ Future<BootstrapArgs> bootstrap() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
+  await Dependencies.instance.init();
+
   final router = AppRouter.init(
     guards: const [
       MilestoneGuard(),
@@ -95,8 +97,6 @@ Future<BootstrapArgs> bootstrap() async {
   );
 
   Bloc.observer = AppBlocObserver();
-
-  await Dependencies.instance.init();
 
   return BootstrapArgs(routerConfig: router);
 }

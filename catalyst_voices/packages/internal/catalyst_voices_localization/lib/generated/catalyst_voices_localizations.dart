@@ -886,12 +886,6 @@ abstract class VoicesLocalizations {
   /// **' in Catalyst.'**
   String get walletLinkRoleSummaryContent3;
 
-  /// A button label on the role summary screen in registration for the next step.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm & Sign with wallet'**
-  String get walletLinkRoleSummaryButton;
-
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
   /// In en, this message translates to:
@@ -1348,22 +1342,22 @@ abstract class VoicesLocalizations {
   /// **'Dark'**
   String get themeDark;
 
-  /// A title on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogTitle.
   ///
   /// In en, this message translates to:
   /// **'Catalyst keychain removed'**
   String get keychainDeletedDialogTitle;
 
-  /// A subtitle on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
+  /// **'Your Catalyst Keychain is removed successfully from this device.'**
   String get keychainDeletedDialogSubtitle;
 
-  /// An info on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogInfo.
   ///
   /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
+  /// **'We reverted this device to Catalyst first use.'**
   String get keychainDeletedDialogInfo;
 
   /// No description provided for @registrationCompletedTitle.
@@ -1905,6 +1899,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Connect a different wallet'**
   String get connectDifferentWallet;
+
+  /// A button label to review the registration transaction in wallet detail panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Review registration transaction'**
+  String get reviewRegistrationTransaction;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
