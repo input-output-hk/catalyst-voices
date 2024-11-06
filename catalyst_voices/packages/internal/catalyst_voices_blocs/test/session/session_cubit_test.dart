@@ -43,7 +43,7 @@ void main() {
       // Given
 
       // When
-      await userService.removeCurrentAccount();
+      await userService.removeCurrentKeychain();
 
       // Then
       expect(userService.keychain, isNull);
@@ -54,7 +54,7 @@ void main() {
       // Given
 
       // When
-      await userService.removeCurrentAccount();
+      await userService.removeCurrentKeychain();
 
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -80,7 +80,7 @@ void main() {
       // When
       notifier.value = RegistrationProgress(keychainProgress: keychainProgress);
 
-      await userService.removeCurrentAccount();
+      await userService.removeCurrentKeychain();
 
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
