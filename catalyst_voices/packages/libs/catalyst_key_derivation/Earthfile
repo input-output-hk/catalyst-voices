@@ -12,13 +12,12 @@ code-generator:
     FROM +builder
     DO flutter_rust_bridge+CODE_GENERATOR_WEB
 
-    IF $local
-        SAVE ARTIFACT ./web/pkg AS LOCAL ./web/pkg
+    IF [ $local = true ]
+        SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
         SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
         SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
     ELSE 
-        SAVE ARTIFACT ./web/pkg web/pkg
+        SAVE ARTIFACT ./assets/js assets_js
         SAVE ARTIFACT ./rust/src/frb_generated.rs frb_generated.rs
         SAVE ARTIFACT ./lib/src src
     END
-
