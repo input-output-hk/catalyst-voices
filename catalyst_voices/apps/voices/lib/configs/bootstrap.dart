@@ -91,6 +91,9 @@ Future<BootstrapArgs> bootstrap() async {
 
   await Dependencies.instance.init();
 
+  // Key derivation needs to be initialized before it can be used
+  await CatalystKeyDerivation.init();
+
   final router = AppRouter.init(
     guards: const [
       MilestoneGuard(),
@@ -98,9 +101,6 @@ Future<BootstrapArgs> bootstrap() async {
   );
 
   Bloc.observer = AppBlocObserver();
-
-  await Dependencies.instance.init();
-  await CatalystKeyDerivation.init();
 
   return BootstrapArgs(routerConfig: router);
 }
