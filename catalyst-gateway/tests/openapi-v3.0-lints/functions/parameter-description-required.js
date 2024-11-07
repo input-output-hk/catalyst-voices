@@ -7,7 +7,7 @@ export default createRulesetFunction(
             type: "object",
         },
     },
-    (targetVal, options) => {
+    (input, options) => {
         const errors = [];
         const {} = options;
 
@@ -19,13 +19,13 @@ export default createRulesetFunction(
             }
         };
 
-        // check if description or description.description exists in the ParameterObject
-        if ("in" in targetVal && targetVal.in === "query") {
-            if (targetVal.description) {
-                testDescriptionValidity(targetVal.description, errors);
+        // check if 'description' or 'schema.description' exists in the ParameterObject
+        if ("in" in input && input.in === "query") {
+            if (input.description) {
+                testDescriptionValidity(input.description, errors);
             }
-            else if (targetVal.schema && targetVal.schema.description) {
-                testDescriptionValidity(targetVal.schema.description, errors);
+            else if (input.schema && input.schema.description) {
+                testDescriptionValidity(input.schema.description, errors);
             }
             else {
                 errors.push({
@@ -35,7 +35,7 @@ export default createRulesetFunction(
         }
         // check if description exists
         else {
-            testDescriptionValidity(targetVal.description, errors);
+            testDescriptionValidity(input.description, errors);
         }
 
         if (errors.length) {

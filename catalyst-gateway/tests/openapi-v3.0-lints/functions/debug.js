@@ -4,31 +4,22 @@ import { createRulesetFunction } from "@stoplight/spectral-core";
 
 export default createRulesetFunction(
     {
-        input: {
-            type: "object"
-        },
+        input: null,
         options: {
             type: "object",
-        },
-        context: RulesetFunctionContext
-    },
-    (targetVal, options) => {
-        const results = [];
-
-        results.push({
-            
-        })
-
-        const { value } = options;
-
-        if (targetVal !== value) {
-            return [
-                {
-                    message: `Value must equal ${value}.`,
-                },
-            ];
+            additionalProperties: true
         }
+    },
+    (input, options, context) => {
+        const { ...args } = options;
+        const { document, documentInventory, rule, path } = context;
 
-        return results;
+        return [
+            // this JSON.stringify causes the linter to freeze.
+            // it'd be better to use console.log instead.
+            {
+                message: `input: ${JSON.stringify(input)}`,
+            },
+        ];
     },
 );

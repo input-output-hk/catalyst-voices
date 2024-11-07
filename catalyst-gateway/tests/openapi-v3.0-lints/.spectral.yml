@@ -13,7 +13,9 @@ extends:
 
 formats: ["oas3"]
 
-functions: ["parameter-description-required"]
+functions:
+  - "debug"
+  - "parameter-description-required"
 
 aliases:
   # From: https://github.com/stoplightio/spectral-owasp-ruleset/blob/26819e80e5ac4571b6271834fc97f0a1b66110bd/src/ruleset.ts#L60
