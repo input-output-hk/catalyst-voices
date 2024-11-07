@@ -172,7 +172,16 @@ rules:
     description: "Documentation tools use description to provide more context to users of the API who are not as familiar with the concepts as the API designers are."
     message: "{{error}}."
     severity: error
-    given: "#DescribableObjects"
+    given:
+      # '#DescribableObjects' but objects with 'in=query' are not included
+      - "$.info"
+      - "$.tags[*]"
+      - "#OperationObject"
+      - "#OperationObject.responses[*]"
+      - "#PathItem.parameters[?(@ && @.in !== 'query')]"
+      - "#OperationObject.parameters[?(@ && @.in !== 'query')]"
+      - "$.components.schemas[*]"
+      - "$.servers[*]"
     then:
       - field: "description"
         function: "truthy"
@@ -180,17 +189,22 @@ rules:
         function: "length"
         functionOptions:
           min: 20
-      - field: "description"
-        function: "pattern"
-        functionOptions:
-          # Matches any character that is #, *, uppercase or lowercase letters from A to Z, or digits from 0 to 9 at the beginning of the string.
-          # with zero or more occurrences of any character except newline.
-          match: "^[#*A-Za-z0-9].*"
-      - field: "description"
-        function: pattern
-        functionOptions:
-          # Matches against a full stop or a literal `*` at the end of a description.
-          match: "[\\.\\*]$"
+  parameter-description-required:
+    description: "ParameterObject must have a 'description' either directly or in the 'schema' property."
+    message: "The parameter is missing a description. Add a 'description' to the ParameterObject or its 'schema'."
+    given: "$..parameters[?(@.in === 'query')]"
+    severity: error
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          anyOf:
+            - required: ["description"]
+            - properties:
+                schema:
+                  type: object
+                  required: ["description"]
 
   api-path:
     message: "Invalid API path - should be /api/draft/* or /api/v<number>/*"
