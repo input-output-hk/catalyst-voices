@@ -13,14 +13,15 @@ deps:
 
 src:
     FROM +deps
-    COPY keys.txt .
+    COPY --dir pages ./pages
+    COPY --dir tests ./tests
+    COPY --dir utils ./utils
     COPY playwright.config.ts .
-    COPY global-setup.ts .
-    COPY wallet-tests.spec.ts .
-    COPY utils.ts .
+    COPY test-fixtures.ts .
 
 package-test:
     FROM +src
+    ENV APP_URL http://test-app:80
     ENV APP_URL http://test-app:80
     RUN mkdir /results
     VOLUME /results
@@ -30,12 +31,12 @@ package-test:
 
 builder:
     DO flutter-ci+SETUP
-    COPY ../../../../../+repo-catalyst-voices/repo .
+    COPY ../../../../+repo-catalyst-voices-all/repo .
     DO flutter-ci+BOOTSTRAP
 
 build-web:
     FROM +builder
-    ARG WORKDIR=/frontend/packages/libs/catalyst_cardano/catalyst_cardano/example
+    ARG WORKDIR=/frontend/catalyst_voices_packages/catalyst_cardano/catalyst_cardano/example
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
@@ -51,13 +52,13 @@ nightly-test:
     WITH DOCKER \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
-        --load test:latest=(+package-test) \
-        --service test-app \
-        --allow-privileged
+        --load test:latest=(+package-test)
 
-        RUN docker run --network=default_default --name=test test:latest && \
-            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml
+        RUN docker run --network=default_default --name=test test:latest ; \
+            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml ; \
+            docker cp test:/results/ /playwright-report
     END
     WAIT
         SAVE ARTIFACT cardano-wallet.junit-report.xml AS LOCAL cardano-wallet.junit-report.xml
+        SAVE ARTIFACT ./playwright-report/* AS LOCAL ./playwright-report/
     END
