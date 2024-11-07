@@ -185,7 +185,7 @@ async fn get_txo_by_txn(
             .entry(row.policy_id.clone())
             .or_insert_with(Vec::new);
 
-        match entry.iter_mut().find(|x| x.id == row.policy_id) {
+        match entry.iter_mut().find(|item| item.id == row.policy_id) {
             Some(item) => item.amount += row.value,
             None => {
                 entry.push(TxoAssetInfo {
