@@ -48,7 +48,14 @@ abstract interface class RegistrationService {
     required SeedPhrase seedPhrase,
   });
 
+  /// Loads account related to this [seedPhrase]. Throws exception if non found.
   Future<Account> recoverAccount({
+    required SeedPhrase seedPhrase,
+  });
+
+  /// Creates [Keychain] for given [account] with [lockFactor].
+  Future<Keychain> createKeychainFor({
+    required Account account,
     required SeedPhrase seedPhrase,
     required LockFactor lockFactor,
   });
@@ -133,7 +140,6 @@ final class RegistrationServiceImpl implements RegistrationService {
   @override
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
@@ -142,16 +148,9 @@ final class RegistrationServiceImpl implements RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
-
-    // TODO(dtscalac): Update key value when derivation is final.
+    // TODO(dtscalac): support more roles when backend is ready
     final roles = {AccountRole.root};
-
     final keychainId = const Uuid().v4();
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
 
     // Note. with rootKey query backend for account details.
     return Account(
@@ -163,6 +162,23 @@ final class RegistrationServiceImpl implements RegistrationService {
         address: _testNetAddress,
       ),
     );
+  }
+
+  @override
+  Future<Keychain> createKeychainFor({
+    required Account account,
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+  }) async {
+    final keychainId = account.keychainId;
+    final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
+
+    final keychain = await _keychainProvider.create(keychainId);
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+    await keychain.setMasterKey(masterKey);
+
+    return keychain;
   }
 
   @override
@@ -186,7 +202,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
       final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
         masterKey: masterKey,
-        // TODO(dtscalac): Only one roles is supported atm.
+        // TODO(dtscalac): support more roles when backend is ready
         role: AccountRole.root,
       );
 
