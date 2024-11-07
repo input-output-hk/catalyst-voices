@@ -13,6 +13,8 @@ extends:
 
 formats: ["oas3"]
 
+functions: ["parameter-description-required"]
+
 aliases:
   # From: https://github.com/stoplightio/spectral-owasp-ruleset/blob/26819e80e5ac4571b6271834fc97f0a1b66110bd/src/ruleset.ts#L60
   StringProperties:
@@ -172,39 +174,10 @@ rules:
     description: "Documentation tools use description to provide more context to users of the API who are not as familiar with the concepts as the API designers are."
     message: "{{error}}."
     severity: error
-    given:
-      # '#DescribableObjects' but objects with 'in=query' are not included
-      - "$.info"
-      - "$.tags[*]"
-      - "#OperationObject"
-      - "#OperationObject.responses[*]"
-      - "#PathItem.parameters[?(@ && @.in !== 'query')]"
-      - "#OperationObject.parameters[?(@ && @.in !== 'query')]"
-      - "$.components.schemas[*]"
-      - "$.servers[*]"
+    given: "#DescribableObjects"
     then:
-      - field: "description"
-        function: "truthy"
-      - field: "description"
-        function: "length"
-        functionOptions:
-          min: 20
-  parameter-description-required:
-    description: "ParameterObject must have a 'description' either directly or in the 'schema' property."
-    message: "The parameter is missing a description. Add a 'description' to the ParameterObject or its 'schema'."
-    given: "$..parameters[?(@.in === 'query')]"
-    severity: error
-    then:
-      function: schema
-      functionOptions:
-        schema:
-          type: object
-          anyOf:
-            - required: ["description"]
-            - properties:
-                schema:
-                  type: object
-                  required: ["description"]
+      function: parameter-description-required
+      functionOptions: {}
 
   api-path:
     message: "Invalid API path - should be /api/draft/* or /api/v<number>/*"
