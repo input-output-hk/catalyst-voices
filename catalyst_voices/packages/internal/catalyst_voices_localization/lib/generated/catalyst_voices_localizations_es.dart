@@ -479,9 +479,6 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkRoleSummaryContent3 => ' in Catalyst.';
 
   @override
-  String get walletLinkRoleSummaryButton => 'Confirm & Sign with wallet';
-
-  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
@@ -717,10 +714,10 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override
-  String get keychainDeletedDialogSubtitle => 'Catalyst keychain removed';
+  String get keychainDeletedDialogSubtitle => 'Your Catalyst Keychain is removed successfully from this device.';
 
   @override
-  String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+  String get keychainDeletedDialogInfo => 'We reverted this device to Catalyst first use.';
 
   @override
   String get registrationCompletedTitle => 'Catalyst account setup';
@@ -918,6 +915,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get recoveryUnlockPasswordInstructionsSubtitle => 'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.';
 
   @override
+  String get recoverDifferentKeychain => 'Restore a different keychain';
+
+  @override
   String get unlockDialogHeader => 'Unlock Catalyst';
 
   @override
@@ -997,4 +997,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get connectDifferentWallet => 'Connect a different wallet';
+
+  @override
+  String get reviewRegistrationTransaction => 'Review registration transaction';
 }

@@ -4,10 +4,10 @@ import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/account/account_page_header.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/list/bullet_list.dart';
-import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -16,9 +16,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-final class AccountPage extends StatelessWidget {
+final class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
 
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +49,7 @@ final class AccountPage extends StatelessWidget {
                       AccountRole.drep,
                     ],
                     defaultRole: AccountRole.voter,
-                    onRemoveKeychain: () => unawaited(_removeKeychain(context)),
+                    onRemoveKeychain: () => unawaited(_removeKeychain()),
                   ),
                 ],
               ),
@@ -55,19 +60,22 @@ final class AccountPage extends StatelessWidget {
     );
   }
 
-  // Note. probably should redirect somewhere.
-  Future<void> _removeKeychain(BuildContext context) async {
+  Future<void> _removeKeychain() async {
     final confirmed = await DeleteKeychainDialog.show(context);
+    if (!confirmed) {
+      return;
+    }
 
-    if (confirmed && context.mounted) {
-      unawaited(context.read<SessionCubit>().removeKeychain());
+    if (mounted) {
+      await context.read<SessionCubit>().removeKeychain();
+    }
 
-      await VoicesDialog.show<void>(
-        context: context,
-        builder: (context) {
-          return const KeychainDeletedDialog();
-        },
-      );
+    if (mounted) {
+      await KeychainDeletedDialog.show(context);
+    }
+
+    if (mounted) {
+      const DiscoveryRoute().go(context);
     }
   }
 }

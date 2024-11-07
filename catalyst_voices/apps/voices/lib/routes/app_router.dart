@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,7 @@ abstract final class AppRouter {
 
   static GoRouter init({
     List<RouteGuard> guards = const [],
+    Listenable? refreshListenable,
   }) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
@@ -21,6 +23,7 @@ abstract final class AppRouter {
       observers: [
         SentryNavigatorObserver(),
       ],
+      refreshListenable: refreshListenable,
       routes: Routes.routes,
       // always true. We're deciding whether to print
       // them or not in LoggingService
@@ -28,16 +31,15 @@ abstract final class AppRouter {
     );
   }
 
-  static FutureOr<String?> _guard(
+  static Future<String?> _guard(
     BuildContext context,
     GoRouterState state,
     List<RouteGuard> guards,
   ) async {
     for (final guard in guards) {
-      final redirect = await guard.redirect(context, state);
-
-      if (redirect != null) {
-        return redirect;
+      final location = await guard.redirect(context, state);
+      if (location != null) {
+        return location;
       }
     }
 

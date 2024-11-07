@@ -48,7 +48,14 @@ abstract interface class RegistrationService {
     required Set<AccountRole> roles,
   });
 
+  /// Loads account related to this [seedPhrase]. Throws exception if non found.
   Future<Account> recoverAccount({
+    required SeedPhrase seedPhrase,
+  });
+
+  /// Creates [Keychain] for given [account] with [lockFactor].
+  Future<Keychain> createKeychainFor({
+    required Account account,
     required SeedPhrase seedPhrase,
     required LockFactor lockFactor,
   });
@@ -138,7 +145,6 @@ final class RegistrationServiceImpl implements RegistrationService {
   @override
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
@@ -148,17 +154,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     }
 
     final roles = {AccountRole.root};
-    // TODO(dtscalac): Update key value when derivation is final.
-    final keyPair = await deriveAccountRoleKeyPair(
-      seedPhrase: seedPhrase,
-      roles: roles,
-    );
-
     final keychainId = const Uuid().v4();
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(keyPair.privateKey);
 
     // Note. with rootKey query backend for account details.
     return Account(
@@ -170,6 +166,27 @@ final class RegistrationServiceImpl implements RegistrationService {
         address: _testNetAddress,
       ),
     );
+  }
+
+  @override
+  Future<Keychain> createKeychainFor({
+    required Account account,
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+  }) async {
+    final keychainId = account.keychainId;
+
+    final keyPair = await deriveAccountRoleKeyPair(
+      seedPhrase: seedPhrase,
+      roles: account.roles,
+    );
+
+    final keychain = await _keychainProvider.create(keychainId);
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+    await keychain.setMasterKey(keyPair.privateKey);
+
+    return keychain;
   }
 
   @override

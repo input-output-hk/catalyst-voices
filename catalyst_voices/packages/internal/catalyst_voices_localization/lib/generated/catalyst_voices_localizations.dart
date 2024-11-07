@@ -886,12 +886,6 @@ abstract class VoicesLocalizations {
   /// **' in Catalyst.'**
   String get walletLinkRoleSummaryContent3;
 
-  /// A button label on the role summary screen in registration for the next step.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm & Sign with wallet'**
-  String get walletLinkRoleSummaryButton;
-
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
   /// In en, this message translates to:
@@ -1348,22 +1342,22 @@ abstract class VoicesLocalizations {
   /// **'Dark'**
   String get themeDark;
 
-  /// A title on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogTitle.
   ///
   /// In en, this message translates to:
   /// **'Catalyst keychain removed'**
   String get keychainDeletedDialogTitle;
 
-  /// A subtitle on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
+  /// **'Your Catalyst Keychain is removed successfully from this device.'**
   String get keychainDeletedDialogSubtitle;
 
-  /// An info on keychain deleted dialog
+  /// No description provided for @keychainDeletedDialogInfo.
   ///
   /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
+  /// **'We reverted this device to Catalyst first use.'**
   String get keychainDeletedDialogInfo;
 
   /// No description provided for @registrationCompletedTitle.
@@ -1744,6 +1738,12 @@ abstract class VoicesLocalizations {
   /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get recoveryUnlockPasswordInstructionsSubtitle;
 
+  /// No description provided for @recoverDifferentKeychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore a different keychain'**
+  String get recoverDifferentKeychain;
+
   /// The header label in unlock dialog.
   ///
   /// In en, this message translates to:
@@ -1905,6 +1905,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Connect a different wallet'**
   String get connectDifferentWallet;
+
+  /// A button label to review the registration transaction in wallet detail panel.
+  ///
+  /// In en, this message translates to:
+  /// **'Review registration transaction'**
+  String get reviewRegistrationTransaction;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
