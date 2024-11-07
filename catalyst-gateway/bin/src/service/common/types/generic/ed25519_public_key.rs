@@ -14,7 +14,10 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
-use crate::{service::common::types::string_types::impl_string_types, utils::ed25519};
+use crate::{
+    service::{common::types::string_types::impl_string_types, utilities::as_hex_string},
+    utils::ed25519,
+};
 
 /// Title.
 const TITLE: &str = "Ed25519 Public Key";
@@ -70,7 +73,7 @@ impl TryFrom<Vec<u8>> for Ed25519HexEncodedPublicKey {
     fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
         let key = ed25519::verifying_key_from_vec(&value)?;
 
-        Ok(Self(format!("0x{}", hex::encode(key))))
+        Ok(Self(as_hex_string(key.as_ref())))
     }
 }
 

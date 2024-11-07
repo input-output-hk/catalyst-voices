@@ -36,7 +36,7 @@ max_width = 100
 
 # Comments:
 normalize_comments = true
-normalize_doc_attributes = true
+normalize_doc_attributes = false
 wrap_comments = true
 comment_width = 90      # small excess is okay but prefer 80
 format_code_in_doc_comments = true

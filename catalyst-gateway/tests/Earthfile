@@ -9,6 +9,6 @@ test-lint-openapi:
     # Copy the doc artifact.
     COPY --dir ../+build/doc .
     # Copy the spectral configuration file.
-    COPY ./.oapi-v3.spectral.yml .spectral.yml
+    COPY --dir ./openapi-lints/* .
     # Scan the doc directory where type of file is JSON.
     DO spectral-ci+LINT --dir=./doc

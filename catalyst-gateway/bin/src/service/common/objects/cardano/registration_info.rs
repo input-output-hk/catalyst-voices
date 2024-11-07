@@ -5,7 +5,7 @@ use poem_openapi::{types::Example, Object, Union};
 use crate::service::{
     api::cardano::types::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
     common::objects::cardano::hash::Hash,
-    utilities::to_hex_with_prefix,
+    utilities::as_hex_string,
 };
 
 /// The Voting power and voting key of a Delegated voter.
@@ -76,7 +76,7 @@ impl RegistrationInfo {
         let voting_info = match voting_info {
             PublicVotingInfo::Direct(voting_key) => {
                 VotingInfo::Direct(DirectVoter {
-                    voting_key: to_hex_with_prefix(voting_key.bytes()),
+                    voting_key: as_hex_string(voting_key.bytes()),
                 })
             },
             PublicVotingInfo::Delegated(delegations) => {
@@ -85,7 +85,7 @@ impl RegistrationInfo {
                         .into_iter()
                         .map(|(voting_key, power)| {
                             Delegation {
-                                voting_key: to_hex_with_prefix(voting_key.bytes()),
+                                voting_key: as_hex_string(voting_key.bytes()),
                                 power,
                             }
                         })
@@ -95,7 +95,7 @@ impl RegistrationInfo {
         };
         Self {
             tx_hash: tx_hash.into(),
-            rewards_address: to_hex_with_prefix(rewards_address),
+            rewards_address: as_hex_string(rewards_address),
             nonce,
             voting_info,
         }
