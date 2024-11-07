@@ -2,7 +2,7 @@
 INSERT INTO unstaked_txo_assets_by_txn_hash (
     txn_hash,
     txo,
-    asset_id,
+    policy_id,
     asset_name,
     slot_no,
     txn,
@@ -10,7 +10,7 @@ INSERT INTO unstaked_txo_assets_by_txn_hash (
 ) VALUES (
    :txn_hash, 
    :txo, 
-   :asset_id, 
+   :policy_id, 
    :asset_name,
    :slot_no,
    :txn,

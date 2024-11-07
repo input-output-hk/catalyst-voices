@@ -26,7 +26,7 @@ pub(super) struct Params {
     /// Transaction Output Offset inside the transaction.
     txo: i16,
     /// Policy hash of the asset
-    asset_id: Vec<u8>,
+    policy_id: Vec<u8>,
     /// Policy name of the asset
     asset_name: Vec<u8>,
     /// Value of the asset
@@ -40,7 +40,7 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
-        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, asset_id: &[u8], asset_name: &str,
+        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, policy_id: &[u8], asset_name: &str,
         value: i128,
     ) -> Self {
         Self {
@@ -48,7 +48,7 @@ impl Params {
             slot_no: slot_no.into(),
             txn,
             txo,
-            asset_id: asset_id.to_vec(),
+            policy_id: policy_id.to_vec(),
             asset_name: asset_name.as_bytes().to_vec(),
             value: value.into(),
         }

@@ -52,7 +52,7 @@ mod result {
         /// TXO transaction slot number.
         pub slot_no: num_bigint::BigInt,
         /// Asset hash.
-        pub asset_id: Vec<u8>,
+        pub policy_id: Vec<u8>,
         /// Asset name.
         pub asset_name: Vec<u8>,
         /// Asset value.

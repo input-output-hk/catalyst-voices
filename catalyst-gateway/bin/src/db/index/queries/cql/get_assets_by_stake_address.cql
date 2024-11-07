@@ -2,7 +2,7 @@ SELECT
     txn,
     txo,
     slot_no,
-    asset_id,
+    policy_id,
     asset_name,
     value
 FROM txo_assets_by_stake
