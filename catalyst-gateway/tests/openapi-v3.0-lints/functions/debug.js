@@ -6,20 +6,23 @@ export default createRulesetFunction(
     {
         input: null,
         options: {
-            type: "object",
+            type: 'object',
+            properties: {
+                context: {
+                    type: 'boolean',
+                    description: 'Debug print the context',
+                    default: false
+                },
+            },
             additionalProperties: true
         }
     },
     (input, options, context) => {
-        const { ...args } = options;
-        const { document, documentInventory, rule, path } = context;
-
-        return [
-            // this JSON.stringify causes the linter to freeze.
-            // it'd be better to use console.log instead.
-            {
-                message: `input: ${JSON.stringify(input)}`,
-            },
-        ];
+        console.log('------ DEBUG ----------------------------------------------------------------')
+        console.log('input', input);
+        console.log('options', options);
+        if (options.context) {
+            console.log('context', context);
+        }
     },
 );
