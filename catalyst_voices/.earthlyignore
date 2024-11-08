@@ -11,8 +11,6 @@
 **/*.iml
 **/coverage/
 **/test_reports/
-**/Earthfile
-**/.earthlyignore
 
 # node related
 
