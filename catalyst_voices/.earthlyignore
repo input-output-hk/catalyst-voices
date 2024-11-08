@@ -9,7 +9,10 @@
 **/.flutter-plugins-dependencies
 **/.idea/
 **/*.iml
+**/coverage/
+**/test_reports/
 **/Earthfile
+**/.earthlyignore
 
 # node related
 
