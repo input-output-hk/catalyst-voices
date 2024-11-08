@@ -57,6 +57,10 @@ run-cat-gateway-mainnet: build-cat-gateway
     RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
     ./target/release/cat-gateway run --log-level debug
 
+# expand all macros and produce a single unified source file.
+expand-macros:
+    just bin/expand-macros
+
 # Generate the current openapi schema file locally.
 generate-opennapi-schema: build-cat-gateway
     ./target/release/cat-gateway docs cat-gateway-api.json
