@@ -1,7 +1,10 @@
 //! Cip36 Registration Query Endpoint Response
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 
 use crate::service::common;
+
+// ToDo: The examples of this response should be taken from representative data from a
+// response generated on pre-prod.
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -20,7 +23,7 @@ pub(crate) type AllRegistration = common::responses::WithErrorResponses<Cip36Reg
 
 /// List of CIP36 Registration Data as found on-chain.
 #[derive(Object)]
-//#[oai(example = true)]
+#[oai(example = true)]
 pub(crate) struct Cip36RegistrationList {
     /// The Slot the Registrations are valid up until.
     ///
@@ -35,52 +38,64 @@ pub(crate) struct Cip36RegistrationList {
     /// List of latest invalid registrations that were found, for the requested filter.
     #[oai(skip_serializing_if_is_empty, validator(max_items = "10"))]
     invalid: Vec<Cip36Details>,
-    #[oai(flatten)]
     /// Current Page
     page: common::objects::generic::pagination::CurrentPage,
 }
 
+impl Example for Cip36RegistrationList {
+    fn example() -> Self {
+        Self {
+            slot: (common::types::cardano::slot_no::EXAMPLE + 635).into(),
+            voting_key: vec![Cip36RegistrationsForVotingPublicKey::example()],
+            invalid: vec![Cip36Details::invalid_example()],
+            page: common::objects::generic::pagination::CurrentPage::example(),
+        }
+    }
+}
+
 /// List of CIP36 Registration Data for a Voting Key.
 #[derive(Object)]
-//#[oai(example = true)]
+#[oai(example = true)]
 pub(crate) struct Cip36RegistrationsForVotingPublicKey {
     /// Voting Public Key
     pub vote_pub_key: common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
-    /// List of stake addresses registered to the voting key
-    #[oai(validator(max_items = "100"))]
-    pub stake_address: Vec<Cip36RegistrationsForStakeAddress>,
-}
-
-/// List of CIP36 Registration Data for a Stake Address.
-#[derive(Object)]
-//#[oai(example = true)]
-pub(crate) struct Cip36RegistrationsForStakeAddress {
-    /// Stake Address registered to the voting key
-    pub stake_addr: common::types::cardano::cip19_stake_address::Cip19StakeAddress,
-    /// List of stake addresses registered to the voting key
+    /// List of Registrations associated with this Voting Key
     #[oai(validator(max_items = "100"))]
     pub registrations: Vec<Cip36Details>,
 }
 
+impl Example for Cip36RegistrationsForVotingPublicKey {
+    fn example() -> Self {
+        Cip36RegistrationsForVotingPublicKey {
+            vote_pub_key:
+                common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
+            registrations: vec![Cip36Details::example()],
+        }
+    }
+}
+
 /// CIP36 Registration Data as found on-chain.
 #[derive(Object)]
+#[oai(example = true)]
 pub(crate) struct Cip36Details {
     /// Blocks Slot Number that the registration certificate is in.
     pub slot_no: common::types::cardano::slot_no::SlotNo,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    #[oai(skip_serializing_if_is_none)]
     pub stake_pub_key:
         Option<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey>,
-    /// Voting Public Key
+    /// Voting Public Key (Ed25519 Public key).
+    #[oai(skip_serializing_if_is_none)]
     pub vote_pub_key:
         Option<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey>,
-
-    /// Nonce value after normalization.
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub nonce: Option<u64>,
-    /// Transaction Index.
-    #[oai(validator(minimum(value = "0"), maximum(value = "32767")))]
-    pub txn: Option<i16>,
+    #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented.
+    #[oai(skip_serializing_if_is_none)]
+    pub nonce: Option<common::types::cardano::nonce::Nonce>,
+    #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented.
+    #[oai(skip_serializing_if_is_none)]
+    pub txn: Option<common::types::cardano::txn_index::TxnIndex>,
     /// Cardano Cip-19 Formatted Shelley Payment Address.
+    #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
     /// If the payment address is a script, then it can not be payed rewards.
     #[oai(default = "is_payable_default")]
@@ -91,11 +106,11 @@ pub(crate) struct Cip36Details {
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
     #[oai(
-        default = "Vec::<String>::new",
+        default = "Vec::<common::types::generic::error_msg::ErrorMessage>::new",
         skip_serializing_if_is_empty,
         validator(max_items = "10")
     )]
-    pub errors: Vec<String>,
+    pub errors: Vec<common::types::generic::error_msg::ErrorMessage>,
 }
 
 /// Is the payment address payable by catalyst.
@@ -106,4 +121,46 @@ fn is_payable_default() -> bool {
 /// Is the registration using CIP15 format.
 fn cip15_default() -> bool {
     false
+}
+
+impl Example for Cip36Details {
+    /// Example of a valid registration
+    fn example() -> Self {
+        Self {
+            slot_no: common::types::cardano::slot_no::SlotNo::example(),
+            stake_pub_key: Some(
+                common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::examples(0),
+            ),
+            vote_pub_key: Some(
+                common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
+            ),
+            nonce: Some(common::types::cardano::nonce::Nonce::example()),
+            txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
+            payment_address: Some(
+                common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
+            ),
+            is_payable: true,
+            cip15: false,
+            errors: Vec::<common::types::generic::error_msg::ErrorMessage>::new(),
+        }
+    }
+}
+
+impl Cip36Details {
+    /// Example of an invalid registration
+    fn invalid_example() -> Self {
+        Self {
+            slot_no: (common::types::cardano::slot_no::EXAMPLE + 135).into(),
+            stake_pub_key: None,
+            vote_pub_key: Some(
+                common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
+            ),
+            nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
+            txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
+            payment_address: None,
+            is_payable: false,
+            cip15: true,
+            errors: vec!["Stake Public Key is required".into()],
+        }
+    }
 }

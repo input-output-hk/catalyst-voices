@@ -8,6 +8,7 @@ use std::{
     sync::LazyLock,
 };
 
+use anyhow::bail;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -24,11 +25,13 @@ const TITLE: &str = "Ed25519 Public Key";
 /// Description.
 const DESCRIPTION: &str = "This is a 32 Byte Hex encoded Ed25519 Public Key.";
 /// Example.
-const EXAMPLE: &str = "0x98dbd3d884068eee77e5894c22268d5d12e6484ba713e7ddd595abba308d88d3";
+const EXAMPLE: &str = "0x56CDD154355E078A0990F9E633F9553F7D43A68B2FF9BEF78B9F5C71C808A7C8";
 /// Length of the hex encoded string
-const ENCODED_LENGTH: usize = ed25519::HEX_ENCODED_LENGTH;
+pub(crate) const ENCODED_LENGTH: usize = ed25519::HEX_ENCODED_LENGTH;
 /// Validation Regex Pattern
-const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
+pub(crate) const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
+/// Format
+pub(crate) const FORMAT: &str = "hex:ed25519-public-key";
 
 /// Schema
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
@@ -55,7 +58,7 @@ fn is_valid(hex_key: &str) -> bool {
 impl_string_types!(
     Ed25519HexEncodedPublicKey,
     "string",
-    "hex:ed25519-public-key",
+    FORMAT,
     Some(SCHEMA.clone()),
     is_valid
 );
@@ -64,6 +67,48 @@ impl Example for Ed25519HexEncodedPublicKey {
     /// An example 32 bytes ED25519 Public Key.
     fn example() -> Self {
         Self(EXAMPLE.to_owned())
+    }
+}
+
+impl Ed25519HexEncodedPublicKey {
+    /// Extra examples of 32 bytes ED25519 Public Key.
+    pub(crate) fn examples(index: usize) -> Self {
+        match index {
+            0 => {
+                Self(
+                    "0xDEF855AE45F3BF9640A5298A38B97617DE75600F796F17579BFB815543624B24".to_owned(),
+                )
+            },
+            1 => {
+                Self(
+                    "0x83B3B55589797EF953E24F4F0DBEE4D50B6363BCF041D15F6DBD33E014E54711".to_owned(),
+                )
+            },
+            _ => {
+                Self(
+                    "0xA3E52361AFDE840918E2589DBAB9967C8027FB4431E83D36E338748CD6E3F820".to_owned(),
+                )
+            },
+        }
+    }
+}
+
+impl TryFrom<&str> for Ed25519HexEncodedPublicKey {
+    type Error = anyhow::Error;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        value.to_string().try_into()
+    }
+}
+
+impl TryFrom<String> for Ed25519HexEncodedPublicKey {
+    type Error = anyhow::Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if !is_valid(&value) {
+            bail!("Invalid Ed25519 Public key")
+        }
+        Ok(Self(value))
     }
 }
 

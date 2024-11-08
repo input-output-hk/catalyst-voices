@@ -2,16 +2,21 @@
 
 use std::time::Duration;
 
+use poem::http::HeaderMap;
 use tokio::time::sleep;
 
-use super::{cardano::slot_no::SlotNo, response, Ed25519HexEncodedPublicKey, NoneOrRBAC};
+use super::{
+    cardano::{self},
+    response, NoneOrRBAC, SlotNo,
+};
 use crate::service::common::{self};
 
 /// Process the endpoint operation
 pub(crate) async fn cip36_registrations(
-    _for: Option<Ed25519HexEncodedPublicKey>, _asat: Option<SlotNo>,
+    _lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, _asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
     _limit: common::types::generic::query::pagination::Limit, _auth: NoneOrRBAC,
+    _headers: &HeaderMap,
 ) -> response::AllRegistration {
     // Dummy sleep, remove it
     sleep(Duration::from_millis(1)).await;

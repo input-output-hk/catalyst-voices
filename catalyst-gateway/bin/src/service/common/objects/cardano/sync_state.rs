@@ -8,7 +8,7 @@ use crate::service::{
 };
 
 /// Cardano follower's sync state info.
-#[derive(Debug, Object)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct SyncState {
     /// Slot number.

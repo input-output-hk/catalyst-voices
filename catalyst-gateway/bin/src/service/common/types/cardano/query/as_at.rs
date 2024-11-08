@@ -27,8 +27,11 @@ use crate::{service::common::types::cardano::slot_no::SlotNo, settings::Settings
 /// Title.
 const TITLE: &str = "As At this Time OR Slot.";
 /// Description.
-const DESCRIPTION: &str = "Time can be represented as either the blockchains number slot number, 
-or the number of seconds since midnight UTC.";
+const DESCRIPTION: &str = "Restrict the query to this time.
+Time can be represented as either the blockchains slot number, 
+or the number of seconds since midnight 1970, UTC.
+
+If this parameter is not defined, the query will retrieve data up to the current time.";
 /// Example whence.
 const EXAMPLE_WHENCE: &str = TIME_DISCRIMINATOR;
 /// Example time.

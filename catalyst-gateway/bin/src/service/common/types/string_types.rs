@@ -32,11 +32,11 @@
 /// impl <stuff> for MyNewType { ... }
 /// ```
 macro_rules! impl_string_types {
-    ($(#[$docs:meta])* $ty:ident, $type_name:literal, $format:literal, $schema:expr ) => {
+    ($(#[$docs:meta])* $ty:ident, $type_name:literal, $format:expr, $schema:expr ) => {
         impl_string_types!($(#[$docs])* $ty, $type_name, $format, $schema, |_| true);
     };
 
-    ($(#[$docs:meta])* $ty:ident, $type_name:literal, $format:literal, $schema:expr, $validator:expr) => {
+    ($(#[$docs:meta])* $ty:ident, $type_name:literal, $format:expr, $schema:expr, $validator:expr) => {
         $(#[$docs])*
         #[derive(Debug, Clone, Eq, PartialEq, Hash)]
         pub(crate) struct $ty(String);
@@ -69,7 +69,7 @@ macro_rules! impl_string_types {
             type RawElementValueType = Self;
 
             fn name() -> Cow<'static, str> {
-                concat!($type_name, "(", $format, ")").into()
+                format!("{}({})", $type_name, $format).into()
             }
 
             fn schema_ref() -> MetaSchemaRef {
@@ -103,7 +103,7 @@ macro_rules! impl_string_types {
                 if let Value::String(value) = value {
                     let validator = $validator;
                     if !validator(&value) {
-                        return Err(concat!("invalid ", $format).into());
+                        return Err(format!("invalid {}", $format).into());
                     }
                     Ok(Self(value))
                 } else {
@@ -116,7 +116,7 @@ macro_rules! impl_string_types {
             fn parse_from_parameter(value: &str) -> ParseResult<Self> {
                 let validator = $validator;
                 if !validator(value) {
-                    return Err(concat!("invalid ", $format).into());
+                    return Err(format!("invalid {}", $format).into());
                 }
                 Ok(Self(value.to_string()))
             }

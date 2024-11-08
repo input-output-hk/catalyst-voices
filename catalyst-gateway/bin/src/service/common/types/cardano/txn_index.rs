@@ -1,4 +1,4 @@
-//! Slot Number on the blockchain.
+//! Transaction Index within a block.
 
 use std::sync::LazyLock;
 
@@ -10,18 +10,20 @@ use poem_openapi::{
 use serde_json::Value;
 
 /// Title.
-const TITLE: &str = "Cardano Blockchain Slot Number";
+const TITLE: &str = "Transaction Index";
 /// Description.
-const DESCRIPTION: &str = "The Slot Number of a Cardano Block on the chain.";
+const DESCRIPTION: &str = "The Index of a transaction within a block.";
 /// Example.
-pub(crate) const EXAMPLE: u64 = 1_234_567;
+const EXAMPLE: u16 = 7;
 /// Minimum.
-const MINIMUM: u64 = 0;
+const MINIMUM: u16 = 0;
 /// Maximum.
-const MAXIMUM: u64 = u64::MAX;
+const MAXIMUM: u16 = u16::MAX;
+/// Invalid Error Msg.
+const INVALID_MSG: &str = "Invalid Transaction Index.";
 
 /// Schema.
-#[allow(clippy::cast_precision_loss)]
+#[allow(clippy::cast_lossless)]
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     MetaSchema {
         title: Some(TITLE.to_owned()),
@@ -33,28 +35,28 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Value of a Cardano Native Asset (may not be zero)
+/// Transaction Index within a block.
 #[derive(Debug, Eq, PartialEq, Hash)]
-pub(crate) struct SlotNo(u64);
+pub(crate) struct TxnIndex(u16);
 
 /// Is the Slot Number valid?
-fn is_valid(_value: u64) -> bool {
+fn is_valid(_value: u16) -> bool {
     true
 }
 
-impl Type for SlotNo {
+impl Type for TxnIndex {
     type RawElementValueType = Self;
     type RawValueType = Self;
 
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "integer(u64)".into()
+        "integer(u16)".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
         let schema_ref =
-            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u64")));
+            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u16")));
         schema_ref.merge(SCHEMA.clone())
     }
 
@@ -69,22 +71,23 @@ impl Type for SlotNo {
     }
 }
 
-impl ParseFromParameter for SlotNo {
+impl ParseFromParameter for TxnIndex {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        let slot: u64 = value.parse()?;
-        Ok(Self(slot))
+        let idx: u16 = value.parse()?;
+        Ok(Self(idx))
     }
 }
 
-impl ParseFromJSON for SlotNo {
+impl ParseFromJSON for TxnIndex {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
         if let Value::Number(value) = value {
             let value = value
                 .as_u64()
-                .ok_or(ParseError::from("invalid slot number"))?;
+                .ok_or(ParseError::from(INVALID_MSG))?
+                .try_into()?;
             if !is_valid(value) {
-                return Err("invalid AssetValue".into());
+                return Err(INVALID_MSG.into());
             }
             Ok(Self(value))
         } else {
@@ -93,38 +96,51 @@ impl ParseFromJSON for SlotNo {
     }
 }
 
-impl ToJSON for SlotNo {
+impl ToJSON for TxnIndex {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())
     }
 }
 
-impl TryFrom<i64> for SlotNo {
+impl TryFrom<u64> for TxnIndex {
     type Error = anyhow::Error;
 
-    fn try_from(value: i64) -> Result<Self, Self::Error> {
-        let value: u64 = value.try_into()?;
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        let value: u16 = value.try_into()?;
         if !is_valid(value) {
-            bail!("Invalid Slot Number");
+            bail!(INVALID_MSG);
         }
         Ok(Self(value))
     }
 }
 
-impl From<u64> for SlotNo {
-    fn from(value: u64) -> Self {
+impl TryFrom<i16> for TxnIndex {
+    type Error = anyhow::Error;
+
+    fn try_from(value: i16) -> Result<Self, Self::Error> {
+        let value: u16 = value.try_into()?;
+        if !is_valid(value) {
+            bail!(INVALID_MSG);
+        }
+        Ok(Self(value))
+    }
+}
+
+impl From<u16> for TxnIndex {
+    fn from(value: u16) -> Self {
         Self(value)
     }
 }
 
-impl SlotNo {
-    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
-    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
+impl TxnIndex {
+    /// Generic conversion of `Option<T>` to `Option<TxnIndex>`.
+    #[allow(dead_code)]
+    pub(crate) fn into_option<T: Into<Self>>(value: Option<T>) -> Option<Self> {
         value.map(std::convert::Into::into)
     }
 }
 
-impl Example for SlotNo {
+impl Example for TxnIndex {
     fn example() -> Self {
         Self(EXAMPLE)
     }

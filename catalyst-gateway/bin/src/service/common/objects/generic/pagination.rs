@@ -17,30 +17,12 @@ The caller must read this record to ensure the correct data requested was return
 #[oai(example = true)]
 /// Current Page of data being returned.
 pub(crate) struct CurrentPage {
-    /// The current `page` of data being returned.
+    #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented
     pub page: common::types::generic::query::pagination::Page,
-    /// The current `limit` of data being returned per page.
-    /// This `limit` may be less than requested if the response does not support the
-    /// requested `limit`.
+    #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented
     pub limit: common::types::generic::query::pagination::Limit,
-    /// Is this the final page?
-    #[oai(
-        rename = "final",
-        default = "final_default",
-        skip_serializing_if = "not_final"
-    )]
-    pub final_page: bool,
-}
-
-/// Default value to assign to `final` in response.
-fn final_default() -> bool {
-    false
-}
-
-/// Don't encode final, if its not final.
-#[allow(clippy::trivially_copy_pass_by_ref)] // Poem requires this.
-fn not_final(final_page: &bool) -> bool {
-    !final_page
+    #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented
+    pub remaining: common::types::generic::query::pagination::Remaining,
 }
 
 impl Example for CurrentPage {
@@ -48,7 +30,7 @@ impl Example for CurrentPage {
         Self {
             page: common::types::generic::query::pagination::Page::example(),
             limit: common::types::generic::query::pagination::Limit::example(),
-            final_page: true,
+            remaining: common::types::generic::query::pagination::Remaining::example(),
         }
     }
 }
@@ -56,14 +38,11 @@ impl Example for CurrentPage {
 impl CurrentPage {
     /// Create a new `CurrentPage` object.
     #[allow(dead_code)]
-    fn new(
-        page: common::types::generic::query::pagination::Page,
-        limit: common::types::generic::query::pagination::Limit, final_page: bool,
-    ) -> Self {
+    fn new(page: u64, limit: u64, remaining: u64) -> Self {
         Self {
-            page,
-            limit,
-            final_page,
+            page: page.into(),
+            limit: limit.into(),
+            remaining: remaining.into(),
         }
     }
 }

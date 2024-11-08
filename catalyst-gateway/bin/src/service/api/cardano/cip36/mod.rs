@@ -1,6 +1,7 @@
 //! CIP36 Registration Endpoints
 
 use ed25519_dalek::VerifyingKey;
+use poem::http::{HeaderMap, StatusCode};
 use poem_openapi::{param::Query, OpenApi};
 
 use self::cardano::slot_no::SlotNo;
@@ -21,46 +22,58 @@ pub(crate) struct Api;
 
 #[OpenApi(tag = "ApiTags::Cardano")]
 impl Api {
-    /// Get CIP36 registrations.
+    /// CIP36 registrations.
     ///
     /// This endpoint gets the latest registration given either the voting key, stake
     /// address, stake public key or the auth token.
     ///
     /// Registration can be the latest to date, or at a particular date-time or slot
     /// number.
-    ///
-    /// Required To be able to look up for:
-    /// 1. Voting Public Key
-    /// 2. Cip-19 stake address
-    /// 3. Stake Public Key (Can be converted to stake address)
-    /// 4. All - Hidden option and would need a hidden api key header (used to create a
-    ///    snapshot replacement.)
-    /// 4. Stake addresses associated with current Role0 registration (if none of the
-    ///    above provided).
-    /// If none of the above provided, return not found.
+    // Required To be able to look up for:
+    // 1. Voting Public Key
+    // 2. Cip-19 stake address
+    // 3. All - Hidden option and would need a hidden api key header (used to create a snapshot
+    //    replacement.)
+    // 4. Stake addresses associated with current Role0 registration (if none of the above
+    //    provided).
+    // If none of the above provided, return not found.
     #[oai(
         path = "/draft/cardano/registration/cip36",
         method = "get",
         operation_id = "cardanoRegistrationCip36"
     )]
     async fn get_registration(
-        &self,
-        /// Stake Public Key to find the latest registration for.
-        stake_pub_key: Query<Ed25519HexEncodedPublicKey>, // Validation provided by type.
-        /// Maximum Slot or Time to get the registration for.  
-        /// If not defined, gets the absolute latest registration.
+        &self, lookup: Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
         asat: Query<Option<cardano::query::AsAt>>,
         page: Query<Option<common::types::generic::query::pagination::Page>>,
         limit: Query<Option<common::types::generic::query::pagination::Limit>>,
         /// No Authorization required, but Token permitted.
         auth: NoneOrRBAC,
+        /// Headers, used if the query is requesting ALL to determine if the secret API
+        /// Key is also defined.
+        headers: &HeaderMap,
     ) -> response::AllRegistration {
+        // Special validation for the `lookup` parameter.
+        // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
+        // is invalid.
+        if let Some(lookup) = lookup.0.clone() {
+            if lookup.is_all(headers).is_err() {
+                return response::AllRegistration::unprocessable_content(vec![
+                    poem::Error::from_string(
+                        "Invalid Stake Address or Voter Key",
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                    ),
+                ]);
+            }
+        }
+
         endpoint::cip36_registrations(
-            Some(stake_pub_key.0),
+            lookup.0,
             SlotNo::into_option(asat.0),
             page.0.unwrap_or_default(),
             limit.0.unwrap_or_default(),
             auth,
+            headers,
         )
         .await
     }
