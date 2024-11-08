@@ -1911,6 +1911,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Review registration transaction'**
   String get reviewRegistrationTransaction;
+
+  /// Selection depending on guidance type
+  ///
+  /// In en, this message translates to:
+  /// **'{guidance, select, mandatory{Mandatory} education{Education} other{Tips}}'**
+  String guidance(String guidance);
+
+  /// Primary used to select all object. To display object without any filter
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

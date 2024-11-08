@@ -967,5 +967,18 @@
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
+  },
+  "guidance": "{guidance, select, mandatory{Mandatory} education{Education} other{Tips}}",
+  "@guidance": {
+    "description": "Selection depending on guidance type",
+    "placeholders": {
+      "guidance": {
+        "type": "String"
+      }
+    }
+  },
+  "all": "All",
+  "@all": {
+    "description": "Primary used to select all object. To display object without any filter"
   }
 }
