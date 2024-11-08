@@ -56,13 +56,6 @@ export default createRulesetFunction(
         let results = [];
         const { } = options;
 
-        console.log('------ DEBUG ----------------------------------------------------------------')
-        console.log('input', input);
-        console.log('options', options);
-        if (options.context) {
-            console.log('context', context);
-        }
-
         const testDescriptionValidity = (value) => {
             if (!value) {
                 (results ??= []).push({
