@@ -36,7 +36,7 @@ filter-openapi:
     RUN npm install -g openapi-format
 
     # Apply the filter
-    RUN openapi-format openapi/cat-gateway-api.json lib/generated/catalyst_gateway/filtered-openapi.json --configFile openapi-filters.json
+    RUN openapi-format openapi/cat-gateway-api.json lib/generated/catalyst_gateway/filtered-openapi.json --configFile openapi-filters.json --verbose
 
     # Delete the original cat-gateway-api.json to prevent conflict
     RUN rm openapi/cat-gateway-api.json
