@@ -78,7 +78,7 @@ Future<void> main() async {
   print('Derive xprv with $path: ${childXprv.toHex()}');
 
   final childXprvHex = childXprv.toHex();
-  print('Master xprv hex $childXprvHex');
+  print('Child xprv hex $childXprvHex');
 
   xprv.drop();
   print('Master xprv dropped ${xprv.toHex()}');
