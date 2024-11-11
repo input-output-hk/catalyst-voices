@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v.3.2.24 AS flutter_rust_bridge
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v3.2.24 AS flutter_rust_bridge
 
 builder:
     FROM flutter_rust_bridge+builder
@@ -8,7 +8,7 @@ builder:
 
 # Generated necessary files for running Flutter web locally and save it locally.
 code-generator:
-    ARG local = false
+    ARG local = false 
     FROM +builder
     DO flutter_rust_bridge+CODE_GENERATOR_WEB
 
