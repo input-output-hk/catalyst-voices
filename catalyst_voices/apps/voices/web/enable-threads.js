@@ -1,4 +1,5 @@
-// TODO(dtscalac): remove workaround when flutter_rust_bridge supporsts crossOriginIsolated for flutter drive
+// TODO(dtscalac): remove workaround when flutter_rust_bridge supports crossOriginIsolated for flutter drive:
+// https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407
 
 // https://github.com/orgs/community/discussions/13309#discussioncomment-3844940
 // NOTE: This file creates a service worker that cross-origin-isolates the page (read more here: https://web.dev/coop-coep/) which allows us to use wasm threads.
