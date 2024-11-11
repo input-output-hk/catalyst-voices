@@ -5,6 +5,7 @@
   * [References](#references)
   * [Requirements](#requirements)
   * [Install](#install)
+  * [Web setup](#web-setup)
   * [Example](#example)
   * [How to contribute changes](#how-to-contribute-changes)
   * [Support](#support)
@@ -35,6 +36,13 @@ via the [flutter_rust_bridge](https://pub.dev/packages/flutter_rust_bridge).
 dependencies:
     catalyst_key_derivation: any # or the latest version on Pub
 ```
+
+## Web setup
+
+[flutter_rust_bridge](https://pub.dev/packages/flutter_rust_bridge) requires custom cross origin headers in order to enable sharing buffer across origins.
+
+* When running the app via `flutter run` follow: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
+* When deploying the app via a web server make sure to setup these headers from your server: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#background
 
 ## Example
 
