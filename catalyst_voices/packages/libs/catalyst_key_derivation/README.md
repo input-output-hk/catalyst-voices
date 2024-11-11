@@ -41,8 +41,10 @@ dependencies:
 
 [flutter_rust_bridge](https://pub.dev/packages/flutter_rust_bridge) requires custom cross origin headers in order to enable sharing buffer across origins.
 
-* When running the app via `flutter run` follow: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
-* When deploying the app via a web server make sure to setup these headers from your server: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#background
+* When running the app via `flutter run` follow:
+[#when-flutter-run](https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run)
+* When deploying the app via a web server make sure to setup these headers from your server:
+[web-cross-origin#background](https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#background)
 
 ## Example
 
