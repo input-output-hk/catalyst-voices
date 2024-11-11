@@ -30,7 +30,7 @@ filter-openapi:
 
     # Copy the original OpenAPI spec file and the filters file
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
-    COPY catalyst_voices/packages/internal/catalyst_voices_services/openapi-filters.json openapi-filters.json
+    # COPY catalyst_voices/packages/internal/catalyst_voices_services/openapi-filters.json openapi-filters.json
 
     # Install openapi-format npm package
     RUN npm install -g openapi-format
