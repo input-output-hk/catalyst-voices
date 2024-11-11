@@ -1,0 +1,17 @@
+{
+    "includeTags": [
+        "Health",
+        "Legacy"
+    ],
+    "includePaths": [
+        "*/api/draft/*"
+    ],
+    "excludeComponents": [
+        "schemas",
+        "parameters",
+        "examples",
+        "headers",
+        "requestBodies",
+        "responses"
+    ]
+}

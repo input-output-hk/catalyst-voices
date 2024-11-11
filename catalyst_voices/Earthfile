@@ -19,6 +19,31 @@ builder:
     COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
+# Creates filtered OpenAPI spec
+# Takes json file from openapi-filter from /packages/internal/catalyst_voices_services
+filter-openapi:
+    FROM node:18-alpine
+
+    WORKDIR /packages/internal/catalyst_voices_services
+
+    FROM +builder
+
+    # Copy the original OpenAPI spec file and the filters file
+    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    COPY catalyst_voices/packages/internal/catalyst_voices_services/openapi-filters.json openapi-filters.json
+
+    # Install openapi-format npm package
+    RUN npm install -g openapi-format
+
+    # Apply the filter
+    RUN openapi-format openapi/cat-gateway-api.json lib/generated/catalyst_gateway/filtered-openapi.json --configFile openapi-filters.json
+
+    # Delete the original cat-gateway-api.json to prevent conflict
+    RUN rm openapi/cat-gateway-api.json
+
+    # Save the filtered file as an artifact for use in the next job
+    SAVE ARTIFACT lib/generated/catalyst_gateway/filtered-openapi.json
+
 # Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
 # and serialization logic.
@@ -26,13 +51,22 @@ builder:
 # proper folder of `catalyst_voices_services` local code.
 code-generator:
     ARG save_locally=false
+    ARG use_filtered_openapi=true
 
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
 
     FROM +builder
+
     WORKDIR packages/internal/catalyst_voices_services
-    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+
+    # Use filtered OpenAPI if the flag is true, else use the original one
+    IF [ $use_filtered_openapi = true ]
+        COPY +filter-openapi/lib/generated/catalyst_gateway/filtered-openapi.json openapi/cat-gateway-api.json
+    ELSE
+        COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    END
+
     DO flutter-ci+OPENAPI_CODE_GEN \
         --SAVE_LOCALLY=$save_locally \
         --GEN_CODE_PATH=$gen_code_path \
