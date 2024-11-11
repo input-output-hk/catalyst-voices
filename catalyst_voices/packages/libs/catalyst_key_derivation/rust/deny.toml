@@ -16,11 +16,7 @@ targets = [
 
 [advisories]
 version = 2
-ignore = [
-    { id = "RUSTSEC-2020-0168", reason = "`mach` is used by wasmtime and we have no control over that." },
-    { id = "RUSTSEC-2021-0145", reason = "we don't target windows, and don't use a custom global allocator." },
-    { id = "RUSTSEC-2024-0370", reason = "`proc-macro-error` is used by crates we rely on, we can't control what they use."},
-]
+ignore = []
 
 [bans]
 multiple-versions = "warn"
@@ -58,6 +54,9 @@ allow-git = [
     "https://github.com/input-output-hk/catalyst-mithril.git",
     "https://github.com/bytecodealliance/wasmtime",
     "https://github.com/aldanor/hdf5-rust",
+    "https://github.com/txpipe/vrf",
+    "https://github.com/txpipe/kes",
+    "https://github.com/txpipe/curve25519-dalek",
 ]
 
 [licenses]
