@@ -53,6 +53,7 @@ COCOAPODS
 codegen
 codepoints
 commitlog
+concatcp
 coti
 coverallsapp
 CQLSH
@@ -79,6 +80,7 @@ drep
 dreps
 dtscalac
 earthfile
+earthlyignore
 Easterling
 eddsa
 Edgedriver
@@ -184,6 +186,7 @@ netifas
 netkey
 nextest
 Nodetool
+oapi
 OCSP
 Oleksandr
 onboarded
@@ -230,6 +233,7 @@ ristretto
 rlib
 rngs
 RPATH
+ruleset
 rustc
 rustdoc
 rustdocflags

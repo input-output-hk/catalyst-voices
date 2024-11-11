@@ -25,7 +25,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
     slot_no: num_bigint::BigInt,
     /// Transaction Index.
     txn: i16,
-    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    /// Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
     stake_address: MaybeUnset<Vec<u8>>,
     /// Is the stake address a script or not.
     script: bool,

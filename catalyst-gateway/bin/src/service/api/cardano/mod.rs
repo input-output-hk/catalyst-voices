@@ -1,4 +1,5 @@
 //! Cardano API endpoints
+use ed25519_dalek::VerifyingKey;
 use poem_openapi::{
     param::{Path, Query},
     OpenApi,
@@ -7,8 +8,13 @@ use types::{DateTime, SlotNumber};
 
 use crate::service::{
     common::{
-        auth::none_or_rbac::NoneOrRBAC, objects::cardano::network::Network, tags::ApiTags,
-        types::cardano::address::Cip19StakeAddress,
+        auth::none_or_rbac::NoneOrRBAC,
+        objects::cardano::network::Network,
+        tags::ApiTags,
+        types::{
+            cardano::address::Cip19StakeAddress,
+            generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
+        },
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };
@@ -17,49 +23,15 @@ mod cip36;
 mod date_time_to_slot_number_get;
 mod rbac;
 mod registration_get;
-mod staked_ada_get;
+pub(crate) mod staking;
 mod sync_state_get;
 pub(crate) mod types;
 
 /// Cardano Follower API Endpoints
-pub(crate) struct CardanoApi;
+pub(crate) struct Api;
 
 #[OpenApi(tag = "ApiTags::Cardano")]
-impl CardanoApi {
-    /// Get staked ADA amount.
-    ///
-    /// This endpoint returns the total Cardano's staked ADA amount to the corresponded
-    /// user's stake address.
-    #[oai(
-        path = "/draft/cardano/staked_ada/:stake_address",
-        method = "get",
-        operation_id = "stakedAdaAmountGet",
-        transform = "schema_version_validation"
-    )]
-    async fn staked_ada_get(
-        &self,
-        /// The stake address of the user.
-        /// Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
-        stake_address: Path<Cip19StakeAddress>,
-        /// Cardano network type.
-        /// If omitted network type is identified from the stake address.
-        /// If specified it must be correspondent to the network type encoded in the stake
-        /// address.
-        /// As `preprod` and `preview` network types in the stake address encoded as a
-        /// `testnet`, to specify `preprod` or `preview` network type use this
-        /// query parameter.
-        network: Query<Option<Network>>,
-        /// Slot number at which the staked ADA amount should be calculated.
-        /// If omitted latest slot number is used.
-        // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-        #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-        slot_number: Query<Option<SlotNumber>>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> staked_ada_get::AllResponses {
-        staked_ada_get::endpoint(stake_address.0, network.0, slot_number.0).await
-    }
-
+impl Api {
     /// Get registration info.
     ///
     /// This endpoint returns the registration info followed by the [CIP-36](https://cips.cardano.org/cip/CIP-36/) to the
@@ -88,6 +60,8 @@ impl CardanoApi {
         // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
         slot_number: Query<Option<SlotNumber>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> registration_get::AllResponses {
         registration_get::endpoint(stake_address.0, network.0, slot_number.0).await
     }
@@ -109,6 +83,8 @@ impl CardanoApi {
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> sync_state_get::AllResponses {
         sync_state_get::endpoint(network.0).await
     }
@@ -134,6 +110,8 @@ impl CardanoApi {
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> date_time_to_slot_number_get::AllResponses {
         date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
     }
@@ -148,11 +126,15 @@ impl CardanoApi {
     )]
     async fn latest_registration_cip36_given_stake_addr(
         &self,
-        /// Stake Address to find the latest registration for.
-        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
-        stake_addr: Query<String>,
+        /// Stake Public Key to find the latest registration for.
+        stake_pub_key: Query<Ed25519HexEncodedPublicKey>, // Validation provided by type.
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> cip36::SingleRegistrationResponse {
-        cip36::get_latest_registration_from_stake_addr(stake_addr.0, true).await
+        let hex_key = stake_pub_key.0;
+        let pub_key: VerifyingKey = hex_key.into();
+
+        cip36::get_latest_registration_from_stake_addr(&pub_key, true).await
     }
 
     /// Get latest CIP36 registrations from a stake key hash.
@@ -168,6 +150,8 @@ impl CardanoApi {
         /// Stake Key Hash to find the latest registration for.
         #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
         stake_key_hash: Query<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> cip36::SingleRegistrationResponse {
         cip36::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
     }
@@ -184,8 +168,10 @@ impl CardanoApi {
     async fn latest_registration_cip36_given_vote_key(
         &self,
         /// Voting Key to find CIP36 registrations for.
-        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
+        #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]"))]
         vote_key: Query<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> cip36::MultipleRegistrationResponse {
         cip36::get_associated_vote_key_registrations(vote_key.0, true).await
     }
@@ -202,6 +188,8 @@ impl CardanoApi {
         &self,
         /// Stake address to get the chain root for.
         Path(stake_address): Path<Cip19StakeAddress>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> rbac::chain_root_get::AllResponses {
         rbac::chain_root_get::endpoint(stake_address).await
     }
@@ -219,6 +207,8 @@ impl CardanoApi {
         /// Chain root to get the registrations for.
         #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
         Path(chain_root): Path<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> rbac::registrations_get::AllResponses {
         rbac::registrations_get::endpoint(chain_root).await
     }
@@ -236,7 +226,12 @@ impl CardanoApi {
         /// Role0 key to get the chain root for.
         #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
         Path(role0_key): Path<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> rbac::role0_chain_root_get::AllResponses {
         rbac::role0_chain_root_get::endpoint(role0_key).await
     }
 }
+
+/// Cardano API Endpoints
+pub(crate) type CardanoApi = (Api, staking::Api);

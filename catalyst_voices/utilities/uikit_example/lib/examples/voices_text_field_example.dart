@@ -42,6 +42,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   suffixIcon: VoicesAssets.icons.chevronDown.buildIcon(),
                 ),
                 maxLength: 200,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -56,6 +57,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 ),
                 maxLength: 200,
                 enabled: false,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -70,6 +72,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   suffixIcon: Icon(Icons.error_outline),
                 ),
                 maxLength: 200,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -83,6 +86,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 ),
                 maxLength: 200,
                 validator: VoicesTextFieldValidationResult.success(),
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -97,6 +101,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 maxLength: 200,
                 validator:
                     VoicesTextFieldValidationResult.warning('Warning message'),
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -111,6 +116,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 maxLength: 200,
                 validator:
                     VoicesTextFieldValidationResult.error('Error message'),
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -125,6 +131,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 maxLength: 200,
                 validator: VoicesTextFieldValidationResult.success(),
                 enabled: false,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -140,6 +147,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 validator:
                     VoicesTextFieldValidationResult.warning('Warning message'),
                 enabled: false,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -155,6 +163,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 validator:
                     VoicesTextFieldValidationResult.error('Error message'),
                 enabled: false,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -188,6 +197,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   }
                 },
                 maxLength: 200,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -202,6 +212,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 maxLength: 200,
                 minLines: 6,
                 maxLines: 10,
+                onFieldSubmitted: (value) {},
               ),
             ),
             SizedBox(
@@ -212,6 +223,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   labelText: 'Resizable',
                 ),
                 maxLines: null,
+                onFieldSubmitted: (value) {},
               ),
             ),
           ],

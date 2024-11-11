@@ -1,6 +1,6 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.22 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.22 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.23 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.23 AS playwright-ci
 
 deps:
     DO playwright-ci+SETUP --workdir=/wallet-automation
@@ -21,7 +21,7 @@ src:
 
 package-test:
     FROM +src
-    ENV APP_URL http://app:80
+    ENV APP_URL http://test-app:80
     RUN mkdir /results
     VOLUME /results
     ENTRYPOINT ["/bin/sh", "-c", "/usr/bin/xvfb-run --auto-servernum npm test", ""]
@@ -52,7 +52,7 @@ nightly-test:
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
         --load test:latest=(+package-test) \
-        --service app \
+        --service test-app \
         --allow-privileged
 
         RUN docker run --network=default_default --name=test test:latest && \

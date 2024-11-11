@@ -7,6 +7,7 @@ use poem_openapi::{
 
 use crate::service::{
     common::{
+        auth::none::NoAuthorization,
         objects::legacy::{
             account_votes::AccountId, fragments_batch::FragmentsBatch,
             fragments_processing_summary::FragmentId,
@@ -41,6 +42,7 @@ impl V1Api {
         /// A account ID to get the votes for.
         #[oai(validator(max_length = "100", pattern = "^0x[a-f0-9]+$"))]
         account_id: Path<AccountId>,
+        _auth: NoAuthorization,
     ) -> account_votes_get::AllResponses {
         account_votes_get::endpoint(account_id).await
     }
@@ -59,6 +61,7 @@ impl V1Api {
         &self,
         /// Batch of fragments to be processed.
         Json(fragments_batch): Json<FragmentsBatch>,
+        _auth: NoAuthorization,
     ) -> fragments_post::AllResponses {
         fragments_post::endpoint(fragments_batch).await
     }
@@ -80,6 +83,7 @@ impl V1Api {
         // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(max_items = "1000"))]
         Query(fragment_ids): Query<Vec<FragmentId>>,
+        _auth: NoAuthorization,
     ) -> fragments_statuses::AllResponses {
         fragments_statuses::endpoint(fragment_ids).await
     }

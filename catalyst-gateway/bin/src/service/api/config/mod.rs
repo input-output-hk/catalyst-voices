@@ -1,10 +1,13 @@
 //! Configuration Endpoints
 
-use std::net::IpAddr;
-
 use jsonschema::BasicOutput;
 use poem::web::RealIp;
-use poem_openapi::{param::Query, payload::Json, types::ToJSON, ApiResponse, OpenApi};
+use poem_openapi::{
+    param::Query,
+    payload::Json,
+    types::{Example, ToJSON},
+    ApiResponse, NewType, OpenApi,
+};
 use serde_json::Value;
 use tracing::error;
 
@@ -53,6 +56,19 @@ enum SetConfigResponse {
 }
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
+
+#[derive(NewType)]
+#[oai(example = true)]
+/// IP Address.
+pub(crate) struct IpAddr(std::net::IpAddr);
+
+impl Example for IpAddr {
+    fn example() -> Self {
+        Self(std::net::IpAddr::V4(std::net::Ipv4Addr::new(
+            192, 168, 10, 15,
+        )))
+    }
+}
 
 #[OpenApi(tag = "ApiTags::Config")]
 impl ConfigApi {
@@ -156,7 +172,7 @@ impl ConfigApi {
         match body_value {
             Some(value) => {
                 match ip_query.0 {
-                    Some(ip) => set(ConfigKey::FrontendForIp(ip), value).await,
+                    Some(ip) => set(ConfigKey::FrontendForIp(ip.0), value).await,
                     None => set(ConfigKey::Frontend, value).await,
                 }
             },

@@ -595,10 +595,6 @@
   "@walletLinkRoleSummaryContent3": {
     "description": "The last part of the message on the role summary screen in registration."
   },
-  "walletLinkRoleSummaryButton": "Confirm & Sign with wallet",
-  "@walletLinkRoleSummaryButton": {
-    "description": "A button label on the role summary screen in registration for the next step."
-  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."
@@ -812,17 +808,8 @@
     "description": "Refers to a dark theme mode."
   },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
-  "@keychainDeletedDialogTitle": {
-    "description": "A title on keychain deleted dialog"
-  },
-  "keychainDeletedDialogSubtitle": "Catalyst keychain removed",
-  "@keychainDeletedDialogSubtitle": {
-    "description": "A subtitle on keychain deleted dialog"
-  },
-  "keychainDeletedDialogInfo": "Catalyst keychain removed",
-  "@keychainDeletedDialogInfo": {
-    "description": "An info on keychain deleted dialog"
-  },
+  "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.",
+  "keychainDeletedDialogInfo": "We reverted this device to Catalyst first use.",
   "registrationCompletedTitle": "Catalyst account setup",
   "registrationCompletedSubtitle": "Completed!",
   "registrationCompletedSummaryHeader": "Summary",
@@ -913,6 +900,7 @@
   "recoveryAccountDetailsAction": "Set unlock password for this device",
   "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password f\u2028or this device",
   "recoveryUnlockPasswordInstructionsSubtitle": "With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.  \u2028\u2028But it can be a bit tedious to enter every single time you want to use the app.  \u2028\u2028In this next step, you'll set your Unlock Password for your current device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "recoverDifferentKeychain": "Restore a different keychain",
   "unlockDialogHeader": "Unlock Catalyst",
   "@unlockDialogHeader": {
     "description": "The header label in unlock dialog."
@@ -975,5 +963,9 @@
   "connectDifferentWallet": "Connect a different wallet",
   "@connectDifferentWallet": {
     "description": "A button label to connect a different wallet in wallet detail panel."
+  },
+  "reviewRegistrationTransaction": "Review registration transaction",
+  "@reviewRegistrationTransaction": {
+    "description": "A button label to review the registration transaction in wallet detail panel."
   }
 }

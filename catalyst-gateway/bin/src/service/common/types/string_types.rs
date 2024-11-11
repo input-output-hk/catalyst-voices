@@ -39,7 +39,7 @@ macro_rules! impl_string_types {
     ($(#[$docs:meta])* $ty:ident, $type_name:literal, $format:literal, $schema:expr, $validator:expr) => {
         $(#[$docs])*
         #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-        pub(crate) struct $ty(pub String);
+        pub(crate) struct $ty(String);
 
         impl Deref for $ty {
             type Target = String;
