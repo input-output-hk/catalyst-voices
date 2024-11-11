@@ -9,7 +9,7 @@ import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents an extended BIP-32 private key based on the Ed25519 curve.
-/// 
+///
 /// It is recommended to call [drop] as soon as the key is not needed anymore.
 class Bip32Ed25519XPrivateKey extends Equatable {
   final rust.Bip32Ed25519XPrivateKey _bytes;
