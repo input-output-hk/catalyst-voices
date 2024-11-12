@@ -17,15 +17,12 @@ use tracing::{error, info};
 
 use super::{
     queries::{
-        FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
+        purge, FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
         PreparedUpsertQuery,
     },
     schema::create_schema,
 };
-use crate::{
-    db::index::queries,
-    settings::{cassandra_db, Settings},
-};
+use crate::settings::{cassandra_db, Settings};
 
 /// Configuration Choices for compression
 #[derive(Clone, strum::EnumString, strum::Display, strum::VariantNames)]
@@ -63,6 +60,8 @@ pub(crate) struct CassandraSession {
     session: Arc<Session>,
     /// All prepared queries we can use on this session.
     queries: Arc<PreparedQueries>,
+    /// All prepared purge queries we can use on this session.
+    purge_queries: Arc<purge::PreparedQueries>,
 }
 
 /// Persistent DB Session.
@@ -269,7 +268,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             continue;
         }
 
-        let queries = match queries::PreparedQueries::new(session.clone(), &cfg).await {
+        let queries = match PreparedQueries::new(session.clone(), &cfg).await {
             Ok(queries) => Arc::new(queries),
             Err(error) => {
                 error!(
@@ -281,11 +280,24 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             },
         };
 
+        let purge_queries = match purge::PreparedQueries::new(session.clone(), &cfg).await {
+            Ok(queries) => Arc::new(queries),
+            Err(error) => {
+                error!(
+                    db_type = db_type,
+                    error = %error,
+                    "Failed to Create Cassandra Prepared Purge Queries"
+                );
+                continue;
+            },
+        };
+
         let cassandra_session = CassandraSession {
             persistent,
             cfg: Arc::new(cfg),
             session,
             queries,
+            purge_queries,
         };
 
         // Save the session so we can execute queries on the DB
