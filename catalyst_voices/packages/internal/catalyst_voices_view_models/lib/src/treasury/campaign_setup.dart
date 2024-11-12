@@ -15,6 +15,7 @@ final class CampaignSetup extends TreasurySection<DummyTopicStep> {
 final class DummyTopicStep extends TreasurySectionStep {
   const DummyTopicStep({
     required super.id,
+    required super.sectionId,
     super.isEditable,
   });
 

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/pages/treasury/treasury_body.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_details_panel.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_navigation_panel.dart';
-import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +9,14 @@ const sections = [
   CampaignSetup(
     id: 0,
     steps: [
-      DummyTopicStep(id: 0, isEditable: false),
-      DummyTopicStep(id: 1),
-      DummyTopicStep(id: 2),
-      DummyTopicStep(id: 3),
+      DummyTopicStep(
+        id: 0,
+        sectionId: 0,
+        isEditable: false,
+      ),
+      DummyTopicStep(id: 1, sectionId: 0),
+      DummyTopicStep(id: 2, sectionId: 0),
+      DummyTopicStep(id: 3, sectionId: 0),
     ],
   ),
 ];
@@ -29,6 +32,8 @@ class TreasuryPage extends StatefulWidget {
 
 class _TreasuryPageState extends State<TreasuryPage> {
   late final SectionsController _sectionsController;
+
+  final List<SectionsListViewItem> _bodyItems = [];
 
   @override
   void initState() {
@@ -49,15 +54,23 @@ class _TreasuryPageState extends State<TreasuryPage> {
   Widget build(BuildContext context) {
     return SectionsControllerScope(
       controller: _sectionsController,
-      child: const SpaceScaffold(
-        left: TreasuryNavigationPanel(),
-        body: TreasuryBody(sections: sections),
-        right: TreasuryDetailsPanel(),
+      child: SpaceScaffold(
+        left: const TreasuryNavigationPanel(),
+        body: TreasuryBody(
+          items: _bodyItems,
+        ),
+        right: const TreasuryDetailsPanel(),
       ),
     );
   }
 
   void _populateSections() {
+    final bodyItems = sections
+        .expand<SectionsListViewItem>((element) => [element, ...element.steps])
+        .toList();
+
+    _bodyItems.addAll(bodyItems);
+
     _sectionsController.value = SectionsControllerState.initial(
       sections: sections,
     );

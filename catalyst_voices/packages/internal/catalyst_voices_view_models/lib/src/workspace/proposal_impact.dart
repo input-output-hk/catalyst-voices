@@ -15,6 +15,7 @@ final class ProposalImpact extends WorkspaceSection {
 final class BonusMarkUpStep extends RichTextStep {
   const BonusMarkUpStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });
@@ -28,6 +29,7 @@ final class BonusMarkUpStep extends RichTextStep {
 final class ValueForMoneyStep extends RichTextStep {
   const ValueForMoneyStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });

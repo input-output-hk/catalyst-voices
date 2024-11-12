@@ -15,6 +15,7 @@ import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 const sections = [
   ProposalSetup(
@@ -22,6 +23,7 @@ const sections = [
     steps: [
       TitleStep(
         id: 0,
+        sectionId: 0,
         data: DocumentJson(title),
       ),
     ],
@@ -31,16 +33,19 @@ const sections = [
     steps: [
       ProblemStep(
         id: 0,
+        sectionId: 1,
         data: DocumentJson(problemStatement),
         charsLimit: 200,
       ),
       SolutionStep(
         id: 1,
+        sectionId: 1,
         data: DocumentJson(solutionStatement),
         charsLimit: 200,
       ),
       PublicDescriptionStep(
         id: 2,
+        sectionId: 1,
         data: DocumentJson(publicDescription),
         charsLimit: 3000,
       ),
@@ -51,16 +56,19 @@ const sections = [
     steps: [
       ProblemPerspectiveStep(
         id: 0,
+        sectionId: 2,
         data: DocumentJson(answer),
         charsLimit: 200,
       ),
       PerspectiveRationaleStep(
         id: 1,
+        sectionId: 2,
         data: DocumentJson(answer),
         charsLimit: 200,
       ),
       ProjectEngagementStep(
         id: 2,
+        sectionId: 2,
         data: DocumentJson(answer),
         charsLimit: 200,
       ),
@@ -71,11 +79,13 @@ const sections = [
     steps: [
       BonusMarkUpStep(
         id: 0,
+        sectionId: 3,
         data: DocumentJson(bonusMarkUp),
         charsLimit: 900,
       ),
       ValueForMoneyStep(
         id: 1,
+        sectionId: 3,
         data: DocumentJson(valueForMoney),
         charsLimit: 2600,
       ),
@@ -86,10 +96,12 @@ const sections = [
     steps: [
       DeliveryAndAccountabilityStep(
         id: 0,
+        sectionId: 4,
         data: DocumentJson(deliveryAndAccountability),
       ),
       FeasibilityChecksStep(
         id: 1,
+        sectionId: 4,
         data: DocumentJson(feasibilityChecks),
       ),
     ],
@@ -107,12 +119,16 @@ class WorkspacePage extends StatefulWidget {
 
 class _WorkspacePageState extends State<WorkspacePage> {
   late final SectionsController _sectionsController;
+  late final ItemScrollController _bodyItemScrollController;
+
+  final List<SectionsListViewItem> _bodyItems = [];
 
   @override
   void initState() {
     super.initState();
 
     _sectionsController = SectionsController();
+    _bodyItemScrollController = ItemScrollController();
 
     _populateSections();
   }
@@ -127,15 +143,24 @@ class _WorkspacePageState extends State<WorkspacePage> {
   Widget build(BuildContext context) {
     return SectionsControllerScope(
       controller: _sectionsController,
-      child: const SpaceScaffold(
-        left: WorkspaceNavigationPanel(),
-        body: WorkspaceBody(sections: sections),
-        right: WorkspaceSetupPanel(),
+      child: SpaceScaffold(
+        left: const WorkspaceNavigationPanel(),
+        body: WorkspaceBody(
+          items: _bodyItems,
+          itemScrollController: _bodyItemScrollController,
+        ),
+        right: const WorkspaceSetupPanel(),
       ),
     );
   }
 
   void _populateSections() {
+    final bodyItems = sections
+        .expand<SectionsListViewItem>((element) => [element, ...element.steps])
+        .toList();
+
+    _bodyItems.addAll(bodyItems);
+
     _sectionsController.value = SectionsControllerState.initial(
       sections: sections,
     );

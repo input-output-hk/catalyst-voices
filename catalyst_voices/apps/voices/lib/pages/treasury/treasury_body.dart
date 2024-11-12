@@ -1,32 +1,26 @@
-import 'package:catalyst_voices/pages/treasury/treasury_campaign_setup.dart';
+import 'package:catalyst_voices/pages/treasury/treasury_dummy_topic_step.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class TreasuryBody extends StatelessWidget {
-  final List<TreasurySection> sections;
+  final List<SectionsListViewItem> items;
 
   const TreasuryBody({
     super.key,
-    required this.sections,
+    required this.items,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.only(top: 10),
-      itemCount: sections.length,
-      itemBuilder: (context, index) {
-        final section = sections[index];
-
-        switch (section) {
-          case CampaignSetup():
-            return TreasuryCampaignSetup(
-              key: ValueKey('CampaignSetupSection[${section.id}]Key'),
-              data: section,
-            );
+    return SectionsListView<TreasurySection, TreasurySectionStep>(
+      items: items,
+      stepBuilder: (context, step) {
+        switch (step) {
+          case DummyTopicStep():
+            return TreasuryDummyTopicStep(step: step);
         }
       },
-      separatorBuilder: (context, index) => const SizedBox(height: 24),
     );
   }
 }
