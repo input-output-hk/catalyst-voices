@@ -136,15 +136,8 @@ class _WorkspacePageState extends State<WorkspacePage> {
   }
 
   void _populateSections() {
-    final section = sections.firstOrNull;
-    final step = section?.steps.firstOrNull;
-
-    _sectionsController.value = SectionsControllerState(
+    _sectionsController.value = SectionsControllerState.initial(
       sections: sections,
-      openedSections: {sections.first.id},
-      selectedStep: section != null && step != null
-          ? (sectionId: section.id, stepId: step.id)
-          : null,
     );
   }
 }

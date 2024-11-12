@@ -58,15 +58,8 @@ class _TreasuryPageState extends State<TreasuryPage> {
   }
 
   void _populateSections() {
-    final section = sections.firstOrNull;
-    final step = section?.steps.firstOrNull;
-
-    _sectionsController.value = SectionsControllerState(
+    _sectionsController.value = SectionsControllerState.initial(
       sections: sections,
-      openedSections: sections.map((e) => e.id).toSet(),
-      selectedStep: section != null && step != null
-          ? (sectionId: section.id, stepId: step.id)
-          : null,
     );
   }
 }

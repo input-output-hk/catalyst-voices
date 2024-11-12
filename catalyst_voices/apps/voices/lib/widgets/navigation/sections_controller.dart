@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,24 @@ final class SectionsControllerState extends Equatable {
     this.openedSections = const {},
     this.selectedStep,
   });
+
+  factory SectionsControllerState.initial({
+    required List<Section> sections,
+  }) {
+    final openedSections = sections.map((e) => e.id).toSet();
+
+    final section = sections.firstWhereOrNull((e) => e.steps.isNotEmpty);
+
+    final selectedStep = section != null
+        ? (sectionId: section.id, stepId: section.steps.first.id)
+        : null;
+
+    return SectionsControllerState(
+      sections: sections,
+      openedSections: openedSections,
+      selectedStep: selectedStep,
+    );
+  }
 
   SectionsControllerState copyWith({
     List<Section>? sections,
