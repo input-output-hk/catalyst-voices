@@ -1,5 +1,6 @@
 //! Queries for purging volatile data.
 
+pub(crate) mod txi_by_hash;
 pub(crate) mod txo_ada;
 pub(crate) mod txo_assets;
 pub(crate) mod unstaked_txo_ada;
@@ -95,10 +96,16 @@ pub(crate) struct PreparedQueries {
     delete_txo_assets: SizedBatch,
     /// Unstaked TXO ADA Primary Key Query.
     select_unstaked_txo_ada: PreparedStatement,
+    /// Unstaked TXO ADA Delete Query.
+    delete_unstaked_txo_ada: SizedBatch,
     /// Unstaked TXO Assets Primary Key Query.
     select_unstaked_txo_assets: PreparedStatement,
+    /// Unstaked TXO Asset Delete Query.
+    delete_unstaked_txo_assets: SizedBatch,
     /// TXI by TXN Hash by TXN Hash Primary Key Query.
     select_txi_by_hash: PreparedStatement,
+    /// TXI by TXN Hash Delete Query.
+    delete_txi_by_hash: SizedBatch,
     /// Stake Registration Primary Key Query.
     select_stake_registration: PreparedStatement,
     /// CIP36 Registrations Primary Key Query.
@@ -115,12 +122,6 @@ pub(crate) struct PreparedQueries {
     select_chain_root_for_role0_key: PreparedStatement,
     /// Chain Root for Stake Address Primary Key Query..
     select_chain_root_for_stake_address: PreparedStatement,
-    /// Unstaked TXO ADA Delete Query.
-    delete_unstaked_txo_ada: SizedBatch,
-    /// Unstaked TXO Asset Delete Query.
-    delete_unstaked_txo_assets: SizedBatch,
-    /// TXI by TXN Hash Delete Query.
-    delete_txi: SizedBatch,
     /// Stake Registration Delete Query.
     delete_stake_registration: SizedBatch,
     /// CIP36 Registrations Delete Query.
@@ -157,6 +158,8 @@ impl PreparedQueries {
             unstaked_txo_assets::PrimaryKeyQuery::prepare(&session).await?;
         let delete_unstaked_txo_assets =
             unstaked_txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_txi_by_hash = txi_by_hash::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_txi_by_hash = txi_by_hash::DeleteQuery::prepare_batch(&session, cfg).await?;
 
         todo!("WIP");
     }
@@ -220,7 +223,7 @@ impl PreparedQueries {
             PreparedDeleteQuery::TxoAssets => &self.delete_txo_assets,
             PreparedDeleteQuery::UnstakedTxoAda => &self.delete_unstaked_txo_ada,
             PreparedDeleteQuery::UnstakedTxoAsset => &self.delete_unstaked_txo_assets,
-            PreparedDeleteQuery::Txi => &self.delete_txi,
+            PreparedDeleteQuery::Txi => &self.delete_txi_by_hash,
             PreparedDeleteQuery::StakeRegistration => &self.delete_stake_registration,
             PreparedDeleteQuery::Cip36Registration => &self.delete_cip36_registration,
             PreparedDeleteQuery::Cip36RegistrationError => &self.delete_cip36_registration_error,
