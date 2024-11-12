@@ -27,7 +27,7 @@ export default defineConfig({
       name: 'chromium',
       dependencies: ['setup'],
       launchOptions: {
-        executablePath: '/usr/bin/google-chrome',
+        executablePath: '/usr/bin/google-chrome5',
       },
     },
   ]
