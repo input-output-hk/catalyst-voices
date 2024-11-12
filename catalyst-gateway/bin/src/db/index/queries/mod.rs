@@ -333,11 +333,7 @@ impl PreparedQueries {
             },
             PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
         };
-
-        session
-            .execute_iter(prepared_stmt.clone(), params)
-            .await
-            .map_err(|e| anyhow::anyhow!(e))
+        session_execute_iter(session, prepared_stmt, params).await
     }
 
     /// Execute a Batch query with the given parameters.
@@ -377,85 +373,53 @@ impl PreparedQueries {
                 &self.chain_root_for_stake_address_insert_queries
             },
         };
-
-        let mut results: Vec<QueryResult> = Vec::new();
-
-        let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
-
-        for chunk in chunks {
-            let chunk_size: u16 = chunk.len().try_into()?;
-            let Some(batch_query) = query_map.get(&chunk_size) else {
-                // This should not actually occur.
-                bail!("No batch query found for size {}", chunk_size);
-            };
-            let batch_query_statements = batch_query.value().clone();
-            results.push(
-                session
-                    .batch(&batch_query_statements, chunk)
-                    .await
-                    .context(format!("query={query}, chunk={chunk:?}"))?,
-            );
-        }
-
-        Ok(results)
+        session_execute_batch(session, query_map, cfg, query, values).await
     }
+}
 
-    /// Execute a purge query with the given parameters.
-    pub(crate) async fn execute_purge<T: SerializeRow + Debug>(
-        &self, session: Arc<Session>, cfg: Arc<cassandra_db::EnvVars>, query: PreparedPurgeQuery,
-        values: Vec<T>,
-    ) -> FallibleQueryResults {
-        let query_map = match query {
-            PreparedPurgeQuery::TxoAdaPurgeQuery => &self.txo_purge_queries,
-            PreparedPurgeQuery::TxoAssetPurgeQuery => &self.txo_asset_purge_queries,
-            PreparedPurgeQuery::UnstakedTxoAdaPurgeQuery => &self.unstaked_txo_purge_queries,
-            PreparedPurgeQuery::UnstakedTxoAssetPurgeQuery => {
-                &self.unstaked_txo_asset_purge_queries
-            },
-            PreparedPurgeQuery::TxiPurgeQuery => &self.txi_purge_queries,
-            PreparedPurgeQuery::StakeRegistrationPurgeQuery => {
-                &self.stake_registration_purge_queries
-            },
-            PreparedPurgeQuery::Cip36RegistrationPurgeQuery => {
-                &self.cip36_registration_purge_queries
-            },
-            PreparedPurgeQuery::Cip36RegistrationPurgeErrorQuery => {
-                &self.cip36_registration_error_purge_queries
-            },
-            PreparedPurgeQuery::Cip36RegistrationForStakeAddrPurgeQuery => {
-                &self.cip36_registration_for_stake_address_purge_queries
-            },
-            PreparedPurgeQuery::Rbac509PurgeQuery => &self.rbac509_registration_purge_queries,
-            PreparedPurgeQuery::ChainRootForTxnIdPurgeQuery => {
-                &self.chain_root_for_txn_id_purge_queries
-            },
-            PreparedPurgeQuery::ChainRootForRole0KeyPurgeQuery => {
-                &self.chain_root_for_role0_key_purge_queries
-            },
-            PreparedPurgeQuery::ChainRootForStakeAddressPurgeQuery => {
-                &self.chain_root_for_stake_address_purge_queries
-            },
+/// Execute a Batch query with the given parameters.
+///
+/// Values should be a Vec of values which implement `SerializeRow` and they MUST be
+/// the same, and must match the query being executed.
+///
+/// This will divide the batch into optimal sized chunks and execute them until all
+/// values have been executed or the first error is encountered.
+async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
+    session: Arc<Session>, query_map: &SizedBatch, cfg: Arc<cassandra_db::EnvVars>, query: Q,
+    values: Vec<T>,
+) -> FallibleQueryResults {
+    let mut results: Vec<QueryResult> = Vec::new();
+
+    let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
+
+    for chunk in chunks {
+        let chunk_size: u16 = chunk.len().try_into()?;
+        let Some(batch_query) = query_map.get(&chunk_size) else {
+            // This should not actually occur.
+            bail!("No batch query found for size {}", chunk_size);
         };
-
-        let mut results: Vec<QueryResult> = Vec::new();
-
-        let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
-
-        for chunk in chunks {
-            let chunk_size: u16 = chunk.len().try_into()?;
-            let Some(batch_query) = query_map.get(&chunk_size) else {
-                // This should not actually occur.
-                bail!("No batch query found for size {}", chunk_size);
-            };
-            let batch_query_statements = batch_query.value().clone();
-            results.push(
-                session
-                    .batch(&batch_query_statements, chunk)
-                    .await
-                    .context(format!("query={query}, chunk={chunk:?}"))?,
-            );
-        }
-
-        Ok(results)
+        let batch_query_statements = batch_query.value().clone();
+        results.push(
+            session
+                .batch(&batch_query_statements, chunk)
+                .await
+                .context(format!("query={query}, chunk={chunk:?}"))?,
+        );
     }
+
+    Ok(results)
+}
+
+/// Executes a select query with the given parameters.
+///
+/// Returns an iterator that iterates over all the result pages that the query
+/// returns.
+pub(crate) async fn session_execute_iter<P>(
+    session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
+) -> anyhow::Result<RowIterator>
+where P: SerializeRow {
+    session
+        .execute_iter(prepared_stmt.clone(), params)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))
 }
