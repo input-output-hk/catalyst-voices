@@ -26,25 +26,21 @@ filter-openapi:
 
     WORKDIR /packages/internal/catalyst_voices_services
 
-    # FROM +builder
-
-    # Copy the original OpenAPI spec file and the filters file
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
 
     COPY packages/internal/catalyst_voices_services/openapi-filters.json openapi-filters.json
-
 
     # Install openapi-format npm package
     RUN npm install -g openapi-format
 
     # Apply the filter
-    RUN openapi-format openapi/cat-gateway-api.json lib/generated/catalyst_gateway/filtered-openapi.json --configFile openapi-filters.json --verbose
-
+    RUN openapi-format openapi/cat-gateway-api.json -o openapi/filtered-openapi.json --filterFile openapi-filters.json --verbose
     # Delete the original cat-gateway-api.json to prevent conflict
-    # RUN rm openapi/cat-gateway-api.json
+    RUN rm openapi/cat-gateway-api.json
 
     # Save the filtered file as an artifact for use in the next job
-    SAVE ARTIFACT lib/generated/catalyst_gateway/filtered-openapi.json
+    SAVE ARTIFACT openapi/filtered-openapi.json 
+    # SAVE ARTIFACT openapi/filtered-openapi.json AS LOCAL openapi/filtered-openapi.json
 
 # Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
@@ -53,7 +49,7 @@ filter-openapi:
 # proper folder of `catalyst_voices_services` local code.
 code-generator:
     ARG save_locally=false
-    ARG use_filtered_openapi=true
+    ARG use_filtered_openapi=false
 
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
@@ -64,7 +60,7 @@ code-generator:
 
     # Use filtered OpenAPI if the flag is true, else use the original one
     IF [ $use_filtered_openapi = true ]
-        COPY +filter-openapi/lib/generated/catalyst_gateway/filtered-openapi.json openapi/cat-gateway-api.json
+        COPY +filter-openapi/filtered-openapi.json openapi/cat-gateway-api.json
     ELSE
         COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     END

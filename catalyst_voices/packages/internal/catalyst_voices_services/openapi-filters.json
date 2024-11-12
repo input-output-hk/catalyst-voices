@@ -1,12 +1,12 @@
 {
-    "includeTags": [
+    "inverseTags": [
         "Health",
         "Legacy"
     ],
-    "includePaths": [
-        "*/api/draft/*"
+    "operations": [
+        "*::/api/draft/*"
     ],
-    "excludeComponents": [
+    "unusedComponents": [
         "schemas",
         "parameters",
         "examples",
