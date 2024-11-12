@@ -17,7 +17,8 @@ use tracing::{error, info};
 
 use super::{
     queries::{
-        purge, FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
+        purge::{self, PreparedDeleteQuery},
+        FallibleQueryResults, PreparedQueries, PreparedSelectQuery, PreparedQuery,
         PreparedUpsertQuery,
     },
     schema::create_schema,
@@ -143,6 +144,46 @@ impl CassandraSession {
         let queries = self.queries.clone();
 
         queries.execute_upsert(session, query, value).await
+    }
+
+    /// Execute a purge query with the given parameters.
+    ///
+    /// Values should be a Vec of values which implement `SerializeRow` and they MUST be
+    /// the same, and must match the query being executed.
+    ///
+    /// This will divide the batch into optimal sized chunks and execute them until all
+    /// values have been executed or the first error is encountered.
+    ///
+    /// NOTE: This is currently only used to purge volatile data.
+    pub(crate) async fn purge_execute_batch<T: SerializeRow + Debug>(
+        &self, query: PreparedDeleteQuery, values: Vec<T>,
+    ) -> FallibleQueryResults {
+        // Only execute purge queries on the volatile session
+        let persistent = false;
+        let Some(volatile_db) = Self::get(persistent) else {
+            // This should never happen
+            anyhow::bail!("Volatile DB Session not found");
+        };
+        let cfg = self.cfg.clone();
+        let queries = self.purge_queries.clone();
+        let session = volatile_db.session.clone();
+
+        queries.execute_batch(session, cfg, query, values).await
+    }
+
+    /// Execute a select query to gather primary keys for purging.
+    pub(crate) async fn purge_execute_iter(
+        &self, query: purge::PreparedSelectQuery
+    ) -> anyhow::Result<RowIterator> {
+        // Only execute purge queries on the volatile session
+        let persistent = false;
+        let Some(volatile_db) = Self::get(persistent) else {
+            // This should never happen
+            anyhow::bail!("Volatile DB Session not found");
+        };
+        let queries = self.purge_queries.clone();
+
+        queries.execute_iter(volatile_db.session.clone(), query).await
     }
 
     /// Get underlying Raw Cassandra Session.

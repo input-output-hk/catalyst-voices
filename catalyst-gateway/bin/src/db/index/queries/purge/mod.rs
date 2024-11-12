@@ -226,10 +226,9 @@ impl PreparedQueries {
     ///
     /// Returns an iterator that iterates over all the result pages that the query
     /// returns.
-    pub(crate) async fn execute_iter<P>(
-        &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
-    ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    pub(crate) async fn execute_iter(
+        &self, session: Arc<Session>, select_query: PreparedSelectQuery,
+    ) -> anyhow::Result<RowIterator> {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoAda => &self.get_txo_purge_queries,
             PreparedSelectQuery::TxoAsset => &self.get_txo_asset_purge_queries,
@@ -254,11 +253,11 @@ impl PreparedQueries {
             },
         };
 
-        super::session_execute_iter(session, prepared_stmt, params).await
+        super::session_execute_iter(session, prepared_stmt, NO_PARAMS).await
     }
 
     /// Execute a purge query with the given parameters.
-    pub(crate) async fn execute<T: SerializeRow + Debug>(
+    pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
         &self, session: Arc<Session>, cfg: Arc<cassandra_db::EnvVars>, query: PreparedDeleteQuery,
         values: Vec<T>,
     ) -> FallibleQueryResults {
