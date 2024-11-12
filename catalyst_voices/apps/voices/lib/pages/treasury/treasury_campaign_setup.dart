@@ -55,6 +55,12 @@ class TreasuryCampaignSetup extends StatelessWidget {
 }
 
 class _StepDetails extends StatelessWidget {
+  final int id;
+  final String name;
+  final String desc;
+  final bool isSelected;
+  final bool isEditable;
+
   const _StepDetails({
     super.key,
     required this.id,
@@ -63,12 +69,6 @@ class _StepDetails extends StatelessWidget {
     this.isSelected = false,
     this.isEditable = false,
   });
-
-  final int id;
-  final String name;
-  final String desc;
-  final bool isSelected;
-  final bool isEditable;
 
   @override
   Widget build(BuildContext context) {

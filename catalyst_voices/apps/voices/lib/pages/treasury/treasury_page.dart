@@ -28,27 +28,27 @@ class TreasuryPage extends StatefulWidget {
 }
 
 class _TreasuryPageState extends State<TreasuryPage> {
-  late final SectionsController sectionsController;
+  late final SectionsController _sectionsController;
 
   @override
   void initState() {
-    sectionsController = SectionsController();
+    super.initState();
+
+    _sectionsController = SectionsController();
 
     _populateSections();
-
-    super.initState();
   }
 
   @override
   void dispose() {
-    sectionsController.dispose();
+    _sectionsController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SectionsControllerScope(
-      controller: sectionsController,
+      controller: _sectionsController,
       child: const SpaceScaffold(
         left: TreasuryNavigationPanel(),
         body: TreasuryBody(sections: sections),
@@ -61,7 +61,7 @@ class _TreasuryPageState extends State<TreasuryPage> {
     final section = sections.firstOrNull;
     final step = section?.steps.firstOrNull;
 
-    sectionsController.value = SectionsControllerState(
+    _sectionsController.value = SectionsControllerState(
       sections: sections,
       openedSections: sections.map((e) => e.id).toSet(),
       selectedStep: section != null && step != null

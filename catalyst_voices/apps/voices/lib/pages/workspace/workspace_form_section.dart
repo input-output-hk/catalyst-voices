@@ -54,16 +54,16 @@ class WorkspaceFormSection extends StatelessWidget {
 }
 
 class _StepDetails extends StatelessWidget {
+  final RichTextStep step;
+  final bool isSelected;
+  final bool isEditable;
+
   const _StepDetails({
     super.key,
     required this.step,
     this.isSelected = false,
     this.isEditable = false,
   });
-
-  final RichTextStep step;
-  final bool isSelected;
-  final bool isEditable;
 
   @override
   Widget build(BuildContext context) {
