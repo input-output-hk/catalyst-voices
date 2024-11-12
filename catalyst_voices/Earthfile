@@ -7,7 +7,6 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.23 AS flutter
 # packages and folders related to catalyst_voices frontend.
 repo-catalyst-voices:
     FROM scratch
-
     WORKDIR /repo
     COPY --dir . .
 
@@ -19,11 +18,16 @@ builder:
     COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
+
 generate-l10n:
     FROM +builder
+    LET CURRENT_DIR = $(pwd)
     WORKDIR packages/internal/catalyst_voices_localization
     RUN flutter gen-l10n
-    SAVE ARTIFACT lib/generated 
+    SAVE ARTIFACT lib/generated
+    WORKDIR $CURRENT_DIR
+
+
 
 
 # Generates flutter code.
@@ -57,7 +61,6 @@ test-flutter-code-generator:
 
 # Runs static analysis on the code.
 check-static-analysis:
-    # FROM +builder
     FROM +generate-l10n
     DO flutter-ci+ANALYZE
 
@@ -78,12 +81,13 @@ check-license:
 
 # Run unit tests
 test-unit:
-    FROM +builder
+    FROM +generate-l10n
+    RUN echo "Current WORKDIR is: $(pwd)"
     DO flutter-ci+UNIT_TESTS
 
 # Build web version of Catalyst Voices
 build-web:
-    FROM +builder
+    FROM +generate-l10n
     ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
