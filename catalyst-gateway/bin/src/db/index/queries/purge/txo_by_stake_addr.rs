@@ -2,8 +2,8 @@
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, FromRow,
-    SerializeRow, Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
+    Session,
 };
 use tracing::error;
 
@@ -18,13 +18,19 @@ use crate::{
     settings::cassandra_db,
 };
 
-/// Select primary keys for TXO by Stake Address.
-const SELECT_QUERY: &str = include_str!("../cql/get_txo_by_stake_address.cql");
+pub(crate) mod result {
+    //! Return values for TXO by Stake Address purge queries.
 
-/// Primary Key Row
-#[derive(FromRow, SerializeRow, Clone)]
-#[allow(dead_code)]
-pub(crate) struct PrimaryKey {
+    /// Primary Key Row
+    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16, i16);
+}
+
+/// Select primary keys for TXO by Stake Address.
+const SELECT_QUERY: &str = include_str!("./cql/get_txo_by_stake_address.cql");
+
+/// Primary Key Value.
+#[derive(SerializeRow)]
+pub(crate) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     pub(crate) stake_address: Vec<u8>,
     /// Block Slot Number
@@ -35,7 +41,7 @@ pub(crate) struct PrimaryKey {
     pub(crate) txo: i16,
 }
 
-impl Debug for PrimaryKey {
+impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("stake_address", &self.stake_address)
@@ -46,6 +52,16 @@ impl Debug for PrimaryKey {
     }
 }
 
+impl From<result::PrimaryKey> for Params {
+    fn from(value: result::PrimaryKey) -> Self {
+        Self {
+            stake_address: value.0,
+            slot_no: value.1,
+            txn: value.2,
+            txo: value.3,
+        }
+    }
+}
 /// Get primary key for TXO by Stake Address query.
 pub(crate) struct PrimaryKeyQuery;
 
@@ -71,18 +87,18 @@ impl PrimaryKeyQuery {
     #[allow(dead_code)]
     pub(crate) async fn execute(
         session: &CassandraSession,
-    ) -> anyhow::Result<TypedRowIterator<PrimaryKey>> {
+    ) -> anyhow::Result<TypedRowIterator<result::PrimaryKey>> {
         let iter = session
             .purge_execute_iter(PreparedSelectQuery::TxoAda)
             .await?
-            .into_typed::<PrimaryKey>();
+            .into_typed::<result::PrimaryKey>();
 
         Ok(iter)
     }
 }
 
 /// Delete TXO by Stake Address
-const DELETE_QUERY: &str = include_str!("../cql/delete_txo_by_stake_address.cql");
+const DELETE_QUERY: &str = include_str!("./cql/delete_txo_by_stake_address.cql");
 
 /// Delet;e TXO by Stake Address Query
 pub(crate) struct DeleteQuery;
@@ -107,7 +123,7 @@ impl DeleteQuery {
     /// Executes a DELETE Query
     #[allow(dead_code)]
     pub(crate) async fn execute(
-        session: &CassandraSession, params: Vec<PrimaryKey>,
+        session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
             .purge_execute_batch(PreparedDeleteQuery::TxoAda, params)
