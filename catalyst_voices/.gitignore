@@ -1,6 +1,17 @@
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
 
+# Generated files from code generation tools
+*.g.dart
+*.freezed.dart
+*.chopper.dart
+*.swagger.dart
+*.openapi.dart
+
+# Localization (l10n) generated files
+packages/internal/catalyst_voices_localization/lib/generated/catalyst_voices_localizations_*.dart
+packages/internal/catalyst_voices_localization/lib/generated/catalyst_voices_localizations.dart
+
 # Files and directories created by pub
 .dart_tool/
 .packages
