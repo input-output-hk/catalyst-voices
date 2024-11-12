@@ -1,5 +1,6 @@
 //! Queries for purging volatile data.
 
+pub(crate) mod stake_registration;
 pub(crate) mod txi_by_hash;
 pub(crate) mod txo_ada;
 pub(crate) mod txo_assets;
@@ -108,6 +109,8 @@ pub(crate) struct PreparedQueries {
     delete_txi_by_hash: SizedBatch,
     /// Stake Registration Primary Key Query.
     select_stake_registration: PreparedStatement,
+    /// Stake Registration Delete Query.
+    delete_stake_registration: SizedBatch,
     /// CIP36 Registrations Primary Key Query.
     select_cip36_registration: PreparedStatement,
     /// CIP36 Registration errors Primary Key Query.
@@ -122,8 +125,6 @@ pub(crate) struct PreparedQueries {
     select_chain_root_for_role0_key: PreparedStatement,
     /// Chain Root for Stake Address Primary Key Query..
     select_chain_root_for_stake_address: PreparedStatement,
-    /// Stake Registration Delete Query.
-    delete_stake_registration: SizedBatch,
     /// CIP36 Registrations Delete Query.
     delete_cip36_registration: SizedBatch,
     /// CIP36 Registration errors Delete Query.
@@ -160,6 +161,10 @@ impl PreparedQueries {
             unstaked_txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?;
         let select_txi_by_hash = txi_by_hash::PrimaryKeyQuery::prepare(&session).await?;
         let delete_txi_by_hash = txi_by_hash::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_stake_registration =
+            stake_registration::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_stake_registration =
+            stake_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
 
         todo!("WIP");
     }
