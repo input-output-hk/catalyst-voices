@@ -18,7 +18,7 @@ use tracing::{error, info};
 use super::{
     queries::{
         purge::{self, PreparedDeleteQuery},
-        FallibleQueryResults, PreparedQueries, PreparedSelectQuery, PreparedQuery,
+        FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
         PreparedUpsertQuery,
     },
     schema::create_schema,
@@ -53,6 +53,7 @@ pub(crate) enum TlsChoice {
 #[derive(Clone)]
 pub(crate) struct CassandraSession {
     /// Is the session to the persistent or volatile DB?
+    #[allow(dead_code)]
     persistent: bool,
     /// Configuration for this session.
     cfg: Arc<cassandra_db::EnvVars>,
@@ -173,7 +174,7 @@ impl CassandraSession {
 
     /// Execute a select query to gather primary keys for purging.
     pub(crate) async fn purge_execute_iter(
-        &self, query: purge::PreparedSelectQuery
+        &self, query: purge::PreparedSelectQuery,
     ) -> anyhow::Result<RowIterator> {
         // Only execute purge queries on the volatile session
         let persistent = false;
@@ -183,7 +184,9 @@ impl CassandraSession {
         };
         let queries = self.purge_queries.clone();
 
-        queries.execute_iter(volatile_db.session.clone(), query).await
+        queries
+            .execute_iter(volatile_db.session.clone(), query)
+            .await
     }
 
     /// Get underlying Raw Cassandra Session.

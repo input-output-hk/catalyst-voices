@@ -9,16 +9,15 @@ use scylla::{
     transport::iterator::RowIterator, Session,
 };
 
-use super::{
-    FallibleQueryResults, SizedBatch,
-};
+use super::{FallibleQueryResults, SizedBatch};
 use crate::settings::cassandra_db;
 
 /// No parameters
-const NO_PARAMS = ();
+const NO_PARAMS: () = ();
 
 /// All prepared DELETE query statements (purge DB table rows).
 #[derive(strum_macros::Display)]
+#[allow(dead_code)]
 pub(crate) enum PreparedDeleteQuery {
     /// TXO Delete query.
     TxoAda,
@@ -50,6 +49,7 @@ pub(crate) enum PreparedDeleteQuery {
 
 /// All prepared SELECT query statements (primary keys from table).
 #[derive(strum_macros::Display)]
+#[allow(dead_code)]
 pub(crate) enum PreparedSelectQuery {
     /// TXO Select query.
     TxoAda,
@@ -138,13 +138,14 @@ pub(crate) struct PreparedQueries {
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
-    #[allow(clippy::todo, unused_variables)]
+    #[allow(clippy::todo, clippy::no_effect_underscore_binding, unused_variables)]
     pub(crate) async fn new(
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
-        let get_txo_purge_queries =
-            txo_by_stake_addr::select::PrimaryKeyQuery::prepare(&session).await?;
+        let get_txo_purge_queries = txo_by_stake_addr::PrimaryKeyQuery::prepare(&session).await?;
+        let txo_purge_queries =
+            txo_by_stake_addr::DeleteQuery::prepare_batch(&session, cfg).await?;
         let _unused = "
         let PurgeBatches {
             get_txo_asset_purge_queries,
