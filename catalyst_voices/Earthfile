@@ -57,7 +57,8 @@ test-flutter-code-generator:
 
 # Runs static analysis on the code.
 check-static-analysis:
-    FROM +builder
+    # FROM +builder
+    FROM +generate-l10n
     DO flutter-ci+ANALYZE
 
 # Runs code formatting checks.
