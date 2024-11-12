@@ -62,7 +62,7 @@ test-flutter-code-generator:
 # Runs static analysis on the code.
 check-static-analysis:
     FROM +generate-l10n
-    DO flutter-ci+ANALYZE
+    DO flutter-ci+ANALYZE 
 
 # Runs code formatting checks.
 check-code-formatting:
@@ -82,7 +82,6 @@ check-license:
 # Run unit tests
 test-unit:
     FROM +generate-l10n
-    RUN echo "Current WORKDIR is: $(pwd)"
     DO flutter-ci+UNIT_TESTS
 
 # Build web version of Catalyst Voices
