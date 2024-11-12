@@ -20,7 +20,7 @@ class SectionsMenuListener extends StatelessWidget {
         return SectionsMenu(
           sections: value.sections,
           openedSections: value.openedSections,
-          selectedStep: value.selectedStep,
+          selectedStep: value.activeStepId,
           onSectionTap: controller.toggleSection,
           onStepSelected: controller.selectSectionStep,
         );

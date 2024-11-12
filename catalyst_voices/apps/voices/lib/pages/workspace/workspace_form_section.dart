@@ -22,7 +22,7 @@ class WorkspaceFormSection extends StatelessWidget {
       valueListenable: controller,
       builder: (context, value, _) {
         final isOpened = value.openedSections.contains(data.id);
-        final selectedStep = value.selectedStep;
+        final activeStepId = value.activeStepId;
 
         return Column(
           children: <Widget>[
@@ -32,16 +32,17 @@ class WorkspaceFormSection extends StatelessWidget {
                 isExpanded: isOpened,
               ),
               name: data.localizedName(context),
-              isSelected: selectedStep?.sectionId == data.id,
+              isSelected: value.activeSectionId == data.id,
             ),
             if (isOpened)
               ...data.steps.whereType<RichTextStep>().map(
                 (step) {
+                  final stepId = (sectionId: data.id, stepId: step.id);
+
                   return _StepDetails(
                     key: ValueKey('WorkspaceStep${step.id}TileKey'),
                     step: step,
-                    isSelected: selectedStep?.sectionId == data.id &&
-                        selectedStep?.stepId == step.id,
+                    isSelected: activeStepId == stepId,
                     isEditable: step.isEditable,
                   );
                 },

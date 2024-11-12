@@ -7,14 +7,19 @@ import 'package:flutter/material.dart';
 final class SectionsControllerState extends Equatable {
   final List<Section> sections;
   final Set<int> openedSections;
-  final SectionStepId? selectedStep;
+  final SectionStepId? activeStepId;
 
   const SectionsControllerState({
     this.sections = const [],
     this.openedSections = const {},
-    this.selectedStep,
+    this.activeStepId,
   });
 
+  int? get activeSectionId => activeStepId?.sectionId;
+
+  bool get allSegmentsClosed => openedSections.isEmpty;
+
+  /// All [sections] are opened and first section is selected.
   factory SectionsControllerState.initial({
     required List<Section> sections,
   }) {
@@ -22,26 +27,26 @@ final class SectionsControllerState extends Equatable {
 
     final section = sections.firstWhereOrNull((e) => e.steps.isNotEmpty);
 
-    final selectedStep = section != null
+    final activeStepId = section != null
         ? (sectionId: section.id, stepId: section.steps.first.id)
         : null;
 
     return SectionsControllerState(
       sections: sections,
       openedSections: openedSections,
-      selectedStep: selectedStep,
+      activeStepId: activeStepId,
     );
   }
 
   SectionsControllerState copyWith({
     List<Section>? sections,
     Set<int>? openedSections,
-    Optional<SectionStepId>? selectedStep,
+    Optional<SectionStepId>? activeStepId,
   }) {
     return SectionsControllerState(
       sections: sections ?? this.sections,
       openedSections: openedSections ?? this.openedSections,
-      selectedStep: selectedStep.dataOr(this.selectedStep),
+      activeStepId: activeStepId.dataOr(this.activeStepId),
     );
   }
 
@@ -49,7 +54,7 @@ final class SectionsControllerState extends Equatable {
   List<Object?> get props => [
         sections,
         openedSections,
-        selectedStep,
+        activeStepId,
       ];
 }
 
@@ -58,32 +63,20 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
 
   void toggleSection(int id) {
     final openedSections = {...value.openedSections};
-    var selectedStep = value.selectedStep;
 
     if (openedSections.contains(id)) {
       openedSections.remove(id);
-
-      if (selectedStep?.sectionId == id) {
-        selectedStep = null;
-      }
     } else {
       openedSections.add(id);
     }
 
     value = value.copyWith(
       openedSections: openedSections,
-      selectedStep: Optional(selectedStep),
     );
   }
 
   void selectSectionStep(SectionStepId id) {
-    final selectedStep = value.selectedStep;
-
-    if (selectedStep == id) {
-      value = value.copyWith(selectedStep: const Optional.empty());
-    } else {
-      value = value.copyWith(selectedStep: Optional(id));
-    }
+    value = value.copyWith(activeStepId: Optional(id));
   }
 }
 

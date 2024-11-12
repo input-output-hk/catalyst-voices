@@ -21,7 +21,7 @@ class TreasuryCampaignSetup extends StatelessWidget {
       valueListenable: controller,
       builder: (context, value, _) {
         final isOpened = value.openedSections.contains(data.id);
-        final selectedStep = value.selectedStep;
+        final activeStepId = value.activeStepId;
 
         return Column(
           children: <Widget>[
@@ -31,18 +31,19 @@ class TreasuryCampaignSetup extends StatelessWidget {
                 isExpanded: isOpened,
               ),
               name: data.localizedName(context),
-              isSelected: selectedStep?.sectionId == data.id,
+              isSelected: activeStepId?.sectionId == data.id,
             ),
             if (isOpened)
               ...data.steps.map(
                 (step) {
+                  final stepId = (sectionId: data.id, stepId: step.id);
+
                   return _StepDetails(
                     key: ValueKey('WorkspaceStep${step.id}TileKey'),
                     id: step.id,
                     name: step.localizedName(context),
                     desc: step.localizedDesc(context),
-                    isSelected: selectedStep?.sectionId == data.id &&
-                        selectedStep?.stepId == step.id,
+                    isSelected: activeStepId == stepId,
                     isEditable: step.isEditable,
                   );
                 },
