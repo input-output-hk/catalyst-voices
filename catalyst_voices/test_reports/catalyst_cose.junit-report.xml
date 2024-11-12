@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite errors="0" failures="0" tests="5" skipped="0" name=".frontend.packages.libs.catalyst_cose.test.catalyst_cose" timestamp="2024-11-12T13:26:43">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+    <testcase classname=".frontend.packages.libs.catalyst_cose.test.catalyst_cose" name="CatalystCose sign1 generates a valid COSE_SIGN1 structure" time="0.069"/>
+    <testcase classname=".frontend.packages.libs.catalyst_cose.test.catalyst_cose" name="CatalystCose sign1 generates a valid cbor" time="0.009"/>
+    <testcase classname=".frontend.packages.libs.catalyst_cose.test.catalyst_cose" name="CatalystCose verifyCoseSign1 validates correct signature" time="0.015"/>
+    <testcase classname=".frontend.packages.libs.catalyst_cose.test.catalyst_cose" name="CatalystCose verifyCoseSign1 rejects invalid signatures" time="0.01"/>
+    <testcase classname=".frontend.packages.libs.catalyst_cose.test.catalyst_cose" name="CatalystCose verifyCoseSign1 handles invalid COSE_SIGN1 structure" time="0.007"/>
+  </testsuite>
+</testsuites>

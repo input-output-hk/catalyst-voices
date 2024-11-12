@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite errors="0" failures="0" tests="0" skipped="0" name=".frontend.packages.internal.catalyst_voices_repositories.test.src.catalyst_voices_repositories" timestamp="2024-11-12T13:28:39">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="1" skipped="0" name=".frontend.packages.internal.catalyst_voices_repositories.test.src.transaction.transaction_config_repository" timestamp="2024-11-12T13:28:39">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+    <testcase classname=".frontend.packages.internal.catalyst_voices_repositories.test.src.transaction.transaction_config_repository" name="TransactionConfigRepository fetchConfig for all networks returns non empty fee" time="0.03"/>
+  </testsuite>
+</testsuites>
