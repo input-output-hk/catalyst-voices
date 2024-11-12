@@ -31,7 +31,7 @@ integration-test-web:
             --web-browser-flag=--disable-gpu \
             --web-browser-flag=--headless=old \
             --web-browser-flag=--disable-search-engine-choice-screen \
-            --profile || echo fail > fail
+            --profile --verbose || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
