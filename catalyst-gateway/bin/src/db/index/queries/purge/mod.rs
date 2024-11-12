@@ -1,6 +1,6 @@
 //! Queries for purging volatile data.
 
-pub(crate) mod txo_by_stake_addr;
+pub(crate) mod txo_ada;
 
 use std::{fmt::Debug, sync::Arc};
 
@@ -21,8 +21,8 @@ const NO_PARAMS: () = ();
 pub(crate) enum PreparedDeleteQuery {
     /// TXO Delete query.
     TxoAda,
-    /// TXO Asset Delete query.
-    TxoAsset,
+    /// TXO Assets Delete query.
+    TxoAssets,
     /// Unstaked TXO Delete query.
     UnstakedTxoAda,
     /// Unstaked TXO Asset Delete query.
@@ -54,7 +54,7 @@ pub(crate) enum PreparedSelectQuery {
     /// TXO Select query.
     TxoAda,
     /// TXO Asset Select query.
-    TxoAsset,
+    TxoAssets,
     /// Unstaked TXO Select query.
     UnstakedTxoAda,
     /// Unstaked TXO Asset Select query.
@@ -83,33 +83,33 @@ pub(crate) enum PreparedSelectQuery {
 #[allow(clippy::struct_field_names)]
 pub(crate) struct PreparedQueries {
     /// TXO Purge Query.
-    get_txo_purge_queries: PreparedStatement,
+    select_txo_ada: PreparedStatement,
     /// TXO Asset Purge Query.
-    get_txo_asset_purge_queries: PreparedStatement,
+    select_txo_assets: PreparedStatement,
     /// Unstaked TXO Purge Query.
-    get_unstaked_txo_purge_queries: PreparedStatement,
+    select_unstaked_txo_purge_queries: PreparedStatement,
     /// Unstaked TXO Asset Purge Query.
-    get_unstaked_txo_asset_purge_queries: PreparedStatement,
+    select_unstaked_txo_asset_purge_queries: PreparedStatement,
     /// TXI Purge Query.
-    get_txi_purge_queries: PreparedStatement,
+    select_txi_purge_queries: PreparedStatement,
     /// TXI Purge Query.
-    get_stake_registration_purge_queries: PreparedStatement,
+    select_stake_registration_purge_queries: PreparedStatement,
     /// CIP36 Registrations Purge Query.
-    get_cip36_registration_purge_queries: PreparedStatement,
+    select_cip36_registration_purge_queries: PreparedStatement,
     /// CIP36 Registration errors Purge Query.
-    get_cip36_registration_error_purge_queries: PreparedStatement,
+    select_cip36_registration_error_purge_queries: PreparedStatement,
     /// CIP36 Registration for Stake Address Purge Query.
-    get_cip36_registration_for_stake_address_purge_queries: PreparedStatement,
+    select_cip36_registration_for_stake_address_purge_queries: PreparedStatement,
     /// RBAC 509 Registrations Purge Query.
-    get_rbac509_registration_purge_queries: PreparedStatement,
+    select_rbac509_registration_purge_queries: PreparedStatement,
     /// Chain Root for TX ID Purge Query..
-    get_chain_root_for_txn_id_purge_queries: PreparedStatement,
+    select_chain_root_for_txn_id_purge_queries: PreparedStatement,
     /// Chain Root for Role 0 Key Purge Query..
-    get_chain_root_for_role0_key_purge_queries: PreparedStatement,
+    select_chain_root_for_role0_key_purge_queries: PreparedStatement,
     /// Chain Root for Stake Address Purge Query..
-    get_chain_root_for_stake_address_purge_queries: PreparedStatement,
+    select_chain_root_for_stake_address_purge_queries: PreparedStatement,
     /// TXO Purge Query.
-    txo_purge_queries: SizedBatch,
+    delete_txo_ada: SizedBatch,
     /// TXO Asset Purge Query.
     txo_asset_purge_queries: SizedBatch,
     /// Unstaked TXO Purge Query.
@@ -143,68 +143,9 @@ impl PreparedQueries {
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
-        let get_txo_purge_queries = txo_by_stake_addr::PrimaryKeyQuery::prepare(&session).await?;
-        let txo_purge_queries =
-            txo_by_stake_addr::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let _unused = "
-        let PurgeBatches {
-            get_txo_asset_purge_queries,
-            get_unstaked_txo_purge_queries,
-            get_unstaked_txo_asset_purge_queries,
-            get_txi_purge_queries,
-            get_stake_registration_purge_queries,
-            get_cip36_registration_purge_queries,
-            get_cip36_registration_error_purge_queries,
-            get_cip36_registration_for_stake_address_purge_queries,
-            get_rbac509_registration_purge_queries,
-            get_chain_root_for_txn_id_purge_queries,
-            get_chain_root_for_role0_key_purge_queries,
-            get_chain_root_for_stake_address_purge_queries,
-            txo_purge_queries,
-            txo_asset_purge_queries,
-            unstaked_txo_purge_queries,
-            unstaked_txo_asset_purge_queries,
-            txi_purge_queries,
-            stake_registration_purge_queries,
-            cip36_registration_purge_queries,
-            cip36_registration_error_purge_queries,
-            cip36_registration_for_stake_address_purge_queries,
-            rbac509_registration_purge_queries,
-            chain_root_for_txn_id_purge_queries,
-            chain_root_for_role0_key_purge_queries,
-            chain_root_for_stake_address_purge_queries,
-            ..
-        }: PurgeBatches = all_purge_queries?;
+        let select_txo_ada = txo_ada::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_txo_ada = txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?;
 
-        Ok(Self {
-            get_txo_purge_queries,
-            get_txo_asset_purge_queries,
-            get_unstaked_txo_purge_queries,
-            get_unstaked_txo_asset_purge_queries,
-            get_txi_purge_queries,
-            get_stake_registration_purge_queries,
-            get_cip36_registration_purge_queries,
-            get_cip36_registration_error_purge_queries,
-            get_cip36_registration_for_stake_address_purge_queries,
-            get_rbac509_registration_purge_queries,
-            get_chain_root_for_txn_id_purge_queries,
-            get_chain_root_for_role0_key_purge_queries,
-            get_chain_root_for_stake_address_purge_queries,
-            txo_purge_queries,
-            txo_asset_purge_queries,
-            unstaked_txo_purge_queries,
-            unstaked_txo_asset_purge_queries,
-            txi_purge_queries,
-            stake_registration_purge_queries,
-            cip36_registration_purge_queries,
-            cip36_registration_error_purge_queries,
-            cip36_registration_for_stake_address_purge_queries,
-            rbac509_registration_purge_queries,
-            chain_root_for_txn_id_purge_queries,
-            chain_root_for_role0_key_purge_queries,
-            chain_root_for_stake_address_purge_queries,
-        })
-        ";
         todo!("WIP");
     }
 
@@ -235,26 +176,28 @@ impl PreparedQueries {
         &self, session: Arc<Session>, select_query: PreparedSelectQuery,
     ) -> anyhow::Result<RowIterator> {
         let prepared_stmt = match select_query {
-            PreparedSelectQuery::TxoAda => &self.get_txo_purge_queries,
-            PreparedSelectQuery::TxoAsset => &self.get_txo_asset_purge_queries,
+            PreparedSelectQuery::TxoAda => &self.select_txo_ada,
+            PreparedSelectQuery::TxoAssets => &self.select_txo_assets,
             PreparedSelectQuery::UnstakedTxoAda => &self.get_unstaked_txo_purge_queries,
-            PreparedSelectQuery::UnstakedTxoAsset => &self.get_unstaked_txo_asset_purge_queries,
-            PreparedSelectQuery::Txi => &self.get_txi_purge_queries,
-            PreparedSelectQuery::StakeRegistration => &self.get_stake_registration_purge_queries,
-            PreparedSelectQuery::Cip36Registration => &self.get_cip36_registration_purge_queries,
+            PreparedSelectQuery::UnstakedTxoAsset => &self.select_unstaked_txo_asset_purge_queries,
+            PreparedSelectQuery::Txi => &self.select_txi_purge_queries,
+            PreparedSelectQuery::StakeRegistration => &self.select_stake_registration_purge_queries,
+            PreparedSelectQuery::Cip36Registration => &self.select_cip36_registration_purge_queries,
             PreparedSelectQuery::Cip36RegistrationError => {
-                &self.get_cip36_registration_error_purge_queries
+                &self.select_cip36_registration_error_purge_queries
             },
             PreparedSelectQuery::Cip36RegistrationForStakeAddr => {
-                &self.get_cip36_registration_for_stake_address_purge_queries
+                &self.select_cip36_registration_for_stake_address_purge_queries
             },
-            PreparedSelectQuery::Rbac509 => &self.get_rbac509_registration_purge_queries,
-            PreparedSelectQuery::ChainRootForTxnId => &self.get_chain_root_for_txn_id_purge_queries,
+            PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration_purge_queries,
+            PreparedSelectQuery::ChainRootForTxnId => {
+                &self.select_chain_root_for_txn_id_purge_queries
+            },
             PreparedSelectQuery::ChainRootForRole0Key => {
-                &self.get_chain_root_for_role0_key_purge_queries
+                &self.select_chain_root_for_role0_key_purge_queries
             },
             PreparedSelectQuery::ChainRootForStakeAddress => {
-                &self.get_chain_root_for_stake_address_purge_queries
+                &self.select_chain_root_for_stake_address_purge_queries
             },
         };
 
@@ -267,8 +210,8 @@ impl PreparedQueries {
         values: Vec<T>,
     ) -> FallibleQueryResults {
         let query_map = match query {
-            PreparedDeleteQuery::TxoAda => &self.txo_purge_queries,
-            PreparedDeleteQuery::TxoAsset => &self.txo_asset_purge_queries,
+            PreparedDeleteQuery::TxoAda => &self.delete_txo_ada,
+            PreparedDeleteQuery::TxoAssets => &self.txo_asset_purge_queries,
             PreparedDeleteQuery::UnstakedTxoAda => &self.unstaked_txo_purge_queries,
             PreparedDeleteQuery::UnstakedTxoAsset => &self.unstaked_txo_asset_purge_queries,
             PreparedDeleteQuery::Txi => &self.txi_purge_queries,
