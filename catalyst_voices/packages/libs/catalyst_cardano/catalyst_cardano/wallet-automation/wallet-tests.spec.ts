@@ -27,6 +27,7 @@ wallets.forEach(({ name, id, url }) => {
                     `--disable-extensions-except=${extensionPath}`,
                     `--load-extension=${extensionPath}`,
                 ],
+                executablePath: '/usr/bin/google-chrome',
             });
             let [background] = browser.serviceWorkers();
             if (!background)
