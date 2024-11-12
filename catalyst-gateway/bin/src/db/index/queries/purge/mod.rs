@@ -28,7 +28,7 @@ pub(crate) enum PreparedDeleteQuery {
     UnstakedTxoAda,
     /// Unstaked TXO Asset Delete query.
     UnstakedTxoAsset,
-    /// TXI Delete query.
+    /// TXI by TXN Hash Delete query.
     Txi,
     /// Stake Registration Delete query.
     StakeRegistration,
@@ -60,7 +60,7 @@ pub(crate) enum PreparedSelectQuery {
     UnstakedTxoAda,
     /// Unstaked TXO Asset Select query.
     UnstakedTxoAsset,
-    /// TXI Select query.
+    /// TXI by TXN Hash Select query.
     Txi,
     /// Stake Registration Select query.
     StakeRegistration,
@@ -81,60 +81,60 @@ pub(crate) enum PreparedSelectQuery {
 }
 
 /// All prepared purge queries for a session.
-#[allow(clippy::struct_field_names)]
+#[allow(dead_code)]
 pub(crate) struct PreparedQueries {
-    /// TXO Purge Query.
+    /// TXO ADA Primary Key Query.
     select_txo_ada: PreparedStatement,
-    /// TXO Asset Purge Query.
-    select_txo_assets: PreparedStatement,
-    /// Unstaked TXO Purge Query.
-    select_unstaked_txo_purge_queries: PreparedStatement,
-    /// Unstaked TXO Asset Purge Query.
-    select_unstaked_txo_asset_purge_queries: PreparedStatement,
-    /// TXI Purge Query.
-    select_txi_purge_queries: PreparedStatement,
-    /// TXI Purge Query.
-    select_stake_registration_purge_queries: PreparedStatement,
-    /// CIP36 Registrations Purge Query.
-    select_cip36_registration_purge_queries: PreparedStatement,
-    /// CIP36 Registration errors Purge Query.
-    select_cip36_registration_error_purge_queries: PreparedStatement,
-    /// CIP36 Registration for Stake Address Purge Query.
-    select_cip36_registration_for_stake_address_purge_queries: PreparedStatement,
-    /// RBAC 509 Registrations Purge Query.
-    select_rbac509_registration_purge_queries: PreparedStatement,
-    /// Chain Root for TX ID Purge Query..
-    select_chain_root_for_txn_id_purge_queries: PreparedStatement,
-    /// Chain Root for Role 0 Key Purge Query..
-    select_chain_root_for_role0_key_purge_queries: PreparedStatement,
-    /// Chain Root for Stake Address Purge Query..
-    select_chain_root_for_stake_address_purge_queries: PreparedStatement,
-    /// TXO Purge Query.
+    /// TXO Delete Query.
     delete_txo_ada: SizedBatch,
-    /// TXO Asset Purge Query.
-    txo_asset_purge_queries: SizedBatch,
-    /// Unstaked TXO Purge Query.
-    unstaked_txo_purge_queries: SizedBatch,
-    /// Unstaked TXO Asset Purge Query.
-    unstaked_txo_asset_purge_queries: SizedBatch,
-    /// TXI Purge Query.
-    txi_purge_queries: SizedBatch,
-    /// TXI Purge Query.
-    stake_registration_purge_queries: SizedBatch,
-    /// CIP36 Registrations Purge Query.
-    cip36_registration_purge_queries: SizedBatch,
-    /// CIP36 Registration errors Purge Query.
-    cip36_registration_error_purge_queries: SizedBatch,
-    /// CIP36 Registration for Stake Address Purge Query.
-    cip36_registration_for_stake_address_purge_queries: SizedBatch,
-    /// RBAC 509 Registrations Purge Query.
-    rbac509_registration_purge_queries: SizedBatch,
-    /// Chain Root for TX ID Purge Query..
-    chain_root_for_txn_id_purge_queries: SizedBatch,
-    /// Chain Root for Role 0 Key Purge Query..
-    chain_root_for_role0_key_purge_queries: SizedBatch,
-    /// Chain Root for Stake Address Purge Query..
-    chain_root_for_stake_address_purge_queries: SizedBatch,
+    /// TXO Asset Primary Key Query.
+    select_txo_assets: PreparedStatement,
+    /// TXO Assets Delete Query.
+    delete_txo_assets: SizedBatch,
+    /// Unstaked TXO ADA Primary Key Query.
+    select_unstaked_txo_ada: PreparedStatement,
+    /// Unstaked TXO Assets Primary Key Query.
+    select_unstaked_txo_assets: PreparedStatement,
+    /// TXI by TXN Hash by TXN Hash Primary Key Query.
+    select_txi_by_hash: PreparedStatement,
+    /// Stake Registration Primary Key Query.
+    select_stake_registration: PreparedStatement,
+    /// CIP36 Registrations Primary Key Query.
+    select_cip36_registration: PreparedStatement,
+    /// CIP36 Registration errors Primary Key Query.
+    select_cip36_registration_error: PreparedStatement,
+    /// CIP36 Registration for Stake Address Primary Key Query.
+    select_cip36_registration_for_stake_address: PreparedStatement,
+    /// RBAC 509 Registrations Primary Key Query.
+    select_rbac509_registration: PreparedStatement,
+    /// Chain Root for TX ID Primary Key Query..
+    select_chain_root_for_txn_id: PreparedStatement,
+    /// Chain Root for Role 0 Key Primary Key Query..
+    select_chain_root_for_role0_key: PreparedStatement,
+    /// Chain Root for Stake Address Primary Key Query..
+    select_chain_root_for_stake_address: PreparedStatement,
+    /// Unstaked TXO ADA Delete Query.
+    delete_unstaked_txo_ada: SizedBatch,
+    /// Unstaked TXO Asset Delete Query.
+    delete_unstaked_txo_assets: SizedBatch,
+    /// TXI by TXN Hash Delete Query.
+    delete_txi: SizedBatch,
+    /// Stake Registration Delete Query.
+    delete_stake_registration: SizedBatch,
+    /// CIP36 Registrations Delete Query.
+    delete_cip36_registration: SizedBatch,
+    /// CIP36 Registration errors Delete Query.
+    delete_cip36_registration_error: SizedBatch,
+    /// CIP36 Registration for Stake Address Delete Query.
+    delete_cip36_registration_for_stake_addr: SizedBatch,
+    /// RBAC 509 Registrations Delete Query.
+    delete_rbac509_registration: SizedBatch,
+    /// Chain Root for TX ID Delete Query..
+    delete_chain_root_for_txn_id: SizedBatch,
+    /// Chain Root for Role 0 Key Delete Query..
+    delete_chain_root_for_role0_key: SizedBatch,
+    /// Chain Root for Stake Address Delete Query..
+    delete_chain_root_for_stake_address: SizedBatch,
 }
 
 impl PreparedQueries {
@@ -181,26 +181,20 @@ impl PreparedQueries {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoAda => &self.select_txo_ada,
             PreparedSelectQuery::TxoAssets => &self.select_txo_assets,
-            PreparedSelectQuery::UnstakedTxoAda => &self.get_unstaked_txo_purge_queries,
-            PreparedSelectQuery::UnstakedTxoAsset => &self.select_unstaked_txo_asset_purge_queries,
-            PreparedSelectQuery::Txi => &self.select_txi_purge_queries,
-            PreparedSelectQuery::StakeRegistration => &self.select_stake_registration_purge_queries,
-            PreparedSelectQuery::Cip36Registration => &self.select_cip36_registration_purge_queries,
-            PreparedSelectQuery::Cip36RegistrationError => {
-                &self.select_cip36_registration_error_purge_queries
-            },
+            PreparedSelectQuery::UnstakedTxoAda => &self.select_unstaked_txo_ada,
+            PreparedSelectQuery::UnstakedTxoAsset => &self.select_unstaked_txo_assets,
+            PreparedSelectQuery::Txi => &self.select_txi_by_hash,
+            PreparedSelectQuery::StakeRegistration => &self.select_stake_registration,
+            PreparedSelectQuery::Cip36Registration => &self.select_cip36_registration,
+            PreparedSelectQuery::Cip36RegistrationError => &self.select_cip36_registration_error,
             PreparedSelectQuery::Cip36RegistrationForStakeAddr => {
-                &self.select_cip36_registration_for_stake_address_purge_queries
+                &self.select_cip36_registration_for_stake_address
             },
-            PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration_purge_queries,
-            PreparedSelectQuery::ChainRootForTxnId => {
-                &self.select_chain_root_for_txn_id_purge_queries
-            },
-            PreparedSelectQuery::ChainRootForRole0Key => {
-                &self.select_chain_root_for_role0_key_purge_queries
-            },
+            PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration,
+            PreparedSelectQuery::ChainRootForTxnId => &self.select_chain_root_for_txn_id,
+            PreparedSelectQuery::ChainRootForRole0Key => &self.select_chain_root_for_role0_key,
             PreparedSelectQuery::ChainRootForStakeAddress => {
-                &self.select_chain_root_for_stake_address_purge_queries
+                &self.select_chain_root_for_stake_address
             },
         };
 
@@ -214,25 +208,21 @@ impl PreparedQueries {
     ) -> FallibleQueryResults {
         let query_map = match query {
             PreparedDeleteQuery::TxoAda => &self.delete_txo_ada,
-            PreparedDeleteQuery::TxoAssets => &self.txo_asset_purge_queries,
-            PreparedDeleteQuery::UnstakedTxoAda => &self.unstaked_txo_purge_queries,
-            PreparedDeleteQuery::UnstakedTxoAsset => &self.unstaked_txo_asset_purge_queries,
-            PreparedDeleteQuery::Txi => &self.txi_purge_queries,
-            PreparedDeleteQuery::StakeRegistration => &self.stake_registration_purge_queries,
-            PreparedDeleteQuery::Cip36Registration => &self.cip36_registration_purge_queries,
-            PreparedDeleteQuery::Cip36RegistrationError => {
-                &self.cip36_registration_error_purge_queries
-            },
+            PreparedDeleteQuery::TxoAssets => &self.delete_txo_assets,
+            PreparedDeleteQuery::UnstakedTxoAda => &self.delete_unstaked_txo_ada,
+            PreparedDeleteQuery::UnstakedTxoAsset => &self.delete_unstaked_txo_assets,
+            PreparedDeleteQuery::Txi => &self.delete_txi,
+            PreparedDeleteQuery::StakeRegistration => &self.delete_stake_registration,
+            PreparedDeleteQuery::Cip36Registration => &self.delete_cip36_registration,
+            PreparedDeleteQuery::Cip36RegistrationError => &self.delete_cip36_registration_error,
             PreparedDeleteQuery::Cip36RegistrationForStakeAddr => {
-                &self.cip36_registration_for_stake_address_purge_queries
+                &self.delete_cip36_registration_for_stake_addr
             },
-            PreparedDeleteQuery::Rbac509 => &self.rbac509_registration_purge_queries,
-            PreparedDeleteQuery::ChainRootForTxnId => &self.chain_root_for_txn_id_purge_queries,
-            PreparedDeleteQuery::ChainRootForRole0Key => {
-                &self.chain_root_for_role0_key_purge_queries
-            },
+            PreparedDeleteQuery::Rbac509 => &self.delete_rbac509_registration,
+            PreparedDeleteQuery::ChainRootForTxnId => &self.delete_chain_root_for_txn_id,
+            PreparedDeleteQuery::ChainRootForRole0Key => &self.delete_chain_root_for_role0_key,
             PreparedDeleteQuery::ChainRootForStakeAddress => {
-                &self.chain_root_for_stake_address_purge_queries
+                &self.delete_chain_root_for_stake_address
             },
         };
 
