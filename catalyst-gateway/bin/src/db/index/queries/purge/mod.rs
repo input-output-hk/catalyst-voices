@@ -1,6 +1,7 @@
 //! Queries for purging volatile data.
 
 pub(crate) mod txo_ada;
+pub(crate) mod txo_assets;
 
 use std::{fmt::Debug, sync::Arc};
 
@@ -138,13 +139,15 @@ pub(crate) struct PreparedQueries {
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
-    #[allow(clippy::todo, clippy::no_effect_underscore_binding, unused_variables)]
+    #[allow(clippy::todo, unused_variables)]
     pub(crate) async fn new(
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
         let select_txo_ada = txo_ada::PrimaryKeyQuery::prepare(&session).await?;
         let delete_txo_ada = txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_txo_assets = txo_assets::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_txo_assets = txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?;
 
         todo!("WIP");
     }
