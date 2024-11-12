@@ -21,7 +21,7 @@ integration-test-web:
     # IF [ $browser = "edge" && $TARGETARCH = "amd64" ]]
     #    LET driver = "msedgedriver"
     # END
-    RUN ($driver --port=$driver_port > $driver.log &) && \
+    RUN --no-cache ($driver --port=$driver_port > $driver.log &) && \
         sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
             --target=integration_test/app_test.dart \
