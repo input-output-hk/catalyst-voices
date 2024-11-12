@@ -2,6 +2,8 @@
 
 pub(crate) mod txo_ada;
 pub(crate) mod txo_assets;
+pub(crate) mod unstaked_txo_ada;
+pub(crate) mod unstaked_txo_assets;
 
 use std::{fmt::Debug, sync::Arc};
 
@@ -148,6 +150,13 @@ impl PreparedQueries {
         let delete_txo_ada = txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?;
         let select_txo_assets = txo_assets::PrimaryKeyQuery::prepare(&session).await?;
         let delete_txo_assets = txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_unstaked_txo_ada = unstaked_txo_ada::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_unstaked_txo_ada =
+            unstaked_txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_unstaked_txo_assets =
+            unstaked_txo_assets::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_unstaked_txo_assets =
+            unstaked_txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?;
 
         todo!("WIP");
     }
