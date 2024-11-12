@@ -63,15 +63,32 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
 
   void toggleSection(int id) {
     final openedSections = {...value.openedSections};
+    final allSegmentsClosed = value.allSegmentsClosed;
+    final shouldOpen = !openedSections.contains(id);
 
-    if (openedSections.contains(id)) {
-      openedSections.remove(id);
-    } else {
+    Optional<SectionStepId>? activeStepId;
+
+    if (shouldOpen) {
       openedSections.add(id);
+    } else {
+      openedSections.remove(id);
+    }
+
+    if (shouldOpen && allSegmentsClosed) {
+      final section = value.sections.firstWhere((element) => element.id == id);
+
+      final newStepId = section.steps.isNotEmpty
+          ? (sectionId: section.id, stepId: section.steps.first.id)
+          : null;
+
+      if (newStepId != null) {
+        activeStepId = Optional.of(newStepId);
+      }
     }
 
     value = value.copyWith(
       openedSections: openedSections,
+      activeStepId: activeStepId,
     );
   }
 
