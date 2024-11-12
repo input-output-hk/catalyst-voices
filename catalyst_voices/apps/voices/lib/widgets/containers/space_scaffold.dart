@@ -6,32 +6,32 @@ import 'package:flutter/material.dart';
 /// does not require any specific child types but
 /// is common to use [SpaceSidePanel] as [left] and [right].
 ///
-/// Only difference from [SidebarScaffold] is that main content, [child],
+/// Only difference from [SidebarScaffold] is that main content, [body],
 /// has maxWidth so it does not expand indefinitely but spacing
-/// between [child] and [left],[right] does.
+/// between [body] and [left],[right] does.
 class SpaceScaffold extends StatelessWidget {
   final Widget left;
+  final Widget body;
   final Widget right;
-  final Widget child;
 
   const SpaceScaffold({
     super.key,
     required this.left,
+    required this.body,
     required this.right,
-    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return SidebarScaffold(
       leftRail: left,
-      rightRail: right,
-      child: Center(
+      body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 612),
-          child: child,
+          child: body,
         ),
       ),
+      rightRail: right,
     );
   }
 }

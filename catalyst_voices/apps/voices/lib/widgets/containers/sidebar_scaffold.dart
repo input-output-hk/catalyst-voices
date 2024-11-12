@@ -16,8 +16,8 @@ class SidebarScaffold extends StatelessWidget {
   final Widget rightRail;
   final double railWidth;
   final double railsGap;
-  final double childMaxWidth;
-  final Widget child;
+  final double bodyMaxWidth;
+  final Widget body;
 
   const SidebarScaffold({
     super.key,
@@ -25,8 +25,8 @@ class SidebarScaffold extends StatelessWidget {
     this.rightRail = const SizedBox(),
     this.railWidth = 326,
     this.railsGap = 56,
-    this.childMaxWidth = 612,
-    required this.child,
+    this.bodyMaxWidth = 612,
+    required this.body,
   });
 
   @override
@@ -39,7 +39,7 @@ class SidebarScaffold extends StatelessWidget {
           child: leftRail,
         ),
         SizedBox(width: railsGap),
-        Expanded(child: child),
+        Expanded(child: body),
         SizedBox(width: railsGap),
         ConstrainedBox(
           constraints: BoxConstraints.tightFor(width: railWidth),
