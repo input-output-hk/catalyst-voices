@@ -48,8 +48,8 @@ filter-openapi:
 # It accepts [save_locally] ARG that when true place the artifacts in the
 # proper folder of `catalyst_voices_services` local code.
 code-generator:
-    ARG save_locally=false
-    ARG use_filtered_openapi=false
+    ARG save_locally=false 
+    ARG use_filtered_openapi=true
 
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
