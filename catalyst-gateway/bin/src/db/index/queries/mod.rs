@@ -2,6 +2,7 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod purge;
 pub(crate) mod rbac;
 pub(crate) mod registrations;
 pub(crate) mod staked_ada;
@@ -31,12 +32,8 @@ use staked_ada::{
 use sync_status::update::SyncStatusInsertQuery;
 
 use super::block::{
-    certs::CertInsertQuery,
-    cip36::Cip36InsertQuery,
-    rbac509::Rbac509InsertQuery,
-    roll_forward::{PurgeBatches, RollforwardPurgeQuery},
-    txi::TxiInsertQuery,
-    txo::TxoInsertQuery,
+    certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
+    txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
 use crate::settings::cassandra_db;
 
@@ -107,38 +104,6 @@ pub(crate) enum PreparedUpsertQuery {
     SyncStatusInsert,
 }
 
-/// All prepared DELETE query statements (purge DB table rows).
-#[derive(strum_macros::Display)]
-#[allow(clippy::enum_variant_names)]
-pub(crate) enum PreparedPurgeQuery {
-    /// TXO Purge query.
-    TxoAdaPurgeQuery,
-    /// TXO Asset Purge query.
-    TxoAssetPurgeQuery,
-    /// Unstaked TXO Purge query.
-    UnstakedTxoAdaPurgeQuery,
-    /// Unstaked TXO Asset Purge query.
-    UnstakedTxoAssetPurgeQuery,
-    /// TXI Purge query.
-    TxiPurgeQuery,
-    /// Stake Registration Purge query.
-    StakeRegistrationPurgeQuery,
-    /// CIP 36 Registration Purge Query.
-    Cip36RegistrationPurgeQuery,
-    /// CIP 36 Registration Error Purge query.
-    Cip36RegistrationPurgeErrorQuery,
-    /// CIP 36 Registration for stake address Purge query.
-    Cip36RegistrationForStakeAddrPurgeQuery,
-    /// RBAC 509 Registration Purge query.
-    Rbac509PurgeQuery,
-    /// Chain Root For Transaction ID Purge query.
-    ChainRootForTxnIdPurgeQuery,
-    /// Chain Root For Role0 Key Purge query.
-    ChainRootForRole0KeyPurgeQuery,
-    /// Chain Root For Stake Address Purge query.
-    ChainRootForStakeAddressPurgeQuery,
-}
-
 /// All prepared queries for a session.
 #[allow(clippy::struct_field_names)]
 pub(crate) struct PreparedQueries {
@@ -192,58 +157,6 @@ pub(crate) struct PreparedQueries {
     registrations_by_chain_root_query: PreparedStatement,
     /// Get chain root by role0 key
     chain_root_by_role0_key_query: PreparedStatement,
-    /// TXO Purge Query.
-    get_txo_purge_queries: SizedBatch,
-    /// TXO Asset Purge Query.
-    get_txo_asset_purge_queries: SizedBatch,
-    /// Unstaked TXO Purge Query.
-    get_unstaked_txo_purge_queries: SizedBatch,
-    /// Unstaked TXO Asset Purge Query.
-    get_unstaked_txo_asset_purge_queries: SizedBatch,
-    /// TXI Purge Query.
-    get_txi_purge_queries: SizedBatch,
-    /// TXI Purge Query.
-    get_stake_registration_purge_queries: SizedBatch,
-    /// CIP36 Registrations Purge Query.
-    get_cip36_registration_purge_queries: SizedBatch,
-    /// CIP36 Registration errors Purge Query.
-    get_cip36_registration_error_purge_queries: SizedBatch,
-    /// CIP36 Registration for Stake Address Purge Query.
-    get_cip36_registration_for_stake_address_purge_queries: SizedBatch,
-    /// RBAC 509 Registrations Purge Query.
-    get_rbac509_registration_purge_queries: SizedBatch,
-    /// Chain Root for TX ID Purge Query..
-    get_chain_root_for_txn_id_purge_queries: SizedBatch,
-    /// Chain Root for Role 0 Key Purge Query..
-    get_chain_root_for_role0_key_purge_queries: SizedBatch,
-    /// Chain Root for Stake Address Purge Query..
-    get_chain_root_for_stake_address_purge_queries: SizedBatch,
-    /// TXO Purge Query.
-    txo_purge_queries: SizedBatch,
-    /// TXO Asset Purge Query.
-    txo_asset_purge_queries: SizedBatch,
-    /// Unstaked TXO Purge Query.
-    unstaked_txo_purge_queries: SizedBatch,
-    /// Unstaked TXO Asset Purge Query.
-    unstaked_txo_asset_purge_queries: SizedBatch,
-    /// TXI Purge Query.
-    txi_purge_queries: SizedBatch,
-    /// TXI Purge Query.
-    stake_registration_purge_queries: SizedBatch,
-    /// CIP36 Registrations Purge Query.
-    cip36_registration_purge_queries: SizedBatch,
-    /// CIP36 Registration errors Purge Query.
-    cip36_registration_error_purge_queries: SizedBatch,
-    /// CIP36 Registration for Stake Address Purge Query.
-    cip36_registration_for_stake_address_purge_queries: SizedBatch,
-    /// RBAC 509 Registrations Purge Query.
-    rbac509_registration_purge_queries: SizedBatch,
-    /// Chain Root for TX ID Purge Query..
-    chain_root_for_txn_id_purge_queries: SizedBatch,
-    /// Chain Root for Role 0 Key Purge Query..
-    chain_root_for_role0_key_purge_queries: SizedBatch,
-    /// Chain Root for Stake Address Purge Query..
-    chain_root_for_stake_address_purge_queries: SizedBatch,
 }
 
 /// An individual query response that can fail
@@ -282,7 +195,6 @@ impl PreparedQueries {
         let registrations_by_chain_root =
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
         let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
-        let all_purge_queries = RollforwardPurgeQuery::prepare_batch(&session, cfg).await;
 
         let (
             txo_insert_queries,
@@ -303,35 +215,6 @@ impl PreparedQueries {
             chain_root_for_role0_key_insert_queries,
             chain_root_for_stake_address_insert_queries,
         ) = all_rbac_queries?;
-
-        let PurgeBatches {
-            get_txo_purge_queries,
-            get_txo_asset_purge_queries,
-            get_unstaked_txo_purge_queries,
-            get_unstaked_txo_asset_purge_queries,
-            get_txi_purge_queries,
-            get_stake_registration_purge_queries,
-            get_cip36_registration_purge_queries,
-            get_cip36_registration_error_purge_queries,
-            get_cip36_registration_for_stake_address_purge_queries,
-            get_rbac509_registration_purge_queries,
-            get_chain_root_for_txn_id_purge_queries,
-            get_chain_root_for_role0_key_purge_queries,
-            get_chain_root_for_stake_address_purge_queries,
-            txo_purge_queries,
-            txo_asset_purge_queries,
-            unstaked_txo_purge_queries,
-            unstaked_txo_asset_purge_queries,
-            txi_purge_queries,
-            stake_registration_purge_queries,
-            cip36_registration_purge_queries,
-            cip36_registration_error_purge_queries,
-            cip36_registration_for_stake_address_purge_queries,
-            rbac509_registration_purge_queries,
-            chain_root_for_txn_id_purge_queries,
-            chain_root_for_role0_key_purge_queries,
-            chain_root_for_stake_address_purge_queries,
-        }: PurgeBatches = all_purge_queries?;
 
         Ok(Self {
             txo_insert_queries,
@@ -359,32 +242,6 @@ impl PreparedQueries {
             chain_root_by_stake_address_query: chain_root_by_stake_address?,
             registrations_by_chain_root_query: registrations_by_chain_root?,
             chain_root_by_role0_key_query: chain_root_by_role0_key?,
-            get_txo_purge_queries,
-            get_txo_asset_purge_queries,
-            get_unstaked_txo_purge_queries,
-            get_unstaked_txo_asset_purge_queries,
-            get_txi_purge_queries,
-            get_stake_registration_purge_queries,
-            get_cip36_registration_purge_queries,
-            get_cip36_registration_error_purge_queries,
-            get_cip36_registration_for_stake_address_purge_queries,
-            get_rbac509_registration_purge_queries,
-            get_chain_root_for_txn_id_purge_queries,
-            get_chain_root_for_role0_key_purge_queries,
-            get_chain_root_for_stake_address_purge_queries,
-            txo_purge_queries,
-            txo_asset_purge_queries,
-            unstaked_txo_purge_queries,
-            unstaked_txo_asset_purge_queries,
-            txi_purge_queries,
-            stake_registration_purge_queries,
-            cip36_registration_purge_queries,
-            cip36_registration_error_purge_queries,
-            cip36_registration_for_stake_address_purge_queries,
-            rbac509_registration_purge_queries,
-            chain_root_for_txn_id_purge_queries,
-            chain_root_for_role0_key_purge_queries,
-            chain_root_for_stake_address_purge_queries,
         })
     }
 
