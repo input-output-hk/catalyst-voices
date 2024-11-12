@@ -6,6 +6,7 @@ class SegmentHeader extends StatelessWidget {
   final Widget? leading;
   final List<Widget> actions;
   final bool isSelected;
+  final VoidCallback? onTap;
 
   const SegmentHeader({
     super.key,
@@ -13,6 +14,7 @@ class SegmentHeader extends StatelessWidget {
     this.leading,
     this.actions = const [],
     this.isSelected = false,
+    this.onTap,
   });
 
   Set<WidgetState> get _states => {
@@ -47,21 +49,24 @@ class SegmentHeader extends StatelessWidget {
           style: textStyle,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          child: AnimatedContainer(
-            duration: kThemeChangeDuration,
-            constraints: const BoxConstraints(minHeight: 52),
-            decoration: BoxDecoration(
-              color: backgroundColor.resolve(_states),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (leading != null) leading!,
-                Expanded(child: Text(name)),
-                if (actions.isNotEmpty) ...actions,
-              ],
+          child: GestureDetector(
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: kThemeChangeDuration,
+              constraints: const BoxConstraints(minHeight: 52),
+              decoration: BoxDecoration(
+                color: backgroundColor.resolve(_states),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  if (leading != null) leading!,
+                  Expanded(child: Text(name)),
+                  if (actions.isNotEmpty) ...actions,
+                ],
+              ),
             ),
           ),
         ),
