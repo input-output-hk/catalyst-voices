@@ -19,6 +19,13 @@ builder:
     COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
+generate-l10n:
+    FROM +builder
+    WORKDIR packages/internal/catalyst_voices_localization
+    RUN flutter gen-l10n
+    SAVE ARTIFACT lib/generated 
+
+
 # Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
 # and serialization logic.
