@@ -1,26 +1,22 @@
-import 'package:catalyst_voices/pages/treasury/campaign_builder_panel.dart';
-import 'package:catalyst_voices/pages/treasury/campaign_comments_panel.dart';
-import 'package:catalyst_voices/pages/treasury/campaign_details.dart';
-import 'package:catalyst_voices/pages/treasury/campaign_segment_controller.dart';
+import 'package:catalyst_voices/pages/treasury/treasury_body.dart';
+import 'package:catalyst_voices/pages/treasury/treasury_details_panel.dart';
+import 'package:catalyst_voices/pages/treasury/treasury_navigation_panel.dart';
+import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-const _setupSegmentId = 'setup';
-
-const _campaignBuilder = TreasuryCampaignBuilder(
-  segments: [
-    TreasuryCampaignSetup(
-      id: _setupSegmentId,
-      steps: [
-        TreasuryCampaignTitle(id: 0, isEditable: true),
-        TreasuryCampaignTopicX(id: 1, nr: 1),
-        TreasuryCampaignTopicX(id: 2, nr: 2),
-        TreasuryCampaignTopicX(id: 3, nr: 2),
-      ],
-    ),
-  ],
-);
+const sections = [
+  CampaignSetup(
+    id: 0,
+    steps: [
+      DummyTopicStep(id: 0, isEditable: false),
+      DummyTopicStep(id: 1),
+      DummyTopicStep(id: 2),
+      DummyTopicStep(id: 3),
+    ],
+  ),
+];
 
 class TreasuryPage extends StatefulWidget {
   const TreasuryPage({
@@ -32,31 +28,45 @@ class TreasuryPage extends StatefulWidget {
 }
 
 class _TreasuryPageState extends State<TreasuryPage> {
+  late final SectionsController _sectionsController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _sectionsController = SectionsController();
+
+    _populateSections();
+  }
+
+  @override
+  void dispose() {
+    _sectionsController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CampaignControllerScope(
-      builder: _buildSegmentController,
+    return SectionsControllerScope(
+      controller: _sectionsController,
       child: const SpaceScaffold(
-        left: CampaignBuilderPanel(
-          builder: _campaignBuilder,
-        ),
-        right: CampaignCommentsPanel(),
-        child: CampaignDetails(
-          builder: _campaignBuilder,
-        ),
+        left: TreasuryNavigationPanel(),
+        body: TreasuryBody(sections: sections),
+        right: TreasuryDetailsPanel(),
       ),
     );
   }
 
-  // Only creates initial controller one time
-  CampaignController _buildSegmentController(Object segmentId) {
-    final value = segmentId == _setupSegmentId
-        ? const CampaignControllerStateData(
-            selectedItemId: 0,
-            isExpanded: true,
-          )
-        : const CampaignControllerStateData();
+  void _populateSections() {
+    final section = sections.firstOrNull;
+    final step = section?.steps.firstOrNull;
 
-    return CampaignController(value);
+    _sectionsController.value = SectionsControllerState(
+      sections: sections,
+      openedSections: sections.map((e) => e.id).toSet(),
+      selectedStep: section != null && step != null
+          ? (sectionId: section.id, stepId: step.id)
+          : null,
+    );
   }
 }
