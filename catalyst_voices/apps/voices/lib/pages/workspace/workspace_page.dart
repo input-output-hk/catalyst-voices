@@ -121,14 +121,14 @@ class _WorkspacePageState extends State<WorkspacePage> {
   late final SectionsController _sectionsController;
   late final ItemScrollController _bodyItemScrollController;
 
-  final List<SectionsListViewItem> _bodyItems = [];
-
   @override
   void initState() {
     super.initState();
 
     _sectionsController = SectionsController();
     _bodyItemScrollController = ItemScrollController();
+
+    _sectionsController.attachItemsScrollController(_bodyItemScrollController);
 
     _populateSections();
   }
@@ -146,7 +146,6 @@ class _WorkspacePageState extends State<WorkspacePage> {
       child: SpaceScaffold(
         left: const WorkspaceNavigationPanel(),
         body: WorkspaceBody(
-          items: _bodyItems,
           itemScrollController: _bodyItemScrollController,
         ),
         right: const WorkspaceSetupPanel(),
@@ -155,12 +154,6 @@ class _WorkspacePageState extends State<WorkspacePage> {
   }
 
   void _populateSections() {
-    final bodyItems = sections
-        .expand<SectionsListViewItem>((element) => [element, ...element.steps])
-        .toList();
-
-    _bodyItems.addAll(bodyItems);
-
     _sectionsController.value = SectionsControllerState.initial(
       sections: sections,
     );

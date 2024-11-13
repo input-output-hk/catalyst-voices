@@ -2,6 +2,7 @@ import 'package:catalyst_voices/widgets/navigation/section_header.dart';
 import 'package:catalyst_voices/widgets/navigation/section_step_offstage.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 typedef SectionHeaderWidgetBuilder<T extends Section> = Widget Function(
   BuildContext context,
@@ -19,6 +20,7 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
   final SectionHeaderWidgetBuilder<T> headerBuilder;
   final SectionStepWidgetBuilder<T2> stepBuilder;
   final EdgeInsetsGeometry? padding;
+  final ItemScrollController? itemScrollController;
 
   const SectionsListView({
     super.key,
@@ -26,12 +28,14 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
     this.headerBuilder = _defaultHeaderBuilder,
     required this.stepBuilder,
     this.padding = const EdgeInsets.only(top: 10),
+    this.itemScrollController,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: padding,
+    return ScrollablePositionedList.separated(
+      padding: padding?.resolve(Directionality.of(context)),
+      itemScrollController: itemScrollController,
       itemBuilder: (context, index) {
         final item = items[index];
 

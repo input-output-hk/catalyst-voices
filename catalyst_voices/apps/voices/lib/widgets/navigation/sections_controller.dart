@@ -1,16 +1,38 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 final class SectionsControllerState extends Equatable {
   final List<Section> sections;
+  final List<SectionsListViewItem> listItems;
   final Set<int> openedSections;
   final SectionStepId? activeStepId;
 
-  const SectionsControllerState({
+  factory SectionsControllerState({
+    List<Section> sections = const [],
+    Set<int> openedSections = const {},
+    SectionStepId? activeStepId,
+  }) {
+    final listItems = sections
+        .expand<SectionsListViewItem>((element) => [element, ...element.steps])
+        .toList();
+
+    return SectionsControllerState._(
+      sections: sections,
+      listItems: listItems,
+      openedSections: openedSections,
+      activeStepId: activeStepId,
+    );
+  }
+
+  const SectionsControllerState._({
     this.sections = const [],
+    this.listItems = const [],
     this.openedSections = const {},
     this.activeStepId,
   });
@@ -53,13 +75,27 @@ final class SectionsControllerState extends Equatable {
   @override
   List<Object?> get props => [
         sections,
+        listItems,
         openedSections,
         activeStepId,
       ];
 }
 
 final class SectionsController extends ValueNotifier<SectionsControllerState> {
-  SectionsController([super.value = const SectionsControllerState()]) : super();
+  ItemScrollController? _itemsScrollController;
+
+  SectionsController([
+    super.value = const SectionsControllerState._(),
+  ]) : super();
+
+  // ignore: use_setters_to_change_properties
+  void attachItemsScrollController(ItemScrollController value) {
+    _itemsScrollController = value;
+  }
+
+  void detachItemsScrollController() {
+    _itemsScrollController = null;
+  }
 
   void toggleSection(int id) {
     final openedSections = {...value.openedSections};
@@ -83,6 +119,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
 
       if (newStepId != null) {
         activeStepId = Optional.of(newStepId);
+        unawaited(_scrollToSectionStep(newStepId));
       }
     }
 
@@ -94,6 +131,44 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
 
   void selectSectionStep(SectionStepId id) {
     value = value.copyWith(activeStepId: Optional(id));
+
+    unawaited(_scrollToSectionStep(id));
+  }
+
+  void focusSection(int id) {
+    unawaited(_scrollToSection(id));
+  }
+
+  @override
+  void dispose() {
+    detachItemsScrollController();
+    super.dispose();
+  }
+
+  Future<void> _scrollToSection(int id) async {
+    final index = value.listItems.indexWhere((e) => e is Section && e.id == id);
+    if (index == -1) {
+      return;
+    }
+
+    await _scrollToIndex(index);
+  }
+
+  Future<void> _scrollToSectionStep(SectionStepId id) async {
+    final index = value.listItems
+        .indexWhere((e) => e is SectionStep && e.sectionStepId == id);
+    if (index == -1) {
+      return;
+    }
+
+    await _scrollToIndex(index);
+  }
+
+  Future<void> _scrollToIndex(int index) async {
+    await _itemsScrollController?.scrollTo(
+      index: index,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 }
 

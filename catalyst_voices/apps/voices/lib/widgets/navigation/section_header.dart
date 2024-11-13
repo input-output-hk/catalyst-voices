@@ -27,9 +27,7 @@ class SectionHeader extends StatelessWidget {
           ),
           name: section.localizedName(context),
           isSelected: isOpened && hasSelectedStep,
-          onTap: () {
-            debugPrint('Section[${section.id}] tapped');
-          },
+          onTap: () => controller.focusSection(section.id),
         );
       },
     );

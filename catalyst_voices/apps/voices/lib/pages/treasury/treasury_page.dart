@@ -4,6 +4,7 @@ import 'package:catalyst_voices/pages/treasury/treasury_navigation_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 const sections = [
   CampaignSetup(
@@ -32,14 +33,16 @@ class TreasuryPage extends StatefulWidget {
 
 class _TreasuryPageState extends State<TreasuryPage> {
   late final SectionsController _sectionsController;
-
-  final List<SectionsListViewItem> _bodyItems = [];
+  late final ItemScrollController _bodyItemScrollController;
 
   @override
   void initState() {
     super.initState();
 
     _sectionsController = SectionsController();
+    _bodyItemScrollController = ItemScrollController();
+
+    _sectionsController.attachItemsScrollController(_bodyItemScrollController);
 
     _populateSections();
   }
@@ -57,7 +60,7 @@ class _TreasuryPageState extends State<TreasuryPage> {
       child: SpaceScaffold(
         left: const TreasuryNavigationPanel(),
         body: TreasuryBody(
-          items: _bodyItems,
+          itemScrollController: _bodyItemScrollController,
         ),
         right: const TreasuryDetailsPanel(),
       ),
@@ -65,12 +68,6 @@ class _TreasuryPageState extends State<TreasuryPage> {
   }
 
   void _populateSections() {
-    final bodyItems = sections
-        .expand<SectionsListViewItem>((element) => [element, ...element.steps])
-        .toList();
-
-    _bodyItems.addAll(bodyItems);
-
     _sectionsController.value = SectionsControllerState.initial(
       sections: sections,
     );
