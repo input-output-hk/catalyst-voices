@@ -25,7 +25,7 @@ pub(crate) mod result {
     pub(crate) type PrimaryKey = (Vec<u8>, Vec<u8>, num_bigint::BigInt, i16, bool);
 }
 
-/// Select primary keys for CIP-36 registration.
+/// Select primary keys for CIP-36 registration by Vote key.
 const SELECT_QUERY: &str = include_str!("./cql/get_cip36_registration_for_vote_key.cql");
 
 /// Primary Key Value.
@@ -92,7 +92,7 @@ impl PrimaryKeyQuery {
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowIterator<result::PrimaryKey>> {
         let iter = session
-            .purge_execute_iter(PreparedSelectQuery::TxoAda)
+            .purge_execute_iter(PreparedSelectQuery::Cip36RegistrationForVoteKey)
             .await?
             .into_typed::<result::PrimaryKey>();
 
@@ -128,7 +128,7 @@ impl DeleteQuery {
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::TxoAda, params)
+            .purge_execute_batch(PreparedDeleteQuery::Cip36RegistrationForVoteKey, params)
             .await?;
 
         Ok(results)

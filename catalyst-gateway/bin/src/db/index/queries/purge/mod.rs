@@ -40,10 +40,10 @@ pub(crate) enum PreparedDeleteQuery {
     StakeRegistration,
     /// CIP 36 Registration Delete Query.
     Cip36Registration,
-    /// CIP 36 Registration Error Delete query.
-    Cip36RegistrationError,
-    /// CIP 36 Registration for stake address Delete query.
-    Cip36RegistrationForStakeAddr,
+    /// CIP 36 Registration Invalid Delete query.
+    Cip36RegistrationInvalid,
+    /// CIP 36 Registration for vote key Delete query.
+    Cip36RegistrationForVoteKey,
     /// RBAC 509 Registration Delete query.
     Rbac509,
     /// Chain Root For Transaction ID Delete query.
@@ -72,10 +72,10 @@ pub(crate) enum PreparedSelectQuery {
     StakeRegistration,
     /// CIP 36 Registration Select Query.
     Cip36Registration,
-    /// CIP 36 Registration Error Select query.
-    Cip36RegistrationError,
-    /// CIP 36 Registration for stake address Select query.
-    Cip36RegistrationForStakeAddr,
+    /// CIP 36 Registration Invalid Select query.
+    Cip36RegistrationInvalid,
+    /// CIP 36 Registration for vote key Select query.
+    Cip36RegistrationForVoteKey,
     /// RBAC 509 Registration Select query.
     Rbac509,
     /// Chain Root For Transaction ID Select query.
@@ -117,8 +117,8 @@ pub(crate) struct PreparedQueries {
     select_cip36_registration: PreparedStatement,
     /// CIP36 Registration errors Primary Key Query.
     select_cip36_registration_error: PreparedStatement,
-    /// CIP36 Registration for Stake Address Primary Key Query.
-    select_cip36_registration_for_stake_address: PreparedStatement,
+    /// CIP36 Registration for Vote Key Primary Key Query.
+    select_cip36_registration_for_vote_key: PreparedStatement,
     /// RBAC 509 Registrations Primary Key Query.
     select_rbac509_registration: PreparedStatement,
     /// Chain Root for TX ID Primary Key Query..
@@ -131,8 +131,8 @@ pub(crate) struct PreparedQueries {
     delete_cip36_registration: SizedBatch,
     /// CIP36 Registration errors Delete Query.
     delete_cip36_registration_error: SizedBatch,
-    /// CIP36 Registration for Stake Address Delete Query.
-    delete_cip36_registration_for_stake_addr: SizedBatch,
+    /// CIP36 Registration for Vote Key Delete Query.
+    delete_cip36_registration_for_vote_key: SizedBatch,
     /// RBAC 509 Registrations Delete Query.
     delete_rbac509_registration: SizedBatch,
     /// Chain Root for TX ID Delete Query..
@@ -213,9 +213,9 @@ impl PreparedQueries {
             PreparedSelectQuery::Txi => &self.select_txi_by_hash,
             PreparedSelectQuery::StakeRegistration => &self.select_stake_registration,
             PreparedSelectQuery::Cip36Registration => &self.select_cip36_registration,
-            PreparedSelectQuery::Cip36RegistrationError => &self.select_cip36_registration_error,
-            PreparedSelectQuery::Cip36RegistrationForStakeAddr => {
-                &self.select_cip36_registration_for_stake_address
+            PreparedSelectQuery::Cip36RegistrationInvalid => &self.select_cip36_registration_error,
+            PreparedSelectQuery::Cip36RegistrationForVoteKey => {
+                &self.select_cip36_registration_for_vote_key
             },
             PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration,
             PreparedSelectQuery::ChainRootForTxnId => &self.select_chain_root_for_txn_id,
@@ -241,9 +241,9 @@ impl PreparedQueries {
             PreparedDeleteQuery::Txi => &self.delete_txi_by_hash,
             PreparedDeleteQuery::StakeRegistration => &self.delete_stake_registration,
             PreparedDeleteQuery::Cip36Registration => &self.delete_cip36_registration,
-            PreparedDeleteQuery::Cip36RegistrationError => &self.delete_cip36_registration_error,
-            PreparedDeleteQuery::Cip36RegistrationForStakeAddr => {
-                &self.delete_cip36_registration_for_stake_addr
+            PreparedDeleteQuery::Cip36RegistrationInvalid => &self.delete_cip36_registration_error,
+            PreparedDeleteQuery::Cip36RegistrationForVoteKey => {
+                &self.delete_cip36_registration_for_vote_key
             },
             PreparedDeleteQuery::Rbac509 => &self.delete_rbac509_registration,
             PreparedDeleteQuery::ChainRootForTxnId => &self.delete_chain_root_for_txn_id,
