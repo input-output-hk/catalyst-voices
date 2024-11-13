@@ -1,24 +1,70 @@
 VERSION 0.8
 
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.24 AS flutter-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v3.2.24 AS flutter_rust_bridge
 
 builder:
     FROM flutter_rust_bridge+builder
     COPY . .
-    DO flutter_rust_bridge+CODE_GENERATOR_WEB
-
-# Generated necessary files for running Flutter web locally.
-code-generator:
-    FROM +builder
-
-    SAVE ARTIFACT ./assets/js assets_js
-    SAVE ARTIFACT ./rust/src/frb_generated.rs frb_generated.rs
-    SAVE ARTIFACT ./lib/src src  
 
 # Generated necessary files for running Flutter web locally and save it locally.
-code-generator-local:
+code-generator:
+    ARG local = false 
     FROM +builder
+    DO flutter_rust_bridge+CODE_GENERATOR_WEB
 
-    SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
-    SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
-    SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
+    IF [ $local = true ]
+        SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
+        SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
+        SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
+    ELSE 
+        SAVE ARTIFACT ./assets/js assets_js
+        SAVE ARTIFACT ./rust/src/frb_generated.rs frb_generated.rs
+        SAVE ARTIFACT ./lib/src src
+    END
+
+builder-example:
+    FROM scratch
+    DO flutter-ci+SETUP
+    COPY . .
+    WORKDIR example
+
+integration-test-web:
+    FROM +builder-example
+    ARG browser
+    LET driver_port = 4444
+
+    IF [ $browser = "chrome" ]
+        LET driver = "chromedriver"
+    END
+
+    IF [ $browser = "firefox" ]
+        LET driver = "geckodriver"
+    END
+
+    RUN ($driver --port=$driver_port > $driver.log &) && \
+        sleep 5 && \
+        flutter drive --driver=test_driver/integration_tests.dart \
+            --target=integration_test/catalyst_key_derivation_test.dart \
+            -d web-server --browser-name=$browser --driver-port=$driver_port \
+            # https://github.com/flutter/flutter/issues/154727
+            --web-browser-flag=--disable-web-security \
+            --web-browser-flag=--disable-gpu \
+            --web-browser-flag=--headless=old \
+            --web-browser-flag=--disable-search-engine-choice-screen \
+            --profile || echo fail > fail
+    WAIT
+        SAVE ARTIFACT $driver.log AS LOCAL $driver.log
+    END
+    
+    IF [ -f fail ]
+        RUN --no-cache echo ""$browser" integration test failed" && \
+            echo "Printing "$driver" logs..." && \
+            cat $driver.log && \
+            exit 1
+    END
+
+test-web-all:
+    BUILD +integration-test-web \
+            --browser=chrome \
+            --browser=firefox

@@ -4,7 +4,7 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
-  await RustLib.init();
+  await CatalystKeyDerivation.init();
   runApp(const MyApp());
 }
 
@@ -36,32 +36,34 @@ class MyApp extends StatelessWidget {
   }
 
   Future<void> _doMagic() async {
-    final xprv = await mnemonicToXprv(
+    const keyDerivation = CatalystKeyDerivation();
+
+    final xprv = await keyDerivation.deriveMasterKey(
       mnemonic: 'prevent company field green slot measure chief'
           ' hero apple task eagle sunset endorse dress seed',
     );
-    print('Master xprv ${xprv.inner}');
+    print('Master xprv ${xprv.toHex()}');
 
-    final xpub = await xprv.xpublicKey();
-    print('Master xpub ${xpub.inner}');
+    final xpub = await xprv.derivePublicKey();
+    print('Master xpub ${xpub.toHex()}');
 
     final data = [1, 2, 3, 4];
-    final sig = await xprv.signData(data: data);
+    final sig = await xprv.sign(data);
 
-    final checkXprvSig = await xprv.verifySignature(data: data, signature: sig);
+    final checkXprvSig = await xprv.verify(data, signature: sig);
     print('Check signature by using xprv $checkXprvSig');
 
-    final checkXpubSig = await xpub.verifySignature(data: data, signature: sig);
+    final checkXpubSig = await xpub.verify(data, signature: sig);
     print('Check signature by using xpub $checkXpubSig');
 
     const path = "m/1852'/1815'/0'/2/0";
-    final childXprv = await xprv.deriveXprv(path: path);
-    print('Derive xprv with $path: ${childXprv.inner}');
+    final childXprv = await xprv.derivePrivateKey(path: path);
+    print('Derive xprv with $path: ${childXprv.toHex()}');
 
     final childXprvHex = childXprv.toHex();
     print('Master xprv hex $childXprvHex');
 
     xprv.drop();
-    print('Master xprv dropped ${xprv.inner}');
+    print('Master xprv dropped ${xprv.toHex()}');
   }
 }
