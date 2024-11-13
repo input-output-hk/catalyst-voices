@@ -36,7 +36,6 @@ code-generator:
         RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" \)
 
         FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" \))
-            RUN echo "Found generated file: $generated_file"
             SAVE ARTIFACT $generated_file AS LOCAL $generated_file
         END
     ELSE 
