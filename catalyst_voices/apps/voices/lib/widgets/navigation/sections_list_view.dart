@@ -27,7 +27,7 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
     required this.items,
     this.headerBuilder = _defaultHeaderBuilder,
     required this.stepBuilder,
-    this.padding = const EdgeInsets.only(top: 10),
+    this.padding = const EdgeInsets.symmetric(vertical: 12),
     this.itemScrollController,
   });
 
@@ -40,10 +40,7 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
         final item = items[index];
 
         if (item is T) {
-          return SectionHeader(
-            key: item.buildKey(),
-            section: item,
-          );
+          return headerBuilder(context, item);
         }
 
         if (item is T2) {
@@ -57,8 +54,16 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
         throw ArgumentError('Unknown section item type[${item.runtimeType}]');
       },
       separatorBuilder: (context, index) {
-        // return const SizedBox(height: 12);
-        // Or
+        final item = items[index];
+
+        if (item is SectionStep) {
+          return SectionStepOffstage(
+            key: ValueKey('SectionStep[${item.sectionStepId}]Separator'),
+            sectionId: item.sectionId,
+            child: const SizedBox(height: 12),
+          );
+        }
+
         return const SizedBox(height: 24);
       },
       itemCount: items.length,
