@@ -17,6 +17,8 @@ builder:
     DO flutter-ci+SETUP
     COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
+    RUN melos build_runner   
+    SAVE ARTIFACT .
 
 
 generate-l10n:
