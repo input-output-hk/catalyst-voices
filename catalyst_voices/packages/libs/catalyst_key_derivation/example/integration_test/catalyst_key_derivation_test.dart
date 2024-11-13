@@ -9,14 +9,36 @@ void main() {
   group(CatalystKeyDerivation, () {
     const mnemonic = 'prevent company field green slot measure chief'
         ' hero apple task eagle sunset endorse dress seed';
-
     const keyDerivation = CatalystKeyDerivation();
+    var initializedSuccessfully = false;
 
-    setUpAll(() async {
-      await CatalystKeyDerivation.init();
+    /// Returns true and marks a test from which this method is called
+    /// as skipped if initialization test didn't work.
+    ///
+    /// All other tests depend on successful initialization therefore
+    /// to limit unclear failures we will skip these tests if init doesn't work.
+    bool shouldSkipTest() {
+      if (initializedSuccessfully) {
+        markTestSkipped("Test is skipped because init does't work");
+      }
+
+      return !initializedSuccessfully;
+    }
+
+    // Keep this test as the first (top) one, other tests depend on it.
+    testWidgets('init', (tester) async {
+      try {
+        await CatalystKeyDerivation.init();
+        initializedSuccessfully = true;
+      } catch (ignored) {
+        initializedSuccessfully = false;
+        rethrow;
+      }
     });
 
     testWidgets('deriveMasterKey and derivePublicKey', (tester) async {
+      if (shouldSkipTest()) return;
+
       final xprv = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
 
       expect(xprv.bytes, isNotEmpty);
@@ -28,6 +50,8 @@ void main() {
     });
 
     testWidgets('deriveKeys, sign data and verify signature', (tester) async {
+      if (shouldSkipTest()) return;
+
       final xprv = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
       final xpub = await xprv.derivePublicKey();
 
@@ -42,6 +66,8 @@ void main() {
     });
 
     testWidgets('derivePrivateKey', (tester) async {
+      if (shouldSkipTest()) return;
+
       final xprv = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
       const path = "m/1852'/1815'/0'/2/0";
       final derivedXprv = await xprv.derivePrivateKey(path: path);
@@ -49,6 +75,8 @@ void main() {
     });
 
     testWidgets('drop clears a key', (tester) async {
+      if (shouldSkipTest()) return;
+
       final xprv = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
 
       expect(
