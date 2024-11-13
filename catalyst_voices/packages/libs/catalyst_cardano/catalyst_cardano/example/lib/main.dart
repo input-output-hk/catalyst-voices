@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
@@ -13,8 +14,9 @@ part 'sign_and_submit_rbac_tx.dart';
 part 'sign_and_submit_tx.dart';
 part 'sign_data.dart';
 
-void main() {
+Future<void> main() async {
   EquatableConfig.stringify = true;
+  await CatalystKeyDerivation.init();
   runApp(const MyApp());
   SemanticsBinding.instance.ensureSemantics();
 }

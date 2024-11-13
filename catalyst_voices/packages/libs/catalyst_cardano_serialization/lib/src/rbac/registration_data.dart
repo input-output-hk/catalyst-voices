@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
@@ -15,7 +16,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
   final List<C509Certificate>? cborCerts;
 
   /// Ordered list of simple public keys that are registered.
-  final List<Ed25519PublicKey>? publicKeys;
+  final List<Bip32Ed25519XPublicKey>? publicKeys;
 
   /// Revocation list of certs being revoked by an issuer.
   final List<CertificateHash>? revocationSet;
@@ -44,7 +45,9 @@ final class RegistrationData extends Equatable implements CborEncodable {
     return RegistrationData(
       derCerts: derCerts?.map(X509DerCertificate.fromCbor).toList(),
       cborCerts: cborCerts?.map(C509Certificate.fromCbor).toList(),
-      publicKeys: publicKeys?.map(Ed25519PublicKey.fromCbor).toList(),
+      publicKeys: publicKeys
+          ?.map(Bip32Ed25519XPublicKeyFactory.instance.fromCbor)
+          .toList(),
       revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
       roleDataSet: roleDataSet?.map(RoleData.fromCbor).toSet(),
     );
@@ -65,7 +68,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
         cborCerts,
         (item) => item.toCbor(),
       ),
-      const CborSmallInt(30): _createCborList<Ed25519PublicKey>(
+      const CborSmallInt(30): _createCborList<Bip32Ed25519XPublicKey>(
         publicKeys,
         (item) => item.toCbor(tags: [CborCustomTags.ed25519Bip32PublicKey]),
       ),

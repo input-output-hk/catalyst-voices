@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 
@@ -68,15 +68,15 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   @override
-  Future<Ed25519PrivateKey?> getMasterKey() async {
+  Future<Bip32Ed25519XPrivateKey?> getMasterKey() async {
     final encodedMasterKey = await readString(key: _rootKey);
     return encodedMasterKey != null
-        ? Ed25519PrivateKey.fromHex(encodedMasterKey)
+        ? Bip32Ed25519XPrivateKeyFactory.instance.fromHex(encodedMasterKey)
         : null;
   }
 
   @override
-  Future<void> setMasterKey(Ed25519PrivateKey data) async {
+  Future<void> setMasterKey(Bip32Ed25519XPrivateKey data) async {
     await writeString(data.toHex(), key: _rootKey);
   }
 
