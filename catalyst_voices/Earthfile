@@ -17,33 +17,31 @@ builder:
     DO flutter-ci+SETUP
     COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
-    RUN melos build_runner   
-    SAVE ARTIFACT .
-
-
-generate-l10n:
-    FROM +builder
-    LET CURRENT_DIR = $(pwd)
-    WORKDIR packages/internal/catalyst_voices_localization
-    RUN flutter gen-l10n
-    SAVE ARTIFACT lib/generated
-    WORKDIR $CURRENT_DIR
-
-
-
 
 # Generates flutter code.
-# Based on Catalyst Gateway OpenAPI specifications generates models, clients
-# and serialization logic.
+# Generates codes for Catalyst Gateway OpenAPI, Voices Localization and
+# VoicesAssets and other packages that depend on code-generator.
 # It accepts [save_locally] ARG that when true place the artifacts in the
-# proper folder of `catalyst_voices_services` local code.
+# proper folders 
 code-generator:
     ARG save_locally=false
-
+    FROM +builder
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
 
-    FROM +builder
+    RUN melos l10n
+    RUN melos build_runner
+
+    IF [ $save_locally = true ]
+        RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" \)
+
+        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" \))
+            RUN echo "Found generated file: $generated_file"
+            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
+        END
+    ELSE 
+        SAVE ARTIFACT .
+    END
     WORKDIR packages/internal/catalyst_voices_services
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     DO flutter-ci+OPENAPI_CODE_GEN \
@@ -51,9 +49,11 @@ code-generator:
         --GEN_CODE_PATH=$gen_code_path \
         --LOCAL_GEN_CODE_PATH=$local_gen_code_path
 
+   
+
 # Runs static analysis on the code.
 check-static-analysis:
-    FROM +generate-l10n
+    FROM +code-generator
     DO flutter-ci+ANALYZE 
 
 # Runs code formatting checks.
@@ -73,12 +73,12 @@ check-license:
 
 # Run unit tests
 test-unit:
-    FROM +generate-l10n
+    FROM +code-generator
     DO flutter-ci+UNIT_TESTS
 
 # Build web version of Catalyst Voices
 build-web:
-    FROM +generate-l10n
+    FROM +code-generator
     ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
