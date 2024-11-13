@@ -7,6 +7,7 @@
 *.chopper.dart
 *.swagger.dart
 *.openapi.dart
+*.gen.dart
 
 # Localization (l10n) generated files
 packages/internal/catalyst_voices_localization/lib/generated/catalyst_voices_localizations_*.dart
