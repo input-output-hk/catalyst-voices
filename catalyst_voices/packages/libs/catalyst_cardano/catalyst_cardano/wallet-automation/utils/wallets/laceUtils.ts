@@ -84,7 +84,8 @@ export const signLaceData = async (page: Page, password: string, isCorrectPasswo
   await page.getByTestId('password-input').fill(password);
   await page.getByRole('button', { name: 'Confirm' }).click();
   if (!isCorrectPassword) {
+    await page.getByRole('button', { name: 'Close' }).click();
     return;
   }
-  await page.getByRole('button', { name: 'Close' }).click();
+  await page.waitForTimeout(2000);
  }

@@ -24,6 +24,7 @@ export const walletConfigs: WalletConfig[] = [
     ],
     username: 'test123',
     password: 'test12345678@',
+    cipBridge: ['cip-95']
   },
   {
     id: '2',
@@ -47,7 +48,32 @@ export const walletConfigs: WalletConfig[] = [
     ],
     username: 'test123',
     password: 'test12345678@',
+    cipBridge: ['cip-30']
   },
+  {
+    id: '3',
+    extension: getBrowserExtension(BrowserExtensionName.Eternl),
+    seed: [
+      'stomach',
+      'horn',
+      'rail',
+      'afraid',
+      'flip',
+      'also',
+      'abandon',
+      'speed',
+      'chaos',
+      'daring',
+      'soon',
+      'soft',
+      'okay',
+      'online',
+      'benefit',
+    ],
+    username: 'test123',
+    password: 'test12345678@!!',
+    cipBridge: ['cip-30', 'cip-95']
+  }
 ];
 
 export const getWalletConfig = (id: string): WalletConfig => {

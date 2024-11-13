@@ -18,10 +18,10 @@ src:
     COPY --dir utils ./utils
     COPY playwright.config.ts .
     COPY test-fixtures.ts .
+    COPY setup.ts .
 
 package-test:
     FROM +src
-    ENV APP_URL http://test-app:80
     ENV APP_URL http://test-app:80
     RUN mkdir /results
     VOLUME /results
@@ -31,19 +31,21 @@ package-test:
 
 builder:
     DO flutter-ci+SETUP
-    COPY ../../../../+repo-catalyst-voices-all/repo .
+    COPY ../../../../../+repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
 build-web:
     FROM +builder
-    ARG WORKDIR=/frontend/catalyst_voices_packages/catalyst_cardano/catalyst_cardano/example
+    ARG WORKDIR=/frontend/packages/libs/catalyst_cardano/catalyst_cardano/example
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
 package-app:
     FROM nginx:alpine3.20-slim
     ARG tag='latest'
-    COPY +build-web/web /usr/share/nginx/html/
+    COPY +build-web/web /app
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
     SAVE IMAGE test-app:$tag
 
 nightly-test:
@@ -55,10 +57,8 @@ nightly-test:
         --load test:latest=(+package-test)
 
         RUN docker run --network=default_default --name=test test:latest ; \
-            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml ; \
-            docker cp test:/results/ /playwright-report
+            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml ;
     END
     WAIT
         SAVE ARTIFACT cardano-wallet.junit-report.xml AS LOCAL cardano-wallet.junit-report.xml
-        SAVE ARTIFACT ./playwright-report/* AS LOCAL ./playwright-report/
     END

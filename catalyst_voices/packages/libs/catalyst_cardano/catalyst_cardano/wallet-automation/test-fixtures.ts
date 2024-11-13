@@ -1,54 +1,32 @@
-import { test as base, BrowserContext, chromium, Page } from '@playwright/test';
-import { allowExtension, onboardWallet, WalletConfig } from './utils/wallets/walletUtils';
-import { BrowserExtensionName } from './utils/extensions';
-import { ExtensionDownloader } from './utils/extensionDownloader';
-import { HomePage } from './pages/homePage';
+// import { test as base, BrowserContext, chromium, Page } from '@playwright/test';
+// import { HomePage } from './pages/homePage';
+// import { WalletListPage } from './pages/walletListPage';
 
-type MyFixtures = {
-  enableWallet: (walletConfig: WalletConfig) => Promise<BrowserContext>;
-  installExtension: (extensionName: BrowserExtensionName) => Promise<BrowserContext>;
-};
 
-export const test = base.extend<MyFixtures>({
-  enableWallet: async ({ installExtension }, use) => {
-    let browser: BrowserContext | null = null;
+// // import { allowExtension, onboardWallet, WalletConfig } from './utils/wallets/walletUtils';
 
-    const enableWalletFn = async (walletConfig: WalletConfig) => {
-      browser = await installExtension(walletConfig.extension.Name);
-      const extensionTab = browser.pages()[0];
-      await extensionTab.goto(walletConfig.extension.HomeUrl);
-      await onboardWallet(extensionTab, walletConfig);
-      await extensionTab.goto('/');
-      await extensionTab.waitForTimeout(4000);
-      const [walletPopup] = await Promise.all([
-        browser.waitForEvent('page'),
-        extensionTab.locator('//*[text()="Enable wallet"]').click(),
-      ]);
-      await walletPopup.waitForTimeout(2000);
-      await allowExtension(walletPopup, walletConfig.extension.Name);
-      await extensionTab.waitForTimeout(2000);
-      //await new HomePage(extensionTab).balanceLabel.waitFor({ state: 'visible' });
-      return browser;
-    };
+// // type MyFixtures = {
+// //   enableWallet: (walletConfig: WalletConfig, browser: BrowserContext) => Promise<BrowserContext>;
+// // };
+
+// // export const test = base.extend<MyFixtures>({
+// //   enableWallet: async ({ }, use) => { 
+// //     const enableWalletFn = async (walletConfig: WalletConfig, browser: BrowserContext) => {
+// //       const page = browser.pages()[0];
+// //       await page.reload();
+// //       await page.goto('/');
+// //       await page.waitForTimeout(4000);
+// //       const [walletPopup] = await Promise.all([
+// //         browser.waitForEvent('page'),
+// //         page.locator('//*[text()="Enable wallet"]').click(),
+// //       ]);
+// //       await walletPopup.waitForTimeout(2000);
+// //       await allowExtension(walletPopup, walletConfig.extension.Name);
+// //       await page.waitForTimeout(2000);
+// //       return browser;
+// //     };
   
-    // Provide the function to the test
-    await use(enableWalletFn);
-  },
-
-  installExtension: async ({ }, use) => {
-    await use(async (extensionName: BrowserExtensionName) => {
-      const extensionPath = await new ExtensionDownloader().getExtension(extensionName);
-      const browser = await chromium.launchPersistentContext('', {
-        headless: false, // extensions only work in headfull mode
-        args: [
-            `--disable-extensions-except=${extensionPath}`,
-            `--load-extension=${extensionPath}`,
-        ],
-    });
-    let [background] = browser.serviceWorkers();
-    if (!background)
-      background = await browser.waitForEvent('serviceworker');
-    return browser;
-    });
-  }
-});
+// //     // Provide the function to the test
+// //     await use(enableWalletFn);
+// //   },
+// // });

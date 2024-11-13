@@ -4,6 +4,9 @@ export enum ModalName {
   SignData = 'SignData',
   SignAndSubmitTx = 'SignAndSubmitTx',
   SignAndSubmitRBACTx = 'SignAndSubmitRBACTx',
+  SignDataUserDeclined = 'UserDeclined',
+  SignTxUserDeclined = 'SignTxUserDeclined',
+  SignRBACTxUserDeclined = 'SignRBACTxUserDeclined',
 }
 
 export interface ModalContent {
@@ -24,6 +27,18 @@ export const modalContents: { [key in ModalName]: ModalContent } = {
     header: 'Sign & submit RBAC tx',
     unchangingText: 'Tx hash:',
   },
+  [ModalName.SignDataUserDeclined]: {
+    header: 'Sign data',
+    unchangingText: 'user declined sign data',
+  },
+  [ModalName.SignTxUserDeclined]: {
+    header: 'Sign & submit tx',
+    unchangingText: 'user declined sign tx',
+  },
+  [ModalName.SignRBACTxUserDeclined]: {
+    header: 'Sign & submit RBAC tx',
+    unchangingText: 'user declined sign tx',
+  },
 };
 
 export class Modal {
@@ -35,8 +50,8 @@ export class Modal {
   constructor(page: Page, modalName: ModalName) {
     this.page = page;
     this.content = modalContents[modalName];
-    this.modalHeader = this.page.getByText(this.content.header)
-    this.modalBody = this.page.getByText(this.content.unchangingText)
+    this.modalHeader = this.page.getByText(this.content.header, { exact: true });
+    this.modalBody = this.page.getByText(this.content.unchangingText) 
   }
 
   async assertModalIsVisible() {
