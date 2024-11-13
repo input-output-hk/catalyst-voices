@@ -4,18 +4,18 @@
 
 Welcome to the Catalyst Voices mono repo, where we manage and maintain the interconnected projects.
 
-- [Catalyst Voices](#catalyst-voices)
-  - [Overview](#overview)
-  - [Getting Started](#getting-started)
-  - [Projects](#projects)
-    - [Athena](#athena)
-    - [Catalyst Voices](#catalyst-voices-1)
-    - [Catalyst Data Gateway](#catalyst-data-gateway)
-    - [Catalyst Voices Packages](#catalyst-voices-packages)
-  - [Development](#development)
-    - [Code Generation](#code-generation)
-  - [Contributing](#contributing)
-  - [License](#license)
+* [Catalyst Voices](#catalyst-voices)
+  * [Overview](#overview)
+  * [Getting Started](#getting-started)
+  * [Projects](#projects)
+    * [Athena](#athena)
+    * [Catalyst Voices](#catalyst-voices-1)
+    * [Catalyst Data Gateway](#catalyst-data-gateway)
+    * [Catalyst Voices Packages](#catalyst-voices-packages)
+  * [Development](#development)
+    * [Code Generation](#code-generation)
+  * [Contributing](#contributing)
+  * [License](#license)
 
 ## Overview
 
@@ -76,25 +76,6 @@ Shared Flutter and Dart packages used across the Catalyst.
 For development guidelines, tooling information, and best practices,
 visit [Catalyst Engineering](https://github.com/input-output-hk/catalyst-engineering)
 and [Catalyst CI](https://input-output-hk.github.io/catalyst-ci/).
-
-### Code Generation
-
-In some sections of the code we use code generation to generate code from OpenAPI specifications, localization files, assets, routes, etc.
-
-To generate code run in root directory:
-
-```sh
-earthly ./catalyst_voices+code-generator 
-```
-
-To save generated code locally run in root directory:
-
-```sh
-earthly ./catalyst_voices+code-generator --save_locally=true
-```
-
-Keep in mind that You will need GITHUB_TOKEN to be able to run this earthly target.
-In root directory there is a template file `.secret.template` save it as `.secret` and fill in the GITHUB_TOKEN. This file should be ignored by git, but make sure to not commit it.
 
 ## Contributing
 

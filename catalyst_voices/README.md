@@ -11,6 +11,7 @@ This repository contains the Catalyst Voices app and packages.
     * [Packages](#packages)
     * [Flavors](#flavors)
     * [Environment variables](#environment-variables)
+    * [Code Generation](#code-generation)
   * [Running Tests](#running-tests)
   * [Common issues](#common-issues)
 
@@ -96,6 +97,26 @@ you can use the following command:
 ```sh
 flutter build web --target apps/voices/lib/configs/main_web.dart --dart-define SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL
 ```
+
+### Code Generation
+
+In some sections of the code we use code generation to generate code from OpenAPI specifications, localization files, assets, routes, etc.
+
+To generate code run in root directory:
+
+```sh
+earthly ./catalyst_voices+code-generator 
+```
+
+To save generated code locally run in root directory:
+
+```sh
+earthly ./catalyst_voices+code-generator --save_locally=true
+```
+
+Keep in mind that You will need GITHUB_TOKEN to be able to run this earthly target.
+In root directory there is a template file `.secret.template` save it as `.secret` and fill in the GITHUB_TOKEN. This file should be ignored by git, but make sure to not commit it.
+
 
 ## Running Tests
 
