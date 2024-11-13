@@ -11,7 +11,6 @@ This repository contains the Catalyst Voices app and packages.
     * [Packages](#packages)
     * [Flavors](#flavors)
     * [Environment variables](#environment-variables)
-    * [Code Generation](#code-generation)
   * [Running Tests](#running-tests)
   * [Common issues](#common-issues)
 
@@ -100,7 +99,12 @@ flutter build web --target apps/voices/lib/configs/main_web.dart --dart-define S
 
 ### Code Generation
 
-In some sections of the code we use code generation to generate code from OpenAPI specifications, Localization files, assets, routes, etc.
+In some section of this repo we use code generation for generation:
+
+* Catalyst Gateway OpenAPI
+* localization files
+* assets files
+* routes files for navigation
 
 To generate code run in root directory:
 
@@ -115,8 +119,8 @@ earthly ./catalyst_voices+code-generator --save_locally=true
 ```
 
 Keep in mind that You will need GITHUB_TOKEN to be able to run this earthly target.
-There is a template file `.secret.template` in the root directory. To use this template, save it as `.secret` and fill in the GITHUB_TOKEN. Git should ignore this file but make sure it does.
-
+In root directory there is a template file `.secret.template` save it as `.secret` and fill in the GITHUB_TOKEN.
+This file should be ignored by git, but make this is the case.
 
 ## Running Tests
 
