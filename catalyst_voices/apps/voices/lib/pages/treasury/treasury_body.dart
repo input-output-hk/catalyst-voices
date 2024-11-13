@@ -14,12 +14,11 @@ class TreasuryBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: SectionsControllerScope.of(context),
+    return SectionsListViewBuilder(
       builder: (context, value, child) {
         return SectionsListView<TreasurySection, TreasurySectionStep>(
           itemScrollController: itemScrollController,
-          items: value.listItems,
+          items: value,
           stepBuilder: (context, step) {
             switch (step) {
               case DummyTopicStep():

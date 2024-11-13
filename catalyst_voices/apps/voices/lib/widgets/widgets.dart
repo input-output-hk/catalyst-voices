@@ -56,6 +56,7 @@ export 'modals/voices_question_dialog.dart';
 export 'modals/voices_upload_file_dialog.dart';
 export 'navigation/sections_controller.dart';
 export 'navigation/sections_list_view.dart';
+export 'navigation/sections_list_view_builder.dart';
 export 'navigation/sections_menu.dart';
 export 'scrollbar/voices_scrollbar.dart';
 export 'seed_phrase/seed_phrases_completer.dart';
