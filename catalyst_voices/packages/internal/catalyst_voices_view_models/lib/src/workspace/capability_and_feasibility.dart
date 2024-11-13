@@ -15,6 +15,7 @@ final class CompatibilityAndFeasibility extends WorkspaceSection {
 final class DeliveryAndAccountabilityStep extends RichTextStep {
   const DeliveryAndAccountabilityStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });
@@ -33,6 +34,7 @@ final class DeliveryAndAccountabilityStep extends RichTextStep {
 final class FeasibilityChecksStep extends RichTextStep {
   const FeasibilityChecksStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });

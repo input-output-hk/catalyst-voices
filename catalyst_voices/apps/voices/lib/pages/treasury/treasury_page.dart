@@ -1,19 +1,23 @@
 import 'package:catalyst_voices/pages/treasury/treasury_body.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_details_panel.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_navigation_panel.dart';
-import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 const sections = [
   CampaignSetup(
     id: 0,
     steps: [
-      DummyTopicStep(id: 0, isEditable: false),
-      DummyTopicStep(id: 1),
-      DummyTopicStep(id: 2),
-      DummyTopicStep(id: 3),
+      DummyTopicStep(
+        id: 0,
+        sectionId: 0,
+        isEditable: false,
+      ),
+      DummyTopicStep(id: 1, sectionId: 0),
+      DummyTopicStep(id: 2, sectionId: 0),
+      DummyTopicStep(id: 3, sectionId: 0),
     ],
   ),
 ];
@@ -29,12 +33,16 @@ class TreasuryPage extends StatefulWidget {
 
 class _TreasuryPageState extends State<TreasuryPage> {
   late final SectionsController _sectionsController;
+  late final ItemScrollController _bodyItemScrollController;
 
   @override
   void initState() {
     super.initState();
 
     _sectionsController = SectionsController();
+    _bodyItemScrollController = ItemScrollController();
+
+    _sectionsController.attachItemsScrollController(_bodyItemScrollController);
 
     _populateSections();
   }
@@ -49,24 +57,19 @@ class _TreasuryPageState extends State<TreasuryPage> {
   Widget build(BuildContext context) {
     return SectionsControllerScope(
       controller: _sectionsController,
-      child: const SpaceScaffold(
-        left: TreasuryNavigationPanel(),
-        body: TreasuryBody(sections: sections),
-        right: TreasuryDetailsPanel(),
+      child: SpaceScaffold(
+        left: const TreasuryNavigationPanel(),
+        body: TreasuryBody(
+          itemScrollController: _bodyItemScrollController,
+        ),
+        right: const TreasuryDetailsPanel(),
       ),
     );
   }
 
   void _populateSections() {
-    final section = sections.firstOrNull;
-    final step = section?.steps.firstOrNull;
-
-    _sectionsController.value = SectionsControllerState(
+    _sectionsController.value = SectionsControllerState.initial(
       sections: sections,
-      openedSections: sections.map((e) => e.id).toSet(),
-      selectedStep: section != null && step != null
-          ? (sectionId: section.id, stepId: step.id)
-          : null,
     );
   }
 }

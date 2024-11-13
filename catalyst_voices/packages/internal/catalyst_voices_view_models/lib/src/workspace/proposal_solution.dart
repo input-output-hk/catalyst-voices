@@ -15,6 +15,7 @@ final class ProposalSolution extends WorkspaceSection {
 final class ProblemPerspectiveStep extends RichTextStep {
   const ProblemPerspectiveStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });
@@ -33,6 +34,7 @@ final class ProblemPerspectiveStep extends RichTextStep {
 final class PerspectiveRationaleStep extends RichTextStep {
   const PerspectiveRationaleStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });
@@ -51,6 +53,7 @@ final class PerspectiveRationaleStep extends RichTextStep {
 final class ProjectEngagementStep extends RichTextStep {
   const ProjectEngagementStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });

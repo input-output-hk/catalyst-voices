@@ -25,11 +25,9 @@ class SpaceScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return SidebarScaffold(
       leftRail: left,
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 612),
-          child: body,
-        ),
+      body: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 612),
+        child: body,
       ),
       rightRail: right,
     );
