@@ -5,19 +5,20 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v3.2.2
 builder:
     FROM flutter_rust_bridge+builder
     COPY . .
-
-# Generated necessary files for running Flutter web locally and save it locally.
-code-generator:
-    ARG local = false 
-    FROM +builder
     DO flutter_rust_bridge+CODE_GENERATOR_WEB
 
-    IF [ $local = true ]
-        SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
-        SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
-        SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
-    ELSE 
-        SAVE ARTIFACT ./assets/js assets_js
-        SAVE ARTIFACT ./rust/src/frb_generated.rs frb_generated.rs
-        SAVE ARTIFACT ./lib/src src
-    END
+# Generated necessary files for running Flutter web locally.
+code-generator:
+    FROM +builder
+
+    SAVE ARTIFACT ./assets/js assets_js
+    SAVE ARTIFACT ./rust/src/frb_generated.rs frb_generated.rs
+    SAVE ARTIFACT ./lib/src src  
+
+# Generated necessary files for running Flutter web locally and save it locally.
+code-generator-local:
+    FROM +builder
+
+    SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
+    SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
+    SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
