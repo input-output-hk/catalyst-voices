@@ -48,5 +48,5 @@ integration-test-web:
 
 test-web-all:
     BUILD +integration-test-web \
-            --browser=chrome
-            # --browser=firefox
+            --browser=chrome \
+            --browser=firefox
