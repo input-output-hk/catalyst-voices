@@ -2,6 +2,7 @@
 
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
+pub(crate) mod cip36_registration_invalid;
 pub(crate) mod stake_registration;
 pub(crate) mod txi_by_hash;
 pub(crate) mod txo_ada;
@@ -115,10 +116,16 @@ pub(crate) struct PreparedQueries {
     delete_stake_registration: SizedBatch,
     /// CIP36 Registrations Primary Key Query.
     select_cip36_registration: PreparedStatement,
-    /// CIP36 Registration errors Primary Key Query.
-    select_cip36_registration_error: PreparedStatement,
+    /// CIP36 Registrations Delete Query.
+    delete_cip36_registration: SizedBatch,
+    /// CIP36 Registration Invalid Primary Key Query.
+    select_cip36_registration_invalid: PreparedStatement,
+    /// CIP36 Registration Invalid Delete Query.
+    delete_cip36_registration_invalid: SizedBatch,
     /// CIP36 Registration for Vote Key Primary Key Query.
     select_cip36_registration_for_vote_key: PreparedStatement,
+    /// CIP36 Registration for Vote Key Delete Query.
+    delete_cip36_registration_for_vote_key: SizedBatch,
     /// RBAC 509 Registrations Primary Key Query.
     select_rbac509_registration: PreparedStatement,
     /// Chain Root for TX ID Primary Key Query..
@@ -127,12 +134,6 @@ pub(crate) struct PreparedQueries {
     select_chain_root_for_role0_key: PreparedStatement,
     /// Chain Root for Stake Address Primary Key Query..
     select_chain_root_for_stake_address: PreparedStatement,
-    /// CIP36 Registrations Delete Query.
-    delete_cip36_registration: SizedBatch,
-    /// CIP36 Registration errors Delete Query.
-    delete_cip36_registration_error: SizedBatch,
-    /// CIP36 Registration for Vote Key Delete Query.
-    delete_cip36_registration_for_vote_key: SizedBatch,
     /// RBAC 509 Registrations Delete Query.
     delete_rbac509_registration: SizedBatch,
     /// Chain Root for TX ID Delete Query..
@@ -171,10 +172,14 @@ impl PreparedQueries {
             cip36_registration::PrimaryKeyQuery::prepare(&session).await?;
         let delete_cip36_registration =
             cip36_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_cip36_registration =
-            cip36_registration::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_cip36_registration =
-            cip36_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_cip36_registration_invalid =
+            cip36_registration_invalid::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_cip36_registration_invalid =
+            cip36_registration_invalid::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_cip36_registration_for_vote_key =
+            cip36_registration_for_vote_key::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_cip36_registration_for_vote_key =
+            cip36_registration_for_vote_key::DeleteQuery::prepare_batch(&session, cfg).await?;
 
         todo!("WIP");
     }
@@ -213,7 +218,9 @@ impl PreparedQueries {
             PreparedSelectQuery::Txi => &self.select_txi_by_hash,
             PreparedSelectQuery::StakeRegistration => &self.select_stake_registration,
             PreparedSelectQuery::Cip36Registration => &self.select_cip36_registration,
-            PreparedSelectQuery::Cip36RegistrationInvalid => &self.select_cip36_registration_error,
+            PreparedSelectQuery::Cip36RegistrationInvalid => {
+                &self.select_cip36_registration_invalid
+            },
             PreparedSelectQuery::Cip36RegistrationForVoteKey => {
                 &self.select_cip36_registration_for_vote_key
             },
@@ -241,7 +248,9 @@ impl PreparedQueries {
             PreparedDeleteQuery::Txi => &self.delete_txi_by_hash,
             PreparedDeleteQuery::StakeRegistration => &self.delete_stake_registration,
             PreparedDeleteQuery::Cip36Registration => &self.delete_cip36_registration,
-            PreparedDeleteQuery::Cip36RegistrationInvalid => &self.delete_cip36_registration_error,
+            PreparedDeleteQuery::Cip36RegistrationInvalid => {
+                &self.delete_cip36_registration_invalid
+            },
             PreparedDeleteQuery::Cip36RegistrationForVoteKey => {
                 &self.delete_cip36_registration_for_vote_key
             },
