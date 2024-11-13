@@ -97,6 +97,31 @@ you can use the following command:
 flutter build web --target apps/voices/lib/configs/main_web.dart --dart-define SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL
 ```
 
+### Code Generation
+
+In some section of this repo we use code generation for generation:
+
+* Catalyst Gateway OpenAPI
+* localization files
+* assets files
+* routes files for navigation
+
+To generate code run in root directory:
+
+```sh
+earthly ./catalyst_voices+code-generator 
+```
+
+To save generated code locally run in root directory:
+
+```sh
+earthly ./catalyst_voices+code-generator --save_locally=true
+```
+
+Keep in mind that You will need GITHUB_TOKEN to be able to run this earthly target.
+In root directory there is a template file `.secret.template` save it as `.secret` and fill in the GITHUB_TOKEN.
+This file should be ignored by git, but make this is the case.
+
 ## Running Tests
 
 To run all unit and widget tests use the following command:

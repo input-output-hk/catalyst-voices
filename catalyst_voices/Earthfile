@@ -7,7 +7,6 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.23 AS flutter
 # packages and folders related to catalyst_voices frontend.
 repo-catalyst-voices:
     FROM scratch
-
     WORKDIR /repo
     COPY --dir . .
 
@@ -20,17 +19,28 @@ builder:
     DO flutter-ci+BOOTSTRAP
 
 # Generates flutter code.
-# Based on Catalyst Gateway OpenAPI specifications generates models, clients
-# and serialization logic.
+# Generates codes for Catalyst Gateway OpenAPI, Voices Localization and
+# VoicesAssets and other packages that depend on code-generator.
 # It accepts [save_locally] ARG that when true place the artifacts in the
-# proper folder of `catalyst_voices_services` local code.
+# proper folders 
 code-generator:
     ARG save_locally=false
-
+    FROM +builder
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
 
-    FROM +builder
+    RUN melos l10n
+    RUN melos build_runner
+
+    IF [ $save_locally = true ]
+        RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" \)
+
+        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" \))
+            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
+        END
+    ELSE 
+        SAVE ARTIFACT .
+    END
     WORKDIR packages/internal/catalyst_voices_services
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     DO flutter-ci+OPENAPI_CODE_GEN \
@@ -38,20 +48,12 @@ code-generator:
         --GEN_CODE_PATH=$gen_code_path \
         --LOCAL_GEN_CODE_PATH=$local_gen_code_path
 
-# Tests that the code generation is consistent
-# with the generated code currently in the repo.
-# This MUST be a test target because it requires artifacts from build targets.
-test-flutter-code-generator:
-    FROM +code-generator
-    # Copy generated files in the local file tree to a temporary folder
-    COPY packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
-    # Check diff between local code and earthly artifacts
-    RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
+   
 
 # Runs static analysis on the code.
 check-static-analysis:
-    FROM +builder
-    DO flutter-ci+ANALYZE
+    FROM +code-generator
+    DO flutter-ci+ANALYZE 
 
 # Runs code formatting checks.
 check-code-formatting:
@@ -70,12 +72,12 @@ check-license:
 
 # Run unit tests
 test-unit:
-    FROM +builder
+    FROM +code-generator
     DO flutter-ci+UNIT_TESTS
 
 # Build web version of Catalyst Voices
 build-web:
-    FROM +builder
+    FROM +code-generator
     ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
