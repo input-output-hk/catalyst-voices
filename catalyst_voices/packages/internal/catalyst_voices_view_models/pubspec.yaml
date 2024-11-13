@@ -11,6 +11,8 @@ dependencies:
   catalyst_cardano: ^0.3.0
   catalyst_cardano_serialization: ^0.4.0
   catalyst_cardano_web: ^0.3.0
+  catalyst_voices_assets:
+    path: ../catalyst_voices_assets
   catalyst_voices_localization:
     path: ../catalyst_voices_localization
   catalyst_voices_models:
