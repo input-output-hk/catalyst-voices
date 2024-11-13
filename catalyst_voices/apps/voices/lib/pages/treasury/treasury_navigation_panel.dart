@@ -1,5 +1,3 @@
-import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
-import 'package:catalyst_voices/widgets/navigation/sections_menu.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
