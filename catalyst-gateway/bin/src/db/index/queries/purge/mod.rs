@@ -3,6 +3,7 @@
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod cip36_registration_invalid;
+pub(crate) mod rbac509_registration;
 pub(crate) mod stake_registration;
 pub(crate) mod txi_by_hash;
 pub(crate) mod txo_ada;
@@ -180,6 +181,10 @@ impl PreparedQueries {
             cip36_registration_for_vote_key::PrimaryKeyQuery::prepare(&session).await?;
         let delete_cip36_registration_for_vote_key =
             cip36_registration_for_vote_key::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_rbac509_registration =
+            rbac509_registration::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_rbac509_registration =
+            rbac509_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
 
         todo!("WIP");
     }
