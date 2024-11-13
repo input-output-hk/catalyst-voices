@@ -1,6 +1,7 @@
 //! Queries for purging volatile data.
 
 pub(crate) mod cip36_registration;
+pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod stake_registration;
 pub(crate) mod txi_by_hash;
 pub(crate) mod txo_ada;
@@ -166,6 +167,10 @@ impl PreparedQueries {
             stake_registration::PrimaryKeyQuery::prepare(&session).await?;
         let delete_stake_registration =
             stake_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_cip36_registration =
+            cip36_registration::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_cip36_registration =
+            cip36_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
         let select_cip36_registration =
             cip36_registration::PrimaryKeyQuery::prepare(&session).await?;
         let delete_cip36_registration =
