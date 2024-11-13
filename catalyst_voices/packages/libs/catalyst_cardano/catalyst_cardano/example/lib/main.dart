@@ -15,7 +15,7 @@ part 'sign_and_submit_tx.dart';
 part 'sign_data.dart';
 
 /// Run only via `flutter run`:
-/// 
+///
 /// ```shell
 /// flutter run \
 /// --web-header Cross-Origin-Opener-Policy=same-origin \
@@ -23,7 +23,7 @@ part 'sign_data.dart';
 /// --target lib/main.dart \
 /// -d chrome
 /// ```
-/// 
+///
 /// Explanation:
 /// - flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
 Future<void> main() async {
