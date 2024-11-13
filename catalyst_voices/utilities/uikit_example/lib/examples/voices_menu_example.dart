@@ -13,11 +13,10 @@ class VoicesMenuExample extends StatefulWidget {
 }
 
 class _VoicesMenuExampleState extends State<VoicesMenuExample> {
-  final _problemSensingController = VoicesNodeMenuController();
+  int? _selectedItemId;
 
   @override
   void dispose() {
-    _problemSensingController.dispose();
     super.dispose();
   }
 
@@ -35,7 +34,16 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
                 const _MenuExample2(),
                 VoicesNodeMenu(
                   name: 'Problem-sensing stage',
-                  controller: _problemSensingController,
+                  onItemTap: (value) {
+                    setState(() {
+                      if (_selectedItemId == value) {
+                        _selectedItemId = null;
+                      } else {
+                        _selectedItemId = value;
+                      }
+                    });
+                  },
+                  selectedItemId: _selectedItemId,
                   items: const [
                     VoicesNodeMenuItem(id: 0, label: 'Start'),
                     VoicesNodeMenuItem(id: 1, label: 'Vote'),
