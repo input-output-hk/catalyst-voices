@@ -39,7 +39,7 @@ pub(crate) struct Params {
     pub(crate) txn: i16,
     /// Transaction Output Offset inside the transaction.
     pub(crate) txo: i16,
-    /// Asset Policy Hash - Binayr 28 bytes.
+    /// Asset Policy Hash - Binary 28 bytes.
     policy_id: Vec<u8>,
     /// Name of the Policy (UTF8)
     // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
