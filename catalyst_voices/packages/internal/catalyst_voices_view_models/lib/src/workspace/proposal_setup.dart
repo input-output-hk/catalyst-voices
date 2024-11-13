@@ -15,6 +15,7 @@ final class ProposalSetup extends WorkspaceSection {
 final class TitleStep extends RichTextStep {
   const TitleStep({
     required super.id,
+    required super.sectionId,
     required super.data,
   });
 

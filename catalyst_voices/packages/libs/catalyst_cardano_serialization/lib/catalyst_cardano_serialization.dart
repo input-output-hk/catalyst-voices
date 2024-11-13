@@ -13,7 +13,6 @@ export 'src/rbac/x509_certificate.dart';
 export 'src/rbac/x509_metadata_envelope.dart';
 export 'src/redeemer.dart';
 export 'src/scripts.dart';
-export 'src/signature.dart';
 export 'src/transaction.dart';
 export 'src/transaction_output.dart';
 export 'src/types.dart';

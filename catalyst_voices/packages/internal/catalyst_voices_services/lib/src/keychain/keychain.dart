@@ -1,4 +1,4 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/lockable.dart';
 
@@ -9,9 +9,9 @@ abstract interface class Keychain implements Lockable {
 
   Future<KeychainMetadata> get metadata;
 
-  Future<Ed25519PrivateKey?> getMasterKey();
+  Future<Bip32Ed25519XPrivateKey?> getMasterKey();
 
-  Future<void> setMasterKey(Ed25519PrivateKey key);
+  Future<void> setMasterKey(Bip32Ed25519XPrivateKey key);
 
   Future<void> clear();
 }
