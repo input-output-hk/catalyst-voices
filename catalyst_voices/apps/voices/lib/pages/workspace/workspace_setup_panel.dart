@@ -39,8 +39,8 @@ final List<Guidance> _mockGuidance = [
   ),
 ];
 
-class ProposalSetupPanel extends StatelessWidget {
-  const ProposalSetupPanel({super.key});
+class WorkspaceSetupPanel extends StatelessWidget {
+  const WorkspaceSetupPanel({super.key});
 
   @override
   Widget build(BuildContext context) {

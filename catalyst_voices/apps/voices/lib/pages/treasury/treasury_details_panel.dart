@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
-class CampaignCommentsPanel extends StatelessWidget {
-  const CampaignCommentsPanel({super.key});
+class TreasuryDetailsPanel extends StatelessWidget {
+  const TreasuryDetailsPanel({super.key});
 
   @override
   Widget build(BuildContext context) {

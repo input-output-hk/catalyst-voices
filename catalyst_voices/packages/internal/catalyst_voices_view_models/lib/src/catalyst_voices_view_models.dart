@@ -4,5 +4,8 @@ export 'exception/localized_unknown_exception.dart';
 export 'proposal/comment.dart';
 export 'proposal/guidance/guidance.dart';
 export 'proposal/guidance/guidance_type.dart';
+export 'navigation/sections_navigation.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
+export 'treasury/treasury_sections.dart';
+export 'workspace/workspace_sections.dart';
