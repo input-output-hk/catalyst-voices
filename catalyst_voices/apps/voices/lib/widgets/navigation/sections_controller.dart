@@ -9,7 +9,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 final class SectionsControllerState extends Equatable {
   final List<Section> sections;
-  final List<SectionsListViewItem> listItems;
   final Set<int> openedSections;
   final SectionStepId? activeStepId;
 
@@ -18,13 +17,8 @@ final class SectionsControllerState extends Equatable {
     Set<int> openedSections = const {},
     SectionStepId? activeStepId,
   }) {
-    final listItems = sections
-        .expand<SectionsListViewItem>((element) => [element, ...element.steps])
-        .toList();
-
     return SectionsControllerState._(
       sections: sections,
-      listItems: listItems,
       openedSections: openedSections,
       activeStepId: activeStepId,
     );
@@ -32,7 +26,6 @@ final class SectionsControllerState extends Equatable {
 
   const SectionsControllerState._({
     this.sections = const [],
-    this.listItems = const [],
     this.openedSections = const {},
     this.activeStepId,
   });
@@ -40,6 +33,19 @@ final class SectionsControllerState extends Equatable {
   int? get activeSectionId => activeStepId?.sectionId;
 
   bool get allSegmentsClosed => openedSections.isEmpty;
+
+  List<SectionsListViewItem> get listItems {
+    final openedSections = {...this.openedSections};
+
+    return sections
+        .expand<SectionsListViewItem>(
+          (element) => [
+            element,
+            if (openedSections.contains(element.id)) ...element.steps,
+          ],
+        )
+        .toList();
+  }
 
   /// All [sections] are opened and first section is selected.
   factory SectionsControllerState.initial({

@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/widgets/navigation/section_header.dart';
-import 'package:catalyst_voices/widgets/navigation/section_step_offstage.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -40,13 +39,15 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
         final item = items[index];
 
         if (item is T) {
-          return headerBuilder(context, item);
+          return KeyedSubtree(
+            key: item.buildKey(),
+            child: headerBuilder(context, item),
+          );
         }
 
         if (item is T2) {
-          return SectionStepOffstage(
+          return KeyedSubtree(
             key: item.buildKey(),
-            sectionId: item.sectionId,
             child: stepBuilder(context, item),
           );
         }
@@ -57,11 +58,7 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
         final item = items[index];
 
         if (item is SectionStep) {
-          return SectionStepOffstage(
-            key: ValueKey('SectionStep[${item.sectionStepId}]Separator'),
-            sectionId: item.sectionId,
-            child: const SizedBox(height: 12),
-          );
+          return const SizedBox(height: 12);
         }
 
         return const SizedBox(height: 24);
@@ -73,7 +70,6 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
 
 Widget _defaultHeaderBuilder(BuildContext context, Section section) {
   return SectionHeader(
-    key: section.buildKey(),
     section: section,
   );
 }
