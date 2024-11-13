@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -66,7 +67,8 @@ final class Dependencies extends DependencyProvider {
 
   void _registerServices() {
     registerLazySingleton<Storage>(() => const SecureStorage());
-    registerLazySingleton<KeyDerivation>(KeyDerivation.new);
+    registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
+    registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
     registerLazySingleton<KeychainProvider>(VaultKeychainProvider.new);
     registerLazySingleton<DummyAuthStorage>(SecureDummyAuthStorage.new);
     registerLazySingleton<Downloader>(Downloader.new);

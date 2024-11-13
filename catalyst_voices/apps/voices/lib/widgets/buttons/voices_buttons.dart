@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices/widgets/common/animated_expand_chevron.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -100,9 +101,10 @@ class ChevronExpandButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isExpanded
-        ? ChevronDownButton(onTap: onTap)
-        : ChevronRightButton(onTap: onTap);
+    return VoicesIconButton(
+      onTap: onTap,
+      child: AnimatedExpandChevron(isExpanded: isExpanded),
+    );
   }
 }
 

@@ -1,0 +1,93 @@
+# Use MOLD linker where possible, but ONLY in CI applicable targets.
+
+# Configure how Docker container targets build.
+
+# If you want to customize these targets for a local build, then customize them in your:
+#  $CARGO_HOME/config.toml
+# NOT in the project itself.
+# These targets are ONLY the targets used by CI and inside docker builds.
+
+# DO NOT remove `"-C", "target-feature=+crt-static"` from the rustflags for these targets.
+
+# Should be the default to have fully static rust programs in CI
+[target.x86_64-unknown-linux-musl]
+linker = "clang"
+rustflags = [
+    "-C", "link-arg=-fuse-ld=/usr/bin/mold",
+    "-C", "target-feature=-crt-static"
+]
+
+# Should be the default to have fully static rust programs in CI
+[target.aarch64-unknown-linux-musl]
+linker = "clang"
+rustflags = [
+    "-C", "link-arg=-fuse-ld=/usr/bin/mold",
+    "-C", "target-feature=-crt-static"
+]
+
+[build]
+rustflags = []
+rustdocflags = [
+    "--enable-index-page",
+    "-Z",
+    "unstable-options",
+]
+
+[profile.dev]
+opt-level = 1
+debug = true
+debug-assertions = true
+overflow-checks = true
+lto = false
+panic = "unwind"
+incremental = true
+codegen-units = 256
+
+[profile.release]
+opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
+lto = "thin"
+panic = "unwind"
+incremental = false
+codegen-units = 16
+
+[profile.test]
+opt-level = 3
+debug = true
+lto = false
+debug-assertions = true
+incremental = true
+codegen-units = 256
+
+[profile.bench]
+opt-level = 3
+debug = false
+debug-assertions = false
+overflow-checks = false
+lto = "thin"
+incremental = false
+codegen-units = 16
+
+[alias]
+lint = "clippy --all-targets"
+lintfix = "clippy --all-targets --fix --allow-dirty"
+lint-vscode = "clippy --message-format=json-diagnostic-rendered-ansi --all-targets"
+
+docs = "doc --release --no-deps --document-private-items --bins --lib --examples"
+# nightly docs build broken... when they are'nt we can enable these docs... --unit-graph --timings=html,json -Z unstable-options"
+testunit = "nextest run --release --bins --lib --tests --no-fail-fast -P ci"
+testcov = "llvm-cov nextest --release --bins --lib --tests --no-fail-fast -P ci"
+testdocs = "test --doc --release"
+
+# Rust formatting, MUST be run with +nightly
+fmtchk = "fmt -- --check -v --color=always"
+fmtfix = "fmt -- -v"
+
+[term]
+quiet = false           # whether cargo output is quiet
+verbose = false         # whether cargo provides verbose output
+color = "auto"          # whether cargo colorizes output use `CARGO_TERM_COLOR="off"` to disable.
+progress.when = "never" # whether cargo shows progress bar
+progress.width = 80     # width of progress bar

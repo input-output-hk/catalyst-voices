@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:equatable/equatable.dart';
 
 bool _registeredASN1Names = false;
@@ -37,14 +38,13 @@ class X509Certificate with EquatableMixin {
   });
 
   /// Generates a self-signed [X509Certificate] from [tbsCertificate]
-  /// that is signed using the private key of [keyPair].
+  /// that is signed using the [privateKey].
   static Future<X509Certificate> generateSelfSigned({
     required X509TBSCertificate tbsCertificate,
-    required Ed25519KeyPair keyPair,
+    required Bip32Ed25519XPrivateKey privateKey,
   }) async {
     final encodedTbsCertificate = tbsCertificate.toASN1();
-    final signature =
-        await keyPair.privateKey.sign(encodedTbsCertificate.encodedBytes);
+    final signature = await privateKey.sign(encodedTbsCertificate.encodedBytes);
 
     return X509Certificate(
       tbsCertificate: tbsCertificate,
@@ -118,7 +118,7 @@ class X509TBSCertificate with EquatableMixin {
   final X509DistinguishedName subject;
 
   /// The public key of the [subject].
-  final Ed25519PublicKey subjectPublicKey;
+  final Bip32Ed25519XPublicKey subjectPublicKey;
 
   /// Extra extensions of the certificate.
   final X509CertificateExtensions? extensions;
@@ -182,7 +182,7 @@ class X509TBSCertificate with EquatableMixin {
       ..add(ASN1UtcTime(validityNotAfter.toUtc()));
   }
 
-  ASN1Object _createSubjectPublicKeyInfo(Ed25519PublicKey publicKey) {
+  ASN1Object _createSubjectPublicKeyInfo(Bip32Ed25519XPublicKey publicKey) {
     return ASN1Sequence()
       ..add(
         ASN1Sequence()

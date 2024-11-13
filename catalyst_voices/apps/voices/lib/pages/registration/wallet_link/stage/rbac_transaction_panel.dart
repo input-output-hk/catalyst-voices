@@ -118,7 +118,7 @@ class _BlocSummary extends StatelessWidget {
       },
       builder: (context, state) {
         if (state == null) {
-          return const Offstage();
+          return const _SummaryPlaceholder();
         }
 
         return _Summary(
@@ -127,6 +127,20 @@ class _BlocSummary extends StatelessWidget {
           transactionFee: state.transactionFee,
         );
       },
+    );
+  }
+}
+
+class _SummaryPlaceholder extends StatelessWidget {
+  const _SummaryPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(32),
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }
