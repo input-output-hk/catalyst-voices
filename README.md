@@ -13,7 +13,6 @@ Welcome to the Catalyst Voices mono repo, where we manage and maintain the inter
     * [Catalyst Data Gateway](#catalyst-data-gateway)
     * [Catalyst Voices Packages](#catalyst-voices-packages)
   * [Development](#development)
-    * [Code Generation](#code-generation)
   * [Contributing](#contributing)
   * [License](#license)
 
