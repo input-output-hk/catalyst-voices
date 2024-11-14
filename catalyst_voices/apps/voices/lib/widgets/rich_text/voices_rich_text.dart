@@ -36,7 +36,6 @@ class VoicesRichText extends StatefulWidget {
   final VoicesRichTextEditModeController? editModeController;
   final FocusNode? focusNode;
   final int? charsLimit;
-  final bool initialEditMode;
   final CanEditDocumentGetter canEditDocumentGetter;
   final VoidCallback? onEditBlocked;
   final ValueChanged<Document>? onSaved;
@@ -48,7 +47,6 @@ class VoicesRichText extends StatefulWidget {
     this.editModeController,
     this.focusNode,
     this.charsLimit,
-    this.initialEditMode = false,
     this.canEditDocumentGetter = _alwaysAllowEdit,
     this.onEditBlocked,
     this.onSaved,
