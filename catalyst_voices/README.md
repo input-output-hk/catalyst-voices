@@ -11,6 +11,10 @@ This repository contains the Catalyst Voices app and packages.
     * [Packages](#packages)
     * [Flavors](#flavors)
     * [Environment variables](#environment-variables)
+    * [Code Generation](#code-generation)
+      * [Running Code Generation](#running-code-generation)
+      * [GitHub Token / PAT Setup](#github-token--pat-setup)
+      * [Security Notes](#security-notes)
   * [Running Tests](#running-tests)
   * [Common issues](#common-issues)
 
@@ -99,28 +103,39 @@ flutter build web --target apps/voices/lib/configs/main_web.dart --dart-define S
 
 ### Code Generation
 
-In some section of this repo we use code generation for generation:
+This project utilizes automatic code generation for the following components:
 
 * Catalyst Gateway OpenAPI
-* localization files
-* assets files
-* routes files for navigation
+* Localization files
+* Asset files
+* Navigation route files
 
-To generate code run in root directory:
+#### Running Code Generation
 
-```sh
-earthly ./catalyst_voices+code-generator 
-```
+##### Basic Generation
 
-To save generated code locally run in root directory:
+To generate code, run the following command in the root directory:
+`earthly ./catalyst_voices+code-generator`
 
-```sh
-earthly ./catalyst_voices+code-generator --save_locally=true
-```
+##### Local Saving
 
-Keep in mind that You will need GITHUB_TOKEN to be able to run this earthly target.
-In root directory there is a template file `.secret.template` save it as `.secret` and fill in the GITHUB_TOKEN.
-This file should be ignored by git, but make this is the case.
+To save the generated code locally, use the `--save_locally` flag:
+`earthly ./catalyst_voices+code-generator --save_locally=true`
+
+#### GitHub Token / PAT Setup
+
+**Important** A valid `GITHUB_TOKEN`/ `PAT` is required to run the earthly target.
+
+**Token Configuration:**
+
+1. Locate the `.secret.template` file in the root directory
+2. Create a copy of this file and name it `.secret`
+3. Add your `GITHUB_TOKEN` to the `.secret` file
+
+#### Security Notes
+
+* The `.secret` file should be included in `.gitignore`
+* Verify that git does not track the `.secret` file before committing
 
 ## Running Tests
 
