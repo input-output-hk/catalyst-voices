@@ -1,4 +1,4 @@
--- Index of Chain Root For Stake Address. RBAC 509 registrations.
+-- Index of Chain Root For Stake Address (RBAC 509 registrations).
 CREATE TABLE IF NOT EXISTS chain_root_for_stake_addr (
     -- Primary Key Data
     stake_addr          blob,       -- 32 Bytes of Stake Address.

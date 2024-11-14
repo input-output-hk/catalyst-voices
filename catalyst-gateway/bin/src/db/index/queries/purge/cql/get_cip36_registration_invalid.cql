@@ -1,4 +1,4 @@
--- Get all primary keys from CIP-36 invalid registration by Stake Address.
+-- Get all primary keys from CIP-36 Invalid Registration by Stake Address.
 SELECT
     stake_address,
     slot_no,

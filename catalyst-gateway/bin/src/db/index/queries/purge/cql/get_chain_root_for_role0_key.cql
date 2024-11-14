@@ -1,4 +1,4 @@
--- Get all primary keys from Chain Root For Role0 Key. RBAC 509 registrations.
+-- Get all primary keys from Chain Root For Role0 Key (RBAC 509 registrations).
 SELECT
     role0_key,
     slot_no,
