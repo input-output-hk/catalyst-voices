@@ -1002,17 +1002,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get reviewRegistrationTransaction => 'Review registration transaction';
 
   @override
-  String guidance(String guidance) {
-    String _temp0 = intl.Intl.selectLogic(
-      guidance,
-      {
-        'mandatory': 'Mandatory',
-        'education': 'Education',
-        'other': 'Tips',
-      },
-    );
-    return '$_temp0';
-  }
+  String get mandatoryGuidanceType => 'Mandatory';
+
+  @override
+  String get educationGuidanceType => 'Education';
+
+  @override
+  String get tipsGuidanceType => 'Tips';
 
   @override
   String get all => 'All';

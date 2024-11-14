@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class CommentCard extends StatelessWidget {
   final Comment comment;
+
   const CommentCard({
     super.key,
     required this.comment,

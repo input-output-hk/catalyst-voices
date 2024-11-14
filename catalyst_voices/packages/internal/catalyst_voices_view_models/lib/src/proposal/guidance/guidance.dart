@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_view_models/src/proposal/guidance/guidance_type.dart';
 import 'package:equatable/equatable.dart';
 
-final class Guidance extends Equatable {
+final class Guidance extends Equatable implements Comparable<Guidance> {
   final String title;
   final String description;
   final GuidanceType type;
@@ -18,6 +18,18 @@ final class Guidance extends Equatable {
   String get weightText => weight?.toString() ?? '';
 
   @override
+  int compareTo(Guidance other) {
+    final typeComparison = type.priority.compareTo(other.type.priority);
+    if (typeComparison != 0) {
+      return typeComparison;
+    }
+    if (weight == null && other.weight == null) return 0;
+    if (weight == null) return 1;
+    if (other.weight == null) return -1;
+    return weight!.compareTo(other.weight!);
+  }
+
+  @override
   List<Object?> get props => [
         title,
         description,
@@ -27,15 +39,6 @@ final class Guidance extends Equatable {
 
 extension GuidanceExt on List<Guidance> {
   List<Guidance> sortedByWeight() {
-    return [...this]..sort((a, b) {
-        final typeComparison = a.type.priority.compareTo(b.type.priority);
-        if (typeComparison != 0) {
-          return typeComparison;
-        }
-        if (a.weight == null && b.weight == null) return 0;
-        if (a.weight == null) return 1;
-        if (b.weight == null) return -1;
-        return a.weight!.compareTo(b.weight!);
-      });
+    return [...this]..sort();
   }
 }

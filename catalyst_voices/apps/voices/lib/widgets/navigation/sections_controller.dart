@@ -36,13 +36,14 @@ final class SectionsControllerState extends Equatable {
 
   int? get activeSectionId => activeStepId?.sectionId;
   int? get activeStep => activeStepId?.stepId;
-
   List<Guidance>? get activeStepGuidances {
-    if (activeStepId == null ||
-        sections[activeSectionId!].steps[activeStep!].guidances.isEmpty) {
+    final activeStepId = this.activeStepId;
+    if (activeStepId == null) {
       return null;
     } else {
-      return sections[activeSectionId!].steps[activeStep!].guidances;
+      return sections[activeStepId.sectionId]
+          .steps[activeStepId.stepId]
+          .guidances;
     }
   }
 
@@ -84,13 +85,13 @@ final class SectionsControllerState extends Equatable {
     List<Section>? sections,
     Set<int>? openedSections,
     Optional<SectionStepId>? activeStepId,
-    GuidanceType? activeType,
+    Optional<GuidanceType>? activeType,
   }) {
     return SectionsControllerState(
       sections: sections ?? this.sections,
       openedSections: openedSections ?? this.openedSections,
       activeStepId: activeStepId?.dataOr(this.activeStepId),
-      activeType: activeType ?? this.activeType,
+      activeType: activeType?.dataOr(this.activeType),
     );
   }
 
@@ -144,6 +145,11 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
         unawaited(_scrollToSectionStep(newStepId));
       }
     }
+
+    //If user want to expand/hide segment and active step is not in the same section
+    //it will not change the active section.
+    //check if activeStepId is not null because if it is it should select
+    //the first section of this segment id.
     if (value.activeSectionId != id && value.activeStepId != null) {
       activeStepId = Optional.of(value.activeStepId!);
     }
@@ -165,7 +171,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
   }
 
   void setType(GuidanceType? type) {
-    value = value.copyWith(activeType: type);
+    value = value.copyWith(activeType: Optional(type));
   }
 
   @override

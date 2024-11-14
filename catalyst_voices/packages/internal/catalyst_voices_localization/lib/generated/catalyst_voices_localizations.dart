@@ -1912,11 +1912,23 @@ abstract class VoicesLocalizations {
   /// **'Review registration transaction'**
   String get reviewRegistrationTransaction;
 
-  /// Selection depending on guidance type
+  /// Guidance type label for mandatory guidance
   ///
   /// In en, this message translates to:
-  /// **'{guidance, select, mandatory{Mandatory} education{Education} other{Tips}}'**
-  String guidance(String guidance);
+  /// **'Mandatory'**
+  String get mandatoryGuidanceType;
+
+  /// Guidance type label for education guidance
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get educationGuidanceType;
+
+  /// Guidance type label for tips guidance
+  ///
+  /// In en, this message translates to:
+  /// **'Tips'**
+  String get tipsGuidanceType;
 
   /// Primary used to select all object. To display object without any filter
   ///

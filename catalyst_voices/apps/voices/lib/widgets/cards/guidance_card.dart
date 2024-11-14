@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 class GuidanceCard extends StatelessWidget {
   final Guidance guidance;
+
   const GuidanceCard({
     super.key,
     required this.guidance,

@@ -1,7 +1,5 @@
-import 'package:catalyst_voices/common/ext/guidance_ext.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_guidance_view.dart';
 import 'package:catalyst_voices/widgets/cards/comment_card.dart';
-import 'package:catalyst_voices/widgets/cards/guidance_card.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -75,6 +73,7 @@ class WorkspaceSetupPanel extends StatelessWidget {
 
 class SetupSectionListener extends StatelessWidget {
   final SectionsController _controller;
+
   const SetupSectionListener(
     this._controller, {
     super.key,
@@ -85,85 +84,17 @@ class SetupSectionListener extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: _controller,
       builder: (context, value, _) {
-        if (value.activeStepId == null) {
+        final activeStepId = value.activeStepId;
+        final activeStepGuidances = value.activeStepGuidances;
+
+        if (activeStepId == null) {
           return Text(context.l10n.selectASection);
-        } else if (value.activeStepGuidances == null) {
+        } else if (activeStepGuidances == null || activeStepGuidances.isEmpty) {
           return Text(context.l10n.noGuidanceForThisSection);
         } else {
-          return _GuidanceView(value.activeStepGuidances!);
+          return GuidanceView(activeStepGuidances);
         }
       },
-    );
-  }
-}
-
-class _GuidanceView extends StatefulWidget {
-  final List<Guidance> guidances;
-  const _GuidanceView(this.guidances);
-
-  @override
-  State<_GuidanceView> createState() => _GuidanceViewState();
-}
-
-class _GuidanceViewState extends State<_GuidanceView> {
-  late List<Guidance> filteredGuidances;
-
-  GuidanceType? selectedType;
-
-  @override
-  void initState() {
-    super.initState();
-    filteredGuidances = widget.guidances;
-  }
-
-  @override
-  void didUpdateWidget(_GuidanceView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.guidances != widget.guidances) {
-      filteredGuidances = widget.guidances;
-      _filterGuidances(selectedType);
-    }
-  }
-
-  void _filterGuidances(GuidanceType? type) {
-    selectedType = type;
-    setState(() {
-      filteredGuidances = type == null
-          ? widget.guidances
-          : widget.guidances.where((e) => e.type == type).toList();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        VoicesDropdown<GuidanceType?>(
-          items: GuidanceType.values
-              .map(
-                (e) => VoicesDropdownMenuEntry<GuidanceType>(
-                  label: e.localizedType(context.l10n),
-                  value: e,
-                  context: context,
-                ),
-              )
-              .toList(),
-          onChanged: _filterGuidances,
-          value: selectedType,
-        ),
-        if (filteredGuidances.isEmpty)
-          Center(
-            child: Text(context.l10n.noGuidanceOfThisType),
-          ),
-        Column(
-          children: filteredGuidances
-              .sortedByWeight()
-              .toList()
-              .map((e) => GuidanceCard(guidance: e))
-              .toList(),
-        ),
-      ],
     );
   }
 }

@@ -968,14 +968,17 @@
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
   },
-  "guidance": "{guidance, select, mandatory{Mandatory} education{Education} other{Tips}}",
-  "@guidance": {
-    "description": "Selection depending on guidance type",
-    "placeholders": {
-      "guidance": {
-        "type": "String"
-      }
-    }
+  "mandatoryGuidanceType": "Mandatory",
+  "@mandatoryGuidanceType": {
+    "description": "Guidance type label for mandatory guidance"
+  },
+  "educationGuidanceType": "Education",
+  "@educationGuidanceType": {
+    "description": "Guidance type label for education guidance"
+  },
+  "tipsGuidanceType": "Tips",
+  "@tipsGuidanceType": {
+    "description": "Guidance type label for tips guidance"
   },
   "all": "All",
   "@all": {
