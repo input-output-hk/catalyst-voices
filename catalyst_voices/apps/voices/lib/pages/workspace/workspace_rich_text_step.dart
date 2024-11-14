@@ -97,12 +97,6 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
     final sectionsController = SectionsControllerScope.of(context);
     final id = widget.step.sectionStepId;
 
-    if (isEditMode) {
-      sectionsController
-        ..editStep(id, enabled: true)
-        ..selectSectionStep(id);
-    } else {
-      sectionsController.editStep(id, enabled: false);
-    }
+    sectionsController.editStep(id, enabled: isEditMode);
   }
 }

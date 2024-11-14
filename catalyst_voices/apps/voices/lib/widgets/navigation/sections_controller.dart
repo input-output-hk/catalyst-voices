@@ -156,14 +156,19 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     required bool enabled,
   }) {
     final editStepsIds = <SectionStepId>{...value.editStepsIds};
+    Optional<SectionStepId>? activeStepId;
 
     if (enabled) {
       editStepsIds.add(id);
+      activeStepId = Optional.of(id);
     } else {
       editStepsIds.remove(id);
     }
 
-    value = value.copyWith(editStepsIds: editStepsIds);
+    value = value.copyWith(
+      editStepsIds: editStepsIds,
+      activeStepId: activeStepId,
+    );
   }
 
   @override
