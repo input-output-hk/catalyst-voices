@@ -57,7 +57,7 @@ class _VoicesRichTextLimitState extends State<VoicesRichTextLimit> {
             ),
           ),
           Text(
-            _buildText(),
+            _formatText(),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
@@ -65,7 +65,7 @@ class _VoicesRichTextLimitState extends State<VoicesRichTextLimit> {
     );
   }
 
-  String _buildText() {
+  String _formatText() {
     final charsLimit = widget.charsLimit;
     final documentLength = widget.document.length;
     if (charsLimit == null) {
