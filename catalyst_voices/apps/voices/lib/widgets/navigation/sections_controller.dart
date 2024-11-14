@@ -13,21 +13,7 @@ final class SectionsControllerState extends Equatable {
   final SectionStepId? activeStepId;
   final Set<SectionStepId> editStepsIds;
 
-  factory SectionsControllerState({
-    List<Section> sections = const [],
-    Set<int> openedSections = const {},
-    SectionStepId? activeStepId,
-    Set<SectionStepId> editStepsIds = const {},
-  }) {
-    return SectionsControllerState._(
-      sections: sections,
-      openedSections: openedSections,
-      activeStepId: activeStepId,
-      editStepsIds: editStepsIds,
-    );
-  }
-
-  const SectionsControllerState._({
+  const SectionsControllerState({
     this.sections = const [],
     this.openedSections = const {},
     this.activeStepId,
@@ -97,7 +83,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
   ItemScrollController? _itemsScrollController;
 
   SectionsController([
-    super.value = const SectionsControllerState._(),
+    super.value = const SectionsControllerState(),
   ]) : super();
 
   // ignore: use_setters_to_change_properties
