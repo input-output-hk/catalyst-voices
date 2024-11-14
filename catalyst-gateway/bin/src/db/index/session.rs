@@ -76,8 +76,10 @@ impl CassandraSession {
     pub(crate) fn init() {
         let (persistent, volatile) = Settings::cassandra_db_cfg();
 
-        let _join_handle = tokio::task::spawn(async move { retry_init(persistent, true).await });
-        let _join_handle = tokio::task::spawn(async move { retry_init(volatile, false).await });
+        let _join_handle =
+            tokio::task::spawn(async move { Box::pin(retry_init(persistent, true)).await });
+        let _join_handle =
+            tokio::task::spawn(async move { Box::pin(retry_init(volatile, false)).await });
     }
 
     /// Check to see if the Cassandra Indexing DB is ready for use
@@ -323,7 +325,8 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             },
         };
 
-        let purge_queries = match purge::PreparedQueries::new(session.clone(), &cfg).await {
+        let purge_queries = match Box::pin(purge::PreparedQueries::new(session.clone(), &cfg)).await
+        {
             Ok(queries) => Arc::new(queries),
             Err(error) => {
                 error!(
