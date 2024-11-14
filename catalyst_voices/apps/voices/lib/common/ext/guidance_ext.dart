@@ -8,7 +8,7 @@ extension GuidanceExt on GuidanceType {
   }
 
   // TODO(ryszard-schossler): when designers will
-  //provide us with icon, change here accordingly
+  // provide us with icon, change here accordingly
   SvgGenImage get icon {
     return switch (this) {
       GuidanceType.education => VoicesAssets.icons.newspaper,

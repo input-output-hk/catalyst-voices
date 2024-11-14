@@ -11,21 +11,21 @@ const List<Guidance> mockGuidance = [
   Guidance(
     title: 'Use a Compelling Hook or Unique Angle',
     description:
-        'Adding an element of intrigue or a unique approach can make your title stand out. For example, “Revolutionizing Urban Mobility with Eco-Friendly Innovation” not only describes the proposal but also piques curiosity.',
+        '''Adding an element of intrigue or a unique approach can make your title stand out. For example, “Revolutionizing Urban Mobility with Eco-Friendly Innovation” not only describes the proposal but also piques curiosity.''',
     type: GuidanceType.tips,
     weight: 1,
   ),
   Guidance(
     title: 'Be Specific and Solution-Oriented',
     description:
-        'Use keywords that pinpoint the problem you’re solving or the opportunity you’re capitalizing on. A title like “Streamlining Supply Chains for Cost-Effective and Rapid Delivery” instantly tells the reader what the proposal aims to achieve.',
+        '''Use keywords that pinpoint the problem you’re solving or the opportunity you’re capitalizing on. A title like “Streamlining Supply Chains for Cost-Effective and Rapid Delivery” instantly tells the reader what the proposal aims to achieve.''',
     type: GuidanceType.mandatory,
     weight: 2,
   ),
   Guidance(
     title: 'Highlight the Benefit or Outcome',
     description:
-        'Make sure the reader can immediately see the value or the end result of your proposal. A title like “Boosting Engagement and Growth through Targeted Digital Strategies” puts the focus on the positive outcomes.',
+        '''Make sure the reader can immediately see the value or the end result of your proposal. A title like “Boosting Engagement and Growth through Targeted Digital Strategies” puts the focus on the positive outcomes.''',
     type: GuidanceType.mandatory,
     weight: 1,
   ),
