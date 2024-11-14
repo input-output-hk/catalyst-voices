@@ -1,5 +1,6 @@
 //! Queries for purging volatile data.
 
+pub(crate) mod chain_root_for_role0_key;
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod cip36_registration_invalid;
@@ -129,18 +130,18 @@ pub(crate) struct PreparedQueries {
     delete_cip36_registration_for_vote_key: SizedBatch,
     /// RBAC 509 Registrations Primary Key Query.
     select_rbac509_registration: PreparedStatement,
-    /// Chain Root for TX ID Primary Key Query..
-    select_chain_root_for_txn_id: PreparedStatement,
-    /// Chain Root for Role 0 Key Primary Key Query..
-    select_chain_root_for_role0_key: PreparedStatement,
-    /// Chain Root for Stake Address Primary Key Query..
-    select_chain_root_for_stake_address: PreparedStatement,
     /// RBAC 509 Registrations Delete Query.
     delete_rbac509_registration: SizedBatch,
+    /// Chain Root for TX ID Primary Key Query..
+    select_chain_root_for_txn_id: PreparedStatement,
     /// Chain Root for TX ID Delete Query..
     delete_chain_root_for_txn_id: SizedBatch,
+    /// Chain Root for Role 0 Key Primary Key Query..
+    select_chain_root_for_role0_key: PreparedStatement,
     /// Chain Root for Role 0 Key Delete Query..
     delete_chain_root_for_role0_key: SizedBatch,
+    /// Chain Root for Stake Address Primary Key Query..
+    select_chain_root_for_stake_address: PreparedStatement,
     /// Chain Root for Stake Address Delete Query..
     delete_chain_root_for_stake_address: SizedBatch,
 }
@@ -185,6 +186,10 @@ impl PreparedQueries {
             rbac509_registration::PrimaryKeyQuery::prepare(&session).await?;
         let delete_rbac509_registration =
             rbac509_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
+        let select_chain_root_for_role0_key =
+            chain_root_for_role0_key::PrimaryKeyQuery::prepare(&session).await?;
+        let delete_chain_root_for_role0_key =
+            chain_root_for_role0_key::DeleteQuery::prepare_batch(&session, cfg).await?;
 
         todo!("WIP");
     }
