@@ -1,6 +1,3 @@
--- Get all primary keys from Chain Roots for a Role0 Key.
-SELECT
-    role0_key,
-    slot_no,
-    txn
-FROM chain_root_for_role0_key
+-- Get all primary keys from Chain Root For TX ID (RBAC 509 Registrations).
+SELECT transaction_id
+FROM chain_root_for_txn_id

@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS chain_root_for_stake_addr (
     stake_addr          blob,       -- 32 Bytes of Stake Address.
     slot_no             varint,     -- slot number when the key_was_registered.
     txn                 smallint,   -- Index of the TX which holds the registration data.
+
+    -- Non-primary Key Data
     chain_root          blob,       -- 32 Bytes of Chain Root.
 
     PRIMARY KEY (stake_addr, slot_no, txn)

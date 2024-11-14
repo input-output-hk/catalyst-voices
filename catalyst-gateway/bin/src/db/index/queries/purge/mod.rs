@@ -1,6 +1,8 @@
 //! Queries for purging volatile data.
 
 pub(crate) mod chain_root_for_role0_key;
+pub(crate) mod chain_root_for_stake_address;
+pub(crate) mod chain_root_for_txn_id;
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod cip36_registration_invalid;
@@ -27,7 +29,6 @@ const NO_PARAMS: () = ();
 
 /// All prepared DELETE query statements (purge DB table rows).
 #[derive(strum_macros::Display)]
-#[allow(dead_code)]
 pub(crate) enum PreparedDeleteQuery {
     /// TXO Delete query.
     TxoAda,
@@ -59,7 +60,6 @@ pub(crate) enum PreparedDeleteQuery {
 
 /// All prepared SELECT query statements (primary keys from table).
 #[derive(strum_macros::Display)]
-#[allow(dead_code)]
 pub(crate) enum PreparedSelectQuery {
     /// TXO Select query.
     TxoAda,
@@ -148,50 +148,71 @@ pub(crate) struct PreparedQueries {
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
-    #[allow(clippy::todo, unused_variables)]
     pub(crate) async fn new(
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
-        let select_txo_ada = txo_ada::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_txo_ada = txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_txo_assets = txo_assets::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_txo_assets = txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_unstaked_txo_ada = unstaked_txo_ada::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_unstaked_txo_ada =
-            unstaked_txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_unstaked_txo_assets =
-            unstaked_txo_assets::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_unstaked_txo_assets =
-            unstaked_txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_txi_by_hash = txi_by_hash::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_txi_by_hash = txi_by_hash::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_stake_registration =
-            stake_registration::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_stake_registration =
-            stake_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_cip36_registration =
-            cip36_registration::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_cip36_registration =
-            cip36_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_cip36_registration_invalid =
-            cip36_registration_invalid::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_cip36_registration_invalid =
-            cip36_registration_invalid::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_cip36_registration_for_vote_key =
-            cip36_registration_for_vote_key::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_cip36_registration_for_vote_key =
-            cip36_registration_for_vote_key::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_rbac509_registration =
-            rbac509_registration::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_rbac509_registration =
-            rbac509_registration::DeleteQuery::prepare_batch(&session, cfg).await?;
-        let select_chain_root_for_role0_key =
-            chain_root_for_role0_key::PrimaryKeyQuery::prepare(&session).await?;
-        let delete_chain_root_for_role0_key =
-            chain_root_for_role0_key::DeleteQuery::prepare_batch(&session, cfg).await?;
-
-        todo!("WIP");
+        Ok(Self {
+            select_txo_ada: txo_ada::PrimaryKeyQuery::prepare(&session).await?,
+            delete_txo_ada: txo_ada::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_txo_assets: txo_assets::PrimaryKeyQuery::prepare(&session).await?,
+            delete_txo_assets: txo_assets::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_unstaked_txo_ada: unstaked_txo_ada::PrimaryKeyQuery::prepare(&session).await?,
+            delete_unstaked_txo_ada: unstaked_txo_ada::DeleteQuery::prepare_batch(&session, cfg)
+                .await?,
+            select_unstaked_txo_assets: unstaked_txo_assets::PrimaryKeyQuery::prepare(&session)
+                .await?,
+            delete_unstaked_txo_assets: unstaked_txo_assets::DeleteQuery::prepare_batch(
+                &session, cfg,
+            )
+            .await?,
+            select_txi_by_hash: txi_by_hash::PrimaryKeyQuery::prepare(&session).await?,
+            delete_txi_by_hash: txi_by_hash::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_stake_registration: stake_registration::PrimaryKeyQuery::prepare(&session)
+                .await?,
+            delete_stake_registration: stake_registration::DeleteQuery::prepare_batch(
+                &session, cfg,
+            )
+            .await?,
+            select_cip36_registration: cip36_registration::PrimaryKeyQuery::prepare(&session)
+                .await?,
+            delete_cip36_registration: cip36_registration::DeleteQuery::prepare_batch(
+                &session, cfg,
+            )
+            .await?,
+            select_cip36_registration_invalid:
+                cip36_registration_invalid::PrimaryKeyQuery::prepare(&session).await?,
+            delete_cip36_registration_invalid:
+                cip36_registration_invalid::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_cip36_registration_for_vote_key:
+                cip36_registration_for_vote_key::PrimaryKeyQuery::prepare(&session).await?,
+            delete_cip36_registration_for_vote_key:
+                cip36_registration_for_vote_key::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_rbac509_registration: rbac509_registration::PrimaryKeyQuery::prepare(&session)
+                .await?,
+            delete_rbac509_registration: rbac509_registration::DeleteQuery::prepare_batch(
+                &session, cfg,
+            )
+            .await?,
+            select_chain_root_for_role0_key: chain_root_for_role0_key::PrimaryKeyQuery::prepare(
+                &session,
+            )
+            .await?,
+            delete_chain_root_for_role0_key: chain_root_for_role0_key::DeleteQuery::prepare_batch(
+                &session, cfg,
+            )
+            .await?,
+            select_chain_root_for_txn_id: chain_root_for_txn_id::PrimaryKeyQuery::prepare(&session)
+                .await?,
+            delete_chain_root_for_txn_id: chain_root_for_txn_id::DeleteQuery::prepare_batch(
+                &session, cfg,
+            )
+            .await?,
+            select_chain_root_for_stake_address:
+                chain_root_for_stake_address::PrimaryKeyQuery::prepare(&session).await?,
+            delete_chain_root_for_stake_address:
+                chain_root_for_stake_address::DeleteQuery::prepare_batch(&session, cfg).await?,
+        })
     }
 
     /// Prepares a statement.
