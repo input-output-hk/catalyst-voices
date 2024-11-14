@@ -5,8 +5,8 @@ self.onmessage = (event) => {
 };
 
 Promise.all([
-    import('https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module').then(m => m.default),
-    import('https://unpkg.com/@oneidentity/zstd-js@1.0.3/wasm/index.js?module')
+    import('./brotli/index.js').then(m => m.default),
+    import('./zstd/index.js')
 ]).then(async ([brotli, zstd]) => {
     // Initializes the zstd module, must be called before it can be used.
     await zstd.ZstdInit();
