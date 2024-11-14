@@ -11,16 +11,19 @@ final class SectionsControllerState extends Equatable {
   final List<Section> sections;
   final Set<int> openedSections;
   final SectionStepId? activeStepId;
+  final Set<SectionStepId> editStepsIds;
 
   factory SectionsControllerState({
     List<Section> sections = const [],
     Set<int> openedSections = const {},
     SectionStepId? activeStepId,
+    Set<SectionStepId> editStepsIds = const {},
   }) {
     return SectionsControllerState._(
       sections: sections,
       openedSections: openedSections,
       activeStepId: activeStepId,
+      editStepsIds: editStepsIds,
     );
   }
 
@@ -28,6 +31,7 @@ final class SectionsControllerState extends Equatable {
     this.sections = const [],
     this.openedSections = const {},
     this.activeStepId,
+    this.editStepsIds = const {},
   });
 
   int? get activeSectionId => activeStepId?.sectionId;
@@ -70,20 +74,22 @@ final class SectionsControllerState extends Equatable {
     List<Section>? sections,
     Set<int>? openedSections,
     Optional<SectionStepId>? activeStepId,
+    Set<SectionStepId>? editStepsIds,
   }) {
     return SectionsControllerState(
       sections: sections ?? this.sections,
       openedSections: openedSections ?? this.openedSections,
       activeStepId: activeStepId.dataOr(this.activeStepId),
+      editStepsIds: editStepsIds ?? this.editStepsIds,
     );
   }
 
   @override
   List<Object?> get props => [
         sections,
-        listItems,
         openedSections,
         activeStepId,
+        editStepsIds,
       ];
 }
 
@@ -143,6 +149,21 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
 
   void focusSection(int id) {
     unawaited(_scrollToSection(id));
+  }
+
+  void editStep(
+    SectionStepId id, {
+    required bool enabled,
+  }) {
+    final editStepsIds = <SectionStepId>{...value.editStepsIds};
+
+    if (enabled) {
+      editStepsIds.add(id);
+    } else {
+      editStepsIds.remove(id);
+    }
+
+    value = value.copyWith(editStepsIds: editStepsIds);
   }
 
   @override
