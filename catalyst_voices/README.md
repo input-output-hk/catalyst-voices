@@ -11,6 +11,10 @@ This repository contains the Catalyst Voices app and packages.
     * [Packages](#packages)
     * [Flavors](#flavors)
     * [Environment variables](#environment-variables)
+    * [Code Generation](#code-generation)
+      * [Running Code Generation](#running-code-generation)
+      * [GitHub Token / PAT Setup](#github-token--pat-setup)
+      * [Security Notes](#security-notes)
   * [Running Tests](#running-tests)
   * [Common issues](#common-issues)
 
@@ -96,6 +100,42 @@ you can use the following command:
 ```sh
 flutter build web --target apps/voices/lib/configs/main_web.dart --dart-define SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL
 ```
+
+### Code Generation
+
+This project utilizes automatic code generation for the following components:
+
+* Catalyst Gateway OpenAPI
+* Localization files
+* Asset files
+* Navigation route files
+
+#### Running Code Generation
+
+##### Basic Generation
+
+To generate code, run the following command in the root directory:
+`earthly ./catalyst_voices+code-generator`
+
+##### Local Saving
+
+To save the generated code locally, use the `--save_locally` flag:
+`earthly ./catalyst_voices+code-generator --save_locally=true`
+
+#### GitHub Token / PAT Setup
+
+**Important** A valid `GITHUB_TOKEN`/ `PAT` is required to run the earthly target.
+
+**Token Configuration:**
+
+1. Locate the `.secret.template` file in the root directory
+2. Create a copy of this file and name it `.secret`
+3. Add your `GITHUB_TOKEN` to the `.secret` file
+
+#### Security Notes
+
+* The `.secret` file should be included in `.gitignore`
+* Verify that git does not track the `.secret` file before committing
 
 ## Running Tests
 
