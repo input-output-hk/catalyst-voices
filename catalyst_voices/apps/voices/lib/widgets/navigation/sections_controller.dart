@@ -11,16 +11,19 @@ final class SectionsControllerState extends Equatable {
   final List<Section> sections;
   final Set<int> openedSections;
   final SectionStepId? activeStepId;
+  final GuidanceType? activeType;
 
   factory SectionsControllerState({
     List<Section> sections = const [],
     Set<int> openedSections = const {},
     SectionStepId? activeStepId,
+    GuidanceType? activeType,
   }) {
     return SectionsControllerState._(
       sections: sections,
       openedSections: openedSections,
       activeStepId: activeStepId,
+      activeType: activeType,
     );
   }
 
@@ -28,9 +31,19 @@ final class SectionsControllerState extends Equatable {
     this.sections = const [],
     this.openedSections = const {},
     this.activeStepId,
+    this.activeType,
   });
 
   int? get activeSectionId => activeStepId?.sectionId;
+  int? get activeStep => activeStepId?.stepId;
+
+  List<Guidance>? get activeStepGuidances {
+    if (activeStepId == null) {
+      return null;
+    } else {
+      return sections[activeSectionId!].steps[activeStep!].guidances;
+    }
+  }
 
   bool get allSegmentsClosed => openedSections.isEmpty;
 
@@ -70,11 +83,13 @@ final class SectionsControllerState extends Equatable {
     List<Section>? sections,
     Set<int>? openedSections,
     Optional<SectionStepId>? activeStepId,
+    GuidanceType? activeType,
   }) {
     return SectionsControllerState(
       sections: sections ?? this.sections,
       openedSections: openedSections ?? this.openedSections,
-      activeStepId: activeStepId.dataOr(this.activeStepId),
+      activeStepId: activeStepId?.dataOr(this.activeStepId),
+      activeType: activeType ?? this.activeType,
     );
   }
 
@@ -128,6 +143,9 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
         unawaited(_scrollToSectionStep(newStepId));
       }
     }
+    if (value.activeSectionId != id && value.activeStepId != null) {
+      activeStepId = Optional.of(value.activeStepId!);
+    }
 
     value = value.copyWith(
       openedSections: openedSections,
@@ -143,6 +161,10 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
 
   void focusSection(int id) {
     unawaited(_scrollToSection(id));
+  }
+
+  void setType(GuidanceType? type) {
+    value = value.copyWith(activeType: type);
   }
 
   @override

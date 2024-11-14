@@ -1923,6 +1923,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get all;
+
+  /// Message when there is no guidance of this type
+  ///
+  /// In en, this message translates to:
+  /// **'There is no guidance of this type'**
+  String get noGuidanceOfThisType;
+
+  /// Message when there is no section selected
+  ///
+  /// In en, this message translates to:
+  /// **'Select a section'**
+  String get selectASection;
+
+  /// Message when there is no guidance for this section
+  ///
+  /// In en, this message translates to:
+  /// **'There is no guidance for this section'**
+  String get noGuidanceForThisSection;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

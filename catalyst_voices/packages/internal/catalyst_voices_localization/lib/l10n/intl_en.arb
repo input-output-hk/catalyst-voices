@@ -980,5 +980,17 @@
   "all": "All",
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
+  },
+  "noGuidanceOfThisType": "There is no guidance of this type",
+  "@noGuidanceOfThisType": {
+    "description": "Message when there is no guidance of this type"
+  },
+  "selectASection": "Select a section",
+  "@selectASection": {
+    "description": "Message when there is no section selected"
+  },
+  "noGuidanceForThisSection": "There is no guidance for this section",
+  "@noGuidanceForThisSection": {
+    "description": "Message when there is no guidance for this section"
   }
 }

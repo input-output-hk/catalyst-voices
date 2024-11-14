@@ -21,6 +21,7 @@ sealed class WorkspaceSectionStep extends BaseSectionStep {
     required super.sectionId,
     super.isEnabled,
     super.isEditable,
+    super.guidances,
   });
 }
 
@@ -34,6 +35,7 @@ abstract base class RichTextStep extends WorkspaceSectionStep {
     required this.data,
     this.charsLimit,
     super.isEditable,
+    super.guidances,
   });
 
   String localizedDesc(BuildContext context) => localizedName(context);

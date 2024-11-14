@@ -1016,4 +1016,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get all => 'All';
+
+  @override
+  String get noGuidanceOfThisType => 'There is no guidance of this type';
+
+  @override
+  String get selectASection => 'Select a section';
+
+  @override
+  String get noGuidanceForThisSection => 'There is no guidance for this section';
 }
