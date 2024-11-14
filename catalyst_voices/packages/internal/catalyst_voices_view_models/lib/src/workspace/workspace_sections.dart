@@ -18,6 +18,7 @@ sealed class WorkspaceSection extends BaseSection<WorkspaceSectionStep> {
 sealed class WorkspaceSectionStep extends BaseSectionStep {
   const WorkspaceSectionStep({
     required super.id,
+    required super.sectionId,
     super.isEnabled,
     super.isEditable,
   });
@@ -29,6 +30,7 @@ abstract base class RichTextStep extends WorkspaceSectionStep {
 
   const RichTextStep({
     required super.id,
+    required super.sectionId,
     required this.data,
     this.charsLimit,
     super.isEditable,

@@ -14,6 +14,7 @@ sealed class TreasurySection<T extends TreasurySectionStep>
 sealed class TreasurySectionStep extends BaseSectionStep {
   const TreasurySectionStep({
     required super.id,
+    required super.sectionId,
     super.isEnabled,
     super.isEditable,
   });

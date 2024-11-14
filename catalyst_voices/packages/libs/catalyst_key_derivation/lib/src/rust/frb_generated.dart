@@ -3,7 +3,7 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/simple.dart';
+import 'api/key_derivation.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -56,9 +56,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       RustLibWire.fromExternalLibrary;
 
   @override
-  Future<void> executeRustInitializers() async {
-    await api.crateApiSimpleInitApp();
-  }
+  Future<void> executeRustInitializers() async {}
 
   @override
   ExternalLibraryLoaderConfig get defaultExternalLibraryLoaderConfig =>
@@ -68,20 +66,110 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => -1918914929;
+  int get rustContentHash => -1976079523;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
     stem: 'catalyst_key_derivation',
     ioDirectory: 'rust/target/release/',
-    webPrefix: 'pkg/',
+    webPrefix: '/assets/packages/catalyst_key_derivation/assets/js/',
   );
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<String> crateApiSimpleGreet({required String name});
+  U8Array64 crateApiKeyDerivationBip32Ed25519SignatureGetInner(
+      {required Bip32Ed25519Signature that});
 
-  Future<void> crateApiSimpleInitApp();
+  Bip32Ed25519Signature crateApiKeyDerivationBip32Ed25519SignatureNew(
+      {required U8Array64 sigBytes});
+
+  String crateApiKeyDerivationBip32Ed25519SignatureToHex(
+      {required Bip32Ed25519Signature that});
+
+  Future<Bip32Ed25519XPrivateKey>
+      crateApiKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv(
+          {required Bip32Ed25519XPrivateKey that, required String path});
+
+  void crateApiKeyDerivationBip32Ed25519XPrivateKeyDrop(
+      {required Bip32Ed25519XPrivateKey that});
+
+  U8Array32 crateApiKeyDerivationBip32Ed25519XPrivateKeyGetChainCode(
+      {required Bip32Ed25519XPrivateKey that});
+
+  U8Array64 crateApiKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKey(
+      {required Bip32Ed25519XPrivateKey that});
+
+  U8Array96 crateApiKeyDerivationBip32Ed25519XPrivateKeyGetInner(
+      {required Bip32Ed25519XPrivateKey that});
+
+  Bip32Ed25519XPrivateKey crateApiKeyDerivationBip32Ed25519XPrivateKeyNew(
+      {required U8Array96 xprvBytes});
+
+  Future<Bip32Ed25519Signature>
+      crateApiKeyDerivationBip32Ed25519XPrivateKeySignData(
+          {required Bip32Ed25519XPrivateKey that, required List<int> data});
+
+  String crateApiKeyDerivationBip32Ed25519XPrivateKeyToHex(
+      {required Bip32Ed25519XPrivateKey that});
+
+  Future<bool> crateApiKeyDerivationBip32Ed25519XPrivateKeyVerifySignature(
+      {required Bip32Ed25519XPrivateKey that,
+      required List<int> data,
+      required Bip32Ed25519Signature signature});
+
+  Future<Bip32Ed25519XPublicKey>
+      crateApiKeyDerivationBip32Ed25519XPrivateKeyXpublicKey(
+          {required Bip32Ed25519XPrivateKey that});
+
+  U8Array32 crateApiKeyDerivationBip32Ed25519XPublicKeyGetChainCode(
+      {required Bip32Ed25519XPublicKey that});
+
+  U8Array64 crateApiKeyDerivationBip32Ed25519XPublicKeyGetInner(
+      {required Bip32Ed25519XPublicKey that});
+
+  U8Array32 crateApiKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(
+      {required Bip32Ed25519XPublicKey that});
+
+  Bip32Ed25519XPublicKey crateApiKeyDerivationBip32Ed25519XPublicKeyNew(
+      {required U8Array64 xpubBytes});
+
+  String crateApiKeyDerivationBip32Ed25519XPublicKeyToHex(
+      {required Bip32Ed25519XPublicKey that});
+
+  Future<bool> crateApiKeyDerivationBip32Ed25519XPublicKeyVerifySignature(
+      {required Bip32Ed25519XPublicKey that,
+      required List<int> data,
+      required Bip32Ed25519Signature signature});
+
+  Future<Bip32Ed25519XPrivateKey> crateApiKeyDerivationMnemonicToXprv(
+      {required String mnemonic, String? passphrase});
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Bip32Ed25519Signature;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Bip32Ed25519Signature;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Bip32Ed25519XPrivateKey;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKey;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Bip32Ed25519XPublicKey;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKey;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -93,56 +181,706 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<String> crateApiSimpleGreet({required String name}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  U8Array64 crateApiKeyDerivationBip32Ed25519SignatureGetInner(
+      {required Bip32Ed25519Signature that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(name, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 1, port: port_);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519SignatureGetInnerConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519SignatureGetInnerConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519Signature_get_inner",
+            argNames: ["that"],
+          );
+
+  @override
+  Bip32Ed25519Signature crateApiKeyDerivationBip32Ed25519SignatureNew(
+      {required U8Array64 sigBytes}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_64(sigBytes, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519SignatureNewConstMeta,
+      argValues: [sigBytes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationBip32Ed25519SignatureNewConstMeta =>
+      const TaskConstMeta(
+        debugName: "Bip32Ed25519Signature_new",
+        argNames: ["sigBytes"],
+      );
+
+  @override
+  String crateApiKeyDerivationBip32Ed25519SignatureToHex(
+      {required Bip32Ed25519Signature that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleGreetConstMeta,
-      argValues: [name],
+      constMeta: kCrateApiKeyDerivationBip32Ed25519SignatureToHexConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleGreetConstMeta => const TaskConstMeta(
-        debugName: "greet",
-        argNames: ["name"],
+  TaskConstMeta get kCrateApiKeyDerivationBip32Ed25519SignatureToHexConstMeta =>
+      const TaskConstMeta(
+        debugName: "Bip32Ed25519Signature_to_hex",
+        argNames: ["that"],
       );
 
   @override
-  Future<void> crateApiSimpleInitApp() {
+  Future<Bip32Ed25519XPrivateKey>
+      crateApiKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv(
+          {required Bip32Ed25519XPrivateKey that, required String path}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        sse_encode_String(path, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 2, port: port_);
+            funcId: 4, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPrivateKeyDeriveXprvConstMeta,
+      argValues: [that, path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyDeriveXprvConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_derive_xprv",
+            argNames: ["that", "path"],
+          );
+
+  @override
+  void crateApiKeyDerivationBip32Ed25519XPrivateKeyDrop(
+      {required Bip32Ed25519XPrivateKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleInitAppConstMeta,
-      argValues: [],
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPrivateKeyDropConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleInitAppConstMeta => const TaskConstMeta(
-        debugName: "init_app",
-        argNames: [],
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyDropConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_drop",
+            argNames: ["that"],
+          );
+
+  @override
+  U8Array32 crateApiKeyDerivationBip32Ed25519XPrivateKeyGetChainCode(
+      {required Bip32Ed25519XPrivateKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_32,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPrivateKeyGetChainCodeConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyGetChainCodeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_get_chain_code",
+            argNames: ["that"],
+          );
+
+  @override
+  U8Array64 crateApiKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKey(
+      {required Bip32Ed25519XPrivateKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKeyConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKeyConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_get_extended_secret_key",
+            argNames: ["that"],
+          );
+
+  @override
+  U8Array96 crateApiKeyDerivationBip32Ed25519XPrivateKeyGetInner(
+      {required Bip32Ed25519XPrivateKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_96,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPrivateKeyGetInnerConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyGetInnerConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_get_inner",
+            argNames: ["that"],
+          );
+
+  @override
+  Bip32Ed25519XPrivateKey crateApiKeyDerivationBip32Ed25519XPrivateKeyNew(
+      {required U8Array96 xprvBytes}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_96(xprvBytes, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPrivateKeyNewConstMeta,
+      argValues: [xprvBytes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyNewConstMeta =>
+      const TaskConstMeta(
+        debugName: "Bip32Ed25519XPrivateKey_new",
+        argNames: ["xprvBytes"],
       );
+
+  @override
+  Future<Bip32Ed25519Signature>
+      crateApiKeyDerivationBip32Ed25519XPrivateKeySignData(
+          {required Bip32Ed25519XPrivateKey that, required List<int> data}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 10, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPrivateKeySignDataConstMeta,
+      argValues: [that, data],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeySignDataConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_sign_data",
+            argNames: ["that", "data"],
+          );
+
+  @override
+  String crateApiKeyDerivationBip32Ed25519XPrivateKeyToHex(
+      {required Bip32Ed25519XPrivateKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPrivateKeyToHexConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyToHexConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_to_hex",
+            argNames: ["that"],
+          );
+
+  @override
+  Future<bool> crateApiKeyDerivationBip32Ed25519XPrivateKeyVerifySignature(
+      {required Bip32Ed25519XPrivateKey that,
+      required List<int> data,
+      required Bip32Ed25519Signature signature}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+            signature, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 12, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPrivateKeyVerifySignatureConstMeta,
+      argValues: [that, data, signature],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyVerifySignatureConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_verify_signature",
+            argNames: ["that", "data", "signature"],
+          );
+
+  @override
+  Future<Bip32Ed25519XPublicKey>
+      crateApiKeyDerivationBip32Ed25519XPrivateKeyXpublicKey(
+          {required Bip32Ed25519XPrivateKey that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 13, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPrivateKeyXpublicKeyConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPrivateKeyXpublicKeyConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPrivateKey_xpublic_key",
+            argNames: ["that"],
+          );
+
+  @override
+  U8Array32 crateApiKeyDerivationBip32Ed25519XPublicKeyGetChainCode(
+      {required Bip32Ed25519XPublicKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_32,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPublicKeyGetChainCodeConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPublicKeyGetChainCodeConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPublicKey_get_chain_code",
+            argNames: ["that"],
+          );
+
+  @override
+  U8Array64 crateApiKeyDerivationBip32Ed25519XPublicKeyGetInner(
+      {required Bip32Ed25519XPublicKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPublicKeyGetInnerConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPublicKeyGetInnerConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPublicKey_get_inner",
+            argNames: ["that"],
+          );
+
+  @override
+  U8Array32 crateApiKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(
+      {required Bip32Ed25519XPublicKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_32,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPublicKeyGetPublicKeyConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPublicKeyGetPublicKeyConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPublicKey_get_public_key",
+            argNames: ["that"],
+          );
+
+  @override
+  Bip32Ed25519XPublicKey crateApiKeyDerivationBip32Ed25519XPublicKeyNew(
+      {required U8Array64 xpubBytes}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_64(xpubBytes, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPublicKeyNewConstMeta,
+      argValues: [xpubBytes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationBip32Ed25519XPublicKeyNewConstMeta =>
+      const TaskConstMeta(
+        debugName: "Bip32Ed25519XPublicKey_new",
+        argNames: ["xpubBytes"],
+      );
+
+  @override
+  String crateApiKeyDerivationBip32Ed25519XPublicKeyToHex(
+      {required Bip32Ed25519XPublicKey that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationBip32Ed25519XPublicKeyToHexConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPublicKeyToHexConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPublicKey_to_hex",
+            argNames: ["that"],
+          );
+
+  @override
+  Future<bool> crateApiKeyDerivationBip32Ed25519XPublicKeyVerifySignature(
+      {required Bip32Ed25519XPublicKey that,
+      required List<int> data,
+      required Bip32Ed25519Signature signature}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+            that, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+            signature, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 19, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiKeyDerivationBip32Ed25519XPublicKeyVerifySignatureConstMeta,
+      argValues: [that, data, signature],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationBip32Ed25519XPublicKeyVerifySignatureConstMeta =>
+          const TaskConstMeta(
+            debugName: "Bip32Ed25519XPublicKey_verify_signature",
+            argNames: ["that", "data", "signature"],
+          );
+
+  @override
+  Future<Bip32Ed25519XPrivateKey> crateApiKeyDerivationMnemonicToXprv(
+      {required String mnemonic, String? passphrase}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(mnemonic, serializer);
+        sse_encode_opt_String(passphrase, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 20, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationMnemonicToXprvConstMeta,
+      argValues: [mnemonic, passphrase],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationMnemonicToXprvConstMeta =>
+      const TaskConstMeta(
+        debugName: "mnemonic_to_xprv",
+        argNames: ["mnemonic", "passphrase"],
+      );
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Bip32Ed25519Signature => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Bip32Ed25519Signature => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Bip32Ed25519XPrivateKey => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKey => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_Bip32Ed25519XPublicKey => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKey => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey;
+
+  @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AnyhowException(raw as String);
+  }
+
+  @protected
+  Bip32Ed25519Signature
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519SignatureImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalDcoDecode(
+        raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519XPublicKey
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519XPublicKeyImpl.frbInternalDcoDecode(
+        raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalDcoDecode(
+        raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519Signature
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519SignatureImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalDcoDecode(
+        raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519XPublicKey
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519XPublicKeyImpl.frbInternalDcoDecode(
+        raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519Signature
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519SignatureImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalDcoDecode(
+        raw as List<dynamic>);
+  }
+
+  @protected
+  Bip32Ed25519XPublicKey
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Bip32Ed25519XPublicKeyImpl.frbInternalDcoDecode(
+        raw as List<dynamic>);
+  }
 
   @protected
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<int>;
   }
 
   @protected
@@ -152,15 +890,142 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
   int dco_decode_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
   }
 
   @protected
+  U8Array32 dco_decode_u_8_array_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return U8Array32(dco_decode_list_prim_u_8_strict(raw));
+  }
+
+  @protected
+  U8Array64 dco_decode_u_8_array_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return U8Array64(dco_decode_list_prim_u_8_strict(raw));
+  }
+
+  @protected
+  U8Array96 dco_decode_u_8_array_96(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return U8Array96(dco_decode_list_prim_u_8_strict(raw));
+  }
+
+  @protected
   void dco_decode_unit(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return;
+  }
+
+  @protected
+  BigInt dco_decode_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
+  }
+
+  @protected
+  Bip32Ed25519Signature
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519SignatureImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519XPublicKey
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519XPublicKeyImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519Signature
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519SignatureImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519XPublicKey
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519XPublicKeyImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519Signature
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519SignatureImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519XPrivateKey
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519XPrivateKeyImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  Bip32Ed25519XPublicKey
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return Bip32Ed25519XPublicKeyImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
@@ -171,10 +1036,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
   }
 
   @protected
@@ -184,8 +1073,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  U8Array32 sse_decode_u_8_array_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return U8Array32(inner);
+  }
+
+  @protected
+  U8Array64 sse_decode_u_8_array_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return U8Array64(inner);
+  }
+
+  @protected
+  U8Array96 sse_decode_u_8_array_96(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return U8Array96(inner);
+  }
+
+  @protected
   void sse_decode_unit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
   }
 
   @protected
@@ -195,15 +1111,131 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
+  void sse_encode_AnyhowException(
+      AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
+    sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          Bip32Ed25519Signature self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519SignatureImpl).frbInternalSseEncode(move: true),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          Bip32Ed25519XPrivateKey self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519XPrivateKeyImpl).frbInternalSseEncode(move: true),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          Bip32Ed25519XPublicKey self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519XPublicKeyImpl).frbInternalSseEncode(move: true),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          Bip32Ed25519XPrivateKey self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519XPrivateKeyImpl).frbInternalSseEncode(move: false),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          Bip32Ed25519Signature self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519SignatureImpl).frbInternalSseEncode(move: false),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          Bip32Ed25519XPrivateKey self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519XPrivateKeyImpl).frbInternalSseEncode(move: false),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          Bip32Ed25519XPublicKey self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519XPublicKeyImpl).frbInternalSseEncode(move: false),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
+          Bip32Ed25519Signature self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519SignatureImpl).frbInternalSseEncode(move: null),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
+          Bip32Ed25519XPrivateKey self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519XPrivateKeyImpl).frbInternalSseEncode(move: null),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
+          Bip32Ed25519XPublicKey self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as Bip32Ed25519XPublicKeyImpl).frbInternalSseEncode(move: null),
+        serializer);
   }
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_loose(
+      List<int> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer
+        .putUint8List(self is Uint8List ? self : Uint8List.fromList(self));
   }
 
   @protected
@@ -215,9 +1247,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
+  }
+
+  @protected
+  void sse_encode_u_8_array_32(U8Array32 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.inner, serializer);
+  }
+
+  @protected
+  void sse_encode_u_8_array_64(U8Array64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.inner, serializer);
+  }
+
+  @protected
+  void sse_encode_u_8_array_96(U8Array96 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.inner, serializer);
   }
 
   @protected
@@ -226,14 +1286,260 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
   }
+}
 
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
-  }
+@sealed
+class Bip32Ed25519SignatureImpl extends RustOpaque
+    implements Bip32Ed25519Signature {
+  // Not to be used by end users
+  Bip32Ed25519SignatureImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  Bip32Ed25519SignatureImpl.frbInternalSseDecode(
+      BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount: RustLib
+        .instance.api.rust_arc_increment_strong_count_Bip32Ed25519Signature,
+    rustArcDecrementStrongCount: RustLib
+        .instance.api.rust_arc_decrement_strong_count_Bip32Ed25519Signature,
+    rustArcDecrementStrongCountPtr: RustLib
+        .instance.api.rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr,
+  );
+
+  /// Get the inner bytes.
+  U8Array64 get inner =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519SignatureGetInner(
+        that: this,
+      );
+
+  /// Convert to a hex string.
+  String toHex() =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519SignatureToHex(
+        that: this,
+      );
+}
+
+@sealed
+class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
+    implements Bip32Ed25519XPrivateKey {
+  // Not to be used by end users
+  Bip32Ed25519XPrivateKeyImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  Bip32Ed25519XPrivateKeyImpl.frbInternalSseDecode(
+      BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount: RustLib
+        .instance.api.rust_arc_increment_strong_count_Bip32Ed25519XPrivateKey,
+    rustArcDecrementStrongCount: RustLib
+        .instance.api.rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKey,
+    rustArcDecrementStrongCountPtr: RustLib.instance.api
+        .rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr,
+  );
+
+  /// Derive a new extended private key from the given extended private key.
+  /// - V2 derivation scheme is used as it is mention in [SLIP-0023](https://github.com/satoshilabs/slips/blob/master/slip-0023.md).
+  /// - More information about child key derivation can be found in [BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf).
+  ///
+  /// # Arguments
+  ///
+  /// - `xprv_bytes`: An extended private key bytes of type `Bip32Ed25519XPrivateKey`.
+  /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
+  ///
+  /// # Returns
+  ///
+  /// Returns a bytes of extended private key as a `Result`.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the derivation path is invalid.
+  Future<Bip32Ed25519XPrivateKey> deriveXprv({required String path}) =>
+      RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv(
+              that: this, path: path);
+
+  /// Drop the extended private key.
+  void drop() =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeyDrop(
+        that: this,
+      );
+
+  /// Extract the chain code from the extended private key.
+  /// The chain code is the last 32 bytes of the extended private key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 32 length bytes representing the chain code.
+  U8Array32 get chainCode => RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPrivateKeyGetChainCode(
+        that: this,
+      );
+
+  /// Extract the extended secret key from the extended private key.
+  /// The extended secret key is the first 64 bytes of the extended private key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 64 length bytes representing the extended secret key.
+  U8Array64 get extendedSecretKey => RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKey(
+        that: this,
+      );
+
+  /// Get the inner bytes.
+  U8Array96 get inner =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeyGetInner(
+        that: this,
+      );
+
+  /// Sign the given data with the given extended private key.
+  ///
+  /// # Arguments
+  ///
+  /// - `data`: The data to sign.
+  ///
+  /// # Returns
+  /// Returns a 64 length bytes `Bip32Ed25519Signature` representing the signature.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended private key is invalid.
+  Future<Bip32Ed25519Signature> signData({required List<int> data}) =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeySignData(
+          that: this, data: data);
+
+  /// Convert to a hex string.
+  String toHex() =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeyToHex(
+        that: this,
+      );
+
+  /// Verify the signature on the given data using extended private key.
+  ///
+  /// # Arguments
+  ///
+  /// - `data`: The data to sign.
+  /// - `signature`: The signature to check.
+  ///
+  /// # Returns
+  /// Returns a boolean value indicating if the signature match the sign data
+  /// True if the signature is valid and match the sign data, false otherwise.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended private key or signature is invalid.
+  Future<bool> verifySignature(
+          {required List<int> data,
+          required Bip32Ed25519Signature signature}) =>
+      RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPrivateKeyVerifySignature(
+              that: this, data: data, signature: signature);
+
+  /// Get extended public key from the given extended private key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 64 length bytes `Bip32Ed25519XPublicKey` representing the extended
+  /// public key.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended private key is invalid.
+  Future<Bip32Ed25519XPublicKey> xpublicKey() => RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPrivateKeyXpublicKey(
+        that: this,
+      );
+}
+
+@sealed
+class Bip32Ed25519XPublicKeyImpl extends RustOpaque
+    implements Bip32Ed25519XPublicKey {
+  // Not to be used by end users
+  Bip32Ed25519XPublicKeyImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  Bip32Ed25519XPublicKeyImpl.frbInternalSseDecode(
+      BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount: RustLib
+        .instance.api.rust_arc_increment_strong_count_Bip32Ed25519XPublicKey,
+    rustArcDecrementStrongCount: RustLib
+        .instance.api.rust_arc_decrement_strong_count_Bip32Ed25519XPublicKey,
+    rustArcDecrementStrongCountPtr: RustLib
+        .instance.api.rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr,
+  );
+
+  /// Extract the chain code from the extended public key.
+  /// The chain code is the last 32 bytes of the extended public key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 32 length bytes representing the chain code.
+  U8Array32 get chainCode => RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPublicKeyGetChainCode(
+        that: this,
+      );
+
+  /// Get the inner bytes.
+  U8Array64 get inner =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPublicKeyGetInner(
+        that: this,
+      );
+
+  /// Extract the public key from the extended public key.
+  /// The public key is the first 32 bytes of the extended public key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 32 length bytes representing the public key.
+  U8Array32 get publicKey => RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(
+        that: this,
+      );
+
+  /// Convert to a hex string.
+  String toHex() =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPublicKeyToHex(
+        that: this,
+      );
+
+  /// Verify the signature on the given data using extended public key.
+  ///
+  /// # Arguments
+  ///
+  /// - `data`: The data to sign.
+  /// - `signature`: The signature to check.
+  ///
+  /// # Returns
+  /// Returns a boolean value indicating if the signature match the sign data
+  /// True if the signature is valid and match the sign data, false otherwise.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended public key or signature is invalid.
+  Future<bool> verifySignature(
+          {required List<int> data,
+          required Bip32Ed25519Signature signature}) =>
+      RustLib.instance.api
+          .crateApiKeyDerivationBip32Ed25519XPublicKeyVerifySignature(
+              that: this, data: data, signature: signature);
 }

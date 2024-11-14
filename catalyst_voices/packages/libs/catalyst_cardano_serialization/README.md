@@ -46,6 +46,7 @@ The caller must prove that they are eligible to spend the input UTXOs.
 
 ```dart
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 

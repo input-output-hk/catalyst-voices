@@ -28,3 +28,6 @@ migrate_working_dir/
 .dart_tool/
 build/
 /web/pkg
+
+# Ignore all auto generated file for rust
+rust/src/frb_generated.rs

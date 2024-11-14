@@ -78,12 +78,17 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
   required Set<TransactionUnspentOutput> utxos,
   required ShelleyAddress rewardAddress,
 }) async {
-  final seed = List.generate(
-    Ed25519PrivateKey.length,
-    (i) => Random().nextInt(256),
-  );
+  const mnemonic = 'minute cause soda tilt taste cabin'
+      ' father body mixture box gym awkward';
 
-  final keyPair = await Ed25519KeyPair.fromSeed(seed);
+  const keyDerivation = CatalystKeyDerivation();
+  final privateKey = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
+  final publicKey = await privateKey.derivePublicKey();
+
+  final keyPair = Bip32Ed25519XKeyPair(
+    publicKey: publicKey,
+    privateKey: privateKey,
+  );
 
   final cert = await generateX509Certificate(
     keyPair: keyPair,
@@ -188,7 +193,7 @@ Transaction _buildUnsignedRbacTx({
 }
 
 Future<X509Certificate> generateX509Certificate({
-  required Ed25519KeyPair keyPair,
+  required Bip32Ed25519XKeyPair keyPair,
   required ShelleyAddress stakeAddress,
 }) async {
   const maxInt = 4294967296;
@@ -224,6 +229,6 @@ Future<X509Certificate> generateX509Certificate({
 
   return X509Certificate.generateSelfSigned(
     tbsCertificate: tbs,
-    keyPair: keyPair,
+    privateKey: keyPair.privateKey,
   );
 }
