@@ -3,7 +3,7 @@ VERSION 0.8
 IMPORT ../../.. AS catalyst-voices
 
 integration-test-web:
-    FROM catalyst-voices+builder
+    FROM catalyst-voices+code-generator
     ARG TARGETARCH
     ARG browser
     LET driver_port = 4444
