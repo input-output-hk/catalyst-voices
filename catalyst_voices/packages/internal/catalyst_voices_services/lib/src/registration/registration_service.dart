@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -42,10 +43,9 @@ abstract interface class RegistrationService {
   /// Afterwards the user must grant a permission inside the wallet extension.
   Future<WalletInfo> getCardanoWalletInfo(CardanoWallet wallet);
 
-  /// See [KeyDerivation.deriveAccountRoleKeyPair].
-  Future<Ed25519KeyPair> deriveAccountRoleKeyPair({
+  /// See [KeyDerivation.deriveMasterKey].
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
-    required Set<AccountRole> roles,
   });
 
   /// Loads account related to this [seedPhrase]. Throws exception if non found.
@@ -66,7 +66,7 @@ abstract interface class RegistrationService {
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
-    required Ed25519KeyPair keyPair,
+    required Bip32Ed25519XPrivateKey masterKey,
     required Set<AccountRole> roles,
   });
 
@@ -84,7 +84,7 @@ abstract interface class RegistrationService {
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
     required LockFactor lockFactor,
-    required Ed25519KeyPair keyPair,
+    required Bip32Ed25519XPrivateKey masterKey,
   });
 
   Future<Account> registerTestAccount({
@@ -127,15 +127,10 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
-  Future<Ed25519KeyPair> deriveAccountRoleKeyPair({
+  Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
     required SeedPhrase seedPhrase,
-    required Set<AccountRole> roles,
   }) {
-    return _keyDerivation.deriveAccountRoleKeyPair(
-      seedPhrase: seedPhrase,
-      // TODO(dtscalac): Only one roles is supported atm.
-      role: AccountRole.root,
-    );
+    return _keyDerivation.deriveMasterKey(seedPhrase: seedPhrase);
   }
 
   // TODO(damian-molinski): to be implemented
@@ -153,6 +148,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       throw const RegistrationUnknownException();
     }
 
+    // TODO(dtscalac): support more roles when backend is ready
     final roles = {AccountRole.root};
     final keychainId = const Uuid().v4();
 
@@ -175,16 +171,12 @@ final class RegistrationServiceImpl implements RegistrationService {
     required LockFactor lockFactor,
   }) async {
     final keychainId = account.keychainId;
-
-    final keyPair = await deriveAccountRoleKeyPair(
-      seedPhrase: seedPhrase,
-      roles: account.roles,
-    );
+    final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
 
     final keychain = await _keychainProvider.create(keychainId);
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(keyPair.privateKey);
+    await keychain.setMasterKey(masterKey);
 
     return keychain;
   }
@@ -193,7 +185,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
-    required Ed25519KeyPair keyPair,
+    required Bip32Ed25519XPrivateKey masterKey,
     required Set<AccountRole> roles,
   }) async {
     try {
@@ -206,6 +198,12 @@ final class RegistrationServiceImpl implements RegistrationService {
         amount: Balance(
           coin: CardanoWalletDetails.minAdaForRegistration,
         ),
+      );
+
+      final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        // TODO(dtscalac): support more roles when backend is ready
+        role: AccountRole.root,
       );
 
       final registrationBuilder = RegistrationTransactionBuilder(
@@ -232,7 +230,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
     required LockFactor lockFactor,
-    required Ed25519KeyPair keyPair,
+    required Bip32Ed25519XPrivateKey masterKey,
   }) async {
     try {
       final enabledWallet = await wallet.enable();
@@ -253,7 +251,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       final keychain = await _keychainProvider.create(keychainId);
       await keychain.setLock(lockFactor);
       await keychain.unlock(lockFactor);
-      await keychain.setMasterKey(keyPair.privateKey);
+      await keychain.setMasterKey(masterKey);
 
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
@@ -281,16 +279,12 @@ final class RegistrationServiceImpl implements RegistrationService {
     required LockFactor lockFactor,
   }) async {
     final roles = {AccountRole.root};
-    // TODO(dtscalac): Update key value when derivation is final.
-    final keyPair = await deriveAccountRoleKeyPair(
-      seedPhrase: seedPhrase,
-      roles: roles,
-    );
+    final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
 
     final keychain = await _keychainProvider.create(keychainId);
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(keyPair.privateKey);
+    await keychain.setMasterKey(masterKey);
 
     return Account(
       keychainId: keychainId,

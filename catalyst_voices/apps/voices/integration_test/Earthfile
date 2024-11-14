@@ -3,7 +3,7 @@ VERSION 0.8
 IMPORT ../../.. AS catalyst-voices
 
 integration-test-web:
-    FROM catalyst-voices+build-web
+    FROM catalyst-voices+builder
     ARG TARGETARCH
     ARG browser
     LET driver_port = 4444
@@ -21,6 +21,9 @@ integration-test-web:
     # IF [ $browser = "edge" && $TARGETARCH = "amd64" ]]
     #    LET driver = "msedgedriver"
     # END
+    
+    WORKDIR /frontend/apps/voices
+
     RUN ($driver --port=$driver_port > $driver.log &) && \
         sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
@@ -35,6 +38,7 @@ integration-test-web:
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
+
     IF [ -f fail ]
         RUN --no-cache echo ""$browser" integration test failed" && \
             echo "Printing "$driver" logs..." && \

@@ -13,6 +13,7 @@ dependencies:
   catalyst_cardano: ^0.3.0
   catalyst_cardano_serialization: ^0.4.0
   catalyst_cardano_web: ^0.3.0
+  catalyst_key_derivation: ^0.1.0
   catalyst_voices_assets:
     path: ../../packages/internal/catalyst_voices_assets
   catalyst_voices_blocs:
@@ -54,6 +55,7 @@ dependencies:
   google_fonts: ^6.2.1
   intl: ^0.19.0
   result_type: ^0.2.0
+  scrollable_positioned_list: ^0.3.8
   sentry_flutter: ^8.8.0
   url_launcher: ^6.2.2
   url_strategy: ^0.3.0
