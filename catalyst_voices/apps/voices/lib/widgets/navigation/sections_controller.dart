@@ -38,7 +38,8 @@ final class SectionsControllerState extends Equatable {
   int? get activeStep => activeStepId?.stepId;
 
   List<Guidance>? get activeStepGuidances {
-    if (activeStepId == null) {
+    if (activeStepId == null ||
+        sections[activeSectionId!].steps[activeStep!].guidances.isEmpty) {
       return null;
     } else {
       return sections[activeSectionId!].steps[activeStep!].guidances;
