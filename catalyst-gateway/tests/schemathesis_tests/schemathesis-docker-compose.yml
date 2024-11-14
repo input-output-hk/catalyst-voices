@@ -1,6 +1,58 @@
 version: "3"
-name: myproject 
+name: myproject
 services:
+  scylla-node1:
+    container_name: scylla-node1
+    image: scylladb/scylla:latest
+    restart: unless-stopped
+    command: --seeds=scylla-node1 --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+    ports:
+      - "9042:9042"
+    volumes:
+      - "/var/lib/scylla/1:/var/lib/scylla"
+      - "./node1-scylla.yaml:/etc/scylla/scylla.yaml"
+    networks:
+      cluster:
+
+  scylla-node2:
+    container_name: scylla-node2
+    image: scylladb/scylla:latest
+    restart: unless-stopped
+    command: --seeds=scylla-node1 --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+    ports:
+      - "9043:9043"
+    volumes:
+      - "/var/lib/scylla/2:/var/lib/scylla"
+      - "./node2-scylla.yaml:/etc/scylla/scylla.yaml"
+    networks:
+      cluster:
+
+  scylla-node3:
+    container_name: scylla-node3
+    image: scylladb/scylla:latest
+    restart: unless-stopped
+    command: --seeds=scylla-node1 --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+    ports:
+      - "9044:9044"
+    volumes:
+      - "/var/lib/scylla/3:/var/lib/scylla"
+      - "./node3-scylla.yaml:/etc/scylla/scylla.yaml"
+    networks:
+      cluster:
+
+  scylla-node4:
+    container_name: scylla-node4
+    image: scylladb/scylla:latest
+    restart: unless-stopped
+    command: --seeds=scylla-node1 --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+    ports:
+      - "9045:9045"
+    volumes:
+      - "/var/lib/scylla/4:/var/lib/scylla"
+      - "./node4-scylla.yaml:/etc/scylla/scylla.yaml"
+    networks:
+      cluster:
+
   event-db:
     image: event-db:latest
     environment:
@@ -34,8 +86,15 @@ services:
       - DATA_REFRESH_TICK=5
       - CHECK_CONFIG_TICK=5
       - MACHINE_ID="UID"
+      - CHAIN_FOLLOWER_SYNC_TASKS="16"
+      - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+      - CHAIN_NETWORK="Preprod"
     ports:
       - 3030:3030
     depends_on:
       event-db:
         condition: service_healthy
+
+networks:
+  cluster:
+    driver: bridge

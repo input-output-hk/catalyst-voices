@@ -29,25 +29,48 @@ package-schemathesis:
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
 # Disabled in CI, to enable it rename to `test-fuzzer-api`.
 fuzzer-api:
-    FROM earthly/dind:alpine-alpine-3.20-docker-26.1.5-r0
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
-    RUN apk add yq zstd
+    RUN apk add yq zstd curl
     COPY schemathesis-docker-compose.yml .
+    COPY node1-scylla.yaml .
+    COPY node2-scylla.yaml .
+    COPY node3-scylla.yaml .
+    COPY node4-scylla.yaml .
+    ENV HOST_IP
+    RUN export HOST_IP="$(ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}')"
     LET OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
+    ENV LOG_LEVEL=error
+    ENV DATA_REFRESH_TICK=5
+    ENV CHECK_CONFIG_TICK=5
+    ENV MACHINE_ID="UID"
+    ENV CHAIN_FOLLOWER_SYNC_TASKS="16"
+    ENV RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+    ENV CHAIN_NETWORK="Preprod"
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
-        --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway) \
-        --service event-db \
-        --service cat-gateway \
+        #--load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
+        #--load event-db:latest=(../../event-db+build) \
+        --load cat-gateway:latest=(../../+package) \
+        #--service event-db \
+        --service scylla-node1 \
+        --service scylla-node2 \
+        --service scylla-node3 \
+        --service scylla-node4 \
+        #--service cat-gateway \
         --allow-privileged
 
-        RUN docker run --net=host --name=st schemathesis:latest && \
-            docker cp st:/results/junit-report.xml junit-report.xml && \
-            docker cp st:/results/cassette.yaml cassette.yaml
+        RUN docker run --net=default_cluster \
+            -e LOG_LEVEL \
+            -e DATA_REFRESH_TICK \
+            -e CHECK_CONFIG_TICK \
+            -e MACHINE_ID \
+            -e CHAIN_FOLLOWER_SYNC_TASKS \
+            -e RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
+            -e CHAIN_NETWORK="Preprod" \
+            cat-gateway:latest
     END
-    WAIT
-        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
-        SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
-    END
+   # WAIT
+   #     SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
+ #       SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+  #  END
