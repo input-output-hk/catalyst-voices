@@ -136,18 +136,8 @@
   "@snackbarErrorMessageText": {
     "description": "Text shown in the Snackbar widget when the message is an error message."
   },
-  "snackbarRefreshButtonText": "Refresh",
-  "@snackbarRefreshButtonText": {
-    "description": "Text shown in the Snackbar widget for the refresh button."
-  },
-  "snackbarMoreButtonText": "Learn more",
-  "@snackbarMoreButtonText": {
-    "description": "Text shown in the Snackbar widget for the more button."
-  },
-  "snackbarOkButtonText": "Ok",
-  "@snackbarOkButtonText": {
-    "description": "Text shown in the Snackbar widget for the ok button."
-  },
+  "refresh": "Refresh",
+  "ok": "Ok",
   "seedPhraseSlotNr": "Slot {nr}",
   "@seedPhraseSlotNr": {
     "description": "When user arranges seed phrases this text is shown when phrase was not selected",
@@ -967,5 +957,6 @@
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
-  }
+  },
+  "saveBeforeEditingErrorText": "Please save before editing something else"
 }
