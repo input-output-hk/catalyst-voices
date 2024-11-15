@@ -68,9 +68,6 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.inputFormatters]
   final List<TextInputFormatter>? inputFormatters;
 
-  /// Optional suffix icon to be displayed at the end of the text field.
-  final bool showSuffix;
-
   /// [AutovalidateMode]
   final AutovalidateMode? autovalidateMode;
 
@@ -97,7 +94,6 @@ class VoicesTextField extends StatefulWidget {
     required this.onFieldSubmitted,
     this.onSaved,
     this.inputFormatters,
-    this.showSuffix = true,
     this.autovalidateMode,
   });
 
@@ -339,7 +335,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
 
   Widget? _getStatusSuffixWidget() {
     final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
-    if (!showStatusIcon || !widget.showSuffix) {
+    if (!showStatusIcon) {
       return null;
     }
 

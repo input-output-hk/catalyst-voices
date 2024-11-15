@@ -2,45 +2,64 @@ import 'dart:async';
 
 import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
 import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
+import 'package:catalyst_voices/widgets/text_field/date_picker/date_picker_controller.dart';
+import 'package:catalyst_voices/widgets/text_field/date_picker/voices_date_picker_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class DiscoveryPage extends StatelessWidget {
+class DiscoveryPage extends StatefulWidget {
   const DiscoveryPage({
     super.key,
   });
 
   @override
+  State<DiscoveryPage> createState() => _DiscoveryPageState();
+}
+
+class _DiscoveryPageState extends State<DiscoveryPage> {
+  final _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        const SliverToBoxAdapter(child: _SpacesNavigationLocation()),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 32)
-              .add(const EdgeInsets.only(bottom: 32)),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                const _Segment(key: ValueKey('Segment1Key')),
-                const SizedBox(height: 24),
-                const _Segment(key: ValueKey('Segment2Key')),
-                const SizedBox(height: 24),
-                const _Segment(key: ValueKey('Segment3Key')),
+    return ScrollControllerProvider(
+      scrollController: _scrollController,
+      child: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          const SliverToBoxAdapter(child: _SpacesNavigationLocation()),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 32)
+                .add(const EdgeInsets.only(bottom: 32)),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  const _Segment(key: ValueKey('Segment1Key')),
+                  const SizedBox(height: 24),
+                  const _Segment(key: ValueKey('Segment2Key')),
+                  const SizedBox(height: 24),
+                  const _Segment(key: ValueKey('Segment3Key')),
+                ],
+              ),
+            ),
+          ),
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                Spacer(),
+                StandardLinksPageFooter(),
               ],
             ),
           ),
-        ),
-        const SliverFillRemaining(
-          hasScrollBody: false,
-          child: Column(
-            children: [
-              Spacer(),
-              StandardLinksPageFooter(),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -80,6 +99,9 @@ class _Segment extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            VoicesDatePicker(
+              controller: DatePickerController(),
+            ),
             const CurrentUserStatusText(),
             const SizedBox(height: 8),
             const ToggleStateText(),

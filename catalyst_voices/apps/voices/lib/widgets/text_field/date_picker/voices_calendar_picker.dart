@@ -16,12 +16,13 @@ class VoicesCalendarDatePicker extends StatelessWidget {
     DateTime? lastDate,
   }) {
     final now = DateTime.now();
+    final maxDate = DateTime(now.year + 1, now.month, now.day);
     return VoicesCalendarDatePicker._(
       key: key,
       onDateSelected: onDateSelected,
       initialDate: initialDate ?? now,
       firstDate: firstDate ?? now,
-      lastDate: lastDate ?? now,
+      lastDate: lastDate ?? maxDate,
       cancelEvent: cancelEvent,
     );
   }
@@ -42,6 +43,7 @@ class VoicesCalendarDatePicker extends StatelessWidget {
       width: 450,
       child: Material(
         clipBehavior: Clip.hardEdge,
+        color: Colors.transparent,
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
@@ -50,9 +52,9 @@ class VoicesCalendarDatePicker extends StatelessWidget {
           child: Column(
             children: [
               CalendarDatePicker(
-                initialDate: DateTime.now(),
-                firstDate: DateTime.now(),
-                lastDate: DateTime.now().add(const Duration(days: 3650)),
+                initialDate: initialDate,
+                firstDate: firstDate,
+                lastDate: lastDate,
                 onDateChanged: (val) {
                   selectedDate = val;
                 },

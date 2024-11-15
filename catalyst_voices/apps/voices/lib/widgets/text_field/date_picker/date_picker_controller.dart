@@ -1,13 +1,14 @@
-import 'dart:developer';
-
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 final class DatePickerControllerState extends Equatable {
   final DateTime? selectedDate;
   final String? selectedTime;
+
+  bool get isValid => selectedDate != null && selectedTime != null;
 
   factory DatePickerControllerState({
     DateTime? selectedDate,
@@ -54,16 +55,14 @@ final class DatePickerController
 
   void _onCalendarPickerControllerChanged() {
     if (calendarPickerController.isValid) {
-      log(timePickerController.text);
       value = value.copyWith(
-        selectedDate: Optional(calendarPickerController.selectedDate),
+        selectedDate: Optional(calendarPickerController.selectedValue),
       );
     }
   }
 
   void _onTimePickerControllerChanged() {
     if (timePickerController.isValid) {
-      log(timePickerController.text);
       value = value.copyWith(
         selectedTime: Optional(timePickerController.text),
       );
@@ -80,29 +79,136 @@ final class DatePickerController
   }
 }
 
-abstract class FieldDatePickerController extends TextEditingController {
-  VoicesTextFieldValidationResult validate(String? value);
+sealed class FieldDatePickerController<T> extends TextEditingController {
+  abstract final String pattern;
 
   bool get isValid => validate(text).status == VoicesTextFieldStatus.success;
+  T get selectedValue;
+
+  VoicesTextFieldValidationResult validate(String? value);
+
+  void setValue(T newValue);
 }
 
-class CalendarPickerController extends FieldDatePickerController {
-  DateTime? get selectedDate => DateTime.tryParse(text);
+final class CalendarPickerController
+    extends FieldDatePickerController<DateTime?> {
+  @override
+  DateTime? get selectedValue {
+    if (text.isEmpty) return null;
+
+    final parts = text.split('/');
+    if (parts.length != 3) return null;
+
+    try {
+      final day = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final year = int.parse(parts[2]);
+
+      if (month < 1 || month > 12) return null;
+      if (day < 1 || day > 31) return null;
+      if (year < 1900 || year > 2100) return null;
+
+      return DateTime(year, month, day);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  String get pattern => 'DD/MM/YYYY';
 
   @override
   VoicesTextFieldValidationResult validate(String? value) {
+    final today = DateTime.now();
+    final maxDate = DateTime(today.year + 1, today.month, today.day);
+    final notValidFormat = VoicesTextFieldValidationResult(
+      status: VoicesTextFieldStatus.error,
+      errorMessage: 'Format: "$pattern"',
+    );
+
+    if (value == null || value == '') {
+      return const VoicesTextFieldValidationResult(
+        status: VoicesTextFieldStatus.success,
+      );
+    }
+
+    if (value.length != 10) return notValidFormat;
+
+    final dateRegex = RegExp(r'^(\d{2})/(\d{2})/(\d{4})$');
+    if (!dateRegex.hasMatch(value)) return notValidFormat;
+
+    final parts = value.split('/');
+    final day = int.parse(parts[0]);
+    final month = int.parse(parts[1]);
+    final year = int.parse(parts[2]);
+
+    if (month < 1 || month > 12) return notValidFormat;
+    if (day < 1 || day > 31) return notValidFormat;
+
+    final inputDate = DateTime(year, month, day);
+
+    if (inputDate.isBefore(today.subtract(const Duration(days: 1))) ||
+        inputDate.isAfter(maxDate)) {
+      return VoicesTextFieldValidationResult(
+        status: VoicesTextFieldStatus.error,
+        errorMessage:
+            'Date must be between ${today.day}/${today.month}/${today.year} and ${maxDate.day}/${maxDate.month}/${maxDate.year}',
+      );
+    }
+
+    // Check days in month
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    if (day > daysInMonth) {
+      return VoicesTextFieldValidationResult(
+        status: VoicesTextFieldStatus.error,
+        errorMessage: 'Day must be between 1 and $daysInMonth',
+      );
+    }
+
     return const VoicesTextFieldValidationResult(
       status: VoicesTextFieldStatus.success,
     );
   }
+
+  @override
+  void setValue(DateTime? newValue) {
+    if (newValue == null) return;
+    final newT = newValue;
+    final formatter = DateFormat('dd/MM/yyyy');
+    value = TextEditingValue(text: formatter.format(newT));
+  }
 }
 
-class TimePickerController extends FieldDatePickerController {
+final class TimePickerController extends FieldDatePickerController<String?> {
+  @override
+  String get pattern => 'HH:MM';
+
+  @override
+  String? get selectedValue => text;
+
   @override
   VoicesTextFieldValidationResult validate(String? value) {
+    if (value == null || value == '') {
+      return const VoicesTextFieldValidationResult(
+        status: VoicesTextFieldStatus.success,
+      );
+    }
+    final pattern = RegExp(r'^(0?[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$');
+    if (!pattern.hasMatch(value)) {
+      return const VoicesTextFieldValidationResult(
+        status: VoicesTextFieldStatus.error,
+        errorMessage: 'Format: "00:00"',
+      );
+    }
+
     return const VoicesTextFieldValidationResult(
       status: VoicesTextFieldStatus.success,
     );
+  }
+
+  @override
+  void setValue(String? newValue) {
+    value = TextEditingValue(text: newValue.toString());
   }
 }
 

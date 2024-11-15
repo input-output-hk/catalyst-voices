@@ -1,13 +1,19 @@
 part of 'voices_date_picker_field.dart';
 
 class VoicesTimePicker extends StatelessWidget {
-  const VoicesTimePicker({super.key});
+  final ValueChanged<String> onTap;
+  const VoicesTimePicker({
+    super.key,
+    required this.onTap,
+  });
 
   List<String> get timeList => _generateTimeList();
 
   @override
   Widget build(BuildContext context) {
     return Material(
+      clipBehavior: Clip.hardEdge,
+      color: Colors.transparent,
       child: Container(
         height: 300,
         width: 150,
@@ -20,6 +26,7 @@ class VoicesTimePicker extends StatelessWidget {
               .map(
                 (e) => TimeText(
                   value: e,
+                  onTap: onTap,
                 ),
               )
               .toList(),
@@ -34,7 +41,9 @@ class VoicesTimePicker extends StatelessWidget {
     for (var hour = 0; hour < 24; hour++) {
       for (var minute = 0; minute < 60; minute += 30) {
         times.add(
-            '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}');
+          // ignore: lines_longer_than_80_chars
+          '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
+        );
       }
     }
 
@@ -43,10 +52,12 @@ class VoicesTimePicker extends StatelessWidget {
 }
 
 class TimeText extends StatelessWidget {
+  final ValueChanged<String> onTap;
   final String value;
   const TimeText({
     super.key,
     required this.value,
+    required this.onTap,
   });
 
   @override
@@ -55,7 +66,7 @@ class TimeText extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {},
+        onTap: () => onTap(value),
         child: Padding(
           key: key,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
