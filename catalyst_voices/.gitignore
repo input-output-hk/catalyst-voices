@@ -150,3 +150,5 @@ coverage/
 
 # Fastlane.swift runner binary
 **/fastlane/FastlaneRunner
+
+devtools_options.yaml
