@@ -68,6 +68,12 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.inputFormatters]
   final List<TextInputFormatter>? inputFormatters;
 
+  /// Optional suffix icon to be displayed at the end of the text field.
+  final bool showSuffix;
+
+  /// [AutovalidateMode]
+  final AutovalidateMode? autovalidateMode;
+
   const VoicesTextField({
     super.key,
     this.controller,
@@ -91,6 +97,8 @@ class VoicesTextField extends StatefulWidget {
     required this.onFieldSubmitted,
     this.onSaved,
     this.inputFormatters,
+    this.showSuffix = true,
+    this.autovalidateMode,
   });
 
   @override
@@ -182,6 +190,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             onFieldSubmitted: widget.onFieldSubmitted,
             onSaved: widget.onSaved,
             inputFormatters: widget.inputFormatters,
+            autovalidateMode: widget.autovalidateMode,
             decoration: InputDecoration(
               filled: widget.decoration?.filled,
               fillColor: widget.decoration?.fillColor,
@@ -244,10 +253,14 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                   : textTheme.bodySmall!
                       .copyWith(color: theme.colors.textDisabled),
               hintText: widget.decoration?.hintText,
-              hintStyle: widget.enabled
-                  ? textTheme.bodyLarge
-                  : textTheme.bodyLarge!
-                      .copyWith(color: theme.colors.textDisabled),
+              hintStyle: _getHintStyle(
+                textTheme,
+                theme,
+                orDefault: widget.enabled
+                    ? textTheme.bodyLarge
+                    : textTheme.bodyLarge!
+                        .copyWith(color: theme.colors.textDisabled),
+              ),
               errorText:
                   widget.decoration?.errorText ?? _validation.errorMessage,
               errorMaxLines: widget.decoration?.errorMaxLines,
@@ -317,9 +330,16 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     }
   }
 
+  TextStyle? _getHintStyle(
+    TextTheme textTheme,
+    ThemeData theme, {
+    TextStyle? orDefault,
+  }) =>
+      widget.decoration?.hintStyle ?? orDefault;
+
   Widget? _getStatusSuffixWidget() {
     final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
-    if (!showStatusIcon) {
+    if (!showStatusIcon || !widget.showSuffix) {
       return null;
     }
 
@@ -560,6 +580,9 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.hintText].
   final String? hintText;
 
+  /// [InputDecoration.hintStyle].
+  final TextStyle? hintStyle;
+
   /// [InputDecoration.errorText].
   final String? errorText;
 
@@ -602,6 +625,7 @@ class VoicesTextFieldDecoration {
     this.labelText,
     this.helperText,
     this.hintText,
+    this.hintStyle,
     this.errorText,
     this.errorMaxLines,
     this.prefixIcon,
