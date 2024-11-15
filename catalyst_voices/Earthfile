@@ -39,9 +39,11 @@ filter-openapi:
 # VoicesAssets and other packages that depend on code-generator.
 # It accepts [save_locally] ARG that when true place the artifacts in the
 # proper folders 
+# It accepts [filter_openapi] ARG that when true filter the openapi spec
+# using filters from /packages/internal/catalyst_voices_services/openapi-filters.json
 code-generator:
     ARG save_locally=false 
-    ARG use_filtered_openapi=true
+    ARG filter_openapi=true
     FROM +builder
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
@@ -60,7 +62,7 @@ code-generator:
     END
     WORKDIR packages/internal/catalyst_voices_services
 
-    IF [ $use_filtered_openapi = true ]
+    IF [ $filter_openapi = true ]
         COPY +filter-openapi/filtered-openapi.json openapi/cat-gateway-api.json
     ELSE
         COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
