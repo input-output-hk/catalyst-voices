@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
@@ -89,6 +90,9 @@ Future<BootstrapArgs> bootstrap() async {
   setPathUrlStrategy();
 
   await Dependencies.instance.init();
+
+  // Key derivation needs to be initialized before it can be used
+  await CatalystKeyDerivation.init();
 
   final router = AppRouter.init(
     guards: const [

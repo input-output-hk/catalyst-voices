@@ -1,0 +1,12 @@
+# use with https://github.com/casey/just
+#
+# Catalyst Key Derivation developers' convenience functions.
+
+# Generated necessary files using Earthly for running Flutter web locally.
+code-gen-web:
+    earthly +code-generator
+
+# Run local Flutter web.
+run-web: code-gen-web
+    cd example
+    flutter run --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp -d chrome
