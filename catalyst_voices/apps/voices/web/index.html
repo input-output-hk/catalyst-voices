@@ -37,7 +37,9 @@
 </head>
 
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- TODO(dtscalac): make flutter_bootstrap.js just async when enable-threads.js is no longer needed -->
+  <script src="flutter_bootstrap.js" async="false"></script>
+  <script src="enable-threads.js" async="false"></script>
 </body>
 
 </html>

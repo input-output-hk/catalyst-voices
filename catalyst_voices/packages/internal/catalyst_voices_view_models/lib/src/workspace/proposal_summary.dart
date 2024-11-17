@@ -15,6 +15,7 @@ final class ProposalSummary extends WorkspaceSection {
 final class ProblemStep extends RichTextStep {
   const ProblemStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });
@@ -28,6 +29,7 @@ final class ProblemStep extends RichTextStep {
 final class SolutionStep extends RichTextStep {
   const SolutionStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });
@@ -41,6 +43,7 @@ final class SolutionStep extends RichTextStep {
 final class PublicDescriptionStep extends RichTextStep {
   const PublicDescriptionStep({
     required super.id,
+    required super.sectionId,
     required super.data,
     super.charsLimit,
   });
