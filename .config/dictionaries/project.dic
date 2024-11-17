@@ -80,6 +80,7 @@ drep
 dreps
 dtscalac
 earthfile
+earthlyignore
 Easterling
 eddsa
 Edgedriver
@@ -319,5 +320,8 @@ xcodeproj
 xctest
 xctestrun
 xcworkspace
+xprv
+xpub
+xpublic
 xvfb
 yoroi
