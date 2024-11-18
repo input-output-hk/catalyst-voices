@@ -57,7 +57,7 @@ impl GetTxiByTxnHashesQuery {
         let get_txi_by_txn_hashes_query = PreparedQueries::prepare(
             session,
             GET_TXI_BY_TXN_HASHES_QUERY,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

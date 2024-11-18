@@ -85,7 +85,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
                     Ok(_res) => {}, // debug!(res=?res,"Query OK")
                     Err(error) => {
                         // IF a query fails, assume everything else is broken.
-                        error!(error=%error,"Query Failed");
+                        error!(error=%error,"Query Failed {:?}",error);
                         result = Err(error);
                     },
                 }

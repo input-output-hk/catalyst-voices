@@ -64,7 +64,7 @@ impl SyncStatusInsertQuery {
         let sync_status_insert_query = PreparedQueries::prepare(
             session,
             INSERT_SYNC_STATUS_QUERY,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

@@ -52,7 +52,7 @@ impl GetStakeAddrQuery {
         let get_stake_addr_query = PreparedQueries::prepare(
             session,
             GET_STAKE_ADDR_FROM_STAKE_HASH,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

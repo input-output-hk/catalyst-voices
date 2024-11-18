@@ -88,7 +88,7 @@ impl Params {
             session.clone(),
             INSERT_CIP36_REGISTRATION_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )

@@ -9,13 +9,13 @@ use crate::db::{
 };
 
 /// Default Cassandra DB URL for the Persistent DB.
-pub(super) const PERSISTENT_URL_DEFAULT: &str = "127.0.0.1:9042";
+pub(super) const PERSISTENT_URL_DEFAULT: &str = "cassandra.eu-central-1.amazonaws.com:9142";
 
 /// Default Cassandra DB URL for the Persistent DB.
 pub(super) const PERSISTENT_NAMESPACE_DEFAULT: &str = "persistent";
 
 /// Default Cassandra DB URL for the Persistent DB.
-pub(super) const VOLATILE_URL_DEFAULT: &str = "127.0.0.1:9042";
+pub(super) const VOLATILE_URL_DEFAULT: &str = "cassandra.eu-central-1.amazonaws.com:9142";
 
 /// Default Cassandra DB URL for the Persistent DB.
 pub(super) const VOLATILE_NAMESPACE_DEFAULT: &str = "volatile";
@@ -59,6 +59,9 @@ pub(crate) struct EnvVars {
 
     /// Maximum Configured Batch size.
     pub(crate) max_batch_size: i64,
+
+    /// Deployment regions
+    pub(crate) regions: Vec<StringEnvVar>,
 }
 
 impl EnvVars {
@@ -69,8 +72,11 @@ impl EnvVars {
         // We can actually change the namespace, but can't change the name used for env vars.
         let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace.into());
 
-        let tls =
-            StringEnvVar::new_as_enum(&format!("CASSANDRA_{name}_TLS"), TlsChoice::Disabled, false);
+        let tls = StringEnvVar::new_as_enum(
+            &format!("CASSANDRA_{name}_TLS"),
+            TlsChoice::Unverified,
+            false,
+        );
         let compression = StringEnvVar::new_as_enum(
             &format!("CASSANDRA_{name}_COMPRESSION"),
             CompressionChoice::Lz4,
@@ -91,6 +97,7 @@ impl EnvVars {
                 MIN_BATCH_SIZE,
                 MAX_BATCH_SIZE,
             ),
+            regions: vec![],
         }
     }
 

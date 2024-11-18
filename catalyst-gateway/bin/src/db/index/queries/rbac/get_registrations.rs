@@ -47,7 +47,7 @@ impl GetRegistrationsByChainRootQuery {
         let get_registrations_by_chain_root_query = PreparedQueries::prepare(
             session,
             GET_REGISTRATIONS_BY_CHAIN_ROOT_CQL,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

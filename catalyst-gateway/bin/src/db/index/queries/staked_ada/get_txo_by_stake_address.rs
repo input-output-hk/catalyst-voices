@@ -68,7 +68,7 @@ impl GetTxoByStakeAddressQuery {
         let get_txo_by_stake_address_query = PreparedQueries::prepare(
             session,
             GET_TXO_BY_STAKE_ADDRESS_QUERY,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

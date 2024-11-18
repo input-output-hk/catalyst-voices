@@ -69,7 +69,7 @@ impl GetInvalidRegistrationQuery {
         let get_invalid_registration_query = PreparedQueries::prepare(
             session,
             GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

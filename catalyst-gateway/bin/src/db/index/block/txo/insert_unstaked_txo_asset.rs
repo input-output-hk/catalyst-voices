@@ -62,7 +62,7 @@ impl Params {
             session.clone(),
             INSERT_UNSTAKED_TXO_ASSET_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )

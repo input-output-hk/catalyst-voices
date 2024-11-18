@@ -46,7 +46,7 @@ impl GetRole0ChainRootQuery {
         let get_chain_root_by_role0_key_query = PreparedQueries::prepare(
             session,
             GET_ROLE0_KEY_CHAIN_ROOT_CQL,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

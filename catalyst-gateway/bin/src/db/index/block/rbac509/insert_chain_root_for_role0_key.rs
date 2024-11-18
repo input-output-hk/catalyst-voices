@@ -56,7 +56,7 @@ impl Params {
             session.clone(),
             INSERT_CHAIN_ROOT_FOR_ROLE0_KEY_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )

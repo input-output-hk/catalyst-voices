@@ -67,7 +67,7 @@ impl GetRegistrationQuery {
         let get_registrations_query = PreparedQueries::prepare(
             session,
             GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

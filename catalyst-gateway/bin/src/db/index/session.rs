@@ -227,9 +227,11 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
+#[allow(unused_assignments)]
 async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
+    let mut created_scheme = false;
 
     info!(db_type = db_type, "Index DB Session Creation: Started.");
 
@@ -259,15 +261,31 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         };
 
         // Set up the Schema for it.
-        if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
-            let error = format!("{error:?}");
-            error!(
-                db_type = db_type,
-                error = error,
-                "Failed to Create Cassandra DB Schema"
-            );
-            continue;
+        if !created_scheme {
+            if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
+                let error = format!("{error:?}");
+                error!(
+                    db_type = db_type,
+                    error = error,
+                    "Failed to Create Cassandra DB Schema"
+                );
+                continue;
+            }
+            created_scheme = true;
         }
+
+        let mut kspace = String::new();
+        if cfg.namespace.to_string().to_lowercase() == "volatile" {
+            kspace = "volatile_08193dfe_698a_8177_bdf8_20c5691a06e7".to_string();
+        } else {
+            kspace = "persistent_08193dfe_698a_8177_bdf8_20c5691a06e7".to_string();
+        };
+
+        if let Ok(()) = session.use_keyspace(kspace, false).await {
+        } else {
+            error!("Failed set keyspace");
+            continue;
+        };
 
         let queries = match queries::PreparedQueries::new(session.clone(), &cfg).await {
             Ok(queries) => Arc::new(queries),

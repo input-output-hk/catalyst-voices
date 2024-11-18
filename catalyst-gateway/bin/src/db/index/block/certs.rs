@@ -115,7 +115,7 @@ impl StakeRegistrationInsertQuery {
             session.clone(),
             INSERT_STAKE_REGISTRATION_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )

@@ -1,6 +1,6 @@
 //! Index Schema
 
-use std::sync::Arc;
+use std::{sync::Arc, thread, time::Duration};
 
 use anyhow::Context;
 use handlebars::Handlebars;
@@ -175,30 +175,47 @@ pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
     )
 }
 
+/// Get deployment params for a particular db configuration
+pub(crate) fn deployment_params(cfg: &cassandra_db::EnvVars) -> String {
+    // Build and set deployment params
+    format!(
+        "{}_{}",
+        cfg.namespace.as_str(),
+        generate_cql_schema_version().replace('-', "_")
+    )
+}
+
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
+#[allow(dead_code)]
 async fn create_namespace(
     session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
 ) -> anyhow::Result<()> {
+    /// Keyspace creation is not instant, induce sleep to wait for remote keyspace
+    /// creation.
+    const KEYSPACE_LATENCY: u64 = 15;
+
     let keyspace = namespace(cfg);
+
+    // Only replication factor of 3 is supported
 
     let mut reg = Handlebars::new();
     // disable default `html_escape` function
     // which transforms `<`, `>` symbols to `&lt`, `&gt`
     reg.register_escape_fn(|s| s.into());
     let query = reg
-        .render_template(CREATE_NAMESPACE_CQL, &json!({"keyspace": keyspace}))
+        .render_template(
+            CREATE_NAMESPACE_CQL,
+            &json!({"keyspace": keyspace,"region1":"eu-central-1","region2":"eu-west-1","replication_factor": 3}),
+        )
         .context(format!("Keyspace: {keyspace}"))?;
 
-    // Create the Keyspace if it doesn't exist already.
-    let stmt = session
-        .prepare(query)
-        .await
-        .context(format!("Keyspace: {keyspace}"))?;
     session
-        .execute_unpaged(&stmt, ())
+        .query_unpaged(query, ())
         .await
         .context(format!("Keyspace: {keyspace}"))?;
+
+    thread::sleep(Duration::from_secs(KEYSPACE_LATENCY));
 
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
@@ -212,6 +229,7 @@ async fn create_namespace(
 }
 
 /// Create the Schema on the connected Cassandra DB
+#[allow(unreachable_code)]
 pub(crate) async fn create_schema(
     session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
 ) -> anyhow::Result<()> {
@@ -219,21 +237,12 @@ pub(crate) async fn create_schema(
         .await
         .context("Creating Namespace")?;
 
-    let mut failed = false;
+    let failed = false;
 
-    for (schema, schema_name) in SCHEMAS {
-        match session.prepare(*schema).await {
-            Ok(stmt) => {
-                if let Err(err) = session.execute_unpaged(&stmt, ()).await {
-                    failed = true;
-                    error!(schema=schema_name, error=%err, "Failed to Execute Create Schema Query");
-                };
-            },
-            Err(err) => {
-                failed = true;
-                error!(schema=schema_name, error=%err, "Failed to Prepare Create Schema Query");
-            },
-        }
+    thread::sleep(Duration::from_secs(30));
+
+    for (schema, _schema_name) in SCHEMAS {
+        session.query_unpaged((*schema).to_string(), &[]).await?;
     }
 
     anyhow::ensure!(!failed, "Failed to Create Schema");

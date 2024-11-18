@@ -60,7 +60,7 @@ impl Params {
             session.clone(),
             INSERT_TXO_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )

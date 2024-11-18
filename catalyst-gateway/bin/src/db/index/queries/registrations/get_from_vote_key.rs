@@ -50,7 +50,7 @@ impl GetStakeAddrFromVoteKeyQuery {
         let get_stake_addr_query = PreparedQueries::prepare(
             session,
             GET_STAKE_ADDR_FROM_VOTE_KEY,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

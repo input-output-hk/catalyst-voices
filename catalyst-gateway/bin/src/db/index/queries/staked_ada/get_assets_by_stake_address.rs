@@ -69,7 +69,7 @@ impl GetAssetsByStakeAddressQuery {
         let get_assets_by_stake_address_query = PreparedQueries::prepare(
             session,
             GET_ASSETS_BY_STAKE_ADDRESS_QUERY,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;
