@@ -14,21 +14,6 @@ enum DatePickerValidationStatus {
 }
 
 extension DatePickerValidationStatusExt on DatePickerValidationStatus {
-  // String? message(VoicesLocalizations l10n) {
-  //   switch (this) {
-  //     case DatePickerValidationStatus.success:
-  //       return null;
-  //     case DatePickerValidationStatus.dateFormatError:
-  //       return 'Format: "DD/MM/YYYY"';
-  //     case DatePickerValidationStatus.timeFormatError:
-  //       return 'Format: "HH:MM"';
-  //     case DatePickerValidationStatus.dateRangeError:
-  //       // ignore: lines_longer_than_80_chars
-  //       return 'Please select a date within the range of today and one year from today.';
-  //     case DatePickerValidationStatus.daysInMonthError:
-  //       return 'Entered day exceeds the maximum days for this month.';
-  //   }
-  // }
   VoicesTextFieldValidationResult message(
     VoicesLocalizations l10n,
     String pattern,

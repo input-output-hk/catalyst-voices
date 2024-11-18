@@ -4,6 +4,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 part 'base_picker.dart';
 part 'voices_calendar_picker.dart';
@@ -26,6 +27,12 @@ class ScrollControllerProvider extends InheritedWidget {
     return provider!.scrollController;
   }
 
+  static ScrollController? maybeOf(BuildContext context) {
+    final provider =
+        context.dependOnInheritedWidgetOfExactType<ScrollControllerProvider>();
+    return provider?.scrollController;
+  }
+
   @override
   bool updateShouldNotify(ScrollControllerProvider oldWidget) {
     return scrollController != oldWidget.scrollController;
@@ -34,9 +41,11 @@ class ScrollControllerProvider extends InheritedWidget {
 
 class VoicesDatePicker extends StatefulWidget {
   final DatePickerController controller;
+  final String timeZone;
   const VoicesDatePicker({
     super.key,
     required this.controller,
+    required this.timeZone,
   });
 
   @override
@@ -54,7 +63,7 @@ class _VoicesDatePickerState extends State<VoicesDatePicker> {
         ),
         TimeFieldPicker(
           controller: widget.controller.timePickerController,
-          timeZone: 'UTC',
+          timeZone: widget.timeZone,
         ),
       ],
     );

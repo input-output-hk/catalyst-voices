@@ -40,8 +40,10 @@ class TimeFieldPicker extends BasePicker {
 }
 
 abstract class _BasePickerState<T extends BasePicker> extends State<T> {
+  static _BasePickerState? _activePicker;
   OverlayEntry? _overlayEntry;
   VoidCallback? _scrollListener;
+  bool _isOverlayOpen = false;
 
   @override
   void dispose() {
@@ -79,22 +81,34 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
       };
 
   void _removeOverlay() {
-    final scrollController = ScrollControllerProvider.of(context);
-    if (_scrollListener != null) {
-      scrollController.removeListener(_scrollListener!);
+    if (_overlayEntry != null) {
+      setState(() {
+        _isOverlayOpen = false;
+      });
+      final scrollController = ScrollControllerProvider.maybeOf(context);
+      if (scrollController != null && _scrollListener != null) {
+        scrollController.removeListener(_scrollListener!);
+      }
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+      _scrollListener = null;
+      _activePicker = null;
     }
-    _scrollListener = null;
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-    widget.onRemoveOverlay?.call();
   }
 
   void _showOverlay(Widget child) {
+    FocusScope.of(context).unfocus();
+    if (_activePicker != null && _activePicker != this) {
+      _activePicker!._removeOverlay();
+    }
+    setState(() {
+      _isOverlayOpen = true;
+    });
     final overlay = Overlay.of(context, rootOverlay: true);
     final renderBox = context.findRenderObject() as RenderBox?;
-    final scrollController = ScrollControllerProvider.of(context);
+    final scrollController = ScrollControllerProvider.maybeOf(context);
     final initialPosition = renderBox!.localToGlobal(
-      Offset(0, scrollController.offset),
+      Offset.zero,
     );
 
     _overlayEntry = OverlayEntry(
@@ -121,7 +135,9 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
           Positioned(
             top: initialPosition.dy +
                 50 -
-                (scrollController.hasClients ? scrollController.offset : 0),
+                (scrollController?.hasClients ?? false
+                    ? scrollController!.offset
+                    : 0),
             left: initialPosition.dx,
             child: child,
           ),
@@ -129,15 +145,18 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
       ),
     );
 
-    void listener() {
-      if (_overlayEntry != null) {
-        _overlayEntry?.markNeedsBuild();
+    if (scrollController != null) {
+      void listener() {
+        if (_overlayEntry != null) {
+          _overlayEntry?.markNeedsBuild();
+        }
       }
+
+      scrollController.addListener(listener);
+      _scrollListener = listener;
     }
 
-    scrollController.addListener(listener);
-    _scrollListener = listener;
-
+    _activePicker = this;
     overlay.insert(_overlayEntry!);
   }
 
@@ -147,15 +166,21 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
   ) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final borderSide = _isOverlayOpen
+        ? BorderSide(
+            color: theme.primaryColor,
+            width: 2,
+          )
+        : BorderSide(
+            color: theme.colors.outlineBorderVariant!,
+            width: 0.75,
+          );
     return VoicesTextFieldDecoration(
       suffixIcon: suffixIcon,
       fillColor: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
       filled: true,
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: theme.colors.outlineBorderVariant!,
-          width: 0.75,
-        ),
+        borderSide: borderSide,
         borderRadius: _getBorderRadius,
       ),
       focusedBorder: OutlineInputBorder(
@@ -193,10 +218,9 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
 
 class _CalendarFieldPickerState extends _BasePickerState<CalendarFieldPicker> {
   void _onTap() {
-    if (_overlayEntry != null) {
+    if (_BasePickerState._activePicker == this) {
       _removeOverlay();
     } else {
-      _removeOverlay();
       _showOverlay(
         VoicesCalendarDatePicker(
           initialDate: widget.controller.selectedValue,
@@ -236,7 +260,7 @@ class _CalendarFieldPickerState extends _BasePickerState<CalendarFieldPicker> {
 
 class _TimeFieldPickerState extends _BasePickerState<TimeFieldPicker> {
   void _onTap() {
-    if (_overlayEntry != null) {
+    if (_BasePickerState._activePicker == this) {
       _removeOverlay();
     } else {
       _showOverlay(
