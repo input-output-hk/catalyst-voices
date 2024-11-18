@@ -12,14 +12,14 @@ final class SectionsControllerState extends Equatable {
   final Set<int> openedSections;
   final SectionStepId? activeStepId;
   final Set<SectionStepId> editStepsIds;
-  final GuidanceType? activeType;
+  final GuidanceType? activeGuidance;
 
   const SectionsControllerState({
     this.sections = const [],
     this.openedSections = const {},
     this.activeStepId,
     this.editStepsIds = const {},
-    this.activeType,
+    this.activeGuidance,
   });
 
   int? get activeSectionId => activeStepId?.sectionId;
@@ -76,14 +76,14 @@ final class SectionsControllerState extends Equatable {
     Set<int>? openedSections,
     Optional<SectionStepId>? activeStepId,
     Set<SectionStepId>? editStepsIds,
-    Optional<GuidanceType>? activeType,
+    Optional<GuidanceType>? activeGuidance,
   }) {
     return SectionsControllerState(
       sections: sections ?? this.sections,
       openedSections: openedSections ?? this.openedSections,
       activeStepId: activeStepId.dataOr(this.activeStepId),
       editStepsIds: editStepsIds ?? this.editStepsIds,
-      activeType: activeType?.dataOr(this.activeType),
+      activeGuidance: activeGuidance?.dataOr(this.activeGuidance),
     );
   }
 
@@ -93,7 +93,7 @@ final class SectionsControllerState extends Equatable {
         openedSections,
         activeStepId,
         editStepsIds,
-        activeType,
+        activeGuidance,
       ];
 }
 
@@ -183,8 +183,8 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     );
   }
 
-  void setType(GuidanceType? type) {
-    value = value.copyWith(activeType: Optional(type));
+  void setActiveGuidance(GuidanceType? type) {
+    value = value.copyWith(activeGuidance: Optional(type));
   }
 
   @override
