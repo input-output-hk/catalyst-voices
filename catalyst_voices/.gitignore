@@ -2,6 +2,28 @@
 # See https://www.dartlang.org/guides/libraries/private-files
 devtools_options.yaml
 
+
+# Generated files from code generation tools
+*.g.dart
+*.freezed.dart
+*.chopper.dart
+*.swagger.dart
+*.openapi.dart
+*.gen.dart
+*.swagger.*.dart
+
+# Un-ignore generated files in public packages
+!**/packages/libs/**/*.g.dart
+!**/packages/libs/**/*.freezed.dart
+!**/packages/libs/**/*.chopper.dart
+!**/packages/libs/**/*.swagger.dart
+!**/packages/libs/**/*.openapi.dart
+!**/packages/libs/**/*.gen.dart
+
+# Localization (l10n) generated files
+packages/internal/catalyst_voices_localization/lib/generated/catalyst_voices_localizations_*.dart
+packages/internal/catalyst_voices_localization/lib/generated/catalyst_voices_localizations.dart
+
 # Files and directories created by pub
 .dart_tool/
 .packages
@@ -131,3 +153,5 @@ coverage/
 
 # Fastlane.swift runner binary
 **/fastlane/FastlaneRunner
+
+devtools_options.yaml

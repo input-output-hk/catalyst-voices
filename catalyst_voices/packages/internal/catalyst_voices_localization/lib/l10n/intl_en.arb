@@ -136,18 +136,8 @@
   "@snackbarErrorMessageText": {
     "description": "Text shown in the Snackbar widget when the message is an error message."
   },
-  "snackbarRefreshButtonText": "Refresh",
-  "@snackbarRefreshButtonText": {
-    "description": "Text shown in the Snackbar widget for the refresh button."
-  },
-  "snackbarMoreButtonText": "Learn more",
-  "@snackbarMoreButtonText": {
-    "description": "Text shown in the Snackbar widget for the more button."
-  },
-  "snackbarOkButtonText": "Ok",
-  "@snackbarOkButtonText": {
-    "description": "Text shown in the Snackbar widget for the ok button."
-  },
+  "refresh": "Refresh",
+  "ok": "Ok",
   "seedPhraseSlotNr": "Slot {nr}",
   "@seedPhraseSlotNr": {
     "description": "When user arranges seed phrases this text is shown when phrase was not selected",
@@ -979,5 +969,6 @@
   "datePickerDaysInMonthError": "Entered day exceeds the maximum days for this month.",
   "@datePickerDaysInMonthError": {
     "description": "Error message for the date picker when the selected day is greater than the maximum days for the selected month."
-  }
+  },
+  "saveBeforeEditingErrorText": "Please save before editing something else"
 }
