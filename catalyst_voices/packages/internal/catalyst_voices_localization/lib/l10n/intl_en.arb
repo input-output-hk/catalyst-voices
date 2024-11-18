@@ -958,5 +958,13 @@
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
   },
-  "saveBeforeEditingErrorText": "Please save before editing something else"
+  "saveBeforeEditingErrorText": "Please save before editing something else",
+  "noProposalStateDescription": "Discovery space will show draft proposals you can comment on, currently there are no draft proposals.",
+  "@noProposalStateDescription": {
+    "description": "Description shown when there are no proposals in the proposals tab"
+  },
+  "noProposalStateTitle": "No draft proposals yet",
+  "@noProposalStateTitle": {
+    "description": "Title shown when there are no proposals in the proposals tab"
+  }
 }
