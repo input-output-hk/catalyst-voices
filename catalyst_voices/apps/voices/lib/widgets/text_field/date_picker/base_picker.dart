@@ -96,6 +96,31 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
     }
   }
 
+  RenderBox? _getRenderBox(GlobalKey key) {
+    return key.currentContext?.findRenderObject() as RenderBox?;
+  }
+
+  bool _isBoxTapped(RenderBox? box, Offset tapPosition) {
+    return box != null &&
+        (box.localToGlobal(Offset.zero) & box.size).contains(tapPosition);
+  }
+
+  void _handleCalendarTap() {
+    _activePicker?._removeOverlay();
+    final calendarState = calendarKey.currentState;
+    if (calendarState is _CalendarFieldPickerState) {
+      calendarState._onTap();
+    }
+  }
+
+  void _handleTimeTap() {
+    _activePicker?._removeOverlay();
+    final timeState = timeKey.currentState;
+    if (timeState is _TimeFieldPickerState) {
+      timeState._onTap();
+    }
+  }
+
   void _showOverlay(Widget child) {
     FocusScope.of(context).unfocus();
     if (_activePicker != null && _activePicker != this) {
@@ -117,8 +142,21 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
           Positioned.fill(
             child: MouseRegion(
               opaque: false,
+              hitTestBehavior: HitTestBehavior.translucent,
               child: GestureDetector(
-                onTap: _removeOverlay,
+                onTapDown: (details) {
+                  final tapPosition = details.globalPosition;
+                  final calendarBox = _getRenderBox(calendarKey);
+                  final timeBox = _getRenderBox(timeKey);
+
+                  if (_isBoxTapped(calendarBox, tapPosition)) {
+                    _handleCalendarTap();
+                  } else if (_isBoxTapped(timeBox, tapPosition)) {
+                    _handleTimeTap();
+                  } else {
+                    _removeOverlay();
+                  }
+                },
                 behavior: HitTestBehavior.translucent,
                 excludeFromSemantics: true,
                 onPanUpdate: null,

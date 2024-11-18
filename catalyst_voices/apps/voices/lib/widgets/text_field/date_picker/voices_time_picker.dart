@@ -78,6 +78,7 @@ class _VoicesTimePickerState extends State<VoicesTimePicker> {
     for (var hour = 0; hour < 24; hour++) {
       for (var minute = 0; minute < 60; minute += 30) {
         times.add(
+          // ignore: lines_longer_than_80_chars
           '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
         );
       }

@@ -4,13 +4,15 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 part 'base_picker.dart';
 part 'voices_calendar_picker.dart';
 part 'voices_time_picker.dart';
 
 enum DateTimePickerType { date, time }
+
+final GlobalKey calendarKey = GlobalKey();
+final GlobalKey timeKey = GlobalKey();
 
 class ScrollControllerProvider extends InheritedWidget {
   final ScrollController scrollController;
@@ -59,9 +61,11 @@ class _VoicesDatePickerState extends State<VoicesDatePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CalendarFieldPicker(
+          key: calendarKey,
           controller: widget.controller.calendarPickerController,
         ),
         TimeFieldPicker(
+          key: timeKey,
           controller: widget.controller.timePickerController,
           timeZone: widget.timeZone,
         ),
