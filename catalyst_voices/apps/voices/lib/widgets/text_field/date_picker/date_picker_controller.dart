@@ -1,8 +1,65 @@
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
+import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+enum DatePickerValidationStatus {
+  success,
+  dateFormatError,
+  timeFormatError,
+  dateRangeError,
+  daysInMonthError
+}
+
+extension DatePickerValidationStatusExt on DatePickerValidationStatus {
+  // String? message(VoicesLocalizations l10n) {
+  //   switch (this) {
+  //     case DatePickerValidationStatus.success:
+  //       return null;
+  //     case DatePickerValidationStatus.dateFormatError:
+  //       return 'Format: "DD/MM/YYYY"';
+  //     case DatePickerValidationStatus.timeFormatError:
+  //       return 'Format: "HH:MM"';
+  //     case DatePickerValidationStatus.dateRangeError:
+  //       // ignore: lines_longer_than_80_chars
+  //       return 'Please select a date within the range of today and one year from today.';
+  //     case DatePickerValidationStatus.daysInMonthError:
+  //       return 'Entered day exceeds the maximum days for this month.';
+  //   }
+  // }
+  VoicesTextFieldValidationResult message(
+    VoicesLocalizations l10n,
+    String pattern,
+  ) =>
+      switch (this) {
+        DatePickerValidationStatus.success =>
+          const VoicesTextFieldValidationResult(
+            status: VoicesTextFieldStatus.success,
+          ),
+        DatePickerValidationStatus.dateFormatError =>
+          VoicesTextFieldValidationResult(
+            status: VoicesTextFieldStatus.error,
+            errorMessage: '${l10n.format}: ${pattern.toUpperCase()}',
+          ),
+        DatePickerValidationStatus.timeFormatError =>
+          VoicesTextFieldValidationResult(
+            status: VoicesTextFieldStatus.error,
+            errorMessage: '${l10n.format}: $pattern',
+          ),
+        DatePickerValidationStatus.dateRangeError =>
+          VoicesTextFieldValidationResult(
+            status: VoicesTextFieldStatus.error,
+            errorMessage: l10n.datePickerDateRangeError,
+          ),
+        DatePickerValidationStatus.daysInMonthError =>
+          VoicesTextFieldValidationResult(
+            status: VoicesTextFieldStatus.error,
+            errorMessage: l10n.datePickerDaysInMonthError,
+          ),
+      };
+}
 
 final class DatePickerControllerState extends Equatable {
   final DateTime? selectedDate;
@@ -82,10 +139,10 @@ final class DatePickerController
 sealed class FieldDatePickerController<T> extends TextEditingController {
   abstract final String pattern;
 
-  bool get isValid => validate(text).status == VoicesTextFieldStatus.success;
+  bool get isValid => validate(text) == DatePickerValidationStatus.success;
   T get selectedValue;
 
-  VoicesTextFieldValidationResult validate(String? value);
+  DatePickerValidationStatus validate(String? value);
 
   void setValue(T newValue);
 }
@@ -115,66 +172,54 @@ final class CalendarPickerController
   }
 
   @override
-  String get pattern => 'DD/MM/YYYY';
+  String get pattern => 'dd/MM/yyyy';
 
   @override
-  VoicesTextFieldValidationResult validate(String? value) {
+  DatePickerValidationStatus validate(String? value) {
     final today = DateTime.now();
     final maxDate = DateTime(today.year + 1, today.month, today.day);
-    final notValidFormat = VoicesTextFieldValidationResult(
-      status: VoicesTextFieldStatus.error,
-      errorMessage: 'Format: "$pattern"',
-    );
 
     if (value == null || value == '') {
-      return const VoicesTextFieldValidationResult(
-        status: VoicesTextFieldStatus.success,
-      );
+      return DatePickerValidationStatus.success;
     }
 
-    if (value.length != 10) return notValidFormat;
+    if (value.length != 10) return DatePickerValidationStatus.dateFormatError;
 
     final dateRegex = RegExp(r'^(\d{2})/(\d{2})/(\d{4})$');
-    if (!dateRegex.hasMatch(value)) return notValidFormat;
+    if (!dateRegex.hasMatch(value)) {
+      return DatePickerValidationStatus.dateFormatError;
+    }
 
     final parts = value.split('/');
     final day = int.parse(parts[0]);
     final month = int.parse(parts[1]);
     final year = int.parse(parts[2]);
 
-    if (month < 1 || month > 12) return notValidFormat;
-    if (day < 1 || day > 31) return notValidFormat;
+    if (month < 1 || month > 12) {
+      return DatePickerValidationStatus.dateFormatError;
+    }
+    if (day < 1 || day > 31) return DatePickerValidationStatus.daysInMonthError;
 
     final inputDate = DateTime(year, month, day);
 
     if (inputDate.isBefore(today.subtract(const Duration(days: 1))) ||
         inputDate.isAfter(maxDate)) {
-      return VoicesTextFieldValidationResult(
-        status: VoicesTextFieldStatus.error,
-        errorMessage:
-            'Date must be between ${today.day}/${today.month}/${today.year} and ${maxDate.day}/${maxDate.month}/${maxDate.year}',
-      );
+      return DatePickerValidationStatus.dateRangeError;
     }
 
-    // Check days in month
     final daysInMonth = DateTime(year, month + 1, 0).day;
     if (day > daysInMonth) {
-      return VoicesTextFieldValidationResult(
-        status: VoicesTextFieldStatus.error,
-        errorMessage: 'Day must be between 1 and $daysInMonth',
-      );
+      return DatePickerValidationStatus.daysInMonthError;
     }
 
-    return const VoicesTextFieldValidationResult(
-      status: VoicesTextFieldStatus.success,
-    );
+    return DatePickerValidationStatus.success;
   }
 
   @override
   void setValue(DateTime? newValue) {
     if (newValue == null) return;
     final newT = newValue;
-    final formatter = DateFormat('dd/MM/yyyy');
+    final formatter = DateFormat(pattern);
     value = TextEditingValue(text: formatter.format(newT));
   }
 }
@@ -187,23 +232,16 @@ final class TimePickerController extends FieldDatePickerController<String?> {
   String? get selectedValue => text;
 
   @override
-  VoicesTextFieldValidationResult validate(String? value) {
+  DatePickerValidationStatus validate(String? value) {
     if (value == null || value == '') {
-      return const VoicesTextFieldValidationResult(
-        status: VoicesTextFieldStatus.success,
-      );
+      return DatePickerValidationStatus.success;
     }
     final pattern = RegExp(r'^(0?[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$');
     if (!pattern.hasMatch(value)) {
-      return const VoicesTextFieldValidationResult(
-        status: VoicesTextFieldStatus.error,
-        errorMessage: 'Format: "00:00"',
-      );
+      return DatePickerValidationStatus.timeFormatError;
     }
 
-    return const VoicesTextFieldValidationResult(
-      status: VoicesTextFieldStatus.success,
-    );
+    return DatePickerValidationStatus.success;
   }
 
   @override

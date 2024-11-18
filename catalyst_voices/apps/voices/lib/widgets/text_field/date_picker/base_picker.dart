@@ -183,6 +183,9 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
       hintStyle: textTheme.bodyLarge?.copyWith(
         color: theme.colors.textDisabled,
       ),
+      errorStyle: textTheme.bodySmall?.copyWith(
+        color: Theme.of(context).colorScheme.error,
+      ),
       errorMaxLines: 2,
     );
   }
@@ -213,7 +216,10 @@ class _CalendarFieldPickerState extends _BasePickerState<CalendarFieldPicker> {
       width: _getWidth,
       child: VoicesTextField(
         controller: widget.controller,
-        validator: (value) => widget.controller.validate(value),
+        validator: (value) {
+          final status = widget.controller.validate(value);
+          return status.message(context.l10n, widget.controller.pattern);
+        },
         decoration: _getInputDecoration(
           context,
           VoicesIconButton(
@@ -239,6 +245,8 @@ class _TimeFieldPickerState extends _BasePickerState<TimeFieldPicker> {
             _removeOverlay();
             widget.controller.setValue(value);
           },
+          selectedTime: widget.controller.selectedValue,
+          timeZone: widget.timeZone,
         ),
       );
     }
@@ -250,7 +258,10 @@ class _TimeFieldPickerState extends _BasePickerState<TimeFieldPicker> {
       width: _getWidth,
       child: VoicesTextField(
         controller: widget.controller,
-        validator: (value) => widget.controller.validate(value),
+        validator: (value) {
+          final status = widget.controller.validate(value);
+          return status.message(context.l10n, widget.controller.pattern);
+        },
         decoration: _getInputDecoration(
           context,
           VoicesIconButton(

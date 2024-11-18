@@ -1000,4 +1000,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get reviewRegistrationTransaction => 'Review registration transaction';
+
+  @override
+  String get format => 'Format';
+
+  @override
+  String get datePickerDateRangeError => 'Please select a date within the range of today and one year from today.';
+
+  @override
+  String get datePickerDaysInMonthError => 'Entered day exceeds the maximum days for this month.';
 }

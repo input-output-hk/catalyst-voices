@@ -70,7 +70,8 @@ class VoicesCalendarDatePicker extends StatelessWidget {
                     ),
                     VoicesTextButton(
                       onTap: () => onDateSelected(selectedDate),
-                      child: Text(context.l10n.snackbarOkButtonText),
+                      child:
+                          Text(context.l10n.snackbarOkButtonText.toUpperCase()),
                     ),
                   ],
                 ),

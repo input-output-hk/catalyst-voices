@@ -260,10 +260,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
               errorText:
                   widget.decoration?.errorText ?? _validation.errorMessage,
               errorMaxLines: widget.decoration?.errorMaxLines,
-              errorStyle: widget.enabled
-                  ? textTheme.bodySmall
-                  : textTheme.bodySmall!
-                      .copyWith(color: theme.colors.textDisabled),
+              errorStyle: _getErrorStyle(textTheme, theme),
               prefixIcon: _wrapIconIfExists(
                 widget.decoration?.prefixIcon,
                 const EdgeInsetsDirectional.only(start: 8, end: 4),
@@ -404,6 +401,15 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     }
 
     return customController;
+  }
+
+  TextStyle? _getErrorStyle(TextTheme textTheme, ThemeData theme) {
+    if (widget.decoration?.errorStyle != null) {
+      return widget.decoration?.errorStyle;
+    }
+    return widget.enabled
+        ? textTheme.bodySmall
+        : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
   }
 
   void _onChanged() {
@@ -582,6 +588,9 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.errorText].
   final String? errorText;
 
+  /// [InputDecoration.errorStyle]
+  final TextStyle? errorStyle;
+
   /// [InputDecoration.errorMaxLines].
   final int? errorMaxLines;
 
@@ -623,6 +632,7 @@ class VoicesTextFieldDecoration {
     this.hintText,
     this.hintStyle,
     this.errorText,
+    this.errorStyle,
     this.errorMaxLines,
     this.prefixIcon,
     this.prefixText,

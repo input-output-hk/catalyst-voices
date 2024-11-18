@@ -967,5 +967,17 @@
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
+  },
+  "format": "Format",
+  "@format": {
+    "description": "A label for the format field in the date picker."
+  },
+  "datePickerDateRangeError": "Please select a date within the range of today and one year from today.",
+  "@datePickerDateRangeError": {
+    "description": "Error message for the date picker when the selected date is outside the range of today and one year from today."
+  },
+  "datePickerDaysInMonthError": "Entered day exceeds the maximum days for this month.",
+  "@datePickerDaysInMonthError": {
+    "description": "Error message for the date picker when the selected day is greater than the maximum days for the selected month."
   }
 }

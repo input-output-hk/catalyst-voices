@@ -1911,6 +1911,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Review registration transaction'**
   String get reviewRegistrationTransaction;
+
+  /// A label for the format field in the date picker.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get format;
+
+  /// Error message for the date picker when the selected date is outside the range of today and one year from today.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a date within the range of today and one year from today.'**
+  String get datePickerDateRangeError;
+
+  /// Error message for the date picker when the selected day is greater than the maximum days for the selected month.
+  ///
+  /// In en, this message translates to:
+  /// **'Entered day exceeds the maximum days for this month.'**
+  String get datePickerDaysInMonthError;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
