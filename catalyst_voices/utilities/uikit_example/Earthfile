@@ -7,7 +7,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.24 AS flutter
 # Prefixed by "local" to make sure it's not auto triggered, the target was
 # designed to work with a specific github action that needs the target output files
 local-build-web:
-    FROM catalyst-voices+builder
+    FROM catalyst-voices+code-generator
     ARG WORKDIR=/frontend/utilities/uikit_example
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
     SAVE ARTIFACT web AS LOCAL public

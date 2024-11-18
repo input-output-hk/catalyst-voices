@@ -111,13 +111,10 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get snackbarErrorMessageText => 'This is an error message!';
 
   @override
-  String get snackbarRefreshButtonText => 'Refresh';
+  String get refresh => 'Refresh';
 
   @override
-  String get snackbarMoreButtonText => 'Learn more';
-
-  @override
-  String get snackbarOkButtonText => 'Ok';
+  String get ok => 'Ok';
 
   @override
   String seedPhraseSlotNr(int nr) {
@@ -1000,6 +997,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get reviewRegistrationTransaction => 'Review registration transaction';
+
+  @override
+  String get saveBeforeEditingErrorText => 'Please save before editing something else';
 
   @override
   String get mandatoryGuidanceType => 'Mandatory';

@@ -298,23 +298,17 @@ abstract class VoicesLocalizations {
   /// **'This is an error message!'**
   String get snackbarErrorMessageText;
 
-  /// Text shown in the Snackbar widget for the refresh button.
+  /// No description provided for @refresh.
   ///
   /// In en, this message translates to:
   /// **'Refresh'**
-  String get snackbarRefreshButtonText;
+  String get refresh;
 
-  /// Text shown in the Snackbar widget for the more button.
-  ///
-  /// In en, this message translates to:
-  /// **'Learn more'**
-  String get snackbarMoreButtonText;
-
-  /// Text shown in the Snackbar widget for the ok button.
+  /// No description provided for @ok.
   ///
   /// In en, this message translates to:
   /// **'Ok'**
-  String get snackbarOkButtonText;
+  String get ok;
 
   /// When user arranges seed phrases this text is shown when phrase was not selected
   ///
@@ -1911,6 +1905,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Review registration transaction'**
   String get reviewRegistrationTransaction;
+
+  /// No description provided for @saveBeforeEditingErrorText.
+  ///
+  /// In en, this message translates to:
+  /// **'Please save before editing something else'**
+  String get saveBeforeEditingErrorText;
 
   /// Guidance type label for mandatory guidance
   ///
