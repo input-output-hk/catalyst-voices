@@ -986,5 +986,20 @@
   "noGuidanceForThisSection": "There is no guidance for this section",
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
+  },
+  "campaignDetails": "Campaign Details",
+  "description": "Description",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "categories": "Categories",
+  "proposals": "Proposals",
+  "totalSubmitted": "Total submitted",
+  "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
+  "@inXDays": {
+    "placeholders": {
+      "x": {
+        "type": "int"
+      }
+    }
   }
 }
