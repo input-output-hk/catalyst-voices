@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/images/voices_image_scheme.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 class NoProposals extends StatelessWidget {
   final String? title;
   final String? description;
+
   const NoProposals({
     super.key,
     this.title,
@@ -21,9 +23,17 @@ class NoProposals extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 64),
         child: Column(
           children: [
-            CatalystSvgPicture.asset(
-              _buildImage(theme).path,
-              height: 180,
+            VoicesImagesScheme(
+              image: CatalystSvgPicture.asset(
+                VoicesAssets.images.noProposalForeground.path,
+              ),
+              background: Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  color: theme.colors.onSurfaceNeutral08,
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -49,13 +59,6 @@ class NoProposals extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  SvgGenImage _buildImage(ThemeData theme) {
-    return switch (theme.brightness) {
-      Brightness.light => VoicesAssets.images.proposalEmptyState,
-      Brightness.dark => VoicesAssets.images.proposalEmptyStateDark,
-    };
   }
 
   String _buildTitle(BuildContext context) {
