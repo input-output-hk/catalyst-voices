@@ -48,13 +48,23 @@ extension DatePickerValidationStatusExt on DatePickerValidationStatus {
 
 final class DatePickerControllerState extends Equatable {
   final DateTime? selectedDate;
-  final String? selectedTime;
+  final DateTime? selectedTime;
 
   bool get isValid => selectedDate != null && selectedTime != null;
 
+  DateTime get date {
+    return DateTime(
+      selectedDate?.year ?? 0,
+      selectedDate?.month ?? 0,
+      selectedDate?.day ?? 0,
+      selectedTime?.hour ?? 0,
+      selectedTime?.minute ?? 0,
+    );
+  }
+
   factory DatePickerControllerState({
     DateTime? selectedDate,
-    String? selectedTime,
+    DateTime? selectedTime,
   }) {
     return DatePickerControllerState._(
       selectedDate: selectedDate,
@@ -69,7 +79,7 @@ final class DatePickerControllerState extends Equatable {
 
   DatePickerControllerState copyWith({
     Optional<DateTime>? selectedDate,
-    Optional<String>? selectedTime,
+    Optional<DateTime>? selectedTime,
   }) {
     return DatePickerControllerState(
       selectedDate: selectedDate.dataOr(this.selectedDate),
@@ -106,7 +116,7 @@ final class DatePickerController
   void _onTimePickerControllerChanged() {
     if (timePickerController.isValid) {
       value = value.copyWith(
-        selectedTime: Optional(timePickerController.text),
+        selectedTime: Optional(timePickerController.selectedValue),
       );
     }
   }
@@ -114,8 +124,6 @@ final class DatePickerController
   @override
   void dispose() {
     super.dispose();
-    calendarPickerController.removeListener(_onCalendarPickerControllerChanged);
-    timePickerController.removeListener(_onTimePickerControllerChanged);
     calendarPickerController.dispose();
     timePickerController.dispose();
   }
@@ -142,15 +150,14 @@ final class CalendarPickerController
     if (parts.length != 3) return null;
 
     try {
-      final day = int.parse(parts[0]);
-      final month = int.parse(parts[1]);
-      final year = int.parse(parts[2]);
+      final reformatted = '${parts[2]}-${parts[1]}-${parts[0]}';
+      final formatDt = DateTime.parse(reformatted);
 
-      if (month < 1 || month > 12) return null;
-      if (day < 1 || day > 31) return null;
-      if (year < 1900 || year > 2100) return null;
+      if (formatDt.month < 1 || formatDt.month > 12) return null;
+      if (formatDt.day < 1 || formatDt.day > 31) return null;
+      if (formatDt.year < 1900 || formatDt.year > 2100) return null;
 
-      return DateTime(year, month, day);
+      return formatDt;
     } catch (e) {
       return null;
     }
@@ -176,24 +183,25 @@ final class CalendarPickerController
     }
 
     final parts = value.split('/');
-    final day = int.parse(parts[0]);
-    final month = int.parse(parts[1]);
-    final year = int.parse(parts[2]);
+    final reformatted = '${parts[2]}-${parts[1]}-${parts[0]}';
+    final formatDt = DateTime.parse(reformatted);
 
-    if (month < 1 || month > 12) {
+    if (formatDt.month < 1 || formatDt.month > 12) {
       return DatePickerValidationStatus.dateFormatError;
     }
-    if (day < 1 || day > 31) return DatePickerValidationStatus.daysInMonthError;
+    if (formatDt.day < 1 || formatDt.day > 31) {
+      return DatePickerValidationStatus.daysInMonthError;
+    }
 
-    final inputDate = DateTime(year, month, day);
+    final inputDate = DateTime(formatDt.year, formatDt.month, formatDt.day);
 
     if (inputDate.isBefore(today.subtract(const Duration(days: 1))) ||
         inputDate.isAfter(maxDate)) {
       return DatePickerValidationStatus.dateRangeError;
     }
 
-    final daysInMonth = DateTime(year, month + 1, 0).day;
-    if (day > daysInMonth) {
+    final daysInMonth = DateTime(formatDt.year, formatDt.month + 1, 0).day;
+    if (formatDt.day > daysInMonth) {
       return DatePickerValidationStatus.daysInMonthError;
     }
 
@@ -209,12 +217,22 @@ final class CalendarPickerController
   }
 }
 
-final class TimePickerController extends FieldDatePickerController<String?> {
+final class TimePickerController extends FieldDatePickerController<DateTime?> {
   @override
-  String get pattern => 'HH:MM';
+  DateTime? get selectedValue {
+    if (text.isEmpty) return null;
+    final parts = text.split(':');
+    return DateTime(
+      0,
+      0,
+      0,
+      int.parse(parts[0]),
+      int.parse(parts[1]),
+    );
+  }
 
   @override
-  String? get selectedValue => text;
+  String get pattern => 'HH:MM';
 
   @override
   DatePickerValidationStatus validate(String? value) {
@@ -230,8 +248,13 @@ final class TimePickerController extends FieldDatePickerController<String?> {
   }
 
   @override
-  void setValue(String? newValue) {
-    value = TextEditingValue(text: newValue.toString());
+  void setValue(DateTime? newValue) {
+    if (newValue == null) return;
+    value = TextEditingValue(
+      text:
+          // ignore: lines_longer_than_80_chars
+          '${newValue.hour.toString().padLeft(2, '0')}:${newValue.minute.toString().padLeft(2, '0')}',
+    );
   }
 }
 

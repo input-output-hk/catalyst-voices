@@ -1,9 +1,10 @@
 part of 'voices_date_picker_field.dart';
 
 class VoicesTimePicker extends StatefulWidget {
-  final ValueChanged<String> onTap;
+  final ValueChanged<DateTime> onTap;
   final String? selectedTime;
   final String timeZone;
+
   const VoicesTimePicker({
     super.key,
     required this.onTap,
@@ -17,21 +18,18 @@ class VoicesTimePicker extends StatefulWidget {
 
 class _VoicesTimePickerState extends State<VoicesTimePicker> {
   late final ScrollController _scrollController;
-  List<String> get timeList => _generateTimeList();
+  final double itemExtent = 40;
+  List<TimeSlot> get timeList => _generateTimeList();
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController();
 
-    if (widget.selectedTime != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final index = timeList.indexOf(widget.selectedTime!);
-        if (index != -1) {
-          _scrollController.jumpTo(
-            index * 40.0,
-          );
-        }
+    final initialSelection = widget.selectedTime;
+    if (initialSelection != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToTimeZone(initialSelection);
       });
     }
   }
@@ -54,46 +52,47 @@ class _VoicesTimePickerState extends State<VoicesTimePicker> {
           color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: ListView(
+        child: ListView.builder(
           controller: _scrollController,
-          children: timeList
-              .map(
-                (e) => TimeText(
-                  key: ValueKey(e),
-                  value: e,
-                  onTap: widget.onTap,
-                  selectedTime: widget.selectedTime,
-                  timeZone: widget.timeZone,
-                ),
-              )
-              .toList(),
+          itemExtent: itemExtent,
+          itemCount: timeList.length,
+          itemBuilder: (context, index) => _TimeText(
+            key: ValueKey(timeList[index].formattedTime),
+            value: timeList[index],
+            onTap: widget.onTap,
+            selectedTime: widget.selectedTime,
+            timeZone: widget.timeZone,
+          ),
         ),
       ),
     );
   }
 
-  List<String> _generateTimeList() {
-    final times = <String>[];
-
-    for (var hour = 0; hour < 24; hour++) {
-      for (var minute = 0; minute < 60; minute += 30) {
-        times.add(
-          // ignore: lines_longer_than_80_chars
-          '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}',
-        );
-      }
+  void _scrollToTimeZone(String value) {
+    final index =
+        timeList.indexWhere((e) => e.formattedTime == widget.selectedTime);
+    if (index != -1) {
+      _scrollController.jumpTo(
+        index * itemExtent,
+      );
     }
+  }
 
-    return times;
+  List<TimeSlot> _generateTimeList() {
+    return [
+      for (var hour = 0; hour < 24; hour++)
+        for (final minute in [0, 30]) TimeSlot(hour: hour, minute: minute),
+    ];
   }
 }
 
-class TimeText extends StatelessWidget {
-  final ValueChanged<String> onTap;
-  final String value;
+class _TimeText extends StatelessWidget {
+  final ValueChanged<DateTime> onTap;
+  final TimeSlot value;
   final String? selectedTime;
   final String timeZone;
-  const TimeText({
+
+  const _TimeText({
     super.key,
     required this.value,
     required this.onTap,
@@ -109,7 +108,7 @@ class TimeText extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => onTap(value),
+        onTap: () => onTap(value.dateTime),
         child: ColoredBox(
           color: !isSelected
               ? Colors.transparent
@@ -121,7 +120,7 @@ class TimeText extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  value,
+                  value.formattedTime,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 if (isSelected) Text(timeZone),

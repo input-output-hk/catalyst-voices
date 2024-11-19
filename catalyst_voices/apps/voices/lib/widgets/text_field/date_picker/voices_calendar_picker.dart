@@ -1,6 +1,6 @@
 part of 'voices_date_picker_field.dart';
 
-class VoicesCalendarDatePicker extends StatelessWidget {
+class VoicesCalendarDatePicker extends StatefulWidget {
   final ValueChanged<DateTime> onDateSelected;
   final VoidCallback cancelEvent;
   final DateTime initialDate;
@@ -16,13 +16,12 @@ class VoicesCalendarDatePicker extends StatelessWidget {
     DateTime? lastDate,
   }) {
     final now = DateTime.now();
-    final maxDate = DateTime(now.year + 1, now.month, now.day);
     return VoicesCalendarDatePicker._(
       key: key,
       onDateSelected: onDateSelected,
       initialDate: initialDate ?? now,
       firstDate: firstDate ?? now,
-      lastDate: lastDate ?? maxDate,
+      lastDate: lastDate ?? DateTime(now.year + 1, now.month, now.day),
       cancelEvent: cancelEvent,
     );
   }
@@ -37,8 +36,14 @@ class VoicesCalendarDatePicker extends StatelessWidget {
   });
 
   @override
+  State<VoicesCalendarDatePicker> createState() =>
+      _VoicesCalendarDatePickerState();
+}
+
+class _VoicesCalendarDatePickerState extends State<VoicesCalendarDatePicker> {
+  DateTime selectedDate = DateTime.now();
+  @override
   Widget build(BuildContext context) {
-    var selectedDate = DateTime.now();
     return SizedBox(
       width: 450,
       child: Material(
@@ -52,9 +57,9 @@ class VoicesCalendarDatePicker extends StatelessWidget {
           child: Column(
             children: [
               CalendarDatePicker(
-                initialDate: initialDate,
-                firstDate: firstDate,
-                lastDate: lastDate,
+                initialDate: widget.initialDate,
+                firstDate: widget.firstDate,
+                lastDate: widget.lastDate,
                 onDateChanged: (val) {
                   selectedDate = val;
                 },
@@ -65,11 +70,11 @@ class VoicesCalendarDatePicker extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     VoicesTextButton(
-                      onTap: cancelEvent,
+                      onTap: widget.cancelEvent,
                       child: Text(context.l10n.cancelButtonText),
                     ),
                     VoicesTextButton(
-                      onTap: () => onDateSelected(selectedDate),
+                      onTap: () => widget.onDateSelected(selectedDate),
                       child: Text(context.l10n.ok.toUpperCase()),
                     ),
                   ],

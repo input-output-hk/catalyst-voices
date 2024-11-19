@@ -1,4 +1,5 @@
 export 'authentication/authentication.dart';
+export 'date_picker/time_slot.dart';
 export 'exception/localized_exception.dart';
 export 'exception/localized_unknown_exception.dart';
 export 'navigation/sections_list_view_item.dart';

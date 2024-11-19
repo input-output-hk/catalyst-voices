@@ -26,6 +26,7 @@ class CalendarFieldPicker extends BasePicker {
 
 class TimeFieldPicker extends BasePicker {
   final TimePickerController controller;
+
   final String timeZone;
 
   const TimeFieldPicker({
@@ -85,9 +86,9 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
       setState(() {
         _isOverlayOpen = false;
       });
-      final scrollController = ScrollControllerProvider.maybeOf(context);
-      if (scrollController != null && _scrollListener != null) {
-        scrollController.removeListener(_scrollListener!);
+      final scrollPosition = Scrollable.maybeOf(context)?.position;
+      if (scrollPosition != null && _scrollListener != null) {
+        scrollPosition.removeListener(_scrollListener!);
       }
       _overlayEntry?.remove();
       _overlayEntry = null;
@@ -131,7 +132,7 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
     });
     final overlay = Overlay.of(context, rootOverlay: true);
     final renderBox = context.findRenderObject() as RenderBox?;
-    final scrollController = ScrollControllerProvider.maybeOf(context);
+    final scrollPosition = Scrollable.maybeOf(context)?.position;
     final initialPosition = renderBox!.localToGlobal(
       Offset.zero,
     );
@@ -150,9 +151,9 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
                   final timeBox = _getRenderBox(timeKey);
 
                   if (_isBoxTapped(calendarBox, tapPosition)) {
-                    _handleCalendarTap();
+                    return _handleCalendarTap();
                   } else if (_isBoxTapped(timeBox, tapPosition)) {
-                    _handleTimeTap();
+                    return _handleTimeTap();
                   } else {
                     _removeOverlay();
                   }
@@ -171,11 +172,7 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
             ),
           ),
           Positioned(
-            top: initialPosition.dy +
-                50 -
-                (scrollController?.hasClients ?? false
-                    ? scrollController!.offset
-                    : 0),
+            top: initialPosition.dy + 50 - (scrollPosition?.pixels ?? 0),
             left: initialPosition.dx,
             child: child,
           ),
@@ -183,14 +180,14 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
       ),
     );
 
-    if (scrollController != null) {
+    if (scrollPosition != null) {
       void listener() {
         if (_overlayEntry != null) {
           _overlayEntry?.markNeedsBuild();
         }
       }
 
-      scrollController.addListener(listener);
+      scrollPosition.addListener(listener);
       _scrollListener = listener;
     }
 
@@ -284,9 +281,11 @@ class _CalendarFieldPickerState extends _BasePickerState<CalendarFieldPicker> {
         },
         decoration: _getInputDecoration(
           context,
-          VoicesIconButton(
-            onTap: _onTap,
-            child: _getIcon.buildIcon(),
+          ExcludeFocus(
+            child: VoicesIconButton(
+              onTap: _onTap,
+              child: _getIcon.buildIcon(),
+            ),
           ),
         ),
         onFieldSubmitted: (String value) {},
@@ -307,7 +306,7 @@ class _TimeFieldPickerState extends _BasePickerState<TimeFieldPicker> {
             _removeOverlay();
             widget.controller.setValue(value);
           },
-          selectedTime: widget.controller.selectedValue,
+          selectedTime: widget.controller.text,
           timeZone: widget.timeZone,
         ),
       );
@@ -326,9 +325,11 @@ class _TimeFieldPickerState extends _BasePickerState<TimeFieldPicker> {
         },
         decoration: _getInputDecoration(
           context,
-          VoicesIconButton(
-            onTap: _onTap,
-            child: _getIcon.buildIcon(),
+          ExcludeFocus(
+            child: VoicesIconButton(
+              onTap: _onTap,
+              child: _getIcon.buildIcon(),
+            ),
           ),
         ),
         onFieldSubmitted: (String value) {},

@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 part 'base_picker.dart';
@@ -13,33 +14,6 @@ enum DateTimePickerType { date, time }
 
 final GlobalKey calendarKey = GlobalKey();
 final GlobalKey timeKey = GlobalKey();
-
-class ScrollControllerProvider extends InheritedWidget {
-  final ScrollController scrollController;
-
-  const ScrollControllerProvider({
-    super.key,
-    required this.scrollController,
-    required super.child,
-  });
-
-  static ScrollController of(BuildContext context) {
-    final provider =
-        context.dependOnInheritedWidgetOfExactType<ScrollControllerProvider>();
-    return provider!.scrollController;
-  }
-
-  static ScrollController? maybeOf(BuildContext context) {
-    final provider =
-        context.dependOnInheritedWidgetOfExactType<ScrollControllerProvider>();
-    return provider?.scrollController;
-  }
-
-  @override
-  bool updateShouldNotify(ScrollControllerProvider oldWidget) {
-    return scrollController != oldWidget.scrollController;
-  }
-}
 
 class VoicesDatePicker extends StatefulWidget {
   final DatePickerController controller;
@@ -55,6 +29,17 @@ class VoicesDatePicker extends StatefulWidget {
 }
 
 class _VoicesDatePickerState extends State<VoicesDatePicker> {
+  final CalendarPickerController _calendarPickerController =
+      CalendarPickerController();
+  final TimePickerController _timePickerController = TimePickerController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _calendarPickerController.dispose();
+    _timePickerController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -62,20 +47,14 @@ class _VoicesDatePickerState extends State<VoicesDatePicker> {
       children: [
         CalendarFieldPicker(
           key: calendarKey,
-          controller: widget.controller.calendarPickerController,
+          controller: _calendarPickerController,
         ),
         TimeFieldPicker(
           key: timeKey,
-          controller: widget.controller.timePickerController,
+          controller: _timePickerController,
           timeZone: widget.timeZone,
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    widget.controller.dispose();
   }
 }
