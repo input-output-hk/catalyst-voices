@@ -17,6 +17,7 @@ final class TitleStep extends RichTextStep {
     required super.id,
     required super.sectionId,
     required super.data,
+    super.guidances,
   });
 
   @override
