@@ -185,7 +185,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/catalyst_voices/lcov.info"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/lcov.info"
           allow-empty: true
           debug: true
           flag-name: flutter-test
