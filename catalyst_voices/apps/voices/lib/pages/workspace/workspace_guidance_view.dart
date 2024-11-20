@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 class GuidanceView extends StatefulWidget {
   final List<Guidance> guidances;
+
   const GuidanceView(this.guidances, {super.key});
 
   @override
@@ -17,25 +18,6 @@ class _GuidanceViewState extends State<GuidanceView> {
   final List<Guidance> filteredGuidances = [];
 
   GuidanceType? selectedType;
-
-  @override
-  void initState() {
-    super.initState();
-    filteredGuidances
-      ..clear()
-      ..addAll(widget.guidances);
-  }
-
-  @override
-  void didUpdateWidget(GuidanceView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.guidances != widget.guidances) {
-      filteredGuidances
-        ..clear()
-        ..addAll(widget.guidances);
-      _filterGuidances(selectedType);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +54,25 @@ class _GuidanceViewState extends State<GuidanceView> {
         ),
       ],
     );
+  }
+
+  @override
+  void didUpdateWidget(GuidanceView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.guidances != widget.guidances) {
+      filteredGuidances
+        ..clear()
+        ..addAll(widget.guidances);
+      _filterGuidances(selectedType);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    filteredGuidances
+      ..clear()
+      ..addAll(widget.guidances);
   }
 
   void _filterGuidances(GuidanceType? type) {
