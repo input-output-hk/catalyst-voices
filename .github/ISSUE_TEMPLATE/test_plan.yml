@@ -45,25 +45,25 @@ body:
       required: true
 
   - type: textarea
-      attributes:
-        label: Risks
-        description: Describe what risks can affect the accomplishment of the testplan. For example documentation is missing, not enough resources etc
-      validations:
-        required: true
+    attributes:
+      label: Risks
+      description: Describe what risks can affect the accomplishment of the testplan. For example documentation is missing, not enough resources etc
+    validations:
+      required: true
 
   - type: textarea
-      attributes:
-        label: Tools
-        description: Describe what tools will be needed for the testing, if new tools are needed to be developed
-      validations:
-        required: true
+    attributes:
+      label: Tools
+      description: Describe what tools will be needed for the testing, if new tools are needed to be developed
+    validations:
+      required: true
 
   - type: textarea
-      attributes:
-        label: Test strategy
-        description: Describe the strategy for testing
-      validations:
-        required: true
+    attributes:
+      label: Test strategy
+      description: Describe the strategy for testing
+    validations:
+      required: true
 
     - type: textarea
       attributes:
