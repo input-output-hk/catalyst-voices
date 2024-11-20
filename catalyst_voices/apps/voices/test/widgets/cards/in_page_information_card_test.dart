@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/cards/inpage_information_card.dart';
+import 'package:catalyst_voices/widgets/cards/in_page_information_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
