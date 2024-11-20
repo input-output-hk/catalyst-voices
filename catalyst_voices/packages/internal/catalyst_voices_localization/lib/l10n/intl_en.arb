@@ -986,5 +986,45 @@
   "noGuidanceForThisSection": "There is no guidance for this section",
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
+  },
+  "campaignIsLive": "Campaign Is Live (Published)",
+  "@campaignIsLive": {
+    "description": "Title of the campaign is live (published) space"
+  },
+  "campaignStaringSoon": "Campaign Staring Soon (Ready to deploy)",
+  "@campaignStaringSoon": {
+    "description": "Title of the campaign staring soon space"
+  },
+  "campaignConcluded": "Campaign Concluded, Result are in!",
+  "@campaignConcluded": {
+    "description": "Title of the campaign concluded space"
+  },
+  "campaignBeginsOn": "Campaign begins on {date} at {time}",
+  "@campaignBeginsOn": {
+    "description": "Title of the campaign concluded space",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "campaignEndsOn": "Campaign ends on {date} at {time}",
+  "@campaignEndsOn": {
+    "description": "Title of the campaign concluded space",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "viewProposals": "View proposals",
+  "@viewProposals": {
+    "description": "Title of the view proposals space"
   }
 }
