@@ -1,5 +1,5 @@
 name: Test Plan
-description: Create a test plan
+description: Create a test plan.
 title: "[Test plan]: <title>"
 labels: ["testplan"]
 projects: ["/input-output-hk/102"]
@@ -11,18 +11,64 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    attributes:
+      label: Stakeholders
+      description: Insert the relevant stakeholders that need to understand, review and approve the test plan
+      placeholder: |
+          | Name | Role | Approval |
+          |:-:|:-:|:-:|
+          |  |  | &#x2610;|
+    validations:
+      required: true
+
   - type: input
     attributes:
       label: Test plan document
       placeholder: https://input-output-hk.github.io/catalyst-voices/architecture/10_quality/testplans/template.md
-      description: A link to the test plan document.
+      description: A link to the test plan document if it is needed.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Requirements
+      description: Business requirements, insert links to relevant Github or JIRA tickets, list what platforms are supported, what will not be tested, etc
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Acceptance criteria
+      description: List the acceptance criteria for this feature
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Risks
+      description: Describe what risks can affect the accomplishment of the testplan. For example documentation is missing, not enough resources etc
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Tools
+      description: Describe what tools will be needed for the testing, if new tools are needed to be developed
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Test strategy
+      description: Describe the strategy for testing
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: Test cases
-      description: The list of the test cases that are part of the test plan
+      description: The list of the test cases that are part of the test plan. Use the ACC framework [https://input-output-hk.github.io/catalyst-voices/architecture/10_quality/testplans/template/#acc-framework] to help you define testcases
       placeholder: |
         -[] https://github.com/input-output-hk/catalyst-voices/issues/1
         -[] https://github.com/input-output-hk/catalyst-voices/issues/1
