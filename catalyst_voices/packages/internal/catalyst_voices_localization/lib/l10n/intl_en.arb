@@ -1026,5 +1026,9 @@
   "viewProposals": "View proposals",
   "@viewProposals": {
     "description": "Title of the view proposals space"
+  },
+  "viewVotingResults": "View Voting Results",
+  "@viewVotingResults": {
+    "description": "Title of the view voting results space"
   }
 }

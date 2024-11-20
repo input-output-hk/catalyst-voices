@@ -61,7 +61,7 @@ class InPageInformationCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 OutlinedButton(
                   onPressed: () {}, // TODO(ryszard-schossler): add logic
-                  child: Text(context.l10n.viewProposals),
+                  child: Text(_getButtonText(context)),
                 ),
               ],
             ],
@@ -69,6 +69,14 @@ class InPageInformationCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getButtonText(BuildContext context) {
+    if (information.stage == CampaignStage.live) {
+      return context.l10n.viewProposals;
+    } else {
+      return context.l10n.viewVotingResults;
+    }
   }
 }
 
