@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/helpers.dart';
 
 void main() {
-  late ThemeData theme;
   late VoicesColorScheme voicesColors;
 
   final draftInformationTest = DraftCampaignInformation(
@@ -26,10 +25,6 @@ void main() {
   );
 
   setUp(() {
-    theme = ThemeBuilder.buildTheme(
-      brand: Brand.catalyst,
-      brightness: Brightness.light,
-    );
     voicesColors = const VoicesColorScheme.optional(
       outlineBorderVariant: Colors.red,
       elevationsOnSurfaceNeutralLv1White: Colors.blue,
@@ -53,7 +48,6 @@ void main() {
       (tester) async {
         await tester.pumpApp(
           buildTestWidget(completedInformationText),
-          theme: theme,
           voicesColors: voicesColors,
         );
 
@@ -67,7 +61,6 @@ void main() {
     testWidgets('Renders correctly for draft information', (tester) async {
       await tester.pumpApp(
         buildTestWidget(draftInformationTest),
-        theme: theme,
         voicesColors: voicesColors,
       );
 
@@ -87,7 +80,6 @@ void main() {
     testWidgets('Renders correctly for live information', (tester) async {
       await tester.pumpApp(
         buildTestWidget(liveInformationTest),
-        theme: theme,
         voicesColors: voicesColors,
       );
 
@@ -108,7 +100,6 @@ void main() {
     testWidgets('Renders correctly for completed information', (tester) async {
       await tester.pumpApp(
         buildTestWidget(completedInformationText),
-        theme: theme,
         voicesColors: voicesColors,
       );
 
