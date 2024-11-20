@@ -1,5 +1,5 @@
 name: Test Plan
-description: Create a test plan. This is meant to be only a guideline, the paragraphs can be removed or added as they fit.
+description: Create a test plan.
 title: "[Test plan]: <title>"
 labels: ["testplan"]
 projects: ["/input-output-hk/102"]
