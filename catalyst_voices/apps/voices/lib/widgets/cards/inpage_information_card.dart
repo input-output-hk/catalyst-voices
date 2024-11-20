@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 class InPageInformationCard extends StatelessWidget {
   final InPageInformation information;
+
   const InPageInformationCard({
     super.key,
     required this.information,
