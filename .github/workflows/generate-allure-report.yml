@@ -189,7 +189,7 @@ jobs:
           allow-empty: true
           debug: true
           flag-name: flutter-test
-          base-path: "/home/runner/work/catalyst-voices/catalyst-voices/"
+          base-path: "/home/runner/work/catalyst-voices/catalyst-voices/catalyst_voices/"
           parallel: true
 
   upload-coverage-report:

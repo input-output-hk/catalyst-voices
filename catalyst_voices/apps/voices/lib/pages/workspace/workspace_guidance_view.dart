@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 class GuidanceView extends StatefulWidget {
   final List<Guidance> guidances;
-  const GuidanceView(this.guidances);
+  const GuidanceView(this.guidances, {super.key});
 
   @override
   State<GuidanceView> createState() => _GuidanceViewState();
