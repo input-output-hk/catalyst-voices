@@ -191,9 +191,13 @@ scripts:
 
   test-report:
     run: |
-      # cleanup from previous build and create new folders
+      # cleanup from previous build and create empty folder where test reports will be stored
       rm -fR $MELOS_ROOT_PATH/test_reports
       mkdir $MELOS_ROOT_PATH/test_reports
+
+      # cleanup old coverage files and create empty folder where coverage files will be stored
+      find . -type d -name coverage -prune -exec rm -rf {} \;
+      mkdir $MELOS_ROOT_PATH/coverage
 
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
@@ -207,18 +211,23 @@ scripts:
       EXIT_CODE=$?
 
       # removes code coverage for generated code
-      melos exec -c 1 --dir-exists="test" -- \
-        lcov --remove coverage/lcov.info -o coverage/lcov.info --ignore-errors unused,unused \
-        '*.swagger.dart' \
-        '*.chopper.dart' \
+      find . -name "*.lcov.info" -exec \
+        lcov --remove {} -o {} --ignore-errors unused,unused \
         '*.g.dart' \
         '*.freezed.dart' \
-        'lib/generated/**'
+        '*.chopper.dart' \
+        '*.swagger.dart' \
+        '*.openapi.dart' \
+        '*.gen.dart' \
+        '*.swagger.*.dart' \
+        'lib/generated/**' \;
 
+      # merges all coverage reports into a single one and puts it in /coverage/lcov.info
       dart pub global run combine_coverage --repo-path=.
       exit $EXIT_CODE
 
     description: |
       Run `flutter test` for all packages and generate junit and coverage reports.
       The test reports are saved in /test_reports folder.
-      The coverages are saved for each package separately in /coverage folder.
+      The coverages are saved in coverage/lcov.info file for each tested package.
+      The combined coverage is saved in the /coverage/lcov.info file.
