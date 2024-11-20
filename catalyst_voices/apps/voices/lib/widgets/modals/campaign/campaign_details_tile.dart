@@ -210,9 +210,9 @@ class _CampaignDataTile extends StatelessWidget {
                   color: colors.textOnPrimaryLevel1,
                 ),
               ),
-            ]
+            ],
           ],
-        )
+        ),
       ],
     );
   }
