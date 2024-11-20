@@ -136,18 +136,8 @@
   "@snackbarErrorMessageText": {
     "description": "Text shown in the Snackbar widget when the message is an error message."
   },
-  "snackbarRefreshButtonText": "Refresh",
-  "@snackbarRefreshButtonText": {
-    "description": "Text shown in the Snackbar widget for the refresh button."
-  },
-  "snackbarMoreButtonText": "Learn more",
-  "@snackbarMoreButtonText": {
-    "description": "Text shown in the Snackbar widget for the more button."
-  },
-  "snackbarOkButtonText": "Ok",
-  "@snackbarOkButtonText": {
-    "description": "Text shown in the Snackbar widget for the ok button."
-  },
+  "refresh": "Refresh",
+  "ok": "Ok",
   "seedPhraseSlotNr": "Slot {nr}",
   "@seedPhraseSlotNr": {
     "description": "When user arranges seed phrases this text is shown when phrase was not selected",
@@ -595,10 +585,6 @@
   "@walletLinkRoleSummaryContent3": {
     "description": "The last part of the message on the role summary screen in registration."
   },
-  "walletLinkRoleSummaryButton": "Confirm & Sign with wallet",
-  "@walletLinkRoleSummaryButton": {
-    "description": "A button label on the role summary screen in registration for the next step."
-  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."
@@ -812,17 +798,8 @@
     "description": "Refers to a dark theme mode."
   },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
-  "@keychainDeletedDialogTitle": {
-    "description": "A title on keychain deleted dialog"
-  },
-  "keychainDeletedDialogSubtitle": "Catalyst keychain removed",
-  "@keychainDeletedDialogSubtitle": {
-    "description": "A subtitle on keychain deleted dialog"
-  },
-  "keychainDeletedDialogInfo": "Catalyst keychain removed",
-  "@keychainDeletedDialogInfo": {
-    "description": "An info on keychain deleted dialog"
-  },
+  "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.",
+  "keychainDeletedDialogInfo": "We reverted this device to Catalyst first use.",
   "registrationCompletedTitle": "Catalyst account setup",
   "registrationCompletedSubtitle": "Completed!",
   "registrationCompletedSummaryHeader": "Summary",
@@ -913,6 +890,7 @@
   "recoveryAccountDetailsAction": "Set unlock password for this device",
   "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password f\u2028or this device",
   "recoveryUnlockPasswordInstructionsSubtitle": "With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.  \u2028\u2028But it can be a bit tedious to enter every single time you want to use the app.  \u2028\u2028In this next step, you'll set your Unlock Password for your current device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "recoverDifferentKeychain": "Restore a different keychain",
   "unlockDialogHeader": "Unlock Catalyst",
   "@unlockDialogHeader": {
     "description": "The header label in unlock dialog."
@@ -975,5 +953,38 @@
   "connectDifferentWallet": "Connect a different wallet",
   "@connectDifferentWallet": {
     "description": "A button label to connect a different wallet in wallet detail panel."
+  },
+  "reviewRegistrationTransaction": "Review registration transaction",
+  "@reviewRegistrationTransaction": {
+    "description": "A button label to review the registration transaction in wallet detail panel."
+  },
+  "saveBeforeEditingErrorText": "Please save before editing something else",
+  "mandatoryGuidanceType": "Mandatory",
+  "@mandatoryGuidanceType": {
+    "description": "Guidance type label for mandatory guidance"
+  },
+  "educationGuidanceType": "Education",
+  "@educationGuidanceType": {
+    "description": "Guidance type label for education guidance"
+  },
+  "tipsGuidanceType": "Tips",
+  "@tipsGuidanceType": {
+    "description": "Guidance type label for tips guidance"
+  },
+  "all": "All",
+  "@all": {
+    "description": "Primary used to select all object. To display object without any filter"
+  },
+  "noGuidanceOfThisType": "There is no guidance of this type",
+  "@noGuidanceOfThisType": {
+    "description": "Message when there is no guidance of this type"
+  },
+  "selectASection": "Select a section",
+  "@selectASection": {
+    "description": "Message when there is no section selected"
+  },
+  "noGuidanceForThisSection": "There is no guidance for this section",
+  "@noGuidanceForThisSection": {
+    "description": "Message when there is no guidance for this section"
   }
 }

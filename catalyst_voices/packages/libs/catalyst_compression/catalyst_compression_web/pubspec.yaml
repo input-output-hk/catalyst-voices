@@ -19,6 +19,8 @@ flutter:
 
   assets:
     - assets/js/
+    - assets/js/brotli/
+    - assets/js/zstd/
 
 dependencies:
   catalyst_compression_platform_interface: ^0.2.0

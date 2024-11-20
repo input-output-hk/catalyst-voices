@@ -15,7 +15,7 @@ class VoicesSnackbarExample extends StatelessWidget {
       [
         VoicesSnackBarPrimaryAction(
           onPressed: () {},
-          child: Text(context.l10n.snackbarRefreshButtonText),
+          child: Text(context.l10n.refresh),
         ),
         VoicesSnackBarSecondaryAction(
           onPressed: () {},

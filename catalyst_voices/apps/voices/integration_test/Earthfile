@@ -3,7 +3,7 @@ VERSION 0.8
 IMPORT ../../.. AS catalyst-voices
 
 integration-test-web:
-    FROM catalyst-voices+build-web
+    FROM catalyst-voices+code-generator
     ARG TARGETARCH
     ARG browser
     LET driver_port = 4444
@@ -21,6 +21,9 @@ integration-test-web:
     # IF [ $browser = "edge" && $TARGETARCH = "amd64" ]]
     #    LET driver = "msedgedriver"
     # END
+    
+    WORKDIR /frontend/apps/voices
+
     RUN ($driver --port=$driver_port > $driver.log &) && \
         sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
@@ -35,6 +38,7 @@ integration-test-web:
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
+
     IF [ -f fail ]
         RUN --no-cache echo ""$browser" integration test failed" && \
             echo "Printing "$driver" logs..." && \
@@ -42,7 +46,10 @@ integration-test-web:
             exit 1
     END
 
-test-web-all:
+# TODO(dtscalac): disabled integration tests due to them being flaky,
+# reenable when enable-threads.js workaround is removed
+# and https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407 closed
+disabled-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome \
             --browser=firefox

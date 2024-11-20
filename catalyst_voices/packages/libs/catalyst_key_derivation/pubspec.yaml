@@ -11,6 +11,10 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
+  cbor: ^6.2.0
+  convert: ^3.1.1
+  cryptography: ^2.7.0
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_rust_bridge: 2.5.1
@@ -22,8 +26,7 @@ dev_dependencies:
   ffigen: ^11.0.0
   flutter_test:
     sdk: flutter
-  integration_test:
-    sdk: flutter
+  test: ^1.24.9
 
 flutter:
   plugin:
@@ -34,3 +37,5 @@ flutter:
         ffiPlugin: true
       macos:
         ffiPlugin: true
+  assets:
+    - assets/js/
