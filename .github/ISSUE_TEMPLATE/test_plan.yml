@@ -65,13 +65,13 @@ body:
     validations:
       required: true
 
-    - type: textarea
-      attributes:
-        label: Test cases
-        description: The list of the test cases that are part of the test plan. Use the ACC framework [https://input-output-hk.github.io/catalyst-voices/architecture/10_quality/testplans/template/#acc-framework] to help you define testcases
-        placeholder: |
-          -[] https://github.com/input-output-hk/catalyst-voices/issues/1
-          -[] https://github.com/input-output-hk/catalyst-voices/issues/1
-          -[] https://github.com/input-output-hk/catalyst-voices/issues/1
-      validations:
-        required: true
+  - type: textarea
+    attributes:
+      label: Test cases
+      description: The list of the test cases that are part of the test plan. Use the ACC framework [https://input-output-hk.github.io/catalyst-voices/architecture/10_quality/testplans/template/#acc-framework] to help you define testcases
+      placeholder: |
+        -[] https://github.com/input-output-hk/catalyst-voices/issues/1
+        -[] https://github.com/input-output-hk/catalyst-voices/issues/1
+        -[] https://github.com/input-output-hk/catalyst-voices/issues/1
+    validations:
+      required: true
