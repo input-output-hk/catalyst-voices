@@ -17,8 +17,8 @@ body:
       description: Insert the relevant stakeholders that need to understand, review and approve the test plan
       placeholder: |
           | Name | Role | Approval |
-          |:-:|:-:|:-:|
-          |  |  | &#x2610;|
+          |:-: |:-:|:-:|
+          |  |  | |
     validations:
       required: true
 
