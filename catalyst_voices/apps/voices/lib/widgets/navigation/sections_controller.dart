@@ -12,15 +12,30 @@ final class SectionsControllerState extends Equatable {
   final Set<int> openedSections;
   final SectionStepId? activeStepId;
   final Set<SectionStepId> editStepsIds;
+  final GuidanceType? activeGuidance;
 
   const SectionsControllerState({
     this.sections = const [],
     this.openedSections = const {},
     this.activeStepId,
     this.editStepsIds = const {},
+    this.activeGuidance,
   });
 
   int? get activeSectionId => activeStepId?.sectionId;
+
+  int? get activeStep => activeStepId?.stepId;
+
+  List<Guidance>? get activeStepGuidances {
+    final activeStepId = this.activeStepId;
+    if (activeStepId == null) {
+      return null;
+    } else {
+      return sections[activeStepId.sectionId]
+          .steps[activeStepId.stepId]
+          .guidances;
+    }
+  }
 
   bool get allSegmentsClosed => openedSections.isEmpty;
 
@@ -61,12 +76,14 @@ final class SectionsControllerState extends Equatable {
     Set<int>? openedSections,
     Optional<SectionStepId>? activeStepId,
     Set<SectionStepId>? editStepsIds,
+    Optional<GuidanceType>? activeGuidance,
   }) {
     return SectionsControllerState(
       sections: sections ?? this.sections,
       openedSections: openedSections ?? this.openedSections,
       activeStepId: activeStepId.dataOr(this.activeStepId),
       editStepsIds: editStepsIds ?? this.editStepsIds,
+      activeGuidance: activeGuidance?.dataOr(this.activeGuidance),
     );
   }
 
@@ -76,6 +93,7 @@ final class SectionsControllerState extends Equatable {
         openedSections,
         activeStepId,
         editStepsIds,
+        activeGuidance,
       ];
 }
 
@@ -121,6 +139,14 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
       }
     }
 
+    //If user want to expand/hide segment and active step is not in the same section
+    //it will not change the active section.
+    //check if activeStepId is not null because if it is it should select
+    //the first section of this segment id.
+    if (value.activeSectionId != id && value.activeStepId != null) {
+      activeStepId = Optional.of(value.activeStepId!);
+    }
+
     value = value.copyWith(
       openedSections: openedSections,
       activeStepId: activeStepId,
@@ -155,6 +181,10 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
       editStepsIds: editStepsIds,
       activeStepId: activeStepId,
     );
+  }
+
+  void setActiveGuidance(GuidanceType? type) {
+    value = value.copyWith(activeGuidance: Optional(type));
   }
 
   @override
