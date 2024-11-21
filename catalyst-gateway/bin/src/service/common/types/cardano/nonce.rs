@@ -44,7 +44,7 @@ pub(crate) struct Nonce(u64);
 
 /// Is the Nonce valid?
 fn is_valid(value: u64) -> bool {
-    value >=MINIMUM && value <=MAXIMUM
+    (MINIMUM..=MAXIMUM).contains(&value)
 }
 
 impl Type for Nonce {
@@ -86,13 +86,14 @@ impl ParseFromJSON for Nonce {
         let value = value.unwrap_or_default();
         match value {
             Value::Number(num) => {
-                let nonce = num.as_u64()
-                    .ok_or( ParseError::from("nonce must be a positive integer"))?;
+                let nonce = num
+                    .as_u64()
+                    .ok_or(ParseError::from("nonce must be a positive integer"))?;
                 if !is_valid(nonce) {
                     return Err(ParseError::from("nonce out of valid range"));
                 }
                 Ok(Self(nonce))
-            }
+            },
             _ => Err(ParseError::expected_type(value)),
         }
     }
