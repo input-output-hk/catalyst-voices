@@ -43,8 +43,8 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 pub(crate) struct Nonce(u64);
 
 /// Is the Nonce valid?
-fn is_valid(_value: u64) -> bool {
-    true
+fn is_valid(value: u64) -> bool {
+    value >=MINIMUM && value <=MAXIMUM
 }
 
 impl Type for Nonce {
@@ -84,16 +84,16 @@ impl ParseFromParameter for Nonce {
 impl ParseFromJSON for Nonce {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
-        if let Value::Number(value) = value {
-            let value = value
-                .as_u64()
-                .ok_or(ParseError::from("invalid slot number"))?;
-            if !is_valid(value) {
-                return Err("invalid AssetValue".into());
+        match value {
+            Value::Number(num) => {
+                let nonce = num.as_u64()
+                    .ok_or( ParseError::from("nonce must be a positive integer"))?;
+                if !is_valid(nonce) {
+                    return Err(ParseError::from("nonce out of valid range"));
+                }
+                Ok(Self(nonce))
             }
-            Ok(Self(value))
-        } else {
-            Err(ParseError::expected_type(value))
+            _ => Err(ParseError::expected_type(value)),
         }
     }
 }
