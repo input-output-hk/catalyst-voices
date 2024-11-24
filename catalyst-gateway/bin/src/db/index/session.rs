@@ -112,7 +112,9 @@ impl CassandraSession {
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let session = self.session.clone();
         let queries = self.queries.clone();
 
@@ -273,13 +275,13 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             created_scheme = true;
         }
 
-        let kspace = if cfg.namespace.to_string().to_lowercase() == "volatile" {
+        let key_space = if cfg.namespace.to_string().to_lowercase() == "volatile" {
             format!("volatile_{}", SCHEMA_VERSION.replace('-', "_"))
         } else {
             format!("persistent_{}", SCHEMA_VERSION.replace('-', "_"))
         };
 
-        match session.use_keyspace(kspace, false).await {
+        match session.use_keyspace(key_space, false).await {
             Ok(()) => (),
             Err(err) => {
                 error!("Failed to set keyspace, continue trying... {:?}", err);
