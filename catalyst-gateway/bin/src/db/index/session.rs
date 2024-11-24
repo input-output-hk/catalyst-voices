@@ -112,7 +112,9 @@ impl CassandraSession {
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let session = self.session.clone();
         let queries = self.queries.clone();
 
@@ -282,7 +284,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
 
         if let Ok(()) = session.use_keyspace(kspace, false).await {
         } else {
-            error!("Failed set keyspace");
+            error!("Failed to set keyspace, continue trying...");
             continue;
         };
 
