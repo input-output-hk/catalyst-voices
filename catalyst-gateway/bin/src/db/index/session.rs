@@ -280,11 +280,13 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             format!("persistent_{}", SCHEMA_VERSION.replace('-', "_"))
         };
 
-        if let Ok(()) = session.use_keyspace(kspace, false).await {
-        } else {
-            error!("Failed to set keyspace, continue trying...");
-            continue;
-        };
+        match session.use_keyspace(kspace, false).await {
+            Ok(()) => (),
+            Err(err) => {
+                error!("Failed to set keyspace, continue trying... {:?}", err);
+                continue;
+            },
+        }
 
         let queries = match queries::PreparedQueries::new(session.clone(), &cfg).await {
             Ok(queries) => Arc::new(queries),
