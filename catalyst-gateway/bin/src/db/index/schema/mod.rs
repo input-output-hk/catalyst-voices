@@ -180,7 +180,6 @@ pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
 
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
-#[allow(dead_code)]
 async fn create_namespace(
     session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
 ) -> anyhow::Result<()> {
