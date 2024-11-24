@@ -23,7 +23,7 @@ use super::{
     schema::create_schema,
 };
 use crate::{
-    db::index::queries,
+    db::index::{queries, schema::SCHEMA_VERSION},
     settings::{cassandra_db, Settings},
 };
 
@@ -274,11 +274,10 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             created_scheme = true;
         }
 
-        let mut kspace = String::new();
-        if cfg.namespace.to_string().to_lowercase() == "volatile" {
-            kspace = "volatile_08193dfe_698a_8177_bdf8_20c5691a06e7".to_string();
+        let kspace = if cfg.namespace.to_string().to_lowercase() == "volatile" {
+            format!("volatile_{}", SCHEMA_VERSION.replace('-', "_"))
         } else {
-            kspace = "persistent_08193dfe_698a_8177_bdf8_20c5691a06e7".to_string();
+            format!("persistent_{}", SCHEMA_VERSION.replace('-', "_"))
         };
 
         if let Ok(()) = session.use_keyspace(kspace, false).await {

@@ -16,8 +16,11 @@ use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_fr
 /// This constant is ONLY used by Unit tests to identify when the schema version will
 /// change accidentally, and is NOT to be used directly to set the schema version of the
 /// table namespaces.
-#[allow(dead_code)]
-const SCHEMA_VERSION: &str = "08193dfe-698a-8177-bdf8-20c5691a06e7";
+pub const SCHEMA_VERSION: &str = "08193dfe-698a-8177-bdf8-20c5691a06e7";
+
+/// AWS Keyspace actions are not instant, induce sleep to wait for remote keyspace
+/// actions to take place.
+const KEYSPACE_LATENCY: u64 = 15;
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
@@ -181,10 +184,6 @@ pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
 async fn create_namespace(
     session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
 ) -> anyhow::Result<()> {
-    /// Keyspace creation is not instant, induce sleep to wait for remote keyspace
-    /// creation.
-    const KEYSPACE_LATENCY: u64 = 15;
-
     let keyspace = namespace(cfg);
 
     let mut reg = Handlebars::new();
@@ -217,7 +216,6 @@ async fn create_namespace(
 }
 
 /// Create the Schema on the connected Cassandra DB
-#[allow(unreachable_code)]
 pub(crate) async fn create_schema(
     session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
 ) -> anyhow::Result<()> {
@@ -227,7 +225,7 @@ pub(crate) async fn create_schema(
 
     let failed = false;
 
-    thread::sleep(Duration::from_secs(30));
+    thread::sleep(Duration::from_secs(KEYSPACE_LATENCY));
 
     for (schema, _schema_name) in SCHEMAS {
         session.query_unpaged((*schema).to_string(), &[]).await?;
