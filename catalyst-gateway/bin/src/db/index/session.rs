@@ -112,9 +112,7 @@ impl CassandraSession {
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where
-        P: SerializeRow,
-    {
+    where P: SerializeRow {
         let session = self.session.clone();
         let queries = self.queries.clone();
 
