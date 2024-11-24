@@ -112,7 +112,9 @@ impl CassandraSession {
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let session = self.session.clone();
         let queries = self.queries.clone();
 
@@ -227,7 +229,6 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
-#[allow(unused_assignments)]
 async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
