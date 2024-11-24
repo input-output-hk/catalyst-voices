@@ -1,13 +1,12 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.23 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.24 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
 repo-catalyst-voices:
     FROM scratch
-
     WORKDIR /repo
     COPY --dir . .
 
@@ -19,39 +18,69 @@ builder:
     COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
-# Generates flutter code.
-# Based on Catalyst Gateway OpenAPI specifications generates models, clients
-# and serialization logic.
-# It accepts [save_locally] ARG that when true place the artifacts in the
-# proper folder of `catalyst_voices_services` local code.
-code-generator:
-    ARG save_locally=false
+# Creates filtered OpenAPI spec
+# Takes json file from openapi-filter from /packages/internal/catalyst_voices_services
+filter-openapi:
+    FROM node:18
+    WORKDIR /packages/internal/catalyst_voices_services
 
+    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    COPY packages/internal/catalyst_voices_services/openapi-filters.json openapi-filters.json
+
+    RUN npm install -g openapi-format
+    RUN openapi-format openapi/cat-gateway-api.json -o openapi/filtered-openapi.json --filterFile openapi-filters.json --verbose
+
+    RUN rm openapi/cat-gateway-api.json
+
+    SAVE ARTIFACT openapi/filtered-openapi.json 
+
+# Generates flutter code.
+# Generates codes for Catalyst Gateway OpenAPI, Voices Localization and
+# VoicesAssets and other packages that depend on code-generator.
+# It accepts [save_locally] ARG that when true place the artifacts in the
+# proper folders 
+# It accepts [filter_openapi] ARG that when true filter the openapi spec
+# using filters from /packages/internal/catalyst_voices_services/openapi-filters.json
+code-generator:
+    ARG save_locally=false 
+    ARG filter_openapi=true
+    FROM +builder
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
 
-    FROM +builder
+    RUN melos l10n
+    RUN melos build_runner
+
+    IF [ $save_locally = true ]
+        RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway_api.*.swagger.*" \)
+
+        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway_api.*.swagger.*" \))
+            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
+        END
+    ELSE 
+        SAVE ARTIFACT .
+    END
     WORKDIR packages/internal/catalyst_voices_services
-    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+
+    IF [ $filter_openapi = true ]
+        COPY +filter-openapi/filtered-openapi.json openapi/cat-gateway-api.json
+    ELSE
+        COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    END
+
     DO flutter-ci+OPENAPI_CODE_GEN \
         --SAVE_LOCALLY=$save_locally \
         --GEN_CODE_PATH=$gen_code_path \
         --LOCAL_GEN_CODE_PATH=$local_gen_code_path
 
-# Tests that the code generation is consistent
-# with the generated code currently in the repo.
-# This MUST be a test target because it requires artifacts from build targets.
-test-flutter-code-generator:
-    FROM +code-generator
-    # Copy generated files in the local file tree to a temporary folder
-    COPY packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
-    # Check diff between local code and earthly artifacts
-    RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
+    # restore current working directory to the root of the project
+    WORKDIR /frontend
+   
 
 # Runs static analysis on the code.
 check-static-analysis:
-    FROM +builder
-    DO flutter-ci+ANALYZE
+    FROM +code-generator
+    DO flutter-ci+ANALYZE 
 
 # Runs code formatting checks.
 check-code-formatting:
@@ -70,12 +99,12 @@ check-license:
 
 # Run unit tests
 test-unit:
-    FROM +builder
+    FROM +code-generator
     DO flutter-ci+UNIT_TESTS
 
 # Build web version of Catalyst Voices
 build-web:
-    FROM +builder
+    FROM +code-generator
     ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
