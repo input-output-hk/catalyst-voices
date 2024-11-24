@@ -9,13 +9,13 @@ use crate::db::{
 };
 
 /// Default Cassandra DB URL for the Persistent DB.
-pub(super) const PERSISTENT_URL_DEFAULT: &str = "cassandra.eu-central-1.amazonaws.com:9142";
+pub(super) const PERSISTENT_URL_DEFAULT: &str = "127.0.0.1:9042";
 
 /// Default Cassandra DB URL for the Persistent DB.
 pub(super) const PERSISTENT_NAMESPACE_DEFAULT: &str = "persistent";
 
 /// Default Cassandra DB URL for the Persistent DB.
-pub(super) const VOLATILE_URL_DEFAULT: &str = "cassandra.eu-central-1.amazonaws.com:9142";
+pub(super) const VOLATILE_URL_DEFAULT: &str = "127.0.0.1:9042";
 
 /// Default Cassandra DB URL for the Persistent DB.
 pub(super) const VOLATILE_NAMESPACE_DEFAULT: &str = "volatile";
@@ -60,8 +60,14 @@ pub(crate) struct EnvVars {
     /// Maximum Configured Batch size.
     pub(crate) max_batch_size: i64,
 
-    /// Deployment regions
-    pub(crate) regions: Vec<StringEnvVar>,
+    /// Deployment region 1
+    pub(crate) region_1: StringEnvVar,
+
+    /// Deployment region 2
+    pub(crate) region_2: StringEnvVar,
+
+    /// AWS replication factor, min is 3
+    pub(crate) replication_factor: StringEnvVar,
 }
 
 impl EnvVars {
@@ -97,7 +103,15 @@ impl EnvVars {
                 MIN_BATCH_SIZE,
                 MAX_BATCH_SIZE,
             ),
-            regions: vec![],
+            region_1: StringEnvVar::new(
+                &format!("CASSANDRA_{name}_REGION_1"),
+                "eu-central-1".into(),
+            ),
+            region_2: StringEnvVar::new(&format!("CASSANDRA_{name}_REGION_2"), "eu-west-1".into()),
+            replication_factor: StringEnvVar::new(
+                &format!("CASSANDRA_{name}_REPLICATION_FACTOR"),
+                "3".into(),
+            ),
         }
     }
 

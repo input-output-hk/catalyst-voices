@@ -175,16 +175,6 @@ pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
     )
 }
 
-/// Get deployment params for a particular db configuration
-pub(crate) fn deployment_params(cfg: &cassandra_db::EnvVars) -> String {
-    // Build and set deployment params
-    format!(
-        "{}_{}",
-        cfg.namespace.as_str(),
-        generate_cql_schema_version().replace('-', "_")
-    )
-}
-
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
 #[allow(dead_code)]
@@ -197,8 +187,6 @@ async fn create_namespace(
 
     let keyspace = namespace(cfg);
 
-    // Only replication factor of 3 is supported
-
     let mut reg = Handlebars::new();
     // disable default `html_escape` function
     // which transforms `<`, `>` symbols to `&lt`, `&gt`
@@ -206,7 +194,7 @@ async fn create_namespace(
     let query = reg
         .render_template(
             CREATE_NAMESPACE_CQL,
-            &json!({"keyspace": keyspace,"region1":"eu-central-1","region2":"eu-west-1","replication_factor": 3}),
+            &json!({"keyspace": keyspace,"region1":cfg.region_1.as_string(),"region2":cfg.region_2.as_string(),"replication_factor": cfg.replication_factor.as_string()}),
         )
         .context(format!("Keyspace: {keyspace}"))?;
 
