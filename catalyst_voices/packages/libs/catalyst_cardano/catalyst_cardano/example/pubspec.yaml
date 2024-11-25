@@ -21,6 +21,11 @@ dependencies:
   equatable: ^2.0.5
   flutter:
     sdk: flutter
+  flutter_driver:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  webdriver: ^3.0.3
 
 dev_dependencies:
   catalyst_analysis: ^2.0.0

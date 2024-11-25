@@ -1,0 +1,59 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "author": "https://typhonwallet.io",
+  "manifest_version": 3,
+  "name": "Typhon Wallet",
+  "description": "Blazing fast, feature-rich, secure, beautiful extension Typhon Wallet for Cardano.",
+  "version": "3.2.6",
+  "permissions": ["storage", "unlimitedStorage", "tabs"],
+  "icons": {
+    "16": "assets/xicons/16.png",
+    "19": "assets/xicons/19.png",
+    "32": "assets/xicons/32.png",
+    "38": "assets/xicons/38.png",
+    "64": "assets/xicons/64.png",
+    "128": "assets/xicons/128.png",
+    "512": "assets/xicons/512.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Typhon Wallet",
+    "default_icon": {
+      "16": "assets/xicons/16.png",
+      "19": "assets/xicons/19.png",
+      "32": "assets/xicons/32.png",
+      "38": "assets/xicons/38.png",
+      "64": "assets/xicons/64.png",
+      "128": "assets/xicons/128.png",
+      "512": "assets/xicons/512.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.bundle.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "exclude_matches": [
+        "https://web.whatsapp.com/*",
+        "https://www.youtube.com/*"
+      ],
+      "js": ["js/contentScript.bundle.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["*://connect.trezor.io/9/popup.html"],
+      "js": ["vendor/trezor-content-script.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["js/cardano.bundle.js", "assets/typhon.png"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
