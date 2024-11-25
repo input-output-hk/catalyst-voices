@@ -28,7 +28,7 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{address::Cip19StakeAddress, asset_name::AssetName},
+        types::cardano::{cip19_stake_address::Cip19StakeAddress, asset_name::AssetName},
     },
 };
 
