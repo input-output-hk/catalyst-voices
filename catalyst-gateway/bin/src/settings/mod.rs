@@ -8,6 +8,7 @@ use std::{
 };
 
 use anyhow::anyhow;
+use cardano_chain_follower::Network;
 use clap::Args;
 use dotenvy::dotenv;
 use duration_string::DurationString;
@@ -268,6 +269,12 @@ impl Settings {
     /// Get the configuration of the chain follower.
     pub(crate) fn follower_cfg() -> chain_follower::EnvVars {
         ENV_VARS.chain_follower.clone()
+    }
+
+    /// Chain Follower network (The Blockchain network we are configured to use).
+    /// Note: Catalyst Gateway can ONLY follow one network at a time.
+    pub(crate) fn cardano_network() -> Network {
+        ENV_VARS.chain_follower.chain
     }
 
     /// The API Url prefix
