@@ -32,7 +32,7 @@ const PROD: &str = "addr";
 const TEST: &str = "addr_test";
 /// Bech32 Match Pattern
 const BECH32: &str = "[a,c-h,j-n,p-z,0,2-9]";
-/// Length of the encoded address.
+/// Length of the encoded address (for type 0 - 3).
 const ENCODED_STAKED_ADDR_LEN: usize = 98;
 /// Length of the encoded address.
 const ENCODED_UNSTAKED_ADDR_LEN: usize = 53;
