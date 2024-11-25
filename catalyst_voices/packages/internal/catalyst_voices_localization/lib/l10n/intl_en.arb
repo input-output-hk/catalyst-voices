@@ -994,5 +994,20 @@
   "noProposalStateTitle": "No draft proposals yet",
   "@noProposalStateTitle": {
     "description": "Title shown when there are no proposals in the proposals tab"
+  },
+  "campaignDetails": "Campaign Details",
+  "description": "Description",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "categories": "Categories",
+  "proposals": "Proposals",
+  "totalSubmitted": "Total submitted",
+  "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
+  "@inXDays": {
+    "placeholders": {
+      "x": {
+        "type": "int"
+      }
+    }
   }
 }
