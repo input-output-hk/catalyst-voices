@@ -2,51 +2,11 @@
 
 use poem_openapi::{types::Example, Object};
 
-#[derive(Debug, Object)]
-#[oai(example, skip_serializing_if_is_none)]
-/// Individual details of a single error that was detected with the content of the
-/// request.
-pub(crate) struct ContentErrorDetail {
-    /// The location of the error
-    #[oai(validator(max_items = 100, max_length = "1000", pattern = "^[0-9a-zA-Z].*$"))]
-    loc: Option<Vec<String>>,
-    /// The error message.
-    #[oai(validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"))]
-    msg: Option<String>,
-    /// The type of error
-    #[oai(
-        rename = "type",
-        validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$")
-    )]
-    err_type: Option<String>,
-}
+use crate::service::common;
 
-impl Example for ContentErrorDetail {
-    /// Example for the `ContentErrorDetail` Payload.
-    fn example() -> Self {
-        Self {
-            loc: Some(vec!["body".to_owned()]),
-            msg: Some("Value is not a valid dict.".to_owned()),
-            err_type: Some("type_error.dict".to_owned()),
-        }
-    }
-}
-
-impl ContentErrorDetail {
-    /// Create a new `ContentErrorDetail` Response Payload.
-    pub(crate) fn new(error: &poem::Error) -> Self {
-        // TODO: See if we can get more info from the error than this.
-        Self {
-            loc: None,
-            msg: Some(error.to_string()),
-            err_type: None,
-        }
-    }
-}
-
-#[derive(Debug, Object)]
-#[oai(example, skip_serializing_if_is_none)]
-/// Server Error response to a Bad request.
+#[derive(Object)]
+#[oai(example)]
+/// The client has not sent valid data in its request, headers, parameters or body.
 pub(crate) struct UnprocessableContent {
     #[oai(validator(max_items = "1000", min_items = "1"))]
     /// Details of each error in the content that was detected.
@@ -73,6 +33,50 @@ impl Example for UnprocessableContent {
     fn example() -> Self {
         Self {
             detail: vec![ContentErrorDetail::example()],
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------
+
+#[derive(Object)]
+#[oai(example)]
+/// Individual details of a single error that was detected with the content of the
+/// request.
+pub(crate) struct ContentErrorDetail {
+    /// The location of the error
+    #[oai(validator(max_items = 100))]
+    loc: Option<Vec<common::types::generic::error_msg::ErrorMessage>>,
+    /// The error message.
+    #[oai(validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"))]
+    msg: Option<common::types::generic::error_msg::ErrorMessage>,
+    /// The type of error
+    #[oai(
+        rename = "type",
+        validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$")
+    )]
+    err_type: Option<common::types::generic::error_msg::ErrorMessage>,
+}
+
+impl Example for ContentErrorDetail {
+    /// Example for the `ContentErrorDetail` Payload.
+    fn example() -> Self {
+        Self {
+            loc: Some(vec!["body".into()]),
+            msg: Some("Value is not a valid dict.".into()),
+            err_type: Some("type_error.dict".into()),
+        }
+    }
+}
+
+impl ContentErrorDetail {
+    /// Create a new `ContentErrorDetail` Response Payload.
+    pub(crate) fn new(error: &poem::Error) -> Self {
+        // TODO: See if we can get more info from the error than this.
+        Self {
+            loc: None,
+            msg: Some(error.to_string().into()),
+            err_type: None,
         }
     }
 }

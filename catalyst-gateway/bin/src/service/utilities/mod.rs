@@ -4,16 +4,30 @@ pub(crate) mod convert;
 pub(crate) mod middleware;
 pub(crate) mod net;
 
-use pallas::ledger::addresses::Network as PallasNetwork;
-use poem_openapi::types::ToJSON;
+use anyhow::{bail, Result};
+// use pallas::ledger::addresses::Network as PallasNetwork;
+// use poem_openapi::types::ToJSON;
 
-use crate::service::common::objects::cardano::network::Network;
+// use crate::service::common::objects::cardano::network::Network;
 
 /// Convert bytes to hex string with the `0x` prefix
-pub(crate) fn to_hex_with_prefix(bytes: &[u8]) -> String {
+pub(crate) fn as_hex_string(bytes: &[u8]) -> String {
     format!("0x{}", hex::encode(bytes))
 }
 
+/// Convert bytes to hex string with the `0x` prefix
+pub(crate) fn from_hex_string(hex: &str) -> Result<Vec<u8>> {
+    #[allow(clippy::string_slice)] // Safe because of size checks.
+    if hex.len() < 4 || hex.len() % 2 != 0 || &hex[0..2] != "0x" {
+        bail!("Invalid hex string");
+    }
+
+    #[allow(clippy::string_slice)] // Safe due to above checks.
+    Ok(hex::decode(&hex[2..])?)
+}
+
+/// Unused
+const _UNUSED: &str = r#"
 /// Network validation error
 #[derive(thiserror::Error, Debug)]
 pub(crate) enum NetworkValidationError {
@@ -63,3 +77,4 @@ pub(crate) fn check_network(
         PallasNetwork::Other(x) => Err(NetworkValidationError::UnknownNetwork(x).into()),
     }
 }
+"#;

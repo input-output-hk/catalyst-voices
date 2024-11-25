@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use anyhow::anyhow;
 use futures::StreamExt;
 use num_traits::ToPrimitive;
+use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use super::SlotNumber;
@@ -113,7 +114,7 @@ async fn calculate_stake_info(
         anyhow::bail!("Failed to acquire db session");
     };
 
-    let address = stake_address.to_stake_address()?;
+    let address: StakeAddress = stake_address.try_into()?;
     let stake_address_bytes = address.payload().as_hash().to_vec();
 
     let mut txos_by_txn = get_txo_by_txn(&session, stake_address_bytes.clone(), slot_num).await?;
