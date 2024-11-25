@@ -33,7 +33,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Value of a Cardano Native Asset (may not be zero)
+/// Slot number
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct SlotNo(u64);
 
