@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 use poem_openapi::Object;
 
+/// The proposal object.
 #[allow(clippy::missing_docs_in_private_items)]
 #[allow(clippy::struct_field_names)]
 #[derive(Object, Default)]
@@ -27,6 +28,7 @@ pub(crate) struct Proposal {
     proposer: Option<Proposer>,
 }
 
+/// The proposer object.
 #[allow(clippy::missing_docs_in_private_items)]
 #[derive(Object, Default)]
 pub(crate) struct Proposer {

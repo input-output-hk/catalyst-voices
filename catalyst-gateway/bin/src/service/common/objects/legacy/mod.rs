@@ -10,6 +10,7 @@ pub(crate) mod fragments_processing_summary;
 pub(crate) mod fund;
 pub(crate) mod hash;
 pub(crate) mod proposal;
+pub(crate) mod review;
 pub(crate) mod settings_info;
 pub(crate) mod stake_public_key;
 pub(crate) mod vote_plan;

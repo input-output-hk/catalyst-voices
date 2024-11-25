@@ -55,7 +55,7 @@ impl V0Api {
 
     /// Get settings.
     ///
-    /// Get settings.
+    /// Get settings information including fees detail.
     #[oai(
         path = "/settings",
         method = "get",
@@ -68,7 +68,7 @@ impl V0Api {
 
     /// Get fund.
     ///
-    /// Get fund.
+    /// Get fund information.
     #[oai(
         path = "/fund/",
         method = "get",
@@ -81,7 +81,7 @@ impl V0Api {
 
     /// Get list of proposals.
     ///
-    /// Get list of proposals
+    /// Get list of proposals and the proposal's detail.
     #[oai(
         path = "/proposals",
         method = "get",
@@ -110,7 +110,7 @@ impl V0Api {
 
     /// Get a proposal.
     ///
-    /// Get a proposal by its ID
+    /// Get a proposal filtering by its identifier.
     #[oai(
         path = "/proposals/:id",
         method = "get",
@@ -123,7 +123,7 @@ impl V0Api {
 
     /// Get proposal reviews.
     ///
-    /// Get proposal reviews by proposal ID
+    /// Get proposal reviews by proposal identifier.
     #[oai(
         path = "/reviews/:proposal_id",
         method = "get",
