@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 use anyhow::anyhow;
 use futures::StreamExt;
+use num_traits::ToPrimitive;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use super::SlotNumber;
@@ -80,7 +81,7 @@ struct TxoAssetInfo {
     /// Asset name.
     name: Vec<u8>,
     /// Asset amount.
-    amount: num_bigint::BigInt,
+    amount: i128,
 }
 
 /// TXO information used when calculating a user's stake info.
@@ -186,12 +187,12 @@ async fn get_txo_by_txn(
             .or_insert_with(Vec::new);
 
         match entry.iter_mut().find(|item| item.id == row.policy_id) {
-            Some(item) => item.amount += row.value,
+            Some(item) => item.amount += row.value.to_i128().unwrap_or(0),
             None => {
                 entry.push(TxoAssetInfo {
                     id: row.policy_id,
                     name: row.asset_name,
-                    amount: row.value,
+                    amount: row.value.to_i128().unwrap_or(0),
                 });
             },
         }
@@ -281,7 +282,7 @@ fn build_stake_info(
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
                         policy_hash: asset.id.try_into()?,
                         asset_name: asset.name.into(),
-                        amount: asset.amount.try_into()?,
+                        amount: num_bigint::BigInt::from(asset.amount).try_into()?,
                     });
                 }
 
