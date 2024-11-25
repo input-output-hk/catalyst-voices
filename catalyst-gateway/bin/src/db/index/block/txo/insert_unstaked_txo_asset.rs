@@ -40,14 +40,14 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
-        txn_hash: &[u8], txo: i16, policy_id: &[u8], asset_name: &str, slot_no: u64, txn: i16,
+        txn_hash: &[u8], txo: i16, policy_id: &[u8], asset_name: &[u8], slot_no: u64, txn: i16,
         value: i128,
     ) -> Self {
         Self {
             txn_hash: txn_hash.to_vec(),
             txo,
             policy_id: policy_id.to_vec(),
-            asset_name: asset_name.as_bytes().to_vec(),
+            asset_name: asset_name.to_vec(),
             slot_no: slot_no.into(),
             txn,
             value: value.into(),
