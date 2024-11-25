@@ -1,12 +1,23 @@
 //! `v0` Endpoints
-use poem_openapi::{payload::Binary, OpenApi};
+use poem_openapi::{
+    param::Path,
+    payload::{Binary, Json},
+    OpenApi,
+};
 
 use crate::service::{
     common::{auth::none::NoAuthorization, tags::ApiTags},
     utilities::middleware::schema_validation::schema_version_validation,
 };
+
+mod fund_get;
 mod message_post;
 mod plans_get;
+mod proposal_by_id_get;
+mod proposals_get;
+mod proposals_post;
+mod review_by_proposal_id_get;
+mod settings_get;
 
 /// `v0` API Endpoints
 pub(crate) struct V0Api;
@@ -40,5 +51,88 @@ impl V0Api {
     )]
     async fn plans_get(&self, _auth: NoAuthorization) -> plans_get::AllResponses {
         plans_get::endpoint().await
+    }
+
+    /// Get settings.
+    ///
+    /// Get settings information including fees detail.
+    #[oai(
+        path = "/settings",
+        method = "get",
+        operation_id = "GetSettings",
+        deprecated = true
+    )]
+    async fn settings_get(&self) -> settings_get::AllResponses {
+        settings_get::endpoint().await
+    }
+
+    /// Get fund.
+    ///
+    /// Get fund information.
+    #[oai(
+        path = "/fund/",
+        method = "get",
+        operation_id = "GetFund",
+        deprecated = true
+    )]
+    async fn fund_get(&self) -> fund_get::AllResponses {
+        fund_get::endpoint().await
+    }
+
+    /// Get list of proposals.
+    ///
+    /// Get list of proposals and the proposal's detail.
+    #[oai(
+        path = "/proposals",
+        method = "get",
+        operation_id = "GetProposals",
+        deprecated = true
+    )]
+    async fn proposals_get(&self) -> proposals_get::AllResponses {
+        proposals_get::endpoint().await
+    }
+
+    /// Get list of proposals.
+    ///
+    /// Get list of proposals according to the filter options.
+    /// This is a POST method, only to send the filter data over the HTTP body.
+    #[oai(
+        path = "/proposals",
+        method = "post",
+        operation_id = "GetProposalsByFilter",
+        deprecated = true
+    )]
+    async fn proposals_post(
+        &self, message: Json<Vec<proposals_post::dto::VotingHistoryItem>>,
+    ) -> proposals_post::AllResponses {
+        proposals_post::endpoint(message.0).await
+    }
+
+    /// Get a proposal.
+    ///
+    /// Get a proposal filtering by its identifier.
+    #[oai(
+        path = "/proposals/:id",
+        method = "get",
+        operation_id = "ShowProposalById",
+        deprecated = true
+    )]
+    async fn proposal_by_id_get(&self, id: Path<String>) -> proposal_by_id_get::AllResponses {
+        proposal_by_id_get::endpoint(id.0).await
+    }
+
+    /// Get proposal reviews.
+    ///
+    /// Get proposal reviews by proposal identifier.
+    #[oai(
+        path = "/reviews/:proposal_id",
+        method = "get",
+        operation_id = "GetReviewByProposalId",
+        deprecated = true
+    )]
+    async fn review_by_proposal_id_get(
+        &self, proposal_id: Path<String>,
+    ) -> review_by_proposal_id_get::AllResponses {
+        review_by_proposal_id_get::endpoint(proposal_id.0).await
     }
 }
