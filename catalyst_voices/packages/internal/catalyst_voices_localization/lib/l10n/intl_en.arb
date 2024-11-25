@@ -1009,5 +1009,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "campaignCategories": "Campaign Categories",
+  "cardanoUseCases": "Cardano Use Cases"
 }

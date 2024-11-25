@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// A menu of the app that
@@ -68,7 +69,7 @@ class _MenuButton extends StatelessWidget {
 
     final textStyle = textTheme.bodyMedium?.copyWith(
       color:
-          menuItem.enabled ? textTheme.bodySmall?.color : theme.disabledColor,
+          menuItem.isEnabled ? textTheme.bodySmall?.color : theme.disabledColor,
     );
 
     final children = menuChildren;
@@ -85,7 +86,7 @@ class _MenuButton extends StatelessWidget {
                     child: IconTheme(
                       data: IconThemeData(
                         size: 24,
-                        color: menuItem.enabled
+                        color: menuItem.isEnabled
                             ? textTheme.bodySmall?.color
                             : theme.disabledColor,
                       ),
@@ -138,32 +139,29 @@ class _MenuButton extends StatelessWidget {
 }
 
 /// Model representing Menu Item
-class MenuItem {
-  final int id;
-  final String label;
-  final Widget? icon;
-  final bool showDivider;
-  final bool enabled;
-
-  MenuItem({
-    required this.id,
-    required this.label,
-    this.icon,
-    this.showDivider = false,
-    this.enabled = true,
+final class MenuItem extends BasicPopupMenuItem {
+  const MenuItem({
+    required super.id,
+    required super.label,
+    super.isEnabled = true,
+    super.icon,
+    super.showDivider = false,
   });
 }
 
 /// Model representing Submenu Item
 /// and extending from MenuItem
-class SubMenuItem extends MenuItem {
-  List<MenuItem> children;
+final class SubMenuItem extends MenuItem {
+  final List<MenuItem> children;
 
-  SubMenuItem({
+  const SubMenuItem({
     required super.id,
     required super.label,
     required this.children,
     super.icon,
     super.showDivider,
   });
+
+  @override
+  List<Object?> get props => super.props + [children];
 }
