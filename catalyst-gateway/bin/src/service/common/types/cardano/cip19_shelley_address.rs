@@ -34,7 +34,7 @@ const TEST: &str = "addr_test";
 const BECH32: &str = "[a,c-h,j-n,p-z,0,2-9]";
 /// Length of the encoded address (for type 0 - 3).
 const ENCODED_STAKED_ADDR_LEN: usize = 98;
-/// Length of the encoded address.
+/// Length of the encoded address (for type 6 - 7).
 const ENCODED_UNSTAKED_ADDR_LEN: usize = 53;
 /// Regex Pattern
 const PATTERN: &str = concatcp!(
