@@ -1,30 +1,11 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:equatable/equatable.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-
-class ModalMenuItem extends Equatable {
-  final String id;
-  final String label;
-  final bool isEnabled;
-
-  const ModalMenuItem({
-    required this.id,
-    required this.label,
-    this.isEnabled = true,
-  });
-
-  @override
-  List<Object?> get props => [
-        id,
-        label,
-        isEnabled,
-      ];
-}
 
 class VoicesModalMenu extends StatelessWidget {
   final String? selectedId;
-  final List<ModalMenuItem> menuItems;
+  final List<MenuItem> menuItems;
   final ValueChanged<String>? onTap;
 
   const VoicesModalMenu({

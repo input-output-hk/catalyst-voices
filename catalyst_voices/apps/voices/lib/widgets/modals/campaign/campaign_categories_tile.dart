@@ -1,11 +1,17 @@
 import 'package:catalyst_voices/widgets/menu/voices_modal_menu.dart';
 import 'package:catalyst_voices/widgets/tiles/voices_expansion_tile.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoriesTile extends StatefulWidget {
+  final List<CampaignSection> sections;
+
   const CampaignCategoriesTile({
     super.key,
+    required this.sections,
   });
 
   @override
@@ -13,27 +19,72 @@ class CampaignCategoriesTile extends StatefulWidget {
 }
 
 class _CampaignCategoriesTileState extends State<CampaignCategoriesTile> {
+  String? _selectedSectionId;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _selectedSectionId = widget.sections.firstOrNull?.id;
+  }
+
+  @override
+  void didUpdateWidget(covariant CampaignCategoriesTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.sections != oldWidget.sections) {
+      if (!widget.sections.any((element) => element.id == _selectedSectionId)) {
+        _selectedSectionId = widget.sections.firstOrNull?.id;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final selectedSection = widget.sections
+        .singleWhereOrNull((element) => element.id == _selectedSectionId);
+
     return VoicesExpansionTile(
       initiallyExpanded: true,
-      title: Text('Campaign Categories'),
+      title: Text(context.l10n.campaignCategories),
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Menu(),
-            SizedBox(width: 32),
-            Expanded(child: _Details()),
+            _Menu(
+              selectedId: _selectedSectionId,
+              menuItems: widget.sections,
+              onTap: _updateSelection,
+            ),
+            const SizedBox(width: 32),
+            Expanded(
+              child: selectedSection != null
+                  ? _Details(section: selectedSection)
+                  : const SizedBox(),
+            ),
           ],
         ),
       ],
     );
   }
+
+  void _updateSelection(String id) {
+    setState(() {
+      _selectedSectionId = id;
+    });
+  }
 }
 
 class _Menu extends StatelessWidget {
-  const _Menu();
+  final String? selectedId;
+  final List<MenuItem> menuItems;
+  final ValueChanged<String> onTap;
+
+  const _Menu({
+    this.selectedId,
+    required this.menuItems,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +98,7 @@ class _Menu extends StatelessWidget {
       children: [
         const SizedBox(height: 16),
         Text(
-          'Cardano Use Cases',
+          context.l10n.cardanoUseCases,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: textTheme.titleSmall?.copyWith(
@@ -56,11 +107,9 @@ class _Menu extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         VoicesModalMenu(
-          selectedId: '1',
-          menuItems: [
-            ModalMenuItem(id: '1', label: 'Concept'),
-            ModalMenuItem(id: '2', label: 'Product'),
-          ],
+          selectedId: selectedId,
+          menuItems: menuItems,
+          onTap: onTap,
         ),
         const SizedBox(height: 16),
       ],
@@ -69,7 +118,11 @@ class _Menu extends StatelessWidget {
 }
 
 class _Details extends StatelessWidget {
-  const _Details();
+  final CampaignSection section;
+
+  const _Details({
+    required this.section,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +136,7 @@ class _Details extends StatelessWidget {
       children: [
         const SizedBox(height: 48),
         Text(
-          'Concept',
+          section.label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: textTheme.headlineMedium?.copyWith(
@@ -92,19 +145,14 @@ class _Details extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          'Section Title',
+          section.title,
           style: textTheme.titleLarge?.copyWith(
             color: colors.textOnPrimaryLevel0,
           ),
         ),
         const SizedBox(height: 16),
         Text(
-          'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum '
-          'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum '
-          'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum '
-          'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum '
-          'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum '
-          'Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum',
+          section.body,
           style: textTheme.bodyLarge?.copyWith(
             color: colors.textOnPrimaryLevel1,
           ),
