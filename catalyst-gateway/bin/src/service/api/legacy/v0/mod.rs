@@ -62,7 +62,7 @@ impl V0Api {
         operation_id = "GetSettings",
         deprecated = true
     )]
-    async fn settings_get(&self) -> settings_get::AllResponses {
+    async fn settings_get(&self, _auth: NoAuthorization) -> settings_get::AllResponses {
         settings_get::endpoint().await
     }
 
@@ -75,7 +75,7 @@ impl V0Api {
         operation_id = "GetFund",
         deprecated = true
     )]
-    async fn fund_get(&self) -> fund_get::AllResponses {
+    async fn fund_get(&self, _auth: NoAuthorization) -> fund_get::AllResponses {
         fund_get::endpoint().await
     }
 
@@ -88,7 +88,7 @@ impl V0Api {
         operation_id = "GetProposals",
         deprecated = true
     )]
-    async fn proposals_get(&self) -> proposals_get::AllResponses {
+    async fn proposals_get(&self, _auth: NoAuthorization) -> proposals_get::AllResponses {
         proposals_get::endpoint().await
     }
 
@@ -103,7 +103,7 @@ impl V0Api {
         deprecated = true
     )]
     async fn proposals_post(
-        &self, message: Json<Vec<proposals_post::dto::VotingHistoryItem>>,
+        &self, message: Json<Vec<proposals_post::dto::VotingHistoryItem>>, _auth: NoAuthorization,
     ) -> proposals_post::AllResponses {
         proposals_post::endpoint(message.0).await
     }
@@ -117,7 +117,13 @@ impl V0Api {
         operation_id = "ShowProposalById",
         deprecated = true
     )]
-    async fn proposal_by_id_get(&self, id: Path<String>) -> proposal_by_id_get::AllResponses {
+    async fn proposal_by_id_get(
+        &self,
+        /// The proposal identifier to be retrieved.
+        #[oai(validator(max_length = 256, min_length = 0, pattern = "[A-Za-z0-9_-]"))]
+        id: Path<String>,
+        _auth: NoAuthorization,
+    ) -> proposal_by_id_get::AllResponses {
         proposal_by_id_get::endpoint(id.0).await
     }
 
@@ -131,7 +137,11 @@ impl V0Api {
         deprecated = true
     )]
     async fn review_by_proposal_id_get(
-        &self, proposal_id: Path<String>,
+        &self,
+        /// The proposal identifier to retrieve the reviews.
+        #[oai(validator(max_length = 256, min_length = 0, pattern = "[A-Za-z0-9_-]"))]
+        proposal_id: Path<String>,
+        _auth: NoAuthorization,
     ) -> review_by_proposal_id_get::AllResponses {
         review_by_proposal_id_get::endpoint(proposal_id.0).await
     }

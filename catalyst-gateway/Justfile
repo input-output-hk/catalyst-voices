@@ -61,3 +61,8 @@ run-cat-gateway-mainnet: build-cat-gateway
 quick-schema-lint: build-cat-gateway
     ./target/release/cat-gateway docs cat-gateway-api.json
     docker run --rm -it -v $(pwd):/tmp stoplight/spectral:latest lint --ruleset "/tmp/tests/.oapi-v3.spectral.yml" "/tmp/cat-gateway-api.json"
+
+tmp:
+    cargo b -r
+    ./target/release/cat-gateway docs cat-gateway-api.json
+    spectral lint --ruleset "tests/.oapi-v3.spectral.yml" "cat-gateway-api.json"
