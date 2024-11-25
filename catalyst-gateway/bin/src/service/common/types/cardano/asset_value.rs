@@ -104,9 +104,14 @@ impl TryFrom<num_bigint::BigInt> for AssetValue {
     }
 }
 
-impl From<i128> for AssetValue {
-    fn from(value: i128) -> Self {
-        Self(value)
+impl TryFrom<i128> for AssetValue {
+    type Error = anyhow::Error;
+
+    fn try_from(value: i128) -> Result<Self, Self::Error> {
+        if !is_valid(value) {
+            bail!("Invalid Asset Value");
+        }
+        Ok(Self(value))
     }
 }
 

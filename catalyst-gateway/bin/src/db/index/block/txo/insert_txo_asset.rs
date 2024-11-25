@@ -40,8 +40,8 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
-        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, policy_id: &[u8], asset_name: &[u8],
-        value: i128,
+        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, policy_id: &[u8],
+        asset_name: &[u8], value: i128,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),

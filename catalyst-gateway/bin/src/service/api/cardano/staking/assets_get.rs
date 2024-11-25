@@ -27,7 +27,7 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{address::Cip19StakeAddress, asset_value::AssetValue},
+        types::cardano::{address::Cip19StakeAddress, asset_name::AssetName},
     },
 };
 
@@ -79,7 +79,7 @@ struct TxoAssetInfo {
     /// Asset hash.
     id: Vec<u8>,
     /// Asset name.
-    name: Vec<u8>,
+    name: AssetName,
     /// Asset amount.
     amount: i128,
 }
@@ -175,6 +175,10 @@ async fn get_txo_by_txn(
 
     while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
+        
+        let Some(row_val) = row.value.to_i128() else {
+            anyhow::bail!("Failed to convert bigint to i128");
+        };
 
         let txo_info_key = (row.slot_no.clone(), row.txn, row.txo);
         let Some(txo_info) = txo_map.get_mut(&txo_info_key) else {
@@ -187,12 +191,12 @@ async fn get_txo_by_txn(
             .or_insert_with(Vec::new);
 
         match entry.iter_mut().find(|item| item.id == row.policy_id) {
-            Some(item) => item.amount += row.value.to_i128().unwrap_or(0),
+            Some(item) => item.amount += row_val,
             None => {
                 entry.push(TxoAssetInfo {
                     id: row.policy_id,
-                    name: row.asset_name,
-                    amount: row.value.to_i128().unwrap_or(0),
+                    name: row.asset_name.into(),
+                    amount: row_val,
                 });
             },
         }
@@ -281,8 +285,8 @@ fn build_stake_info(
                 for asset in txo_info.assets.into_values().flatten() {
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
                         policy_hash: asset.id.try_into()?,
-                        asset_name: asset.name.into(),
-                        amount: AssetValue::from(asset.amount),
+                        asset_name: asset.name,
+                        amount: asset.amount.try_into()?,
                     });
                 }
 
