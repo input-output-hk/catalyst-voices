@@ -104,6 +104,12 @@ impl TryFrom<num_bigint::BigInt> for AssetValue {
     }
 }
 
+impl From<i128> for AssetValue {
+    fn from(value: i128) -> Self {
+        Self(value)
+    }
+}
+
 impl Example for AssetValue {
     fn example() -> Self {
         Self(EXAMPLE)

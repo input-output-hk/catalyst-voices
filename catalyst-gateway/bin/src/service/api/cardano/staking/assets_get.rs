@@ -27,7 +27,7 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::address::Cip19StakeAddress,
+        types::cardano::{address::Cip19StakeAddress, asset_value::AssetValue},
     },
 };
 
@@ -282,7 +282,7 @@ fn build_stake_info(
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
                         policy_hash: asset.id.try_into()?,
                         asset_name: asset.name.into(),
-                        amount: num_bigint::BigInt::from(asset.amount).try_into()?,
+                        amount: AssetValue::from(asset.amount),
                     });
                 }
 
