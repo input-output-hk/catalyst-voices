@@ -4,6 +4,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoriesTile extends StatefulWidget {
@@ -32,7 +33,7 @@ class _CampaignCategoriesTileState extends State<CampaignCategoriesTile> {
   void didUpdateWidget(covariant CampaignCategoriesTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.sections != oldWidget.sections) {
+    if (!listEquals(widget.sections, oldWidget.sections)) {
       if (!widget.sections.any((element) => element.id == _selectedSectionId)) {
         _selectedSectionId = widget.sections.firstOrNull?.id;
       }
