@@ -273,10 +273,10 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             created_scheme = true;
         }
 
-        let key_space = if cfg.namespace.to_string().to_lowercase() == "volatile" {
-            format!("volatile_{}", SCHEMA_VERSION.replace('-', "_"))
-        } else {
+        let key_space = if persistent {
             format!("persistent_{}", SCHEMA_VERSION.replace('-', "_"))
+        } else {
+            format!("volatile_{}", SCHEMA_VERSION.replace('-', "_"))
         };
 
         match session.use_keyspace(key_space, false).await {
