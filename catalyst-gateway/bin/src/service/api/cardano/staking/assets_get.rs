@@ -28,7 +28,7 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{cip19_stake_address::Cip19StakeAddress, asset_name::AssetName},
+        types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
     },
 };
 
@@ -176,7 +176,7 @@ async fn get_txo_by_txn(
 
     while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
-        
+
         let Some(row_val) = row.value.to_i128() else {
             anyhow::bail!("Failed to convert bigint to i128");
         };
