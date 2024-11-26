@@ -4,14 +4,18 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class NoProposals extends StatelessWidget {
+class EmptyState extends StatelessWidget {
   final String? title;
   final String? description;
+  final Widget? image;
+  final Widget? imageBackground;
 
-  const NoProposals({
+  const EmptyState({
     super.key,
     this.title,
     this.description,
+    this.image,
+    this.imageBackground,
   });
 
   @override
@@ -23,18 +27,20 @@ class NoProposals extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 64),
         child: Column(
           children: [
-            VoicesImagesScheme(
-              image: CatalystSvgPicture.asset(
-                VoicesAssets.images.noProposalForeground.path,
-              ),
-              background: Container(
-                height: 180,
-                decoration: BoxDecoration(
-                  color: theme.colors.onSurfaceNeutral08,
-                  shape: BoxShape.circle,
+            image ??
+                VoicesImagesScheme(
+                  image: CatalystSvgPicture.asset(
+                    VoicesAssets.images.noProposalForeground.path,
+                  ),
+                  background: imageBackground ??
+                      Container(
+                        height: 180,
+                        decoration: BoxDecoration(
+                          color: theme.colors.onSurfaceNeutral08,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                 ),
-              ),
-            ),
             const SizedBox(height: 24),
             SizedBox(
               width: 430,
@@ -61,11 +67,11 @@ class NoProposals extends StatelessWidget {
     );
   }
 
-  String _buildTitle(BuildContext context) {
-    return title ?? context.l10n.noProposalStateTitle;
-  }
-
   String _buildDescription(BuildContext context) {
     return description ?? context.l10n.noProposalStateDescription;
+  }
+
+  String _buildTitle(BuildContext context) {
+    return title ?? context.l10n.noProposalStateTitle;
   }
 }
