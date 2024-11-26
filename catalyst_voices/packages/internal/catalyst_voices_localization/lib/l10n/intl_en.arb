@@ -995,7 +995,6 @@
   "@noProposalStateTitle": {
     "description": "Title shown when there are no proposals in the proposals tab"
   },
-
   "campaignIsLive": "Campaign Is Live (Published)",
   "@campaignIsLive": {
     "description": "Title of the campaign is live (published) space"
@@ -1039,8 +1038,7 @@
   "viewVotingResults": "View Voting Results",
   "@viewVotingResults": {
     "description": "Title of the view voting results space"
-  }
-
+  },
   "campaignDetails": "Campaign Details",
   "description": "Description",
   "startDate": "Start Date",
@@ -1058,5 +1056,4 @@
   },
   "campaignCategories": "Campaign Categories",
   "cardanoUseCases": "Cardano Use Cases"
-
 }

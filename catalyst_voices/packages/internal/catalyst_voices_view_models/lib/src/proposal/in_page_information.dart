@@ -16,28 +16,6 @@ enum CampaignStage {
       };
 }
 
-class CompletedCampaignInformation extends InPageInformation {
-  const CompletedCampaignInformation({required super.description})
-      : super(stage: CampaignStage.completed);
-}
-
-mixin DateTimeMixin {
-  DateTime get date;
-}
-
-class DraftCampaignInformation extends InPageInformation with DateTimeMixin {
-  @override
-  final DateTime date;
-
-  const DraftCampaignInformation({
-    required this.date,
-    required super.description,
-  }) : super(stage: CampaignStage.draft);
-
-  @override
-  List<Object?> get props => [...super.props, date];
-}
-
 sealed class InPageInformation extends Equatable {
   final CampaignStage stage;
   final String description;
@@ -51,6 +29,24 @@ sealed class InPageInformation extends Equatable {
   List<Object?> get props => [stage, description];
 }
 
+class CompletedCampaignInformation extends InPageInformation {
+  const CompletedCampaignInformation({required super.description})
+      : super(stage: CampaignStage.completed);
+}
+
+class DraftCampaignInformation extends InPageInformation with DateTimeMixin {
+  @override
+  final DateTime date;
+
+  const DraftCampaignInformation({
+    required this.date,
+    required super.description,
+  }) : super(stage: CampaignStage.draft);
+
+  @override
+  List<Object?> get props => [date, description];
+}
+
 class LiveCampaignInformation extends InPageInformation with DateTimeMixin {
   @override
   final DateTime date;
@@ -61,5 +57,21 @@ class LiveCampaignInformation extends InPageInformation with DateTimeMixin {
   }) : super(stage: CampaignStage.live);
 
   @override
-  List<Object?> get props => [...super.props, date];
+  List<Object?> get props => [date, description];
+}
+
+mixin DateTimeMixin {
+  DateTime get date;
+  CampaignStage get stage;
+
+  String localizedDate(
+    VoicesLocalizations l10n,
+    (String date, String time) formatedDate,
+  ) {
+    if (stage == CampaignStage.draft) {
+      return l10n.campaignBeginsOn(formatedDate.$1, formatedDate.$2);
+    } else {
+      return l10n.campaignEndsOn(formatedDate.$1, formatedDate.$2);
+    }
+  }
 }
