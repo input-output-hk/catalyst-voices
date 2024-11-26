@@ -12,6 +12,8 @@ class VoicesSinglePaneDialog extends StatelessWidget {
   final BoxConstraints constraints;
   final Color? backgroundColor;
   final bool showBorder;
+  final bool showClose;
+  final Alignment closeAlignment;
   final Widget child;
 
   const VoicesSinglePaneDialog({
@@ -19,6 +21,8 @@ class VoicesSinglePaneDialog extends StatelessWidget {
     this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
     this.backgroundColor,
     this.showBorder = false,
+    this.showClose = true,
+    this.closeAlignment = Alignment.topRight,
     required this.child,
   });
 
@@ -31,7 +35,13 @@ class VoicesSinglePaneDialog extends StatelessWidget {
       child: Stack(
         children: [
           child,
-          _DialogCloseButton(),
+          Offstage(
+            offstage: !showClose,
+            child: _CloseButtonPosition(
+              alignment: closeAlignment,
+              child: const _CloseButton(),
+            ),
+          ),
         ],
       ),
     );
@@ -82,7 +92,10 @@ class VoicesTwoPaneDialog extends StatelessWidget {
               ),
             ],
           ),
-          if (showCloseButton) const _DialogCloseButton(),
+          Offstage(
+            offstage: !showCloseButton,
+            child: const _CloseButtonPosition(child: _CloseButton()),
+          ),
         ],
       ),
     );
@@ -124,8 +137,14 @@ class _VoicesDesktopDialog extends StatelessWidget {
   }
 }
 
-class _DialogCloseButton extends StatelessWidget {
-  const _DialogCloseButton();
+class _CloseButtonPosition extends StatelessWidget {
+  final AlignmentGeometry alignment;
+  final Widget child;
+
+  const _CloseButtonPosition({
+    this.alignment = Alignment.topRight,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -134,15 +153,24 @@ class _DialogCloseButton extends StatelessWidget {
     );
 
     return Align(
-      alignment: Alignment.topRight,
+      alignment: alignment,
       child: IconButtonTheme(
         data: const IconButtonThemeData(style: buttonStyle),
-        child: XButton(
-          onTap: () {
-            unawaited(Navigator.of(context).maybePop());
-          },
-        ),
+        child: child,
       ),
+    );
+  }
+}
+
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return XButton(
+      onTap: () {
+        unawaited(Navigator.of(context).maybePop());
+      },
     );
   }
 }
