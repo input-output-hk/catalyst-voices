@@ -3,7 +3,6 @@ use std::collections::HashMap;
 
 use anyhow::anyhow;
 use futures::StreamExt;
-use num_traits::ToPrimitive;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
