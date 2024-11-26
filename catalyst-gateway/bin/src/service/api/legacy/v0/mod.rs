@@ -6,7 +6,9 @@ use poem_openapi::{
 };
 
 use crate::service::{
-    common::{auth::none::NoAuthorization, tags::ApiTags},
+    common::{
+        auth::none::NoAuthorization, objects::legacy::vote_history::VoteHistoryItem, tags::ApiTags,
+    },
     utilities::middleware::schema_validation::schema_version_validation,
 };
 
@@ -103,7 +105,7 @@ impl V0Api {
         deprecated = true
     )]
     async fn proposals_post(
-        &self, message: Json<Vec<proposals_post::dto::VotingHistoryItem>>, _auth: NoAuthorization,
+        &self, message: Json<Vec<VoteHistoryItem>>, _auth: NoAuthorization,
     ) -> proposals_post::AllResponses {
         proposals_post::endpoint(message.0).await
     }

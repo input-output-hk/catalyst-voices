@@ -17,5 +17,5 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// The service endpoint
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    Responses::Ok(Json(Vec::new())).into()
+    Responses::Ok(Json(Default::default())).into()
 }

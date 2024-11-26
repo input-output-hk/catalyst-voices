@@ -13,6 +13,7 @@ pub(crate) mod proposal;
 pub(crate) mod review;
 pub(crate) mod settings_info;
 pub(crate) mod stake_public_key;
+pub(crate) mod vote_history;
 pub(crate) mod vote_plan;
 pub(crate) mod voter_group_id;
 pub(crate) mod voter_info;
