@@ -27,4 +27,32 @@ abstract class DateFormatter {
 
     return DateFormat.yMMMMd().format(dateTime);
   }
+
+  static String formatInDays(
+    VoicesLocalizations l10n,
+    DateTime dateTime, {
+    DateTime? from,
+  }) {
+    from ??= DateTimeExt.now();
+
+    final days = dateTime.isAfter(from) ? dateTime.difference(from).inDays : 0;
+
+    return l10n.inXDays(days);
+  }
+
+  static (String date, String time) formatDateTimeParts(
+    DateTime date,
+  ) {
+    final dayMonthFormatter = DateFormat('d MMMM').format(date);
+    final timeFormatter = DateFormat('HH:mm').format(date);
+
+    return (dayMonthFormatter, timeFormatter);
+  }
+
+  static String formatShortMonth(
+    VoicesLocalizations l10n,
+    DateTime dateTime,
+  ) {
+    return DateFormat.MMM().format(dateTime);
+  }
 }
