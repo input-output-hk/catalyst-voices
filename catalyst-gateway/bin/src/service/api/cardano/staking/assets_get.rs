@@ -82,7 +82,7 @@ struct TxoAssetInfo {
     /// Asset name.
     name: AssetName,
     /// Asset amount.
-    amount: i128,
+    amount: num_bigint::BigInt,
 }
 
 /// TXO information used when calculating a user's stake info.
@@ -177,10 +177,6 @@ async fn get_txo_by_txn(
     while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
 
-        let Some(row_val) = row.value.to_i128() else {
-            anyhow::bail!("Failed to convert bigint to i128");
-        };
-
         let txo_info_key = (row.slot_no.clone(), row.txn, row.txo);
         let Some(txo_info) = txo_map.get_mut(&txo_info_key) else {
             continue;
@@ -192,12 +188,12 @@ async fn get_txo_by_txn(
             .or_insert_with(Vec::new);
 
         match entry.iter_mut().find(|item| item.id == row.policy_id) {
-            Some(item) => item.amount += row_val,
+            Some(item) => item.amount += row.value,
             None => {
                 entry.push(TxoAssetInfo {
                     id: row.policy_id,
                     name: row.asset_name.into(),
-                    amount: row_val,
+                    amount: row.value,
                 });
             },
         }
