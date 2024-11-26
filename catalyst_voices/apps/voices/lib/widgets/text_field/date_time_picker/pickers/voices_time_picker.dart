@@ -1,4 +1,4 @@
-part of 'voices_date_picker_field.dart';
+part of '../voices_date_time_picker.dart';
 
 class VoicesTimePicker extends StatefulWidget {
   final ValueChanged<DateTime> onTap;

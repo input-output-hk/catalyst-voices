@@ -1,4 +1,4 @@
-part of 'voices_date_picker_field.dart';
+part of 'voices_date_time_picker.dart';
 
 abstract class BasePicker extends StatefulWidget {
   final VoidCallback? onRemoveOverlay;
@@ -246,7 +246,7 @@ abstract class _BasePickerState<T extends BasePicker> extends State<T> {
       errorStyle: textTheme.bodySmall?.copyWith(
         color: Theme.of(context).colorScheme.error,
       ),
-      errorMaxLines: 2,
+      errorMaxLines: 3,
     );
   }
 }
