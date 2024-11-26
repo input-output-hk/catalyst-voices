@@ -66,12 +66,12 @@ mixin DateTimeMixin {
 
   String localizedDate(
     VoicesLocalizations l10n,
-    (String date, String time) formatedDate,
+    (String date, String time) formattedDate,
   ) {
     if (stage == CampaignStage.draft) {
-      return l10n.campaignBeginsOn(formatedDate.$1, formatedDate.$2);
+      return l10n.campaignBeginsOn(formattedDate.$1, formattedDate.$2);
     } else {
-      return l10n.campaignEndsOn(formatedDate.$1, formatedDate.$2);
+      return l10n.campaignEndsOn(formattedDate.$1, formattedDate.$2);
     }
   }
 }

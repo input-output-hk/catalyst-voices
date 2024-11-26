@@ -83,13 +83,13 @@ class InPageInformationCard extends StatelessWidget {
 
   String _getDateInformation(BuildContext context) {
     final dateMixin = (information as DateTimeMixin);
-    final formatedDate = DateFormatter.formatDateTimeParts(dateMixin.date);
+    final formattedDate = DateFormatter.formatDateTimeParts(dateMixin.date);
     return switch (information) {
       final LiveCampaignInformation _ ||
       final DraftCampaignInformation _ =>
         dateMixin.localizedDate(
           context.l10n,
-          formatedDate,
+          formattedDate,
         ),
       _ => '',
     };
