@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/helpers.dart';
 
 void main() {
-  group('NoProposals Widget Tests', () {
+  group('EmptyState Widget Tests', () {
     testWidgets('Renders correctly with default values', (tester) async {
       await tester.pumpApp(
         const EmptyState(),
