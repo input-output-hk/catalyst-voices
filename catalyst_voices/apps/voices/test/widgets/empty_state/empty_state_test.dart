@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
+import 'package:catalyst_voices/widgets/images/voices_image_scheme.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -112,5 +113,19 @@ void main() {
         );
       },
     );
+
+    testWidgets('Renders correctly with custom image', (tester) async {
+      await tester.pumpApp(
+        EmptyState(
+          image: CatalystSvgPicture.asset(
+            VoicesAssets.images.noProposalForeground.path,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CatalystSvgPicture), findsOneWidget);
+      expect(find.byType(VoicesImagesScheme), findsNothing);
+    });
   });
 }
