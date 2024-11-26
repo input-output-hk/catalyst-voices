@@ -29,7 +29,7 @@ void main() {
       // Then
       final currentKeychain = service.keychain;
 
-      expect(currentKeychain?.id, keychain.id);
+      expect(currentKeychain, keychain);
     });
 
     test('using different keychain emits update in stream', () async {
@@ -48,8 +48,8 @@ void main() {
         keychainStream,
         emitsInOrder([
           isNull,
-          predicate<Keychain>((e) => e.id == keychainOne.id),
-          predicate<Keychain>((e) => e.id == keychainTwo.id),
+          keychainOne,
+          keychainTwo,
           isNull,
         ]),
       );
@@ -75,7 +75,7 @@ void main() {
       // Then
       final serviceKeychains = await service.keychains;
 
-      expect(serviceKeychains.map((e) => e.id), keychains.map((e) => e.id));
+      expect(serviceKeychains, keychains);
     });
   });
 
@@ -92,7 +92,7 @@ void main() {
       await service.useLastAccount();
 
       // Then
-      expect(service.keychain?.id, expectedKeychain.id);
+      expect(service.keychain, expectedKeychain);
     });
 
     test('use last account does nothing on clear instance', () async {

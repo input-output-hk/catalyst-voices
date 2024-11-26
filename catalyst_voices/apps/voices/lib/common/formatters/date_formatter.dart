@@ -10,14 +10,10 @@ abstract class DateFormatter {
   /// - Yesterday
   /// - 2 days ago
   /// - Other cases: yMMMMd date format.
-  static String formatRecentDate(
-    VoicesLocalizations l10n,
-    DateTime dateTime, {
-    DateTime? from,
-  }) {
-    from ??= DateTimeExt.now();
+  static String formatRecentDate(VoicesLocalizations l10n, DateTime dateTime) {
+    final now = DateTimeExt.now();
 
-    final today = DateTime(from.year, from.month, from.day, 12);
+    final today = DateTime(now.year, now.month, now.day, 12);
     if (dateTime.isSameDateAs(today)) return l10n.today;
 
     final tomorrow = today.plusDays(1);
@@ -30,24 +26,5 @@ abstract class DateFormatter {
     if (dateTime.isSameDateAs(twoDaysAgo)) return l10n.twoDaysAgo;
 
     return DateFormat.yMMMMd().format(dateTime);
-  }
-
-  static String formatInDays(
-    VoicesLocalizations l10n,
-    DateTime dateTime, {
-    DateTime? from,
-  }) {
-    from ??= DateTimeExt.now();
-
-    final days = dateTime.isAfter(from) ? dateTime.difference(from).inDays : 0;
-
-    return l10n.inXDays(days);
-  }
-
-  static String formatShortMonth(
-    VoicesLocalizations l10n,
-    DateTime dateTime,
-  ) {
-    return DateFormat.MMM().format(dateTime);
   }
 }

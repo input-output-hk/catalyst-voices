@@ -127,4 +127,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
 
   @override
   String toString() => 'VaultKeychain[$id]';
+
+  @override
+  List<Object?> get props => [id];
 }

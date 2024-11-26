@@ -24,10 +24,7 @@ void main() {
 
       // Then
       expect(await provider.exists(id), isTrue);
-      expect(
-        [keychain.id],
-        await provider.getAll().then((value) => value.map((e) => e.id)),
-      );
+      expect([keychain], await provider.getAll());
     });
 
     test('calling create twice on keychain will empty previous data', () async {

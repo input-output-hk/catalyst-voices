@@ -6,6 +6,7 @@ import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
 import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
 import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -13,8 +14,9 @@ const _lockKey = 'LockKey';
 
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
-base class SecureStorageVault with StorageAsStringMixin implements Vault {
-  @override
+base class SecureStorageVault
+    with StorageAsStringMixin, EquatableMixin
+    implements Vault {
   final String id;
   @protected
   final FlutterSecureStorage secureStorage;
@@ -169,11 +171,6 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     }
   }
 
-  @override
-  String toString() {
-    return 'SecureStorageVault{id: $id}';
-  }
-
   /// Allows operation only when [isUnlocked] it true, otherwise returns null.
   ///
   /// Returns value assigned to [key]. May return null if not found for [key].
@@ -249,4 +246,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   void _erase(Uint8List list) {
     list.fillRange(0, list.length, 0);
   }
+
+  @override
+  List<Object?> get props => [id];
 }
