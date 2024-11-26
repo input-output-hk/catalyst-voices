@@ -1013,5 +1013,15 @@
   "campaignCategories": "Campaign Categories",
   "cardanoUseCases": "Cardano Use Cases",
   "discoverySpaceTitle": "Boost Social Entrepreneurship",
-  "discoverySpaceDescription": "Project Catalyst is built on the ingenuity of our global network. Ideas can come from anyone, from any background, anywhere in the world. Proposers pitch their ideas to the community by submitting proposals onto the Catalyst collaboration platform."
+  "@discoverySpaceTitle": {
+    "description": "Title for the discovery space for actor (unlocked) user."
+  },
+  "discoverySpaceDescription": "Project Catalyst is built on the ingenuity of our global network. Ideas can come from anyone, from any background, anywhere in the world. Proposers pitch their ideas to the community by submitting proposals onto the Catalyst collaboration platform.",
+  "@discoverySpaceDescription": {
+    "description": "Description for the discovery space for actor (unlocked) user."
+  },
+  "discoverySpaceEmptyProposals": "Once this campaign launches draft proposals will be shared here.",
+  "@discoverySpaceEmptyProposals": {
+    "description": "Description for empty state on discovery space when there are no draft proposals."
+  }
 }

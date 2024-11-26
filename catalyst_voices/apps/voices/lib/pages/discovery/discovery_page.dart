@@ -4,6 +4,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
 import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
+import 'package:catalyst_voices/widgets/proposals/no_proposals.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -312,6 +313,10 @@ class _AllProposals extends StatelessWidget {
     return ValueListenableBuilder<List<PendingProposal>>(
       valueListenable: _favoriteProposals,
       builder: (context, favoriteProposals, child) {
+        if (_proposals.isEmpty) {
+          return const _EmptyProposals();
+        }
+
         return Wrap(
           spacing: 16,
           runSpacing: 16,
@@ -339,6 +344,10 @@ class _FavoriteProposals extends StatelessWidget {
     return ValueListenableBuilder<List<PendingProposal>>(
       valueListenable: _favoriteProposals,
       builder: (context, favoriteProposals, child) {
+        if (favoriteProposals.isEmpty) {
+          return const _EmptyProposals();
+        }
+
         return Wrap(
           spacing: 16,
           runSpacing: 16,
@@ -366,4 +375,15 @@ void _onFavoriteChanged(PendingProposal proposal, bool isFavorite) {
     proposals.remove(proposal);
   }
   _favoriteProposals.value = proposals.toList();
+}
+
+class _EmptyProposals extends StatelessWidget {
+  const _EmptyProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return NoProposals(
+      description: context.l10n.discoverySpaceEmptyProposals,
+    );
+  }
 }
