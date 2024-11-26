@@ -18,6 +18,11 @@ class VoicesDetailsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesSinglePaneDialog(
       showClose: false,
+      constraints: const BoxConstraints(
+        minWidth: 600,
+        maxWidth: 900,
+        minHeight: double.infinity,
+      ),
       child: Column(
         children: [
           VoicesDetailsDialogHeader(
