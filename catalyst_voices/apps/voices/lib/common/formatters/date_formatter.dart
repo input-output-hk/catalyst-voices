@@ -44,6 +44,15 @@ abstract class DateFormatter {
     return l10n.inXDays(days);
   }
 
+  static (String date, String time) formatDateTimeParts(
+    DateTime date,
+  ) {
+    final dayMonthFormatter = DateFormat('d MMMM').format(date);
+    final timeFormatter = DateFormat('HH:mm').format(date);
+
+    return (dayMonthFormatter, timeFormatter);
+  }
+
   static String formatShortMonth(
     VoicesLocalizations l10n,
     DateTime dateTime,
