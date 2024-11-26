@@ -6,7 +6,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('ProposalsCubit', () {
+  group(ProposalsCubit, () {
     final proposal = PendingProposal(
       id: '1',
       title: 'Proposal 1',
