@@ -9,7 +9,7 @@ use super::types::SlotNumber;
 use crate::service::{
     common::{
         auth::none_or_rbac::NoneOrRBAC, objects::cardano::network::Network, tags::ApiTags,
-        types::cardano::address::Cip19StakeAddress,
+        types::cardano::cip19_stake_address::Cip19StakeAddress,
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };
