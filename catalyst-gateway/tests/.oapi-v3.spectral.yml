@@ -103,6 +103,9 @@ overrides:
   - files:
       - "**#/paths/~1api~1v0~1vote~1active~1plans/get/responses"
       - "**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/responses"
+      - "**#/paths/~1api~1v0~1proposals/get/responses"
+      - "**#/paths/~1api~1v0~1proposals/post/requestBody"
+      - "**#/paths/~1api~1v0~1proposals/post/responses"
     rules:
       # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L506
       owasp:api4:2023-array-limit: off
@@ -111,6 +114,7 @@ overrides:
   # ONLY Legacy endpoints may be added to this override.
   - files:
       - "**#/paths/~1api~1v1~1fragments~1statuses/get/responses"
+      - "**#/paths/~1api~1v0~1reviews~1%7Bproposal_id%7D/get/responses"
     rules:
       # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L678
       owasp:api3:2023-constrained-additionalProperties: off
