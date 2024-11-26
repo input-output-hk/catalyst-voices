@@ -12,7 +12,9 @@ use crate::{
     },
     service::common::{
         responses::WithErrorResponses,
-        types::{cardano::address::Cip19StakeAddress, headers::retry_after::RetryAfterOption},
+        types::{
+            cardano::cip19_stake_address::Cip19StakeAddress, headers::retry_after::RetryAfterOption,
+        },
     },
 };
 

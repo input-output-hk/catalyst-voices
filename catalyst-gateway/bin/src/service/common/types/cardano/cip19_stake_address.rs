@@ -8,6 +8,7 @@ use std::{
     sync::LazyLock,
 };
 
+use anyhow::bail;
 use const_format::concatcp;
 use pallas::ledger::addresses::{Address, StakeAddress};
 use poem_openapi::{
@@ -24,14 +25,14 @@ const TITLE: &str = "Cardano stake address";
 const DESCRIPTION: &str = "Cardano stake address, also known as a reward address.";
 /// Stake address example.
 // cSpell:disable
-const EXAMPLE: &str = "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
+pub(crate) const EXAMPLE: &str = "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
 // cSpell:enable
 /// Production Stake Address Identifier
 const PROD_STAKE: &str = "stake";
 /// Test Stake Address Identifier
 const TEST_STAKE: &str = "stake_test";
 /// Regex Pattern
-const PATTERN: &str = concatcp!(
+pub(crate) const PATTERN: &str = concatcp!(
     "(",
     PROD_STAKE,
     "|",
@@ -43,9 +44,12 @@ const ENCODED_ADDR_LEN: usize = 53;
 /// Length of the decoded address.
 const DECODED_ADDR_LEN: usize = 28;
 /// Minimum length
-const MIN_LENGTH: usize = PROD_STAKE.len() + 1 + ENCODED_ADDR_LEN;
+pub(crate) const MIN_LENGTH: usize = PROD_STAKE.len() + 1 + ENCODED_ADDR_LEN;
 /// Minimum length
-const MAX_LENGTH: usize = TEST_STAKE.len() + 1 + ENCODED_ADDR_LEN;
+pub(crate) const MAX_LENGTH: usize = TEST_STAKE.len() + 1 + ENCODED_ADDR_LEN;
+
+/// String Format
+pub(crate) const FORMAT: &str = "cardano:cip19-address";
 
 /// External document for Cardano addresses.
 static EXTERNAL_DOCS: LazyLock<MetaExternalDocument> = LazyLock::new(|| {
@@ -85,35 +89,59 @@ fn is_valid(stake_addr: &str) -> bool {
 impl_string_types!(
     Cip19StakeAddress,
     "string",
-    "cardano:cip19-address",
+    FORMAT,
     Some(STAKE_SCHEMA.clone()),
     is_valid
 );
 
-impl Cip19StakeAddress {
-    /// Create a new `StakeAddress`.
-    #[allow(dead_code)]
-    pub fn new(address: String) -> Self {
-        Cip19StakeAddress(address)
-    }
+impl TryFrom<&str> for Cip19StakeAddress {
+    type Error = anyhow::Error;
 
-    /// Convert a `StakeAddress` string to a `StakeAddress`.
-    pub fn to_stake_address(&self) -> anyhow::Result<StakeAddress> {
-        let address_str = &self.0;
-        let address = Address::from_bech32(address_str)?;
-        match address {
-            Address::Stake(stake_address) => Ok(stake_address),
-            _ => Err(anyhow::anyhow!("Invalid stake address")),
-        }
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        value.to_string().try_into()
     }
+}
 
-    /// Convert a `StakeAddress` to a `StakeAddress` string.
-    #[allow(dead_code)]
-    pub fn from_stake_address(addr: &StakeAddress) -> anyhow::Result<Self> {
+impl TryFrom<String> for Cip19StakeAddress {
+    type Error = anyhow::Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match bech32::decode(&value) {
+            Ok((hrp, addr)) => {
+                let hrp = hrp.as_str();
+                if addr.len() == DECODED_ADDR_LEN && (hrp == PROD_STAKE || hrp == TEST_STAKE) {
+                    return Ok(Cip19StakeAddress(value));
+                }
+                bail!("Invalid CIP-19 formatted Stake Address")
+            },
+            Err(err) => {
+                bail!("Invalid CIP-19 formatted Stake Address : {err}");
+            },
+        };
+    }
+}
+
+impl TryFrom<StakeAddress> for Cip19StakeAddress {
+    type Error = anyhow::Error;
+
+    fn try_from(addr: StakeAddress) -> Result<Self, Self::Error> {
         let addr_str = addr
             .to_bech32()
             .map_err(|e| anyhow::anyhow!(format!("Invalid stake address {e}")))?;
         Ok(Self(addr_str))
+    }
+}
+
+impl TryInto<StakeAddress> for Cip19StakeAddress {
+    type Error = anyhow::Error;
+
+    fn try_into(self) -> Result<StakeAddress, Self::Error> {
+        let address_str = &self.0;
+        let address = Address::from_bech32(address_str)?;
+        match address {
+            Address::Stake(address) => Ok(address),
+            _ => Err(anyhow::anyhow!("Invalid stake address")),
+        }
     }
 }
 

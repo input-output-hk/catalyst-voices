@@ -15,7 +15,10 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
-use crate::service::common::types::string_types::impl_string_types;
+use crate::service::{
+    common::types::string_types::impl_string_types,
+    utilities::{as_hex_string, from_hex_string},
+};
 
 /// Title.
 const TITLE: &str = "28 Byte Hash";
@@ -78,7 +81,7 @@ impl TryFrom<Vec<u8>> for HexEncodedHash28 {
         if value.len() != HASH_LENGTH {
             bail!("Hash Length Invalid.")
         }
-        Ok(Self(format!("0x{}", hex::encode(value))))
+        Ok(Self(as_hex_string(&value)))
     }
 }
 
@@ -87,9 +90,7 @@ impl TryFrom<Vec<u8>> for HexEncodedHash28 {
 // All creation of this type should come only from one of the deserialization methods.
 impl From<HexEncodedHash28> for Vec<u8> {
     fn from(val: HexEncodedHash28) -> Self {
-        #[allow(clippy::string_slice)] // 100% safe due to the way this type can be constructed.
-        let raw_hex = &val.0[2..];
         #[allow(clippy::expect_used)]
-        hex::decode(raw_hex).expect("This can only fail if the type was invalidly constructed.")
+        from_hex_string(&val.0).expect("This can only fail if the type was invalidly constructed.")
     }
 }
