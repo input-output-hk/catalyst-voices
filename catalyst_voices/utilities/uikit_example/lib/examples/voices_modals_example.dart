@@ -33,9 +33,6 @@ class VoicesModalsExample extends StatelessWidget {
                   onUpload: (_) async {
                     await Future<void>.delayed(const Duration(seconds: 2));
                   },
-                  onCancel: () => debugPrint(
-                    'onCancel, we can cancel upload here',
-                  ),
                 );
                 if (file != null) {
                   debugPrint('uploaded file: ${file.name}');

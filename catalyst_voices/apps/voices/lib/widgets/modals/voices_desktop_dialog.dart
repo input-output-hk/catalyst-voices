@@ -12,7 +12,6 @@ class VoicesSinglePaneDialog extends StatelessWidget {
   final BoxConstraints constraints;
   final Color? backgroundColor;
   final bool showBorder;
-  final VoidCallback? onCancel;
   final Widget child;
 
   const VoicesSinglePaneDialog({
@@ -20,7 +19,6 @@ class VoicesSinglePaneDialog extends StatelessWidget {
     this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
     this.backgroundColor,
     this.showBorder = false,
-    this.onCancel,
     required this.child,
   });
 
@@ -33,9 +31,7 @@ class VoicesSinglePaneDialog extends StatelessWidget {
       child: Stack(
         children: [
           child,
-          _DialogCloseButton(
-            onCancel: onCancel,
-          ),
+          _DialogCloseButton(),
         ],
       ),
     );
@@ -129,11 +125,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
 }
 
 class _DialogCloseButton extends StatelessWidget {
-  final VoidCallback? onCancel;
-
-  const _DialogCloseButton({
-    this.onCancel,
-  });
+  const _DialogCloseButton();
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +139,6 @@ class _DialogCloseButton extends StatelessWidget {
         data: const IconButtonThemeData(style: buttonStyle),
         child: XButton(
           onTap: () {
-            onCancel?.call();
             unawaited(Navigator.of(context).maybePop());
           },
         ),
