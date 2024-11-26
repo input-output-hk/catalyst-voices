@@ -9,34 +9,34 @@ import '../../helpers/helpers.dart';
 void main() {
   final menu = [
     MenuItem(
-      id: 1,
+      id: '1',
       label: 'Rename',
       icon: VoicesAssets.icons.pencil.buildIcon(),
     ),
     SubMenuItem(
-      id: 2,
+      id: '2',
       label: 'Move Private Team',
       icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
-      children: [
+      children: const [
         MenuItem(
-          id: 3,
+          id: '3',
           label: 'Team 1: The Vikings',
         ),
         MenuItem(
-          id: 4,
+          id: '4',
           label: 'Team 2: Pure Hearts',
         ),
       ],
     ),
     MenuItem(
-      id: 5,
+      id: '5',
       label: 'Move to public',
       icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
       showDivider: true,
-      enabled: false,
+      isEnabled: false,
     ),
     MenuItem(
-      id: 6,
+      id: '6',
       label: 'Delete',
       icon: VoicesAssets.icons.trash.buildIcon(),
     ),

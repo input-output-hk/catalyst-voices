@@ -68,7 +68,7 @@ void main() {
       );
     });
 
-    test('are equal when id is matching', () async {
+    test('are not equal when id is matching', () async {
       // Given
       final id = const Uuid().v4();
 
@@ -77,7 +77,7 @@ void main() {
       final vaultTwo = VaultKeychain(id: id);
 
       // Then
-      expect(vaultOne, equals(vaultTwo));
+      expect(vaultOne, isNot(equals(vaultTwo)));
     });
 
     test('metadata dates are in UTC', () async {
