@@ -92,6 +92,8 @@ overrides:
   # ONLY Legacy endpoints may be added to this override.
   - files:
       - "**#/components/schemas/FragmentStatus"
+      - "**#/components/schemas/Review"
+      - "**#/components/schemas/Proposal/properties/chain_vote_options"
     rules:
       # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L678
       owasp:api3:2023-no-additionalProperties: off
