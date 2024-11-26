@@ -11,7 +11,7 @@ environment:
 
 dependencies:
   catalyst_cardano_serialization: ^0.4.0
-  equatable: ^2.0.5
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.7
