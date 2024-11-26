@@ -37,7 +37,7 @@ class PendingProposalCard extends StatelessWidget {
       width: 326,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

@@ -51,7 +51,7 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<ProposalsCubit>(
-        ProposalsCubit.new,
+        () => ProposalsCubit(proposalRepository: get<ProposalRepository>()),
       );
   }
 
@@ -65,6 +65,9 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerLazySingleton<TransactionConfigRepository>(
         TransactionConfigRepository.new,
+      )
+      ..registerLazySingleton<ProposalRepository>(
+        ProposalRepository.new,
       );
   }
 
