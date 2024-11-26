@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +19,11 @@ class VoicesDetailsDialogHeader extends StatelessWidget {
       // Later this upper constraints may change
       constraints: const BoxConstraints(minHeight: 166, maxHeight: 166),
       padding: const EdgeInsets.all(12).add(const EdgeInsets.only(bottom: 4)),
+      decoration: BoxDecoration(
+        image: _BackgroundDecorationImage(
+          asset: VoicesAssets.images.comingSoonBkg,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -40,6 +46,15 @@ class VoicesDetailsDialogHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BackgroundDecorationImage extends DecorationImage {
+  _BackgroundDecorationImage({
+    required AssetGenImage asset,
+  }) : super(
+          image: CatalystImage.asset(asset.path).image,
+          fit: BoxFit.cover,
+        );
 }
 
 class _TitleLabelText extends StatelessWidget {
@@ -79,7 +94,7 @@ class _TitleText extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: textTheme.displayMedium?.copyWith(
-        color: colors.textOnPrimary,
+        color: colors.textOnPrimaryWhite,
       ),
     );
   }
