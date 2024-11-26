@@ -14,6 +14,7 @@ const _lockKey = 'LockKey';
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
 base class SecureStorageVault with StorageAsStringMixin implements Vault {
+  @override
   final String id;
   @protected
   final FlutterSecureStorage secureStorage;
