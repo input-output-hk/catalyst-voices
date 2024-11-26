@@ -13,6 +13,10 @@ extends:
 
 formats: ["oas3"]
 
+functions:
+  - "debug"
+  - "description-required"
+
 aliases:
   # From: https://github.com/stoplightio/spectral-owasp-ruleset/blob/26819e80e5ac4571b6271834fc97f0a1b66110bd/src/ruleset.ts#L60
   StringProperties:
@@ -74,6 +78,8 @@ overrides:
       owasp:api3:2023-no-additionalProperties: error
       owasp:api3:2023-constrained-additionalProperties: error
       owasp:api2:2023-read-restricted: error
+      # Replaced by custom rule `description-required`
+      oas3-parameter-description: off
       # Not enforced at OpenAPI level.  Production URL's will always be https.
       owasp:api8:2023-no-server-http: off
       # Can't add custom properties to server list.
@@ -174,23 +180,9 @@ rules:
     severity: error
     given: "#DescribableObjects"
     then:
-      - field: "description"
-        function: "truthy"
-      - field: "description"
-        function: "length"
-        functionOptions:
-          min: 20
-      - field: "description"
-        function: "pattern"
-        functionOptions:
-          # Matches any character that is #, *, uppercase or lowercase letters from A to Z, or digits from 0 to 9 at the beginning of the string.
-          # with zero or more occurrences of any character except newline.
-          match: "^[#*A-Za-z0-9].*"
-      - field: "description"
-        function: pattern
-        functionOptions:
-          # Matches against a full stop or a literal `*` at the end of a description.
-          match: "[\\.\\*]$"
+      function: description-required
+      functionOptions:
+        length: 20
 
   api-path:
     message: "Invalid API path - should be /api/draft/* or /api/v<number>/*"
