@@ -1000,6 +1000,7 @@
   "startDate": "Start Date",
   "endDate": "End Date",
   "categories": "Categories",
+  "fundingCategories": "Funding categories",
   "proposals": "Proposals",
   "totalSubmitted": "Total submitted",
   "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
