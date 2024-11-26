@@ -49,7 +49,10 @@ final class Dependencies extends DependencyProvider {
           registrationService: get<RegistrationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
         );
-      });
+      })
+      ..registerLazySingleton<ProposalsCubit>(
+        ProposalsCubit.new,
+      );
   }
 
   void _registerRepositories() {

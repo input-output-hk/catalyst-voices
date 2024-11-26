@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
 import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
@@ -11,29 +10,29 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DiscoveryPage extends StatelessWidget {
-  const DiscoveryPage({
-    super.key,
-  });
+class DiscoveryPage extends StatefulWidget {
+  const DiscoveryPage({super.key});
+
+  @override
+  State<DiscoveryPage> createState() => _DiscoveryPageState();
+}
+
+class _DiscoveryPageState extends State<DiscoveryPage> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(context.read<ProposalsCubit>().load());
+  }
 
   @override
   Widget build(BuildContext context) {
     return const CustomScrollView(
       slivers: [
         _Body(),
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: Column(
-            children: [
-              Spacer(),
-              StandardLinksPageFooter(),
-            ],
-          ),
-        ),
+        _Footer(),
       ],
     );
   }
@@ -163,62 +162,6 @@ class _ActiveAccountBody extends StatelessWidget {
   }
 }
 
-final _proposalDescription = """
-Zanzibar is becoming one of the hotspots for DID's through
-World Mobile and PRISM, but its potential is only barely exploited.
-Zanzibar is becoming one of the hotspots for DID's through World Mobile
-and PRISM, but its potential is only barely exploited.
-"""
-    .replaceAll('\n', ' ');
-
-final _proposals = [
-  PendingProposal(
-    id: 'f14/0',
-    fund: 'F14',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    commentsCount: 0,
-    description: _proposalDescription,
-    completedSegments: 0,
-    totalSegments: 13,
-  ),
-  PendingProposal(
-    id: 'f14/1',
-    fund: 'F14',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    commentsCount: 0,
-    description: _proposalDescription,
-    completedSegments: 7,
-    totalSegments: 13,
-  ),
-  PendingProposal(
-    id: 'f14/2',
-    fund: 'F14',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    commentsCount: 0,
-    description: _proposalDescription,
-    completedSegments: 13,
-    totalSegments: 13,
-  ),
-];
-
-final _proposalImages = {
-  for (final (index, proposal) in _proposals.indexed)
-    proposal.id: index.isEven
-        ? VoicesAssets.images.proposalBackground1
-        : VoicesAssets.images.proposalBackground2,
-};
-
-final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
-
 class _Header extends StatelessWidget {
   const _Header();
 
@@ -267,40 +210,55 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return const DefaultTabController(
       length: 2,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            tabs: [
-              Tab(
-                text: context.l10n.noOfAllProposals(_proposals.length),
-              ),
-              Tab(
-                child: Row(
-                  children: [
-                    VoicesAssets.icons.starOutlined.buildIcon(),
-                    const SizedBox(width: 8),
-                    Text(context.l10n.favorites),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const TabBarStackView(
+          _TabBar(),
+          SizedBox(height: 24),
+          TabBarStackView(
             children: [
               _AllProposals(),
               _FavoriteProposals(),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
         ],
       ),
+    );
+  }
+}
+
+class _TabBar extends StatelessWidget {
+  const _TabBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<ProposalsCubit, ProposalsState, int>(
+      selector: (state) =>
+          state is LoadedProposalsState ? state.proposals.length : 0,
+      builder: (context, proposalsCount) {
+        return TabBar(
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          tabs: [
+            Tab(
+              text: context.l10n.noOfAllProposals(proposalsCount),
+            ),
+            Tab(
+              child: Row(
+                children: [
+                  VoicesAssets.icons.starOutlined.buildIcon(),
+                  const SizedBox(width: 8),
+                  Text(context.l10n.favorites),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -310,28 +268,60 @@ class _AllProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<PendingProposal>>(
-      valueListenable: _favoriteProposals,
-      builder: (context, favoriteProposals, child) {
-        if (_proposals.isEmpty) {
-          return const _EmptyProposals();
-        }
-
-        return Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            for (final proposal in _proposals)
-              PendingProposalCard(
-                image: _proposalImages[proposal.id]!,
-                proposal: proposal,
-                isFavorite: favoriteProposals.contains(proposal),
-                onFavoriteChanged: (isFavorite) =>
-                    _onFavoriteChanged(proposal, isFavorite),
-              ),
-          ],
-        );
+    return BlocBuilder<ProposalsCubit, ProposalsState>(
+      builder: (context, state) {
+        return switch (state) {
+          LoadingProposalsState() => const _LoadingProposals(),
+          LoadedProposalsState(:final proposals, :final favoriteProposals) =>
+            proposals.isEmpty
+                ? const _EmptyProposals()
+                : _AllProposalsList(
+                    proposals: proposals,
+                    favoriteProposals: favoriteProposals,
+                  ),
+        };
       },
+    );
+  }
+}
+
+class _AllProposalsList extends StatelessWidget {
+  final List<PendingProposal> proposals;
+  final List<PendingProposal> favoriteProposals;
+
+  const _AllProposalsList({
+    required this.proposals,
+    required this.favoriteProposals,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: [
+        for (final proposal in proposals)
+          PendingProposalCard(
+            image: _generateImageForProposal(proposal.id),
+            proposal: proposal,
+            showStatus: false,
+            showLastUpdate: false,
+            showComments: false,
+            showSegments: false,
+            isFavorite: favoriteProposals.contains(proposal),
+            onFavoriteChanged: (isFavorite) async {
+              if (isFavorite) {
+                await context
+                    .read<ProposalsCubit>()
+                    .onFavoriteProposal(proposal.id);
+              } else {
+                await context
+                    .read<ProposalsCubit>()
+                    .onUnfavoriteProposal(proposal.id);
+              }
+            },
+          ),
+      ],
     );
   }
 }
@@ -341,40 +331,71 @@ class _FavoriteProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<PendingProposal>>(
-      valueListenable: _favoriteProposals,
-      builder: (context, favoriteProposals, child) {
-        if (favoriteProposals.isEmpty) {
-          return const _EmptyProposals();
-        }
-
-        return Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            for (final proposal in favoriteProposals)
-              PendingProposalCard(
-                image: _proposalImages[proposal.id]!,
-                proposal: proposal,
-                isFavorite: true,
-                onFavoriteChanged: (isFavorite) =>
-                    _onFavoriteChanged(proposal, isFavorite),
-              ),
-          ],
-        );
+    return BlocBuilder<ProposalsCubit, ProposalsState>(
+      builder: (context, state) {
+        return switch (state) {
+          LoadingProposalsState() => const _LoadingProposals(),
+          LoadedProposalsState(:final favoriteProposals) =>
+            favoriteProposals.isEmpty
+                ? const _EmptyProposals()
+                : _FavoriteProposalsList(
+                    proposals: favoriteProposals,
+                  ),
+        };
       },
     );
   }
 }
 
-void _onFavoriteChanged(PendingProposal proposal, bool isFavorite) {
-  final proposals = Set.of(_favoriteProposals.value);
-  if (isFavorite) {
-    proposals.add(proposal);
-  } else {
-    proposals.remove(proposal);
+class _FavoriteProposalsList extends StatelessWidget {
+  final List<PendingProposal> proposals;
+
+  const _FavoriteProposalsList({required this.proposals});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: [
+        for (final proposal in proposals)
+          PendingProposalCard(
+            image: _generateImageForProposal(proposal.id),
+            proposal: proposal,
+            showStatus: false,
+            showLastUpdate: false,
+            showComments: false,
+            showSegments: false,
+            isFavorite: true,
+            onFavoriteChanged: (isFavorite) async {
+              if (isFavorite) {
+                await context
+                    .read<ProposalsCubit>()
+                    .onFavoriteProposal(proposal.id);
+              } else {
+                await context
+                    .read<ProposalsCubit>()
+                    .onUnfavoriteProposal(proposal.id);
+              }
+            },
+          ),
+      ],
+    );
   }
-  _favoriteProposals.value = proposals.toList();
+}
+
+class _LoadingProposals extends StatelessWidget {
+  const _LoadingProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(64),
+        child: VoicesCircularProgressIndicator(),
+      ),
+    );
+  }
 }
 
 class _EmptyProposals extends StatelessWidget {
@@ -386,4 +407,27 @@ class _EmptyProposals extends StatelessWidget {
       description: context.l10n.discoverySpaceEmptyProposals,
     );
   }
+}
+
+class _Footer extends StatelessWidget {
+  const _Footer();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SliverFillRemaining(
+      hasScrollBody: false,
+      child: Column(
+        children: [
+          Spacer(),
+          StandardLinksPageFooter(),
+        ],
+      ),
+    );
+  }
+}
+
+AssetGenImage _generateImageForProposal(String id) {
+  return id.codeUnits.last.isEven
+      ? VoicesAssets.images.proposalBackground1
+      : VoicesAssets.images.proposalBackground2;
 }
