@@ -970,5 +970,58 @@
   "@datePickerDaysInMonthError": {
     "description": "Error message for the date picker when the selected day is greater than the maximum days for the selected month."
   },
-  "saveBeforeEditingErrorText": "Please save before editing something else"
+  "saveBeforeEditingErrorText": "Please save before editing something else",
+  "mandatoryGuidanceType": "Mandatory",
+  "@mandatoryGuidanceType": {
+    "description": "Guidance type label for mandatory guidance"
+  },
+  "educationGuidanceType": "Education",
+  "@educationGuidanceType": {
+    "description": "Guidance type label for education guidance"
+  },
+  "tipsGuidanceType": "Tips",
+  "@tipsGuidanceType": {
+    "description": "Guidance type label for tips guidance"
+  },
+  "all": "All",
+  "@all": {
+    "description": "Primary used to select all object. To display object without any filter"
+  },
+  "noGuidanceOfThisType": "There is no guidance of this type",
+  "@noGuidanceOfThisType": {
+    "description": "Message when there is no guidance of this type"
+  },
+  "selectASection": "Select a section",
+  "@selectASection": {
+    "description": "Message when there is no section selected"
+  },
+  "noGuidanceForThisSection": "There is no guidance for this section",
+  "@noGuidanceForThisSection": {
+    "description": "Message when there is no guidance for this section"
+  },
+  "noProposalStateDescription": "Discovery space will show draft proposals you can comment on, currently there are no draft proposals.",
+  "@noProposalStateDescription": {
+    "description": "Description shown when there are no proposals in the proposals tab"
+  },
+  "noProposalStateTitle": "No draft proposals yet",
+  "@noProposalStateTitle": {
+    "description": "Title shown when there are no proposals in the proposals tab"
+  },
+  "campaignDetails": "Campaign Details",
+  "description": "Description",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "categories": "Categories",
+  "proposals": "Proposals",
+  "totalSubmitted": "Total submitted",
+  "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
+  "@inXDays": {
+    "placeholders": {
+      "x": {
+        "type": "int"
+      }
+    }
+  },
+  "campaignCategories": "Campaign Categories",
+  "cardanoUseCases": "Cardano Use Cases"
 }

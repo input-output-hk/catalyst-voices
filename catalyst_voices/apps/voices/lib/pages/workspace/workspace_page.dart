@@ -17,14 +17,15 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-const sections = [
-  ProposalSetup(
+final sections = [
+  const ProposalSetup(
     id: 0,
     steps: [
       TitleStep(
         id: 0,
         sectionId: 0,
         data: DocumentJson(title),
+        guidances: mockGuidance,
       ),
     ],
   ),
@@ -34,24 +35,29 @@ const sections = [
       ProblemStep(
         id: 0,
         sectionId: 1,
-        data: DocumentJson(problemStatement),
+        data: const DocumentJson(problemStatement),
         charsLimit: 200,
+        guidances: [
+          mockGuidance[0],
+        ],
       ),
-      SolutionStep(
+      const SolutionStep(
         id: 1,
         sectionId: 1,
         data: DocumentJson(solutionStatement),
         charsLimit: 200,
+        guidances: mockGuidance,
       ),
-      PublicDescriptionStep(
+      const PublicDescriptionStep(
         id: 2,
         sectionId: 1,
         data: DocumentJson(publicDescription),
         charsLimit: 3000,
+        guidances: mockGuidance,
       ),
     ],
   ),
-  ProposalSolution(
+  const ProposalSolution(
     id: 2,
     steps: [
       ProblemPerspectiveStep(
@@ -74,7 +80,7 @@ const sections = [
       ),
     ],
   ),
-  ProposalImpact(
+  const ProposalImpact(
     id: 3,
     steps: [
       BonusMarkUpStep(
@@ -91,7 +97,7 @@ const sections = [
       ),
     ],
   ),
-  CompatibilityAndFeasibility(
+  const CompatibilityAndFeasibility(
     id: 4,
     steps: [
       DeliveryAndAccountabilityStep(
