@@ -27,7 +27,7 @@ pub(super) struct Params {
     txo: i16,
     /// Policy hash of the asset
     policy_id: Vec<u8>,
-    /// Policy name of the asset
+    /// Name of the asset, within the Policy.
     asset_name: Vec<u8>,
     /// Value of the asset
     value: num_bigint::BigInt,
