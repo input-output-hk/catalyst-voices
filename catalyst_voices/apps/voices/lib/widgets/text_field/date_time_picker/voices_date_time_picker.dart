@@ -69,15 +69,15 @@ class _VoicesDateTimePickerState extends State<VoicesDateTimePicker> {
   @override
   void initState() {
     super.initState();
-    _dateController = CalendarPickerController()..addListener(_dateListiner);
-    _timeController = TimePickerController()..addListener(_timeListiner);
+    _dateController = CalendarPickerController()..addListener(_dateListener);
+    _timeController = TimePickerController()..addListener(_timeListener);
   }
 
-  void _dateListiner() {
+  void _dateListener() {
     widget.controller.updateDate(_dateController.selectedValue);
   }
 
-  void _timeListiner() {
+  void _timeListener() {
     widget.controller.updateTimeOfDate(_timeController.selectedValue);
   }
 

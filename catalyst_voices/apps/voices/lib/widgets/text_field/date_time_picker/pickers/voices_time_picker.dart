@@ -100,7 +100,7 @@ class _TimeText extends StatelessWidget {
     required this.timeZone,
   });
 
-  bool get isSelected => selectedTime == value;
+  bool get isSelected => selectedTime == value.formattedTime;
 
   @override
   Widget build(BuildContext context) {
