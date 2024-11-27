@@ -1,5 +1,8 @@
 //! CIP36 object
 
+// TODO: This is NOT common, remove it once the rationalized endpoint is implemented.
+// Retained to keep the existing code from breaking only.
+
 use poem_openapi::{types::Example, Object};
 
 use crate::service::common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey;
