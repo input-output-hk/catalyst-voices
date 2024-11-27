@@ -12,6 +12,10 @@ import 'package:flutter/material.dart';
 class PendingProposalCard extends StatelessWidget {
   final AssetGenImage image;
   final PendingProposal proposal;
+  final bool showStatus;
+  final bool showLastUpdate;
+  final bool showComments;
+  final bool showSegments;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
@@ -19,6 +23,10 @@ class PendingProposalCard extends StatelessWidget {
     super.key,
     required this.image,
     required this.proposal,
+    this.showStatus = true,
+    this.showLastUpdate = true,
+    this.showComments = true,
+    this.showSegments = true,
     this.isFavorite = false,
     this.onFavoriteChanged,
   });
@@ -29,7 +37,7 @@ class PendingProposalCard extends StatelessWidget {
       width: 326,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -37,6 +45,7 @@ class PendingProposalCard extends StatelessWidget {
         children: [
           _Header(
             image: image,
+            showStatus: showStatus,
             isFavorite: isFavorite,
             onFavoriteChanged: onFavoriteChanged,
           ),
@@ -51,22 +60,26 @@ class PendingProposalCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 _Title(text: proposal.title),
-                const SizedBox(height: 4),
-                _LastUpdateDate(dateTime: proposal.lastUpdateDate),
+                if (showLastUpdate) ...[
+                  const SizedBox(height: 4),
+                  _LastUpdateDate(dateTime: proposal.lastUpdateDate),
+                ],
                 const SizedBox(height: 24),
                 _FundsAndComments(
                   funds: proposal.fundsRequested,
                   commentsCount: proposal.commentsCount,
+                  showComments: showComments,
                 ),
                 const SizedBox(height: 24),
                 _Description(text: proposal.description),
               ],
             ),
           ),
-          _CompletedSegments(
-            completed: proposal.completedSegments,
-            total: proposal.totalSegments,
-          ),
+          if (showSegments)
+            _CompletedSegments(
+              completed: proposal.completedSegments,
+              total: proposal.totalSegments,
+            ),
         ],
       ),
     );
@@ -75,11 +88,13 @@ class PendingProposalCard extends StatelessWidget {
 
 class _Header extends StatelessWidget {
   final AssetGenImage image;
+  final bool showStatus;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const _Header({
     required this.image,
+    required this.showStatus,
     required this.isFavorite,
     required this.onFavoriteChanged,
   });
@@ -112,18 +127,19 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
-          Positioned(
-            left: 12,
-            bottom: 12,
-            child: VoicesChip.rectangular(
-              padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-              leading: VoicesAssets.icons.briefcase.buildIcon(
-                color: Theme.of(context).colorScheme.primary,
+          if (showStatus)
+            Positioned(
+              left: 12,
+              bottom: 12,
+              child: VoicesChip.rectangular(
+                padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
+                leading: VoicesAssets.icons.briefcase.buildIcon(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                content: Text(context.l10n.publishedProposal),
+                backgroundColor: Theme.of(context).colors.primary98,
               ),
-              content: Text(context.l10n.publishedProposal),
-              backgroundColor: Theme.of(context).colors.primary98,
             ),
-          ),
         ],
       ),
     );
@@ -193,10 +209,12 @@ class _LastUpdateDate extends StatelessWidget {
 class _FundsAndComments extends StatelessWidget {
   final Coin funds;
   final int commentsCount;
+  final bool showComments;
 
   const _FundsAndComments({
     required this.funds,
     required this.commentsCount,
+    required this.showComments,
   });
 
   @override
@@ -222,19 +240,21 @@ class _FundsAndComments extends StatelessWidget {
               ),
             ],
           ),
-          VoicesChip.rectangular(
-            padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-            leading: VoicesAssets.icons.checkCircle.buildIcon(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            content: Text(
-              context.l10n.noOfComments(commentsCount),
-              style: TextStyle(
+          if (showComments)
+            VoicesChip.rectangular(
+              padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+              leading: VoicesAssets.icons.checkCircle.buildIcon(
                 color: Theme.of(context).colorScheme.primary,
               ),
+              content: Text(
+                context.l10n.noOfComments(commentsCount),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              backgroundColor:
+                  Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
             ),
-            backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
-          ),
         ],
       ),
     );

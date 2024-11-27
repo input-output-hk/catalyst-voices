@@ -32,6 +32,9 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.style]
   final TextStyle? style;
 
+  /// [TextField.autofocus]
+  final bool autofocus;
+
   /// [TextField.obscureText]
   final bool obscureText;
 
@@ -77,6 +80,7 @@ class VoicesTextField extends StatefulWidget {
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
     this.style,
+    this.autofocus = false,
     this.obscureText = false,
     this.maxLength,
     this.maxLines = 1,
@@ -176,6 +180,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           resizableVertically: resizable,
           child: TextFormField(
             textAlignVertical: TextAlignVertical.top,
+            autofocus: widget.autofocus,
             expands: resizable,
             controller: _obtainController(),
             focusNode: widget.focusNode,
