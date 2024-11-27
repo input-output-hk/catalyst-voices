@@ -38,20 +38,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   }
 }
 
-class _SpacesNavigationLocation extends StatelessWidget {
-  const _SpacesNavigationLocation();
-
-  @override
-  Widget build(BuildContext context) {
-    return const NavigationLocation(
-      parts: [
-        'Discovery Space',
-        'Homepage',
-      ],
-    );
-  }
-}
-
 class _Body extends StatelessWidget {
   const _Body();
 
@@ -92,6 +78,20 @@ class _GuestVisitorBody extends StatelessWidget {
             ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _SpacesNavigationLocation extends StatelessWidget {
+  const _SpacesNavigationLocation();
+
+  @override
+  Widget build(BuildContext context) {
+    return const NavigationLocation(
+      parts: [
+        'Discovery Space',
+        'Homepage',
       ],
     );
   }
