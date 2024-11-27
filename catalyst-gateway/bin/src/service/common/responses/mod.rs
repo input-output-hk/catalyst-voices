@@ -75,7 +75,7 @@ pub(crate) enum ErrorResponses {
 
     /// ## Service Unavailable
     ///
-    /// The service is not available, do not send other requests.
+    /// The service is not available, try again later.
     ///
     /// *This is returned when the service either has not started,
     /// or has become unavailable.*

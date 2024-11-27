@@ -1,0 +1,12 @@
+# use with https://github.com/casey/just
+#
+# Developer convenience functions
+
+# cspell: words prereqs, commitlog, rustls, nocapture
+
+default:
+    @just --list --unsorted
+
+# expand all macros and produce a single unified source file.
+expand-macros:
+    cargo expand --release --bin cat-gateway > ../expanded.rs

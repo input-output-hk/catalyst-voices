@@ -20,6 +20,25 @@ class _GuidanceViewState extends State<GuidanceView> {
   GuidanceType? selectedType;
 
   @override
+  void initState() {
+    super.initState();
+    filteredGuidances
+      ..clear()
+      ..addAll(widget.guidances);
+  }
+
+  @override
+  void didUpdateWidget(GuidanceView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.guidances != widget.guidances) {
+      filteredGuidances
+        ..clear()
+        ..addAll(widget.guidances);
+      _filterGuidances(selectedType);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -54,25 +73,6 @@ class _GuidanceViewState extends State<GuidanceView> {
         ),
       ],
     );
-  }
-
-  @override
-  void didUpdateWidget(GuidanceView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.guidances != widget.guidances) {
-      filteredGuidances
-        ..clear()
-        ..addAll(widget.guidances);
-      _filterGuidances(selectedType);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    filteredGuidances
-      ..clear()
-      ..addAll(widget.guidances);
   }
 
   void _filterGuidances(GuidanceType? type) {

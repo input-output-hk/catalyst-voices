@@ -5,7 +5,7 @@ use poem_openapi::{
     types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 
-use crate::service::utilities::to_hex_with_prefix;
+use crate::service::utilities::as_hex_string;
 
 /// Cardano Blake2b256 hash encoded in hex.
 #[derive(Debug)]
@@ -91,6 +91,6 @@ impl ParseFromJSON for Hash {
 
 impl ToJSON for Hash {
     fn to_json(&self) -> Option<serde_json::Value> {
-        Some(serde_json::Value::String(to_hex_with_prefix(&self.0)))
+        Some(serde_json::Value::String(as_hex_string(&self.0)))
     }
 }

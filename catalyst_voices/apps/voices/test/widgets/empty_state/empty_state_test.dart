@@ -1,4 +1,5 @@
-import 'package:catalyst_voices/widgets/proposals/no_proposals.dart';
+import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
+import 'package:catalyst_voices/widgets/images/voices_image_scheme.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +8,10 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/helpers.dart';
 
 void main() {
-  group('NoProposals Widget Tests', () {
+  group('EmptyState Widget Tests', () {
     testWidgets('Renders correctly with default values', (tester) async {
       await tester.pumpApp(
-        const NoProposals(),
+        const EmptyState(),
       );
       await tester.pumpAndSettle();
 
@@ -28,7 +29,7 @@ void main() {
 
     testWidgets('Renders correctly with custom values', (tester) async {
       await tester.pumpApp(
-        const NoProposals(
+        const EmptyState(
           title: 'Custom Title',
           description: 'Custom Description',
         ),
@@ -45,7 +46,7 @@ void main() {
           VoicesColorScheme.optional(textOnPrimaryLevel1: Colors.red);
       await tester.pumpApp(
         voicesColors: colors,
-        const NoProposals(
+        const EmptyState(
           title: 'Custom Title',
           description: 'Custom Description',
         ),
@@ -75,7 +76,7 @@ void main() {
       'Proposal image changes depending on theme brightness',
       (tester) async {
         // Given
-        const widget = NoProposals();
+        const widget = EmptyState();
 
         // When - Light theme
         await tester.pumpApp(
@@ -112,5 +113,19 @@ void main() {
         );
       },
     );
+
+    testWidgets('Renders correctly with custom image', (tester) async {
+      await tester.pumpApp(
+        EmptyState(
+          image: CatalystSvgPicture.asset(
+            VoicesAssets.images.noProposalForeground.path,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CatalystSvgPicture), findsOneWidget);
+      expect(find.byType(VoicesImagesScheme), findsNothing);
+    });
   });
 }

@@ -14,3 +14,4 @@ target/
 cat-gateway.coverage.info
 cat-gateway.junit-report.xml
 cat-gateway-api.*
+expanded.rs
