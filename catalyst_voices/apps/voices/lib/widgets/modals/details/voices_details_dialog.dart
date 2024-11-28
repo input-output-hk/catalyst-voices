@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 class VoicesDetailsDialog extends StatelessWidget {
@@ -21,6 +22,7 @@ class VoicesDetailsDialog extends StatelessWidget {
         maxWidth: 900,
         minHeight: double.infinity,
       ),
+      backgroundColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
       child: Column(
         children: [
           header,
