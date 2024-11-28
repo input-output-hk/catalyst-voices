@@ -54,7 +54,7 @@ void main() {
 
       final xprv = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
       final xpub = await xprv.derivePublicKey();
-      final pub = xpub.extractPublicKey();
+      final pub = xpub.toPublicKey();
 
       const data = [1, 2, 3, 4];
       final sig = await xprv.sign(data);

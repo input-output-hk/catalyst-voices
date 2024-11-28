@@ -33,7 +33,7 @@ class Bip32Ed25519XPublicKey extends Equatable {
   List<int> get bytes => _bytes.inner;
 
   /// Extracts the public key bytes from the extended public key.
-  Ed25519PublicKey extractPublicKey() =>
+  Ed25519PublicKey toPublicKey() =>
       Ed25519PublicKey.fromBytes(_bytes.publicKey);
 
   /// Verifies whether a given [signature] was created using this public key
