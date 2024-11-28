@@ -16,7 +16,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
   final List<C509Certificate>? cborCerts;
 
   /// Ordered list of simple public keys that are registered.
-  final List<Bip32Ed25519XPublicKey>? publicKeys;
+  final List<Ed25519PublicKey>? publicKeys;
 
   /// Revocation list of certs being revoked by an issuer.
   final List<CertificateHash>? revocationSet;
@@ -45,9 +45,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
     return RegistrationData(
       derCerts: derCerts?.map(X509DerCertificate.fromCbor).toList(),
       cborCerts: cborCerts?.map(C509Certificate.fromCbor).toList(),
-      publicKeys: publicKeys
-          ?.map(Bip32Ed25519XPublicKeyFactory.instance.fromCbor)
-          .toList(),
+      publicKeys: publicKeys?.map(Ed25519PublicKey.fromCbor).toList(),
       revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
       roleDataSet: roleDataSet?.map(RoleData.fromCbor).toSet(),
     );
@@ -68,7 +66,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
         cborCerts,
         (item) => item.toCbor(),
       ),
-      const CborSmallInt(30): _createCborList<Bip32Ed25519XPublicKey>(
+      const CborSmallInt(30): _createCborList<Ed25519PublicKey>(
         publicKeys,
         (item) => item.toCbor(tags: [CborCustomTags.ed25519Bip32PublicKey]),
       ),
