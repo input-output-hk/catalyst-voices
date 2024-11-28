@@ -7,4 +7,6 @@ import 'package:catalyst_voices_services/src/storage/storage.dart';
 ///
 /// In order to unlock [Vault] sufficient [LockFactor] have to be
 /// set via [unlock] that can unlock [LockFactor] from [setLock].
-abstract interface class Vault implements Storage, Lockable {}
+abstract interface class Vault implements Storage, Lockable {
+  String get id;
+}
