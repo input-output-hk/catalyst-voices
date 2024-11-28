@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class VoicesImagesScheme extends StatelessWidget {
   final Widget image;
-  final Widget background;
+  final Widget? background;
 
   const VoicesImagesScheme({
     super.key,
@@ -15,7 +15,7 @@ class VoicesImagesScheme extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        background,
+        if (background != null) background!,
         image,
       ],
     );

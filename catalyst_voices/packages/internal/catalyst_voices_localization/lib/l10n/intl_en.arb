@@ -995,6 +995,50 @@
   "@noProposalStateTitle": {
     "description": "Title shown when there are no proposals in the proposals tab"
   },
+  "campaignIsLive": "Campaign Is Live (Published)",
+  "@campaignIsLive": {
+    "description": "Title of the campaign is live (published) space"
+  },
+  "campaignStaringSoon": "Campaign Staring Soon (Ready to deploy)",
+  "@campaignStaringSoon": {
+    "description": "Title of the campaign staring soon space"
+  },
+  "campaignConcluded": "Campaign Concluded, Result are in!",
+  "@campaignConcluded": {
+    "description": "Title of the campaign concluded space"
+  },
+  "campaignBeginsOn": "Campaign begins on {date} at {time}",
+  "@campaignBeginsOn": {
+    "description": "Title of the campaign concluded space",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "campaignEndsOn": "Campaign ends on {date} at {time}",
+  "@campaignEndsOn": {
+    "description": "Title of the campaign concluded space",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "viewProposals": "View proposals",
+  "@viewProposals": {
+    "description": "Title of the view proposals space"
+  },
+  "viewVotingResults": "View Voting Results",
+  "@viewVotingResults": {
+    "description": "Title of the view voting results space"
+  },
   "campaignDetails": "Campaign Details",
   "description": "Description",
   "startDate": "Start Date",
@@ -1013,5 +1057,17 @@
   },
   "campaignCategories": "Campaign Categories",
   "cardanoUseCases": "Cardano Use Cases",
+  "discoverySpaceTitle": "Boost Social Entrepreneurship",
+  "@discoverySpaceTitle": {
+    "description": "Title for the discovery space for actor (unlocked) user."
+  },
+  "discoverySpaceDescription": "Project Catalyst is built on the ingenuity of our global network. Ideas can come from anyone, from any background, anywhere in the world. Proposers pitch their ideas to the community by submitting proposals onto the Catalyst collaboration platform.",
+  "@discoverySpaceDescription": {
+    "description": "Description for the discovery space for actor (unlocked) user."
+  },
+  "discoverySpaceEmptyProposals": "Once this campaign launches draft proposals will be shared here.",
+  "@discoverySpaceEmptyProposals": {
+    "description": "Description for empty state on discovery space when there are no draft proposals."
+  },
   "campaign": "Campaign"
 }

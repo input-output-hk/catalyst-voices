@@ -17,9 +17,11 @@ const DESCRIPTION: &str = "This is a non-zero signed integer.";
 const EXAMPLE: i128 = 1_234_567;
 /// Minimum.
 /// From: <https://github.com/IntersectMBO/cardano-ledger/blob/78b32d585fd4a0340fb2b184959fb0d46f32c8d2/eras/conway/impl/cddl-files/conway.cddl#L568>
+/// This is NOT `i128::MIN`.
 const MINIMUM: i128 = -9_223_372_036_854_775_808;
 /// Maximum.
 /// From: <https://github.com/IntersectMBO/cardano-ledger/blob/78b32d585fd4a0340fb2b184959fb0d46f32c8d2/eras/conway/impl/cddl-files/conway.cddl#L569>
+/// This is NOT `i128::MAX`.
 const MAXIMUM: i128 = 9_223_372_036_854_775_808;
 
 /// Schema.
