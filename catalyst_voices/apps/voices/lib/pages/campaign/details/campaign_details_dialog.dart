@@ -20,7 +20,7 @@ class CampaignDetailsDialog extends StatefulWidget {
   }) {
     return VoicesDialog.show(
       context: context,
-      routeSettings: RouteSettings(name: '/campaign_${id}_details'),
+      routeSettings: RouteSettings(name: '/campaign/$id'),
       builder: (context) => CampaignDetailsDialog._(id: id),
       barrierDismissible: true,
     );
@@ -36,7 +36,7 @@ class _CampaignDetailsDialogState extends State<CampaignDetailsDialog> {
   @override
   void initState() {
     super.initState();
-    _bloc.add(LoadCampaign(id: widget.id));
+    _bloc.add(LoadCampaignEvent(id: widget.id));
   }
 
   @override
@@ -44,7 +44,7 @@ class _CampaignDetailsDialogState extends State<CampaignDetailsDialog> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.id != oldWidget.id) {
-      _bloc.add(LoadCampaign(id: widget.id));
+      _bloc.add(LoadCampaignEvent(id: widget.id));
     }
   }
 
