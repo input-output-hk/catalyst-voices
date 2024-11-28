@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_signature.dart';
+import 'package:catalyst_key_derivation/src/ed25519/ed25519_public_key.dart';
 import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart'
     as rust;
 import 'package:cbor/cbor.dart';
@@ -30,6 +31,10 @@ class Bip32Ed25519XPublicKey extends Equatable {
 
   /// Returns the bytes of the public key.
   List<int> get bytes => _bytes.inner;
+
+  /// Extracts the public key bytes from the extended public key.
+  Ed25519PublicKey extractPublicKey() =>
+      Ed25519PublicKey.fromBytes(_bytes.publicKey);
 
   /// Verifies whether a given [signature] was created using this public key
   /// for the provided [message].

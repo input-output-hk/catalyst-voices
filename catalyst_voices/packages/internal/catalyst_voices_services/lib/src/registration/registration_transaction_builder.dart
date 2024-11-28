@@ -75,7 +75,7 @@ final class RegistrationTransactionBuilder {
       txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
       chunkedData: RegistrationData(
         derCerts: [derCert],
-        publicKeys: [keyPair.publicKey],
+        publicKeys: [keyPair.publicKey.extractPublicKey()],
         roleDataSet: {
           // TODO(dtscalac): currently we only support the voter account role,
           // regardless of selected roles

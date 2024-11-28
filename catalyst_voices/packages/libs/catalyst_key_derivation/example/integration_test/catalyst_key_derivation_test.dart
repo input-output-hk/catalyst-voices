@@ -54,6 +54,7 @@ void main() {
 
       final xprv = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
       final xpub = await xprv.derivePublicKey();
+      final pub = xpub.extractPublicKey();
 
       const data = [1, 2, 3, 4];
       final sig = await xprv.sign(data);
@@ -63,6 +64,13 @@ void main() {
 
       final xpubVerification = await xpub.verify(data, signature: sig);
       expect(xpubVerification, isTrue);
+
+      final pubVerification = await pub.verify(
+        data,
+        signature: Ed25519Signature.fromBytes(sig.bytes),
+      );
+
+      expect(pubVerification, isTrue);
     });
 
     testWidgets('derivePrivateKey', (tester) async {
