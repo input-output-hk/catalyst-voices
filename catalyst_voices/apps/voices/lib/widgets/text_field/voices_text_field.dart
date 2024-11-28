@@ -468,7 +468,8 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// The validation can be either a success, a warning or an error.
   final VoicesTextFieldStatus status;
 
-  /// The error message to be used in case of a [warning] or an [error].
+  /// The error message to be used in case of a [VoicesTextFieldStatus.warning]
+  /// or an [VoicesTextFieldStatus.error].
   final String? errorMessage;
 
   const VoicesTextFieldValidationResult({
