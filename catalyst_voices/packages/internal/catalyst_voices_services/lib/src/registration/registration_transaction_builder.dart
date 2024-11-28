@@ -85,7 +85,7 @@ final class RegistrationTransactionBuilder {
             roleNumber: AccountRole.root.roleNumber,
             roleSigningKey: const LocalKeyReference(
               keyType: LocalKeyReferenceType.x509Certs,
-              keyOffset: 0,
+              offset: 0,
             ),
             // Refer to first key in transaction outputs,
             // in our case it's the change address (which the user controls).

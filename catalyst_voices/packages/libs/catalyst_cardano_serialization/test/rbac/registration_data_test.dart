@@ -34,11 +34,11 @@ void main() {
             roleNumber: 0,
             roleSigningKey: const LocalKeyReference(
               keyType: LocalKeyReferenceType.x509Certs,
-              keyOffset: 0,
+              offset: 0,
             ),
             roleEncryptionKey: const LocalKeyReference(
               keyType: LocalKeyReferenceType.x509Certs,
-              keyOffset: 0,
+              offset: 0,
             ),
             paymentKey: 0,
             roleSpecificData: {

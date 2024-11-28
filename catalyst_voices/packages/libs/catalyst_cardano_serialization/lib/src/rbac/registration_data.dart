@@ -257,23 +257,23 @@ class LocalKeyReference extends Equatable implements CborEncodable {
   final LocalKeyReferenceType keyType;
 
   /// Offset of the key in the specified set. 0 = first entry.
-  final int keyOffset;
+  final int offset;
 
   /// The default constructor for [LocalKeyReference].
   const LocalKeyReference({
     required this.keyType,
-    required this.keyOffset,
+    required this.offset,
   });
 
   /// Deserializes the type from cbor.
   factory LocalKeyReference.fromCbor(CborValue value) {
     final list = value as CborList;
     final keyType = list[0] as CborSmallInt;
-    final keyOffset = list[1] as CborSmallInt;
+    final offset = list[1] as CborSmallInt;
 
     return LocalKeyReference(
       keyType: LocalKeyReferenceType.fromTag(keyType.value),
-      keyOffset: keyOffset.value,
+      offset: offset.value,
     );
   }
 
@@ -282,12 +282,12 @@ class LocalKeyReference extends Equatable implements CborEncodable {
   CborValue toCbor() {
     return CborList([
       CborSmallInt(keyType.tag),
-      CborSmallInt(keyOffset),
+      CborSmallInt(offset),
     ]);
   }
 
   @override
-  List<Object?> get props => [keyType, keyOffset];
+  List<Object?> get props => [keyType, offset];
 }
 
 /// Defines the type of the referenced local key.

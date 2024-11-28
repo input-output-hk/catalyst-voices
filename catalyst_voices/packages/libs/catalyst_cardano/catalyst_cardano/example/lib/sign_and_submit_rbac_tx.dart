@@ -109,7 +109,7 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
           roleNumber: 0,
           roleSigningKey: const LocalKeyReference(
             keyType: LocalKeyReferenceType.x509Certs,
-            keyOffset: 0,
+            offset: 0,
           ),
           paymentKey: -1,
           roleSpecificData: {
