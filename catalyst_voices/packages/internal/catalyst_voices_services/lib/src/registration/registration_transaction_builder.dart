@@ -83,14 +83,13 @@ final class RegistrationTransactionBuilder {
           // they should be registered here
           RoleData(
             roleNumber: AccountRole.root.roleNumber,
-            roleSigningKey: KeyReference(
-              localRef: const LocalKeyReference(
-                keyType: LocalKeyReferenceType.x509Certs,
-                keyOffset: 0,
-              ),
+            roleSigningKey: const LocalKeyReference(
+              keyType: LocalKeyReferenceType.x509Certs,
+              keyOffset: 0,
             ),
-            roleEncryptionKey: KeyReference(
-              hash: CertificateHash.fromX509DerCertificate(derCert),
+            roleEncryptionKey: const LocalKeyReference(
+              keyType: LocalKeyReferenceType.x509Certs,
+              keyOffset: 0,
             ),
             paymentKey: 0,
           ),

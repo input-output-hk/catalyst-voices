@@ -142,7 +142,7 @@ class RoleData extends Equatable implements CborEncodable {
   ///
   /// If the certificate is revoked, the role is unusable for signing unless
   /// and until a new signing certificate is registered for the role.
-  final KeyReference? roleSigningKey;
+  final LocalKeyReference? roleSigningKey;
 
   /// A Role may require the ability to transfer encrypted data.
   /// The registration can include the Public key use by the role to encrypt
@@ -157,7 +157,7 @@ class RoleData extends Equatable implements CborEncodable {
   /// key encryption, and not just a signing key.
   /// If the key referenced does not support public key encryption,
   /// the registration is invalid.
-  final KeyReference? roleEncryptionKey;
+  final LocalKeyReference? roleEncryptionKey;
 
   /// Reference to a transaction input/output as the payment key to use for a role.
   /// Payment key (n) >= 0 = Use Transaction Input Key offset (n)
@@ -209,10 +209,11 @@ class RoleData extends Equatable implements CborEncodable {
 
     return RoleData(
       roleNumber: roleNumber.value,
-      roleSigningKey:
-          roleSigningKey != null ? KeyReference.fromCbor(roleSigningKey) : null,
+      roleSigningKey: roleSigningKey != null
+          ? LocalKeyReference.fromCbor(roleSigningKey)
+          : null,
       roleEncryptionKey: roleEncryptionKey != null
-          ? KeyReference.fromCbor(roleEncryptionKey)
+          ? LocalKeyReference.fromCbor(roleEncryptionKey)
           : null,
       paymentKey: paymentKey?.value,
       roleSpecificData: roleSpecificData.isNotEmpty
@@ -246,61 +247,6 @@ class RoleData extends Equatable implements CborEncodable {
         paymentKey,
         roleSpecificData,
       ];
-}
-
-/// References a local key in this registration or
-/// a given key in an earlier registration.
-///
-/// Either [localRef] or [hash] must be set, but not both and not none.
-class KeyReference extends Equatable implements CborEncodable {
-  /// Offset reference to a key defined in this registration.
-  /// More efficient than a key hash.
-  final LocalKeyReference? localRef;
-
-  /// Reference to a key defined in an earlier registration.
-  final CertificateHash? hash;
-
-  /// The default constructor for [KeyReference].
-  KeyReference({this.localRef, this.hash}) {
-    if (!((localRef == null) ^ (hash == null))) {
-      throw ArgumentError(
-        'Either localRef or hash must be set, but not both and not none.',
-      );
-    }
-  }
-
-  /// Deserializes the type from cbor.
-  factory KeyReference.fromCbor(CborValue value) {
-    return KeyReference(
-      localRef: _tryParseLocalRef(value),
-      hash: _tryParseHash(value),
-    );
-  }
-
-  static LocalKeyReference? _tryParseLocalRef(CborValue value) {
-    try {
-      return LocalKeyReference.fromCbor(value);
-    } catch (ignored) {
-      return null;
-    }
-  }
-
-  static CertificateHash? _tryParseHash(CborValue value) {
-    try {
-      return CertificateHash.fromCbor(value);
-    } catch (ignored) {
-      return null;
-    }
-  }
-
-  /// Serializes the type as cbor.
-  @override
-  CborValue toCbor() {
-    return localRef?.toCbor() ?? hash!.toCbor();
-  }
-
-  @override
-  List<Object?> get props => [localRef, hash];
 }
 
 /// Offset reference to a key defined in this registration.
