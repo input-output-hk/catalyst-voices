@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_models/src/campaign/campaign_section.dart';
 import 'package:equatable/equatable.dart';
 
 final class Campaign extends Equatable {

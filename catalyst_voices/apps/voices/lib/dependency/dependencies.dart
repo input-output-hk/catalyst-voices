@@ -52,7 +52,12 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<ProposalsCubit>(
         () => ProposalsCubit(proposalRepository: get<ProposalRepository>()),
-      );
+      )
+      ..registerFactory<CampaignDetailsBloc>(() {
+        return CampaignDetailsBloc(
+          get<CampaignRepository>(),
+        );
+      });
   }
 
   void _registerRepositories() {
@@ -66,9 +71,8 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<TransactionConfigRepository>(
         TransactionConfigRepository.new,
       )
-      ..registerLazySingleton<ProposalRepository>(
-        ProposalRepository.new,
-      );
+      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new);
   }
 
   void _registerServices() {

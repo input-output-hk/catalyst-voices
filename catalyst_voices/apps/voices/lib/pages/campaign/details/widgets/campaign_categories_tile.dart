@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoriesTile extends StatefulWidget {
-  final List<CampaignSection> sections;
+  final List<CampaignCategorySection> sections;
 
   const CampaignCategoriesTile({
     super.key,
@@ -119,7 +119,7 @@ class _Menu extends StatelessWidget {
 }
 
 class _Details extends StatelessWidget {
-  final CampaignSection section;
+  final CampaignCategorySection section;
 
   const _Details({
     required this.section,

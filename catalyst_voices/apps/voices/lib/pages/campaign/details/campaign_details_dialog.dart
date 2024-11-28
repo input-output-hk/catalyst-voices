@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_header.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_sections_list_view.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -31,11 +32,12 @@ class CampaignDetailsDialog extends StatefulWidget {
 }
 
 class _CampaignDetailsDialogState extends State<CampaignDetailsDialog> {
-  final _bloc = CampaignDetailsBloc();
+  late final CampaignDetailsBloc _bloc;
 
   @override
   void initState() {
     super.initState();
+    _bloc = Dependencies.instance.get();
     _bloc.add(LoadCampaignEvent(id: widget.id));
   }
 

@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_view_models/src/campaign/campaign_section.dart';
+import 'package:catalyst_voices_view_models/src/campaign/campaign_category_section.dart';
 import 'package:equatable/equatable.dart';
 
 sealed class CampaignListItem extends Equatable {}
@@ -29,7 +29,7 @@ final class CampaignDetailsListItem extends CampaignListItem {
 }
 
 final class CampaignCategoriesListItem extends CampaignListItem {
-  final List<CampaignSection> sections;
+  final List<CampaignCategorySection> sections;
 
   CampaignCategoriesListItem({
     required this.sections,
