@@ -481,25 +481,23 @@ class VoicesTextFieldValidationResult with EquatableMixin {
           'errorMessage can be only used for warning or error status',
         );
 
-  @override
-  List<Object?> get props => [status, errorMessage];
-
   /// Returns a successful validation result.
   ///
   /// The method was designed to be used as
   /// [VoicesTextField.validator] param:
   ///
   /// ```
-  /// validator: VoicesTextFieldValidationResult.success,
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.success();
+  ///   },
   /// ```
   ///
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
-  static VoicesTextFieldValidator success() {
-    return (_) => const VoicesTextFieldValidationResult(
+  const VoicesTextFieldValidationResult.success()
+      : this(
           status: VoicesTextFieldStatus.success,
         );
-  }
 
   /// Returns a warning validation result.
   ///
@@ -507,17 +505,18 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// [VoicesTextField.validator] param:
   ///
   /// ```
-  /// validator: VoicesTextFieldValidationResult.warning,
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.warning();
+  ///   },
   /// ```
   ///
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
-  static VoicesTextFieldValidator warning([String? message]) {
-    return (_) => VoicesTextFieldValidationResult(
+  const VoicesTextFieldValidationResult.warning([String? message])
+      : this(
           status: VoicesTextFieldStatus.warning,
           errorMessage: message,
         );
-  }
 
   /// Returns an error validation result.
   ///
@@ -525,17 +524,21 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// [VoicesTextField.validator] param:
   ///
   /// ```
-  /// validator: VoicesTextFieldValidationResult.error,
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.error();
+  ///   },
   /// ```
   ///
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
-  static VoicesTextFieldValidator error([String? message]) {
-    return (_) => VoicesTextFieldValidationResult(
+  const VoicesTextFieldValidationResult.error([String? message])
+      : this(
           status: VoicesTextFieldStatus.error,
           errorMessage: message,
         );
-  }
+
+  @override
+  List<Object?> get props => [status, errorMessage];
 }
 
 /// Defines the appearance of the [VoicesTextField].
