@@ -103,7 +103,7 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
     previousTransactionId: _transactionHash,
     chunkedData: RegistrationData(
       derCerts: [derCert],
-      publicKeys: [keyPair.publicKey],
+      publicKeys: [keyPair.publicKey.toPublicKey()],
       roleDataSet: {
         RoleData(
           roleNumber: 0,
