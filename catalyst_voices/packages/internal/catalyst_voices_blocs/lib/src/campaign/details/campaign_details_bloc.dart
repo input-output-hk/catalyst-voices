@@ -6,11 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class CampaignDetailsBloc
     extends Bloc<CampaignDetailsEvent, CampaignDetailsState> {
   CampaignDetailsBloc() : super(const CampaignDetailsState()) {
-    on<LoadCampaign>(_onLoadCampaign);
+    on<LoadCampaignEvent>(_onLoadCampaignEvent);
   }
 
-  Future<void> _onLoadCampaign(
-    LoadCampaign event,
+  Future<void> _onLoadCampaignEvent(
+    LoadCampaignEvent event,
     Emitter<CampaignDetailsState> emit,
   ) async {
     final id = event.id;

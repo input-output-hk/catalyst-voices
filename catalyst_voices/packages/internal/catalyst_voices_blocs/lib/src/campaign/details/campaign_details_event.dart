@@ -4,10 +4,10 @@ sealed class CampaignDetailsEvent extends Equatable {
   const CampaignDetailsEvent();
 }
 
-final class LoadCampaign extends CampaignDetailsEvent {
+final class LoadCampaignEvent extends CampaignDetailsEvent {
   final String id;
 
-  const LoadCampaign({
+  const LoadCampaignEvent({
     required this.id,
   });
 
