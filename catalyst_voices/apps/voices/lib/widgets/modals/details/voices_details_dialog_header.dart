@@ -15,15 +15,64 @@ class VoicesDetailsDialogHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ConstrainedBox(
       // Later this upper constraints may change
       constraints: const BoxConstraints(minHeight: 166, maxHeight: 166),
-      padding: const EdgeInsets.all(12).add(const EdgeInsets.only(bottom: 4)),
+      child: Stack(
+        children: [
+          const Positioned.fill(child: _Background()),
+          _Foreground(titleLabel: titleLabel, title: title),
+        ],
+      ),
+    );
+  }
+}
+
+class _Background extends StatelessWidget {
+  const _Background();
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = VoicesAssets.images.comingSoonBkg;
+    return DecoratedBox(
       decoration: BoxDecoration(
-        image: _BackgroundDecorationImage(
-          asset: VoicesAssets.images.comingSoonBkg,
+        gradient: LinearGradient(
+          colors: [
+            Colors.black.withOpacity(0),
+            Colors.black.withOpacity(0.4),
+            Colors.black.withOpacity(0.4),
+          ],
+          stops: const [
+            0,
+            0.7452,
+            1,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
+      position: DecorationPosition.foreground,
+      child: CatalystImage.asset(
+        asset.path,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+}
+
+class _Foreground extends StatelessWidget {
+  final String titleLabel;
+  final String title;
+
+  const _Foreground({
+    required this.titleLabel,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(12).add(const EdgeInsets.only(bottom: 4)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -48,15 +97,6 @@ class VoicesDetailsDialogHeader extends StatelessWidget {
   }
 }
 
-class _BackgroundDecorationImage extends DecorationImage {
-  _BackgroundDecorationImage({
-    required AssetGenImage asset,
-  }) : super(
-          image: CatalystImage.asset(asset.path).image,
-          fit: BoxFit.cover,
-        );
-}
-
 class _TitleLabelText extends StatelessWidget {
   final String data;
 
@@ -66,14 +106,14 @@ class _TitleLabelText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final colors = theme.colors;
 
     return Text(
       data,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: textTheme.titleSmall
-          ?.copyWith(color: colors.elevationsOnSurfaceNeutralLv1Grey),
+      // TODO(damian-molinski): Always using white colors without token.
+      // Colors/sys color neutral md ref/N100
+      style: textTheme.titleSmall?.copyWith(color: Colors.white),
     );
   }
 }
@@ -87,15 +127,14 @@ class _TitleText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final colors = theme.colors;
 
     return Text(
       data,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: textTheme.displayMedium?.copyWith(
-        color: colors.textOnPrimaryWhite,
-      ),
+      // TODO(damian-molinski): Always using white colors without token.
+      // Colors/sys color neutral md ref/N100
+      style: textTheme.displayMedium?.copyWith(color: Colors.white),
     );
   }
 }
