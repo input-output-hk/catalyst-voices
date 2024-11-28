@@ -111,7 +111,7 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
             keyType: LocalKeyReferenceType.x509Certs,
             keyOffset: 0,
           ),
-          paymentKey: 0,
+          paymentKey: -1,
           roleSpecificData: {
             10: CborString('Test'),
           },

@@ -87,7 +87,9 @@ final class RegistrationTransactionBuilder {
               keyType: LocalKeyReferenceType.x509Certs,
               keyOffset: 0,
             ),
-            paymentKey: 0,
+            // Refer to first key in transaction outputs,
+            // in our case it's the change address (which the user controls).
+            paymentKey: -1,
           ),
         },
       ),
