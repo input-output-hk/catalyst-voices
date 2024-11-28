@@ -87,10 +87,6 @@ final class RegistrationTransactionBuilder {
               keyType: LocalKeyReferenceType.x509Certs,
               keyOffset: 0,
             ),
-            roleEncryptionKey: const LocalKeyReference(
-              keyType: LocalKeyReferenceType.x509Certs,
-              keyOffset: 0,
-            ),
             paymentKey: 0,
           ),
         },
@@ -142,12 +138,12 @@ final class RegistrationTransactionBuilder {
 
     /* cSpell:disable */
     const issuer = X509DistinguishedName(
-      countryName: 'US',
-      stateOrProvinceName: 'California',
-      localityName: 'San Francisco',
-      organizationName: 'MyCompany',
-      organizationalUnitName: 'MyDepartment',
-      commonName: 'mydomain.com',
+      countryName: '',
+      stateOrProvinceName: '',
+      localityName: '',
+      organizationName: '',
+      organizationalUnitName: '',
+      commonName: '',
     );
 
     final tbs = X509TBSCertificate(
