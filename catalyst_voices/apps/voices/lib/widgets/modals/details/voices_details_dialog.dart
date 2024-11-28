@@ -1,16 +1,13 @@
-import 'package:catalyst_voices/widgets/modals/details/voices_details_dialog_header.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:flutter/material.dart';
 
 class VoicesDetailsDialog extends StatelessWidget {
-  final String title;
-  final String titleLabel;
+  final Widget header;
   final Widget body;
 
   const VoicesDetailsDialog({
     super.key,
-    required this.title,
-    required this.titleLabel,
+    required this.header,
     required this.body,
   });
 
@@ -26,10 +23,7 @@ class VoicesDetailsDialog extends StatelessWidget {
       ),
       child: Column(
         children: [
-          VoicesDetailsDialogHeader(
-            title: title,
-            titleLabel: titleLabel,
-          ),
+          header,
           Expanded(child: body),
         ],
       ),
