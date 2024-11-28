@@ -1,3 +1,4 @@
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_key_derivation/src/ed25519/ed25519_signature.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';

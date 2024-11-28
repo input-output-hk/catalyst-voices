@@ -16,7 +16,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
   final List<C509Certificate>? cborCerts;
 
   /// Ordered list of simple public keys that are registered.
-  final List<Bip32Ed25519XPublicKey>? publicKeys;
+  final List<Ed25519PublicKey>? publicKeys;
 
   /// Revocation list of certs being revoked by an issuer.
   final List<CertificateHash>? revocationSet;
@@ -45,9 +45,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
     return RegistrationData(
       derCerts: derCerts?.map(X509DerCertificate.fromCbor).toList(),
       cborCerts: cborCerts?.map(C509Certificate.fromCbor).toList(),
-      publicKeys: publicKeys
-          ?.map(Bip32Ed25519XPublicKeyFactory.instance.fromCbor)
-          .toList(),
+      publicKeys: publicKeys?.map(Ed25519PublicKey.fromCbor).toList(),
       revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
       roleDataSet: roleDataSet?.map(RoleData.fromCbor).toSet(),
     );
@@ -68,7 +66,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
         cborCerts,
         (item) => item.toCbor(),
       ),
-      const CborSmallInt(30): _createCborList<Bip32Ed25519XPublicKey>(
+      const CborSmallInt(30): _createCborList<Ed25519PublicKey>(
         publicKeys,
         (item) => item.toCbor(tags: [CborCustomTags.ed25519Bip32PublicKey]),
       ),
@@ -142,7 +140,7 @@ class RoleData extends Equatable implements CborEncodable {
   ///
   /// If the certificate is revoked, the role is unusable for signing unless
   /// and until a new signing certificate is registered for the role.
-  final KeyReference? roleSigningKey;
+  final LocalKeyReference? roleSigningKey;
 
   /// A Role may require the ability to transfer encrypted data.
   /// The registration can include the Public key use by the role to encrypt
@@ -157,7 +155,7 @@ class RoleData extends Equatable implements CborEncodable {
   /// key encryption, and not just a signing key.
   /// If the key referenced does not support public key encryption,
   /// the registration is invalid.
-  final KeyReference? roleEncryptionKey;
+  final LocalKeyReference? roleEncryptionKey;
 
   /// Reference to a transaction input/output as the payment key to use for a role.
   /// Payment key (n) >= 0 = Use Transaction Input Key offset (n)
@@ -209,10 +207,11 @@ class RoleData extends Equatable implements CborEncodable {
 
     return RoleData(
       roleNumber: roleNumber.value,
-      roleSigningKey:
-          roleSigningKey != null ? KeyReference.fromCbor(roleSigningKey) : null,
+      roleSigningKey: roleSigningKey != null
+          ? LocalKeyReference.fromCbor(roleSigningKey)
+          : null,
       roleEncryptionKey: roleEncryptionKey != null
-          ? KeyReference.fromCbor(roleEncryptionKey)
+          ? LocalKeyReference.fromCbor(roleEncryptionKey)
           : null,
       paymentKey: paymentKey?.value,
       roleSpecificData: roleSpecificData.isNotEmpty
@@ -248,61 +247,6 @@ class RoleData extends Equatable implements CborEncodable {
       ];
 }
 
-/// References a local key in this registration or
-/// a given key in an earlier registration.
-///
-/// Either [localRef] or [hash] must be set, but not both and not none.
-class KeyReference extends Equatable implements CborEncodable {
-  /// Offset reference to a key defined in this registration.
-  /// More efficient than a key hash.
-  final LocalKeyReference? localRef;
-
-  /// Reference to a key defined in an earlier registration.
-  final CertificateHash? hash;
-
-  /// The default constructor for [KeyReference].
-  KeyReference({this.localRef, this.hash}) {
-    if (!((localRef == null) ^ (hash == null))) {
-      throw ArgumentError(
-        'Either localRef or hash must be set, but not both and not none.',
-      );
-    }
-  }
-
-  /// Deserializes the type from cbor.
-  factory KeyReference.fromCbor(CborValue value) {
-    return KeyReference(
-      localRef: _tryParseLocalRef(value),
-      hash: _tryParseHash(value),
-    );
-  }
-
-  static LocalKeyReference? _tryParseLocalRef(CborValue value) {
-    try {
-      return LocalKeyReference.fromCbor(value);
-    } catch (ignored) {
-      return null;
-    }
-  }
-
-  static CertificateHash? _tryParseHash(CborValue value) {
-    try {
-      return CertificateHash.fromCbor(value);
-    } catch (ignored) {
-      return null;
-    }
-  }
-
-  /// Serializes the type as cbor.
-  @override
-  CborValue toCbor() {
-    return localRef?.toCbor() ?? hash!.toCbor();
-  }
-
-  @override
-  List<Object?> get props => [localRef, hash];
-}
-
 /// Offset reference to a key defined in this registration.
 ///
 /// More efficient than a key hash.
@@ -311,23 +255,23 @@ class LocalKeyReference extends Equatable implements CborEncodable {
   final LocalKeyReferenceType keyType;
 
   /// Offset of the key in the specified set. 0 = first entry.
-  final int keyOffset;
+  final int offset;
 
   /// The default constructor for [LocalKeyReference].
   const LocalKeyReference({
     required this.keyType,
-    required this.keyOffset,
+    required this.offset,
   });
 
   /// Deserializes the type from cbor.
   factory LocalKeyReference.fromCbor(CborValue value) {
     final list = value as CborList;
     final keyType = list[0] as CborSmallInt;
-    final keyOffset = list[1] as CborSmallInt;
+    final offset = list[1] as CborSmallInt;
 
     return LocalKeyReference(
       keyType: LocalKeyReferenceType.fromTag(keyType.value),
-      keyOffset: keyOffset.value,
+      offset: offset.value,
     );
   }
 
@@ -336,12 +280,12 @@ class LocalKeyReference extends Equatable implements CborEncodable {
   CborValue toCbor() {
     return CborList([
       CborSmallInt(keyType.tag),
-      CborSmallInt(keyOffset),
+      CborSmallInt(offset),
     ]);
   }
 
   @override
-  List<Object?> get props => [keyType, keyOffset];
+  List<Object?> get props => [keyType, offset];
 }
 
 /// Defines the type of the referenced local key.
