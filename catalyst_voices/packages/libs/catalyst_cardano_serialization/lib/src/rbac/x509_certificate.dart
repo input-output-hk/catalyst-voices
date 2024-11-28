@@ -242,70 +242,75 @@ class X509DistinguishedName with EquatableMixin {
 
     final sequence = ASN1Sequence();
 
-    // set -> sequence
     final countryName = this.countryName;
     if (countryName != null) {
       sequence.add(
-        ASN1Set()..add(
-          ASN1Sequence()
-            ..add(ASN1ObjectIdentifier.fromName('c'))
-            ..add(ASN1PrintableString(countryName)),
-        ),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('c'))
+              ..add(ASN1PrintableString(countryName)),
+          ),
       );
     }
 
     final stateOrProvinceName = this.stateOrProvinceName;
     if (stateOrProvinceName != null) {
       sequence.add(
-        ASN1Set()..add(
-          ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('st'))
-          ..add(ASN1PrintableString(stateOrProvinceName)),
-        ),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('st'))
+              ..add(ASN1PrintableString(stateOrProvinceName)),
+          ),
       );
     }
 
     final localityName = this.localityName;
     if (localityName != null) {
       sequence.add(
-        ASN1Set()..add(
-          ASN1Sequence()
-            ..add(ASN1ObjectIdentifier.fromName('l'))
-            ..add(ASN1PrintableString(localityName)),
-        ),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('l'))
+              ..add(ASN1PrintableString(localityName)),
+          ),
       );
     }
 
     final organizationName = this.organizationName;
     if (organizationName != null) {
       sequence.add(
-        ASN1Set()..add(
-          ASN1Sequence()
-            ..add(ASN1ObjectIdentifier.fromName('o'))
-            ..add(ASN1PrintableString(organizationName)),
-        ),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('o'))
+              ..add(ASN1PrintableString(organizationName)),
+          ),
       );
     }
 
     final organizationalUnitName = this.organizationalUnitName;
     if (organizationalUnitName != null) {
       sequence.add(
-        ASN1Set()..add(
-          ASN1Sequence()
-            ..add(ASN1ObjectIdentifier.fromName('ou'))
-            ..add(ASN1PrintableString(organizationalUnitName)),
-        ),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('ou'))
+              ..add(ASN1PrintableString(organizationalUnitName)),
+          ),
       );
     }
 
     final commonName = this.commonName;
     if (commonName != null) {
       sequence.add(
-        ASN1Set()..add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('cn'))
-          ..add(ASN1PrintableString(commonName)),
-        ),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('cn'))
+              ..add(ASN1PrintableString(commonName)),
+          ),
       );
     }
 
