@@ -44,6 +44,7 @@ m / purpose' / type' / account' / role / index
 ```
 
 In Cardano, both `purpose'` and `coin_type'` are notable years.
+This specification uses [historical dates] related to democracy and voting.
 This specification follows that convention but choose years more applicable to project Catalyst and its goals.
 This specification also renames `coin_type'` to just `type'`, to be more generalized.
 
@@ -53,7 +54,7 @@ be derivable or collide with keys derived for Cardano.
 * `purpose'` = `508` : Taken from year 508 BCE, the first known instance of democracy in human history.
     *"The Athenian Revolution,
     a revolt that overthrew the aristocratic oligarchy and established a participatory democracy in Athens"*.
-* `type'` = `139` : Taken from the year 138 BCE, the first known instance of secret voting.
+* `type'` = `139` : Taken from the year 139 BCE, the first known instance of secret voting.
     *"A secret ballot is instituted for Roman citizens, who mark their vote on a tablet and place it in an urn."*
 * `account'` = `0` : Reserved for future use cases.
     Always to be set to `0`.
@@ -86,3 +87,4 @@ Fund 14 project catalyst will deploy this scheme for Key derivation.>
 This document is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
 
 [CIP-1852]: https://cips.cardano.org/cip/CIP-1852
+[historical dates]: https://www.oxfordreference.com/display/10.1093/acref/9780191737152.timeline.0001
