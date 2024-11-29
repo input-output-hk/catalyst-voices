@@ -155,14 +155,14 @@ impl Example for Cip19StakeAddress {
 mod tests {
     use super::*;
 
-    /* cspell: disable */
+    // cspell: disable
     const VALID_PROD_STAKE_ADDRESS: &str =
         "stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq";
     const VALID_TEST_STAKE_ADDRESS: &str =
         "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
     const INVALID_STAKE_ADDRESS: &str =
         "invalid1u9nlq5nmuzthw3vhgakfpxyq4r0zl2c0p8uqy24gpyjsa6c3df4h6";
-    /* cspell: enable */
+    // cspell: enable
 
     #[test]
     fn test_valid_stake_address_from_string() {
