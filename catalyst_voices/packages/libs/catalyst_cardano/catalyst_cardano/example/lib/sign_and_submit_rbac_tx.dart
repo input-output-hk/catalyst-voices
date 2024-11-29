@@ -103,20 +103,15 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
     previousTransactionId: _transactionHash,
     chunkedData: RegistrationData(
       derCerts: [derCert],
-      publicKeys: [keyPair.publicKey],
+      publicKeys: [keyPair.publicKey.toPublicKey()],
       roleDataSet: {
         RoleData(
           roleNumber: 0,
-          roleSigningKey: KeyReference(
-            localRef: const LocalKeyReference(
-              keyType: LocalKeyReferenceType.x509Certs,
-              keyOffset: 0,
-            ),
+          roleSigningKey: const LocalKeyReference(
+            keyType: LocalKeyReferenceType.x509Certs,
+            offset: 0,
           ),
-          roleEncryptionKey: KeyReference(
-            hash: CertificateHash.fromX509DerCertificate(derCert),
-          ),
-          paymentKey: 0,
+          paymentKey: -1,
           roleSpecificData: {
             10: CborString('Test'),
           },
@@ -200,12 +195,12 @@ Future<X509Certificate> generateX509Certificate({
 
   /* cSpell:disable */
   const issuer = X509DistinguishedName(
-    countryName: 'US',
-    stateOrProvinceName: 'California',
-    localityName: 'San Francisco',
-    organizationName: 'MyCompany',
-    organizationalUnitName: 'MyDepartment',
-    commonName: 'mydomain.com',
+    countryName: '',
+    stateOrProvinceName: '',
+    localityName: '',
+    organizationName: '',
+    organizationalUnitName: '',
+    commonName: '',
   );
 
   final tbs = X509TBSCertificate(
