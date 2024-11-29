@@ -44,9 +44,7 @@ final class KeyDerivation {
 
   /// The path feed into key derivation algorithm
   /// to generate a key pair from a seed phrase.
-  ///
-  // TODO(dtscalac): update when RBAC specifies it
   String _roleKeyDerivationPath(AccountRole role) {
-    return "m/${role.roleNumber}'/1234'";
+    return "m/508'/139'/0'/${role.roleNumber}/0";
   }
 }
