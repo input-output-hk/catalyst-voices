@@ -43,7 +43,6 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   }
 
   String get _pattern => 'dd/MM/yyyy';
-  
 
   @override
   void initState() {

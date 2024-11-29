@@ -47,7 +47,6 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
 
   String get _pattern => 'HH:MM';
   String get timeZone => widget.timeZone ?? '';
-  
 
   @override
   void initState() {
