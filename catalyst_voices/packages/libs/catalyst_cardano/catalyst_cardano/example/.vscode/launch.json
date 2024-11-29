@@ -1,0 +1,31 @@
+{
+    // Użyj funkcji IntelliSense, aby uzyskać informacje o możliwych atrybutach.
+    // Najedź kursorem, aby wyświetlić opisy istniejących atrybutów.
+    // Aby uzyskać więcej informacji, odwiedź stronę: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "example",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--web-header",
+                "Cross-Origin-Opener-Policy=same-origin",
+                "--web-header",
+                "Cross-Origin-Embedder-Policy=require-corp",
+            ],
+        },
+        {
+            "name": "example (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "example (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

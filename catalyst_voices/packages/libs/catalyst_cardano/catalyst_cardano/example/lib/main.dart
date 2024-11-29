@@ -27,6 +27,8 @@ part 'sign_data.dart';
 /// Explanation:
 /// - flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   EquatableConfig.stringify = true;
   await CatalystKeyDerivation.init();
   runApp(const MyApp());
@@ -122,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const CipExtension(cip: 95),
         ],
       );
+
       setState(() => _api = api);
     } catch (error) {
       setState(() => _error = error);

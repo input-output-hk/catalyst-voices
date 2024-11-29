@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_driver/flutter_driver.dart';
-import 'package:integration_test/common.dart';
-import 'package:integration_test/integration_test_driver.dart';
 import 'package:webdriver/async_io.dart' as async_io;
 
-Future<WebFlutterDriver> createCustomWebDriver({
+Future<WebFlutterDriver> createVoicesWebDriver({
   String? hostUrl,
-  bool printCommunication = false,
+  bool printCommunication = true,
   bool logCommunicationToFile = true,
   Duration? timeout,
 }) async {
@@ -27,35 +25,36 @@ Future<WebFlutterDriver> createCustomWebDriver({
       : 'moz:firefoxOptions';
   final browsersArgs =
       driverCapabilities[browserKeyArgs] as Map<String, dynamic>;
+  final Directory dataDir =
+      fs.systemTempDirectory.createTempSync('flutter_tool.');
   final updatedDriverCapabilities = <String, dynamic>{
     'browserName': browserName,
     browserKeyArgs: {
       'args': [
         ...(browsersArgs['args'] as List<dynamic>? ?? <String>[])
             .cast<String>(),
+        '--user-data-dir=${dataDir.path}',
         '--disable-extensions-except=$extensionPath',
         '--load-extension=$extensionPath',
         '--disable-gpu',
+        '--disable-renderer-backgrounding',
         '--disable-search-engine-choice-screen',
+        '--no-first-run',
+        '--enable-automation',
+        '--enable-extension-automation',
+        '--allow-insecure-localhost',
       ],
     },
   };
-
-  hostUrl ??= Platform.environment['VM_SERVICE_URL'];
   final sessionUri =
       Uri.parse(Platform.environment['DRIVER_SESSION_URI'].toString());
+
   final driver = await async_io.createDriver(
     uri: sessionUri,
     desired: updatedDriverCapabilities,
-    spec: async_io.WebDriverSpec.W3c,
   );
-  final windows = await driver.windows.toList();
-  if (windows.length > 1) {
-    final window = windows.first;
-    await window.close();
-    final lastWindow = windows.last;
-    await lastWindow.setAsActive();
-  }
+
+  hostUrl ??= Platform.environment['VM_SERVICE_URL'];
   await driver.get(hostUrl!);
   await waitUntilExtensionInstalled(driver, timeout);
 
@@ -68,33 +67,4 @@ Future<WebFlutterDriver> createCustomWebDriver({
     printCommunication: printCommunication,
     logCommunicationToFile: logCommunicationToFile,
   );
-}
-
-Future<void> voicesIntegrationDriver({
-  Duration timeout = const Duration(minutes: 20),
-  ResponseDataCallback? responseDataCallback = writeResponseData,
-  bool writeResponseOnFailure = false,
-}) async {
-  final webDriver = await createCustomWebDriver(timeout: timeout);
-
-  final jsonResult = await webDriver.requestData(null, timeout: timeout);
-  final response = Response.fromJson(jsonResult);
-
-  final window = await webDriver.webDriver.window;
-  await window.close();
-  await webDriver.close();
-
-  if (response.allTestsPassed) {
-    print('All tests passed.');
-    if (responseDataCallback != null) {
-      await responseDataCallback(response.data);
-    }
-    exit(0);
-  } else {
-    print('Failure Details:\n${response.formattedFailureDetails}');
-    if (responseDataCallback != null && writeResponseOnFailure) {
-      await responseDataCallback(response.data);
-    }
-    exit(1);
-  }
 }
