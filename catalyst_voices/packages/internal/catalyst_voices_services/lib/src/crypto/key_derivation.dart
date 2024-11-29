@@ -6,7 +6,7 @@ final class KeyDerivation {
   /// See: https://github.com/input-output-hk/catalyst-voices/pull/1300
   static const int _purpose = 508;
   static const int _type = 139;
-static const int _account = 0; // Future Use
+  static const int _account = 0; // Future Use
   final CatalystKeyDerivation _keyDerivation;
 
   const KeyDerivation(this._keyDerivation);
