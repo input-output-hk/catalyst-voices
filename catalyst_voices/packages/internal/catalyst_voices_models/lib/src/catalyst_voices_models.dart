@@ -2,6 +2,9 @@ library catalyst_voices_models;
 
 export 'auth/authentication_status.dart';
 export 'auth/password_strength.dart';
+export 'campaign/campaign.dart';
+export 'campaign/campaign_category.dart';
+export 'campaign/campaign_section.dart';
 export 'crypto/keychain_metadata.dart';
 export 'crypto/lock_factor.dart';
 export 'document/document_json.dart';

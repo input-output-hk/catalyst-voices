@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 class CampaignDetailsTile extends StatelessWidget {
   final String description;
-  final DateTime publishDate;
   final DateTime startDate;
   final DateTime endDate;
   final int categoriesCount;
@@ -16,7 +15,6 @@ class CampaignDetailsTile extends StatelessWidget {
   const CampaignDetailsTile({
     super.key,
     required this.description,
-    required this.publishDate,
     required this.startDate,
     required this.endDate,
     required this.categoriesCount,
@@ -34,7 +32,6 @@ class CampaignDetailsTile extends StatelessWidget {
         ),
         const SizedBox(height: 16 + 24),
         _CampaignData(
-          publishDate: publishDate,
           startDate: startDate,
           endDate: endDate,
           categoriesCount: categoriesCount,
@@ -84,14 +81,12 @@ class _Body extends StatelessWidget {
 }
 
 class _CampaignData extends StatelessWidget {
-  final DateTime publishDate;
   final DateTime startDate;
   final DateTime endDate;
   final int categoriesCount;
   final int proposalsCount;
 
   const _CampaignData({
-    required this.publishDate,
     required this.startDate,
     required this.endDate,
     required this.categoriesCount,
@@ -129,11 +124,7 @@ class _CampaignData extends StatelessWidget {
           _CampaignDataTile(
             key: const ValueKey('CategoriesTileKey'),
             title: l10n.categories,
-            subtitle: DateFormatter.formatInDays(
-              l10n,
-              DateTime.now(),
-              from: publishDate,
-            ),
+            subtitle: l10n.fundingCategories,
             value: categoriesCount,
           ),
           _CampaignDataTile(

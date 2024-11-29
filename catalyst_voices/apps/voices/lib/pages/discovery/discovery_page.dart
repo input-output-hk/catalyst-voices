@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
 import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
@@ -192,8 +193,9 @@ class _Header extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             OutlinedButton.icon(
-              onPressed: () {
-                // TODO(dtscalac): show campaign details dialog
+              onPressed: () async {
+                // TODO(dtscalac): pass correct campaign id
+                await CampaignDetailsDialog.show(context, id: '1');
               },
               label: Text(context.l10n.campaignDetails),
               icon: VoicesAssets.icons.arrowsExpand.buildIcon(),
