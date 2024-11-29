@@ -65,7 +65,6 @@ impl Example for AssetName {
     }
 }
 
-// TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
 impl From<Vec<u8>> for AssetName {
     fn from(value: Vec<u8>) -> Self {
         match String::from_utf8(value.clone()) {
