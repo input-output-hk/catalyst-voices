@@ -1,8 +1,7 @@
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_models/src/campaign/campaign_category.dart';
 import 'package:equatable/equatable.dart';
 
-final class CampaignSection extends Equatable implements MenuItem {
-  @override
+final class CampaignSection extends Equatable {
   final String id;
   final CampaignCategory category;
   final String title;
@@ -14,12 +13,6 @@ final class CampaignSection extends Equatable implements MenuItem {
     required this.title,
     required this.body,
   });
-
-  @override
-  String get label => category.name;
-
-  @override
-  bool get isEnabled => true;
 
   @override
   List<Object?> get props => [

@@ -49,6 +49,7 @@ export 'menu/voices_menu.dart';
 export 'menu/voices_modal_menu.dart';
 export 'menu/voices_node_menu.dart';
 export 'menu/voices_wallet_tile.dart';
+export 'modals/details/voices_details_dialog.dart';
 export 'modals/voices_alert_dialog.dart';
 export 'modals/voices_desktop_dialog.dart';
 export 'modals/voices_dialog.dart';
