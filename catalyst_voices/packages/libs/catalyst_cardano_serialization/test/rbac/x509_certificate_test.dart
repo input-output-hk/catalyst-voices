@@ -29,10 +29,10 @@ void main() {
         subject: issuer,
         extensions: const X509CertificateExtensions(
           subjectAltName: [
-            'mydomain.com',
-            'www.mydomain.com',
-            'example.com',
-            'www.example.com',
+            X509String('mydomain.com', tag: X509String.domainNameTag),
+            X509String('www.mydomain.com', tag: X509String.domainNameTag),
+            X509String('example.com', tag: X509String.domainNameTag),
+            X509String('www.example.com', tag: X509String.domainNameTag),
           ],
         ),
       );

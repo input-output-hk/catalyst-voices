@@ -331,7 +331,7 @@ class X509DistinguishedName with EquatableMixin {
 /// Extra extensions of the certificate.
 class X509CertificateExtensions with EquatableMixin {
   /// List of alternative subject names.
-  final List<String>? subjectAltName;
+  final List<X509String>? subjectAltName;
 
   /// The default constructor for the [X509CertificateExtensions].
   const X509CertificateExtensions({this.subjectAltName});
@@ -348,7 +348,7 @@ class X509CertificateExtensions with EquatableMixin {
     if (subjectAltName != null) {
       final subjectAltNameSequence = ASN1Sequence();
       for (final name in subjectAltName) {
-        subjectAltNameSequence.add(ASN1OctetString(name));
+        subjectAltNameSequence.add(name.toASN1());
       }
 
       extensionsSequence.add(
@@ -367,4 +367,35 @@ class X509CertificateExtensions with EquatableMixin {
 
   @override
   List<Object?> get props => [subjectAltName];
+}
+
+/// Represents an ASN1 encodable string that can be optionally tagged with [tag].
+class X509String with EquatableMixin {
+  /// An ASN1 tag for the uris.
+  static const int uriTag = 0x86;
+
+  /// An ASN1 tag for domain names.
+  static const int domainNameTag = 0x82;
+
+  /// The string value.
+  final String value;
+
+  /// The optional ASN1 tag.
+  final int tag;
+
+  /// The default constructor for the [X509String].
+  const X509String(
+    this.value, {
+    this.tag = OCTET_STRING_TYPE,
+  });
+
+  /// Encodes the data in ASN1 format.
+  ASN1Object toASN1() {
+    _ensureASN1FrequentNamesRegistered();
+
+    return ASN1OctetString(value, tag: tag);
+  }
+
+  @override
+  List<Object?> get props => [value, tag];
 }
