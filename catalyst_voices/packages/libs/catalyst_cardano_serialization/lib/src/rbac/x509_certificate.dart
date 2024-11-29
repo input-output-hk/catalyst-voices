@@ -369,7 +369,8 @@ class X509CertificateExtensions with EquatableMixin {
   List<Object?> get props => [subjectAltName];
 }
 
-/// Represents an ASN1 encodable string that can be optionally tagged with [tag].
+/// Represents an ASN1 encodable string
+/// that can be optionally tagged with [tag].
 class X509String with EquatableMixin {
   /// An ASN1 tag for the uris.
   static const int uriTag = 0x86;
