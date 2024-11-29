@@ -34,6 +34,7 @@ class VoicesDateField extends StatefulWidget {
 
 class _VoicesDateFieldState extends State<VoicesDateField> {
   late final TextEditingController _textEditingController;
+  late final MaskTextInputFormatter dateFormatter;
 
   VoicesDateFieldController? _controller;
 
@@ -42,7 +43,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   }
 
   String get _pattern => 'dd/MM/yyyy';
-  late MaskTextInputFormatter dateFormatter;
+  
 
   @override
   void initState() {
