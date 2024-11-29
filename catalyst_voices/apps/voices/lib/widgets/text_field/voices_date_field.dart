@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 final class VoicesDateFieldController extends ValueNotifier<DateTime?> {
   VoicesDateFieldController([super._value]);
@@ -41,6 +42,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   }
 
   String get _pattern => 'dd/MM/yyyy';
+  late MaskTextInputFormatter dateFormatter;
 
   @override
   void initState() {
@@ -51,6 +53,16 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
     _textEditingController.addListener(_handleTextChanged);
 
     _effectiveController.addListener(_handleDateChanged);
+
+    dateFormatter = MaskTextInputFormatter(
+      mask: _pattern,
+      filter: {
+        'd': RegExp('[0-9]'),
+        'M': RegExp('[0-9]'),
+        'y': RegExp('[0-9]'),
+      },
+      type: MaskAutoCompletionType.eager,
+    );
 
     super.initState();
   }
@@ -100,6 +112,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
       ),
       borderRadius: widget.borderRadius,
       dimBorder: widget.dimBorder,
+      inputFormatters: [dateFormatter],
     );
   }
 

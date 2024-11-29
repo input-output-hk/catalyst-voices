@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 final class VoicesTimeFieldController extends ValueNotifier<TimeOfDay?> {
   VoicesTimeFieldController([super._value]);
@@ -17,6 +18,7 @@ class VoicesTimeField extends StatefulWidget {
   final VoidCallback? onClockTap;
   final bool dimBorder;
   final BorderRadius borderRadius;
+  final String? timeZone;
 
   const VoicesTimeField({
     super.key,
@@ -26,6 +28,7 @@ class VoicesTimeField extends StatefulWidget {
     this.onClockTap,
     this.dimBorder = false,
     this.borderRadius = const BorderRadius.all(Radius.circular(16)),
+    this.timeZone,
   });
 
   @override
@@ -42,6 +45,8 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
   }
 
   String get _pattern => 'HH:MM';
+  String get timeZone => widget.timeZone ?? '';
+  late MaskTextInputFormatter timeFormatter;
 
   @override
   void initState() {
@@ -52,6 +57,15 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
     _textEditingController.addListener(_handleTextChanged);
 
     _effectiveController.addListener(_handleDateChanged);
+
+    timeFormatter = MaskTextInputFormatter(
+      mask: _pattern,
+      filter: {
+        'H': RegExp('[0-9]'),
+        'M': RegExp('[0-9]'),
+      },
+      type: MaskAutoCompletionType.eager,
+    );
 
     super.initState();
   }
@@ -89,7 +103,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
           ? (value) => onChanged(_convertTextToTime(value))
           : null,
       validator: _validate,
-      hintText: _pattern.toUpperCase(),
+      hintText: '${_pattern.toUpperCase()} $timeZone',
       onFieldSubmitted: onFieldSubmitted != null
           ? (value) => onFieldSubmitted(_convertTextToTime(value))
           : null,
@@ -101,6 +115,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
       ),
       dimBorder: widget.dimBorder,
       borderRadius: widget.borderRadius,
+      inputFormatters: [timeFormatter],
     );
   }
 

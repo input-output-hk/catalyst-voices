@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 typedef DateTimeParts = ({DateTime date, TimeOfDay time});
 
+enum PickerType { date, time }
+
 final class VoicesDateTimeFieldController extends ValueNotifier<DateTime?> {
   VoicesDateTimeFieldController([super._value]);
 }
@@ -43,8 +45,10 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
   }
 
   OverlayEntry? _overlayEntry;
+  PickerType? _pickerType;
   VoidCallback? _scrollListener;
-  bool _isOverlayOpen = false;
+  bool _isDateOverlayOpen = false;
+  bool _isTimeOverlayOpen = false;
 
   @override
   void initState() {
@@ -94,24 +98,25 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
             borderRadius: const BorderRadius.horizontal(
               left: Radius.circular(16),
             ),
-            dimBorder: _isOverlayOpen,
+            dimBorder: _isDateOverlayOpen,
             onCalendarTap: _showDatePicker,
             onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
           ),
         ),
         ConstrainedBox(
-          constraints: const BoxConstraints.tightFor(width: 170),
+          constraints: const BoxConstraints.tightFor(width: 200),
           child: VoicesTimeField(
             key: _timeFieldKey,
             controller: _timeController,
             borderRadius: const BorderRadius.horizontal(
               right: Radius.circular(16),
             ),
-            dimBorder: _isOverlayOpen,
+            dimBorder: _isTimeOverlayOpen,
             onClockTap: _showTimePicker,
             onFieldSubmitted: (_) {
               widget.onFieldSubmitted?.call(_effectiveController.value);
             },
+            timeZone: widget.timeZone,
           ),
         ),
       ],
@@ -129,6 +134,7 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
     );
 
     final initialPosition = _getRenderBoxOffset(_dateFiledKey);
+    _pickerType = PickerType.date;
 
     _showOverlay(
       initialPosition: initialPosition,
@@ -147,6 +153,7 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
     );
 
     final initialPosition = _getRenderBoxOffset(_timeFieldKey);
+    _pickerType = PickerType.time;
 
     _showOverlay(
       initialPosition: initialPosition,
@@ -198,12 +205,16 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
   }) {
     FocusScope.of(context).unfocus();
 
-    if (_isOverlayOpen) {
+    if (_pickerType != null) {
       _removeOverlay();
     }
 
     setState(() {
-      _isOverlayOpen = true;
+      if (_pickerType == PickerType.date) {
+        _isDateOverlayOpen = true;
+      } else {
+        _isTimeOverlayOpen = true;
+      }
     });
 
     final overlay = Overlay.of(context, rootOverlay: true);
@@ -217,7 +228,19 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
               opaque: false,
               hitTestBehavior: HitTestBehavior.translucent,
               child: GestureDetector(
-                onTapDown: (_) => _removeOverlay(),
+                onTapDown: (details) async {
+                  final tapPosition = details.globalPosition;
+                  final dateBox = _getRenderBox(_dateFiledKey);
+                  final timeBox = _getRenderBox(_timeFieldKey);
+
+                  if (_isBoxTapped(dateBox, tapPosition)) {
+                    return _handleTap(PickerType.date);
+                  } else if (_isBoxTapped(timeBox, tapPosition)) {
+                    return _handleTap(PickerType.time);
+                  } else {
+                    _removeOverlay();
+                  }
+                },
                 behavior: HitTestBehavior.translucent,
                 excludeFromSemantics: true,
                 onPanUpdate: null,
@@ -257,7 +280,11 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
   void _removeOverlay() {
     if (_overlayEntry != null) {
       setState(() {
-        _isOverlayOpen = false;
+        if (_pickerType == PickerType.date) {
+          _isDateOverlayOpen = false;
+        } else {
+          _isTimeOverlayOpen = false;
+        }
       });
 
       final scrollPosition = Scrollable.maybeOf(context)?.position;
@@ -268,6 +295,7 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
       _overlayEntry?.remove();
       _overlayEntry = null;
       _scrollListener = null;
+      _pickerType = null;
     }
   }
 
@@ -278,5 +306,23 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
     }
 
     return renderObject.localToGlobal(Offset.zero);
+  }
+
+  RenderBox? _getRenderBox(GlobalKey key) {
+    return key.currentContext?.findRenderObject() as RenderBox?;
+  }
+
+  bool _isBoxTapped(RenderBox? box, Offset tapPosition) {
+    return box != null &&
+        (box.localToGlobal(Offset.zero) & box.size).contains(tapPosition);
+  }
+
+  Future<void> _handleTap(PickerType pickerType) async {
+    _removeOverlay();
+    if (pickerType == PickerType.date) {
+      await _showDatePicker();
+    } else {
+      await _showTimePicker();
+    }
   }
 }

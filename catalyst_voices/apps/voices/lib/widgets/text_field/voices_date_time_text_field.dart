@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class VoicesDateTimeTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -11,6 +12,7 @@ class VoicesDateTimeTextField extends StatelessWidget {
   final Widget suffixIcon;
   final bool dimBorder;
   final BorderRadius borderRadius;
+  final List<TextInputFormatter>? inputFormatters;
   final AutovalidateMode? autovalidateMode;
 
   const VoicesDateTimeTextField({
@@ -23,6 +25,7 @@ class VoicesDateTimeTextField extends StatelessWidget {
     required this.suffixIcon,
     this.dimBorder = false,
     this.borderRadius = const BorderRadius.all(Radius.circular(16)),
+    this.inputFormatters,
     this.autovalidateMode = AutovalidateMode.onUserInteraction,
   });
 
@@ -33,7 +36,7 @@ class VoicesDateTimeTextField extends StatelessWidget {
 
     final onFieldSubmitted = this.onFieldSubmitted;
 
-    final borderSide = dimBorder
+    final borderSide = !dimBorder
         ? BorderSide(
             color: theme.colors.outlineBorderVariant!,
             width: 0.75,
@@ -86,6 +89,7 @@ class VoicesDateTimeTextField extends StatelessWidget {
         errorMaxLines: 3,
       ),
       onFieldSubmitted: onFieldSubmitted,
+      inputFormatters: inputFormatters,
       autovalidateMode: autovalidateMode,
     );
   }
