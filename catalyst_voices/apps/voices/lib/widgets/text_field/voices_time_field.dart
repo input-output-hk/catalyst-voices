@@ -37,6 +37,7 @@ class VoicesTimeField extends StatefulWidget {
 
 class _VoicesTimeFieldState extends State<VoicesTimeField> {
   late final TextEditingController _textEditingController;
+  late final MaskTextInputFormatter timeFormatter;
 
   VoicesTimeFieldController? _controller;
 
@@ -46,7 +47,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
 
   String get _pattern => 'HH:MM';
   String get timeZone => widget.timeZone ?? '';
-  late MaskTextInputFormatter timeFormatter;
+  
 
   @override
   void initState() {
