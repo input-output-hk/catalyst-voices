@@ -71,6 +71,9 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.inputFormatters]
   final List<TextInputFormatter>? inputFormatters;
 
+  /// [AutovalidateMode]
+  final AutovalidateMode? autovalidateMode;
+
   const VoicesTextField({
     super.key,
     this.controller,
@@ -95,6 +98,7 @@ class VoicesTextField extends StatefulWidget {
     required this.onFieldSubmitted,
     this.onSaved,
     this.inputFormatters,
+    this.autovalidateMode,
   });
 
   @override
@@ -187,6 +191,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             onFieldSubmitted: widget.onFieldSubmitted,
             onSaved: widget.onSaved,
             inputFormatters: widget.inputFormatters,
+            autovalidateMode: widget.autovalidateMode,
             decoration: InputDecoration(
               filled: widget.decoration?.filled,
               fillColor: widget.decoration?.fillColor,
@@ -249,17 +254,18 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                   : textTheme.bodySmall!
                       .copyWith(color: theme.colors.textDisabled),
               hintText: widget.decoration?.hintText,
-              hintStyle: widget.enabled
-                  ? textTheme.bodyLarge
-                  : textTheme.bodyLarge!
-                      .copyWith(color: theme.colors.textDisabled),
+              hintStyle: _getHintStyle(
+                textTheme,
+                theme,
+                orDefault: widget.enabled
+                    ? textTheme.bodyLarge
+                    : textTheme.bodyLarge!
+                        .copyWith(color: theme.colors.textDisabled),
+              ),
               errorText:
                   widget.decoration?.errorText ?? _validation.errorMessage,
               errorMaxLines: widget.decoration?.errorMaxLines,
-              errorStyle: widget.enabled
-                  ? textTheme.bodySmall
-                  : textTheme.bodySmall!
-                      .copyWith(color: theme.colors.textDisabled),
+              errorStyle: _getErrorStyle(textTheme, theme),
               prefixIcon: _wrapIconIfExists(
                 widget.decoration?.prefixIcon,
                 const EdgeInsetsDirectional.only(start: 8, end: 4),
@@ -321,6 +327,13 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         );
     }
   }
+
+  TextStyle? _getHintStyle(
+    TextTheme textTheme,
+    ThemeData theme, {
+    TextStyle? orDefault,
+  }) =>
+      widget.decoration?.hintStyle ?? orDefault;
 
   Widget? _getStatusSuffixWidget() {
     final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
@@ -395,6 +408,15 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     return customController;
   }
 
+  TextStyle? _getErrorStyle(TextTheme textTheme, ThemeData theme) {
+    if (widget.decoration?.errorStyle != null) {
+      return widget.decoration?.errorStyle;
+    }
+    return widget.enabled
+        ? textTheme.bodySmall
+        : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
+  }
+
   void _onChanged() {
     _validate(_obtainController().text);
   }
@@ -446,7 +468,8 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// The validation can be either a success, a warning or an error.
   final VoicesTextFieldStatus status;
 
-  /// The error message to be used in case of a [warning] or an [error].
+  /// The error message to be used in case of a [VoicesTextFieldStatus.warning]
+  /// or an [VoicesTextFieldStatus.error].
   final String? errorMessage;
 
   const VoicesTextFieldValidationResult({
@@ -459,25 +482,23 @@ class VoicesTextFieldValidationResult with EquatableMixin {
           'errorMessage can be only used for warning or error status',
         );
 
-  @override
-  List<Object?> get props => [status, errorMessage];
-
   /// Returns a successful validation result.
   ///
   /// The method was designed to be used as
   /// [VoicesTextField.validator] param:
   ///
   /// ```
-  /// validator: VoicesTextFieldValidationResult.success,
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.success();
+  ///   },
   /// ```
   ///
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
-  static VoicesTextFieldValidator success() {
-    return (_) => const VoicesTextFieldValidationResult(
+  const VoicesTextFieldValidationResult.success()
+      : this(
           status: VoicesTextFieldStatus.success,
         );
-  }
 
   /// Returns a warning validation result.
   ///
@@ -485,17 +506,18 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// [VoicesTextField.validator] param:
   ///
   /// ```
-  /// validator: VoicesTextFieldValidationResult.warning,
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.warning();
+  ///   },
   /// ```
   ///
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
-  static VoicesTextFieldValidator warning([String? message]) {
-    return (_) => VoicesTextFieldValidationResult(
+  const VoicesTextFieldValidationResult.warning([String? message])
+      : this(
           status: VoicesTextFieldStatus.warning,
           errorMessage: message,
         );
-  }
 
   /// Returns an error validation result.
   ///
@@ -503,17 +525,21 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// [VoicesTextField.validator] param:
   ///
   /// ```
-  /// validator: VoicesTextFieldValidationResult.error,
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.error();
+  ///   },
   /// ```
   ///
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
-  static VoicesTextFieldValidator error([String? message]) {
-    return (_) => VoicesTextFieldValidationResult(
+  const VoicesTextFieldValidationResult.error([String? message])
+      : this(
           status: VoicesTextFieldStatus.error,
           errorMessage: message,
         );
-  }
+
+  @override
+  List<Object?> get props => [status, errorMessage];
 }
 
 /// Defines the appearance of the [VoicesTextField].
@@ -565,8 +591,14 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.hintText].
   final String? hintText;
 
+  /// [InputDecoration.hintStyle].
+  final TextStyle? hintStyle;
+
   /// [InputDecoration.errorText].
   final String? errorText;
+
+  /// [InputDecoration.errorStyle]
+  final TextStyle? errorStyle;
 
   /// [InputDecoration.errorMaxLines].
   final int? errorMaxLines;
@@ -607,7 +639,9 @@ class VoicesTextFieldDecoration {
     this.labelText,
     this.helperText,
     this.hintText,
+    this.hintStyle,
     this.errorText,
+    this.errorStyle,
     this.errorMaxLines,
     this.prefixIcon,
     this.prefixText,
