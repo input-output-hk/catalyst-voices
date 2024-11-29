@@ -1,1 +1,1 @@
-export 'vitss_openapi.swagger.dart' show VitssOpenapi;
+export 'vit.swagger.dart' show Vit;
