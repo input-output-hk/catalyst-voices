@@ -6,7 +6,7 @@ INSERT INTO txo_assets_by_stake (
     txn,
     txo,
     policy_id,
-    policy_name,
+    asset_name,
     value
 ) VALUES (
     :stake_address,
@@ -14,6 +14,6 @@ INSERT INTO txo_assets_by_stake (
     :txn,
     :txo,
     :policy_id,
-    :policy_name,
+    :asset_name,
     :value 
 );
