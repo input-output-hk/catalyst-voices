@@ -24,11 +24,10 @@ class VoicesWebDriver extends WebFlutterDriver {
             as Map<String, dynamic>;
     final browserName = driverCapabilities['browserName'] as String;
 
-    final extensionsPath =
-        extensions
-            .where((e) => e.browser.name == browserName)
-            .map((e) => e.extensionPath)
-            .toList();
+    final extensionsPath = extensions
+        .where((e) => e.browser.name == browserName)
+        .map((e) => e.extensionPath)
+        .toList();
 
     final sessionUri = Uri.parse(
       Platform.environment['DRIVER_SESSION_URI'].toString(),
@@ -60,10 +59,9 @@ class VoicesWebDriver extends WebFlutterDriver {
         json.decode(Platform.environment['DRIVER_SESSION_CAPABILITIES']!)
             as Map<String, dynamic>;
     final browserName = driverCapabilities['browserName'] as String;
-    final browserKeyArgs =
-        browserName.contains('chrome')
-            ? 'goog:chromeOptions'
-            : 'moz:firefoxOptions';
+    final browserKeyArgs = browserName.contains('chrome')
+        ? 'goog:chromeOptions'
+        : 'moz:firefoxOptions';
     final browsersArgs =
         driverCapabilities[browserKeyArgs] as Map<String, dynamic>;
     final Directory dataDir = fs.systemTempDirectory.createTempSync(

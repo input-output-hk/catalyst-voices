@@ -55,6 +55,7 @@ packageLicenseOverride:
   remote_widgets_example: Apache-2.0
   catalyst_voices_view_models: Apache-2.0
   catalyst_voices_blocs: Apache-2.0
+  catalyst_voices_driver: Apache-2.0
   catalyst_voices_shared: Apache-2.0
   catalyst_voices_brands: Apache-2.0
   catalyst_voices_services: Apache-2.0
@@ -201,7 +202,7 @@ scripts:
           EXIT_CODE=$? ; \
           printf "%s" "$OUTPUT" | tojunit --output $MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml ; \
           exit $EXIT_CODE'
-      
+
       # store the exit code after running the tests,
       # this is the exit code for the whole script
       EXIT_CODE=$?
