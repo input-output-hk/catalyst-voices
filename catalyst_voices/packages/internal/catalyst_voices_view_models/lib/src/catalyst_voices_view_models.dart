@@ -1,6 +1,6 @@
 export 'authentication/authentication.dart';
-export 'campaign/campaign_category.dart';
-export 'campaign/campaign_section.dart';
+export 'campaign/campaign_category_section.dart';
+export 'campaign/campaign_list_item.dart';
 export 'exception/localized_exception.dart';
 export 'exception/localized_unknown_exception.dart';
 export 'menu/menu_item.dart';

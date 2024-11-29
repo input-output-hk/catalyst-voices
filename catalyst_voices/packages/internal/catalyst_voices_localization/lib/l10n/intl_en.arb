@@ -1056,6 +1056,7 @@
   "startDate": "Start Date",
   "endDate": "End Date",
   "categories": "Categories",
+  "fundingCategories": "Funding categories",
   "proposals": "Proposals",
   "totalSubmitted": "Total submitted",
   "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
@@ -1079,5 +1080,6 @@
   "discoverySpaceEmptyProposals": "Once this campaign launches draft proposals will be shared here.",
   "@discoverySpaceEmptyProposals": {
     "description": "Description for empty state on discovery space when there are no draft proposals."
-  }
+  },
+  "campaign": "Campaign"
 }
