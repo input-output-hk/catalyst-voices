@@ -14,6 +14,7 @@ Arbritrary
 ARCHS
 ARGB
 Arissara
+asat
 asmjs
 asyncio
 asyncpg
@@ -243,6 +244,7 @@ rustflags
 rustfmt
 rustls
 rxdart
+ryszard-schossler
 saibatizoku
 Schemathesis
 Scripthash
@@ -288,7 +290,6 @@ trailings
 TXNZD
 txos
 Typer
-ryszard-schossler
 unawaited
 unchunk
 Unlogged

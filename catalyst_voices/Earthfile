@@ -73,6 +73,8 @@ code-generator:
         --GEN_CODE_PATH=$gen_code_path \
         --LOCAL_GEN_CODE_PATH=$local_gen_code_path
 
+    # restore current working directory to the root of the project
+    WORKDIR /frontend
    
 
 # Runs static analysis on the code.
