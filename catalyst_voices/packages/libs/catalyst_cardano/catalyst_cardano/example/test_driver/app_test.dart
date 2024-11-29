@@ -1,64 +1,57 @@
+import 'package:catalyst_voices_driver/catalyst_voices_driver.dart';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
-
-// import 'package:webdriver/sync_core.dart';
-
-import '../custom_test_driver/flutter_web_driver.dart';
+import 'package:webdriver/async_io.dart';
 
 void main() {
-  group('Hello World App', () {
-    late WebFlutterDriver driver;
+  group('Test if extensions are installed and driver can communicate with them',
+      () {
+    late final VoicesWebDriver driver;
 
     // Connect to the Flutter driver before running any tests.
     setUpAll(() async {
-      driver = await createVoicesWebDriver();
+      driver = await VoicesWebDriver.create(extensions);
+      // Here should be call function to setup wallets
+      await switchToWindowContaining(driver.webDriver, 'localhost');
     });
 
     // Close the connection to the driver after the tests have completed.
     tearDownAll(() async {
       await driver.webDriver.quit();
       await driver.close();
-      // await driver.close();
     });
 
     test(
-      'test name',
+      'Try to enable eternl wallet. Eternl wallet is not configured.',
       () async {
-        // final buttonFinder = find.byType('ElevatedButton');
-        // // final windows = await driver.webDriver.windows.toList();
-        // var windows = await driver.webDriver.windows.toList();
-        // await driver.tap(buttonFinder);
-        // await Future<void>.delayed(const Duration(seconds: 6));
-        // final currentWindow = await driver.webDriver.window;
+        final buttonFinder = find.byValueKey('enableWallet-eternl');
+        await driver.tap(buttonFinder);
+        await Future<void>.delayed(const Duration(seconds: 6));
+        final currentWindow = await driver.webDriver.window;
 
-        // // Switch to popup window if needed
-        // windows = await driver.webDriver.windows.toList();
-        // for (final window in windows) {
-        //   await driver.webDriver.switchTo.window(window);
-        //   final url = await driver.webDriver.currentUrl;
-        //   if (url.contains('enable.html?id=')) {
-        //     // Found extension popup
-        //     print('Found extension window: $url');
-        //     print('Found window id: ${window.id}');
+        await switchToWindowContaining(driver.webDriver, extensions[0].id);
 
-        //     await Future<void>.delayed(const Duration(seconds: 2));
-        //     break;
-        //   }
-        // }
+        final cancelButtonFinder =
+            await driver.webDriver.findElement(const By.tagName('button'));
 
-        // final cancelButtonFinder =
-        //     await driver.webDriver.findElement(const By.tagName('button'));
-        // print('Found cancelButtonFinder : $cancelButtonFinder');
-        // final win1 = await driver.webDriver.window;
-
-        // await cancelButtonFinder.click();
-        // // await driver.webDriver.switchTo.window(currentWindow);
-        // await currentWindow.setAsActive();
-        // final win = await driver.webDriver.window;
-        // print('currentWindow back : ${win.id}');
-        // await find.text('WalletApiException');
+        await cancelButtonFinder.click();
+        await currentWindow.setAsActive();
+        find.text('WalletApiException');
       },
-      timeout: const Timeout(Duration(seconds: 60)),
     );
   });
+}
+
+Future<void> switchToWindowContaining(
+  WebDriver driver,
+  String urlPattern,
+) async {
+  final windows = await driver.windows.toList();
+  for (final window in windows) {
+    await driver.switchTo.window(window);
+    final url = await driver.currentUrl;
+    if (url.contains(urlPattern)) {
+      break;
+    }
+  }
 }

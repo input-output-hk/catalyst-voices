@@ -228,6 +228,7 @@ class _WalletItem extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
+              key: Key('enableWallet-${wallet.name}'),
               onPressed: onEnable,
               child: const Text('Enable wallet'),
             ),
