@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Derives key pairs from a seed phrase.
 final class KeyDerivation {
+  /// See: https://github.com/input-output-hk/catalyst-voices/pull/1300
   static const int _purpose = 508;
   static const int _type = 139;
 
@@ -47,8 +48,6 @@ final class KeyDerivation {
 
   /// The path feed into key derivation algorithm
   /// to generate a key pair from a seed phrase.
-  ///
-  /// See: https://github.com/input-output-hk/catalyst-voices/pull/1300
   String _roleKeyDerivationPath(AccountRole role) {
     return "m/$_purpose'/$_type'/0'/${role.number}/0";
   }
