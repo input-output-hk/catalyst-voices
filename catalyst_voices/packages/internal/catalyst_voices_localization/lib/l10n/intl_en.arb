@@ -392,6 +392,10 @@
   "@visitor": {
     "description": "Refers to user that created keychain but is locked"
   },
+  "actor": "Actor",
+  "@actor": {
+    "description": "Refers to user that created keychain and is unlocked."
+  },
   "noConnectionBannerRefreshButtonText": "Refresh",
   "@noConnectionBannerRefreshButtonText": {
     "description": "Text shown in the No Internet Connection Banner widget for the refresh button."
@@ -1113,18 +1117,6 @@
   "userAuthenticationState": "User Authentication State",
   "@userAuthenticationState": {
     "description": "The state of the user (keychain), actor, guest, visitor, etc."
-  },
-  "activeUserState": "Actor",
-  "@activeUserState": {
-    "description": "User state with unlocked keychain."
-  },
-  "guestUserState": "Guest",
-  "@guestUserState": {
-    "description": "User state with locked keychain."
-  },
-  "visitorUserState": "Visitor",
-  "@visitorUserState": {
-    "description": "User state without a keychain."
   },
   "active": "Active",
   "@active": {
