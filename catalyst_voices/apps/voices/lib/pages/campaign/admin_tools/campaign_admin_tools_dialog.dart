@@ -1,16 +1,14 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/common/ext/space_ext.dart';
+import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_events.dart';
+import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_views.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// A draggable [CampaignAdminToolsDialog],
 /// should be used as a child of a [Stack].
@@ -224,8 +222,8 @@ class _Tabs extends StatelessWidget {
           Expanded(
             child: TabBarStackView(
               children: [
-                _EventsTab(),
-                _ViewsTab(),
+                CampaignAdminToolsEventsTab(),
+                CampaignAdminToolsViewsTab(),
               ],
             ),
           ),
@@ -252,250 +250,6 @@ class _TabBar extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _EventsTab extends StatelessWidget {
-  const _EventsTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Expanded(child: _CampaignStatusChooser()),
-        _EventTimelapseControls(),
-      ],
-    );
-  }
-}
-
-class _CampaignStatusChooser extends StatelessWidget {
-  const _CampaignStatusChooser();
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
-      child: Column(
-        children: [
-          const SizedBox(height: 8),
-          for (final status in CampaignStatus.values)
-            // TODO(dtscalac): store active one somewhere
-            _EventItem(
-              status: status,
-              isActive: status == CampaignStatus.draft,
-              onTap: () {},
-            ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-}
-
-class _EventItem extends StatelessWidget {
-  final CampaignStatus status;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _EventItem({
-    required this.status,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colors.textOnPrimary;
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 24, 12),
-        child: Row(
-          children: [
-            _icon.buildIcon(
-              size: 24,
-              color: color,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                _text(context.l10n),
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: color,
-                    ),
-              ),
-            ),
-            if (isActive)
-              Text(
-                context.l10n.active.toUpperCase(),
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 11,
-                      color: color,
-                    ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  SvgGenImage get _icon => switch (status) {
-        CampaignStatus.draft => VoicesAssets.icons.clock,
-        CampaignStatus.live => VoicesAssets.icons.flag,
-        CampaignStatus.completed => VoicesAssets.icons.calendar,
-      };
-
-  String _text(VoicesLocalizations l10n) => switch (status) {
-        CampaignStatus.draft => l10n.campaignPreviewEventBefore,
-        CampaignStatus.live => l10n.campaignPreviewEventDuring,
-        CampaignStatus.completed => l10n.campaignPreviewEventAfter,
-      };
-}
-
-class _EventTimelapseControls extends StatelessWidget {
-  const _EventTimelapseControls();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: VoicesTextButton(
-              leading: VoicesAssets.icons.rewind.buildIcon(),
-              child: Text(context.l10n.previous),
-              // TODO(dtscalac): implement button action
-              onTap: () {},
-            ),
-          ),
-          Container(
-            width: 60,
-            height: 56,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
-            ),
-            alignment: Alignment.center,
-            // TODO(dtscalac): implement timer ticking
-            child: const Text('-5s'),
-          ),
-          Expanded(
-            child: VoicesTextButton(
-              leading: VoicesAssets.icons.fastForward.buildIcon(),
-              child: Text(context.l10n.next),
-              // TODO(dtscalac): implement button action
-              onTap: () {},
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ViewsTab extends StatefulWidget {
-  const _ViewsTab();
-
-  @override
-  State<_ViewsTab> createState() => _ViewsTabState();
-}
-
-class _ViewsTabState extends State<_ViewsTab> {
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              context.l10n.userAuthenticationState,
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
-            const SizedBox(height: 16),
-            BlocBuilder<SessionCubit, SessionState>(
-              builder: (context, state) {
-                return VoicesSegmentedButton<_UserAuthState>(
-                  segments: [
-                    for (final userState in _UserAuthState.values)
-                      ButtonSegment(
-                        value: userState,
-                        label: Text(userState.name(context.l10n)),
-                      ),
-                  ],
-                  selected: {_UserAuthState.fromSessionState(state)},
-                  onChanged: (selected) {
-                    unawaited(_switchToState(selected.first));
-                  },
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _switchToState(_UserAuthState state) async {
-    switch (state) {
-      case _UserAuthState.actor:
-        await _switchToActor();
-      case _UserAuthState.guest:
-        await _switchToGuest();
-      case _UserAuthState.visitor:
-        await _switchToVisitor();
-    }
-  }
-
-  Future<void> _switchToActor() async {
-    final sessionBloc = context.read<SessionCubit>();
-    await sessionBloc
-        .switchToDummyAccount()
-        .then((_) => sessionBloc.unlock(SessionCubit.dummyUnlockFactor));
-  }
-
-  Future<void> _switchToGuest() async {
-    final sessionBloc = context.read<SessionCubit>();
-    if (sessionBloc.state is ActiveAccountSessionState) {
-      await sessionBloc.lock();
-    } else if (sessionBloc.state is VisitorSessionState) {
-      await sessionBloc.switchToDummyAccount().then((_) => sessionBloc.lock());
-    }
-  }
-
-  Future<void> _switchToVisitor() async {
-    await context.read<SessionCubit>().removeKeychain();
-  }
-}
-
-enum _UserAuthState {
-  actor,
-  guest,
-  visitor;
-
-  factory _UserAuthState.fromSessionState(SessionState state) {
-    return switch (state) {
-      VisitorSessionState() => _UserAuthState.visitor,
-      GuestSessionState() => _UserAuthState.guest,
-      ActiveAccountSessionState() => _UserAuthState.actor,
-    };
-  }
-
-  String name(VoicesLocalizations l10n) {
-    return switch (this) {
-      _UserAuthState.actor => l10n.actor,
-      _UserAuthState.guest => l10n.guest,
-      _UserAuthState.visitor => l10n.visitor,
-    };
   }
 }
 
