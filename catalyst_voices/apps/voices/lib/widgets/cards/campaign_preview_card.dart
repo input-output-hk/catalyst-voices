@@ -6,12 +6,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class InPageInformationCard extends StatelessWidget {
-  final InPageInformation information;
+class CampaignPreviewCard extends StatelessWidget {
+  final CampaignPreviewInfo campaign;
 
-  const InPageInformationCard({
+  const CampaignPreviewCard({
     super.key,
-    required this.information,
+    required this.campaign,
   });
 
   @override
@@ -43,11 +43,11 @@ class InPageInformationCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        information.stage.localizedName(context.l10n),
+                        campaign.stage.localizedName(context.l10n),
                         style: textTheme.titleMedium,
                       ),
                       Text(
-                        information.description,
+                        campaign.description,
                         style: textTheme.bodyMedium,
                       ),
                       if (_getDateInformation(context).isNotEmpty)
@@ -60,10 +60,11 @@ class InPageInformationCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (!information.stage.isDraft) ...[
+            if (!campaign.stage.isDraft) ...[
               const SizedBox(height: 16),
               OutlinedButton(
-                onPressed: () {}, // TODO(ryszard-schossler): add logic
+                // TODO(ryszard-schossler): add logic
+                onPressed: () {},
                 child: Text(_getButtonText(context)),
               ),
             ],
@@ -74,7 +75,7 @@ class InPageInformationCard extends StatelessWidget {
   }
 
   String _getButtonText(BuildContext context) {
-    if (information.stage == CampaignStage.live) {
+    if (campaign.stage == CampaignStage.live) {
       return context.l10n.viewProposals;
     } else {
       return context.l10n.viewVotingResults;
@@ -82,9 +83,9 @@ class InPageInformationCard extends StatelessWidget {
   }
 
   String _getDateInformation(BuildContext context) {
-    if (information is LiveCampaignInformation ||
-        information is DraftCampaignInformation) {
-      final dateMixin = (information as DateTimeMixin);
+    if (campaign is LiveCampaignInformation ||
+        campaign is DraftCampaignInformation) {
+      final dateMixin = (campaign as DateTimeMixin);
       final formattedDate = DateFormatter.formatDateTimeParts(dateMixin.date);
       return dateMixin.localizedDate(
         context.l10n,

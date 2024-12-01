@@ -1011,9 +1011,9 @@
   "@campaignIsLive": {
     "description": "Title of the campaign is live (published) space"
   },
-  "campaignStaringSoon": "Campaign Staring Soon (Ready to deploy)",
-  "@campaignStaringSoon": {
-    "description": "Title of the campaign staring soon space"
+  "campaignStartingSoon": "Campaign Starting Soon (Ready to deploy)",
+  "@campaignStartingSoon": {
+    "description": "Title of the campaign starting soon space"
   },
   "campaignConcluded": "Campaign Concluded, Result are in!",
   "@campaignConcluded": {

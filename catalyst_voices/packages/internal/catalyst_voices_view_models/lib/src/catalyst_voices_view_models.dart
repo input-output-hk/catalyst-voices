@@ -1,4 +1,6 @@
 export 'authentication/authentication.dart';
+export 'campaign/admin/campaign_preview_info.dart';
+export 'campaign/admin/campaign_status_info.dart';
 export 'campaign/campaign_category_section.dart';
 export 'campaign/campaign_list_item.dart';
 export 'exception/localized_exception.dart';
@@ -10,7 +12,6 @@ export 'navigation/sections_navigation.dart';
 export 'proposal/comment.dart';
 export 'proposal/guidance/guidance.dart';
 export 'proposal/guidance/guidance_type.dart';
-export 'proposal/in_page_information.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
 export 'treasury/treasury_sections.dart';
