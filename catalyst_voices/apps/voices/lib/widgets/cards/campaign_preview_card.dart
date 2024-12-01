@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +76,7 @@ class CampaignPreviewCard extends StatelessWidget {
   }
 
   String _getButtonText(BuildContext context) {
-    if (campaign.stage == CampaignStage.live) {
+    if (campaign.stage == CampaignStatus.live) {
       return context.l10n.viewProposals;
     } else {
       return context.l10n.viewVotingResults;
