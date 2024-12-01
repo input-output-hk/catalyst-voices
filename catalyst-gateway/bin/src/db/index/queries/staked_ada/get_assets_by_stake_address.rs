@@ -54,7 +54,7 @@ mod result {
         /// Asset hash.
         pub policy_id: Vec<u8>,
         /// Asset name.
-        pub policy_name: String,
+        pub asset_name: Vec<u8>,
         /// Asset value.
         pub value: num_bigint::BigInt,
     }

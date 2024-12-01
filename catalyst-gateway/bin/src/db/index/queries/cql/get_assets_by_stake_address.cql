@@ -3,7 +3,7 @@ SELECT
     txo,
     slot_no,
     policy_id,
-    policy_name,
+    asset_name,
     value
 FROM txo_assets_by_stake
 WHERE stake_address = :stake_address
