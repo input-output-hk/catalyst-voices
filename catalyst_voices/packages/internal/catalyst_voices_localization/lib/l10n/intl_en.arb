@@ -1081,5 +1081,9 @@
   "@discoverySpaceEmptyProposals": {
     "description": "Description for empty state on discovery space when there are no draft proposals."
   },
-  "campaign": "Campaign"
+  "campaign": "Campaign",
+  "campaignManagement": "Campaign Management",
+  "campaignDraftStatus": "Draft",
+  "campaignPublishedStatus": "Published",
+  "status": "Status"
 }

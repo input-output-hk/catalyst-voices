@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -61,11 +62,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         appBar: VoicesAppBar(
           leading: isVisitor ? null : const DrawerToggleButton(),
           automaticallyImplyLeading: false,
-          actions: const [
-            SpacesThemeModeSwitch(),
-            SessionActionHeader(),
-            SessionStateHeader(),
-          ],
+          actions: _getActions(widget.space),
         ),
         drawer: isVisitor
             ? null
@@ -78,5 +75,20 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         body: widget.child,
       ),
     );
+  }
+
+  List<Widget> _getActions(Space space) {
+    if (space == Space.treasury) {
+      return [
+        const CampaignManagement(),
+        const SpacesThemeModeSwitch(),
+      ];
+    } else {
+      return [
+        const SpacesThemeModeSwitch(),
+        const SessionActionHeader(),
+        const SessionStateHeader(),
+      ];
+    }
   }
 }

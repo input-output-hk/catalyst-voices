@@ -50,6 +50,9 @@ class _AppState extends State<App> {
       BlocProvider<ProposalsCubit>(
         create: (_) => Dependencies.instance.get<ProposalsCubit>(),
       ),
+      BlocProvider<CampaignStatusCubit>(
+        create: (_) => Dependencies.instance.get<CampaignStatusCubit>(),
+      ),
     ];
   }
 }
