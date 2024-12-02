@@ -212,11 +212,14 @@ Future<X509Certificate> generateX509Certificate({
     subject: issuer,
     extensions: X509CertificateExtensions(
       subjectAltName: [
-        'mydomain.com',
-        'www.mydomain.com',
-        'example.com',
-        'www.example.com',
-        'web+cardano://addr/${stakeAddress.toBech32()}',
+        const X509String('mydomain.com', tag: X509String.domainNameTag),
+        const X509String('www.mydomain.com', tag: X509String.domainNameTag),
+        const X509String('example.com', tag: X509String.domainNameTag),
+        const X509String('www.example.com', tag: X509String.domainNameTag),
+        X509String(
+          'web+cardano://addr/${stakeAddress.toBech32()}',
+          tag: X509String.uriTag,
+        ),
       ],
     ),
   );
