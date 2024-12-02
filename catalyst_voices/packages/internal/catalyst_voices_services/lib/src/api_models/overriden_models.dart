@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_services/generated/catalyst_gateway/vit.models.swagger.dart';
+import 'package:catalyst_voices_services/generated/api/vit.models.swagger.dart';
 
 /// For some reason VitSS openapi spec does not play nice with generating
 /// sub classes for Proposal while extending more then 2 level.
