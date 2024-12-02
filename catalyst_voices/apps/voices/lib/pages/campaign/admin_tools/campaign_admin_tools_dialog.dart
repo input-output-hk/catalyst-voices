@@ -13,7 +13,7 @@ import 'package:flutter/services.dart';
 /// A draggable [CampaignAdminToolsDialog],
 /// should be used as a child of a [Stack].
 ///
-/// Initially shown at bottom-left corner with [initialPadding] offset.
+/// Initially shown at bottom-left corner with [initialOffset] offset.
 class DraggableCampaignAdminToolsDialog extends StatefulWidget {
   /// The key for the [CampaignAdminToolsDialog] to make sure it's state
   /// is kept when a user keeps dragging it.
@@ -32,11 +32,7 @@ class DraggableCampaignAdminToolsDialog extends StatefulWidget {
   final VoidCallback onClose;
 
   /// The initial offset from bottom-left for the dialog.
-  ///
-  /// The widget should be used inside a stack so left/bottom properties
-  /// from [EdgeInsets] correspond to left/bottom properties
-  /// from the related [Positioned] widget.
-  final EdgeInsets initialPadding;
+  final Offset initialOffset;
 
   const DraggableCampaignAdminToolsDialog({
     super.key,
@@ -44,7 +40,7 @@ class DraggableCampaignAdminToolsDialog extends StatefulWidget {
     required this.selectedSpace,
     required this.onSpaceSelected,
     required this.onClose,
-    this.initialPadding = const EdgeInsets.only(left: 32, bottom: 32),
+    this.initialOffset = const Offset(32, 32),
   });
 
   @override
@@ -54,7 +50,7 @@ class DraggableCampaignAdminToolsDialog extends StatefulWidget {
 
 class _DraggableCampaignAdminToolsDialogState
     extends State<DraggableCampaignAdminToolsDialog> {
-  late Offset _position;
+  Offset _position = Offset.infinite;
   late Size _screenSize;
 
   @override
@@ -62,12 +58,30 @@ class _DraggableCampaignAdminToolsDialogState
     super.didChangeDependencies();
 
     _screenSize = MediaQuery.sizeOf(context);
-    _position = Offset(
-      widget.initialPadding.left,
-      _screenSize.height -
-          CampaignAdminToolsDialog._height -
-          widget.initialPadding.bottom,
-    );
+
+    if (_position.isInfinite) {
+      // initialize it for the first time
+      _position = Offset(
+        widget.initialOffset.dx,
+        _screenSize.height -
+            CampaignAdminToolsDialog._height -
+            widget.initialOffset.dy,
+      );
+    } else {
+      // clamp it so that it fits into the screen
+      // in case user shrinks the app window
+
+      _position = Offset(
+        _position.dx.clamp(
+          0,
+          _screenSize.width - CampaignAdminToolsDialog._width,
+        ),
+        _position.dy.clamp(
+          0,
+          _screenSize.height - CampaignAdminToolsDialog._height,
+        ),
+      );
+    }
   }
 
   @override
