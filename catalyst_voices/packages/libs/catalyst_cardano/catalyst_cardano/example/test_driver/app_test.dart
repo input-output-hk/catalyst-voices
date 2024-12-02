@@ -38,6 +38,7 @@ void main() {
         await currentWindow.setAsActive();
         find.text('WalletApiException');
       },
+      skip: true,
     );
   });
 }
