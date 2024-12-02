@@ -1,9 +1,21 @@
 #!/usr/bin/env just --justfile
-
 # cspell: words justfile
 
 default:
     @just --list --unsorted
+
+# Linking of all packages
+setup-code:
+    melos bs
+
+# Builds generated code
+generate-code: setup-code
+    melos l10n
+    melos build_runner
+    just generate-gateway-services
+
+# Syntax sugar for linking packages and building generated code
+bootstrap: generate-code
 
 # Runs all static code checks
 check-code:
