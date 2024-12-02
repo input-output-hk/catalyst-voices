@@ -1,27 +1,13 @@
 import 'package:catalyst_cardano_serialization/src/rbac/x509_certificate.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'x509_certificate_test.mocks.dart';
-
-@GenerateNiceMocks([
-  MockSpec<Bip32Ed25519XPrivateKey>(),
-  MockSpec<Bip32Ed25519XPublicKey>(),
-  MockSpec<Bip32Ed25519XSignature>(),
-])
 void main() {
   group(X509Certificate, () {
-    final privateKey = MockBip32Ed25519XPrivateKey();
-    final publicKey = MockBip32Ed25519XPublicKey();
-    final signature = MockBip32Ed25519XSignature();
-
-    setUp(() {
-      // ignore: discarded_futures
-      when(privateKey.sign(any)).thenAnswer((_) async => signature);
-      when(signature.bytes).thenReturn([1, 2, 3]);
-    });
+    final signature = _FakeBip32Ed25519XSignature();
+    final privateKey = _FakeBip32Ed25519XPrivateKey(signature: signature);
+    final publicKey = _FakeBip32Ed25519XPublicKey();
 
     test('generateSelfSigned X509 certificate', () async {
       /* cSpell:disable */
@@ -43,10 +29,10 @@ void main() {
         subject: issuer,
         extensions: const X509CertificateExtensions(
           subjectAltName: [
-            'mydomain.com',
-            'www.mydomain.com',
-            'example.com',
-            'www.example.com',
+            X509String('mydomain.com', tag: X509String.domainNameTag),
+            X509String('www.mydomain.com', tag: X509String.domainNameTag),
+            X509String('example.com', tag: X509String.domainNameTag),
+            X509String('www.example.com', tag: X509String.domainNameTag),
           ],
         ),
       );
@@ -64,4 +50,28 @@ void main() {
       expect(certificate.toDer().bytes, isNotEmpty);
     });
   });
+}
+
+class _FakeBip32Ed25519XPrivateKey extends Fake
+    implements Bip32Ed25519XPrivateKey {
+  final Bip32Ed25519XSignature signature;
+
+  _FakeBip32Ed25519XPrivateKey({required this.signature});
+
+  @override
+  Future<Bip32Ed25519XSignature> sign(List<int> message) async {
+    return signature;
+  }
+}
+
+class _FakeBip32Ed25519XPublicKey extends Fake
+    implements Bip32Ed25519XPublicKey {
+  @override
+  List<int> get bytes => [1, 2, 3];
+}
+
+class _FakeBip32Ed25519XSignature extends Fake
+    implements Bip32Ed25519XSignature {
+  @override
+  List<int> get bytes => [4, 5, 6];
 }
