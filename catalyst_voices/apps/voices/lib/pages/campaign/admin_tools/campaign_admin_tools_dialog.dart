@@ -108,7 +108,7 @@ class _DraggableCampaignAdminToolsDialogState
   }
 
   /// Makes sure the dialog would fit into a screen window
-  /// even if the window gets shrunked, etc.
+  /// even if the window gets shrunk, etc.
   Offset _clampIntoScreenBounds(Offset offset) {
     return Offset(
       offset.dx.clamp(
