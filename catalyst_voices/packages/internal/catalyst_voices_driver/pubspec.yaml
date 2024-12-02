@@ -8,7 +8,7 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
-  equatable: ^2.0.5
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
   flutter_driver:

@@ -4,9 +4,12 @@ import 'package:test/test.dart';
 import 'package:webdriver/async_io.dart';
 
 ///To run test driver you need to have chromedriver installed
+///
 ///Then in terminal run:
 ///chromedriver --port=4444
+///
 ///In new terminal in example dir run:
+///
 ///flutter drive --target=test_driver/app.dart \
 ///--web-browser-flag=--disable-web-security \
 ///--web-browser-flag=--disable-gpu \
