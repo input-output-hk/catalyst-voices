@@ -17,11 +17,11 @@ part 'sign_data.dart';
 /// Run only via `flutter run`:
 ///
 /// ```shell
-//  flutter run \
-//  --web-header Cross-Origin-Opener-Policy=same-origin \
-//  --web-header Cross-Origin-Embedder-Policy=require-corp \
-//  --target lib/main.dart \
-//  -d chrome
+///  flutter run \
+///  --web-header Cross-Origin-Opener-Policy=same-origin \
+///  --web-header Cross-Origin-Embedder-Policy=require-corp \
+///  --target lib/main.dart \
+///  -d chrome
 /// ```
 ///
 /// Explanation:

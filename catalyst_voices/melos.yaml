@@ -130,6 +130,7 @@ command:
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
       win32: ^5.5.4
       web: ^1.1.0
+      webdriver: ^3.0.3
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
