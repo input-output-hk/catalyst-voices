@@ -71,16 +71,7 @@ class _DraggableCampaignAdminToolsDialogState
       // clamp it so that it fits into the screen
       // in case user shrinks the app window
 
-      _position = Offset(
-        _position.dx.clamp(
-          0,
-          _screenSize.width - CampaignAdminToolsDialog._width,
-        ),
-        _position.dy.clamp(
-          0,
-          _screenSize.height - CampaignAdminToolsDialog._height,
-        ),
-      );
+      _position = _clampIntoScreenBounds(_position);
     }
   }
 
@@ -107,22 +98,28 @@ class _DraggableCampaignAdminToolsDialogState
 
   void _onDragUpdate(DragUpdateDetails details) {
     final newPosition = _position + details.delta;
-    final clampedPosition = Offset(
-      newPosition.dx.clamp(
-        0,
-        _screenSize.width - CampaignAdminToolsDialog._width,
-      ),
-      newPosition.dy.clamp(
-        0,
-        _screenSize.height - CampaignAdminToolsDialog._height,
-      ),
-    );
+    final clampedPosition = _clampIntoScreenBounds(newPosition);
 
     if (_position != clampedPosition) {
       setState(() {
         _position = clampedPosition;
       });
     }
+  }
+
+  /// Makes sure the dialog would fit into a screen window
+  /// even if the window gets shrunked, etc.
+  Offset _clampIntoScreenBounds(Offset offset) {
+    return Offset(
+      offset.dx.clamp(
+        0,
+        _screenSize.width - CampaignAdminToolsDialog._width,
+      ),
+      offset.dy.clamp(
+        0,
+        _screenSize.height - CampaignAdminToolsDialog._height,
+      ),
+    );
   }
 }
 
