@@ -3,10 +3,12 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 sealed class CampaignInfo extends Equatable {
+  final String id;
   final CampaignStatus stage;
   final String description;
 
   const CampaignInfo({
+    required this.id,
     required this.stage,
     required this.description,
   });
@@ -14,6 +16,8 @@ sealed class CampaignInfo extends Equatable {
   factory CampaignInfo.fromCampaign(Campaign campaign) {
     return DraftCampaignInfo(
       startDate: campaign.startDate,
+      id: campaign.id,
+      // TODO(dtscalac): provide description
       /* cSpell:disable */
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
           ' Sed do eiusmod tempor incididunt ut labore et dolore magna.',
@@ -26,8 +30,10 @@ sealed class CampaignInfo extends Equatable {
 }
 
 class CompletedCampaignInfo extends CampaignInfo {
-  const CompletedCampaignInfo({required super.description})
-      : super(stage: CampaignStatus.completed);
+  const CompletedCampaignInfo({
+    required super.id,
+    required super.description,
+  }) : super(stage: CampaignStatus.completed);
 }
 
 class DraftCampaignInfo extends CampaignInfo with DateTimeMixin {
@@ -36,6 +42,7 @@ class DraftCampaignInfo extends CampaignInfo with DateTimeMixin {
 
   const DraftCampaignInfo({
     required this.startDate,
+    required super.id,
     required super.description,
   }) : super(stage: CampaignStatus.draft);
 
@@ -49,6 +56,7 @@ class LiveCampaignInfo extends CampaignInfo with DateTimeMixin {
 
   const LiveCampaignInfo({
     required this.startDate,
+    required super.id,
     required super.description,
   }) : super(stage: CampaignStatus.live);
 
