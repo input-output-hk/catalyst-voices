@@ -61,7 +61,8 @@ final class Dependencies extends DependencyProvider {
       // TODO(ryszard-schossler): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
-      );
+      )
+      ..registerFactory<WorkspaceBloc>(WorkspaceBloc.new);
   }
 
   void _registerRepositories() {

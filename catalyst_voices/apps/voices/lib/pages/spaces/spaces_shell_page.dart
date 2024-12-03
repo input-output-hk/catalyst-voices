@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
@@ -57,38 +58,36 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     final isVisitor = sessionBloc.state is VisitorSessionState;
     final isUnlocked = sessionBloc.state is ActiveAccountSessionState;
 
-    return CallbackShortcuts(
-      bindings: <ShortcutActivator, VoidCallback>{
-        for (final entry in SpacesShellPage._spacesShortcutsActivators.entries)
-          entry.value: () => entry.key.go(context),
-        CampaignAdminToolsDialog.shortcut: _toggleCampaignAdminTools,
-      },
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: VoicesAppBar(
-              leading: isVisitor ? null : const DrawerToggleButton(),
-              automaticallyImplyLeading: false,
-              actions: _getActions(widget.space),
+    return _Shortcuts(
+      toggleCampaignAdminTools: _toggleCampaignAdminTools,
+      child: _BlocsProviders(
+        child: Stack(
+          children: [
+            Scaffold(
+              appBar: VoicesAppBar(
+                leading: isVisitor ? null : const DrawerToggleButton(),
+                automaticallyImplyLeading: false,
+                actions: _getActions(widget.space),
+              ),
+              drawer: isVisitor
+                  ? null
+                  : SpacesDrawer(
+                      space: widget.space,
+                      spacesShortcutsActivators:
+                          SpacesShellPage._spacesShortcutsActivators,
+                      isUnlocked: isUnlocked,
+                    ),
+              body: widget.child,
             ),
-            drawer: isVisitor
-                ? null
-                : SpacesDrawer(
-                    space: widget.space,
-                    spacesShortcutsActivators:
-                        SpacesShellPage._spacesShortcutsActivators,
-                    isUnlocked: isUnlocked,
-                  ),
-            body: widget.child,
-          ),
-          if (_showAdminTools)
-            DraggableCampaignAdminToolsDialog(
-              dialogKey: _adminToolsKey,
-              selectedSpace: widget.space,
-              onSpaceSelected: (space) => space.go(context),
-              onClose: _closeCampaignAdminTools,
-            ),
-        ],
+            if (_showAdminTools)
+              DraggableCampaignAdminToolsDialog(
+                dialogKey: _adminToolsKey,
+                selectedSpace: widget.space,
+                onSpaceSelected: (space) => space.go(context),
+                onClose: _closeCampaignAdminTools,
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -118,5 +117,47 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     setState(() {
       _showAdminTools = false;
     });
+  }
+}
+
+class _Shortcuts extends StatelessWidget {
+  final Widget child;
+  final VoidCallback toggleCampaignAdminTools;
+
+  const _Shortcuts({
+    required this.child,
+    required this.toggleCampaignAdminTools,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        for (final entry in SpacesShellPage._spacesShortcutsActivators.entries)
+          entry.value: () => entry.key.go(context),
+        CampaignAdminToolsDialog.shortcut: toggleCampaignAdminTools,
+      },
+      child: child,
+    );
+  }
+}
+
+class _BlocsProviders extends StatelessWidget {
+  final Widget child;
+
+  const _BlocsProviders({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<WorkspaceBloc>(
+          create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
+        ),
+      ],
+      child: child,
+    );
   }
 }
