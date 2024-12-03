@@ -33,6 +33,10 @@ pub(crate) const MIN_BATCH_SIZE: i64 = 1;
 /// Maximum possible batch size.
 const MAX_BATCH_SIZE: i64 = 256;
 
+/// AWS remote latency, resources are not created instanly hence we need to add delays
+/// before we access them.
+const AWS_LATENCY_DEFAULT: u64 = 45;
+
 /// Configuration for an individual cassandra cluster.
 #[derive(Clone)]
 pub(crate) struct EnvVars {
@@ -60,14 +64,14 @@ pub(crate) struct EnvVars {
     /// Maximum Configured Batch size.
     pub(crate) max_batch_size: i64,
 
-    /// Deployment region 1
-    pub(crate) region_1: StringEnvVar,
+    /// Config options for deployment i.e replication strategy
+    pub(crate) deployment: StringEnvVar,
 
-    /// Deployment region 2
-    pub(crate) region_2: StringEnvVar,
+    /// Keyspace UID
+    pub(crate) keyspace_uid: StringEnvVar,
 
-    /// AWS replication factor, min is 3
-    pub(crate) replication_factor: StringEnvVar,
+    /// AWS infra latency in seconds, remote resources are not created instantly
+    pub(crate) aws_latency: Option<u64>,
 }
 
 impl EnvVars {
@@ -103,15 +107,20 @@ impl EnvVars {
                 MIN_BATCH_SIZE,
                 MAX_BATCH_SIZE,
             ),
-            region_1: StringEnvVar::new(
-                &format!("CASSANDRA_{name}_REGION_1"),
-                "eu-central-1".into(),
+            deployment: StringEnvVar::new(
+                &format!("CASSANDRA_{name}_DEPLOYMENT"),
+                "{'class': 'NetworkTopologyStrategy','replication_factor': 1}".into(),
             ),
-            region_2: StringEnvVar::new(&format!("CASSANDRA_{name}_REGION_2"), "eu-west-1".into()),
-            replication_factor: StringEnvVar::new(
-                &format!("CASSANDRA_{name}_REPLICATION_FACTOR"),
-                "3".into(),
+            keyspace_uid: StringEnvVar::new(
+                &format!("CASSANDRA_{name}_KEYSPACE_UID"),
+                "default".into(),
             ),
+            aws_latency: Some(StringEnvVar::new_as(
+                &format!("CASSANDRA_{name}_AWS_LATENCY"),
+                AWS_LATENCY_DEFAULT,
+                AWS_LATENCY_DEFAULT,
+                AWS_LATENCY_DEFAULT,
+            )),
         }
     }
 

@@ -8,6 +8,7 @@ use scylla::Session;
 use serde_json::json;
 use tracing::error;
 
+use super::session::{keyspace_creation_status, on_aws};
 use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_from_data};
 
 /// The version of the Index DB Schema we SHOULD BE using.
@@ -16,14 +17,29 @@ use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_fr
 /// This constant is ONLY used by Unit tests to identify when the schema version will
 /// change accidentally, and is NOT to be used directly to set the schema version of the
 /// table namespaces.
-pub const SCHEMA_VERSION: &str = "08193dfe-698a-8177-bdf8-20c5691a06e7";
-
-/// AWS Keyspace actions are not instant, induce sleep to wait for remote keyspace
-/// actions to take place.
-const KEYSPACE_LATENCY: u64 = 15;
+#[allow(dead_code)]
+const SCHEMA_VERSION: &str = "08193dfe-698a-8177-bdf8-20c5691a06e7";
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
+
+/// List of tables for AWS ALIVE check
+pub const TABLES: &[&str] = &[
+    "chain_root_for_role0_key",
+    "chain_root_for_stake_addr",
+    "chain_root_for_txn_id",
+    "cip36_registration",
+    "cip36_registration_for_vote_key",
+    "cip36_registration_invalid",
+    "rbac509_registration",
+    "stake_registration",
+    "txi_by_txn_hash",
+    "sync_status",
+    "txo_by_stake",
+    "txo_assets_by_stake",
+    "unstaked_txo_assets_by_txn_hash",
+    "unstaked_txo_by_txn_hash",
+];
 
 /// All Schema Creation Statements
 const SCHEMAS: &[(&str, &str)] = &[
@@ -192,7 +208,7 @@ async fn create_namespace(
     let query = reg
         .render_template(
             CREATE_NAMESPACE_CQL,
-            &json!({"keyspace": keyspace,"region1":cfg.region_1.as_string(),"region2":cfg.region_2.as_string(),"replication_factor": cfg.replication_factor.as_string()}),
+            &json!({"keyspace": keyspace,"options": cfg.deployment.clone().to_string()}),
         )
         .context(format!("Keyspace: {keyspace}"))?;
 
@@ -201,12 +217,22 @@ async fn create_namespace(
         .await
         .context(format!("Keyspace: {keyspace}"))?;
 
-    thread::sleep(Duration::from_secs(KEYSPACE_LATENCY));
-
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
 
-    // Set the Keyspace to use for this session.
+    // if on aws, wait until keyspace exsits due to remote aws latency
+    if on_aws(session.clone()).await {
+        while keyspace_creation_status(session.clone(), keyspace.clone())
+            .await
+            .is_err()
+        {}
+
+        // Despite the query saying the keyspace has been created,
+        // it sometimes has not, so we still need to induce a latency to ensure creation has taken
+        // place
+        if let Some(latency) = cfg.aws_latency { thread::sleep(Duration::from_secs(latency)) }
+    }
+
     if let Err(error) = session.use_keyspace(keyspace.clone(), false).await {
         error!(keyspace = keyspace, error = %error, "Failed to set keyspace");
     }
@@ -223,8 +249,6 @@ pub(crate) async fn create_schema(
         .context("Creating Namespace")?;
 
     let failed = false;
-
-    thread::sleep(Duration::from_secs(KEYSPACE_LATENCY));
 
     for (schema, _schema_name) in SCHEMAS {
         session.query_unpaged((*schema).to_string(), &[]).await?;
