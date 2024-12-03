@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/campaign/campaign_section.dart';
+import 'package:catalyst_voices_models/src/proposal/proposal_template.dart';
 import 'package:equatable/equatable.dart';
 
 final class Campaign extends Equatable {
@@ -9,6 +10,7 @@ final class Campaign extends Equatable {
   final DateTime endDate;
   final int proposalsCount;
   final List<CampaignSection> sections;
+  final ProposalTemplate proposalTemplate;
 
   const Campaign({
     required this.id,
@@ -18,6 +20,7 @@ final class Campaign extends Equatable {
     required this.endDate,
     required this.proposalsCount,
     required this.sections,
+    required this.proposalTemplate,
   });
 
   int get categoriesCount => sections.map((e) => e.category).toSet().length;
@@ -31,5 +34,6 @@ final class Campaign extends Equatable {
         endDate,
         proposalsCount,
         sections,
+        proposalTemplate,
       ];
 }

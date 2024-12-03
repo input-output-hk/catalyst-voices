@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/proposals/proposals_state.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,11 +15,24 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
   /// Loads the proposals.
   Future<void> load() async {
-    final proposals = await proposalRepository.getDraftProposals();
+    const currentCampaignId = 'f14';
+
+    final proposals = await proposalRepository.getDraftProposals(
+      campaignId: currentCampaignId,
+    );
+
+    final pendingProposals = proposals.map(
+      (proposal) {
+        return PendingProposal.fromProposal(
+          proposal,
+          campaignName: 'F14',
+        );
+      },
+    ).toList();
 
     emit(
       LoadedProposalsState(
-        proposals: proposals,
+        proposals: pendingProposals,
         favoriteProposals: const [],
       ),
     );
