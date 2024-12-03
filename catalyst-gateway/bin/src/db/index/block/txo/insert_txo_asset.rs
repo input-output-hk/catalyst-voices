@@ -27,8 +27,8 @@ pub(super) struct Params {
     txo: i16,
     /// Policy hash of the asset
     policy_id: Vec<u8>,
-    /// Policy name of the asset
-    policy_name: String,
+    /// Name of the asset, within the Policy.
+    asset_name: Vec<u8>,
     /// Value of the asset
     value: num_bigint::BigInt,
 }
@@ -41,7 +41,7 @@ impl Params {
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
         stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, policy_id: &[u8],
-        policy_name: &str, value: i128,
+        asset_name: &[u8], value: i128,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
@@ -49,7 +49,7 @@ impl Params {
             txn,
             txo,
             policy_id: policy_id.to_vec(),
-            policy_name: policy_name.to_owned(),
+            asset_name: asset_name.to_vec(),
             value: value.into(),
         }
     }
