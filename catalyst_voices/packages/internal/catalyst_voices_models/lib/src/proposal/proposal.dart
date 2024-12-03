@@ -15,6 +15,7 @@ final class Proposal extends Equatable {
   final DateTime updateDate;
   final DateTime? fundedDate;
   final Coin fundsRequested;
+  final ProposalStatus status;
   final ProposalPublish publish;
   final ProposalAccess access;
 
@@ -33,6 +34,7 @@ final class Proposal extends Equatable {
     required this.updateDate,
     this.fundedDate,
     required this.fundsRequested,
+    required this.status,
     required this.publish,
     required this.access,
     required this.category,
@@ -40,13 +42,6 @@ final class Proposal extends Equatable {
     required this.completedSegments,
     required this.totalSegments,
   });
-
-  bool get isFunded => fundedDate != null;
-
-  // Note. Not yet sure how it should be computed
-  ProposalStatus get status {
-    return ProposalStatus.draft;
-  }
 
   @override
   List<Object?> get props => [

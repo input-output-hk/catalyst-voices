@@ -15,6 +15,7 @@ void main() {
       category: '',
       updateDate: DateTime.now(),
       fundsRequested: const Coin(100000),
+      status: ProposalStatus.draft,
       publish: ProposalPublish.draft,
       access: ProposalAccess.private,
       commentsCount: 0,
