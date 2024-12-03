@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
-final class CampaignRepository {
+class CampaignRepository {
   Future<Campaign> getCampaign({
     required String id,
   }) async {

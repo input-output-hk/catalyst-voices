@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/cards/campaign_preview_card.dart';
+import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -10,17 +10,17 @@ import '../../helpers/helpers.dart';
 void main() {
   late VoicesColorScheme voicesColors;
 
-  final draftInformationTest = DraftCampaignInformation(
-    date: DateTime(2024, 11, 20, 13, 00, 00),
+  final draftInformationTest = DraftCampaignInfo(
+    startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Draft Information Test',
   );
 
-  final liveInformationTest = LiveCampaignInformation(
-    date: DateTime(2024, 11, 20, 13, 00, 00),
+  final liveInformationTest = LiveCampaignInfo(
+    startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Live Information Test',
   );
 
-  const completedInformationText = CompletedCampaignInformation(
+  const completedInformationText = CompletedCampaignInfo(
     description: 'Completed Information Test',
   );
 
@@ -31,18 +31,18 @@ void main() {
     );
   });
 
-  Widget buildTestWidget(CampaignPreviewInfo campaign) {
+  Widget buildTestWidget(CampaignInfo campaign) {
     return Scaffold(
       body: SizedBox(
         width: 1000,
-        child: CampaignPreviewCard(
+        child: CampaignStageCard(
           campaign: campaign,
         ),
       ),
     );
   }
 
-  group(CampaignPreviewCard, () {
+  group(CampaignStageCard, () {
     testWidgets(
       'Renders correctly always display elements which are always render',
       (tester) async {
@@ -53,7 +53,7 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.byType(CampaignPreviewCard), findsOneWidget);
+        expect(find.byType(CampaignStageCard), findsOneWidget);
         expect(find.byType(CatalystSvgIcon), findsOneWidget);
       },
     );
@@ -66,7 +66,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(CampaignPreviewCard), findsOneWidget);
+      expect(find.byType(CampaignStageCard), findsOneWidget);
       expect(find.byType(Text), findsExactly(3));
       expect(find.byType(CatalystSvgIcon), findsExactly(2));
       expect(
@@ -85,7 +85,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(CampaignPreviewCard), findsOneWidget);
+      expect(find.byType(CampaignStageCard), findsOneWidget);
       expect(find.byType(Text), findsExactly(4));
       expect(find.byType(CatalystSvgIcon), findsExactly(2));
       expect(
@@ -105,7 +105,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(CampaignPreviewCard), findsOneWidget);
+      expect(find.byType(CampaignStageCard), findsOneWidget);
       expect(find.byType(Text), findsExactly(3));
       expect(find.byType(CatalystSvgIcon), findsOneWidget);
       expect(

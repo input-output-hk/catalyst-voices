@@ -2,52 +2,62 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-sealed class CampaignPreviewInfo extends Equatable {
+sealed class CampaignInfo extends Equatable {
   final CampaignStatus stage;
   final String description;
 
-  const CampaignPreviewInfo({
+  const CampaignInfo({
     required this.stage,
     required this.description,
   });
+
+  factory CampaignInfo.fromCampaign(Campaign campaign) {
+    return DraftCampaignInfo(
+      startDate: campaign.startDate,
+      /* cSpell:disable */
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+          ' Sed do eiusmod tempor incididunt ut labore et dolore magna.',
+      /* cSpell:enable */
+    );
+  }
 
   @override
   List<Object?> get props => [stage, description];
 }
 
-class CompletedCampaignInformation extends CampaignPreviewInfo {
-  const CompletedCampaignInformation({required super.description})
+class CompletedCampaignInfo extends CampaignInfo {
+  const CompletedCampaignInfo({required super.description})
       : super(stage: CampaignStatus.completed);
 }
 
-class DraftCampaignInformation extends CampaignPreviewInfo with DateTimeMixin {
+class DraftCampaignInfo extends CampaignInfo with DateTimeMixin {
   @override
-  final DateTime date;
+  final DateTime startDate;
 
-  const DraftCampaignInformation({
-    required this.date,
+  const DraftCampaignInfo({
+    required this.startDate,
     required super.description,
   }) : super(stage: CampaignStatus.draft);
 
   @override
-  List<Object?> get props => [date, description];
+  List<Object?> get props => [startDate, description];
 }
 
-class LiveCampaignInformation extends CampaignPreviewInfo with DateTimeMixin {
+class LiveCampaignInfo extends CampaignInfo with DateTimeMixin {
   @override
-  final DateTime date;
+  final DateTime startDate;
 
-  const LiveCampaignInformation({
-    required this.date,
+  const LiveCampaignInfo({
+    required this.startDate,
     required super.description,
   }) : super(stage: CampaignStatus.live);
 
   @override
-  List<Object?> get props => [date, description];
+  List<Object?> get props => [startDate, description];
 }
 
 mixin DateTimeMixin {
-  DateTime get date;
+  DateTime get startDate;
   CampaignStatus get stage;
 
   String localizedDate(

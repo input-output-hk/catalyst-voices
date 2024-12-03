@@ -7,10 +7,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class CampaignPreviewCard extends StatelessWidget {
-  final CampaignPreviewInfo campaign;
+class CampaignStageCard extends StatelessWidget {
+  final CampaignInfo campaign;
 
-  const CampaignPreviewCard({
+  const CampaignStageCard({
     super.key,
     required this.campaign,
   });
@@ -84,10 +84,10 @@ class CampaignPreviewCard extends StatelessWidget {
   }
 
   String _getDateInformation(BuildContext context) {
-    if (campaign is LiveCampaignInformation ||
-        campaign is DraftCampaignInformation) {
+    if (campaign is LiveCampaignInfo || campaign is DraftCampaignInfo) {
       final dateMixin = (campaign as DateTimeMixin);
-      final formattedDate = DateFormatter.formatDateTimeParts(dateMixin.date);
+      final formattedDate =
+          DateFormatter.formatDateTimeParts(dateMixin.startDate);
       return dateMixin.localizedDate(
         context.l10n,
         formattedDate,
