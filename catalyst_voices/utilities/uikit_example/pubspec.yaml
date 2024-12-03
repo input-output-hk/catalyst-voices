@@ -22,6 +22,8 @@ dependencies:
     path: ../../packages/internal/catalyst_voices_models
   catalyst_voices_shared:
     path: ../../packages/internal/catalyst_voices_shared
+  catalyst_voices_view_models:
+    path: ../../packages/internal/catalyst_voices_view_models
   collection: ^1.18.0
   cupertino_icons: ^1.0.6
   flutter:
