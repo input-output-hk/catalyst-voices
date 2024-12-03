@@ -26,8 +26,6 @@ abstract interface class SectionStep implements SectionsListViewItem {
 
   bool get isEditable;
 
-  List<Guidance> get guidances;
-
   String localizedName(BuildContext context);
 }
 
@@ -65,15 +63,12 @@ abstract base class BaseSectionStep extends Equatable implements SectionStep {
   final bool isEnabled;
   @override
   final bool isEditable;
-  @override
-  final List<Guidance> guidances;
 
   const BaseSectionStep({
     required this.id,
     required this.sectionId,
     this.isEnabled = true,
     this.isEditable = true,
-    this.guidances = const [],
   });
 
   @override

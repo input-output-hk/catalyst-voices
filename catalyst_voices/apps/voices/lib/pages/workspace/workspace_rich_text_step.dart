@@ -26,7 +26,7 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
   void initState() {
     super.initState();
 
-    final document = Document.fromJson(widget.step.data.value);
+    final document = Document.fromJson(widget.step.initialData.value);
     final selectionOffset = document.length == 0 ? 0 : document.length - 1;
 
     _controller = VoicesRichTextController(
@@ -55,7 +55,7 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
         );
       },
       child: VoicesRichText(
-        title: widget.step.localizedDesc(context),
+        title: widget.step.description ?? widget.step.name,
         controller: _controller,
         editModeController: _editModeController,
         charsLimit: widget.step.charsLimit,
