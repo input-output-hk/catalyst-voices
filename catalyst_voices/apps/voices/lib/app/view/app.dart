@@ -53,6 +53,9 @@ class _AppState extends State<App> {
       BlocProvider<CampaignInfoCubit>(
         create: (_) => Dependencies.instance.get<CampaignInfoCubit>(),
       ),
+      BlocProvider<CampaignBuilderCubit>(
+        create: (_) => Dependencies.instance.get<CampaignBuilderCubit>(),
+      ),
     ];
   }
 }

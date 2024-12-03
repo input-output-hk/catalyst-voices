@@ -11,16 +11,19 @@ void main() {
   late VoicesColorScheme voicesColors;
 
   final draftInformationTest = DraftCampaignInfo(
+    id: 'campaign_draft',
     startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Draft Information Test',
   );
 
   final liveInformationTest = LiveCampaignInfo(
+    id: 'campaign_live',
     startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Live Information Test',
   );
 
   const completedInformationText = CompletedCampaignInfo(
+    id: 'campaign_completed',
     description: 'Completed Information Test',
   );
 

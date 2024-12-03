@@ -1,10 +1,11 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
 
 sealed class CampaignInfo extends Equatable {
   final String id;
-  final CampaignStatus stage;
+  final CampaignStage stage;
   final String description;
 
   const CampaignInfo({
@@ -33,7 +34,7 @@ class CompletedCampaignInfo extends CampaignInfo {
   const CompletedCampaignInfo({
     required super.id,
     required super.description,
-  }) : super(stage: CampaignStatus.completed);
+  }) : super(stage: CampaignStage.completed);
 }
 
 class DraftCampaignInfo extends CampaignInfo with DateTimeMixin {
@@ -44,7 +45,7 @@ class DraftCampaignInfo extends CampaignInfo with DateTimeMixin {
     required this.startDate,
     required super.id,
     required super.description,
-  }) : super(stage: CampaignStatus.draft);
+  }) : super(stage: CampaignStage.draft);
 
   @override
   List<Object?> get props => [startDate, description];
@@ -58,7 +59,7 @@ class LiveCampaignInfo extends CampaignInfo with DateTimeMixin {
     required this.startDate,
     required super.id,
     required super.description,
-  }) : super(stage: CampaignStatus.live);
+  }) : super(stage: CampaignStage.live);
 
   @override
   List<Object?> get props => [startDate, description];
@@ -66,13 +67,13 @@ class LiveCampaignInfo extends CampaignInfo with DateTimeMixin {
 
 mixin DateTimeMixin {
   DateTime get startDate;
-  CampaignStatus get stage;
+  CampaignStage get stage;
 
   String localizedDate(
     VoicesLocalizations l10n,
     (String date, String time) formattedDate,
   ) {
-    if (stage == CampaignStatus.draft) {
+    if (stage == CampaignStage.draft) {
       return l10n.campaignBeginsOn(formattedDate.$1, formattedDate.$2);
     } else {
       return l10n.campaignEndsOn(formattedDate.$1, formattedDate.$2);
