@@ -21,7 +21,7 @@ use registrations::{
 };
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
-    transport::iterator::RowIterator, QueryResult, Session,
+    transport::iterator::QueryPager, QueryResult, Session,
 };
 use staked_ada::{
     get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
@@ -311,7 +311,7 @@ impl PreparedQueries {
     /// returns.
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
-    ) -> anyhow::Result<RowIterator>
+    ) -> anyhow::Result<QueryPager>
     where P: SerializeRow {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
