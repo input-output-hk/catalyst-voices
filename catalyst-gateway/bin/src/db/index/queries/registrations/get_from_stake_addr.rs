@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -32,33 +32,26 @@ impl From<&ed25519_dalek::VerifyingKey> for GetRegistrationParams {
     }
 }
 
-/// Get registration given stake addr or vote key
-mod result {
-    use scylla::DeserializeRow;
-
-    /// Get registration query result.
-    #[derive(DeserializeRow)]
-    pub(crate) struct GetRegistrationQuery {
-        /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-        pub stake_address: Vec<u8>,
-        /// Nonce value after normalization.
-        pub nonce: num_bigint::BigInt,
-        /// Slot Number the cert is in.
-        pub slot_no: num_bigint::BigInt,
-        /// Transaction Index.
-        pub txn: i16,
-        /// Voting Public Key
-        pub vote_key: Vec<u8>,
-        /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
-        pub payment_address: Vec<u8>,
-        /// Is the stake address a script or not.
-        pub is_payable: bool,
-        /// Is the Registration CIP36 format, or CIP15
-        pub cip36: bool,
-    }
-}
 /// Get registration query.
-pub(crate) struct GetRegistrationQuery;
+#[derive(DeserializeRow)]
+pub(crate) struct GetRegistrationQuery {
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    pub stake_address: Vec<u8>,
+    /// Nonce value after normalization.
+    pub nonce: num_bigint::BigInt,
+    /// Slot Number the cert is in.
+    pub slot_no: num_bigint::BigInt,
+    /// Transaction Index.
+    pub txn: i16,
+    /// Voting Public Key
+    pub vote_key: Vec<u8>,
+    /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
+    pub payment_address: Vec<u8>,
+    /// Is the stake address a script or not.
+    pub is_payable: bool,
+    /// Is the Registration CIP36 format, or CIP15
+    pub cip36: bool,
+}
 
 impl GetRegistrationQuery {
     /// Prepares a get registration query.
@@ -81,11 +74,11 @@ impl GetRegistrationQuery {
     /// Executes get registration info for given stake addr query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetRegistrationParams,
-    ) -> anyhow::Result<TypedRowStream<result::GetRegistrationQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetRegistrationQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::RegistrationFromStakeAddr, params)
             .await?
-            .rows_stream::<result::GetRegistrationQuery>()?;
+            .rows_stream::<GetRegistrationQuery>()?;
 
         Ok(iter)
     }

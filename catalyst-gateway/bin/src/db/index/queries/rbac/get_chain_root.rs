@@ -2,8 +2,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -22,21 +22,12 @@ pub(crate) struct GetChainRootQueryParams {
     pub(crate) stake_address: Vec<u8>,
 }
 
-/// Get chain root by stake address query row result
-// The macro uses expect to signal an error in deserializing values.
-mod result {
-    use scylla::DeserializeRow;
-
-    /// Get chain root query result.
-    #[derive(DeserializeRow)]
-    pub(crate) struct GetChainRootQuery {
-        /// Chain root for the queries stake address.
-        pub(crate) chain_root: Vec<u8>,
-    }
-}
-
 /// Get chain root by stake address query.
-pub(crate) struct GetChainRootQuery;
+#[derive(DeserializeRow)]
+pub(crate) struct GetChainRootQuery {
+    /// Chain root for the queries stake address.
+    pub(crate) chain_root: Vec<u8>,
+}
 
 impl GetChainRootQuery {
     /// Prepares a get chain root by stake address query.
@@ -59,11 +50,11 @@ impl GetChainRootQuery {
     /// Executes a get chain root by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetChainRootQueryParams,
-    ) -> anyhow::Result<TypedRowStream<result::GetChainRootQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetChainRootQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::ChainRootByStakeAddress, params)
             .await?
-            .rows_stream::<result::GetChainRootQuery>()?;
+            .rows_stream::<GetChainRootQuery>()?;
 
         Ok(iter)
     }

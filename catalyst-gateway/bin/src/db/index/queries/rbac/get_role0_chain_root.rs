@@ -2,8 +2,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -22,21 +22,12 @@ pub(crate) struct GetRole0ChainRootQueryParams {
     pub(crate) role0_key: Vec<u8>,
 }
 
-/// Get chain root by role0 key query row result
-// The macro uses expect to signal an error in deserializing values.
-mod result {
-    use scylla::DeserializeRow;
-
-    /// Get role0 key chain root query result.
-    #[derive(DeserializeRow)]
-    pub(crate) struct GetRole0ChainRootQuery {
-        /// Chain root.
-        pub(crate) chain_root: Vec<u8>,
-    }
-}
-
 /// Get chain root by role0 key query.
-pub(crate) struct GetRole0ChainRootQuery;
+#[derive(DeserializeRow)]
+pub(crate) struct GetRole0ChainRootQuery {
+    /// Chain root.
+    pub(crate) chain_root: Vec<u8>,
+}
 
 impl GetRole0ChainRootQuery {
     /// Prepares a get chain root by role0 key query.
@@ -59,11 +50,11 @@ impl GetRole0ChainRootQuery {
     /// Executes a get chain root role0 key query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetRole0ChainRootQueryParams,
-    ) -> anyhow::Result<TypedRowStream<result::GetRole0ChainRootQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetRole0ChainRootQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::ChainRootByRole0Key, params)
             .await?
-            .rows_stream::<result::GetRole0ChainRootQuery>()?;
+            .rows_stream::<GetRole0ChainRootQuery>()?;
 
         Ok(iter)
     }

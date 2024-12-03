@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -30,24 +30,16 @@ impl GetTxiByTxnHashesQueryParams {
     }
 }
 
-/// Get TXI Query Result
-// The macro uses expect to signal an error in deserializing values.
-mod result {
-    use scylla::DeserializeRow;
-
-    /// Get TXI query result.
-    #[derive(DeserializeRow)]
-    pub(crate) struct GetTxiByTxnHashesQuery {
-        /// TXI transaction hash.
-        pub txn_hash: Vec<u8>,
-        /// TXI original TXO index.
-        pub txo: i16,
-        /// TXI slot number.
-        pub slot_no: num_bigint::BigInt,
-    }
-}
 /// Get TXI query.
-pub(crate) struct GetTxiByTxnHashesQuery;
+#[derive(DeserializeRow)]
+pub(crate) struct GetTxiByTxnHashesQuery {
+    /// TXI transaction hash.
+    pub txn_hash: Vec<u8>,
+    /// TXI original TXO index.
+    pub txo: i16,
+    /// TXI slot number.
+    pub slot_no: num_bigint::BigInt,
+}
 
 impl GetTxiByTxnHashesQuery {
     /// Prepares a get txi query.
@@ -70,11 +62,11 @@ impl GetTxiByTxnHashesQuery {
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetTxiByTxnHashesQueryParams,
-    ) -> anyhow::Result<TypedRowStream<result::GetTxiByTxnHashesQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetTxiByTxnHashesQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::TxiByTransactionHash, params)
             .await?
-            .rows_stream::<result::GetTxiByTxnHashesQuery>()?;
+            .rows_stream::<GetTxiByTxnHashesQuery>()?;
 
         Ok(iter)
     }

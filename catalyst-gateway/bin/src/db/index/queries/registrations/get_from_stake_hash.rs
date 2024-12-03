@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -31,19 +31,12 @@ impl GetStakeAddrParams {
     }
 }
 
-/// Get stake addr from stake hash query string.
-mod result {
-    use scylla::DeserializeRow;
-
-    /// Get stake addr from stake hash query result.
-    #[derive(DeserializeRow)]
-    pub(crate) struct GetStakeAddrQuery {
-        /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-        pub stake_address: Vec<u8>,
-    }
+/// Get stake addr from stake hash query.
+#[derive(DeserializeRow)]
+pub(crate) struct GetStakeAddrQuery {
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    pub stake_address: Vec<u8>,
 }
-/// Get registration query.
-pub(crate) struct GetStakeAddrQuery;
 
 impl GetStakeAddrQuery {
     /// Prepares a get get stake addr from stake hash query.
@@ -66,11 +59,11 @@ impl GetStakeAddrQuery {
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetStakeAddrParams,
-    ) -> anyhow::Result<TypedRowStream<result::GetStakeAddrQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetStakeAddrQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::StakeAddrFromStakeHash, params)
             .await?
-            .rows_stream::<result::GetStakeAddrQuery>()?;
+            .rows_stream::<GetStakeAddrQuery>()?;
 
         Ok(iter)
     }

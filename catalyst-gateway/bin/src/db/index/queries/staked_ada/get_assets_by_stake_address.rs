@@ -2,8 +2,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -35,31 +35,22 @@ impl GetAssetsByStakeAddressParams {
     }
 }
 
-/// Get assets by stake address query row result
-// The macro uses expect to signal an error in deserializing values.
-mod result {
-    use scylla::DeserializeRow;
-
-    /// Get native assets query result.
-    #[derive(DeserializeRow)]
-    pub(crate) struct GetAssetsByStakeAddressQuery {
-        /// TXO transaction index within the slot.
-        pub txn: i16,
-        /// TXO index.
-        pub txo: i16,
-        /// TXO transaction slot number.
-        pub slot_no: num_bigint::BigInt,
-        /// Asset hash.
-        pub policy_id: Vec<u8>,
-        /// Asset name.
-        pub asset_name: Vec<u8>,
-        /// Asset value.
-        pub value: num_bigint::BigInt,
-    }
+/// Get native assets query.
+#[derive(DeserializeRow)]
+pub(crate) struct GetAssetsByStakeAddressQuery {
+    /// TXO transaction index within the slot.
+    pub txn: i16,
+    /// TXO index.
+    pub txo: i16,
+    /// TXO transaction slot number.
+    pub slot_no: num_bigint::BigInt,
+    /// Asset hash.
+    pub policy_id: Vec<u8>,
+    /// Asset name.
+    pub asset_name: Vec<u8>,
+    /// Asset value.
+    pub value: num_bigint::BigInt,
 }
-
-/// Get assets by stake address query.
-pub(crate) struct GetAssetsByStakeAddressQuery;
 
 impl GetAssetsByStakeAddressQuery {
     /// Prepares a get assets by stake address query.
@@ -82,11 +73,11 @@ impl GetAssetsByStakeAddressQuery {
     /// Executes a get assets by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetAssetsByStakeAddressParams,
-    ) -> anyhow::Result<TypedRowStream<result::GetAssetsByStakeAddressQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetAssetsByStakeAddressQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, params)
             .await?
-            .rows_stream::<result::GetAssetsByStakeAddressQuery>()?;
+            .rows_stream::<GetAssetsByStakeAddressQuery>()?;
 
         Ok(iter)
     }
