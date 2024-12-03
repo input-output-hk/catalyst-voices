@@ -28,6 +28,8 @@ non_ascii_idents = "deny"
 single_use_lifetimes = "deny"
 trivial_casts = "deny"
 trivial_numeric_casts = "deny"
+# TODO(bkioshn): Revisit the errors https://github.com/input-output-hk/catalyst-voices/issues/1319
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
 
 [lints.rustdoc]
 broken_intra_doc_links = "deny"
