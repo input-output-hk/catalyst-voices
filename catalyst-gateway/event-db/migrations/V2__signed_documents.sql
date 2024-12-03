@@ -39,15 +39,15 @@ COMMENT ON COLUMN signed_docs.raw IS
 'The RAW unaltered signed document, including its signatures, and full COSE envelope.';
 
 CREATE INDEX IF NOT EXISTS idx_signed_docs_type ON signed_docs (type);
-COMMENT ON INDEX signed_docs_type IS
+COMMENT ON INDEX idx_signed_docs_type IS
 'Index to help finding documents by a known type faster.';
 
 CREATE INDEX IF NOT EXISTS idx_signed_docs_author ON signed_docs (author);
-COMMENT ON INDEX signed_docs_author IS
+COMMENT ON INDEX idx_signed_docs_author IS
 'Index to help finding documents by a known author faster.';
 
 CREATE INDEX IF NOT EXISTS idx_signed_docs_type_author ON signed_docs (type, author);
-COMMENT ON INDEX signed_docs_type_author IS
+COMMENT ON INDEX idx_signed_docs_type_author IS
 'Index to help finding documents by a known author for a specific document type faster.';
 
 
