@@ -52,20 +52,17 @@ void main() {
   }
 
   group(CampaignStageCard, () {
-    testWidgets(
-      'Renders correctly always display elements which are always render',
-      (tester) async {
-        await tester.pumpApp(
-          buildTestWidget(completedCampaignText),
-          voicesColors: voicesColors,
-        );
+    testWidgets('Renders all elements correctly', (tester) async {
+      await tester.pumpApp(
+        buildTestWidget(completedCampaignText),
+        voicesColors: voicesColors,
+      );
 
-        await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-        expect(find.byType(CampaignStageCard), findsOneWidget);
-        expect(find.byType(CatalystSvgIcon), findsOneWidget);
-      },
-    );
+      expect(find.byType(CampaignStageCard), findsOneWidget);
+      expect(find.byType(CatalystSvgIcon), findsOneWidget);
+    });
 
     testWidgets('Renders correctly for draft campaign', (tester) async {
       await tester.pumpApp(
