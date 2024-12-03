@@ -56,8 +56,8 @@ void main() {
     test('completed campaign resolves to completed stage', () {
       final liveCampaign = campaign.copyWith(
         publish: CampaignPublish.published,
-        startDate: date.plusDays(1),
-        endDate: date.plusDays(2),
+        startDate: date.minusDays(2),
+        endDate: date.minusDays(1),
       );
 
       expect(
