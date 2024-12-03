@@ -3,22 +3,25 @@ import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 import 'package:webdriver/async_io.dart';
 
-///To run test driver you need to have chromedriver installed
+/// To run test driver you need to have chromedriver installed
 ///
-///Then in terminal run:
-///chromedriver --port=4444
+/// Then in terminal run:
+/// ```sh
+/// chromedriver --port=4444
+/// ```
 ///
-///In new terminal in example dir run:
-///
-///flutter drive --target=test_driver/app.dart \
-///--web-browser-flag=--disable-web-security \
-///--web-browser-flag=--disable-gpu \
-///--web-browser-flag=--disable-search-engine-choice-screen \
-///--web-header=Cross-Origin-Opener-Policy=same-origin \
-///--web-header=Cross-Origin-Embedder-Policy=require-corp \
-///--debug \
-///--no-headless \
-///-d web-server --browser-name=chrome --driver-port=4444
+/// In new terminal in example dir run:
+/// ```dart
+///  flutter drive --target=test_driver/app.dart \
+/// --web-browser-flag=--disable-web-security \
+/// --web-browser-flag=--disable-gpu \
+/// --web-browser-flag=--disable-search-engine-choice-screen \
+/// --web-header=Cross-Origin-Opener-Policy=same-origin \
+/// --web-header=Cross-Origin-Embedder-Policy=require-corp \
+/// --debug \
+/// --no-headless \
+/// -d web-server --browser-name=chrome --driver-port=4444
+/// ```
 void main() {
   group('Test if extensions are installed and driver can communicate with them',
       () {
