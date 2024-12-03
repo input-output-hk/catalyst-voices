@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS signed_docs (
   author TEXT NOT NULL,
   metadata JSONB NOT NULL,
   payload JSONB NULL,
-  raw BLOB NOT NULL,
+  raw BYTEA NOT NULL,
 
   CONSTRAINT pk PRIMARY KEY (id, ver)
 );
