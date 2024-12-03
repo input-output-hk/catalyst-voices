@@ -5,11 +5,19 @@ import 'package:flutter/material.dart';
 class VoicesDetailsDialog extends StatelessWidget {
   final Widget header;
   final Widget body;
+  final BoxConstraints constraints;
+  final Color? backgroundColor;
 
   const VoicesDetailsDialog({
     super.key,
     required this.header,
     required this.body,
+    this.constraints = const BoxConstraints(
+      minWidth: 600,
+      maxWidth: 900,
+      minHeight: double.infinity,
+    ),
+    this.backgroundColor,
   });
 
   @override
@@ -17,12 +25,9 @@ class VoicesDetailsDialog extends StatelessWidget {
     return VoicesSinglePaneDialog(
       showClose: false,
       showBorder: true,
-      constraints: const BoxConstraints(
-        minWidth: 600,
-        maxWidth: 900,
-        minHeight: double.infinity,
-      ),
-      backgroundColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+      constraints: constraints,
+      backgroundColor: backgroundColor ??
+          Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
       child: Column(
         children: [
           header,

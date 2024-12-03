@@ -1,9 +1,9 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 sealed class CampaignPreviewInfo extends Equatable {
-  final CampaignStatus stage;
+  final CampaignStage stage;
   final String description;
 
   const CampaignPreviewInfo({
@@ -17,7 +17,7 @@ sealed class CampaignPreviewInfo extends Equatable {
 
 class CompletedCampaignInformation extends CampaignPreviewInfo {
   const CompletedCampaignInformation({required super.description})
-      : super(stage: CampaignStatus.completed);
+      : super(stage: CampaignStage.completed);
 }
 
 class DraftCampaignInformation extends CampaignPreviewInfo with DateTimeMixin {
@@ -27,7 +27,7 @@ class DraftCampaignInformation extends CampaignPreviewInfo with DateTimeMixin {
   const DraftCampaignInformation({
     required this.date,
     required super.description,
-  }) : super(stage: CampaignStatus.draft);
+  }) : super(stage: CampaignStage.draft);
 
   @override
   List<Object?> get props => [date, description];
@@ -40,7 +40,7 @@ class LiveCampaignInformation extends CampaignPreviewInfo with DateTimeMixin {
   const LiveCampaignInformation({
     required this.date,
     required super.description,
-  }) : super(stage: CampaignStatus.live);
+  }) : super(stage: CampaignStage.live);
 
   @override
   List<Object?> get props => [date, description];
@@ -48,13 +48,13 @@ class LiveCampaignInformation extends CampaignPreviewInfo with DateTimeMixin {
 
 mixin DateTimeMixin {
   DateTime get date;
-  CampaignStatus get stage;
+  CampaignStage get stage;
 
   String localizedDate(
     VoicesLocalizations l10n,
     (String date, String time) formattedDate,
   ) {
-    if (stage == CampaignStatus.draft) {
+    if (stage == CampaignStage.draft) {
       return l10n.campaignBeginsOn(formattedDate.$1, formattedDate.$2);
     } else {
       return l10n.campaignEndsOn(formattedDate.$1, formattedDate.$2);

@@ -3,7 +3,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// The "events" tab of the [CampaignAdminToolsDialog].
@@ -31,13 +31,14 @@ class _CampaignStatusChooser extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          for (final status in CampaignStatus.values)
-            // TODO(dtscalac): store active one somewhere
-            _EventItem(
-              status: status,
-              isActive: status == CampaignStatus.draft,
-              onTap: () {},
-            ),
+          for (final status in CampaignStage.values)
+            if (status != CampaignStage.scheduled)
+              // TODO(dtscalac): store active one somewhere
+              _EventItem(
+                status: status,
+                isActive: status == CampaignStage.draft,
+                onTap: () {},
+              ),
           const SizedBox(height: 8),
         ],
       ),
@@ -46,7 +47,7 @@ class _CampaignStatusChooser extends StatelessWidget {
 }
 
 class _EventItem extends StatelessWidget {
-  final CampaignStatus status;
+  final CampaignStage status;
   final bool isActive;
   final VoidCallback onTap;
 
@@ -97,15 +98,15 @@ class _EventItem extends StatelessWidget {
   }
 
   SvgGenImage get _icon => switch (status) {
-        CampaignStatus.draft => VoicesAssets.icons.clock,
-        CampaignStatus.live => VoicesAssets.icons.flag,
-        CampaignStatus.completed => VoicesAssets.icons.calendar,
+        CampaignStage.draft => VoicesAssets.icons.clock,
+        CampaignStage.live => VoicesAssets.icons.flag,
+        _ => VoicesAssets.icons.calendar,
       };
 
   String _text(VoicesLocalizations l10n) => switch (status) {
-        CampaignStatus.draft => l10n.campaignPreviewEventBefore,
-        CampaignStatus.live => l10n.campaignPreviewEventDuring,
-        CampaignStatus.completed => l10n.campaignPreviewEventAfter,
+        CampaignStage.draft => l10n.campaignPreviewEventBefore,
+        CampaignStage.live => l10n.campaignPreviewEventDuring,
+        _ => l10n.campaignPreviewEventAfter,
       };
 }
 
