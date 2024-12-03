@@ -35,9 +35,7 @@ impl GetTxoByStakeAddressQueryParams {
 }
 
 /// Get TXO by stake address query row result
-// TODO: https://github.com/input-output-hk/catalyst-voices/issues/828
 // The macro uses expect to signal an error in deserializing values.
-#[allow(clippy::expect_used)]
 mod result {
     use scylla::DeserializeRow;
 
