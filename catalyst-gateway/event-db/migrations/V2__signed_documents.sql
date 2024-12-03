@@ -5,6 +5,9 @@
 
 -- Signed Documents Repository Tables
 
+-- Note: ULID are stored using the native postgresql UUID type, as they are the same size.
+-- See: https://blog.daveallie.com/ulid-primary-keys/ for a description of this approach.
+
 -- -------------------------------------------------------------------------------------------------
 
 -- Signed Documents Storage Repository defintion.
