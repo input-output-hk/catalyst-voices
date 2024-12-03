@@ -37,9 +37,7 @@ class VoicesProposalCardExample extends StatelessWidget {
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
                 fundedDate: DateTime(2025, 1, 28),
-                fundsRequested: CryptocurrencyFormatter.formatAmount(
-                  Coin.fromAda(100000),
-                ),
+                fundsRequested: Coin.fromAda(100000),
                 commentsCount: 0,
                 description: _description,
               ),
@@ -52,9 +50,7 @@ class VoicesProposalCardExample extends StatelessWidget {
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
                 lastUpdateDate: DateTime.now().minusDays(2),
-                fundsRequested: CryptocurrencyFormatter.formatAmount(
-                  Coin.fromAda(100000),
-                ),
+                fundsRequested: Coin.fromAda(100000),
                 commentsCount: 0,
                 description: _description,
                 completedSegments: 7,

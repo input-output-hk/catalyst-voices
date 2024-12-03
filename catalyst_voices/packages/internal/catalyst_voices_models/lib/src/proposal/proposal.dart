@@ -55,7 +55,7 @@ final class Proposal extends Equatable {
         description,
         updateDate,
         fundedDate,
-        fundsRequested,
+        fundsRequested.value,
         publish,
         access,
         category,

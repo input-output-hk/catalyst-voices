@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/proposals/proposals_state.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,9 +26,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
         return PendingProposal.fromProposal(
           proposal,
           campaignName: 'F14',
-          formattedFundsRequested: CryptocurrencyFormatter.formatAmount(
-            proposal.fundsRequested,
-          ),
         );
       },
     ).toList();

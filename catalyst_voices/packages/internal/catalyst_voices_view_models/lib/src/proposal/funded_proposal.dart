@@ -1,3 +1,5 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 /// Defines the already funded proposal.
@@ -7,7 +9,7 @@ final class FundedProposal extends Equatable {
   final String category;
   final String title;
   final DateTime fundedDate;
-  final String fundsRequested;
+  final Coin _fundsRequested;
   final int commentsCount;
   final String description;
 
@@ -17,10 +19,14 @@ final class FundedProposal extends Equatable {
     required this.category,
     required this.title,
     required this.fundedDate,
-    required this.fundsRequested,
+    required Coin fundsRequested,
     required this.commentsCount,
     required this.description,
-  });
+  }) : _fundsRequested = fundsRequested;
+
+  String get fundsRequested {
+    return CryptocurrencyFormatter.formatAmount(_fundsRequested);
+  }
 
   @override
   List<Object?> get props => [
@@ -29,7 +35,7 @@ final class FundedProposal extends Equatable {
         category,
         title,
         fundedDate,
-        fundsRequested,
+        _fundsRequested,
         commentsCount,
         description,
       ];

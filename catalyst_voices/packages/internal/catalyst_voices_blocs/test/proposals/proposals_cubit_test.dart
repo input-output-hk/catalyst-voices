@@ -3,7 +3,6 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,9 +25,6 @@ void main() {
     final pendingProposal = PendingProposal.fromProposal(
       proposal,
       campaignName: 'F14',
-      formattedFundsRequested: CryptocurrencyFormatter.formatAmount(
-        proposal.fundsRequested,
-      ),
     );
 
     blocTest<ProposalsCubit, ProposalsState>(
