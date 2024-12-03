@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/cards/in_page_information_card.dart';
+import 'package:catalyst_voices/widgets/cards/campaign_preview_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -31,18 +31,18 @@ void main() {
     );
   });
 
-  Widget buildTestWidget(InPageInformation information) {
+  Widget buildTestWidget(CampaignPreviewInfo campaign) {
     return Scaffold(
       body: SizedBox(
         width: 1000,
-        child: InPageInformationCard(
-          information: information,
+        child: CampaignPreviewCard(
+          campaign: campaign,
         ),
       ),
     );
   }
 
-  group('InPageInformationCard', () {
+  group(CampaignPreviewCard, () {
     testWidgets(
       'Renders correctly always display elements which are always render',
       (tester) async {
@@ -53,7 +53,7 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        expect(find.byType(InPageInformationCard), findsOneWidget);
+        expect(find.byType(CampaignPreviewCard), findsOneWidget);
         expect(find.byType(CatalystSvgIcon), findsOneWidget);
       },
     );
@@ -66,11 +66,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(InPageInformationCard), findsOneWidget);
+      expect(find.byType(CampaignPreviewCard), findsOneWidget);
       expect(find.byType(Text), findsExactly(3));
       expect(find.byType(CatalystSvgIcon), findsExactly(2));
       expect(
-        find.text('Campaign Staring Soon (Ready to deploy)'),
+        find.text('Campaign Starting Soon (Ready to deploy)'),
         findsOneWidget,
       );
       expect(find.text(draftInformationTest.description), findsOneWidget);
@@ -85,7 +85,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(InPageInformationCard), findsOneWidget);
+      expect(find.byType(CampaignPreviewCard), findsOneWidget);
       expect(find.byType(Text), findsExactly(4));
       expect(find.byType(CatalystSvgIcon), findsExactly(2));
       expect(
@@ -105,7 +105,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(InPageInformationCard), findsOneWidget);
+      expect(find.byType(CampaignPreviewCard), findsOneWidget);
       expect(find.byType(Text), findsExactly(3));
       expect(find.byType(CatalystSvgIcon), findsOneWidget);
       expect(

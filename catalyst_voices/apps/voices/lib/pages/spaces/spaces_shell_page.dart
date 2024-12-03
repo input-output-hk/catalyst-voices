@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
@@ -47,6 +48,9 @@ class SpacesShellPage extends StatefulWidget {
 }
 
 class _SpacesShellPageState extends State<SpacesShellPage> {
+  final GlobalKey _adminToolsKey = GlobalKey(debugLabel: 'admin_tools');
+  bool _showAdminTools = false;
+
   @override
   Widget build(BuildContext context) {
     final sessionBloc = context.watch<SessionCubit>();
@@ -57,22 +61,34 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
       bindings: <ShortcutActivator, VoidCallback>{
         for (final entry in SpacesShellPage._spacesShortcutsActivators.entries)
           entry.value: () => entry.key.go(context),
+        CampaignAdminToolsDialog.shortcut: _toggleCampaignAdminTools,
       },
-      child: Scaffold(
-        appBar: VoicesAppBar(
-          leading: isVisitor ? null : const DrawerToggleButton(),
-          automaticallyImplyLeading: false,
-          actions: _getActions(widget.space),
-        ),
-        drawer: isVisitor
-            ? null
-            : SpacesDrawer(
-                space: widget.space,
-                spacesShortcutsActivators:
-                    SpacesShellPage._spacesShortcutsActivators,
-                isUnlocked: isUnlocked,
-              ),
-        body: widget.child,
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: VoicesAppBar(
+              leading: isVisitor ? null : const DrawerToggleButton(),
+              automaticallyImplyLeading: false,
+              actions: _getActions(widget.space),
+            ),
+            drawer: isVisitor
+                ? null
+                : SpacesDrawer(
+                    space: widget.space,
+                    spacesShortcutsActivators:
+                        SpacesShellPage._spacesShortcutsActivators,
+                    isUnlocked: isUnlocked,
+                  ),
+            body: widget.child,
+          ),
+          if (_showAdminTools)
+            DraggableCampaignAdminToolsDialog(
+              dialogKey: _adminToolsKey,
+              selectedSpace: widget.space,
+              onSpaceSelected: (space) => space.go(context),
+              onClose: _closeCampaignAdminTools,
+            ),
+        ],
       ),
     );
   }
@@ -90,5 +106,17 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         const SessionStateHeader(),
       ];
     }
+  }
+
+  void _toggleCampaignAdminTools() {
+    setState(() {
+      _showAdminTools = !_showAdminTools;
+    });
+  }
+
+  void _closeCampaignAdminTools() {
+    setState(() {
+      _showAdminTools = false;
+    });
   }
 }
