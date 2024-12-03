@@ -2,7 +2,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
+    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow,
     Session,
 };
 use tracing::error;
@@ -39,10 +39,10 @@ impl GetTxoByStakeAddressQueryParams {
 // The macro uses expect to signal an error in deserializing values.
 #[allow(clippy::expect_used)]
 mod result {
-    use scylla::FromRow;
+    use scylla::DeserializeRow;
 
     /// Get txo by stake address query result.
-    #[derive(FromRow)]
+    #[derive(DeserializeRow)]
     pub(crate) struct GetTxoByStakeAddressQuery {
         /// TXO transaction hash.
         pub txn_hash: Vec<u8>,

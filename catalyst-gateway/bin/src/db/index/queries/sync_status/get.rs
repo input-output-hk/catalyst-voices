@@ -1,6 +1,5 @@
 //! Get Sync Status query
 
-use futures::StreamExt;
 use tracing::{debug, warn};
 
 use super::update::row::SyncStatusQueryParams;

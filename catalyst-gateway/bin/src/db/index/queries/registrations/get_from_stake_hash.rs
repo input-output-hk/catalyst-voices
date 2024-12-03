@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
+    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow,
     Session,
 };
 use tracing::error;
@@ -34,10 +34,10 @@ impl GetStakeAddrParams {
 /// Get stake addr from stake hash query string.
 #[allow(clippy::expect_used)]
 mod result {
-    use scylla::FromRow;
+    use scylla::DeserializeRow;
 
     /// Get stake addr from stake hash query result.
-    #[derive(FromRow)]
+    #[derive(DeserializeRow)]
     pub(crate) struct GetStakeAddrQuery {
         /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
         pub stake_address: Vec<u8>,

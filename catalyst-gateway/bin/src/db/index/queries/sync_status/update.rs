@@ -22,10 +22,10 @@ const INSERT_SYNC_STATUS_QUERY: &str = include_str!("../cql/insert_sync_status.c
 /// Sync Status Row Record Module
 #[allow(clippy::expect_used)]
 pub(super) mod row {
-    use scylla::{frame::value::CqlTimestamp, FromRow, SerializeRow};
+    use scylla::{frame::value::CqlTimestamp, DeserializeRow, SerializeRow};
 
     /// Sync Status Record Row (used for both Insert and Query response)
-    #[derive(SerializeRow, FromRow, Debug)]
+    #[derive(SerializeRow, DeserializeRow, Debug)]
     pub(crate) struct SyncStatusQueryParams {
         /// End Slot.
         pub(crate) end_slot: num_bigint::BigInt,

@@ -3,8 +3,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
-    Session,
+    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow, Session
 };
 use tracing::error;
 
@@ -35,10 +34,10 @@ impl From<&ed25519_dalek::VerifyingKey> for GetRegistrationParams {
 /// Get registration given stake addr or vote key
 #[allow(clippy::expect_used)]
 mod result {
-    use scylla::FromRow;
+    use scylla::DeserializeRow;
 
     /// Get registration query result.
-    #[derive(FromRow)]
+    #[derive(DeserializeRow)]
     pub(crate) struct GetRegistrationQuery {
         /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
         pub stake_address: Vec<u8>,

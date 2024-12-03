@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
+    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow,
     Session,
 };
 use tracing::error;
@@ -41,10 +41,10 @@ impl GetInvalidRegistrationParams {
 /// Get invalid registrations given stake addr
 #[allow(clippy::expect_used)]
 mod result {
-    use scylla::FromRow;
+    use scylla::DeserializeRow;
 
     /// Get registration query result.
-    #[derive(FromRow)]
+    #[derive(DeserializeRow)]
     pub(crate) struct GetInvalidRegistrationQuery {
         /// Error report
         pub error_report: Vec<String>,

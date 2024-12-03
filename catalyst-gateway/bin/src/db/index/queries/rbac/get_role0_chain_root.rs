@@ -2,8 +2,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
-    Session,
+    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow, Session
 };
 use tracing::error;
 
@@ -27,10 +26,10 @@ pub(crate) struct GetRole0ChainRootQueryParams {
 // The macro uses expect to signal an error in deserializing values.
 #[allow(clippy::expect_used)]
 mod result {
-    use scylla::FromRow;
+    use scylla::DeserializeRow;
 
     /// Get role0 key chain root query result.
-    #[derive(FromRow)]
+    #[derive(DeserializeRow)]
     pub(crate) struct GetRole0ChainRootQuery {
         /// Chain root.
         pub(crate) chain_root: Vec<u8>,

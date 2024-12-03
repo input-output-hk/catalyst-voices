@@ -9,7 +9,7 @@ use std::{
 
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
-    frame::Compression, serialize::row::SerializeRow, transport::iterator::RowIterator,
+    frame::Compression, serialize::row::SerializeRow,
     ExecutionProfile, Session, SessionBuilder,
 };
 use tokio::fs;

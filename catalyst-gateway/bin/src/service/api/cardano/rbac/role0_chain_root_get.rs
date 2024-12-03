@@ -1,6 +1,5 @@
 //! Implementation of the GET `/rbac/role0_chain_root` endpoint.
 use anyhow::anyhow;
-use futures::StreamExt as _;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
 
@@ -59,7 +58,7 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
 
     match query_res {
         Ok(mut row_iter) => {
-            if let Some(row_res) = row_iter.next().await {
+            if let Some(row_res) = row_iter.next() {
                 let row = match row_res {
                     Ok(row) => row,
                     Err(err) => {
