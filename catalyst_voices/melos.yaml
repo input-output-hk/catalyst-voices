@@ -89,6 +89,7 @@ command:
       asn1lib: ^1.5.3
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
+      chopper: ^8.0.3
       collection: ^1.18.0
       cryptography: ^2.7.0
       dotted_border: ^2.1.0
@@ -134,6 +135,7 @@ command:
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
+      chopper_generator: ^8.0.3
       mocktail: ^1.0.1
 
 scripts:
