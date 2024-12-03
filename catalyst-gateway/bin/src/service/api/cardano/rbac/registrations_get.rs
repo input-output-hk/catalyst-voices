@@ -1,6 +1,6 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 use anyhow::anyhow;
-use futures::StreamExt as _;
+use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
 

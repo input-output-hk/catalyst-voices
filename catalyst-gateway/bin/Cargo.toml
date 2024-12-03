@@ -53,7 +53,7 @@ anyhow = "1.0.92"
 duration-string = "0.4.0"
 build-info = "0.0.39"
 ed25519-dalek = "2.1.1"
-scylla = { version = "0.14.0", features = ["cloud", "full-serialization"] }
+scylla = { version = "0.15.0", features = ["cloud", "full-serialization"] }
 strum = { version = "0.26.3", features = ["derive"] }
 strum_macros = "0.26.4"
 openssl = { version = "0.10.66", features = ["vendored"] }
