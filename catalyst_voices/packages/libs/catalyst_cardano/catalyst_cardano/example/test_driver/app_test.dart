@@ -61,17 +61,3 @@ void main() {
     );
   });
 }
-
-Future<void> switchToWindowContaining(
-  WebDriver driver,
-  String urlPattern,
-) async {
-  final windows = await driver.windows.toList();
-  for (final window in windows) {
-    await driver.switchTo.window(window);
-    final url = await driver.currentUrl;
-    if (url.contains(urlPattern)) {
-      break;
-    }
-  }
-}
