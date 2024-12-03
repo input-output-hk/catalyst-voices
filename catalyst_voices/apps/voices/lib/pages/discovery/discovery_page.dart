@@ -183,13 +183,8 @@ class _Header extends StatelessWidget {
         const Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Flexible(child: _FundInfo()),
-            Flexible(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Flexible(child: _CampaignStage()),
-              ),
-            ),
+            Expanded(child: _FundInfo()),
+            Expanded(child: _CampaignStage()),
           ],
         ),
       ],
@@ -260,18 +255,21 @@ class _CampaignStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CampaignInfoCubit, CampaignInfoState>(
-      builder: (context, state) {
-        return switch (state) {
-          LoadingCampaignInfoState() => const Offstage(),
-          LoadedCampaignInfoState(:final campaign) => campaign != null
-              ? ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 500),
-                  child: CampaignStageCard(campaign: campaign),
-                )
-              : const Offstage()
-        };
-      },
+    return Align(
+      alignment: Alignment.topRight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: BlocBuilder<CampaignInfoCubit, CampaignInfoState>(
+          builder: (context, state) {
+            return switch (state) {
+              LoadingCampaignInfoState() => const Offstage(),
+              LoadedCampaignInfoState(:final campaign) => campaign != null
+                  ? CampaignStageCard(campaign: campaign)
+                  : const Offstage()
+            };
+          },
+        ),
+      ),
     );
   }
 }

@@ -16,24 +16,46 @@ sealed class CampaignInfo extends Equatable {
 
   /// Calculates the [campaign] info state at given [date].
   factory CampaignInfo.fromCampaign(Campaign campaign, DateTime date) {
-    final CampaignStage stage = CampaignStage.fromCampaign(campaign, date);
+    final stage = CampaignStage.fromCampaign(campaign, date);
     return switch (stage) {
       CampaignStage.draft => DraftCampaignInfo(
           startDate: campaign.startDate,
           id: campaign.id,
           description: campaign.description,
         ),
-      // TODO: Handle this case.
-      CampaignStage.scheduled => throw UnimplementedError(),
-      // TODO: Handle this case.
-      CampaignStage.live => throw UnimplementedError(),
-      // TODO: Handle this case.
-      CampaignStage.completed => throw UnimplementedError(),
+      CampaignStage.scheduled => ScheduledCampaignInfo(
+          startDate: campaign.startDate,
+          id: campaign.id,
+          description: campaign.description,
+        ),
+      CampaignStage.live => LiveCampaignInfo(
+          startDate: campaign.startDate,
+          id: campaign.id,
+          description: campaign.description,
+        ),
+      CampaignStage.completed => CompletedCampaignInfo(
+          id: campaign.id,
+          description: campaign.description,
+        ),
     };
   }
 
   @override
   List<Object?> get props => [stage, description];
+}
+
+class ScheduledCampaignInfo extends CampaignInfo with CampaignDateTimeMixin {
+  @override
+  final DateTime startDate;
+
+  const ScheduledCampaignInfo({
+    required this.startDate,
+    required super.id,
+    required super.description,
+  }) : super(stage: CampaignStage.draft);
+
+  @override
+  List<Object?> get props => [startDate, description];
 }
 
 class DraftCampaignInfo extends CampaignInfo with CampaignDateTimeMixin {

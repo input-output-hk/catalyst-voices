@@ -10,21 +10,27 @@ import '../../helpers/helpers.dart';
 void main() {
   late VoicesColorScheme voicesColors;
 
-  final draftInformationTest = DraftCampaignInfo(
+  final draftCampaignTest = DraftCampaignInfo(
     id: 'campaign_draft',
     startDate: DateTime(2024, 11, 20, 13, 00, 00),
-    description: 'Draft Information Test',
+    description: 'Draft Campaign Test',
   );
 
-  final liveInformationTest = LiveCampaignInfo(
+  final scheduledCampaignTest = DraftCampaignInfo(
+    id: 'campaign_draft',
+    startDate: DateTime(2024, 11, 20, 13, 00, 00),
+    description: 'Scheduled Campaign Test',
+  );
+
+  final liveCampaignTest = LiveCampaignInfo(
     id: 'campaign_live',
     startDate: DateTime(2024, 11, 20, 13, 00, 00),
-    description: 'Live Information Test',
+    description: 'Live Campaign Test',
   );
 
-  const completedInformationText = CompletedCampaignInfo(
+  const completedCampaignText = CompletedCampaignInfo(
     id: 'campaign_completed',
-    description: 'Completed Information Test',
+    description: 'Completed Campaign Test',
   );
 
   setUp(() {
@@ -50,7 +56,7 @@ void main() {
       'Renders correctly always display elements which are always render',
       (tester) async {
         await tester.pumpApp(
-          buildTestWidget(completedInformationText),
+          buildTestWidget(completedCampaignText),
           voicesColors: voicesColors,
         );
 
@@ -61,9 +67,9 @@ void main() {
       },
     );
 
-    testWidgets('Renders correctly for draft information', (tester) async {
+    testWidgets('Renders correctly for draft campaign', (tester) async {
       await tester.pumpApp(
-        buildTestWidget(draftInformationTest),
+        buildTestWidget(draftCampaignTest),
         voicesColors: voicesColors,
       );
 
@@ -76,13 +82,32 @@ void main() {
         find.text('Campaign Starting Soon (Ready to deploy)'),
         findsOneWidget,
       );
-      expect(find.text(draftInformationTest.description), findsOneWidget);
+      expect(find.text(draftCampaignTest.description), findsOneWidget);
       expect(find.byType(OutlinedButton), findsNothing);
     });
 
-    testWidgets('Renders correctly for live information', (tester) async {
+    testWidgets('Renders correctly for scheduled campaign', (tester) async {
       await tester.pumpApp(
-        buildTestWidget(liveInformationTest),
+        buildTestWidget(scheduledCampaignTest),
+        voicesColors: voicesColors,
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CampaignStageCard), findsOneWidget);
+      expect(find.byType(Text), findsExactly(3));
+      expect(find.byType(CatalystSvgIcon), findsExactly(2));
+      expect(
+        find.text('Campaign Starting Soon (Ready to deploy)'),
+        findsOneWidget,
+      );
+      expect(find.text(scheduledCampaignTest.description), findsOneWidget);
+      expect(find.byType(OutlinedButton), findsNothing);
+    });
+
+    testWidgets('Renders correctly for live campaign', (tester) async {
+      await tester.pumpApp(
+        buildTestWidget(liveCampaignTest),
         voicesColors: voicesColors,
       );
 
@@ -95,14 +120,14 @@ void main() {
         find.text('Campaign Is Live (Published)'),
         findsOneWidget,
       );
-      expect(find.text(liveInformationTest.description), findsOneWidget);
+      expect(find.text(liveCampaignTest.description), findsOneWidget);
       expect(find.byType(OutlinedButton), findsOneWidget);
       expect(find.text('View proposals'), findsOneWidget);
     });
 
-    testWidgets('Renders correctly for completed information', (tester) async {
+    testWidgets('Renders correctly for completed campaign', (tester) async {
       await tester.pumpApp(
-        buildTestWidget(completedInformationText),
+        buildTestWidget(completedCampaignText),
         voicesColors: voicesColors,
       );
 
@@ -115,7 +140,7 @@ void main() {
         find.text('Campaign Concluded, Result are in!'),
         findsOneWidget,
       );
-      expect(find.text(completedInformationText.description), findsOneWidget);
+      expect(find.text(completedCampaignText.description), findsOneWidget);
       expect(find.byType(OutlinedButton), findsOneWidget);
       expect(find.text('View Voting Results'), findsOneWidget);
     });
