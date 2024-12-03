@@ -33,7 +33,6 @@ impl From<&ed25519_dalek::VerifyingKey> for GetRegistrationParams {
 }
 
 /// Get registration given stake addr or vote key
-#[allow(clippy::expect_used)]
 mod result {
     use scylla::DeserializeRow;
 

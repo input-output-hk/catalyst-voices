@@ -24,7 +24,6 @@ pub(crate) struct GetChainRootQueryParams {
 
 /// Get chain root by stake address query row result
 // The macro uses expect to signal an error in deserializing values.
-#[allow(clippy::expect_used)]
 mod result {
     use scylla::DeserializeRow;
 

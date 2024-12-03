@@ -32,7 +32,6 @@ impl GetStakeAddrParams {
 }
 
 /// Get stake addr from stake hash query string.
-#[allow(clippy::expect_used)]
 mod result {
     use scylla::DeserializeRow;
 

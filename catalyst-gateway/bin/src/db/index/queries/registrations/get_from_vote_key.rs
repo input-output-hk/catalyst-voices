@@ -30,7 +30,6 @@ impl GetStakeAddrFromVoteKeyParams {
 }
 
 /// Get stake addr given vote key
-#[allow(clippy::expect_used)]
 mod result {
     use scylla::DeserializeRow;
 

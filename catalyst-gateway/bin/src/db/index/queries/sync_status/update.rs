@@ -20,7 +20,6 @@ use crate::{
 const INSERT_SYNC_STATUS_QUERY: &str = include_str!("../cql/insert_sync_status.cql");
 
 /// Sync Status Row Record Module
-#[allow(clippy::expect_used)]
 pub(super) mod row {
     use scylla::{frame::value::CqlTimestamp, DeserializeRow, SerializeRow};
 

@@ -39,7 +39,6 @@ impl GetInvalidRegistrationParams {
 }
 
 /// Get invalid registrations given stake addr
-#[allow(clippy::expect_used)]
 mod result {
     use scylla::DeserializeRow;
 
