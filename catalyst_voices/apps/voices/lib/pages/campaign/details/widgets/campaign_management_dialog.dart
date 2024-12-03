@@ -93,12 +93,12 @@ class _CampaignPublishSegmentButton extends StatefulWidget {
 }
 
 class _SingleChoiceState extends State<_CampaignPublishSegmentButton> {
-  late CampaignPublish segmentValue;
+  late CampaignPublish _segmentValue;
 
   @override
   void initState() {
     super.initState();
-    segmentValue = widget.value;
+    _segmentValue = widget.value;
   }
 
   @override
@@ -115,12 +115,12 @@ class _SingleChoiceState extends State<_CampaignPublishSegmentButton> {
           label: Text(context.l10n.published),
         ),
       ],
-      selected: <CampaignPublish>{segmentValue},
+      selected: <CampaignPublish>{_segmentValue},
       onChanged: (Set<CampaignPublish> newSelection) {
         setState(() {
-          segmentValue = newSelection.first;
+          _segmentValue = newSelection.first;
         });
-        widget.onChanged(segmentValue);
+        widget.onChanged(_segmentValue);
       },
     );
   }
