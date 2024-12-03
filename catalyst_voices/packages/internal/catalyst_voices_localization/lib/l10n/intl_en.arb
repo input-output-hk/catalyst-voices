@@ -151,28 +151,28 @@
   "@proposalStatusReady": {
     "description": "Indicates to user that status is in ready mode"
   },
-  "proposalStatusDraft": "Draft",
-  "@proposalStatusDraft": {
+  "draft": "Draft",
+  "@draft": {
     "description": "Indicates to user that status is in draft mode"
   },
-  "proposalStatusInProgress": "In progress",
-  "@proposalStatusInProgress": {
+  "inProgress": "In progress",
+  "@inProgress": {
     "description": "Indicates to user that status is in progress"
   },
-  "proposalStatusPrivate": "Private",
-  "@proposalStatusPrivate": {
+  "private": "Private",
+  "@private": {
     "description": "Indicates to user that status is in private mode"
   },
-  "proposalStatusLive": "LIVE",
-  "@proposalStatusLive": {
+  "live": "Live",
+  "@live": {
     "description": "Indicates to user that status is in live mode"
   },
-  "proposalStatusCompleted": "Completed",
-  "@proposalStatusCompleted": {
+  "completed": "Completed",
+  "@completed": {
     "description": "Indicates to user that status is completed"
   },
-  "proposalStatusOpen": "Open",
-  "@proposalStatusOpen": {
+  "open": "Open",
+  "@open": {
     "description": "Indicates to user that status is in open mode"
   },
   "fundedProposal": "Funded proposal",
@@ -1121,5 +1121,8 @@
   "active": "Active",
   "@active": {
     "description": "Activated state"
-  }
+  },
+  "campaignManagement": "Campaign Management",
+  "published": "Published",
+  "status": "Status"
 }
