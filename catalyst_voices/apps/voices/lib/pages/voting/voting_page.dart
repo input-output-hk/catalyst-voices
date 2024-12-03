@@ -4,8 +4,8 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,11 +20,11 @@ and PRISM, but its potential is only barely exploited.
 final _proposals = [
   PendingProposal(
     id: 'f14/0',
-    fund: 'F14',
+    campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
+    fundsRequested: CryptocurrencyFormatter.formatAmount(Coin.fromAda(100000)),
     commentsCount: 0,
     description: _proposalDescription,
     completedSegments: 0,
@@ -32,11 +32,11 @@ final _proposals = [
   ),
   PendingProposal(
     id: 'f14/1',
-    fund: 'F14',
+    campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
+    fundsRequested: CryptocurrencyFormatter.formatAmount(Coin.fromAda(100000)),
     commentsCount: 0,
     description: _proposalDescription,
     completedSegments: 7,
@@ -44,11 +44,11 @@ final _proposals = [
   ),
   PendingProposal(
     id: 'f14/2',
-    fund: 'F14',
+    campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
+    fundsRequested: CryptocurrencyFormatter.formatAmount(Coin.fromAda(100000)),
     commentsCount: 0,
     description: _proposalDescription,
     completedSegments: 13,

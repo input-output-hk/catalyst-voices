@@ -6,9 +6,12 @@ class ProposalRepository {
   const ProposalRepository();
 
   /// Fetches all draft proposals.
-  Future<List<PendingProposal>> getDraftProposals() async {
+  Future<List<Proposal>> getDraftProposals({
+    required String campaignId,
+  }) async {
     // simulate network delay
     await Future<void>.delayed(const Duration(seconds: 1));
+    // optionally filter by status.
     return _proposals;
   }
 }
@@ -22,37 +25,40 @@ and PRISM, but its potential is only barely exploited.
     .replaceAll('\n', ' ');
 
 final _proposals = [
-  PendingProposal(
+  Proposal(
     id: 'f14/0',
-    fund: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
+    updateDate: DateTime.now().minusDays(2),
     fundsRequested: Coin.fromAda(100000),
+    publish: ProposalPublish.draft,
+    access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
     completedSegments: 0,
     totalSegments: 13,
   ),
-  PendingProposal(
+  Proposal(
     id: 'f14/1',
-    fund: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
+    updateDate: DateTime.now().minusDays(2),
     fundsRequested: Coin.fromAda(100000),
+    publish: ProposalPublish.draft,
+    access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
     completedSegments: 7,
     totalSegments: 13,
   ),
-  PendingProposal(
+  Proposal(
     id: 'f14/2',
-    fund: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
+    updateDate: DateTime.now().minusDays(2),
     fundsRequested: Coin.fromAda(100000),
+    publish: ProposalPublish.draft,
+    access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
     completedSegments: 13,
