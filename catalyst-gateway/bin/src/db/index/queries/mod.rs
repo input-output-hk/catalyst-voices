@@ -20,7 +20,8 @@ use registrations::{
     get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
 };
 use scylla::{
-    batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow, transport::iterator::QueryPager, QueryResult, Session
+    batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
+    transport::iterator::QueryPager, QueryResult, Session,
 };
 use staked_ada::{
     get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
