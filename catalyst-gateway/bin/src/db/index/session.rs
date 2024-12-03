@@ -161,7 +161,7 @@ fn make_execution_profile(_cfg: &cassandra_db::EnvVars) -> ExecutionProfile {
     ExecutionProfile::builder()
         .consistency(scylla::statement::Consistency::LocalQuorum)
         .serial_consistency(Some(scylla::statement::SerialConsistency::LocalSerial))
-        .retry_policy(Box::new(scylla::retry_policy::DefaultRetryPolicy::new()))
+        .retry_policy(Arc::new(scylla::retry_policy::DefaultRetryPolicy::new()))
         .load_balancing_policy(
             scylla::load_balancing::DefaultPolicyBuilder::new()
                 .permit_dc_failover(true)
