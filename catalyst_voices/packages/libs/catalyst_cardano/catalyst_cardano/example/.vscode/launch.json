@@ -16,13 +16,25 @@
             "name": "example (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "args": [
+                "--web-header",
+                "Cross-Origin-Opener-Policy=same-origin",
+                "--web-header",
+                "Cross-Origin-Embedder-Policy=require-corp",
+            ],
         },
         {
             "name": "example (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "args": [
+                "--web-header",
+                "Cross-Origin-Opener-Policy=same-origin",
+                "--web-header",
+                "Cross-Origin-Embedder-Policy=require-corp",
+            ],
         }
     ]
 }

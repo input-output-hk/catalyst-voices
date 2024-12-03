@@ -1,0 +1,25 @@
+
+.separator[data-v-cf1a29a6]::before,
+.separator[data-v-cf1a29a6]::after {
+  content: '';
+  border-bottom: 1px solid;
+}
+.separator-left[data-v-cf1a29a6]::after {
+  flex: 1;
+}
+.separator-right[data-v-cf1a29a6]::before {
+  flex: 1;
+}
+.separator-center[data-v-cf1a29a6]::before,
+.separator-center[data-v-cf1a29a6]::after {
+  flex: 1;
+}
+.separator-right[data-v-cf1a29a6]:not(:empty)::before,
+.separator-center[data-v-cf1a29a6]:not(:empty)::before {
+  margin-right: .5em;
+}
+.separator-left[data-v-cf1a29a6]:not(:empty)::after,
+.separator-center[data-v-cf1a29a6]:not(:empty)::after {
+  margin-left: .5em;
+}
+

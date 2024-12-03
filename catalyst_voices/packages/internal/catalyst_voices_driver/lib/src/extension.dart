@@ -42,14 +42,14 @@ List<Extension> extensions = [
     id: 'kmhcihpebfmpgmihbkipmjlmmioameka',
     browser: Browser.chrome,
     extensionPath:
-        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/extensions/eternl',
+        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/eternl',
   ),
   const Extension(
     name: 'Typhon',
     id: 'kfdniefadaanbjodldohaedphafoffoh',
     browser: Browser.chrome,
     extensionPath:
-        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/extensions/typhon',
+        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/typhon',
   ),
 ];
 /* cSpell:enable */

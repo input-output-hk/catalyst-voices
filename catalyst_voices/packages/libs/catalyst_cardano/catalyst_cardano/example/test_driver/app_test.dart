@@ -11,7 +11,7 @@ import 'package:webdriver/async_io.dart';
 /// ```
 ///
 /// In new terminal in example dir run:
-/// ```dart
+/// ```sh
 ///  flutter drive --target=test_driver/app.dart \
 /// --web-browser-flag=--disable-web-security \
 /// --web-browser-flag=--disable-gpu \
@@ -31,7 +31,7 @@ void main() {
     setUpAll(() async {
       driver = await VoicesWebDriver.create(extensions);
       // Here should be call function to setup wallets
-      await switchToWindowContaining(driver.webDriver, 'localhost');
+      await driver.switchToWindow('localhost');
     });
 
     // Close the connection to the driver after the tests have completed.
@@ -48,7 +48,7 @@ void main() {
         await Future<void>.delayed(const Duration(seconds: 6));
         final currentWindow = await driver.webDriver.window;
 
-        await switchToWindowContaining(driver.webDriver, extensions[0].id);
+        await driver.switchToWindow(extensions[0].id);
 
         final cancelButtonFinder =
             await driver.webDriver.findElement(const By.tagName('button'));
