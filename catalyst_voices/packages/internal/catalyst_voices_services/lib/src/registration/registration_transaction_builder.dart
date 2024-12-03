@@ -82,7 +82,7 @@ final class RegistrationTransactionBuilder {
           // TODO(dtscalac): when RBAC specification will define other roles
           // they should be registered here
           RoleData(
-            roleNumber: AccountRole.root.roleNumber,
+            roleNumber: AccountRole.root.number,
             roleSigningKey: const LocalKeyReference(
               keyType: LocalKeyReferenceType.x509Certs,
               offset: 0,
@@ -157,7 +157,10 @@ final class RegistrationTransactionBuilder {
       subject: issuer,
       extensions: X509CertificateExtensions(
         subjectAltName: [
-          'web+cardano://addr/${_stakeAddress.toBech32()}',
+          X509String(
+            'web+cardano://addr/${_stakeAddress.toBech32()}',
+            tag: X509String.uriTag,
+          ),
         ],
       ),
     );
