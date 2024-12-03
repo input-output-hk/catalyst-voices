@@ -58,8 +58,10 @@ final class Dependencies extends DependencyProvider {
           get<CampaignRepository>(),
         );
       })
-      // TODO(ryszard-schossler): add repository for campaign status
-      ..registerLazySingleton<CampaignStatusCubit>(CampaignStatusCubit.new);
+      // TODO(ryszard-schossler): add repository for campaign management
+      ..registerLazySingleton<CampaignBuilderCubit>(
+        CampaignBuilderCubit.new,
+      );
   }
 
   void _registerRepositories() {

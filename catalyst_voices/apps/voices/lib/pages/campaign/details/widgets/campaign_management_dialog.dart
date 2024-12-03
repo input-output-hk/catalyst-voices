@@ -3,18 +3,19 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CampaignManagementDialog extends StatefulWidget {
-  final CampaignStatus? initialValue;
+  final CampaignPublish? initialValue;
   const CampaignManagementDialog._(this.initialValue);
 
-  static Future<CampaignStatus?> show(
+  static Future<CampaignPublish?> show(
     BuildContext context,
-    CampaignStatus? initialValue,
+    CampaignPublish? initialValue,
   ) async {
-    final result = await VoicesDialog.show<CampaignStatus?>(
+    final result = await VoicesDialog.show<CampaignPublish?>(
       context: context,
       builder: (context) => CampaignManagementDialog._(initialValue),
     );
@@ -27,12 +28,12 @@ class CampaignManagementDialog extends StatefulWidget {
 }
 
 class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
-  late CampaignStatus _campaignSetup;
+  late CampaignPublish _campaignSetup;
 
   @override
   void initState() {
     super.initState();
-    _campaignSetup = widget.initialValue ?? CampaignStatus.draft;
+    _campaignSetup = widget.initialValue ?? CampaignPublish.draft;
   }
 
   @override
@@ -54,7 +55,7 @@ class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
               style: Theme.of(context).textTheme.titleSmall,
             ),
             const SizedBox(height: 8),
-            _CampaignStatusSegmentButton(
+            _CampaignPublishSegmentButton(
               value: _campaignSetup,
               onChanged: (value) => _campaignSetup = value,
             ),
@@ -66,7 +67,7 @@ class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
                 onTap: () {
                   Navigator.of(context).pop(_campaignSetup);
                   context
-                      .read<CampaignStatusCubit>()
+                      .read<CampaignBuilderCubit>()
                       .updateCampaignStatus(_campaignSetup);
                 },
               ),
@@ -78,21 +79,21 @@ class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
   }
 }
 
-class _CampaignStatusSegmentButton extends StatefulWidget {
-  final CampaignStatus value;
-  final ValueChanged<CampaignStatus> onChanged;
+class _CampaignPublishSegmentButton extends StatefulWidget {
+  final CampaignPublish value;
+  final ValueChanged<CampaignPublish> onChanged;
 
-  const _CampaignStatusSegmentButton({
+  const _CampaignPublishSegmentButton({
     required this.value,
     required this.onChanged,
   });
 
   @override
-  State<_CampaignStatusSegmentButton> createState() => _SingleChoiceState();
+  State<_CampaignPublishSegmentButton> createState() => _SingleChoiceState();
 }
 
-class _SingleChoiceState extends State<_CampaignStatusSegmentButton> {
-  late CampaignStatus segmentValue;
+class _SingleChoiceState extends State<_CampaignPublishSegmentButton> {
+  late CampaignPublish segmentValue;
 
   @override
   void initState() {
@@ -102,20 +103,20 @@ class _SingleChoiceState extends State<_CampaignStatusSegmentButton> {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSegmentedButton<CampaignStatus>(
+    return VoicesSegmentedButton<CampaignPublish>(
       showSelectedIcon: false,
-      segments: <ButtonSegment<CampaignStatus>>[
-        ButtonSegment<CampaignStatus>(
-          value: CampaignStatus.draft,
-          label: Text(context.l10n.campaignDraftStatus),
+      segments: <ButtonSegment<CampaignPublish>>[
+        ButtonSegment<CampaignPublish>(
+          value: CampaignPublish.draft,
+          label: Text(context.l10n.draft),
         ),
-        ButtonSegment<CampaignStatus>(
-          value: CampaignStatus.published,
-          label: Text(context.l10n.campaignPublishedStatus),
+        ButtonSegment<CampaignPublish>(
+          value: CampaignPublish.published,
+          label: Text(context.l10n.published),
         ),
       ],
-      selected: <CampaignStatus>{segmentValue},
-      onChanged: (Set<CampaignStatus> newSelection) {
+      selected: <CampaignPublish>{segmentValue},
+      onChanged: (Set<CampaignPublish> newSelection) {
         setState(() {
           segmentValue = newSelection.first;
         });

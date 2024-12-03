@@ -4,6 +4,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,12 +19,12 @@ class _CampaignManagementState extends State<CampaignManagement> {
   @override
   void initState() {
     super.initState();
-    context.read<CampaignStatusCubit>().getCampaignStatus();
+    context.read<CampaignBuilderCubit>().getCampaignStatus();
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentStatus = context.watch<CampaignStatusCubit>().campaignStatus;
+    final currentStatus = context.watch<CampaignBuilderCubit>().campaignStatus;
     return Row(
       children: [
         VoicesOutlinedButton(
@@ -35,27 +36,26 @@ class _CampaignManagementState extends State<CampaignManagement> {
           },
         ),
         _CampaignStatusIndicator(
-          campaignStatus: CampaignStatus.draft,
+          campaignStatus: CampaignPublish.draft,
           currentStatus: currentStatus,
         ),
         _CampaignStatusIndicator(
-          campaignStatus: CampaignStatus.published,
+          campaignStatus: CampaignPublish.published,
           currentStatus: currentStatus,
         ),
       ],
     );
   }
 
-  void _handleDialogResult(CampaignStatus? newStatus) {
+  void _handleDialogResult(CampaignPublish? newStatus) {
     if (newStatus == null) return;
-
-    context.read<CampaignStatusCubit>().updateCampaignStatus(newStatus);
+    context.read<CampaignBuilderCubit>().updateCampaignStatus(newStatus);
   }
 }
 
 class _CampaignStatusIndicator extends StatelessWidget {
-  final CampaignStatus campaignStatus;
-  final CampaignStatus? currentStatus;
+  final CampaignPublish campaignStatus;
+  final CampaignPublish? currentStatus;
 
   const _CampaignStatusIndicator({
     required this.campaignStatus,
@@ -86,13 +86,13 @@ class _CampaignStatusIndicator extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               switch (campaignStatus) {
-                CampaignStatus.draft => _Text(
-                    context.l10n.campaignDraftStatus,
-                    isSelected: campaignStatus.isSelected(currentStatus),
+                CampaignPublish.draft => _Text(
+                    context.l10n.draft,
+                    isSelected: campaignStatus == currentStatus,
                   ),
-                CampaignStatus.published => _Text(
-                    context.l10n.campaignPublishedStatus,
-                    isSelected: campaignStatus.isSelected(currentStatus),
+                CampaignPublish.published => _Text(
+                    context.l10n.published,
+                    isSelected: campaignStatus == currentStatus,
                   ),
               },
             ],

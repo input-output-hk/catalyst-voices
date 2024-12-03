@@ -1,8 +1,8 @@
 export 'authentication/authentication.dart';
 export 'bloc_error_emitter_mixin.dart';
 export 'brand/brand.dart';
+export 'campaign/campaign_builder/campaign_builder.dart';
 export 'campaign/details/campaign_details.dart';
-export 'campaign_status/campaign_status.dart';
 export 'login/login.dart';
 export 'proposals/proposals.dart';
 export 'registration/registration.dart';
