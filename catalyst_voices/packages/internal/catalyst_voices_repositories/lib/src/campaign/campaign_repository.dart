@@ -36,6 +36,7 @@ class CampaignRepository {
       endDate: now.add(const Duration(days: 92)),
       proposalsCount: 0,
       sections: sections,
+      publish: CampaignPublish.draft,
       proposalTemplate: const ProposalTemplate(),
     );
   }

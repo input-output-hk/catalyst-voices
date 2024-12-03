@@ -14,30 +14,29 @@ sealed class CampaignInfo extends Equatable {
     required this.description,
   });
 
-  factory CampaignInfo.fromCampaign(Campaign campaign) {
-    return DraftCampaignInfo(
-      startDate: campaign.startDate,
-      id: campaign.id,
-      // TODO(dtscalac): provide description
-      /* cSpell:disable */
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-          ' Sed do eiusmod tempor incididunt ut labore et dolore magna.',
-      /* cSpell:enable */
-    );
+  /// Calculates the [campaign] info state at given [date].
+  factory CampaignInfo.fromCampaign(Campaign campaign, DateTime date) {
+    final CampaignStage stage = CampaignStage.fromCampaign(campaign, date);
+    return switch (stage) {
+      CampaignStage.draft => DraftCampaignInfo(
+          startDate: campaign.startDate,
+          id: campaign.id,
+          description: campaign.description,
+        ),
+      // TODO: Handle this case.
+      CampaignStage.scheduled => throw UnimplementedError(),
+      // TODO: Handle this case.
+      CampaignStage.live => throw UnimplementedError(),
+      // TODO: Handle this case.
+      CampaignStage.completed => throw UnimplementedError(),
+    };
   }
 
   @override
   List<Object?> get props => [stage, description];
 }
 
-class CompletedCampaignInfo extends CampaignInfo {
-  const CompletedCampaignInfo({
-    required super.id,
-    required super.description,
-  }) : super(stage: CampaignStage.completed);
-}
-
-class DraftCampaignInfo extends CampaignInfo with DateTimeMixin {
+class DraftCampaignInfo extends CampaignInfo with CampaignDateTimeMixin {
   @override
   final DateTime startDate;
 
@@ -51,7 +50,7 @@ class DraftCampaignInfo extends CampaignInfo with DateTimeMixin {
   List<Object?> get props => [startDate, description];
 }
 
-class LiveCampaignInfo extends CampaignInfo with DateTimeMixin {
+class LiveCampaignInfo extends CampaignInfo with CampaignDateTimeMixin {
   @override
   final DateTime startDate;
 
@@ -65,7 +64,14 @@ class LiveCampaignInfo extends CampaignInfo with DateTimeMixin {
   List<Object?> get props => [startDate, description];
 }
 
-mixin DateTimeMixin {
+class CompletedCampaignInfo extends CampaignInfo {
+  const CompletedCampaignInfo({
+    required super.id,
+    required super.description,
+  }) : super(stage: CampaignStage.completed);
+}
+
+mixin CampaignDateTimeMixin {
   DateTime get startDate;
   CampaignStage get stage;
 
