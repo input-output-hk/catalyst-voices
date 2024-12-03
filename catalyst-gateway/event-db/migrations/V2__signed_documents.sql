@@ -7,7 +7,7 @@
 
 -- -------------------------------------------------------------------------------------------------
 
--- Category defintion.
+-- Signed Documents Storage Repository defintion.
 CREATE TABLE IF NOT EXISTS signed_docs (
   id UUID NOT NULL, -- Actually a ULID
   ver UUID NOT NULL, -- Actually a ULID
@@ -31,11 +31,11 @@ COMMENT ON COLUMN signed_docs.type IS
 'The Signed Document type identifier.';
 COMMENT ON COLUMN signed_docs.author IS
 'The Primary Author of the Signed Document.';
-COMMENT ON COLUMN category.metadata IS
+COMMENT ON COLUMN signed_docs.metadata IS
 'Extra metadata extracted from the Signed Document, and encoded as JSON.';
-COMMENT ON COLUMN category.payload IS
+COMMENT ON COLUMN signed_docs.payload IS
 'IF the document has a compressed json payload, the uncompressed json payload is stored here.';
-COMMENT ON COLUMN category.raw IS
+COMMENT ON COLUMN signed_docs.raw IS
 'The RAW unaltered signed document, including its signatures, and full COSE envelope.';
 
 CREATE INDEX IF NOT EXISTS idx_signed_docs_type ON signed_docs (type);
