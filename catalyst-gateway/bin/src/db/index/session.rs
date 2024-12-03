@@ -9,8 +9,7 @@ use std::{
 
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
-    frame::Compression, serialize::row::SerializeRow,
-    ExecutionProfile, Session, SessionBuilder,
+    frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager, ExecutionProfile, Session, SessionBuilder
 };
 use tokio::fs;
 use tracing::{error, info};
@@ -111,11 +110,11 @@ impl CassandraSession {
     /// returns.
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
-    ) -> anyhow::Result<RowIterator>
+    ) -> anyhow::Result<QueryPager>
     where P: SerializeRow {
         let session = self.session.clone();
         let queries = self.queries.clone();
-
+        
         queries.execute_iter(session, select_query, params).await
     }
 
