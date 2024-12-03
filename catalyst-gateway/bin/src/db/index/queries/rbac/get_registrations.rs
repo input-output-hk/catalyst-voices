@@ -2,7 +2,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow, Session
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow, Session
 };
 use tracing::error;
 
@@ -61,11 +61,11 @@ impl GetRegistrationsByChainRootQuery {
     /// Executes a get registrations by chain root query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetRegistrationsByChainRootQueryParams,
-    ) -> anyhow::Result<TypedRowIterator<result::GetRegistrationsByChainRootQuery>> {
+    ) -> anyhow::Result<TypedRowStream<result::GetRegistrationsByChainRootQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::RegistrationsByChainRoot, params)
             .await?
-            .into_typed::<result::GetRegistrationsByChainRootQuery>();
+            .rows_stream::<result::GetRegistrationsByChainRootQuery>()?;
 
         Ok(iter)
     }

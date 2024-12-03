@@ -1,5 +1,6 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
 use anyhow::anyhow;
+use futures::StreamExt;
 use der_parser::asn1_rs::ToDer;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
@@ -57,7 +58,7 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
 
     match query_res {
         Ok(mut row_iter) => {
-            if let Some(row_res) = row_iter.next() {
+            if let Some(row_res) = row_iter.next().await {
                 let row = match row_res {
                     Ok(row) => row,
                     Err(err) => {

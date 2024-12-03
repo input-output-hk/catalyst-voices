@@ -3,8 +3,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow, Session
 };
 use tracing::error;
 
@@ -67,11 +66,11 @@ impl GetStakeAddrQuery {
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetStakeAddrParams,
-    ) -> anyhow::Result<TypedRowIterator<result::GetStakeAddrQuery>> {
+    ) -> anyhow::Result<TypedRowStream<result::GetStakeAddrQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::StakeAddrFromStakeHash, params)
             .await?
-            .into_typed::<result::GetStakeAddrQuery>();
+            .rows_stream::<result::GetStakeAddrQuery>()?;
 
         Ok(iter)
     }

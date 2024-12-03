@@ -2,6 +2,7 @@
 use std::collections::HashMap;
 
 use anyhow::anyhow;
+use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
@@ -145,7 +146,7 @@ async fn get_txo_by_txn(
     .await?;
 
     // Aggregate TXO info.
-    while let Some(row_res) = txos_iter.next() {
+    while let Some(row_res) = txos_iter.next().await {
         let row = row_res?;
 
         // Filter out already known spent TXOs.
@@ -172,7 +173,7 @@ async fn get_txo_by_txn(
     )
     .await?;
 
-    while let Some(row_res) = assets_txos_iter.next() {
+    while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
 
         let txo_info_key = (row.slot_no.clone(), row.txn, row.txo);
@@ -221,7 +222,7 @@ async fn check_and_set_spent(
         )
         .await?;
 
-        while let Some(row_res) = txi_iter.next() {
+        while let Some(row_res) = txi_iter.next().await {
             let row = row_res?;
 
             if let Some(txn_map) = txos_by_txn.get_mut(&row.txn_hash) {

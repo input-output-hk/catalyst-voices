@@ -3,6 +3,7 @@
 use std::{cmp::Reverse, sync::Arc};
 
 use anyhow::anyhow;
+use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 use tracing::error;
 
@@ -114,7 +115,7 @@ async fn get_all_registrations_from_stake_pub_key(
     let mut registrations_iter =
         GetRegistrationQuery::execute(&session, stake_pub_key.into()).await?;
     let mut registrations = Vec::new();
-    while let Some(row) = registrations_iter.next() {
+    while let Some(row) = registrations_iter.next().await {
         let row = row?;
 
         let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
@@ -164,7 +165,7 @@ async fn get_invalid_registrations(
     )
     .await?;
     let mut invalid_registrations = Vec::new();
-    while let Some(row) = invalid_registrations_iter.next() {
+    while let Some(row) = invalid_registrations_iter.next().await {
         let row = row?;
 
         invalid_registrations.push(InvalidRegistrationsReport {
@@ -223,7 +224,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             },
         };
 
-    if let Some(row_stake_addr) = stake_addr_iter.next() {
+    if let Some(row_stake_addr) = stake_addr_iter.next().await {
         let row = match row_stake_addr {
             Ok(r) => r,
             Err(err) => {
@@ -333,7 +334,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
         },
     };
 
-    if let Some(row_stake_addr) = stake_addr_iter.next() {
+    if let Some(row_stake_addr) = stake_addr_iter.next().await {
         let row = match row_stake_addr {
             Ok(r) => r,
             Err(err) => {

@@ -3,8 +3,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow, Session
 };
 use tracing::error;
 
@@ -72,11 +71,11 @@ impl GetTxiByTxnHashesQuery {
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetTxiByTxnHashesQueryParams,
-    ) -> anyhow::Result<TypedRowIterator<result::GetTxiByTxnHashesQuery>> {
+    ) -> anyhow::Result<TypedRowStream<result::GetTxiByTxnHashesQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::TxiByTransactionHash, params)
             .await?
-            .into_typed::<result::GetTxiByTxnHashesQuery>();
+            .rows_stream::<result::GetTxiByTxnHashesQuery>()?;
 
         Ok(iter)
     }

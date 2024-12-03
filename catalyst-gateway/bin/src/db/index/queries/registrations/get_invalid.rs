@@ -3,8 +3,7 @@
 use std::sync::Arc;
 
 use scylla::{
-    deserialize::result::TypedRowIterator, prepared_statement::PreparedStatement, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow, Session
 };
 use tracing::error;
 
@@ -84,14 +83,14 @@ impl GetInvalidRegistrationQuery {
     /// Executes get invalid registration info for given stake addr query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetInvalidRegistrationParams,
-    ) -> anyhow::Result<TypedRowIterator<result::GetInvalidRegistrationQuery>> {
+    ) -> anyhow::Result<TypedRowStream<result::GetInvalidRegistrationQuery>> {
         let iter = session
             .execute_iter(
                 PreparedSelectQuery::InvalidRegistrationsFromStakeAddr,
                 params,
             )
             .await?
-            .into_typed::<result::GetInvalidRegistrationQuery>();
+            .rows_stream::<result::GetInvalidRegistrationQuery>()?;
 
         Ok(iter)
     }
