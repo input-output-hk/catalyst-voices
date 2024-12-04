@@ -33,7 +33,7 @@ pub(crate) const MIN_BATCH_SIZE: i64 = 1;
 /// Maximum possible batch size.
 const MAX_BATCH_SIZE: i64 = 256;
 
-/// AWS remote latency, resources are not created instanly hence we need to add delays
+/// AWS remote latency, resources are not created instantly hence we need to add delays
 /// before we access them.
 const LATENCY_DEFAULT: u64 = 60;
 

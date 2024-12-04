@@ -332,7 +332,7 @@ pub async fn on_aws(session: Arc<Session>) -> bool {
     session.query_unpaged(ON_AWS, []).await.is_ok()
 }
 
-/// Check tables are active in AWS keyspaces
+/// Check tables are active in AWS key spaces
 async fn check_all_tables(session: Arc<Session>, keyspace: String) -> anyhow::Result<()> {
     for table in get_table_names()? {
         table_creation_status_keyspaces(session.clone(), keyspace.clone(), table).await?;
@@ -341,7 +341,7 @@ async fn check_all_tables(session: Arc<Session>, keyspace: String) -> anyhow::Re
     Ok(())
 }
 
-/// Check if AWS table havs been created and status is ACTIVE.
+/// Check if AWS table has been created and status is ACTIVE.
 /// `https://docs.aws.amazon.com/keyspaces/latest/devguide/tables-create.html`
 async fn table_creation_status_keyspaces(
     session: Arc<Session>, keyspace: String, table_name: String,

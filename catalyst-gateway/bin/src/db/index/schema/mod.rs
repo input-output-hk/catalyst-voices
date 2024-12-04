@@ -203,7 +203,7 @@ async fn create_namespace(
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
 
-    // if on aws, wait until keyspace exsits due to remote aws latency
+    // if on aws, wait until keyspace exists due to remote aws latency
     if on_aws(session.clone()).await {
         while keyspace_creation_status(session.clone(), keyspace.clone())
             .await
