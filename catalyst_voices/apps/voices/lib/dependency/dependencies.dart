@@ -60,7 +60,7 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<CampaignInfoCubit>(() {
         return CampaignInfoCubit(
-          campaignRepository: get<CampaignRepository>(),
+          campaignService: get<CampaignService>(),
         );
       })
       // TODO(ryszard-schossler): add repository for campaign management
@@ -112,6 +112,9 @@ final class Dependencies extends DependencyProvider {
         );
       },
       dispose: (service) => unawaited(service.dispose()),
+    );
+    registerLazySingleton<CampaignService>(
+      () => CampaignService(get<CampaignRepository>()),
     );
   }
 }
