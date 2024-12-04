@@ -31,7 +31,7 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
     final markdownString = widget.step.initialData ?? const MarkdownString('');
     final delta = markdown.encode(markdownString);
 
-    final document = Document.fromDelta(delta);
+    final document = delta.isNotEmpty ? Document.fromDelta(delta) : Document();
     final selectionOffset = document.length == 0 ? 0 : document.length - 1;
 
     _controller = VoicesRichTextController(
