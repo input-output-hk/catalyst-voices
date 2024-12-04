@@ -13,7 +13,7 @@ class VoicesMenuExample extends StatefulWidget {
 }
 
 class _VoicesMenuExampleState extends State<VoicesMenuExample> {
-  int? _selectedItemId;
+  String? _selectedItemId;
 
   @override
   void dispose() {
@@ -45,9 +45,9 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
                   },
                   selectedItemId: _selectedItemId,
                   items: const [
-                    VoicesNodeMenuItem(id: 0, label: 'Start'),
-                    VoicesNodeMenuItem(id: 1, label: 'Vote'),
-                    VoicesNodeMenuItem(id: 2, label: 'Results'),
+                    VoicesNodeMenuItem(id: '0', label: 'Start'),
+                    VoicesNodeMenuItem(id: '1', label: 'Vote'),
+                    VoicesNodeMenuItem(id: '2', label: 'Results'),
                   ],
                 ),
               ].separatedBy(const SizedBox(height: 12)).toList(),

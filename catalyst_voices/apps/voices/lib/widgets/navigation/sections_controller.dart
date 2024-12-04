@@ -9,7 +9,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 final class SectionsControllerState extends Equatable {
   final List<Section> sections;
-  final Set<int> openedSections;
+  final Set<String> openedSections;
   final SectionStepId? activeStepId;
   final Set<SectionStepId> editStepsIds;
 
@@ -20,9 +20,9 @@ final class SectionsControllerState extends Equatable {
     this.editStepsIds = const {},
   });
 
-  int? get activeSectionId => activeStepId?.sectionId;
+  String? get activeSectionId => activeStepId?.sectionId;
 
-  int? get activeStep => activeStepId?.stepId;
+  String? get activeStep => activeStepId?.stepId;
 
   bool get allSegmentsClosed => openedSections.isEmpty;
 
@@ -60,7 +60,7 @@ final class SectionsControllerState extends Equatable {
 
   SectionsControllerState copyWith({
     List<Section>? sections,
-    Set<int>? openedSections,
+    Set<String>? openedSections,
     Optional<SectionStepId>? activeStepId,
     Set<SectionStepId>? editStepsIds,
   }) {
@@ -97,7 +97,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     _itemsScrollController = null;
   }
 
-  void toggleSection(int id) {
+  void toggleSection(String id) {
     final openedSections = {...value.openedSections};
     final allSegmentsClosed = value.allSegmentsClosed;
     final shouldOpen = !openedSections.contains(id);
@@ -143,7 +143,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     unawaited(_scrollToSectionStep(id));
   }
 
-  void focusSection(int id) {
+  void focusSection(String id) {
     unawaited(_scrollToSection(id));
   }
 
@@ -173,7 +173,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     super.dispose();
   }
 
-  Future<void> _scrollToSection(int id) async {
+  Future<void> _scrollToSection(String id) async {
     final index = value.listItems.indexWhere((e) => e is Section && e.id == id);
     if (index == -1) {
       return;

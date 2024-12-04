@@ -1,3 +1,4 @@
+export 'campaign/campaign_service.dart' show CampaignService;
 export 'crypto/key_derivation.dart';
 export 'downloader/downloader.dart';
 export 'keychain/keychain.dart';

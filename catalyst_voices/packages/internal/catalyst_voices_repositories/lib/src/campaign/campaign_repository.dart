@@ -31,7 +31,35 @@ final class CampaignRepository {
       endDate: now.add(const Duration(days: 92)),
       proposalsCount: 0,
       sections: sections,
-      proposalTemplate: const ProposalTemplate(),
+      proposalTemplate: ProposalTemplate(
+        sections: [
+          ProposalSection(
+            id: '${id}_1',
+            name: 'Proposal Setup',
+            steps: [
+              ProposalSectionStep(id: '${id}_1_1', name: 'Title'),
+            ],
+          ),
+          ProposalSection(
+            id: '${id}_2',
+            name: 'Proposal Summary',
+            steps: [
+              ProposalSectionStep(id: '${id}_2_1', name: 'Problem Statement'),
+              ProposalSectionStep(id: '${id}_2_2', name: 'Solution Statement'),
+            ],
+          ),
+          ProposalSection(
+            id: '${id}_3',
+            name: 'Proposal Setup',
+            steps: [
+              ProposalSectionStep(id: '${id}_3_1', name: 'Topic 1'),
+              ProposalSectionStep(id: '${id}_3_2', name: 'Topic 2'),
+              ProposalSectionStep(id: '${id}_3_3', name: 'Topic 3'),
+              ProposalSectionStep(id: '${id}_3_4', name: 'Topic 4'),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

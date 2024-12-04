@@ -62,7 +62,11 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
       )
-      ..registerFactory<WorkspaceBloc>(WorkspaceBloc.new);
+      ..registerFactory<WorkspaceBloc>(() {
+        return WorkspaceBloc(
+          get<CampaignService>(),
+        );
+      });
   }
 
   void _registerRepositories() {
@@ -109,5 +113,11 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+    registerLazySingleton<CampaignService>(() {
+      return CampaignService(
+        campaignRepository: get<CampaignRepository>(),
+        proposalRepository: get<ProposalRepository>(),
+      );
+    });
   }
 }

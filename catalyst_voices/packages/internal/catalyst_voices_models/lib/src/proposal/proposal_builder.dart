@@ -1,26 +1,25 @@
-import 'package:catalyst_voices_models/src/proposal/proposal.dart';
-import 'package:catalyst_voices_models/src/proposal/proposal_template.dart';
+import 'package:catalyst_voices_models/src/proposal/proposal_section.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBuilder extends Equatable {
-  const ProposalBuilder();
+  final List<ProposalSection> sections;
 
-  // ignore: avoid_unused_constructor_parameters
-  const ProposalBuilder.fromTemplate(ProposalTemplate template) : this();
+  const ProposalBuilder({
+    required this.sections,
+  });
 
-  // ignore: avoid_unused_constructor_parameters
-  const ProposalBuilder.fromProposal(Proposal proposal) : this();
+  bool get isValid => sections.every((element) => element.isCompleted);
 
-  bool get isValid => false;
-
-  Proposal build() {
-    throw UnimplementedError();
-  }
-
-  ProposalBuilder copyWith() {
-    return const ProposalBuilder();
+  ProposalBuilder copyWith({
+    List<ProposalSection>? sections,
+  }) {
+    return ProposalBuilder(
+      sections: sections ?? this.sections,
+    );
   }
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        sections,
+      ];
 }

@@ -1,10 +1,18 @@
 import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
-  WorkspaceBloc() : super(const WorkspaceState()) {
+  final CampaignService _campaignService;
+
+  var _builder = const ProposalBuilder(sections: []);
+
+  WorkspaceBloc(
+    this._campaignService,
+  ) : super(const WorkspaceState()) {
     on<LoadCurrentProposalEvent>(_loadCurrentProposal);
   }
 
@@ -12,21 +20,34 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     LoadCurrentProposalEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    const sections = <Section>[
-      WorkspaceSection(
-        id: 0,
-        name: 'Proposal solution',
-        steps: [
-          RichTextStep(
-            id: 0,
-            sectionId: 0,
-            name: 'Problem perspective',
-            description:
-                "What is your perspective on the problem you're solving?",
-          ),
-        ],
-      ),
-    ];
+    final activeCampaign = await _campaignService.getActiveCampaign();
+    if (activeCampaign == null) {
+      emit(state.copyWith(sections: []));
+      return;
+    }
+
+    final template = activeCampaign.proposalTemplate;
+    _builder = ProposalBuilder(sections: List.from(template.sections));
+
+    final sections = template.sections.map(
+      (section) {
+        return WorkspaceSection(
+          id: section.id,
+          name: section.name,
+          steps: section.steps.map(
+            (step) {
+              return RichTextStep(
+                id: step.id,
+                sectionId: section.id,
+                name: step.name,
+                description: step.description,
+                initialData: step.answer,
+              );
+            },
+          ).toList(),
+        );
+      },
+    ).toList();
 
     emit(state.copyWith(sections: sections));
   }

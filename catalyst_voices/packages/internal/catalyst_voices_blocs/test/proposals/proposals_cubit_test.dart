@@ -19,8 +19,19 @@ void main() {
       publish: ProposalPublish.draft,
       access: ProposalAccess.private,
       commentsCount: 0,
-      completedSegments: 1,
-      totalSegments: 3,
+      sections: List.generate(3, (index) {
+        return ProposalSection(
+          id: 'f14/0_$index',
+          name: 'Section_$index',
+          steps: [
+            ProposalSectionStep(
+              id: 'f14/0_${index}_1',
+              name: 'Topic 1',
+              answer: index < 1 ? MarkdownString('Ans') : null,
+            ),
+          ],
+        );
+      }),
     );
 
     final pendingProposal = PendingProposal.fromProposal(

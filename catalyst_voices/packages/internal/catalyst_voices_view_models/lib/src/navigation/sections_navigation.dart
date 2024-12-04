@@ -3,10 +3,10 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
-typedef SectionStepId = ({int sectionId, int stepId});
+typedef SectionStepId = ({String sectionId, String stepId});
 
 abstract interface class Section implements SectionsListViewItem {
-  int get id;
+  String get id;
 
   SvgGenImage get icon;
 
@@ -16,9 +16,9 @@ abstract interface class Section implements SectionsListViewItem {
 }
 
 abstract interface class SectionStep implements SectionsListViewItem {
-  int get id;
+  String get id;
 
-  int get sectionId;
+  String get sectionId;
 
   SectionStepId get sectionStepId;
 
@@ -32,7 +32,7 @@ abstract interface class SectionStep implements SectionsListViewItem {
 abstract base class BaseSection<T extends SectionStep> extends Equatable
     implements Section {
   @override
-  final int id;
+  final String id;
   @override
   final List<T> steps;
 
@@ -56,9 +56,9 @@ abstract base class BaseSection<T extends SectionStep> extends Equatable
 
 abstract base class BaseSectionStep extends Equatable implements SectionStep {
   @override
-  final int id;
+  final String id;
   @override
-  final int sectionId;
+  final String sectionId;
   @override
   final bool isEnabled;
   @override

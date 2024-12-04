@@ -14,6 +14,7 @@ export 'markdown_string.dart';
 export 'optional.dart';
 export 'proposal/proposal.dart';
 export 'proposal/proposal_builder.dart';
+export 'proposal/proposal_section.dart';
 export 'proposal/proposal_template.dart';
 export 'registration/registration.dart';
 export 'seed_phrase.dart';
