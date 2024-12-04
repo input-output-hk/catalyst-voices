@@ -1,0 +1,19 @@
+{
+    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+    "general": {
+        "title": "Single line plain text ..............................",
+        "links": [
+            "http://notauri",
+            "ftp://some_old_site",
+            "cardano://some-block"
+        ],
+        "applicant_type": "Individual",
+    },
+    "metadata": {
+        "group": "Education",
+        "tag": "Learn to Earn"
+    },
+    "agreements": {
+        "fund_rules": "Yes"
+    }
+}
