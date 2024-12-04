@@ -15,7 +15,7 @@ dependencies:
     path: ../catalyst_voices_services
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
-  chopper: ^7.2.0
+  chopper: ^8.0.3
   flutter:
     sdk: flutter
   http: ^1.2.1
