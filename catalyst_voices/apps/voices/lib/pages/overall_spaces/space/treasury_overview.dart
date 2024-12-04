@@ -9,50 +9,48 @@ class TreasuryOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SpaceOverviewContainer(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SpaceOverviewHeader(Space.treasury),
-            SectionHeader(title: Text('Individual private campaigns')),
-            VoicesNavTile(
-              name: 'Fund name 1',
-              status: ProposalStatus.ready,
-              trailing: MoreOptionsButton(),
-            ),
-            VoicesNavTile(
-              name: 'Fund name 2',
-              status: ProposalStatus.draft,
-              trailing: MoreOptionsButton(),
-            ),
-            VoicesNavTile(
-              name: 'Fund name 3',
-              status: ProposalStatus.draft,
-              trailing: MoreOptionsButton(),
-            ),
-            VoicesDivider(indent: 0, endIndent: 0, height: 16),
-            SectionHeader(title: Text('Team private campaigns')),
-            VoicesNavTile(
-              name: 'Fund name',
-              status: ProposalStatus.private,
-              trailing: MoreOptionsButton(),
-            ),
-            VoicesDivider(indent: 0, endIndent: 0, height: 16),
-            SectionHeader(title: Text('Public campaigns')),
-            VoicesNavTile(
-              name: 'Fund 14',
-              status: ProposalStatus.live,
-              trailing: MoreOptionsButton(),
-            ),
-            VoicesDivider(indent: 0, endIndent: 0, height: 16),
-            SectionHeader(title: Text('Completed campaigns')),
-            VoicesNavTile(
-              name: 'Fund 15',
-              status: ProposalStatus.completed,
-              trailing: MoreOptionsButton(),
-            ),
-          ],
-        ),
+    return SpaceOverviewContainer(
+      child: ListView(
+        children: const [
+          SpaceOverviewHeader(Space.treasury),
+          SectionHeader(title: Text('Individual private campaigns')),
+          VoicesNavTile(
+            name: 'Fund name 1',
+            status: ProposalStatus.ready,
+            trailing: MoreOptionsButton(),
+          ),
+          VoicesNavTile(
+            name: 'Fund name 2',
+            status: ProposalStatus.draft,
+            trailing: MoreOptionsButton(),
+          ),
+          VoicesNavTile(
+            name: 'Fund name 3',
+            status: ProposalStatus.draft,
+            trailing: MoreOptionsButton(),
+          ),
+          VoicesDivider(indent: 0, endIndent: 0, height: 16),
+          SectionHeader(title: Text('Team private campaigns')),
+          VoicesNavTile(
+            name: 'Fund name',
+            status: ProposalStatus.private,
+            trailing: MoreOptionsButton(),
+          ),
+          VoicesDivider(indent: 0, endIndent: 0, height: 16),
+          SectionHeader(title: Text('Public campaigns')),
+          VoicesNavTile(
+            name: 'Fund 14',
+            status: ProposalStatus.live,
+            trailing: MoreOptionsButton(),
+          ),
+          VoicesDivider(indent: 0, endIndent: 0, height: 16),
+          SectionHeader(title: Text('Completed campaigns')),
+          VoicesNavTile(
+            name: 'Fund 15',
+            status: ProposalStatus.completed,
+            trailing: MoreOptionsButton(),
+          ),
+        ],
       ),
     );
   }

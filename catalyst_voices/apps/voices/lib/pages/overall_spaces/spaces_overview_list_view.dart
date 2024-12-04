@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/utils/access_control_util.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/discovery_overview.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/funded_projects_overview.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/treasury_overview.dart';
@@ -29,35 +30,44 @@ class _SpacesListViewState extends State<SpacesListView> {
 
   @override
   Widget build(BuildContext context) {
-    final sessionBloc = context.watch<SessionCubit>();
-    final activeAccount = sessionBloc.account;
     return VoicesScrollbar(
       controller: _scrollController,
       alwaysVisible: true,
       padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: ListView.separated(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(right: 16, bottom: 24),
-        itemBuilder: (context, index) {
-          final space = Space.values[index];
-          return switch (space) {
-            Space.discovery => DiscoveryOverview(key: ObjectKey(space)),
-            Space.workspace => WorkspaceOverview(key: ObjectKey(space)),
-            Space.voting =>
-              GreyOut(child: VotingOverview(key: ObjectKey(space))),
-            Space.fundedProjects =>
-              GreyOut(child: FundedProjectsOverview(key: ObjectKey(space))),
-            Space.treasury => Offstage(
-                offstage: activeAccount?.isAdmin == false,
-                child: TreasuryOverview(
-                  key: ObjectKey(space),
-                ),
-              ),
-          };
+      child: BlocSelector<SessionCubit, SessionState, Account?>(
+        selector: (state) {
+          if (state is ActiveAccountSessionState) {
+            return state.account;
+          }
+          return null;
         },
-        separatorBuilder: (context, index) => const SizedBox(width: 16),
-        itemCount: Space.values.length,
+        builder: (context, state) {
+          final spaces = AccessControlUtil.overallSpaces(state);
+          return ListView.separated(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(right: 16, bottom: 24),
+            itemBuilder: (context, index) {
+              final space = spaces[index];
+              return switch (space) {
+                Space.discovery => DiscoveryOverview(key: ObjectKey(space)),
+                Space.workspace => WorkspaceOverview(key: ObjectKey(space)),
+                Space.voting =>
+                  GreyOut(child: VotingOverview(key: ObjectKey(space))),
+                Space.fundedProjects =>
+                  GreyOut(child: FundedProjectsOverview(key: ObjectKey(space))),
+                Space.treasury => Offstage(
+                    offstage: false,
+                    child: TreasuryOverview(
+                      key: ObjectKey(space),
+                    ),
+                  ),
+              };
+            },
+            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            itemCount: spaces.length,
+          );
+        },
       ),
     );
   }
@@ -66,6 +76,7 @@ class _SpacesListViewState extends State<SpacesListView> {
 class GreyOut extends StatelessWidget {
   final Widget child;
   final bool greyOut;
+
   const GreyOut({
     super.key,
     required this.child,

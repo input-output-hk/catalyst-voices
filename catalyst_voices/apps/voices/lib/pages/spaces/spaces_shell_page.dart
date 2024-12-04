@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/utils/access_control_util.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
@@ -59,7 +60,9 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
-        for (final entry in SpacesShellPage._spacesShortcutsActivators.entries)
+        for (final entry
+            in AccessControlUtil.spacesShortcutsActivators(sessionBloc.account)
+                .entries)
           entry.value: () => entry.key.go(context),
         CampaignAdminToolsDialog.shortcut: _toggleCampaignAdminTools,
       },

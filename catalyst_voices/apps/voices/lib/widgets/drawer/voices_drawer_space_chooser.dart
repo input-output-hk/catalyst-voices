@@ -1,9 +1,12 @@
+import 'package:catalyst_voices/common/utils/access_control_util.dart';
 import 'package:catalyst_voices/widgets/avatars/space_avatar.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class VoicesDrawerSpaceChooser extends StatelessWidget {
   final Space currentSpace;
@@ -21,15 +24,25 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDrawerChooser<Space>(
-      items: Space.values,
-      selectedItem: currentSpace,
-      onSelected: onChanged,
-      itemBuilder: _itemBuilder,
-      leading: VoicesIconButton(
-        onTap: onOverallTap,
-        child: VoicesAssets.icons.allSpacesMenu.buildIcon(size: 20),
-      ),
+    return BlocSelector<SessionCubit, SessionState, Account?>(
+      selector: (state) {
+        if (state is ActiveAccountSessionState) {
+          return state.account;
+        }
+        return null;
+      },
+      builder: (context, state) {
+        return VoicesDrawerChooser<Space>(
+          items: AccessControlUtil.spacesAccess(state),
+          selectedItem: currentSpace,
+          onSelected: onChanged,
+          itemBuilder: _itemBuilder,
+          leading: VoicesIconButton(
+            onTap: onOverallTap,
+            child: VoicesAssets.icons.allSpacesMenu.buildIcon(size: 20),
+          ),
+        );
+      },
     );
   }
 

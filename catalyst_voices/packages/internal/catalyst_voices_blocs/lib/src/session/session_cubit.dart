@@ -143,12 +143,7 @@ final class SessionCubit extends Cubit<SessionState>
     emit(ActiveAccountSessionState(account: account));
   }
 
-  Account? get account {
-    if (state is ActiveAccountSessionState) {
-      if ((state as ActiveAccountSessionState).account != null) {
-        return (state as ActiveAccountSessionState).account;
-      }
-    }
-    return null;
-  }
+  Account? get account => state is ActiveAccountSessionState
+      ? (state as ActiveAccountSessionState).account
+      : null;
 }
