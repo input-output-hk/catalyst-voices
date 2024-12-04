@@ -11,10 +11,12 @@ final class CampaignInfoCubit extends Cubit<CampaignInfoState> {
   final CampaignService campaignService;
 
   CampaignInfoCubit({required this.campaignService})
-      : super(const CampaignInfoState(isLoading: true));
+      : super(const CampaignInfoState());
 
   /// Loads the currently active campaign.
   Future<void> load() async {
+    emit(const CampaignInfoState(isLoading: true));
+
     final campaign = await campaignService.getActiveCampaign();
 
     emit(
