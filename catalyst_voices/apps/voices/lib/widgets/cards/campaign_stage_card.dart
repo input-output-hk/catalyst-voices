@@ -60,26 +60,25 @@ class CampaignStageCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (!campaign.stage.isDraft) ...[
+            if (campaign.stage == CampaignStage.live) ...[
               const SizedBox(height: 16),
               OutlinedButton(
                 // TODO(ryszard-schossler): add logic
                 onPressed: () {},
-                child: Text(_getButtonText(context)),
+                child: Text(context.l10n.viewProposals),
+              ),
+            ] else if (campaign.stage == CampaignStage.completed) ...[
+              const SizedBox(height: 16),
+              OutlinedButton(
+                // TODO(ryszard-schossler): add logic
+                onPressed: () {},
+                child: Text(context.l10n.viewVotingResults),
               ),
             ],
           ],
         ),
       ),
     );
-  }
-
-  String _getButtonText(BuildContext context) {
-    if (campaign.stage == CampaignStage.live) {
-      return context.l10n.viewProposals;
-    } else {
-      return context.l10n.viewVotingResults;
-    }
   }
 
   String _getDateInformation(BuildContext context) {
