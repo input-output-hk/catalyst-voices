@@ -83,11 +83,10 @@ class CampaignStageCard extends StatelessWidget {
   }
 
   String _getDateInformation(BuildContext context) {
-    if (campaign is CampaignDateTimeMixin) {
-      final dateMixin = campaign as CampaignDateTimeMixin;
+    if (campaign.stage != CampaignStage.completed) {
       final formattedDate =
-          DateFormatter.formatDateTimeParts(dateMixin.startDate);
-      return dateMixin.localizedDate(context.l10n, formattedDate);
+          DateFormatter.formatDateTimeParts(campaign.startDate);
+      return campaign.localizedDate(context.l10n, formattedDate);
     } else {
       return '';
     }
