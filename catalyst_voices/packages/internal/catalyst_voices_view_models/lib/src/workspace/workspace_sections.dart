@@ -7,12 +7,18 @@ final class WorkspaceSection extends BaseSection<WorkspaceSectionStep> {
 
   const WorkspaceSection({
     required super.id,
-    required super.steps,
     required this.name,
+    required super.steps,
   });
 
   @override
   String localizedName(BuildContext context) => name;
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        name,
+      ];
 }
 
 sealed class WorkspaceSectionStep extends BaseSectionStep {
@@ -27,7 +33,7 @@ sealed class WorkspaceSectionStep extends BaseSectionStep {
 final class RichTextStep extends WorkspaceSectionStep {
   final String name;
   final String? description;
-  final DocumentJson initialData;
+  final MarkdownString? initialData;
   final int? charsLimit;
 
   const RichTextStep({
@@ -35,11 +41,20 @@ final class RichTextStep extends WorkspaceSectionStep {
     required super.sectionId,
     required this.name,
     this.description,
-    this.initialData = const DocumentJson([]),
+    this.initialData,
     this.charsLimit,
     super.isEditable,
   });
 
   @override
   String localizedName(BuildContext context) => name;
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        name,
+        description,
+        initialData,
+        charsLimit,
+      ];
 }

@@ -1,7 +1,9 @@
+import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/widgets/navigation/section_step_state_builder.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -26,7 +28,10 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
   void initState() {
     super.initState();
 
-    final document = Document.fromJson(widget.step.initialData.value);
+    final markdownString = widget.step.initialData ?? const MarkdownString('');
+    final delta = markdown.encode(markdownString);
+
+    final document = Document.fromDelta(delta);
     final selectionOffset = document.length == 0 ? 0 : document.length - 1;
 
     _controller = VoicesRichTextController(
