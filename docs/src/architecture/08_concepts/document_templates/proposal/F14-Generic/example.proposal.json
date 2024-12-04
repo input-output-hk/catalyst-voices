@@ -1,0 +1,142 @@
+{
+    "$schema": "./proposalTemplate.F14.schema.json",
+    "setup": {
+        "title": {
+            "title": "Cardano DeFi Integration Platform"
+        },
+        "proposer": {
+            "mainApplicant": "John Smith",
+            "applicant_type": "Entity (Incorporated)",
+            "co-proposers": ["Alice Johnson", "Bob Wilson"]
+        }
+    },
+    "proposalSummary": {
+        "budget": {
+            "requestedFunds": 500000
+        },
+        "problem": {
+            "description": "Current DeFi platforms on Cardano lack seamless integration capabilities, making it difficult for developers to build interconnected financial applications.",
+            "relevance": "This problem affects the entire Cardano ecosystem by limiting the growth and adoption of DeFi applications."
+        },
+        "supportingLinks": {
+            "documentation": "https://example.com/project-docs",
+            "github": "https://github.com/example/defi-platform",
+            "media": ["https://example.com/demo-video"]
+        }
+    },
+    "horizons": {
+        "category": {
+            "primaryCategory": "DeFi",
+            "subCategory": "Integration Tools"
+        },
+        "tags": ["defi", "integration", "developer-tools", "smart-contracts"]
+    },
+    "proposalDetails": {
+        "solution": {
+            "description": "Our platform will provide a unified API layer that enables seamless integration between different DeFi protocols on Cardano.",
+            "features": [
+                "Standardized API endpoints",
+                "Smart contract templates",
+                "Cross-protocol liquidity management"
+            ]
+        },
+        "impact": {
+            "metrics": [
+                "Number of integrated protocols",
+                "Developer adoption rate",
+                "Transaction volume through the platform"
+            ],
+            "targetAudience": "DeFi developers and protocol creators on Cardano"
+        },
+        "capability": {
+            "teamExperience": "Our team has 5+ years of experience in DeFi development and Cardano ecosystem",
+            "resources": "Fully equipped development team with blockchain expertise"
+        }
+    },
+    "milestones": {
+        "milestonesConfig": {
+            "count": 4,
+            "duration": "6 months"
+        },
+        "milestonesList": [
+            {
+                "title": "Architecture Design",
+                "description": "Complete system architecture and API specifications",
+                "deliverables": ["Architecture documentation", "API specifications"],
+                "budget": {
+                    "amount": 100000
+                }
+            },
+            {
+                "title": "Core Development",
+                "description": "Develop core integration layer and smart contracts",
+                "deliverables": ["Core platform code", "Smart contract templates"],
+                "budget": {
+                    "amount": 200000
+                }
+            },
+            {
+                "title": "Testing and Integration",
+                "description": "Comprehensive testing and initial protocol integrations",
+                "deliverables": ["Test reports", "Integration documentation"],
+                "budget": {
+                    "amount": 150000
+                }
+            }
+        ],
+        "finalMilestone": {
+            "title": "Launch and Documentation",
+            "deliverables": ["Platform launch", "Complete documentation", "Video demonstration"],
+            "budget": {
+                "amount": 50000
+            }
+        }
+    },
+    "finalPitch": {
+        "team": {
+            "members": [
+                {
+                    "name": "John Smith",
+                    "role": "Project Lead",
+                    "experience": "10 years in blockchain development"
+                },
+                {
+                    "name": "Alice Johnson",
+                    "role": "Smart Contract Developer",
+                    "experience": "5 years Cardano development"
+                }
+            ],
+            "teamCapabilities": "Our team combines deep expertise in DeFi protocols, Cardano development, and system architecture."
+        },
+        "budget": {
+            "totalBudget": 500000,
+            "categories": {
+                "development": 300000,
+                "testing": 100000,
+                "documentation": 50000,
+                "management": 50000
+            },
+            "timeline": {
+                "distributionSchedule": "Quarterly"
+            }
+        },
+        "valueProposition": {
+            "impact": "Accelerate DeFi development on Cardano",
+            "sustainability": "Platform fees and maintenance contracts"
+        }
+    },
+    "mandatoryAcknowledgments": {
+        "fundRules": {
+            "acknowledgment": true
+        },
+        "privacyPolicy": {
+            "acknowledgment": true
+        },
+        "intellectualProperty": {
+            "acknowledgment": true
+        },
+        "compliance": {
+            "legalCompliance": true
+        }
+    }
+}

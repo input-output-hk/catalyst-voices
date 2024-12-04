@@ -364,294 +364,7 @@
                 }
             }
         },
-        "milestones": {
-            "type": "object",
-            "title": "Project Milestones",
-            "description": "Detailed project milestones and deliverables",
-            "properties": {
-                "milestonesConfig": {
-                    "type": "object",
-                    "title": "Milestones Configuration",
-                    "description": "Configuration for number of milestones based on grant amount",
-                    "properties": {
-                        "grantAmount": {
-                            "type": "number",
-                            "title": "Grant Amount in ADA",
-                            "description": "Total grant amount requested in ADA",
-                            "minimum": 0,
-                            "maximum": 1000000
-                        },
-                        "numberOfMilestones": {
-                            "type": "integer",
-                            "title": "Number of Milestones",
-                            "description": "Total number of milestones including the final milestone",
-                            "minimum": 3,
-                            "maximum": 10
-                        }
-                    },
-                    "required": ["grantAmount", "numberOfMilestones"]
-                },
-                "milestonesList": {
-                    "type": "array",
-                    "title": "List of Milestones",
-                    "description": "Detailed description of each project milestone",
-                    "items": {
-                        "type": "object",
-                        "title": "Milestone",
-                        "properties": {
-                            "title": {
-                                "type": "string",
-                                "title": "Milestone Title",
-                                "description": "Short, descriptive title for the milestone",
-                                "minLength": 5,
-                                "maxLength": 100
-                            },
-                            "description": {
-                                "type": "string",
-                                "title": "Milestone Description",
-                                "description": "Detailed description of what this milestone entails",
-                                "minLength": 50,
-                                "maxLength": 1000
-                            },
-                            "deliverables": {
-                                "type": "array",
-                                "title": "Deliverables",
-                                "description": "Specific outputs and deliverables for this milestone",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "name": {
-                                            "type": "string",
-                                            "title": "Deliverable Name",
-                                            "minLength": 5,
-                                            "maxLength": 100
-                                        },
-                                        "description": {
-                                            "type": "string",
-                                            "title": "Deliverable Description",
-                                            "minLength": 20,
-                                            "maxLength": 500
-                                        },
-                                        "type": {
-                                            "type": "string",
-                                            "title": "Deliverable Type",
-                                            "enum": [
-                                                "Documentation",
-                                                "Software",
-                                                "Report",
-                                                "Presentation",
-                                                "Video",
-                                                "Other"
-                                            ]
-                                        }
-                                    },
-                                    "required": ["name", "description", "type"]
-                                },
-                                "minItems": 1,
-                                "maxItems": 5
-                            },
-                            "acceptanceCriteria": {
-                                "type": "array",
-                                "title": "Acceptance Criteria",
-                                "description": "Specific criteria that must be met to consider this milestone complete",
-                                "items": {
-                                    "type": "string",
-                                    "minLength": 10,
-                                    "maxLength": 200
-                                },
-                                "minItems": 1,
-                                "maxItems": 5
-                            },
-                            "evidenceOfCompletion": {
-                                "type": "array",
-                                "title": "Evidence of Completion",
-                                "description": "How will you demonstrate that this milestone is complete?",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "type": {
-                                            "type": "string",
-                                            "title": "Evidence Type",
-                                            "enum": [
-                                                "Code Repository",
-                                                "Documentation",
-                                                "Demo Video",
-                                                "Test Results",
-                                                "Metrics Report",
-                                                "User Feedback",
-                                                "Other"
-                                            ]
-                                        },
-                                        "description": {
-                                            "type": "string",
-                                            "title": "Evidence Description",
-                                            "minLength": 20,
-                                            "maxLength": 300
-                                        }
-                                    },
-                                    "required": ["type", "description"]
-                                },
-                                "minItems": 1,
-                                "maxItems": 3
-                            },
-                            "timeline": {
-                                "type": "object",
-                                "title": "Timeline",
-                                "properties": {
-                                    "startDate": {
-                                        "type": "string",
-                                        "title": "Start Date",
-                                        "format": "date"
-                                    },
-                                    "endDate": {
-                                        "type": "string",
-                                        "title": "End Date",
-                                        "format": "date"
-                                    },
-                                    "durationInWeeks": {
-                                        "type": "integer",
-                                        "title": "Duration in Weeks",
-                                        "minimum": 1,
-                                        "maximum": 52
-                                    }
-                                },
-                                "required": ["startDate", "endDate", "durationInWeeks"]
-                            },
-                            "budget": {
-                                "type": "object",
-                                "title": "Milestone Budget",
-                                "properties": {
-                                    "amount": {
-                                        "type": "number",
-                                        "title": "Amount in ADA",
-                                        "minimum": 0
-                                    },
-                                    "breakdown": {
-                                        "type": "array",
-                                        "title": "Budget Breakdown",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "category": {
-                                                    "type": "string",
-                                                    "enum": [
-                                                        "Development",
-                                                        "Design",
-                                                        "Marketing",
-                                                        "Operations",
-                                                        "Other"
-                                                    ]
-                                                },
-                                                "amount": {
-                                                    "type": "number",
-                                                    "minimum": 0
-                                                },
-                                                "description": {
-                                                    "type": "string",
-                                                    "minLength": 10,
-                                                    "maxLength": 200
-                                                }
-                                            },
-                                            "required": ["category", "amount", "description"]
-                                        },
-                                        "minItems": 1
-                                    }
-                                },
-                                "required": ["amount", "breakdown"]
-                            }
-                        },
-                        "required": [
-                            "title",
-                            "description",
-                            "deliverables",
-                            "acceptanceCriteria",
-                            "evidenceOfCompletion",
-                            "timeline",
-                            "budget"
-                        ]
-                    },
-                    "minItems": 3,
-                    "maxItems": 10
-                },
-                "finalMilestone": {
-                    "type": "object",
-                    "title": "Final Milestone",
-                    "description": "Project close-out milestone with final report and video",
-                    "properties": {
-                        "closeoutReport": {
-                            "type": "object",
-                            "title": "Project Close-out Report",
-                            "properties": {
-                                "summary": {
-                                    "type": "string",
-                                    "title": "Project Summary",
-                                    "description": "Overall summary of project achievements",
-                                    "minLength": 100,
-                                    "maxLength": 2000
-                                },
-                                "keyAchievements": {
-                                    "type": "array",
-                                    "title": "Key Achievements",
-                                    "items": {
-                                        "type": "string",
-                                        "minLength": 10,
-                                        "maxLength": 200
-                                    },
-                                    "minItems": 1,
-                                    "maxItems": 10
-                                },
-                                "lessonsLearned": {
-                                    "type": "array",
-                                    "title": "Lessons Learned",
-                                    "items": {
-                                        "type": "string",
-                                        "minLength": 20,
-                                        "maxLength": 500
-                                    },
-                                    "minItems": 1,
-                                    "maxItems": 5
-                                },
-                                "futureSteps": {
-                                    "type": "string",
-                                    "title": "Future Steps",
-                                    "description": "Plans for project continuation or future development",
-                                    "minLength": 50,
-                                    "maxLength": 1000
-                                }
-                            },
-                            "required": ["summary", "keyAchievements", "lessonsLearned", "futureSteps"]
-                        },
-                        "demoVideo": {
-                            "type": "object",
-                            "title": "Project Demo Video",
-                            "properties": {
-                                "url": {
-                                    "type": "string",
-                                    "title": "Video URL",
-                                    "format": "uri",
-                                    "pattern": "^https://"
-                                },
-                                "duration": {
-                                    "type": "integer",
-                                    "title": "Duration in Minutes",
-                                    "minimum": 3,
-                                    "maximum": 15
-                                },
-                                "description": {
-                                    "type": "string",
-                                    "title": "Video Description",
-                                    "minLength": 50,
-                                    "maxLength": 500
-                                }
-                            },
-                            "required": ["url", "duration", "description"]
-                        }
-                    },
-                    "required": ["closeoutReport", "demoVideo"]
-                }
-            },
-            "required": ["milestonesConfig", "milestonesList", "finalMilestone"]
-        },
+
         "Horizons": {
             "type": "object",
             "title": "Project Horizons",
@@ -1025,6 +738,294 @@
             },
             "required": ["solution", "impact", "capability"]
         },
+        "milestones": {
+            "type": "object",
+            "title": "Project Milestones",
+            "description": "Detailed project milestones and deliverables",
+            "properties": {
+                "milestonesConfig": {
+                    "type": "object",
+                    "title": "Milestones Configuration",
+                    "description": "Configuration for number of milestones based on grant amount",
+                    "properties": {
+                        "grantAmount": {
+                            "type": "number",
+                            "title": "Grant Amount in ADA",
+                            "description": "Total grant amount requested in ADA",
+                            "minimum": 0,
+                            "maximum": 1000000
+                        },
+                        "numberOfMilestones": {
+                            "type": "integer",
+                            "title": "Number of Milestones",
+                            "description": "Total number of milestones including the final milestone",
+                            "minimum": 3,
+                            "maximum": 10
+                        }
+                    },
+                    "required": ["grantAmount", "numberOfMilestones"]
+                },
+                "milestonesList": {
+                    "type": "array",
+                    "title": "List of Milestones",
+                    "description": "Detailed description of each project milestone",
+                    "items": {
+                        "type": "object",
+                        "title": "Milestone",
+                        "properties": {
+                            "title": {
+                                "type": "string",
+                                "title": "Milestone Title",
+                                "description": "Short, descriptive title for the milestone",
+                                "minLength": 5,
+                                "maxLength": 100
+                            },
+                            "description": {
+                                "type": "string",
+                                "title": "Milestone Description",
+                                "description": "Detailed description of what this milestone entails",
+                                "minLength": 50,
+                                "maxLength": 1000
+                            },
+                            "deliverables": {
+                                "type": "array",
+                                "title": "Deliverables",
+                                "description": "Specific outputs and deliverables for this milestone",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "title": "Deliverable Name",
+                                            "minLength": 5,
+                                            "maxLength": 100
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "title": "Deliverable Description",
+                                            "minLength": 20,
+                                            "maxLength": 500
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "title": "Deliverable Type",
+                                            "enum": [
+                                                "Documentation",
+                                                "Software",
+                                                "Report",
+                                                "Presentation",
+                                                "Video",
+                                                "Other"
+                                            ]
+                                        }
+                                    },
+                                    "required": ["name", "description", "type"]
+                                },
+                                "minItems": 1,
+                                "maxItems": 5
+                            },
+                            "acceptanceCriteria": {
+                                "type": "array",
+                                "title": "Acceptance Criteria",
+                                "description": "Specific criteria that must be met to consider this milestone complete",
+                                "items": {
+                                    "type": "string",
+                                    "minLength": 10,
+                                    "maxLength": 200
+                                },
+                                "minItems": 1,
+                                "maxItems": 5
+                            },
+                            "evidenceOfCompletion": {
+                                "type": "array",
+                                "title": "Evidence of Completion",
+                                "description": "How will you demonstrate that this milestone is complete?",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "title": "Evidence Type",
+                                            "enum": [
+                                                "Code Repository",
+                                                "Documentation",
+                                                "Demo Video",
+                                                "Test Results",
+                                                "Metrics Report",
+                                                "User Feedback",
+                                                "Other"
+                                            ]
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "title": "Evidence Description",
+                                            "minLength": 20,
+                                            "maxLength": 300
+                                        }
+                                    },
+                                    "required": ["type", "description"]
+                                },
+                                "minItems": 1,
+                                "maxItems": 3
+                            },
+                            "timeline": {
+                                "type": "object",
+                                "title": "Timeline",
+                                "properties": {
+                                    "startDate": {
+                                        "type": "string",
+                                        "title": "Start Date",
+                                        "format": "date"
+                                    },
+                                    "endDate": {
+                                        "type": "string",
+                                        "title": "End Date",
+                                        "format": "date"
+                                    },
+                                    "durationInWeeks": {
+                                        "type": "integer",
+                                        "title": "Duration in Weeks",
+                                        "minimum": 1,
+                                        "maximum": 52
+                                    }
+                                },
+                                "required": ["startDate", "endDate", "durationInWeeks"]
+                            },
+                            "budget": {
+                                "type": "object",
+                                "title": "Milestone Budget",
+                                "properties": {
+                                    "amount": {
+                                        "type": "number",
+                                        "title": "Amount in ADA",
+                                        "minimum": 0
+                                    },
+                                    "breakdown": {
+                                        "type": "array",
+                                        "title": "Budget Breakdown",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "category": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "Development",
+                                                        "Design",
+                                                        "Marketing",
+                                                        "Operations",
+                                                        "Other"
+                                                    ]
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "minimum": 0
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "minLength": 10,
+                                                    "maxLength": 200
+                                                }
+                                            },
+                                            "required": ["category", "amount", "description"]
+                                        },
+                                        "minItems": 1
+                                    }
+                                },
+                                "required": ["amount", "breakdown"]
+                            }
+                        },
+                        "required": [
+                            "title",
+                            "description",
+                            "deliverables",
+                            "acceptanceCriteria",
+                            "evidenceOfCompletion",
+                            "timeline",
+                            "budget"
+                        ]
+                    },
+                    "minItems": 3,
+                    "maxItems": 10
+                },
+                "finalMilestone": {
+                    "type": "object",
+                    "title": "Final Milestone",
+                    "description": "Project close-out milestone with final report and video",
+                    "properties": {
+                        "closeoutReport": {
+                            "type": "object",
+                            "title": "Project Close-out Report",
+                            "properties": {
+                                "summary": {
+                                    "type": "string",
+                                    "title": "Project Summary",
+                                    "description": "Overall summary of project achievements",
+                                    "minLength": 100,
+                                    "maxLength": 2000
+                                },
+                                "keyAchievements": {
+                                    "type": "array",
+                                    "title": "Key Achievements",
+                                    "items": {
+                                        "type": "string",
+                                        "minLength": 10,
+                                        "maxLength": 200
+                                    },
+                                    "minItems": 1,
+                                    "maxItems": 10
+                                },
+                                "lessonsLearned": {
+                                    "type": "array",
+                                    "title": "Lessons Learned",
+                                    "items": {
+                                        "type": "string",
+                                        "minLength": 20,
+                                        "maxLength": 500
+                                    },
+                                    "minItems": 1,
+                                    "maxItems": 5
+                                },
+                                "futureSteps": {
+                                    "type": "string",
+                                    "title": "Future Steps",
+                                    "description": "Plans for project continuation or future development",
+                                    "minLength": 50,
+                                    "maxLength": 1000
+                                }
+                            },
+                            "required": ["summary", "keyAchievements", "lessonsLearned", "futureSteps"]
+                        },
+                        "demoVideo": {
+                            "type": "object",
+                            "title": "Project Demo Video",
+                            "properties": {
+                                "url": {
+                                    "type": "string",
+                                    "title": "Video URL",
+                                    "format": "uri",
+                                    "pattern": "^https://"
+                                },
+                                "duration": {
+                                    "type": "integer",
+                                    "title": "Duration in Minutes",
+                                    "minimum": 3,
+                                    "maximum": 15
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "title": "Video Description",
+                                    "minLength": 50,
+                                    "maxLength": 500
+                                }
+                            },
+                            "required": ["url", "duration", "description"]
+                        }
+                    },
+                    "required": ["closeoutReport", "demoVideo"]
+                }
+            },
+            "required": ["milestonesConfig", "milestonesList", "finalMilestone"]
+        },
         "finalPitch": {
             "type": "object",
             "title": "Final Pitch",
@@ -1350,13 +1351,16 @@
                             "type": "string",
                             "title": "Fund Rules Version",
                             "description": "Version of the Fund Rules being acknowledged",
-                            "pattern": "^F[0-9]+$"
+                            "pattern": "^F[0-9]{1,3}$",
+                            "examples": ["F14", "F15"]
                         },
                         "timestamp": {
                             "type": "string",
                             "title": "Acknowledgment Timestamp",
                             "description": "When the rules were acknowledged",
-                            "format": "date-time"
+                            "format": "date-time",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                            "examples": ["2024-01-20T15:30:00Z"]
                         }
                     },
                     "required": ["acknowledgment", "version", "timestamp"]
@@ -1375,16 +1379,27 @@
                             "type": "string",
                             "title": "Terms Version",
                             "description": "Version of the Terms and Conditions being acknowledged",
-                            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                            "examples": ["1.0.0", "2.1.3"]
+                        },
+                        "documentUrl": {
+                            "type": "string",
+                            "title": "Terms Document URL",
+                            "description": "URL to the specific version of terms and conditions",
+                            "format": "uri",
+                            "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                            "contentMediaType": "text/html"
                         },
                         "timestamp": {
                             "type": "string",
                             "title": "Acknowledgment Timestamp",
                             "description": "When the terms were acknowledged",
-                            "format": "date-time"
+                            "format": "date-time",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                            "examples": ["2024-01-20T15:30:00Z"]
                         }
                     },
-                    "required": ["acknowledgment", "version", "timestamp"]
+                    "required": ["acknowledgment", "version", "timestamp", "documentUrl"]
                 },
                 "privacyPolicy": {
                     "type": "object",
@@ -1400,16 +1415,27 @@
                             "type": "string",
                             "title": "Privacy Policy Version",
                             "description": "Version of the Privacy Policy being acknowledged",
-                            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                            "examples": ["1.0.0", "2.1.3"]
+                        },
+                        "documentUrl": {
+                            "type": "string",
+                            "title": "Privacy Policy URL",
+                            "description": "URL to the specific version of privacy policy",
+                            "format": "uri",
+                            "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                            "contentMediaType": "text/html"
                         },
                         "timestamp": {
                             "type": "string",
                             "title": "Acknowledgment Timestamp",
                             "description": "When the privacy policy was acknowledged",
-                            "format": "date-time"
+                            "format": "date-time",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                            "examples": ["2024-01-20T15:30:00Z"]
                         }
                     },
-                    "required": ["acknowledgment", "version", "timestamp"]
+                    "required": ["acknowledgment", "version", "timestamp", "documentUrl"]
                 },
                 "intellectualProperty": {
                     "type": "object",
@@ -1425,13 +1451,46 @@
                             "type": "string",
                             "title": "IP Details",
                             "description": "Additional details about intellectual property rights (if applicable)",
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
+                        },
+                        "attachments": {
+                            "type": "array",
+                            "title": "IP Documentation",
+                            "description": "Supporting documentation for IP rights (if applicable)",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "documentType": {
+                                        "type": "string",
+                                        "enum": ["patent", "trademark", "copyright", "license", "other"],
+                                        "description": "Type of IP documentation"
+                                    },
+                                    "documentUrl": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                                        "contentMediaType": "application/pdf"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
+                                    }
+                                },
+                                "required": ["documentType", "documentUrl", "description"]
+                            },
+                            "maxItems": 10
                         },
                         "timestamp": {
                             "type": "string",
                             "title": "Acknowledgment Timestamp",
                             "description": "When the IP declaration was made",
-                            "format": "date-time"
+                            "format": "date-time",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                            "examples": ["2024-01-20T15:30:00Z"]
                         }
                     },
                     "required": ["acknowledgment", "timestamp"]
@@ -1458,14 +1517,28 @@
                             "description": "I confirm that all information provided is accurate and complete",
                             "const": true
                         },
+                        "jurisdictions": {
+                            "type": "array",
+                            "title": "Applicable Jurisdictions",
+                            "description": "List of jurisdictions where compliance is declared",
+                            "items": {
+                                "type": "string",
+                                "pattern": "^[A-Z]{2}$",
+                                "description": "ISO 3166-1 alpha-2 country code"
+                            },
+                            "minItems": 1,
+                            "uniqueItems": true
+                        },
                         "timestamp": {
                             "type": "string",
                             "title": "Acknowledgment Timestamp",
                             "description": "When the compliance declaration was made",
-                            "format": "date-time"
+                            "format": "date-time",
+                            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                            "examples": ["2024-01-20T15:30:00Z"]
                         }
                     },
-                    "required": ["legalCompliance", "noConflictOfInterest", "accurateInformation", "timestamp"]
+                    "required": ["legalCompliance", "noConflictOfInterest", "accurateInformation", "jurisdictions", "timestamp"]
                 },
                 "additionalAcknowledgments": {
                     "type": "array",
@@ -1478,7 +1551,8 @@
                                 "type": "string",
                                 "title": "Acknowledgment Type",
                                 "minLength": 5,
-                                "maxLength": 100
+                                "maxLength": 100,
+                                "pattern": "^[a-zA-Z][a-zA-Z0-9_\\-\\.]*$"
                             },
                             "acknowledgment": {
                                 "type": "boolean",
@@ -1490,12 +1564,24 @@
                                 "title": "Description",
                                 "description": "Detailed description of what is being acknowledged",
                                 "minLength": 10,
-                                "maxLength": 500
+                                "maxLength": 500,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            },
+                            "documentUrl": {
+                                "type": "string",
+                                "title": "Reference Document",
+                                "description": "URL to the document being acknowledged",
+                                "format": "uri",
+                                "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                                "contentMediaType": "text/html"
                             },
                             "timestamp": {
                                 "type": "string",
                                 "title": "Acknowledgment Timestamp",
-                                "format": "date-time"
+                                "format": "date-time",
+                                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                                "examples": ["2024-01-20T15:30:00Z"]
                             }
                         },
                         "required": ["type", "acknowledgment", "description", "timestamp"]
