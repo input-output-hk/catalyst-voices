@@ -6,8 +6,8 @@
         },
         "proposer": {
             "mainApplicant": "John Smith",
-            "applicant_type": "Entity (Incorporated)",
-            "co-proposers": ["Alice Johnson", "Bob Wilson"]
+            "applicantType": "Entity (Incorporated)",
+            "coProposers": ["Alice Johnson", "Bob Wilson"]
         }
     },
     "proposalSummary": {
@@ -27,7 +27,7 @@
     "horizons": {
         "category": {
             "primaryCategory": "DeFi",
-            "subCategory": "Integration Tools"
+            "subCategory": "Developer Tools"
         },
         "tags": ["defi", "integration", "developer-tools", "smart-contracts"]
     },

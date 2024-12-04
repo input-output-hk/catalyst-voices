@@ -51,7 +51,7 @@
                             "pattern": "^[\\S\\s]*$",
                             "contentMediaType": "text/plain"
                         },
-                        "applicant_type": {
+                        "applicantType": {
                             "type": "string",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
@@ -62,8 +62,8 @@
                                 "Entity (Not Incorporated)"
                             ]
                         },
-                        "co-proposers": {
-                            "type": "string",
+                        "coProposers": {
+                            "type": "array",
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
                             "$comment": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. IMPORTANT A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 13 rules for added detail.",
@@ -105,7 +105,7 @@
                 "time": {
                     "type": "object",
                     "properties": {
-                        "project_duration": {
+                        "projectDuration": {
                             "type": "integer",
                             "title": "Project Duration in Months",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
@@ -114,7 +114,7 @@
                             "examples": ["Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out."]
                         }
                     },
-                    "required": ["project_duration"]
+                    "required": ["projectDuration"]
                 },
                 "translation": {
                     "type": "object",
@@ -428,91 +428,67 @@
                             "type": "string",
                             "title": "Sub-category",
                             "description": "Specific area within the main category",
-                            "enum": {
-                                "Governance": [
-                                    "DAO",
-                                    "Voting",
-                                    "Treasury Management"
-                                ],
-                                "Education": [
-                                    "Learn to Earn",
-                                    "Training",
-                                    "Translation"
-                                ],
-                                "Community & Outreach": [
-                                    "Connected Community",
-                                    "Social Media",
-                                    "Community Building"
-                                ],
-                                "Development & Tools": [
-                                    "Developer Tools",
-                                    "L2 Infrastructure",
-                                    "Analytics",
-                                    "AI Research",
-                                    "UTXO",
-                                    "P2P"
-                                ],
-                                "Identity & Security": [
-                                    "Identity & Verification",
-                                    "Cybersecurity",
-                                    "Authentication",
-                                    "Privacy"
-                                ],
-                                "DeFi": [
-                                    "Payments",
-                                    "Stablecoin",
-                                    "Risk Management",
-                                    "Yield",
-                                    "Staking",
-                                    "Lending"
-                                ],
-                                "Real World Applications": [
-                                    "Wallet",
-                                    "Marketplace",
-                                    "Manufacturing",
-                                    "IoT",
-                                    "Financial Services",
-                                    "E-commerce",
-                                    "Business Services",
-                                    "Supply Chain",
-                                    "Real Estate",
-                                    "Healthcare",
-                                    "Tourism",
-                                    "Entertainment",
-                                    "RWA",
-                                    "Music",
-                                    "Tokenization"
-                                ],
-                                "Events & Marketing": [
-                                    "Events",
-                                    "Marketing",
-                                    "Hackathons",
-                                    "Accelerator",
-                                    "Incubator"
-                                ],
-                                "Interoperability": [
-                                    "Cross-chain",
-                                    "Off-chain",
-                                    "Bridges"
-                                ],
-                                "Legal & Policy": [
-                                    "Policy",
-                                    "Advocacy",
-                                    "Standards",
-                                    "Compliance"
-                                ],
-                                "Sustainability": [
-                                    "Environment",
-                                    "Agriculture",
-                                    "Clean Energy"
-                                ],
-                                "Smart Contracts": [
-                                    "Development",
-                                    "Security",
-                                    "Templates",
-                                    "Auditing"
-                                ]
-                            }
+                            "enum": [
+                                "DAO",
+                                "Voting",
+                                "Treasury Management",
+                                "Learn to Earn",
+                                "Training",
+                                "Translation",
+                                "Connected Community",
+                                "Social Media",
+                                "Community Building",
+                                "Developer Tools",
+                                "L2 Infrastructure",
+                                "Analytics",
+                                "AI Research",
+                                "UTXO",
+                                "P2P",
+                                "Identity & Verification",
+                                "Cybersecurity",
+                                "Authentication",
+                                "Privacy",
+                                "Payments",
+                                "Stablecoin",
+                                "Risk Management",
+                                "Yield",
+                                "Staking",
+                                "Lending",
+                                "Wallet",
+                                "Marketplace",
+                                "Manufacturing",
+                                "IoT",
+                                "Financial Services",
+                                "E-commerce",
+                                "Business Services",
+                                "Supply Chain",
+                                "Real Estate",
+                                "Healthcare",
+                                "Tourism",
+                                "Entertainment",
+                                "RWA",
+                                "Music",
+                                "Tokenization",
+                                "Events",
+                                "Marketing",
+                                "Hackathons",
+                                "Accelerator",
+                                "Incubator",
+                                "Cross-chain",
+                                "Off-chain",
+                                "Bridges",
+                                "Policy",
+                                "Advocacy",
+                                "Standards",
+                                "Compliance",
+                                "Environment",
+                                "Agriculture",
+                                "Clean Energy",
+                                "Development",
+                                "Security",
+                                "Templates",
+                                "Auditing"
+                            ]
                         }
                     }
                 },
@@ -884,7 +860,6 @@
                                         },
                                         "type": {
                                             "type": "string",
-                                            "title": "Deliverable Type",
                                             "enum": [
                                                 "Documentation",
                                                 "Software",
