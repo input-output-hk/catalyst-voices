@@ -4,8 +4,10 @@ import 'package:catalyst_voices/pages/overall_spaces/space/treasury_overview.dar
 import 'package:catalyst_voices/pages/overall_spaces/space/voting_overview.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/workspace_overview.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SpacesListView extends StatefulWidget {
   const SpacesListView({
@@ -27,6 +29,8 @@ class _SpacesListViewState extends State<SpacesListView> {
 
   @override
   Widget build(BuildContext context) {
+    final sessionBloc = context.watch<SessionCubit>();
+    final activeAccount = sessionBloc.account;
     return VoicesScrollbar(
       controller: _scrollController,
       alwaysVisible: true,
@@ -40,14 +44,41 @@ class _SpacesListViewState extends State<SpacesListView> {
           return switch (space) {
             Space.discovery => DiscoveryOverview(key: ObjectKey(space)),
             Space.workspace => WorkspaceOverview(key: ObjectKey(space)),
-            Space.voting => VotingOverview(key: ObjectKey(space)),
+            Space.voting =>
+              GreyOut(child: VotingOverview(key: ObjectKey(space))),
             Space.fundedProjects =>
-              FundedProjectsOverview(key: ObjectKey(space)),
-            Space.treasury => TreasuryOverview(key: ObjectKey(space)),
+              GreyOut(child: FundedProjectsOverview(key: ObjectKey(space))),
+            Space.treasury => Offstage(
+                offstage: activeAccount?.isAdmin == false,
+                child: TreasuryOverview(
+                  key: ObjectKey(space),
+                ),
+              ),
           };
         },
         separatorBuilder: (context, index) => const SizedBox(width: 16),
         itemCount: Space.values.length,
+      ),
+    );
+  }
+}
+
+class GreyOut extends StatelessWidget {
+  final Widget child;
+  final bool greyOut;
+  const GreyOut({
+    super.key,
+    required this.child,
+    this.greyOut = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      ignoring: greyOut,
+      child: Opacity(
+        opacity: greyOut ? 0.5 : 1,
+        child: child,
       ),
     );
   }

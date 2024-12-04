@@ -17,6 +17,8 @@ final class Account extends Equatable {
   // Note. this is not defined yet what we will show here.
   String get acronym => 'A';
 
+  bool get isAdmin => true;
+
   @override
   List<Object?> get props => [
         keychainId,
