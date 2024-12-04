@@ -18,7 +18,7 @@ use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
     prepared_statement::PreparedStatement, serialize::row::SerializeRow,
-    transport::iterator::RowIterator, Session,
+    transport::iterator::QueryPager, Session,
 };
 
 use super::{FallibleQueryResults, SizedBatch};
@@ -240,7 +240,7 @@ impl PreparedQueries {
     /// returns.
     pub(crate) async fn execute_iter(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery,
-    ) -> anyhow::Result<RowIterator> {
+    ) -> anyhow::Result<QueryPager> {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoAda => &self.select_txo_ada,
             PreparedSelectQuery::TxoAssets => &self.select_txo_assets,

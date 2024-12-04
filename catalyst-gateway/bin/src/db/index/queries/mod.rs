@@ -416,7 +416,7 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
 /// returns.
 pub(crate) async fn session_execute_iter<P>(
     session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
-) -> anyhow::Result<RowIterator>
+) -> anyhow::Result<QueryPager>
 where P: SerializeRow {
     session
         .execute_iter(prepared_stmt.clone(), params)

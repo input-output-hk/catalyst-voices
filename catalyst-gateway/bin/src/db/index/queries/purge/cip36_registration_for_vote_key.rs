@@ -2,7 +2,7 @@
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
     Session,
 };
 use tracing::error;
@@ -90,11 +90,11 @@ impl PrimaryKeyQuery {
     /// Executes a query to get all CIP-36 registration by Vote key primary keys.
     pub(crate) async fn execute(
         session: &CassandraSession,
-    ) -> anyhow::Result<TypedRowIterator<result::PrimaryKey>> {
+    ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
             .purge_execute_iter(PreparedSelectQuery::Cip36RegistrationForVoteKey)
             .await?
-            .into_typed::<result::PrimaryKey>();
+            .rows_stream::<result::PrimaryKey>()?;
 
         Ok(iter)
     }

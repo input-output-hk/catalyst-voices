@@ -177,7 +177,7 @@ impl CassandraSession {
     /// Execute a select query to gather primary keys for purging.
     pub(crate) async fn purge_execute_iter(
         &self, query: purge::PreparedSelectQuery,
-    ) -> anyhow::Result<RowIterator> {
+    ) -> anyhow::Result<QueryPager> {
         // Only execute purge queries on the volatile session
         let persistent = false;
         let Some(volatile_db) = Self::get(persistent) else {
