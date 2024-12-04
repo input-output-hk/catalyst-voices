@@ -10,26 +10,31 @@ import '../../helpers/helpers.dart';
 void main() {
   late VoicesColorScheme voicesColors;
 
-  final draftCampaignTest = DraftCampaignInfo(
+  final draftCampaignTest = CampaignInfo(
     id: 'campaign_draft',
+    stage: CampaignStage.draft,
     startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Draft Campaign Test',
   );
 
-  final scheduledCampaignTest = DraftCampaignInfo(
-    id: 'campaign_draft',
+  final scheduledCampaignTest = CampaignInfo(
+    id: 'campaign_scheduled',
+    stage: CampaignStage.scheduled,
     startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Scheduled Campaign Test',
   );
 
-  final liveCampaignTest = LiveCampaignInfo(
+  final liveCampaignTest = CampaignInfo(
     id: 'campaign_live',
+    stage: CampaignStage.live,
     startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Live Campaign Test',
   );
 
-  const completedCampaignText = CompletedCampaignInfo(
+  final completedCampaignText = CampaignInfo(
     id: 'campaign_completed',
+    stage: CampaignStage.completed,
+    startDate: DateTime(2024, 11, 20, 13, 00, 00),
     description: 'Completed Campaign Test',
   );
 

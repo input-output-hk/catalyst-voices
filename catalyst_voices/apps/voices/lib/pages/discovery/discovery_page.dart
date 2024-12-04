@@ -224,10 +224,7 @@ class _CampaignDetailsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<CampaignInfoCubit, CampaignInfoState, String?>(
-      selector: (state) => switch (state) {
-        LoadingCampaignInfoState() => null,
-        LoadedCampaignInfoState(:final campaign) => campaign?.id,
-      },
+      selector: (state) => state.campaign?.id,
       builder: (context, campaignId) {
         if (campaignId == null) {
           return const Offstage();
@@ -261,12 +258,10 @@ class _CampaignStage extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 500),
         child: BlocBuilder<CampaignInfoCubit, CampaignInfoState>(
           builder: (context, state) {
-            return switch (state) {
-              LoadingCampaignInfoState() => const Offstage(),
-              LoadedCampaignInfoState(:final campaign) => campaign != null
-                  ? CampaignStageCard(campaign: campaign)
-                  : const Offstage()
-            };
+            final campaign = state.campaign;
+            return campaign != null
+                ? CampaignStageCard(campaign: campaign)
+                : const Offstage();
           },
         ),
       ),

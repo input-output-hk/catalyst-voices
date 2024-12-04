@@ -60,12 +60,19 @@ class CampaignStageCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (!campaign.stage.isDraft) ...[
+            if (campaign.stage == CampaignStage.live) ...[
               const SizedBox(height: 16),
               OutlinedButton(
                 // TODO(ryszard-schossler): add logic
                 onPressed: () {},
-                child: Text(_getButtonText(context)),
+                child: Text(context.l10n.viewProposals),
+              ),
+            ] else if (campaign.stage == CampaignStage.completed) ...[
+              const SizedBox(height: 16),
+              OutlinedButton(
+                // TODO(ryszard-schossler): add logic
+                onPressed: () {},
+                child: Text(context.l10n.viewVotingResults),
               ),
             ],
           ],
@@ -74,20 +81,11 @@ class CampaignStageCard extends StatelessWidget {
     );
   }
 
-  String _getButtonText(BuildContext context) {
-    if (campaign.stage == CampaignStage.live) {
-      return context.l10n.viewProposals;
-    } else {
-      return context.l10n.viewVotingResults;
-    }
-  }
-
   String _getDateInformation(BuildContext context) {
-    if (campaign is CampaignDateTimeMixin) {
-      final dateMixin = campaign as CampaignDateTimeMixin;
+    if (campaign.stage != CampaignStage.completed) {
       final formattedDate =
-          DateFormatter.formatDateTimeParts(dateMixin.startDate);
-      return dateMixin.localizedDate(context.l10n, formattedDate);
+          DateFormatter.formatDateTimeParts(campaign.startDate);
+      return campaign.localizedDate(context.l10n, formattedDate);
     } else {
       return '';
     }

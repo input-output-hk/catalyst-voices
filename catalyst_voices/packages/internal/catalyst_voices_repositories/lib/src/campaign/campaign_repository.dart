@@ -1,11 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 class CampaignRepository {
-  Future<Campaign?> getActiveCampaign() {
-    // TODO(dtscalac): replace by api call
-    return getCampaign(id: 'F14');
-  }
-
   Future<Campaign> getCampaign({
     required String id,
   }) async {
