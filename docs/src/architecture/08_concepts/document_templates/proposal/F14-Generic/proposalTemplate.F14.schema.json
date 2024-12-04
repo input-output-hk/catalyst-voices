@@ -28,7 +28,9 @@
                             "description": "A clear, unambiguous, and concise title for your proposal",
                             "minLength": 1,
                             "maxLength": 60,
-                            "examples": ["DeFi Integration Platform for Cardano"]
+                            "examples": ["DeFi Integration Platform for Cardano"],
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         }
                     },
                     "additionalProperties": false,
@@ -45,7 +47,9 @@
                             "description": "Name and surname of main applicant",
                             "$comment": "Please provide the name and surname of the main applicant. The main applicant is considered as the individual responsible for the project and the person authorized to act on behalf of other applicants (where applicable).",
                             "minLength": 2,
-                            "maxLength": 100
+                            "maxLength": 100,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "applicant_type": {
                             "type": "string",
@@ -98,7 +102,7 @@
                         }
                     }
                 },
-                "Time": {
+                "time": {
                     "type": "object",
                     "properties": {
                         "project_duration": {
@@ -112,7 +116,7 @@
                     },
                     "required": ["project_duration"]
                 },
-                "Translation": {
+                "translation": {
                     "type": "object",
                     "title": "Translation Information",
                     "description": "Information about the proposal's language and translation status",
@@ -129,13 +133,17 @@
                             "description": "If auto-translated, specify the original language of your proposal",
                             "minLength": 2,
                             "maxLength": 50,
-                            "examples": ["Spanish", "Japanese", "French"]
+                            "examples": ["Spanish", "Japanese", "French"],
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "translationNotes": {
                             "type": "string",
                             "title": "Translation Notes",
                             "description": "Additional notes about the translation or original language content",
-                            "maxLength": 500
+                            "maxLength": 500,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         }
                     },
                     "required": ["isTranslated"],
@@ -150,7 +158,7 @@
                         "required": ["originalLanguage"]
                     }
                 },
-                "Problem": {
+                "problem": {
                     "type": "object",
                     "title": "Problem Statement",
                     "description": "Define the problem your proposal aims to solve",
@@ -161,7 +169,9 @@
                             "description": "Clearly define the problem you aim to solve. This will be visible in the Catalyst voting app.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "examples": ["The Cardano ecosystem lacks standardized tools for cross-protocol communication, resulting in fragmented user experiences and inefficient resource utilization."]
+                            "examples": ["The Cardano ecosystem lacks standardized tools for cross-protocol communication, resulting in fragmented user experiences and inefficient resource utilization."],
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "impactArea": {
                             "type": "array",
@@ -189,7 +199,7 @@
                     },
                     "required": ["statement", "impactArea"]
                 },
-                "Solution": {
+                "solution": {
                     "type": "object",
                     "title": "Solution Overview",
                     "description": "Describe your proposed solution to the problem",
@@ -200,13 +210,17 @@
                             "description": "Briefly describe your solution. Focus on what you will do or create to solve the problem.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "examples": ["Develop an open-source integration framework that standardizes protocol communication and provides a unified API layer for seamless DeFi interactions."]
+                            "examples": ["Develop an open-source integration framework that standardizes protocol communication and provides a unified API layer for seamless DeFi interactions."],
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "approach": {
                             "type": "string",
                             "title": "Technical Approach",
                             "description": "Outline the technical approach or methodology you will use",
-                            "maxLength": 500
+                            "maxLength": 500,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "innovationAspects": {
                             "type": "array",
@@ -214,7 +228,9 @@
                             "description": "Key innovative aspects of your solution",
                             "items": {
                                 "type": "string",
-                                "maxLength": 100
+                                "maxLength": 100,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
                             },
                             "minItems": 1,
                             "maxItems": 5,
@@ -244,7 +260,9 @@
                                         "examples": [
                                             "https://github.com/your-org/project",
                                             "https://your-project-docs.com"
-                                        ]
+                                        ],
+                                        "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
+                                        "contentMediaType": "text/uri-list"
                                     },
                                     "type": {
                                         "type": "string",
@@ -271,7 +289,9 @@
                                         "examples": [
                                             "Project's main GitHub repository containing all source code",
                                             "Technical whitepaper detailing the solution architecture"
-                                        ]
+                                        ],
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     }
                                 },
                                 "required": ["url", "type", "description"]
@@ -285,18 +305,22 @@
                             "format": "uri",
                             "pattern": "^https://(github\\.com|gitlab\\.com|bitbucket\\.org)/.*",
                             "title": "Main Code Repository",
-                            "description": "Primary repository where the project's code will be hosted"
+                            "description": "Primary repository where the project's code will be hosted",
+                            "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
+                            "contentMediaType": "text/uri-list"
                         },
                         "documentation": {
                             "type": "string",
                             "format": "uri",
                             "pattern": "^https://.*",
                             "title": "Documentation URL",
-                            "description": "Main documentation site or resource for the project"
+                            "description": "Main documentation site or resource for the project",
+                            "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
+                            "contentMediaType": "text/uri-list"
                         }
                     }
                 },
-                "Dependencies": {
+                "dependencies": {
                     "type": "object",
                     "title": "Project Dependencies",
                     "description": "External dependencies and requirements for project success",
@@ -318,7 +342,9 @@
                                         "type": "string",
                                         "title": "Dependency Name",
                                         "description": "Name of the organization, technology, or resource",
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "type": {
                                         "type": "string",
@@ -336,13 +362,17 @@
                                         "type": "string",
                                         "title": "Description",
                                         "description": "Explain why this dependency is essential and how it affects your project",
-                                        "maxLength": 500
+                                        "maxLength": 500,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "mitigationPlan": {
                                         "type": "string",
                                         "title": "Mitigation Plan",
                                         "description": "How will you handle potential issues with this dependency",
-                                        "maxLength": 300
+                                        "maxLength": 300,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     }
                                 },
                                 "required": ["name", "type", "description"]
@@ -365,7 +395,7 @@
             }
         },
 
-        "Horizons": {
+        "horizons": {
             "type": "object",
             "title": "Project Horizons",
             "description": "Long-term vision and categorization of your project",
@@ -493,7 +523,9 @@
                     "items": {
                         "type": "string",
                         "minLength": 2,
-                        "maxLength": 30
+                        "maxLength": 30,
+                        "pattern": "^[\\S\\s]*$",
+                        "contentMediaType": "text/plain"
                     },
                     "minItems": 1,
                     "maxItems": 5,
@@ -535,19 +567,25 @@
                                         "type": "string",
                                         "title": "Metric Name",
                                         "description": "Name of the metric",
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "target": {
                                         "type": "string",
                                         "title": "Target Value",
                                         "description": "Target value or goal for this metric",
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "measurement": {
                                         "type": "string",
                                         "title": "Measurement Method",
                                         "description": "How this metric will be measured",
-                                        "maxLength": 200
+                                        "maxLength": 200,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     }
                                 },
                                 "required": ["metric", "target", "measurement"]
@@ -579,14 +617,18 @@
                             "maxLength": 2000,
                             "examples": [
                                 "Our solution involves developing a decentralized education platform that will..."
-                            ]
+                            ],
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "uniqueValue": {
                             "type": "string",
                             "title": "Unique Value Proposition",
                             "description": "What makes your solution unique and innovative?",
                             "minLength": 50,
-                            "maxLength": 500
+                            "maxLength": 500,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "targetAudience": {
                             "type": "array",
@@ -595,7 +637,9 @@
                             "items": {
                                 "type": "string",
                                 "minLength": 5,
-                                "maxLength": 100
+                                "maxLength": 100,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
                             },
                             "minItems": 1,
                             "maxItems": 5,
@@ -606,7 +650,9 @@
                             "title": "Implementation Approach",
                             "description": "How will you implement your solution?",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         }
                     },
                     "required": ["description", "uniqueValue", "targetAudience", "implementation"]
@@ -621,7 +667,9 @@
                             "title": "Community Benefit",
                             "description": "How will the Cardano community benefit from your project?",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "metrics": {
                             "type": "array",
@@ -634,25 +682,33 @@
                                         "type": "string",
                                         "title": "Metric Name",
                                         "minLength": 5,
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "description": {
                                         "type": "string",
                                         "title": "Metric Description",
                                         "minLength": 20,
-                                        "maxLength": 300
+                                        "maxLength": 300,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "target": {
                                         "type": "string",
                                         "title": "Target Value",
                                         "minLength": 1,
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "measurement": {
                                         "type": "string",
                                         "title": "Measurement Method",
                                         "minLength": 20,
-                                        "maxLength": 300
+                                        "maxLength": 300,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     }
                                 },
                                 "required": ["name", "description", "target", "measurement"]
@@ -667,7 +723,9 @@
                             "items": {
                                 "type": "string",
                                 "minLength": 10,
-                                "maxLength": 200
+                                "maxLength": 200,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
                             },
                             "minItems": 1,
                             "maxItems": 10,
@@ -686,14 +744,18 @@
                             "title": "Team Experience",
                             "description": "Describe your team's relevant experience and capabilities",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "feasibilityApproach": {
                             "type": "string",
                             "title": "Feasibility Approach",
                             "description": "How will you validate the feasibility of your approach?",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "riskMitigation": {
                             "type": "array",
@@ -706,7 +768,9 @@
                                         "type": "string",
                                         "title": "Risk Description",
                                         "minLength": 10,
-                                        "maxLength": 200
+                                        "maxLength": 200,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "impact": {
                                         "type": "string",
@@ -717,7 +781,9 @@
                                         "type": "string",
                                         "title": "Mitigation Strategy",
                                         "minLength": 20,
-                                        "maxLength": 300
+                                        "maxLength": 300,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     }
                                 },
                                 "required": ["risk", "impact", "mitigation"]
@@ -730,7 +796,9 @@
                             "title": "Fund Management",
                             "description": "How will you ensure proper management and accountability of funds?",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         }
                     },
                     "required": ["teamExperience", "feasibilityApproach", "riskMitigation", "fundManagement"]
@@ -746,7 +814,7 @@
                 "milestonesConfig": {
                     "type": "object",
                     "title": "Milestones Configuration",
-                    "description": "Configuration for number of milestones based on grant amount",
+                    "description": "Configuration for number of milestones",
                     "properties": {
                         "grantAmount": {
                             "type": "number",
@@ -778,14 +846,18 @@
                                 "title": "Milestone Title",
                                 "description": "Short, descriptive title for the milestone",
                                 "minLength": 5,
-                                "maxLength": 100
+                                "maxLength": 100,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
                             },
                             "description": {
                                 "type": "string",
                                 "title": "Milestone Description",
                                 "description": "Detailed description of what this milestone entails",
                                 "minLength": 50,
-                                "maxLength": 1000
+                                "maxLength": 1000,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
                             },
                             "deliverables": {
                                 "type": "array",
@@ -798,13 +870,17 @@
                                             "type": "string",
                                             "title": "Deliverable Name",
                                             "minLength": 5,
-                                            "maxLength": 100
+                                            "maxLength": 100,
+                                            "pattern": "^[\\S\\s]*$",
+                                            "contentMediaType": "text/plain"
                                         },
                                         "description": {
                                             "type": "string",
                                             "title": "Deliverable Description",
                                             "minLength": 20,
-                                            "maxLength": 500
+                                            "maxLength": 500,
+                                            "pattern": "^[\\S\\s]*$",
+                                            "contentMediaType": "text/plain"
                                         },
                                         "type": {
                                             "type": "string",
@@ -831,7 +907,9 @@
                                 "items": {
                                     "type": "string",
                                     "minLength": 10,
-                                    "maxLength": 200
+                                    "maxLength": 200,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
                                 },
                                 "minItems": 1,
                                 "maxItems": 5
@@ -860,7 +938,9 @@
                                             "type": "string",
                                             "title": "Evidence Description",
                                             "minLength": 20,
-                                            "maxLength": 300
+                                            "maxLength": 300,
+                                            "pattern": "^[\\S\\s]*$",
+                                            "contentMediaType": "text/plain"
                                         }
                                     },
                                     "required": ["type", "description"]
@@ -923,7 +1003,9 @@
                                                 "description": {
                                                     "type": "string",
                                                     "minLength": 10,
-                                                    "maxLength": 200
+                                                    "maxLength": 200,
+                                                    "pattern": "^[\\S\\s]*$",
+                                                    "contentMediaType": "text/plain"
                                                 }
                                             },
                                             "required": ["category", "amount", "description"]
@@ -961,7 +1043,9 @@
                                     "title": "Project Summary",
                                     "description": "Overall summary of project achievements",
                                     "minLength": 100,
-                                    "maxLength": 2000
+                                    "maxLength": 2000,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
                                 },
                                 "keyAchievements": {
                                     "type": "array",
@@ -969,7 +1053,9 @@
                                     "items": {
                                         "type": "string",
                                         "minLength": 10,
-                                        "maxLength": 200
+                                        "maxLength": 200,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "minItems": 1,
                                     "maxItems": 10
@@ -980,7 +1066,9 @@
                                     "items": {
                                         "type": "string",
                                         "minLength": 20,
-                                        "maxLength": 500
+                                        "maxLength": 500,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "minItems": 1,
                                     "maxItems": 5
@@ -990,7 +1078,9 @@
                                     "title": "Future Steps",
                                     "description": "Plans for project continuation or future development",
                                     "minLength": 50,
-                                    "maxLength": 1000
+                                    "maxLength": 1000,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
                                 }
                             },
                             "required": ["summary", "keyAchievements", "lessonsLearned", "futureSteps"]
@@ -1003,7 +1093,9 @@
                                     "type": "string",
                                     "title": "Video URL",
                                     "format": "uri",
-                                    "pattern": "^https://"
+                                    "pattern": "^https://",
+                                    "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
+                                    "contentMediaType": "text/uri-list"
                                 },
                                 "duration": {
                                     "type": "integer",
@@ -1015,7 +1107,9 @@
                                     "type": "string",
                                     "title": "Video Description",
                                     "minLength": 50,
-                                    "maxLength": 500
+                                    "maxLength": 500,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
                                 }
                             },
                             "required": ["url", "duration", "description"]
@@ -1048,14 +1142,18 @@
                                         "title": "Name",
                                         "description": "Full name of the team member",
                                         "minLength": 2,
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "role": {
                                         "type": "string",
                                         "title": "Role",
                                         "description": "Primary role in the project",
                                         "minLength": 5,
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "expertise": {
                                         "type": "array",
@@ -1063,7 +1161,9 @@
                                         "items": {
                                             "type": "string",
                                             "minLength": 3,
-                                            "maxLength": 50
+                                            "maxLength": 50,
+                                            "pattern": "^[\\S\\s]*$",
+                                            "contentMediaType": "text/plain"
                                         },
                                         "minItems": 1,
                                         "maxItems": 5,
@@ -1074,7 +1174,9 @@
                                         "title": "Relevant Experience",
                                         "description": "Brief description of relevant experience",
                                         "minLength": 50,
-                                        "maxLength": 500
+                                        "maxLength": 500,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "links": {
                                         "type": "array",
@@ -1097,11 +1199,15 @@
                                                 "url": {
                                                     "type": "string",
                                                     "format": "uri",
-                                                    "pattern": "^https://"
+                                                    "pattern": "^https://",
+                                                    "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
+                                                    "contentMediaType": "text/uri-list"
                                                 },
                                                 "description": {
                                                     "type": "string",
-                                                    "maxLength": 100
+                                                    "maxLength": 100,
+                                                    "pattern": "^[\\S\\s]*$",
+                                                    "contentMediaType": "text/plain"
                                                 }
                                             },
                                             "required": ["type", "url"]
@@ -1119,7 +1225,9 @@
                             "title": "Team Capabilities",
                             "description": "Overview of the team's collective capabilities and why they are best suited for this project",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "previousWork": {
                             "type": "array",
@@ -1132,25 +1240,33 @@
                                         "type": "string",
                                         "title": "Project Name",
                                         "minLength": 3,
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "description": {
                                         "type": "string",
                                         "title": "Project Description",
                                         "minLength": 50,
-                                        "maxLength": 500
+                                        "maxLength": 500,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "relevance": {
                                         "type": "string",
                                         "title": "Relevance to Current Proposal",
                                         "minLength": 50,
-                                        "maxLength": 300
+                                        "maxLength": 300,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "url": {
                                         "type": "string",
                                         "title": "Project URL",
                                         "format": "uri",
-                                        "pattern": "^https://"
+                                        "pattern": "^https://",
+                                        "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
+                                        "contentMediaType": "text/uri-list"
                                     }
                                 },
                                 "required": ["projectName", "description", "relevance"]
@@ -1199,7 +1315,9 @@
                                     "description": {
                                         "type": "string",
                                         "minLength": 20,
-                                        "maxLength": 300
+                                        "maxLength": 300,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "breakdown": {
                                         "type": "array",
@@ -1209,7 +1327,9 @@
                                                 "item": {
                                                     "type": "string",
                                                     "minLength": 5,
-                                                    "maxLength": 100
+                                                    "maxLength": 100,
+                                                    "pattern": "^[\\S\\s]*$",
+                                                    "contentMediaType": "text/plain"
                                                 },
                                                 "cost": {
                                                     "type": "number",
@@ -1218,7 +1338,9 @@
                                                 "justification": {
                                                     "type": "string",
                                                     "minLength": 20,
-                                                    "maxLength": 200
+                                                    "maxLength": 200,
+                                                    "pattern": "^[\\S\\s]*$",
+                                                    "contentMediaType": "text/plain"
                                                 }
                                             },
                                             "required": ["item", "cost", "justification"]
@@ -1242,7 +1364,9 @@
                                             "milestone": {
                                                 "type": "string",
                                                 "minLength": 5,
-                                                "maxLength": 100
+                                                "maxLength": 100,
+                                                "pattern": "^[\\S\\s]*$",
+                                                "contentMediaType": "text/plain"
                                             },
                                             "amount": {
                                                 "type": "number",
@@ -1274,7 +1398,9 @@
                             "title": "Cost-Benefit Analysis",
                             "description": "Analysis of the project's costs versus its benefits to the Cardano ecosystem",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "impactMetrics": {
                             "type": "array",
@@ -1287,19 +1413,25 @@
                                         "type": "string",
                                         "title": "Metric Name",
                                         "minLength": 5,
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "target": {
                                         "type": "string",
                                         "title": "Target Value",
                                         "minLength": 1,
-                                        "maxLength": 100
+                                        "maxLength": 100,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     },
                                     "justification": {
                                         "type": "string",
                                         "title": "Value Justification",
                                         "minLength": 50,
-                                        "maxLength": 300
+                                        "maxLength": 300,
+                                        "pattern": "^[\\S\\s]*$",
+                                        "contentMediaType": "text/plain"
                                     }
                                 },
                                 "required": ["metric", "target", "justification"]
@@ -1312,7 +1444,9 @@
                             "title": "Long-term Value",
                             "description": "Description of the long-term value and sustainability of the project",
                             "minLength": 100,
-                            "maxLength": 1000
+                            "maxLength": 1000,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
                         },
                         "communityBenefits": {
                             "type": "array",
@@ -1321,7 +1455,9 @@
                             "items": {
                                 "type": "string",
                                 "minLength": 20,
-                                "maxLength": 200
+                                "maxLength": 200,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
                             },
                             "minItems": 2,
                             "maxItems": 5
