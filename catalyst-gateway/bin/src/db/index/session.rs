@@ -22,10 +22,10 @@ use super::{
         FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
         PreparedUpsertQuery,
     },
-    schema::create_schema,
+    schema::{create_schema, get_table_names},
 };
 use crate::{
-    db::index::{queries, schema::TABLES},
+    db::index::{queries, schema::namespace},
     settings::{cassandra_db, Settings},
 };
 
@@ -113,15 +113,8 @@ impl CassandraSession {
     /// returns.
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
-
-    ) -> anyhow::Result<RowIterator>
-    where
-        P: SerializeRow,
-    {
-
     ) -> anyhow::Result<QueryPager>
     where P: SerializeRow {
-
         let session = self.session.clone();
         let queries = self.queries.clone();
 
@@ -280,11 +273,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
 
         // Check if we are on AWS infrastructure
         if on_aws(session.clone()).await {
-            let key_space = if persistent {
-                format!("persistent_{}", cfg.keyspace_uid.clone())
-            } else {
-                format!("volatile_{}", cfg.keyspace_uid.clone())
-            };
+            let key_space = namespace(&cfg);
 
             match session.use_keyspace(key_space.clone(), false).await {
                 Ok(()) => (),
@@ -294,6 +283,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                 },
             }
 
+            // poll until the status of all tables are ACTIVE
             while check_all_tables(session.clone(), key_space.clone())
                 .await
                 .is_err()
@@ -342,11 +332,10 @@ pub async fn on_aws(session: Arc<Session>) -> bool {
     session.query_unpaged(ON_AWS, []).await.is_ok()
 }
 
-/// Check tables are active before continuing
+/// Check tables are active in AWS keyspaces
 async fn check_all_tables(session: Arc<Session>, keyspace: String) -> anyhow::Result<()> {
-    for table in TABLES {
-        table_creation_status_keyspaces(session.clone(), keyspace.clone(), (*table).to_string())
-            .await?;
+    for table in get_table_names()? {
+        table_creation_status_keyspaces(session.clone(), keyspace.clone(), table).await?;
     }
 
     Ok(())
@@ -367,17 +356,17 @@ async fn table_creation_status_keyspaces(
         &json!({"keyspace_name": keyspace,"table_name":table_name}),
     )?;
 
-    session
-        .query_unpaged(query, [])
+    let table_status: (String,) = session
+        .query_unpaged(query, &[])
         .await?
-        .first_row()?
-        .columns
-        .into_iter()
-        .flatten()
-        .find_map(scylla::frame::response::result::CqlValue::into_string)
-        .map(|status| status == "ACTIVE")
-        .ok_or("Table is not active")
-        .map_err(|err| anyhow::anyhow!("{:?} {:?} {:?}", err, table_name, keyspace))
+        .into_rows_result()?
+        .first_row::<(String,)>()?;
+
+    if table_status.0 == "ACTIVE" {
+        Ok(true)
+    } else {
+        Err(anyhow::anyhow!("Table not active yet {:?}", table_name))
+    }
 }
 
 /// Check keyspace creation status in Amazon Keyspaces
@@ -392,15 +381,15 @@ pub async fn keyspace_creation_status(
     reg.register_escape_fn(|s| s.into());
     let query = reg.render_template(AWS_KEYSPACE_CHECK, &json!({"keyspace_name": keyspace}))?;
 
-    session
-        .query_unpaged(query, [])
+    let keyspace_name: (String,) = session
+        .query_unpaged(query, &[])
         .await?
-        .first_row()?
-        .columns
-        .into_iter()
-        .flatten()
-        .find_map(scylla::frame::response::result::CqlValue::into_string)
-        .map(|keyspace_name| keyspace_name == keyspace)
-        .ok_or("Keyspace is not created")
-        .map_err(|err| anyhow::anyhow!("{:?} {:?}", err, keyspace))
+        .into_rows_result()?
+        .first_row::<(String,)>()?;
+
+    if keyspace_name.0 == keyspace {
+        Ok(true)
+    } else {
+        Err(anyhow::anyhow!("Keyspace not created yet {:?}", keyspace))
+    }
 }

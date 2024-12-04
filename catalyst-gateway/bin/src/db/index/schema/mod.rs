@@ -3,6 +3,7 @@
 use std::{sync::Arc, thread, time::Duration};
 
 use anyhow::Context;
+use fancy_regex::Regex;
 use handlebars::Handlebars;
 use scylla::Session;
 use serde_json::json;
@@ -22,24 +23,6 @@ const SCHEMA_VERSION: &str = "75ae6ac9-ddd8-8472-8a7a-8676d04f8679";
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
-
-/// List of tables for AWS ALIVE check
-pub const TABLES: &[&str] = &[
-    "chain_root_for_role0_key",
-    "chain_root_for_stake_addr",
-    "chain_root_for_txn_id",
-    "cip36_registration",
-    "cip36_registration_for_vote_key",
-    "cip36_registration_invalid",
-    "rbac509_registration",
-    "stake_registration",
-    "txi_by_txn_hash",
-    "sync_status",
-    "txo_by_stake",
-    "txo_assets_by_stake",
-    "unstaked_txo_assets_by_txn_hash",
-    "unstaked_txo_by_txn_hash",
-];
 
 /// All Schema Creation Statements
 const SCHEMAS: &[(&str, &str)] = &[
@@ -227,10 +210,11 @@ async fn create_namespace(
             .is_err()
         {}
 
-        // Despite the query saying the keyspace has been created,
-        // it sometimes has not, so we still need to induce a latency to ensure creation has taken
-        // place
-        if let Some(latency) = cfg.aws_latency { thread::sleep(Duration::from_secs(latency)) }
+        // induce latency as aws remote resources are not available immediately despite saying
+        // so..
+        if let Some(latency) = cfg.deployment_latency {
+            thread::sleep(Duration::from_secs(latency));
+        }
     }
 
     if let Err(error) = session.use_keyspace(keyspace.clone(), false).await {
@@ -262,9 +246,63 @@ pub(crate) async fn create_schema(
     Ok(())
 }
 
+/// Get table names from schema
+/// `https://regex101.com/r/pPF7NI/1`
+pub fn get_table_names() -> anyhow::Result<Vec<String>> {
+    // Extract table names from schemas
+    // Using Positive Lookbehind hence fancy regex
+    let re = Regex::new(r"(?<=CREATE TABLE IF NOT EXISTS).* ")?;
+
+    // collect table names
+    let mut table_names = Vec::new();
+
+    for (schema, _schema_name) in SCHEMAS {
+        for cql_file_line in schema.lines() {
+            // Extract table name
+            let Ok(captures) = re.captures(cql_file_line) else {
+                continue;
+            };
+
+            // Extract captures
+            let Some(cc) = captures else { continue };
+
+            // Should be just 1 match
+            let group = match cc.get(0) {
+                Some(g) => g.as_str().replace(' ', "").to_ascii_lowercase(),
+                None => continue,
+            };
+
+            table_names.push(group.as_str().to_string());
+
+            // Table name successfully extracted from cql file, no further processing needed in this
+            // file.
+            break;
+        }
+    }
+    Ok(table_names)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// List of tables
+    pub const TABLES: &[&str] = &[
+        "sync_status",
+        "txo_by_stake",
+        "txo_assets_by_stake",
+        "unstaked_txo_by_txn_hash",
+        "unstaked_txo_assets_by_txn_hash",
+        "txi_by_txn_hash",
+        "stake_registration",
+        "cip36_registration",
+        "cip36_registration_invalid",
+        "cip36_registration_for_vote_key",
+        "rbac509_registration",
+        "chain_root_for_txn_id",
+        "chain_root_for_role0_key",
+        "chain_root_for_stake_addr",
+    ];
 
     #[test]
     /// This test is designed to fail if the schema version has changed.
@@ -316,5 +354,12 @@ mod tests {
         let input = "   \n  -- comment here\n   ";
         let expected_output = "";
         assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
+
+    #[test]
+    fn test_table_name_extraction() {
+        let tables = get_table_names().unwrap();
+        let matching = TABLES.iter().zip(&tables).filter(|&(a, b)| a == b).count();
+        assert!(matching == TABLES.len() && matching == tables.len());
     }
 }

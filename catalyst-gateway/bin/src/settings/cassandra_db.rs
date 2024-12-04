@@ -35,7 +35,7 @@ const MAX_BATCH_SIZE: i64 = 256;
 
 /// AWS remote latency, resources are not created instanly hence we need to add delays
 /// before we access them.
-const AWS_LATENCY_DEFAULT: u64 = 45;
+const LATENCY_DEFAULT: u64 = 60;
 
 /// Configuration for an individual cassandra cluster.
 #[derive(Clone)]
@@ -67,11 +67,8 @@ pub(crate) struct EnvVars {
     /// Config options for deployment i.e replication strategy
     pub(crate) deployment: StringEnvVar,
 
-    /// Keyspace UID
-    pub(crate) keyspace_uid: StringEnvVar,
-
     /// AWS infra latency in seconds, remote resources are not created instantly
-    pub(crate) aws_latency: Option<u64>,
+    pub(crate) deployment_latency: Option<u64>,
 }
 
 impl EnvVars {
@@ -111,15 +108,11 @@ impl EnvVars {
                 &format!("CASSANDRA_{name}_DEPLOYMENT"),
                 "{'class': 'NetworkTopologyStrategy','replication_factor': 1}".into(),
             ),
-            keyspace_uid: StringEnvVar::new(
-                &format!("CASSANDRA_{name}_KEYSPACE_UID"),
-                "default".into(),
-            ),
-            aws_latency: Some(StringEnvVar::new_as(
-                &format!("CASSANDRA_{name}_AWS_LATENCY"),
-                AWS_LATENCY_DEFAULT,
-                AWS_LATENCY_DEFAULT,
-                AWS_LATENCY_DEFAULT,
+            deployment_latency: Some(StringEnvVar::new_as(
+                &format!("CASSANDRA_{name}_DEPLOYMENT_LATENCY"),
+                LATENCY_DEFAULT,
+                LATENCY_DEFAULT,
+                LATENCY_DEFAULT,
             )),
         }
     }
