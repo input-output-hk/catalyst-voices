@@ -11,5 +11,13 @@ targets:
       swagger_dart_code_generator:
         options:
           input_folder: "openapi/"
-          output_folder: "lib/generated/catalyst_gateway"
+          output_folder: "lib/generated/api"
           separate_models: true
+          overriden_models:
+            - file_name: "vitss-openapi"
+              import_url: "../../src/api_models/overriden_models.dart"
+              overriden_models:
+                - SimpleProposal$ProposalCategory
+                - SimpleProposal$Proposer
+                - CommunityChoiceProposal$ProposalCategory
+                - CommunityChoiceProposal$Proposer
