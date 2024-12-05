@@ -1,184 +1,266 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
-    "version": "1.0.0",
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
-    "type": "object",
-    "properties": {
-        "$schema": {
+    "definitions": {
+        "schemaReferenceNonUI": {
+            "$comment": "NOT UI: used to identify the kind of template document used.",
             "type": "string",
             "format": "path",
-            "const": "./proposalTemplate.F14.schema.json",
             "readOnly": true
         },
-        "setup": {
+        "section": {
+            "$comment": "UI - Logical Document Section Break.",
             "type": "object",
+            "additionalProperties": false
+        },
+        "subsection": {
+            "$comment": "UI - Logical Document Sub-Section Break.",
+            "type": "object",
+            "additionalProperties": false
+        },
+        "singleLineTextEntry": {
+            "$comment": "UI - Single Line text entry without any markup or rich text capability.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^.*$"
+        },
+        "multiLineTextEntry": {
+            "$comment": "UI - Multiline text entry without any markup or rich text capability.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^[\\S\\s]$"
+        },
+        "dropDownSingleSelect": {
+            "$comment": "UI - Drop Down Selection of a single entry from the defined enum.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^.*$",
+            "format": "dropDownSingleSelect"
+        },
+        "multiSelect": {
+            "$comment": "UI - Multiselect from the given items.",
+            "type": "array",
+            "uniqueItems": true,
+            "format": "multiSelect"
+        },
+        "singleLineTextEntryList": {
+            "$comment": "UI - A Growable List of single line text (no markup or richtext).",
+            "type": "array",
+            "format": "singleLineTextEntryList",
+            "uniqueItems": true,
+            "default": [],
+            "items": {
+                "$ref": "#/definitions/singleLineTextEntry",
+                "maxLength": 1024
+            }
+        },
+        "tokenValueCardanoADA": {
+            "$comment": "UI - A Token Value denominated in Cardano ADA.",
+            "type": "integer",
+            "format": "token:cardano:ada"
+        },
+        "durationInMonths": {
+            "$comment": "UI - A Duration represented in total months.",
+            "type": "integer",
+            "format": "datetime:duration:months"
+        },
+        "yesNoChoice": {
+            "$comment": "UI - A Boolean choice, represented as a Yes/No selection.  Yes = true.",
+            "type": "boolean",
+            "format": "yes/no",
+            "default": false
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "$ref": "#/definitions/schemaReferenceNonUI",
+            "default": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+            "const": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
+        },
+        "setup": {
+            "$ref": "#/definitions/section",
             "title": "proposal setup",
             "description": "Proposal title",
             "properties": {
                 "title": {
-                    "type": "object",
+                    "$ref": "#/definitions/subsection",
                     "title": "proposal setup",
                     "description": "Proposal title",
                     "properties": {
                         "title": {
-                            "type": "string",
+                            "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Proposal Title",
                             "description": "A clear, unambiguous, and concise title for your proposal",
                             "minLength": 1,
                             "maxLength": 60,
-                            "examples": ["DeFi Integration Platform for Cardano"],
-                            "pattern": "^[\\S\\s]*$",
-                            "contentMediaType": "text/plain"
+                            "examples": [
+                                "DeFi Integration Platform for Cardano"
+                            ]
                         }
                     },
-                    "additionalProperties": false,
                     "required": [
                         "title"
                     ]
                 },
                 "proposer": {
-                    "type": "object",
+                    "$ref": "#/definitions/subsection",
                     "properties": {
-                        "mainApplicant": {
-                            "type": "string",
+                        "applicant": {
+                            "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Name and surname of main applicant",
                             "description": "Name and surname of main applicant",
-                            "$comment": "Please provide the name and surname of the main applicant. The main applicant is considered as the individual responsible for the project and the person authorized to act on behalf of other applicants (where applicable).",
+                            "x-guidance": "Please provide the name and surname of the main applicant. The main applicant is considered as the individual responsible for the project and the person authorized to act on behalf of other applicants (where applicable).",
                             "minLength": 2,
-                            "maxLength": 100,
-                            "pattern": "^[\\S\\s]*$",
-                            "contentMediaType": "text/plain"
+                            "maxLength": 100
                         },
-                        "applicantType": {
-                            "type": "string",
+                        "type": {
+                            "$ref": "#/definitions/dropDownSingleSelect",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
-                            "$comment": "Please select from one of the following: 1. Individual 2. Entity (Incorporated) 3. Entity (Not Incorporated)",
+                            "x-guidance": "Please select from one of the following: 1. Individual 2. Entity (Incorporated) 3. Entity (Not Incorporated)",
                             "enum": [
                                 "Individual",
                                 "Entity (Incorporated)",
                                 "Entity (Not Incorporated)"
-                            ]
+                            ],
+                            "default": "Individual"
                         },
-                        "coProposers": {
-                            "type": "array",
+                        "coproposers": {
+                            "$ref": "#/definitions/singleLineTextEntryList",
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
-                            "$comment": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. IMPORTANT A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 13 rules for added detail.",
-                            "items": {
-                                "type": "string"
-                            },
-                            "maxItems": 5
+                            "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. IMPORTANT A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 13 rules for added detail.",
+                            "maxItems": 5,
+                            "minItems": 0
                         }
                     },
-                    "required": ["mainApplicant", "applicantType"]
+                    "required": [
+                        "applicant",
+                        "type"
+                    ]
                 }
             },
-            "required": ["title", "proposer"]
+            "required": [
+                "title",
+                "proposer"
+            ]
         },
-        "proposalSummary": {
-            "type": "object",
+        "summary": {
+            "$ref": "#/definitions/section",
             "title": "Proposal Summary",
             "description": "Key information about your proposal",
             "properties": {
                 "budget": {
-                    "type": "object",
+                    "$ref": "#/definitions/subsection",
                     "title": "Budget Information",
                     "properties": {
                         "requestedFunds": {
-                            "type": "number",
+                            "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Requested funds in ADA",
                             "description": "The amount of funding requested for your proposal",
+                            "x-guidance": "There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category: Minimum Funding Amount per proposal: Cardano Open: A15,000 Cardano Uses Cases: A15,000 Cardano Partners: A500,000 Maximum Funding Amount per proposal: Cardano Open: Developers (technical): A200,000 • Ecosystem (non-technical): A100,000 Cardano Uses Cases: Concept A150,000 Product: A500,000 Cardano Partners: Enterprise R&D A2,000,000 Growth & Acceleration: A2,000,000",
                             "minimum": 15000,
-                            "maximum": 2000000,
-                            "examples": ["There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category: Minimum Funding Amount per proposal: Cardano Open: A15,000 Cardano Uses Cases: A15,000 Cardano Partners: A500,000 Maximum Funding Amount per proposal: Cardano Open: Developers (technical): A200,000 • Ecosystem (non-technical): A100,000 Cardano Uses Cases: Concept A150,000 Product: A500,000 Cardano Partners: Enterprise R&D A2,000,000 Growth & Acceleration: A2,000,000"],
-                            "format": "cardano:ada",
-                            "errorMessage": {
-                                "minimum": "Minimum funding amount is 15,000 ADA",
-                                "maximum": "Maximum funding amount is 2,000,000 ADA"
-                            }
-                        }
-                    }
-                },
-                "time": {
-                    "type": "object",
-                    "properties": {
-                        "projectDuration": {
-                            "type": "integer",
-                            "title": "Project Duration in Months",
-                            "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
-                            "minimum": 2,
-                            "maximum": 12,
-                            "examples": ["Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out."]
+                            "maximum": 2000000
                         }
                     },
-                    "required": ["projectDuration"]
+                    "required": [
+                        "requestedFunds"
+                    ]
+                },
+                "time": {
+                    "$ref": "#/definitions/subsection",
+                    "properties": {
+                        "duration": {
+                            "$ref": "#/definitions.durationInMonths",
+                            "title": "Project Duration in Months",
+                            "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
+                            "x-guidance": "Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out.",
+                            "minimum": 2,
+                            "maximum": 12
+                        }
+                    },
+                    "required": [
+                        "projectDuration"
+                    ]
                 },
                 "translation": {
-                    "type": "object",
+                    "$ref": "#/definitions/subsection",
                     "title": "Translation Information",
                     "description": "Information about the proposal's language and translation status",
                     "properties": {
-                        "isTranslated": {
-                            "type": "boolean",
+                        "translated": {
+                            "$ref": "#/definitions/yesNoChoice",
                             "title": "Auto-translated Status",
-                            "description": "Indicate if your proposal has been auto-translated into English from another language",
-                            "default": false
+                            "description": "Indicate if your proposal has been auto-translated into English from another language"
                         },
-                        "originalLanguage": {
-                            "type": "string",
+                        "original": {
+                            "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Original Language",
                             "description": "If auto-translated, specify the original language of your proposal",
                             "minLength": 2,
                             "maxLength": 50,
-                            "examples": ["Spanish", "Japanese", "French"],
-                            "pattern": "^[\\S\\s]*$",
-                            "contentMediaType": "text/plain"
+                            "examples": [
+                                "Spanish",
+                                "Japanese",
+                                "French"
+                            ]
                         },
-                        "translationNotes": {
-                            "type": "string",
+                        "notes": {
+                            "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Translation Notes",
                             "description": "Additional notes about the translation or original language content",
-                            "maxLength": 500,
-                            "pattern": "^[\\S\\s]*$",
-                            "contentMediaType": "text/plain"
+                            "maxLength": 500
                         }
                     },
-                    "required": ["isTranslated"],
+                    "required": [
+                        "isTranslated"
+                    ],
                     "dependencies": {
-                        "originalLanguage": ["isTranslated"],
-                        "translationNotes": ["isTranslated"]
+                        "originalLanguage": [
+                            "isTranslated"
+                        ],
+                        "translationNotes": [
+                            "isTranslated"
+                        ]
                     },
                     "if": {
-                        "properties": { "isTranslated": { "const": true } }
+                        "properties": {
+                            "isTranslated": {
+                                "const": true
+                            }
+                        }
                     },
                     "then": {
-                        "required": ["originalLanguage"]
+                        "required": [
+                            "originalLanguage"
+                        ]
                     }
                 },
                 "problem": {
-                    "type": "object",
+                    "$ref": "#/definitions/subsection",
                     "title": "Problem Statement",
                     "description": "Define the problem your proposal aims to solve",
                     "properties": {
                         "statement": {
-                            "type": "string",
+                            "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Problem Description",
                             "description": "Clearly define the problem you aim to solve. This will be visible in the Catalyst voting app.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "examples": ["The Cardano ecosystem lacks standardized tools for cross-protocol communication, resulting in fragmented user experiences and inefficient resource utilization."],
-                            "pattern": "^[\\S\\s]*$",
-                            "contentMediaType": "text/plain"
+                            "examples": [
+                                "The Cardano ecosystem lacks standardized tools for cross-protocol communication, resulting in fragmented user experiences and inefficient resource utilization."
+                            ]
                         },
-                        "impactArea": {
-                            "type": "array",
+                        "impact": {
+                            "$ref": "#/definitions/multiSelect",
                             "title": "Impact Areas",
                             "description": "Select the areas that will be most impacted by solving this problem",
                             "items": {
-                                "type": "string",
+                                "$ref": "singleLineTextEntry",
                                 "enum": [
                                     "Technical Infrastructure",
                                     "User Experience",
@@ -193,26 +275,28 @@
                                 ]
                             },
                             "minItems": 1,
-                            "maxItems": 3,
-                            "uniqueItems": true
+                            "maxItems": 3
                         }
                     },
-                    "required": ["statement", "impactArea"]
+                    "required": [
+                        "statement",
+                        "impact"
+                    ]
                 },
                 "solution": {
-                    "type": "object",
+                    "$ref": "#/definitions/subsection",
                     "title": "Solution Overview",
                     "description": "Describe your proposed solution to the problem",
                     "properties": {
                         "summary": {
-                            "type": "string",
+                            "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Solution Summary",
                             "description": "Briefly describe your solution. Focus on what you will do or create to solve the problem.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "examples": ["Develop an open-source integration framework that standardizes protocol communication and provides a unified API layer for seamless DeFi interactions."],
-                            "pattern": "^[\\S\\s]*$",
-                            "contentMediaType": "text/plain"
+                            "examples": [
+                                "Develop an open-source integration framework that standardizes protocol communication and provides a unified API layer for seamless DeFi interactions."
+                            ]
                         },
                         "approach": {
                             "type": "string",
@@ -237,7 +321,10 @@
                             "uniqueItems": true
                         }
                     },
-                    "required": ["summary", "approach"]
+                    "required": [
+                        "summary",
+                        "approach"
+                    ]
                 },
                 "SupportingLinks": {
                     "type": "object",
@@ -294,7 +381,11 @@
                                         "contentMediaType": "text/plain"
                                     }
                                 },
-                                "required": ["url", "type", "description"]
+                                "required": [
+                                    "url",
+                                    "type",
+                                    "description"
+                                ]
                             },
                             "minItems": 0,
                             "maxItems": 10,
@@ -375,26 +466,39 @@
                                         "contentMediaType": "text/plain"
                                     }
                                 },
-                                "required": ["name", "type", "description"]
+                                "required": [
+                                    "name",
+                                    "type",
+                                    "description"
+                                ]
                             },
                             "minItems": 0,
                             "maxItems": 10
                         }
                     },
-                    "required": ["hasDependencies"],
+                    "required": [
+                        "hasDependencies"
+                    ],
                     "dependencies": {
-                        "details": ["hasDependencies"]
+                        "details": [
+                            "hasDependencies"
+                        ]
                     },
                     "if": {
-                        "properties": { "hasDependencies": { "const": true } }
+                        "properties": {
+                            "hasDependencies": {
+                                "const": true
+                            }
+                        }
                     },
                     "then": {
-                        "required": ["details"]
+                        "required": [
+                            "details"
+                        ]
                     }
                 }
             }
         },
-
         "horizons": {
             "type": "object",
             "title": "Project Horizons",
@@ -564,16 +668,29 @@
                                         "contentMediaType": "text/plain"
                                     }
                                 },
-                                "required": ["metric", "target", "measurement"]
+                                "required": [
+                                    "metric",
+                                    "target",
+                                    "measurement"
+                                ]
                             },
                             "minItems": 1,
                             "maxItems": 5
                         }
                     },
-                    "required": ["timeframe", "scale", "metrics"]
+                    "required": [
+                        "timeframe",
+                        "scale",
+                        "metrics"
+                    ]
                 }
             },
-            "required": ["primaryCategory", "subCategory", "tags", "impact"]
+            "required": [
+                "primaryCategory",
+                "subCategory",
+                "tags",
+                "impact"
+            ]
         },
         "proposalDetails": {
             "type": "object",
@@ -631,7 +748,12 @@
                             "contentMediaType": "text/plain"
                         }
                     },
-                    "required": ["description", "uniqueValue", "targetAudience", "implementation"]
+                    "required": [
+                        "description",
+                        "uniqueValue",
+                        "targetAudience",
+                        "implementation"
+                    ]
                 },
                 "impact": {
                     "type": "object",
@@ -687,7 +809,12 @@
                                         "contentMediaType": "text/plain"
                                     }
                                 },
-                                "required": ["name", "description", "target", "measurement"]
+                                "required": [
+                                    "name",
+                                    "description",
+                                    "target",
+                                    "measurement"
+                                ]
                             },
                             "minItems": 2,
                             "maxItems": 5
@@ -708,7 +835,11 @@
                             "uniqueItems": true
                         }
                     },
-                    "required": ["communityBenefit", "metrics", "outputs"]
+                    "required": [
+                        "communityBenefit",
+                        "metrics",
+                        "outputs"
+                    ]
                 },
                 "capability": {
                     "type": "object",
@@ -750,7 +881,11 @@
                                     },
                                     "impact": {
                                         "type": "string",
-                                        "enum": ["Low", "Medium", "High"],
+                                        "enum": [
+                                            "Low",
+                                            "Medium",
+                                            "High"
+                                        ],
                                         "title": "Risk Impact"
                                     },
                                     "mitigation": {
@@ -762,7 +897,11 @@
                                         "contentMediaType": "text/plain"
                                     }
                                 },
-                                "required": ["risk", "impact", "mitigation"]
+                                "required": [
+                                    "risk",
+                                    "impact",
+                                    "mitigation"
+                                ]
                             },
                             "minItems": 1,
                             "maxItems": 5
@@ -777,10 +916,19 @@
                             "contentMediaType": "text/plain"
                         }
                     },
-                    "required": ["teamExperience", "feasibilityApproach", "riskMitigation", "fundManagement"]
+                    "required": [
+                        "teamExperience",
+                        "feasibilityApproach",
+                        "riskMitigation",
+                        "fundManagement"
+                    ]
                 }
             },
-            "required": ["solution", "impact", "capability"]
+            "required": [
+                "solution",
+                "impact",
+                "capability"
+            ]
         },
         "milestones": {
             "type": "object",
@@ -807,7 +955,10 @@
                             "maximum": 10
                         }
                     },
-                    "required": ["grantAmount", "numberOfMilestones"]
+                    "required": [
+                        "grantAmount",
+                        "numberOfMilestones"
+                    ]
                 },
                 "milestonesList": {
                     "type": "array",
@@ -870,7 +1021,11 @@
                                             ]
                                         }
                                     },
-                                    "required": ["name", "description", "type"]
+                                    "required": [
+                                        "name",
+                                        "description",
+                                        "type"
+                                    ]
                                 },
                                 "minItems": 1,
                                 "maxItems": 5
@@ -918,7 +1073,10 @@
                                             "contentMediaType": "text/plain"
                                         }
                                     },
-                                    "required": ["type", "description"]
+                                    "required": [
+                                        "type",
+                                        "description"
+                                    ]
                                 },
                                 "minItems": 1,
                                 "maxItems": 3
@@ -944,7 +1102,11 @@
                                         "maximum": 52
                                     }
                                 },
-                                "required": ["startDate", "endDate", "durationInWeeks"]
+                                "required": [
+                                    "startDate",
+                                    "endDate",
+                                    "durationInWeeks"
+                                ]
                             },
                             "budget": {
                                 "type": "object",
@@ -983,12 +1145,19 @@
                                                     "contentMediaType": "text/plain"
                                                 }
                                             },
-                                            "required": ["category", "amount", "description"]
+                                            "required": [
+                                                "category",
+                                                "amount",
+                                                "description"
+                                            ]
                                         },
                                         "minItems": 1
                                     }
                                 },
-                                "required": ["amount", "breakdown"]
+                                "required": [
+                                    "amount",
+                                    "breakdown"
+                                ]
                             }
                         },
                         "required": [
@@ -1058,7 +1227,12 @@
                                     "contentMediaType": "text/plain"
                                 }
                             },
-                            "required": ["summary", "keyAchievements", "lessonsLearned", "futureSteps"]
+                            "required": [
+                                "summary",
+                                "keyAchievements",
+                                "lessonsLearned",
+                                "futureSteps"
+                            ]
                         },
                         "demoVideo": {
                             "type": "object",
@@ -1087,13 +1261,24 @@
                                     "contentMediaType": "text/plain"
                                 }
                             },
-                            "required": ["url", "duration", "description"]
+                            "required": [
+                                "url",
+                                "duration",
+                                "description"
+                            ]
                         }
                     },
-                    "required": ["closeoutReport", "demoVideo"]
+                    "required": [
+                        "closeoutReport",
+                        "demoVideo"
+                    ]
                 }
             },
-            "required": ["milestonesConfig", "milestonesList", "finalMilestone"]
+            "required": [
+                "milestonesConfig",
+                "milestonesList",
+                "finalMilestone"
+            ]
         },
         "finalPitch": {
             "type": "object",
@@ -1185,12 +1370,20 @@
                                                     "contentMediaType": "text/plain"
                                                 }
                                             },
-                                            "required": ["type", "url"]
+                                            "required": [
+                                                "type",
+                                                "url"
+                                            ]
                                         },
                                         "maxItems": 5
                                     }
                                 },
-                                "required": ["name", "role", "expertise", "experience"]
+                                "required": [
+                                    "name",
+                                    "role",
+                                    "expertise",
+                                    "experience"
+                                ]
                             },
                             "minItems": 1,
                             "maxItems": 10
@@ -1244,12 +1437,19 @@
                                         "contentMediaType": "text/uri-list"
                                     }
                                 },
-                                "required": ["projectName", "description", "relevance"]
+                                "required": [
+                                    "projectName",
+                                    "description",
+                                    "relevance"
+                                ]
                             },
                             "maxItems": 5
                         }
                     },
-                    "required": ["members", "teamCapabilities"]
+                    "required": [
+                        "members",
+                        "teamCapabilities"
+                    ]
                 },
                 "budget": {
                     "type": "object",
@@ -1318,12 +1518,21 @@
                                                     "contentMediaType": "text/plain"
                                                 }
                                             },
-                                            "required": ["item", "cost", "justification"]
+                                            "required": [
+                                                "item",
+                                                "cost",
+                                                "justification"
+                                            ]
                                         },
                                         "minItems": 1
                                     }
                                 },
-                                "required": ["category", "amount", "description", "breakdown"]
+                                "required": [
+                                    "category",
+                                    "amount",
+                                    "description",
+                                    "breakdown"
+                                ]
                             },
                             "minItems": 1
                         },
@@ -1353,15 +1562,25 @@
                                                 "maximum": 100
                                             }
                                         },
-                                        "required": ["milestone", "amount", "percentage"]
+                                        "required": [
+                                            "milestone",
+                                            "amount",
+                                            "percentage"
+                                        ]
                                     },
                                     "minItems": 1
                                 }
                             },
-                            "required": ["distributionSchedule"]
+                            "required": [
+                                "distributionSchedule"
+                            ]
                         }
                     },
-                    "required": ["totalBudget", "categories", "timeline"]
+                    "required": [
+                        "totalBudget",
+                        "categories",
+                        "timeline"
+                    ]
                 },
                 "valueProposition": {
                     "type": "object",
@@ -1409,7 +1628,11 @@
                                         "contentMediaType": "text/plain"
                                     }
                                 },
-                                "required": ["metric", "target", "justification"]
+                                "required": [
+                                    "metric",
+                                    "target",
+                                    "justification"
+                                ]
                             },
                             "minItems": 2,
                             "maxItems": 5
@@ -1438,10 +1661,19 @@
                             "maxItems": 5
                         }
                     },
-                    "required": ["costBenefitAnalysis", "impactMetrics", "longTermValue", "communityBenefits"]
+                    "required": [
+                        "costBenefitAnalysis",
+                        "impactMetrics",
+                        "longTermValue",
+                        "communityBenefits"
+                    ]
                 }
             },
-            "required": ["team", "budget", "valueProposition"]
+            "required": [
+                "team",
+                "budget",
+                "valueProposition"
+            ]
         },
         "mandatoryAcknowledgments": {
             "type": "object",
@@ -1463,7 +1695,10 @@
                             "title": "Fund Rules Version",
                             "description": "Version of the Fund Rules being acknowledged",
                             "pattern": "^F[0-9]{1,3}$",
-                            "examples": ["F14", "F15"]
+                            "examples": [
+                                "F14",
+                                "F15"
+                            ]
                         },
                         "timestamp": {
                             "type": "string",
@@ -1471,10 +1706,16 @@
                             "description": "When the rules were acknowledged",
                             "format": "date-time",
                             "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
-                            "examples": ["2024-01-20T15:30:00Z"]
+                            "examples": [
+                                "2024-01-20T15:30:00Z"
+                            ]
                         }
                     },
-                    "required": ["acknowledgment", "version", "timestamp"]
+                    "required": [
+                        "acknowledgment",
+                        "version",
+                        "timestamp"
+                    ]
                 },
                 "termsAndConditions": {
                     "type": "object",
@@ -1491,7 +1732,10 @@
                             "title": "Terms Version",
                             "description": "Version of the Terms and Conditions being acknowledged",
                             "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-                            "examples": ["1.0.0", "2.1.3"]
+                            "examples": [
+                                "1.0.0",
+                                "2.1.3"
+                            ]
                         },
                         "documentUrl": {
                             "type": "string",
@@ -1507,10 +1751,17 @@
                             "description": "When the terms were acknowledged",
                             "format": "date-time",
                             "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
-                            "examples": ["2024-01-20T15:30:00Z"]
+                            "examples": [
+                                "2024-01-20T15:30:00Z"
+                            ]
                         }
                     },
-                    "required": ["acknowledgment", "version", "timestamp", "documentUrl"]
+                    "required": [
+                        "acknowledgment",
+                        "version",
+                        "timestamp",
+                        "documentUrl"
+                    ]
                 },
                 "privacyPolicy": {
                     "type": "object",
@@ -1527,7 +1778,10 @@
                             "title": "Privacy Policy Version",
                             "description": "Version of the Privacy Policy being acknowledged",
                             "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-                            "examples": ["1.0.0", "2.1.3"]
+                            "examples": [
+                                "1.0.0",
+                                "2.1.3"
+                            ]
                         },
                         "documentUrl": {
                             "type": "string",
@@ -1543,10 +1797,17 @@
                             "description": "When the privacy policy was acknowledged",
                             "format": "date-time",
                             "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
-                            "examples": ["2024-01-20T15:30:00Z"]
+                            "examples": [
+                                "2024-01-20T15:30:00Z"
+                            ]
                         }
                     },
-                    "required": ["acknowledgment", "version", "timestamp", "documentUrl"]
+                    "required": [
+                        "acknowledgment",
+                        "version",
+                        "timestamp",
+                        "documentUrl"
+                    ]
                 },
                 "intellectualProperty": {
                     "type": "object",
@@ -1575,7 +1836,13 @@
                                 "properties": {
                                     "documentType": {
                                         "type": "string",
-                                        "enum": ["patent", "trademark", "copyright", "license", "other"],
+                                        "enum": [
+                                            "patent",
+                                            "trademark",
+                                            "copyright",
+                                            "license",
+                                            "other"
+                                        ],
                                         "description": "Type of IP documentation"
                                     },
                                     "documentUrl": {
@@ -1591,7 +1858,11 @@
                                         "contentMediaType": "text/plain"
                                     }
                                 },
-                                "required": ["documentType", "documentUrl", "description"]
+                                "required": [
+                                    "documentType",
+                                    "documentUrl",
+                                    "description"
+                                ]
                             },
                             "maxItems": 10
                         },
@@ -1601,10 +1872,15 @@
                             "description": "When the IP declaration was made",
                             "format": "date-time",
                             "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
-                            "examples": ["2024-01-20T15:30:00Z"]
+                            "examples": [
+                                "2024-01-20T15:30:00Z"
+                            ]
                         }
                     },
-                    "required": ["acknowledgment", "timestamp"]
+                    "required": [
+                        "acknowledgment",
+                        "timestamp"
+                    ]
                 },
                 "compliance": {
                     "type": "object",
@@ -1646,10 +1922,18 @@
                             "description": "When the compliance declaration was made",
                             "format": "date-time",
                             "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
-                            "examples": ["2024-01-20T15:30:00Z"]
+                            "examples": [
+                                "2024-01-20T15:30:00Z"
+                            ]
                         }
                     },
-                    "required": ["legalCompliance", "noConflictOfInterest", "accurateInformation", "jurisdictions", "timestamp"]
+                    "required": [
+                        "legalCompliance",
+                        "noConflictOfInterest",
+                        "accurateInformation",
+                        "jurisdictions",
+                        "timestamp"
+                    ]
                 },
                 "additionalAcknowledgments": {
                     "type": "array",
@@ -1692,10 +1976,17 @@
                                 "title": "Acknowledgment Timestamp",
                                 "format": "date-time",
                                 "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
-                                "examples": ["2024-01-20T15:30:00Z"]
+                                "examples": [
+                                    "2024-01-20T15:30:00Z"
+                                ]
                             }
                         },
-                        "required": ["type", "acknowledgment", "description", "timestamp"]
+                        "required": [
+                            "type",
+                            "acknowledgment",
+                            "description",
+                            "timestamp"
+                        ]
                     }
                 }
             },

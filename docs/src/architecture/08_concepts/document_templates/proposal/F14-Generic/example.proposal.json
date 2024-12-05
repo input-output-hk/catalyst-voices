@@ -1,5 +1,5 @@
 {
-    "$schema": "./proposalTemplate.F14.schema.json",
+    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
     "setup": {
         "title": {
             "title": "Cardano DeFi Integration Platform"
