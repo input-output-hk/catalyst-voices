@@ -32,8 +32,12 @@ void main() {
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
-    sessionCubit =
-        SessionCubit(userService, registrationService, notifier, accessControl);
+    sessionCubit = SessionCubit(
+      userService,
+      registrationService,
+      notifier,
+      accessControl,
+    );
   });
 
   tearDown(() async {
