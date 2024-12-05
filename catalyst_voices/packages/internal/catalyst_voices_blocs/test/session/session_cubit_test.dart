@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_blocs/src/session/session.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -12,6 +13,7 @@ void main() {
   late final UserService userService;
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
+  late final AccessControl accessControl;
 
   late SessionCubit sessionCubit;
 
@@ -25,11 +27,17 @@ void main() {
     );
     registrationService = _MockRegistrationService();
     notifier = RegistrationProgressNotifier();
+    accessControl = const AccessControl();
   });
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
-    sessionCubit = SessionCubit(userService, registrationService, notifier);
+    sessionCubit = SessionCubit(
+      userService,
+      registrationService,
+      notifier,
+      accessControl,
+    );
   });
 
   tearDown(() async {
