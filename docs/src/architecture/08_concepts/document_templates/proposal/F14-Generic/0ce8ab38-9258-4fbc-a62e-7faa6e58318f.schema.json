@@ -94,11 +94,11 @@
                         "title": {
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Proposal Title",
-                            "description": "A clear, unambiguous, and concise title for your proposal",
+                            "description": "<p><b>Proposal title</b></p><p>Please note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app. </p>",
                             "minLength": 1,
                             "maxLength": 60,
                             "examples": [
-                                "DeFi Integration Platform for Cardano"
+                                "<p>The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important.</p>"
                             ]
                         }
                     },
@@ -113,7 +113,7 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Name and surname of main applicant",
                             "description": "Name and surname of main applicant",
-                            "x-guidance": "Please provide the name and surname of the main applicant. The main applicant is considered as the individual responsible for the project and the person authorized to act on behalf of other applicants (where applicable).",
+                            "x-guidance": "<p>Please provide the name and surname of the main applicant. The main applicant is considered as the individual responsible for the project and the person authorized to act on behalf of other applicants (where applicable).</p>",
                             "minLength": 2,
                             "maxLength": 100
                         },
@@ -121,7 +121,7 @@
                             "$ref": "#/definitions/dropDownSingleSelect",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
-                            "x-guidance": "Please select from one of the following: 1. Individual 2. Entity (Incorporated) 3. Entity (Not Incorporated)",
+                            "x-guidance": "<p>Please select from one of the following:</p><ol><li>Individual</li><li>Entity (Incorporated)</li><li>Entity (Not Incorporated) </li></ol>",
                             "enum": [
                                 "Individual",
                                 "Entity (Incorporated)",
@@ -133,7 +133,7 @@
                             "$ref": "#/definitions/singleLineTextEntryList",
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
-                            "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. IMPORTANT A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 13 rules for added detail.",
+                            "x-guidance": "<p>List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. <b>IMPORTANT</b> A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 13 rules for added detail.</p>",
                             "maxItems": 5,
                             "minItems": 0
                         }
@@ -162,7 +162,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Requested funds in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category: Minimum Funding Amount per proposal: Cardano Open: A15,000 Cardano Uses Cases: A15,000 Cardano Partners: A500,000 Maximum Funding Amount per proposal: Cardano Open: Developers (technical): A200,000 • Ecosystem (non-technical): A100,000 Cardano Uses Cases: Concept A150,000 Product: A500,000 Cardano Partners: Enterprise R&D A2,000,000 Growth & Acceleration: A2,000,000",
+                            "x-guidance": "<p>There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category:</p><p>Minimum Funding Amount per proposal:</p><p>Cardano Open: A15,000</p><p>Cardano Uses Cases: A15,000</p><p>Cardano Partners: A500,000 </p><p>Maximum Funding Amount per proposal:</p><p>Cardano Open:</p><ul><li>Developers (technical): A200,000</li><li>Ecosystem (non-technical): A100,000</li></ul><p>Cardano Uses Cases:</p><ul><li>Concept A150,000</li><li>Product: A500,000</li></ul><p>Cardano Partners:</p><ul><li>Enterprise R&D A2,000,000</li><li>Growth & Acceleration: A2,000,000 </li></ul>",
                             "minimum": 15000,
                             "maximum": 2000000
                         }
@@ -178,7 +178,7 @@
                             "$ref": "#/definitions.durationInMonths",
                             "title": "Project Duration in Months",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
-                            "x-guidance": "Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out.",
+                            "x-guidance": "<p>Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out. </p> ",
                             "minimum": 2,
                             "maximum": 12
                         }
@@ -195,7 +195,8 @@
                         "translated": {
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Auto-translated Status",
-                            "description": "Indicate if your proposal has been auto-translated into English from another language"
+                            "description": "Indicate if your proposal has been auto-translated into English from another language",
+                            "x-guidance": "<p>Tick YES if your proposal has been auto-translated into English from another language  so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections. Tick NO if your proposal has not been auto-translated into English from another language</p>"
                         },
                         "original": {
                             "$ref": "#/definitions/singleLineTextEntry",
@@ -251,9 +252,7 @@
                             "description": "Clearly define the problem you aim to solve. This will be visible in the Catalyst voting app.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "examples": [
-                                "The Cardano ecosystem lacks standardized tools for cross-protocol communication, resulting in fragmented user experiences and inefficient resource utilization."
-                            ]
+                            "x-guidance": "<p>Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail. </p> "
                         },
                         "impact": {
                             "$ref": "#/definitions/multiSelect",
@@ -294,9 +293,7 @@
                             "description": "Briefly describe your solution. Focus on what you will do or create to solve the problem.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "examples": [
-                                "Develop an open-source integration framework that standardizes protocol communication and provides a unified API layer for seamless DeFi interactions."
-                            ]
+                           "x-guidance":"<p>Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how' This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail. </p> "
                         },
                         "approach": {
                             "type": "string",
@@ -335,6 +332,7 @@
                             "type": "array",
                             "title": "Resource Links",
                             "description": "Links to relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "x-guidance": "<p>Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your proposal. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any of the questions in this form because you feel the answers can be found elsewhere. If any links are specified make sure these are added in good order (first link must be present before specifying second). Also ensure all links include https. Without these steps, the form will not be submittable and show errors </p>",
                             "items": {
                                 "type": "object",
                                 "properties": {
@@ -426,6 +424,7 @@
                             "type": "array",
                             "title": "Dependency Details",
                             "description": "List and describe each dependency",
+                            "x-guidance": "<p>Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software. </p>",
                             "items": {
                                 "type": "object",
                                 "properties": {
@@ -496,6 +495,49 @@
                             "details"
                         ]
                     }
+                },
+                "open_source": {
+                    "title": "Project Open Source",
+                    "description": "Will your project's output/be s fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
+                    "x-guidance":"<p>Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software</p>",
+                    "properties": {
+                        "open_source": {
+                            "$ref": "#/definitions/yesNoChoice",
+                            "title": "Is Project Open Source?",
+                            "description": "Will your project's output/be s fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
+                            "x-guidance": "<p>Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software</p>"
+                        },
+                        "more_information": {
+                            "$ref": "#/definitions/multiLineTextEntry",
+                            "title": "More Information",
+                            "description": "Please provide here more information on the open source status of your project outputs",
+                            "maxLength": 500,
+                            "x-guidance": "<p>If you answered YES to the above question If declaring the project is open source in the application form, the project should be open source-available throughout the entire lifecycle of the project with a declared open-source repository. Please indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs If only certain elements of your code will be open source please clarify which elements will be open source here. If you answered NO to the above question, please give further details as to why your projects outputs will not be open source METADATA</p>"
+                        }
+                    },
+                    "required": [
+                        "isOpenSource"
+                    ],
+                    "dependencies": {
+                        "open_source": [
+                            "isOpenSource"
+                        ],
+                        "more_information": [
+                            "isOpenSource"
+                        ]
+                    },
+                    "if": {
+                        "properties": {
+                            "isOpenSource": {
+                                "const": true
+                            }
+                        }
+                    },
+                    "then": {
+                        "required": [
+                            "more_information"
+                        ]
+                    }
                 }
             }
         },
@@ -508,6 +550,7 @@
                     "type": "object",
                     "title": "Project Category",
                     "description": "Select the most relevant category and tags for your project",
+                    "x-guidance": "<p>Please choose the most relevant category group and tag related to the outcomes of your proposal. Can select only one group and one tag.</p>",
                     "properties": {
                         "primaryCategory": {
                             "type": "string",
@@ -701,6 +744,7 @@
                     "type": "object",
                     "title": "Solution Description",
                     "description": "Detailed description of your proposed solution",
+                    "x-guidance": "<p><b>YOUR PROJECT AND SOLUTION</b></p><p>How you write this section will depend on what type of proposal you are writing. You might want to include details on:</p><ul><li>How do you perceive the problem you are solving?</li><li>What are your reasons for approaching it in the way that you have?</li><li>Who will your project engage?</li><li>How will you demonstrate or prove your impact?</li></ul><p>Explain what is unique about your solution, who will benefit, and why this is important to Cardano. </p>",
                     "properties": {
                         "description": {
                             "type": "string",
@@ -759,6 +803,7 @@
                     "type": "object",
                     "title": "Project Impact",
                     "description": "Define and measure the impact of your project",
+                    "x-guidance": "<p>Please include here a description of how you intend to measure impact (whether quantitative or qualitative) and how and with whom you will share your outputs:</p><ul><li>In what way will the success of your project bring value to the Cardano Community?</li><li>How will you measure this impact?</li><li>How will you share the outputs and opportunities that result from your project? </li></ul>",
                     "properties": {
                         "communityBenefit": {
                             "type": "string",
@@ -845,6 +890,7 @@
                     "type": "object",
                     "title": "Capability & Feasibility",
                     "description": "Demonstrate your ability to deliver the project successfully",
+                    "x-guidance":"<p>Please describe your existing capabilities that demonstrate how and why you believe you're best suited to deliver this project? Please include the steps or processes that demonstrate that you can be trusted to manage funds properly. </p>",
                     "properties": {
                         "teamExperience": {
                             "type": "string",
@@ -864,48 +910,6 @@
                             "pattern": "^[\\S\\s]*$",
                             "contentMediaType": "text/plain"
                         },
-                        "riskMitigation": {
-                            "type": "array",
-                            "title": "Risk Mitigation",
-                            "description": "Key risks and mitigation strategies",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "risk": {
-                                        "type": "string",
-                                        "title": "Risk Description",
-                                        "minLength": 10,
-                                        "maxLength": 200,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "impact": {
-                                        "type": "string",
-                                        "enum": [
-                                            "Low",
-                                            "Medium",
-                                            "High"
-                                        ],
-                                        "title": "Risk Impact"
-                                    },
-                                    "mitigation": {
-                                        "type": "string",
-                                        "title": "Mitigation Strategy",
-                                        "minLength": 20,
-                                        "maxLength": 300,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    }
-                                },
-                                "required": [
-                                    "risk",
-                                    "impact",
-                                    "mitigation"
-                                ]
-                            },
-                            "minItems": 1,
-                            "maxItems": 5
-                        },
                         "fundManagement": {
                             "type": "string",
                             "title": "Fund Management",
@@ -919,7 +923,6 @@
                     "required": [
                         "teamExperience",
                         "feasibilityApproach",
-                        "riskMitigation",
                         "fundManagement"
                     ]
                 }
@@ -934,6 +937,7 @@
             "type": "object",
             "title": "Project Milestones",
             "description": "Detailed project milestones and deliverables",
+            "x-guidance": "<p>A clear set of milestones and acceptance criteria will demonstrate your capability to deliver the project as proposed. More guidance on submitting milestones as part of your project proposal can be found here</p><p>For Grant Amounts of up to 75k ada, at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (3 milestones in total)</p><p>For Grant Amounts over 75k ada up to 150k ada, at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (4 milestones in total)</p><p>For Grant Amounts over 150k ada up to 300k ada, at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (5 milestones in total)</p><p>For Grant Amounts exceeding 300k ada, at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (6 milestones in total)</p> ",
             "properties": {
                 "milestonesConfig": {
                     "type": "object",
@@ -951,8 +955,8 @@
                             "type": "integer",
                             "title": "Number of Milestones",
                             "description": "Total number of milestones including the final milestone",
-                            "minimum": 3,
-                            "maximum": 10
+                            "minimum": 2,
+                            "maximum": 6
                         }
                     },
                     "required": [
@@ -1172,112 +1176,11 @@
                     },
                     "minItems": 3,
                     "maxItems": 10
-                },
-                "finalMilestone": {
-                    "type": "object",
-                    "title": "Final Milestone",
-                    "description": "Project close-out milestone with final report and video",
-                    "properties": {
-                        "closeoutReport": {
-                            "type": "object",
-                            "title": "Project Close-out Report",
-                            "properties": {
-                                "summary": {
-                                    "type": "string",
-                                    "title": "Project Summary",
-                                    "description": "Overall summary of project achievements",
-                                    "minLength": 100,
-                                    "maxLength": 2000,
-                                    "pattern": "^[\\S\\s]*$",
-                                    "contentMediaType": "text/plain"
-                                },
-                                "keyAchievements": {
-                                    "type": "array",
-                                    "title": "Key Achievements",
-                                    "items": {
-                                        "type": "string",
-                                        "minLength": 10,
-                                        "maxLength": 200,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "minItems": 1,
-                                    "maxItems": 10
-                                },
-                                "lessonsLearned": {
-                                    "type": "array",
-                                    "title": "Lessons Learned",
-                                    "items": {
-                                        "type": "string",
-                                        "minLength": 20,
-                                        "maxLength": 500,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "minItems": 1,
-                                    "maxItems": 5
-                                },
-                                "futureSteps": {
-                                    "type": "string",
-                                    "title": "Future Steps",
-                                    "description": "Plans for project continuation or future development",
-                                    "minLength": 50,
-                                    "maxLength": 1000,
-                                    "pattern": "^[\\S\\s]*$",
-                                    "contentMediaType": "text/plain"
-                                }
-                            },
-                            "required": [
-                                "summary",
-                                "keyAchievements",
-                                "lessonsLearned",
-                                "futureSteps"
-                            ]
-                        },
-                        "demoVideo": {
-                            "type": "object",
-                            "title": "Project Demo Video",
-                            "properties": {
-                                "url": {
-                                    "type": "string",
-                                    "title": "Video URL",
-                                    "format": "uri",
-                                    "pattern": "^https://",
-                                    "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
-                                    "contentMediaType": "text/uri-list"
-                                },
-                                "duration": {
-                                    "type": "integer",
-                                    "title": "Duration in Minutes",
-                                    "minimum": 3,
-                                    "maximum": 15
-                                },
-                                "description": {
-                                    "type": "string",
-                                    "title": "Video Description",
-                                    "minLength": 50,
-                                    "maxLength": 500,
-                                    "pattern": "^[\\S\\s]*$",
-                                    "contentMediaType": "text/plain"
-                                }
-                            },
-                            "required": [
-                                "url",
-                                "duration",
-                                "description"
-                            ]
-                        }
-                    },
-                    "required": [
-                        "closeoutReport",
-                        "demoVideo"
-                    ]
-                }
+                }            
             },
             "required": [
                 "milestonesConfig",
-                "milestonesList",
-                "finalMilestone"
+                "milestonesList"
             ]
         },
         "finalPitch": {
@@ -1387,68 +1290,10 @@
                             },
                             "minItems": 1,
                             "maxItems": 10
-                        },
-                        "teamCapabilities": {
-                            "type": "string",
-                            "title": "Team Capabilities",
-                            "description": "Overview of the team's collective capabilities and why they are best suited for this project",
-                            "minLength": 100,
-                            "maxLength": 1000,
-                            "pattern": "^[\\S\\s]*$",
-                            "contentMediaType": "text/plain"
-                        },
-                        "previousWork": {
-                            "type": "array",
-                            "title": "Previous Work",
-                            "description": "Examples of relevant previous work or projects",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "projectName": {
-                                        "type": "string",
-                                        "title": "Project Name",
-                                        "minLength": 3,
-                                        "maxLength": 100,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "title": "Project Description",
-                                        "minLength": 50,
-                                        "maxLength": 500,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "relevance": {
-                                        "type": "string",
-                                        "title": "Relevance to Current Proposal",
-                                        "minLength": 50,
-                                        "maxLength": 300,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "url": {
-                                        "type": "string",
-                                        "title": "Project URL",
-                                        "format": "uri",
-                                        "pattern": "^https://",
-                                        "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
-                                        "contentMediaType": "text/uri-list"
-                                    }
-                                },
-                                "required": [
-                                    "projectName",
-                                    "description",
-                                    "relevance"
-                                ]
-                            },
-                            "maxItems": 5
                         }
                     },
                     "required": [
-                        "members",
-                        "teamCapabilities"
+                        "members"
                     ]
                 },
                 "budget": {
@@ -1493,94 +1338,21 @@
                                         "maxLength": 300,
                                         "pattern": "^[\\S\\s]*$",
                                         "contentMediaType": "text/plain"
-                                    },
-                                    "breakdown": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "item": {
-                                                    "type": "string",
-                                                    "minLength": 5,
-                                                    "maxLength": 100,
-                                                    "pattern": "^[\\S\\s]*$",
-                                                    "contentMediaType": "text/plain"
-                                                },
-                                                "cost": {
-                                                    "type": "number",
-                                                    "minimum": 0
-                                                },
-                                                "justification": {
-                                                    "type": "string",
-                                                    "minLength": 20,
-                                                    "maxLength": 200,
-                                                    "pattern": "^[\\S\\s]*$",
-                                                    "contentMediaType": "text/plain"
-                                                }
-                                            },
-                                            "required": [
-                                                "item",
-                                                "cost",
-                                                "justification"
-                                            ]
-                                        },
-                                        "minItems": 1
                                     }
                                 },
                                 "required": [
                                     "category",
                                     "amount",
-                                    "description",
-                                    "breakdown"
+                                    "description"
                                 ]
                             },
                             "minItems": 1
-                        },
-                        "timeline": {
-                            "type": "object",
-                            "title": "Budget Timeline",
-                            "properties": {
-                                "distributionSchedule": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "milestone": {
-                                                "type": "string",
-                                                "minLength": 5,
-                                                "maxLength": 100,
-                                                "pattern": "^[\\S\\s]*$",
-                                                "contentMediaType": "text/plain"
-                                            },
-                                            "amount": {
-                                                "type": "number",
-                                                "minimum": 0
-                                            },
-                                            "percentage": {
-                                                "type": "number",
-                                                "minimum": 0,
-                                                "maximum": 100
-                                            }
-                                        },
-                                        "required": [
-                                            "milestone",
-                                            "amount",
-                                            "percentage"
-                                        ]
-                                    },
-                                    "minItems": 1
-                                }
-                            },
-                            "required": [
-                                "distributionSchedule"
-                            ]
                         }
                     },
                     "required": [
                         "totalBudget",
-                        "categories",
-                        "timeline"
-                    ]
+                        "categories"
+                                        ]
                 },
                 "valueProposition": {
                     "type": "object",
@@ -1595,47 +1367,6 @@
                             "maxLength": 1000,
                             "pattern": "^[\\S\\s]*$",
                             "contentMediaType": "text/plain"
-                        },
-                        "impactMetrics": {
-                            "type": "array",
-                            "title": "Impact Metrics",
-                            "description": "Specific metrics that demonstrate value for money",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "metric": {
-                                        "type": "string",
-                                        "title": "Metric Name",
-                                        "minLength": 5,
-                                        "maxLength": 100,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "target": {
-                                        "type": "string",
-                                        "title": "Target Value",
-                                        "minLength": 1,
-                                        "maxLength": 100,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    },
-                                    "justification": {
-                                        "type": "string",
-                                        "title": "Value Justification",
-                                        "minLength": 50,
-                                        "maxLength": 300,
-                                        "pattern": "^[\\S\\s]*$",
-                                        "contentMediaType": "text/plain"
-                                    }
-                                },
-                                "required": [
-                                    "metric",
-                                    "target",
-                                    "justification"
-                                ]
-                            },
-                            "minItems": 2,
-                            "maxItems": 5
                         },
                         "longTermValue": {
                             "type": "string",
@@ -1663,7 +1394,6 @@
                     },
                     "required": [
                         "costBenefitAnalysis",
-                        "impactMetrics",
                         "longTermValue",
                         "communityBenefits"
                     ]
