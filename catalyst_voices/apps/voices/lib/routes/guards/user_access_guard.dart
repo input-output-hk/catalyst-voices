@@ -12,8 +12,7 @@ final class UserAccessGuard implements RouteGuard {
   const UserAccessGuard();
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
-    final sessionCubit = context.read<SessionCubit>();
-    final account = sessionCubit.account;
+    final account = context.read<SessionCubit>().state.account;
 
     if (account == null) {
       return const DiscoveryRoute().location;
@@ -36,8 +35,7 @@ final class AdminAccessGuard implements RouteGuard {
   const AdminAccessGuard();
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
-    final sessionCubit = context.read<SessionCubit>();
-    final account = sessionCubit.account;
+    final account = context.read<SessionCubit>().state.account;
     if (account?.isAdmin ?? false) {
       return null;
     } else {

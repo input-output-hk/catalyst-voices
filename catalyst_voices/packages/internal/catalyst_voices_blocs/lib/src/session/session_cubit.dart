@@ -155,8 +155,4 @@ final class SessionCubit extends Cubit<SessionState>
       ),
     );
   }
-
-  Account? get account => state is ActiveAccountSessionState
-      ? (state as ActiveAccountSessionState).account
-      : null;
 }

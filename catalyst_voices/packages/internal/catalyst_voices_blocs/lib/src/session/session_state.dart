@@ -48,3 +48,13 @@ final class ActiveAccountSessionState extends SessionState {
         account,
       ];
 }
+
+extension SessionStateExt on SessionState {
+  Account? get account {
+    if (this is ActiveAccountSessionState) {
+      return (this as ActiveAccountSessionState).account;
+    }
+
+    return null;
+  }
+}
