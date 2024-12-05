@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 /// Determines the state of the user session.
 sealed class SessionState extends Equatable {
@@ -31,13 +32,29 @@ final class GuestSessionState extends SessionState {
 /// The user has registered and unlocked the keychain.
 final class ActiveAccountSessionState extends SessionState {
   final Account? account;
+  final List<Space> spaces;
+  final List<Space> overallSpaces;
+  final Map<Space, ShortcutActivator> spacesShortcuts;
 
   const ActiveAccountSessionState({
     this.account,
+    required this.spaces,
+    required this.overallSpaces,
+    required this.spacesShortcuts,
   });
 
   @override
   List<Object?> get props => [
         account,
       ];
+}
+
+extension SessionStateExt on SessionState {
+  Account? get account {
+    if (this is ActiveAccountSessionState) {
+      return (this as ActiveAccountSessionState).account;
+    }
+
+    return null;
+  }
 }

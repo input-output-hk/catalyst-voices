@@ -4,6 +4,10 @@ import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
 import 'package:catalyst_voices/pages/voting/voting_page.dart';
 import 'package:catalyst_voices/pages/workspace/workspace_page.dart';
+import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
+import 'package:catalyst_voices/routes/guards/route_guard.dart';
+import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
+import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
 import 'package:catalyst_voices/routes/routing/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -68,8 +72,15 @@ final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
   }
 }
 
-final class WorkspaceRoute extends GoRouteData with FadePageTransitionMixin {
+final class WorkspaceRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const WorkspaceRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+        const SessionUnlockedGuard(),
+        const UserAccessGuard(),
+      ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -77,8 +88,15 @@ final class WorkspaceRoute extends GoRouteData with FadePageTransitionMixin {
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
+final class VotingRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const VotingRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+        const SessionUnlockedGuard(),
+        const UserAccessGuard(),
+      ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -87,8 +105,14 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
 }
 
 final class FundedProjectsRoute extends GoRouteData
-    with FadePageTransitionMixin {
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const FundedProjectsRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+        const SessionUnlockedGuard(),
+        const UserAccessGuard(),
+      ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -96,8 +120,15 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
-final class TreasuryRoute extends GoRouteData with FadePageTransitionMixin {
+final class TreasuryRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const TreasuryRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+        const SessionUnlockedGuard(),
+        const AdminAccessGuard(),
+      ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
