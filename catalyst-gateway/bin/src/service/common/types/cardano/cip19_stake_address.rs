@@ -42,7 +42,7 @@ pub(crate) const PATTERN: &str = concatcp!(
 /// Length of the encoded address.
 const ENCODED_ADDR_LEN: usize = 53;
 /// Length of the decoded address.
-const DECODED_ADDR_LEN: usize = 28;
+const DECODED_ADDR_LEN: usize = 29;
 /// Minimum length
 pub(crate) const MIN_LENGTH: usize = PROD_STAKE.len() + 1 + ENCODED_ADDR_LEN;
 /// Minimum length
@@ -148,5 +148,36 @@ impl TryInto<StakeAddress> for Cip19StakeAddress {
 impl Example for Cip19StakeAddress {
     fn example() -> Self {
         Self(EXAMPLE.to_owned())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // cspell: disable
+    const VALID_PROD_STAKE_ADDRESS: &str =
+        "stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq";
+    const VALID_TEST_STAKE_ADDRESS: &str =
+        "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
+    const INVALID_STAKE_ADDRESS: &str =
+        "invalid1u9nlq5nmuzthw3vhgakfpxyq4r0zl2c0p8uqy24gpyjsa6c3df4h6";
+    // cspell: enable
+
+    #[test]
+    fn test_valid_stake_address_from_string() {
+        let stake_address_prod = Cip19StakeAddress::try_from(VALID_PROD_STAKE_ADDRESS.to_string());
+        let stake_address_test = Cip19StakeAddress::try_from(VALID_TEST_STAKE_ADDRESS.to_string());
+
+        assert!(stake_address_prod.is_ok());
+        assert!(stake_address_test.is_ok());
+        assert_eq!(stake_address_prod.unwrap().0, VALID_PROD_STAKE_ADDRESS);
+        assert_eq!(stake_address_test.unwrap().0, VALID_TEST_STAKE_ADDRESS);
+    }
+
+    #[test]
+    fn test_invalid_stake_address_from_string() {
+        let stake_address = Cip19StakeAddress::try_from(INVALID_STAKE_ADDRESS.to_string());
+        assert!(stake_address.is_err());
     }
 }

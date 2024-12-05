@@ -2,8 +2,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -34,33 +34,22 @@ impl GetTxoByStakeAddressQueryParams {
     }
 }
 
-/// Get TXO by stake address query row result
-// TODO: https://github.com/input-output-hk/catalyst-voices/issues/828
-// The macro uses expect to signal an error in deserializing values.
-#[allow(clippy::expect_used)]
-mod result {
-    use scylla::FromRow;
-
-    /// Get txo by stake address query result.
-    #[derive(FromRow)]
-    pub(crate) struct GetTxoByStakeAddressQuery {
-        /// TXO transaction hash.
-        pub txn_hash: Vec<u8>,
-        /// TXO transaction index within the slot.
-        pub txn: i16,
-        /// TXO index.
-        pub txo: i16,
-        /// TXO transaction slot number.
-        pub slot_no: num_bigint::BigInt,
-        /// TXO value.
-        pub value: num_bigint::BigInt,
-        /// TXO spent slot.
-        pub spent_slot: Option<num_bigint::BigInt>,
-    }
+/// Get txo by stake address query.
+#[derive(DeserializeRow)]
+pub(crate) struct GetTxoByStakeAddressQuery {
+    /// TXO transaction hash.
+    pub txn_hash: Vec<u8>,
+    /// TXO transaction index within the slot.
+    pub txn: i16,
+    /// TXO index.
+    pub txo: i16,
+    /// TXO transaction slot number.
+    pub slot_no: num_bigint::BigInt,
+    /// TXO value.
+    pub value: num_bigint::BigInt,
+    /// TXO spent slot.
+    pub spent_slot: Option<num_bigint::BigInt>,
 }
-
-/// Get staked ADA query.
-pub(crate) struct GetTxoByStakeAddressQuery;
 
 impl GetTxoByStakeAddressQuery {
     /// Prepares a get txo by stake address query.
@@ -83,11 +72,11 @@ impl GetTxoByStakeAddressQuery {
     /// Executes a get txo by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
-    ) -> anyhow::Result<TypedRowIterator<result::GetTxoByStakeAddressQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetTxoByStakeAddressQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::TxoByStakeAddress, params)
             .await?
-            .into_typed::<result::GetTxoByStakeAddressQuery>();
+            .rows_stream::<GetTxoByStakeAddressQuery>()?;
 
         Ok(iter)
     }
