@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
 import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
+import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -26,6 +27,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   void initState() {
     super.initState();
     unawaited(context.read<ProposalsCubit>().load());
+    unawaited(context.read<CampaignInfoCubit>().load());
   }
 
   @override
@@ -168,39 +170,99 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 680),
-        child: Column(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          context.l10n.spaceDiscoveryName,
+          style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+        ),
+        const SizedBox(height: 24),
+        const Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              context.l10n.spaceDiscoveryName,
-              style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              context.l10n.discoverySpaceTitle,
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              context.l10n.discoverySpaceDescription,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 32),
-            OutlinedButton.icon(
-              onPressed: () async {
-                // TODO(dtscalac): pass correct campaign id
-                await CampaignDetailsDialog.show(context, id: '1');
-              },
-              label: Text(context.l10n.campaignDetails),
-              icon: VoicesAssets.icons.arrowsExpand.buildIcon(),
-            ),
+            Expanded(child: _FundInfo()),
+            Expanded(child: _CampaignStage()),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FundInfo extends StatelessWidget {
+  const _FundInfo();
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 680),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.discoverySpaceTitle,
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.discoverySpaceDescription,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const _CampaignDetailsButton(),
+        ],
+      ),
+    );
+  }
+}
+
+class _CampaignDetailsButton extends StatelessWidget {
+  const _CampaignDetailsButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<CampaignInfoCubit, CampaignInfoState, String?>(
+      selector: (state) => state.campaign?.id,
+      builder: (context, campaignId) {
+        if (campaignId == null) {
+          return const Offstage();
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(top: 32),
+          child: OutlinedButton.icon(
+            onPressed: () {
+              unawaited(
+                CampaignDetailsDialog.show(context, id: campaignId),
+              );
+            },
+            label: Text(context.l10n.campaignDetails),
+            icon: VoicesAssets.icons.arrowsExpand.buildIcon(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CampaignStage extends StatelessWidget {
+  const _CampaignStage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topRight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: BlocBuilder<CampaignInfoCubit, CampaignInfoState>(
+          builder: (context, state) {
+            final campaign = state.campaign;
+            return campaign != null
+                ? CampaignStageCard(campaign: campaign)
+                : const Offstage();
+          },
         ),
       ),
     );

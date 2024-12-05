@@ -169,6 +169,10 @@ class CampaignAdminToolsDialog extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colors.onSurfaceNeutral012!,
+          width: 1,
+        ),
       ),
       child: Material(
         type: MaterialType.transparency,
