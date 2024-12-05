@@ -6,10 +6,10 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class CampaignPreviewCard extends StatelessWidget {
-  final CampaignPreviewInfo campaign;
+class CampaignStageCard extends StatelessWidget {
+  final CampaignInfo campaign;
 
-  const CampaignPreviewCard({
+  const CampaignStageCard({
     super.key,
     required this.campaign,
   });
@@ -60,12 +60,19 @@ class CampaignPreviewCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (!campaign.stage.isDraft) ...[
+            if (campaign.stage == CampaignStage.live) ...[
               const SizedBox(height: 16),
               OutlinedButton(
                 // TODO(ryszard-schossler): add logic
                 onPressed: () {},
-                child: Text(_getButtonText(context)),
+                child: Text(context.l10n.viewProposals),
+              ),
+            ] else if (campaign.stage == CampaignStage.completed) ...[
+              const SizedBox(height: 16),
+              OutlinedButton(
+                // TODO(ryszard-schossler): add logic
+                onPressed: () {},
+                child: Text(context.l10n.viewVotingResults),
               ),
             ],
           ],
@@ -74,23 +81,11 @@ class CampaignPreviewCard extends StatelessWidget {
     );
   }
 
-  String _getButtonText(BuildContext context) {
-    if (campaign.stage == CampaignStage.live) {
-      return context.l10n.viewProposals;
-    } else {
-      return context.l10n.viewVotingResults;
-    }
-  }
-
   String _getDateInformation(BuildContext context) {
-    if (campaign is LiveCampaignInformation ||
-        campaign is DraftCampaignInformation) {
-      final dateMixin = (campaign as DateTimeMixin);
-      final formattedDate = DateFormatter.formatDateTimeParts(dateMixin.date);
-      return dateMixin.localizedDate(
-        context.l10n,
-        formattedDate,
-      );
+    if (campaign.stage != CampaignStage.completed) {
+      final formattedDate =
+          DateFormatter.formatDateTimeParts(campaign.startDate);
+      return campaign.localizedDate(context.l10n, formattedDate);
     } else {
       return '';
     }

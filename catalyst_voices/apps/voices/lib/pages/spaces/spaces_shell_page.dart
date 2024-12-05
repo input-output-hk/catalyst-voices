@@ -11,9 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SpacesShellPage extends StatefulWidget {
-  final Space space;
-  final Widget child;
-
   static final Map<Space, ShortcutActivator> _spacesShortcutsActivators = {
     Space.discovery: LogicalKeySet(
       LogicalKeyboardKey.control,
@@ -36,6 +33,9 @@ class SpacesShellPage extends StatefulWidget {
       LogicalKeyboardKey.keyT,
     ),
   };
+
+  final Space space;
+  final Widget child;
 
   const SpacesShellPage({
     super.key,

@@ -17,6 +17,22 @@ enum CampaignStage {
   live,
   completed;
 
+  /// Calculates the [campaign] stage at given [date].
+  factory CampaignStage.fromCampaign(Campaign campaign, DateTime date) {
+    switch (campaign.publish) {
+      case CampaignPublish.draft:
+        return CampaignStage.draft;
+      case CampaignPublish.published:
+        if (date.isBefore(campaign.startDate)) {
+          return CampaignStage.scheduled;
+        } else if (date.isAfter(campaign.endDate)) {
+          return CampaignStage.completed;
+        } else {
+          return CampaignStage.live;
+        }
+    }
+  }
+
   bool get isCompleted => this == CampaignStage.completed;
   bool get isDraft => this == CampaignStage.draft;
 
