@@ -97,9 +97,7 @@
                             "description": "<p><b>Proposal title</b></p><p>Please note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app. </p>",
                             "minLength": 1,
                             "maxLength": 60,
-                            "examples": [
-                                "<p>The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important.</p>"
-                            ]
+                            "x-guidance": "<p>The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important.</p>"
                         }
                     },
                     "required": [
@@ -121,7 +119,7 @@
                             "$ref": "#/definitions/dropDownSingleSelect",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
-                            "x-guidance": "<p>Please select from one of the following:</p><ol><li>Individual</li><li>Entity (Incorporated)</li><li>Entity (Not Incorporated) </li></ol>",
+                            "x-mad-guidance": "<p>Please select from one of the following:</p><ol><li>Individual</li><li>Entity (Incorporated)</li><li>Entity (Not Incorporated) </li></ol>",
                             "enum": [
                                 "Individual",
                                 "Entity (Incorporated)",
