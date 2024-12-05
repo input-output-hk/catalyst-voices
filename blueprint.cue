@@ -12,9 +12,9 @@ global: {
 		]
 		providers: {
 			aws: {
-				region:   "eu-central-1"
-				registry: "332405224602.dkr.ecr.eu-central-1.amazonaws.com"
-				role:     "arn:aws:iam::332405224602:role/ci"
+				region: "eu-central-1"
+				ecr: registry: "332405224602.dkr.ecr.eu-central-1.amazonaws.com"
+				role: "arn:aws:iam::332405224602:role/ci"
 			}
 
 			docker: credentials: {
