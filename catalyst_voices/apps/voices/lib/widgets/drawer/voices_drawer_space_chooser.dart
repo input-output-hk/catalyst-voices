@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/common/utils/access_control_util.dart';
 import 'package:catalyst_voices/widgets/avatars/space_avatar.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
@@ -24,16 +23,16 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState, Account?>(
+    return BlocSelector<SessionCubit, SessionState, List<Space>>(
       selector: (state) {
         if (state is ActiveAccountSessionState) {
-          return state.account;
+          return state.spaces;
         }
-        return null;
+        return [];
       },
       builder: (context, state) {
         return VoicesDrawerChooser<Space>(
-          items: AccessControlUtil.spacesAccess(state),
+          items: state,
           selectedItem: currentSpace,
           onSelected: onChanged,
           itemBuilder: _itemBuilder,

@@ -1,9 +1,9 @@
-import 'package:catalyst_voices/common/ext/map_ext.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-final class AccessControlUtil {
+final class AccessControl {
+  const AccessControl();
   static const defaultSpacesAccess = [Space.discovery];
 
   static const List<Space> _votingAccess = [
@@ -40,12 +40,7 @@ final class AccessControlUtil {
         LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyT),
   };
 
-  static bool _hasProposerOrDrepRole(Account account) {
-    return account.roles
-        .any((role) => [AccountRole.proposer, AccountRole.drep].contains(role));
-  }
-
-  static List<Space> spacesAccess(Account? account) {
+  List<Space> spacesAccess(Account? account) {
     if (account == null) return defaultSpacesAccess;
     if (account.isAdmin) return Space.values;
     if (_hasProposerOrDrepRole(account)) {
@@ -57,7 +52,7 @@ final class AccessControlUtil {
     return defaultSpacesAccess;
   }
 
-  static Map<Space, ShortcutActivator> spacesShortcutsActivators(
+  Map<Space, ShortcutActivator> spacesShortcutsActivators(
     Account? account,
   ) {
     if (account == null) {
@@ -68,7 +63,7 @@ final class AccessControlUtil {
       return allSpacesShortcutsActivators.useKeys([
         Space.discovery,
         Space.workspace,
-        // TODO(ryszard-schossler): After F14 add 
+        // TODO(ryszard-schossler): After F14 add
         // Space.voting and Space.fundedProjects
         // OR use values from _proposalAccess
       ]);
@@ -76,10 +71,23 @@ final class AccessControlUtil {
     return allSpacesShortcutsActivators.useKeys([Space.discovery]);
   }
 
-  static List<Space> overallSpaces(Account? account) {
+  List<Space> overallSpaces(Account? account) {
     if (account == null) return _votingAccess;
     if (account.isAdmin) return _adminAccess;
     if (_hasProposerOrDrepRole(account)) return _proposalAccess;
     return _votingAccess;
+  }
+
+  static bool _hasProposerOrDrepRole(Account account) {
+    return account.roles
+        .any((role) => [AccountRole.proposer, AccountRole.drep].contains(role));
+  }
+}
+
+extension MapFilterExtension<K, V> on Map<K, V> {
+  Map<K, V> useKeys(List<K> keys) {
+    return Map.fromEntries(
+      entries.where((entry) => keys.contains(entry.key)),
+    );
   }
 }

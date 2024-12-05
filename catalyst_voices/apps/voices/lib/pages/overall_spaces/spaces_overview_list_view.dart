@@ -1,9 +1,9 @@
-import 'package:catalyst_voices/common/utils/access_control_util.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/discovery_overview.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/funded_projects_overview.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/treasury_overview.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/voting_overview.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/workspace_overview.dart';
+import 'package:catalyst_voices/widgets/containers/grey_out_container.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -34,62 +34,38 @@ class _SpacesListViewState extends State<SpacesListView> {
       controller: _scrollController,
       alwaysVisible: true,
       padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: BlocSelector<SessionCubit, SessionState, Account?>(
+      child: BlocSelector<SessionCubit, SessionState, List<Space>>(
         selector: (state) {
           if (state is ActiveAccountSessionState) {
-            return state.account;
+            return state.overallSpaces;
           }
-          return null;
+          return [];
         },
         builder: (context, state) {
-          final spaces = AccessControlUtil.overallSpaces(state);
           return ListView.separated(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(right: 16, bottom: 24),
             itemBuilder: (context, index) {
-              final space = spaces[index];
+              final space = state[index];
               return switch (space) {
                 Space.discovery => DiscoveryOverview(key: ObjectKey(space)),
                 Space.workspace => WorkspaceOverview(key: ObjectKey(space)),
-                Space.voting =>
-                  GreyOut(child: VotingOverview(key: ObjectKey(space))),
-                Space.fundedProjects =>
-                  GreyOut(child: FundedProjectsOverview(key: ObjectKey(space))),
-                Space.treasury => Offstage(
-                    offstage: false,
-                    child: TreasuryOverview(
-                      key: ObjectKey(space),
-                    ),
+                Space.voting => GreyOutContainer(
+                    child: VotingOverview(key: ObjectKey(space)),
+                  ),
+                Space.fundedProjects => GreyOutContainer(
+                    child: FundedProjectsOverview(key: ObjectKey(space)),
+                  ),
+                Space.treasury => TreasuryOverview(
+                    key: ObjectKey(space),
                   ),
               };
             },
             separatorBuilder: (context, index) => const SizedBox(width: 16),
-            itemCount: spaces.length,
+            itemCount: state.length,
           );
         },
-      ),
-    );
-  }
-}
-
-class GreyOut extends StatelessWidget {
-  final Widget child;
-  final bool greyOut;
-
-  const GreyOut({
-    super.key,
-    required this.child,
-    this.greyOut = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      ignoring: greyOut,
-      child: Opacity(
-        opacity: greyOut ? 0.5 : 1,
-        child: child,
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:catalyst_voices_blocs/src/session/session_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,6 +15,7 @@ final class SessionCubit extends Cubit<SessionState>
   final UserService _userService;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
+  final AccessControl _accessControl;
 
   final _logger = Logger('SessionCubit');
 
@@ -36,6 +38,7 @@ final class SessionCubit extends Cubit<SessionState>
     this._userService,
     this._registrationService,
     this._registrationProgressNotifier,
+    this._accessControl,
   ) : super(const VisitorSessionState(isRegistrationInProgress: false)) {
     _keychainSub = _userService.watchKeychain
         .map((keychain) => keychain != null)
@@ -139,8 +142,18 @@ final class SessionCubit extends Cubit<SessionState>
       emit(const GuestSessionState());
       return;
     }
+    final spaces = _accessControl.spacesAccess(account);
+    final overallSpaces = _accessControl.overallSpaces(account);
+    final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
-    emit(ActiveAccountSessionState(account: account));
+    emit(
+      ActiveAccountSessionState(
+        account: account,
+        spaces: spaces,
+        spacesShortcuts: spacesShortcuts,
+        overallSpaces: overallSpaces,
+      ),
+    );
   }
 
   Account? get account => state is ActiveAccountSessionState
