@@ -32,8 +32,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
   void initState() {
     super.initState();
 
-    final bloc = context.read<WorkspaceBloc>()
-      ..add(const LoadCurrentProposalEvent());
+    final bloc = context.read<WorkspaceBloc>();
 
     _sectionsController = SectionsController();
     _bodyItemScrollController = ItemScrollController();
@@ -46,6 +45,8 @@ class _WorkspacePageState extends State<WorkspacePage> {
         .map((event) => event.sections)
         .distinct(listEquals)
         .listen(_updateSections);
+
+    bloc.add(const LoadCurrentProposalEvent());
   }
 
   @override
