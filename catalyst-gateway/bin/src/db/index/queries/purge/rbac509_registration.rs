@@ -92,7 +92,7 @@ impl PrimaryKeyQuery {
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
-            .purge_execute_iter(PreparedSelectQuery::TxoAda)
+            .purge_execute_iter(PreparedSelectQuery::Rbac509)
             .await?
             .rows_stream::<result::PrimaryKey>()?;
 
@@ -128,7 +128,7 @@ impl DeleteQuery {
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::TxoAda, params)
+            .purge_execute_batch(PreparedDeleteQuery::Rbac509, params)
             .await?;
 
         Ok(results)

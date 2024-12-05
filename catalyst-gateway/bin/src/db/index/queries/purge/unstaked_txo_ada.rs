@@ -117,7 +117,7 @@ impl DeleteQuery {
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::TxoAda, params)
+            .purge_execute_batch(PreparedDeleteQuery::UnstakedTxoAda, params)
             .await?;
 
         Ok(results)
