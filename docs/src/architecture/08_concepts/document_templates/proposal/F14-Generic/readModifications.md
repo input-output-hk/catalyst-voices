@@ -1,60 +1,58 @@
-# F14-Generic
-## Changes to the proposal template fields 
+# F14-Generic Proposal Template
+## New Fields added to the proposal template  
 
 **Problem:**
-  - Statement
-  - Impact (select):
-    - "Technical Infrastructure",
-    - "User Experience",
-    - "Developer Tooling",
-    - "Community Growth",
-    - "Economic Sustainability",
-    - "Interoperability",
-    - "Security",
-    - "Scalability",
-    - "Education",
-    - "Adoption"
-
-
+  + Statement
+  + Impact (select):
+    + "Technical Infrastructure",
+    + "User Experience",
+    + "Developer Tooling",
+    + "Community Growth",
+    + "Economic Sustainability",
+    + "Interoperability",
+    + "Security",
+    + "Scalability",
+    + "Education",
+    + "Adoption"
 
 **Solution:**
-  - summary
-  - approach
-  - innovative aspects
+  + Summary
+  + Approach
+  + Innovative aspects
 
 **Supporting links:**
-  - Links
-    - Url
-    - Description
-    - Type (select):
-      - "GitHub Repository",
-      - "Documentation",
-      - "Whitepaper",
-      - "Website",
-      - "Marketing Material",
-      - "Technical Specification",
-      - "Research Paper",
-      - "Blog Post",
-      - "Social Media",
-      - "Other"
-  - Main Repository link
-  - Documentation link
+  + Links
+    + Url
+    + Description
+    + Type (select):
+      + "GitHub Repository",
+      + "Documentation",
+      + "Whitepaper",
+      + "Website",
+      + "Marketing Material",
+      + "Technical Specification",
+      + "Research Paper",
+      + "Blog Post",
+      + "Social Media",
+      + "Other"
+  + Main Repository link
+  + Documentation link
 
 **Dependencies**
-  - detail:
-    - name
-    - description
-    - type:
-      - "Technical"
-      - "Organizational"
-      - "Legal"
-      - "Financial"
-      - "Other"
-    - mitigationPlan
+  + detail:
+    + name
+    + description
+    + type:
+      + "Technical"
+      + "Organizational"
+      + "Legal"
+      + "Financial"
+      + "Other"
+    + mitigationPlan
 
 **Horizons:**
-  - tags:
-    - additional tags to be entered for the project -> on top of category and subcategory
+  + tags:
+    + additional tags to be entered for the project -> on top of category and subcategory
   + Impact: 
     + timeframe:
       + "Short-term (0-6 months)"
@@ -164,29 +162,46 @@
   + communityBenefits
 
 **Mandatory Acknowledgments**
- + fundRules 
-   + acknowledgment
-   + version
-   + timestamp
- + termsAndConditions
-   + acknowledgment
-   + version
-   + documentUrl
-   + timestamp
- + privacyPolicy
-   + acknowledgment
-   + version
-   + documentUrl
-   + timestamp
- + compliance
-   + legalCompliance
-   + noConflictOfInterest
-   + accurateInformation
-   + jurisdictions
-   + timestamp
- + additionalAcknowledgments
-   + type
-   + acknowledgment
-   + description
-   + documentUrl
-   + timestamp
+ + Fund Rules 
+   + Acknowledgment
+   + Version
+   + Timestamp
+  
+ + Terms And Conditions
+   + Acknowledgment
+   + Version
+   + DocumentUrl
+   + Timestamp
+  
+ + Privacy Policy
+   + Acknowledgment
+   + Version
+   + DocumentUrl
+   + Timestamp
+  
+ + Intellectual Property
+   + Acknowledgment
+   + Details
+   + Attachments
+     + Document Type
+       + "patent",
+       + "trademark",
+       + "copyright",
+       + "license",
+       + "other"
+     + Document Url
+     + Description
+  
+ + Compliances (checkboxes)
+   + Legal Compliance
+   + No Conflict Of Interest
+   + Accurate Information
+   + Jurisdictions
+   + Timestamp
+  
+ + Additional Acknowledgments
+   + Type
+   + Acknowledgment
+   + Description
+   + Document Url
+   + Timestamp
