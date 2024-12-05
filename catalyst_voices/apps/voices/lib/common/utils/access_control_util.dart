@@ -49,11 +49,11 @@ final class AccessControlUtil {
     if (account == null) return defaultSpacesAccess;
     if (account.isAdmin) return Space.values;
     if (_hasProposerOrDrepRole(account)) {
-      // TODO(ryszard.schossler): After F14 use _proposalAccess
+      // TODO(ryszard-schossler): After F14 use _proposalAccess
       return [Space.discovery, Space.workspace];
     }
 
-    // TODO(ryszard.schossler): After F14 use _votingAccess
+    // TODO(ryszard-schossler): After F14 use _votingAccess
     return defaultSpacesAccess;
   }
 
@@ -68,7 +68,8 @@ final class AccessControlUtil {
       return allSpacesShortcutsActivators.useKeys([
         Space.discovery,
         Space.workspace,
-        // TODO(ryszard.schossler): After F14 add Space.voting and Space.fundedProjects
+        // TODO(ryszard-schossler): After F14 add 
+        // Space.voting and Space.fundedProjects
         // OR use values from _proposalAccess
       ]);
     }
