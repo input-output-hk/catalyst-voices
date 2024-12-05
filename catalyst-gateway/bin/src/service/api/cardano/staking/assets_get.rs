@@ -27,7 +27,7 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::cip19_stake_address::Cip19StakeAddress,
+        types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
     },
 };
 
@@ -79,8 +79,7 @@ struct TxoAssetInfo {
     /// Asset hash.
     id: Vec<u8>,
     /// Asset name.
-    // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
-    name: String,
+    name: AssetName,
     /// Asset amount.
     amount: num_bigint::BigInt,
 }
@@ -100,8 +99,7 @@ struct TxoInfo {
     /// Whether the TXO was spent.
     spent_slot_no: Option<num_bigint::BigInt>,
     /// TXO assets.
-    // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
-    assets: HashMap<Vec<u8>, TxoAssetInfo>,
+    assets: HashMap<Vec<u8>, Vec<TxoAssetInfo>>,
 }
 
 /// Calculate the stake info for a given stake address.
@@ -186,12 +184,18 @@ async fn get_txo_by_txn(
         let entry = txo_info
             .assets
             .entry(row.policy_id.clone())
-            .or_insert(TxoAssetInfo {
-                id: row.policy_id,
-                name: row.policy_name,
-                amount: num_bigint::BigInt::ZERO,
-            });
-        entry.amount += row.value;
+            .or_insert_with(Vec::new);
+
+        match entry.iter_mut().find(|item| item.id == row.policy_id) {
+            Some(item) => item.amount += row.value,
+            None => {
+                entry.push(TxoAssetInfo {
+                    id: row.policy_id,
+                    name: row.asset_name.into(),
+                    amount: row.value,
+                });
+            },
+        }
     }
 
     let mut txos_by_txn = HashMap::new();
@@ -274,10 +278,10 @@ fn build_stake_info(
                 stake_info.ada_amount +=
                     i64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
 
-                for asset in txo_info.assets.into_values() {
+                for asset in txo_info.assets.into_values().flatten() {
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
                         policy_hash: asset.id.try_into()?,
-                        asset_name: asset.name.into(),
+                        asset_name: asset.name,
                         amount: asset.amount.try_into()?,
                     });
                 }

@@ -19,9 +19,6 @@ final class VoicesPasswordTextField extends StatelessWidget {
   /// Optional decoration. See [VoicesTextField] for more details.
   final VoicesTextFieldDecoration? decoration;
 
-  /// [VoicesTextField.autofocus].
-  final bool autofocus;
-
   const VoicesPasswordTextField({
     super.key,
     this.controller,
@@ -29,7 +26,6 @@ final class VoicesPasswordTextField extends StatelessWidget {
     this.onChanged,
     this.onSubmitted,
     this.decoration,
-    this.autofocus = false,
   });
 
   @override
@@ -37,7 +33,6 @@ final class VoicesPasswordTextField extends StatelessWidget {
     return VoicesTextField(
       controller: controller,
       keyboardType: TextInputType.visiblePassword,
-      autofocus: autofocus,
       obscureText: true,
       textInputAction: textInputAction,
       onChanged: onChanged,

@@ -3,8 +3,8 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowIterator, SerializeRow,
-    Session,
+    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
+    SerializeRow, Session,
 };
 use tracing::error;
 
@@ -38,30 +38,22 @@ impl GetInvalidRegistrationParams {
     }
 }
 
-/// Get invalid registrations given stake addr
-#[allow(clippy::expect_used)]
-mod result {
-    use scylla::FromRow;
-
-    /// Get registration query result.
-    #[derive(FromRow)]
-    pub(crate) struct GetInvalidRegistrationQuery {
-        /// Error report
-        pub error_report: Vec<String>,
-        /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-        pub stake_address: Vec<u8>,
-        /// Voting Public Key
-        pub vote_key: Vec<u8>,
-        /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
-        pub payment_address: Vec<u8>,
-        /// Is the stake address a script or not.
-        pub is_payable: bool,
-        /// Is the Registration CIP36 format, or CIP15
-        pub cip36: bool,
-    }
+/// Get invalid registrations given stake address.
+#[derive(DeserializeRow)]
+pub(crate) struct GetInvalidRegistrationQuery {
+    /// Error report
+    pub error_report: Vec<String>,
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    pub stake_address: Vec<u8>,
+    /// Voting Public Key
+    pub vote_key: Vec<u8>,
+    /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
+    pub payment_address: Vec<u8>,
+    /// Is the stake address a script or not.
+    pub is_payable: bool,
+    /// Is the Registration CIP36 format, or CIP15
+    pub cip36: bool,
 }
-/// Get invalid registration query.
-pub(crate) struct GetInvalidRegistrationQuery;
 
 impl GetInvalidRegistrationQuery {
     /// Prepares a get invalid registration query.
@@ -84,14 +76,14 @@ impl GetInvalidRegistrationQuery {
     /// Executes get invalid registration info for given stake addr query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetInvalidRegistrationParams,
-    ) -> anyhow::Result<TypedRowIterator<result::GetInvalidRegistrationQuery>> {
+    ) -> anyhow::Result<TypedRowStream<GetInvalidRegistrationQuery>> {
         let iter = session
             .execute_iter(
                 PreparedSelectQuery::InvalidRegistrationsFromStakeAddr,
                 params,
             )
             .await?
-            .into_typed::<result::GetInvalidRegistrationQuery>();
+            .rows_stream::<GetInvalidRegistrationQuery>()?;
 
         Ok(iter)
     }

@@ -75,24 +75,21 @@ final class RegistrationTransactionBuilder {
       txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
       chunkedData: RegistrationData(
         derCerts: [derCert],
-        publicKeys: [keyPair.publicKey],
+        publicKeys: [keyPair.publicKey.toPublicKey()],
         roleDataSet: {
           // TODO(dtscalac): currently we only support the voter account role,
           // regardless of selected roles
           // TODO(dtscalac): when RBAC specification will define other roles
           // they should be registered here
           RoleData(
-            roleNumber: AccountRole.root.roleNumber,
-            roleSigningKey: KeyReference(
-              localRef: const LocalKeyReference(
-                keyType: LocalKeyReferenceType.x509Certs,
-                keyOffset: 0,
-              ),
+            roleNumber: AccountRole.root.number,
+            roleSigningKey: const LocalKeyReference(
+              keyType: LocalKeyReferenceType.x509Certs,
+              offset: 0,
             ),
-            roleEncryptionKey: KeyReference(
-              hash: CertificateHash.fromX509DerCertificate(derCert),
-            ),
-            paymentKey: 0,
+            // Refer to first key in transaction outputs,
+            // in our case it's the change address (which the user controls).
+            paymentKey: -1,
           ),
         },
       ),
@@ -143,12 +140,12 @@ final class RegistrationTransactionBuilder {
 
     /* cSpell:disable */
     const issuer = X509DistinguishedName(
-      countryName: 'US',
-      stateOrProvinceName: 'California',
-      localityName: 'San Francisco',
-      organizationName: 'MyCompany',
-      organizationalUnitName: 'MyDepartment',
-      commonName: 'mydomain.com',
+      countryName: '',
+      stateOrProvinceName: '',
+      localityName: '',
+      organizationName: '',
+      organizationalUnitName: '',
+      commonName: '',
     );
 
     final tbs = X509TBSCertificate(
@@ -160,7 +157,10 @@ final class RegistrationTransactionBuilder {
       subject: issuer,
       extensions: X509CertificateExtensions(
         subjectAltName: [
-          'web+cardano://addr/${_stakeAddress.toBech32()}',
+          X509String(
+            'web+cardano://addr/${_stakeAddress.toBech32()}',
+            tag: X509String.uriTag,
+          ),
         ],
       ),
     );
