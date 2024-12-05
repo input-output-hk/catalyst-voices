@@ -113,7 +113,7 @@ async fn checker_api_catalyst_auth(
     };
 
     // Check if the token is young enough.
-    if !token.young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
+    if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
         error!("Auth token expired: {:?}", token);
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
