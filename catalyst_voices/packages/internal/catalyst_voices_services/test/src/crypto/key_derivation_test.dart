@@ -31,7 +31,7 @@ void main() {
       for (final role in AccountRole.values) {
         final keyPair = await keyDerivation.deriveKeyPair(
           masterKey: masterKey,
-          path: "m/${role.roleNumber}'/1234'",
+          path: "m/${role.number}'/1234'",
         );
         expect(keyPair, isNotNull);
       }

@@ -55,6 +55,7 @@ packageLicenseOverride:
   remote_widgets_example: Apache-2.0
   catalyst_voices_view_models: Apache-2.0
   catalyst_voices_blocs: Apache-2.0
+  catalyst_voices_driver: Apache-2.0
   catalyst_voices_shared: Apache-2.0
   catalyst_voices_brands: Apache-2.0
   catalyst_voices_services: Apache-2.0
@@ -130,6 +131,7 @@ command:
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
       win32: ^5.5.4
       web: ^1.1.0
+      webdriver: ^3.0.3
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
@@ -207,7 +209,7 @@ scripts:
           EXIT_CODE=$? ; \
           printf "%s" "$OUTPUT" | tojunit --output $MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml ; \
           exit $EXIT_CODE'
-      
+
       # store the exit code after running the tests,
       # this is the exit code for the whole script
       EXIT_CODE=$?
