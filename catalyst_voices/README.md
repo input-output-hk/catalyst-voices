@@ -43,7 +43,7 @@ This repository contains the Catalyst Voices app and packages.
 ```sh
 git clone https://github.com/input-output-hk/catalyst-voices.git
 cd catalyst_voices
-melos bootstrap
+just bootstrap
 ```
 
 ### Packages

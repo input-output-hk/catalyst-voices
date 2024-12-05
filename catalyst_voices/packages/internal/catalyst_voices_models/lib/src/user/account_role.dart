@@ -1,18 +1,18 @@
 enum AccountRole {
-  voter(roleNumber: 0),
+  /// An account role that is assigned to every account.
+  /// Allows to vote for proposals.
+  voter(number: 0),
 
-  // TODO(dtscalac): the RBAC specification doesn't define yet the role number
-  // for the proposer, replace this arbitrary number when it's specified.
-  proposer(roleNumber: 1),
+  /// A delegated representative that can vote on behalf of other accounts.
+  drep(number: 1),
 
-  // TODO(dtscalac): the RBAC specification doesn't define yet the role number
-  // for the drep, replace this arbitrary number when it's specified.
-  drep(roleNumber: 2);
+  /// An account role that can create new proposals.
+  proposer(number: 3);
 
   /// The RBAC specified role number.
-  final int roleNumber;
+  final int number;
 
-  const AccountRole({required this.roleNumber});
+  const AccountRole({required this.number});
 
   /// Returns the role which is assigned to every user.
   static AccountRole get root => voter;
