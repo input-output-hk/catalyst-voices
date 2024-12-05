@@ -1,28 +1,116 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// The "events" tab of the [CampaignAdminToolsDialog].
-class CampaignAdminToolsEventsTab extends StatelessWidget {
+class CampaignAdminToolsEventsTab extends StatefulWidget {
   const CampaignAdminToolsEventsTab({super.key});
 
   @override
+  State<CampaignAdminToolsEventsTab> createState() =>
+      _CampaignAdminToolsEventsTabState();
+}
+
+class _CampaignAdminToolsEventsTabState
+    extends State<CampaignAdminToolsEventsTab> {
+  static const _defaultStageTransitionDelay = Duration(seconds: 5);
+
+  CampaignStage _stage = CampaignStage.scheduled;
+  Timer? _stageTimer;
+  DateTime? _stageTransitionAt;
+  Duration _stageTransitionDelay = _defaultStageTransitionDelay;
+
+  @override
+  void dispose() {
+    _stageTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       children: [
-        Expanded(child: _CampaignStatusChooser()),
-        _EventTimelapseControls(),
+        Expanded(
+          child: _CampaignStatusChooser(
+            selectedStage: _stage,
+            onStageSelected: _onStageSelected,
+          ),
+        ),
+        _EventTimelapseControls(
+          nextStageTransitionAt: _stageTransitionAt,
+          stageTransitionDelay: _stageTransitionDelay,
+          onPreviousStage: _canSelectPreviousStage ? _onPreviousStage : null,
+          onNextStage: _canSelectNextStage ? _onNextStage : null,
+          onTransitionDelayChanged: _onTransitionDelayChanged,
+        ),
       ],
     );
+  }
+
+  void _onStageSelected(CampaignStage stage) {
+    setState(() {
+      _stageTimer?.cancel();
+      _stageTimer = Timer(
+        _stageTransitionDelay,
+        () => _updateStage(stage),
+      );
+      _stageTransitionAt = DateTimeExt.now().add(_stageTransitionDelay);
+    });
+  }
+
+  bool get _canSelectPreviousStage {
+    // draft stage is not supported
+
+    final previousIndex = _stage.index - 1;
+    return previousIndex > CampaignStage.draft.index;
+  }
+
+  bool get _canSelectNextStage {
+    final nextIndex = _stage.index + 1;
+    return nextIndex < CampaignStage.values.length;
+  }
+
+  void _onPreviousStage() {
+    if (!_canSelectPreviousStage) return;
+
+    _onStageSelected(CampaignStage.values[_stage.index - 1]);
+  }
+
+  void _onNextStage() {
+    if (!_canSelectNextStage) return;
+
+    _onStageSelected(CampaignStage.values[_stage.index + 1]);
+  }
+
+  void _updateStage(CampaignStage stage) {
+    setState(() {
+      _stage = stage;
+      _stageTransitionAt = null;
+    });
+  }
+
+  void _onTransitionDelayChanged(Duration delay) {
+    setState(() {
+      _stageTransitionDelay = delay;
+    });
   }
 }
 
 class _CampaignStatusChooser extends StatelessWidget {
-  const _CampaignStatusChooser();
+  final CampaignStage selectedStage;
+  final ValueChanged<CampaignStage> onStageSelected;
+
+  const _CampaignStatusChooser({
+    required this.selectedStage,
+    required this.onStageSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +119,12 @@ class _CampaignStatusChooser extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          for (final status in CampaignStage.values)
-            if (status != CampaignStage.scheduled)
-              // TODO(dtscalac): store active one somewhere
+          for (final stage in CampaignStage.values)
+            if (stage != CampaignStage.draft)
               _EventItem(
-                status: status,
-                isActive: status == CampaignStage.draft,
-                onTap: () {},
+                stage: stage,
+                isActive: stage == selectedStage,
+                onTap: () => onStageSelected(stage),
               ),
           const SizedBox(height: 8),
         ],
@@ -47,12 +134,12 @@ class _CampaignStatusChooser extends StatelessWidget {
 }
 
 class _EventItem extends StatelessWidget {
-  final CampaignStage status;
+  final CampaignStage stage;
   final bool isActive;
   final VoidCallback onTap;
 
   const _EventItem({
-    required this.status,
+    required this.stage,
     required this.isActive,
     required this.onTap,
   });
@@ -97,21 +184,65 @@ class _EventItem extends StatelessWidget {
     );
   }
 
-  SvgGenImage get _icon => switch (status) {
+  SvgGenImage get _icon => switch (stage) {
         CampaignStage.draft => VoicesAssets.icons.clock,
         CampaignStage.live => VoicesAssets.icons.flag,
         _ => VoicesAssets.icons.calendar,
       };
 
-  String _text(VoicesLocalizations l10n) => switch (status) {
+  String _text(VoicesLocalizations l10n) => switch (stage) {
         CampaignStage.draft => l10n.campaignPreviewEventBefore,
         CampaignStage.live => l10n.campaignPreviewEventDuring,
         _ => l10n.campaignPreviewEventAfter,
       };
 }
 
-class _EventTimelapseControls extends StatelessWidget {
-  const _EventTimelapseControls();
+class _EventTimelapseControls extends StatefulWidget {
+  final DateTime? nextStageTransitionAt;
+  final Duration stageTransitionDelay;
+  final VoidCallback? onPreviousStage;
+  final VoidCallback? onNextStage;
+  final ValueChanged<Duration> onTransitionDelayChanged;
+
+  const _EventTimelapseControls({
+    required this.nextStageTransitionAt,
+    required this.stageTransitionDelay,
+    required this.onPreviousStage,
+    required this.onNextStage,
+    required this.onTransitionDelayChanged,
+  });
+
+  @override
+  State<_EventTimelapseControls> createState() =>
+      _EventTimelapseControlsState();
+}
+
+class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
+  final _timerController = TextEditingController();
+  Timer? _refreshTimer;
+  bool _enabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _refresh();
+    _restartRefreshTimer();
+  }
+
+  @override
+  void didUpdateWidget(_EventTimelapseControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _refresh();
+    _restartRefreshTimer();
+  }
+
+  @override
+  void dispose() {
+    _timerController.dispose();
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,9 +253,8 @@ class _EventTimelapseControls extends StatelessWidget {
           Expanded(
             child: VoicesTextButton(
               leading: VoicesAssets.icons.rewind.buildIcon(),
+              onTap: widget.onPreviousStage,
               child: Text(context.l10n.previous),
-              // TODO(dtscalac): implement button action
-              onTap: () {},
             ),
           ),
           Container(
@@ -136,19 +266,77 @@ class _EventTimelapseControls extends StatelessWidget {
               color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
             ),
             alignment: Alignment.center,
-            // TODO(dtscalac): implement timer ticking
-            child: const Text('-5s'),
+            child: TextField(
+              controller: _timerController,
+              onChanged: (_) => _onTransitionDelayChanged(),
+              enabled: _enabled,
+              decoration: null,
+              textAlign: TextAlign.center,
+            ),
           ),
           Expanded(
             child: VoicesTextButton(
               leading: VoicesAssets.icons.fastForward.buildIcon(),
+              onTap: widget.onNextStage,
               child: Text(context.l10n.next),
-              // TODO(dtscalac): implement button action
-              onTap: () {},
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _restartRefreshTimer() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _refresh(),
+    );
+  }
+
+  void _refresh() {
+    final now = DateTimeExt.now();
+    final nextStageTransitionAt = widget.nextStageTransitionAt;
+
+    if (nextStageTransitionAt != null && nextStageTransitionAt.isAfter(now)) {
+      final remainingDelay = nextStageTransitionAt.difference(now);
+      _updateTimerController(remainingDelay, enabled: false);
+    } else {
+      _updateTimerController(widget.stageTransitionDelay, enabled: true);
+    }
+  }
+
+  void _updateTimerController(Duration duration, {required bool enabled}) {
+    // only update if the duration is different,
+    // otherwise we might be overwriting local user edits
+    if (_stageTransitionDelay != duration) {
+      final seconds =
+          (duration.inMilliseconds / Duration.millisecondsPerSecond).ceil();
+      final text = '${seconds}s';
+      _timerController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    }
+
+    if (enabled != _enabled) {
+      setState(() {
+        _enabled = enabled;
+      });
+    }
+  }
+
+  void _onTransitionDelayChanged() {
+    final duration = _stageTransitionDelay;
+    if (duration != null && duration != widget.stageTransitionDelay) {
+      widget.onTransitionDelayChanged(duration);
+    }
+  }
+
+  Duration? get _stageTransitionDelay {
+    final cleanedString =
+        _timerController.text.replaceAll('s', '').replaceAll(' ', '');
+    final seconds = int.tryParse(cleanedString);
+    return seconds != null ? Duration(seconds: seconds) : null;
   }
 }
