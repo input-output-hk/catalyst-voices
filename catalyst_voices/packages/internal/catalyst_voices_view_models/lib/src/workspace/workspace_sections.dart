@@ -33,7 +33,7 @@ sealed class WorkspaceSectionStep extends BaseSectionStep {
 final class RichTextStep extends WorkspaceSectionStep {
   final String name;
   final String? description;
-  final MarkdownString? initialData;
+  final MarkdownData? initialData;
   final int? charsLimit;
 
   const RichTextStep({

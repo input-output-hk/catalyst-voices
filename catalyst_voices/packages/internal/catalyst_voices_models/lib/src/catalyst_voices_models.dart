@@ -10,7 +10,7 @@ export 'crypto/keychain_metadata.dart';
 export 'crypto/lock_factor.dart';
 export 'errors/errors.dart';
 export 'file/voices_file.dart';
-export 'markdown_string.dart';
+export 'markdown_data.dart';
 export 'optional.dart';
 export 'proposal/guidance.dart';
 export 'proposal/proposal.dart';

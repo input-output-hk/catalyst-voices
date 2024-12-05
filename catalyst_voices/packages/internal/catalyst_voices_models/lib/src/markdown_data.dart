@@ -1,1 +1,1 @@
-extension type const MarkdownString(String data) implements Object {}
+extension type const MarkdownData(String data) implements Object {}

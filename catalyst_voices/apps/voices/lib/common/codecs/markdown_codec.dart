@@ -20,21 +20,21 @@ final _deltaToMd = DeltaToMarkdown(
   customContentHandler: DeltaToMarkdown.escapeSpecialCharactersRelaxed,
 );
 
-final class MarkdownCodec extends Codec<MarkdownString, Delta> {
+final class MarkdownCodec extends Codec<MarkdownData, Delta> {
   const MarkdownCodec();
 
   @override
-  Converter<Delta, MarkdownString> get decoder => const MarkdownEncoder();
+  Converter<Delta, MarkdownData> get decoder => const MarkdownEncoder();
 
   @override
-  Converter<MarkdownString, Delta> get encoder => const MarkdownDecoder();
+  Converter<MarkdownData, Delta> get encoder => const MarkdownDecoder();
 }
 
-class MarkdownDecoder extends Converter<MarkdownString, Delta> {
+class MarkdownDecoder extends Converter<MarkdownData, Delta> {
   const MarkdownDecoder();
 
   @override
-  Delta convert(MarkdownString input) {
+  Delta convert(MarkdownData input) {
     if (input.data.isEmpty) {
       return Delta();
     }
@@ -43,18 +43,18 @@ class MarkdownDecoder extends Converter<MarkdownString, Delta> {
   }
 }
 
-class MarkdownEncoder extends Converter<Delta, MarkdownString> {
+class MarkdownEncoder extends Converter<Delta, MarkdownData> {
   const MarkdownEncoder();
 
   @override
-  MarkdownString convert(Delta input) {
+  MarkdownData convert(Delta input) {
     if (input.isEmpty) {
-      return const MarkdownString('');
+      return const MarkdownData('');
     }
 
     final data = _deltaToMd.convert(input);
     final trimmed = data.trim();
 
-    return MarkdownString(trimmed);
+    return MarkdownData(trimmed);
   }
 }

@@ -68,7 +68,7 @@ final _proposals = [
           ProposalSectionStep(
             id: 'f14/0_${index}_1',
             name: 'Topic 1',
-            answer: index < 7 ? const MarkdownString('Ans') : null,
+            answer: index < 7 ? const MarkdownData('Ans') : null,
           ),
         ],
       );
@@ -93,7 +93,7 @@ final _proposals = [
           ProposalSectionStep(
             id: 'f14/0_${index}_1',
             name: 'Topic 1',
-            answer: const MarkdownString('Ans'),
+            answer: const MarkdownData('Ans'),
           ),
         ],
       );

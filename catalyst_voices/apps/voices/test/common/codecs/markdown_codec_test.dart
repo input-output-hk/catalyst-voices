@@ -7,7 +7,7 @@ void main() {
   group(MarkdownCodec, () {
     test('code and encode empty string', () {
       // Given
-      const source = MarkdownString('');
+      const source = MarkdownData('');
 
       // When
       final delta = markdown.encode(source);
@@ -19,7 +19,7 @@ void main() {
 
     test('code and encode plain text', () {
       // Given
-      const source = MarkdownString('Hello Catalyst!');
+      const source = MarkdownData('Hello Catalyst!');
 
       // When
       final delta = markdown.encode(source);
@@ -59,7 +59,7 @@ void main() {
     group('encode', () {
       test('empty markdown string builds valid empty delta', () {
         // Given
-        const markdownString = MarkdownString('');
+        const markdownString = MarkdownData('');
 
         // When
         final delta = markdown.encode(markdownString);
@@ -71,7 +71,7 @@ void main() {
       test('plan text markdown builds correct delta', () {
         // Given
         const plainText = 'Hello Catalyst!';
-        const markdownString = MarkdownString(plainText);
+        const markdownString = MarkdownData(plainText);
 
         // When
         final delta = markdown.encode(markdownString);

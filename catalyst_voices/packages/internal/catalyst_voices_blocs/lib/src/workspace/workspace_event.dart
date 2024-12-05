@@ -15,7 +15,7 @@ final class LoadCurrentProposalEvent extends WorkspaceEvent {
 
 final class UpdateStepAnswerEvent extends WorkspaceEvent {
   final SectionStepId id;
-  final MarkdownString? data;
+  final MarkdownData? data;
 
   const UpdateStepAnswerEvent({
     required this.id,

@@ -30,7 +30,7 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
   void initState() {
     super.initState();
 
-    final markdownString = widget.step.initialData ?? const MarkdownString('');
+    final markdownString = widget.step.initialData ?? const MarkdownData('');
     final delta = markdown.encode(markdownString);
 
     final document = delta.isNotEmpty ? Document.fromDelta(delta) : Document();

@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
   final CampaignService _campaignService;
 
-  final _answers = <SectionStepId, MarkdownString>{};
+  final _answers = <SectionStepId, MarkdownData>{};
   final _guidances = <SectionStepId, List<Guidance>>{};
 
   SectionStepId? _activeStepId;
