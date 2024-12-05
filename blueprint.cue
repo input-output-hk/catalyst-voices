@@ -8,7 +8,7 @@ global: {
 			"^test(-.*)?$",
 		]
 		registries: [
-			ci.providers.aws.registry,
+			ci.providers.aws.ecr.registry,
 		]
 		providers: {
 			aws: {
