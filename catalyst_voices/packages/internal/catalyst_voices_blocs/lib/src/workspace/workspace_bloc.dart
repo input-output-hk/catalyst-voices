@@ -41,27 +41,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
 
     final template = activeCampaign.proposalTemplate;
 
-    final sections = template.sections.map(
-      (section) {
-        return WorkspaceSection(
-          id: section.id,
-          name: section.name,
-          steps: section.steps.map(
-            (step) {
-              final id = (sectionId: section.id, stepId: step.id);
-
-              return RichTextStep(
-                id: step.id,
-                sectionId: section.id,
-                name: step.name,
-                description: step.description,
-                initialData: _answers[id] ?? step.answer,
-              );
-            },
-          ).toList(),
-        );
-      },
-    ).toList();
+    final sections = template.sections.map(_mapProposalSection).toList();
 
     for (final section in template.sections) {
       for (final step in section.steps) {
@@ -111,5 +91,25 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     );
 
     emit(state.copyWith(guidance: guidance));
+  }
+
+  WorkspaceSection _mapProposalSection(ProposalSection section) {
+    return WorkspaceSection(
+      id: section.id,
+      name: section.name,
+      steps: section.steps.map(
+        (step) {
+          final id = (sectionId: section.id, stepId: step.id);
+
+          return RichTextStep(
+            id: step.id,
+            sectionId: section.id,
+            name: step.name,
+            description: step.description,
+            initialData: _answers[id] ?? step.answer,
+          );
+        },
+      ).toList(),
+    );
   }
 }
