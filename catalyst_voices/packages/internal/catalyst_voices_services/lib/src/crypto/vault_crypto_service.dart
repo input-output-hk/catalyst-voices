@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
-import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+import 'package:catalyst_voices_services/src/vault/vault.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';

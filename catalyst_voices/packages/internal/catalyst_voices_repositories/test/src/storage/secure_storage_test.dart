@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_services/src/storage/secure_storage.dart';
+import 'package:catalyst_voices_repositories/src/storage/secure_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:test/test.dart';
 
