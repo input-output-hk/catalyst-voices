@@ -116,16 +116,16 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
         children: [
           if (leading != null) leading!,
           IconButton(
-            key: const ValueKey('DrawerSpaceChooserPreviousButton'),
+            key: const ValueKey('DrawerChooserPreviousButton'),
             onPressed: _selectedIndex > 0 ? _onSelectPrevious : null,
             icon: VoicesAssets.icons.chevronLeft.buildIcon(size: 20),
           ),
           for (final item in items)
             MouseRegion(
-              key: ValueKey('DrawerSpaceChooser$item'),
+              key: ValueKey('DrawerChooser$item'),
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
-                key: const ValueKey('DrawerSpaceChooserItem'),
+                key: const ValueKey('DrawerChooserItem'),
                 behavior: HitTestBehavior.opaque,
                 onTap: () => onSelected(item),
                 child: itemBuilder(
@@ -136,7 +136,7 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
               ),
             ),
           IconButton(
-            key: const ValueKey('DrawerSpaceChooserNextButton'),
+            key: const ValueKey('DrawerChooserNextButton'),
             onPressed:
                 _selectedIndex < (items.length - 1) ? _onSelectNext : null,
             icon: VoicesAssets.icons.chevronRight.buildIcon(size: 20),
