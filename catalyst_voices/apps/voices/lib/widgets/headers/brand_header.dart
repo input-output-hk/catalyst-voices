@@ -19,6 +19,7 @@ class BrandHeader extends StatelessWidget {
         children: [
           Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
           IconButton(
+            key: const ValueKey('SpacesMenuCloseButton'),
             onPressed: Navigator.of(context).pop,
             icon: VoicesAssets.icons.x.buildIcon(size: 22),
           ),
