@@ -13,15 +13,24 @@ final class LoadCurrentProposalEvent extends WorkspaceEvent {
   List<Object?> get props => [];
 }
 
-final class UpdateSectionStepAnswer extends WorkspaceEvent {
+final class UpdateStepAnswerEvent extends WorkspaceEvent {
   final SectionStepId id;
   final MarkdownString? data;
 
-  const UpdateSectionStepAnswer({
+  const UpdateStepAnswerEvent({
     required this.id,
     this.data,
   });
 
   @override
   List<Object?> get props => [id, data];
+}
+
+final class ActiveStepChangedEvent extends WorkspaceEvent {
+  final SectionStepId? id;
+
+  const ActiveStepChangedEvent(this.id);
+
+  @override
+  List<Object?> get props => [id];
 }

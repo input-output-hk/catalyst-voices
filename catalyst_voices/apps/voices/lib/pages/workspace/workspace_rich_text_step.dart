@@ -79,7 +79,7 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
 
     final sectionStepId = widget.step.sectionStepId;
 
-    final event = UpdateSectionStepAnswer(
+    final event = UpdateStepAnswerEvent(
       id: sectionStepId,
       data: markdownString.data.isNotEmpty ? markdownString : null,
     );

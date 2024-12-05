@@ -2,7 +2,7 @@ import 'package:catalyst_voices/common/ext/guidance_ext.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class GuidanceCard extends StatelessWidget {
@@ -57,6 +57,14 @@ class GuidanceCard extends StatelessWidget {
     );
   }
 
-  String _buildTypeTitle(BuildContext context) =>
-      '${guidance.type.localizedType(context.l10n)} ${guidance.weightText}';
+  String _buildTypeTitle(BuildContext context) {
+    final weight = guidance.weight;
+    final localizedType = guidance.type.localizedType(context.l10n);
+
+    if (weight == null) {
+      return localizedType;
+    }
+
+    return '$localizedType $weight';
+  }
 }

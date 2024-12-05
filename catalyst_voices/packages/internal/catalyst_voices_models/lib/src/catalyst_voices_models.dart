@@ -12,6 +12,7 @@ export 'errors/errors.dart';
 export 'file/voices_file.dart';
 export 'markdown_string.dart';
 export 'optional.dart';
+export 'proposal/guidance.dart';
 export 'proposal/proposal.dart';
 export 'proposal/proposal_section.dart';
 export 'proposal/proposal_template.dart';

@@ -25,6 +25,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
   late final SectionsController _sectionsController;
   late final ItemScrollController _bodyItemScrollController;
 
+  SectionStepId? _activeStepId;
   StreamSubscription<List<Section>>? _sectionsSub;
 
   @override
@@ -37,7 +38,9 @@ class _WorkspacePageState extends State<WorkspacePage> {
     _sectionsController = SectionsController();
     _bodyItemScrollController = ItemScrollController();
 
-    _sectionsController.attachItemsScrollController(_bodyItemScrollController);
+    _sectionsController
+      ..addListener(_handleSectionsControllerChange)
+      ..attachItemsScrollController(_bodyItemScrollController);
 
     _sectionsSub = bloc.stream
         .map((event) => event.sections)
@@ -76,5 +79,16 @@ class _WorkspacePageState extends State<WorkspacePage> {
         : state.copyWith(sections: data);
 
     _sectionsController.value = newState;
+  }
+
+  void _handleSectionsControllerChange() {
+    final activeStepId = _sectionsController.value.activeStepId;
+
+    if (_activeStepId != activeStepId) {
+      _activeStepId = activeStepId;
+
+      final event = ActiveStepChangedEvent(activeStepId);
+      context.read<WorkspaceBloc>().add(event);
+    }
   }
 }

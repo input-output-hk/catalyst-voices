@@ -1,8 +1,11 @@
+import 'package:catalyst_voices/pages/workspace/workspace_guidance_view.dart';
 import 'package:catalyst_voices/widgets/cards/comment_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WorkspaceSetupPanel extends StatelessWidget {
   const WorkspaceSetupPanel({super.key});
@@ -16,7 +19,7 @@ class WorkspaceSetupPanel extends StatelessWidget {
       tabs: [
         SpaceSidePanelTab(
           name: 'Guidance',
-          body: const _SetupSectionListener(),
+          body: const _GuidanceSelector(),
         ),
         SpaceSidePanelTab(
           name: 'Comments',
@@ -38,22 +41,22 @@ class WorkspaceSetupPanel extends StatelessWidget {
   }
 }
 
-// TODO(damian): Read bloc state
-class _SetupSectionListener extends StatelessWidget {
-  const _SetupSectionListener();
+class _GuidanceSelector extends StatelessWidget {
+  const _GuidanceSelector();
 
   @override
   Widget build(BuildContext context) {
-    return Text(context.l10n.noGuidanceForThisSection);
-    // final activeStepId = value.activeStepId;
-    // final activeStepGuidances = value.activeStepGuidances;
-    //
-    // if (activeStepId == null) {
-    //   return Text(context.l10n.selectASection);
-    // } else if (activeStepGuidances == null || activeStepGuidances.isEmpty) {
-    //   return Text(context.l10n.noGuidanceForThisSection);
-    // } else {
-    //   return GuidanceView(activeStepGuidances);
-    // }
+    return BlocSelector<WorkspaceBloc, WorkspaceState, WorkspaceGuidance>(
+      selector: (state) => state.guidance,
+      builder: (context, state) {
+        if (state.isNoneSelected) {
+          return Text(context.l10n.selectASection);
+        } else if (state.showEmptyState) {
+          return Text(context.l10n.noGuidanceForThisSection);
+        } else {
+          return GuidanceView(state.guidances);
+        }
+      },
+    );
   }
 }

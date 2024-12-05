@@ -38,12 +38,14 @@ final class ProposalSectionStep extends Equatable {
   final String id;
   final String name;
   final String? description;
+  final List<Guidance> guidances;
   final MarkdownString? answer;
 
   const ProposalSectionStep({
     required this.id,
     required this.name,
     this.description,
+    this.guidances = const [],
     this.answer,
   });
 
@@ -53,12 +55,14 @@ final class ProposalSectionStep extends Equatable {
     String? id,
     String? name,
     Optional<String>? description,
+    List<Guidance>? guidances,
     Optional<MarkdownString>? answer,
   }) {
     return ProposalSectionStep(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description.dataOr(this.description),
+      guidances: guidances ?? this.guidances,
       answer: answer.dataOr(this.answer),
     );
   }
@@ -68,6 +72,7 @@ final class ProposalSectionStep extends Equatable {
         id,
         name,
         description,
+        guidances,
         answer,
       ];
 }

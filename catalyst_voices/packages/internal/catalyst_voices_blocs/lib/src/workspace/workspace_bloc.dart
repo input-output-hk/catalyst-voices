@@ -9,12 +9,16 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
   final CampaignService _campaignService;
 
   final _answers = <SectionStepId, MarkdownString>{};
+  final _guidances = <SectionStepId, List<Guidance>>{};
+
+  SectionStepId? _activeStepId;
 
   WorkspaceBloc(
     this._campaignService,
   ) : super(const WorkspaceState()) {
     on<LoadCurrentProposalEvent>(_loadCurrentProposal);
-    on<UpdateSectionStepAnswer>(_updateStepAnswer);
+    on<UpdateStepAnswerEvent>(_updateStepAnswer);
+    on<ActiveStepChangedEvent>(_handleActiveStepEvent);
   }
 
   Future<void> _loadCurrentProposal(
@@ -22,10 +26,16 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     Emitter<WorkspaceState> emit,
   ) async {
     _answers.clear();
+    _guidances.clear();
 
     final activeCampaign = await _campaignService.getActiveCampaign();
     if (activeCampaign == null) {
-      emit(state.copyWith(sections: []));
+      emit(
+        state.copyWith(
+          sections: [],
+          guidance: const WorkspaceGuidance(isNoneSelected: true),
+        ),
+      );
       return;
     }
 
@@ -38,12 +48,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
           name: section.name,
           steps: section.steps.map(
             (step) {
+              final id = (sectionId: section.id, stepId: step.id);
+
               return RichTextStep(
                 id: step.id,
                 sectionId: section.id,
                 name: step.name,
                 description: step.description,
-                initialData: step.answer,
+                initialData: _answers[id] ?? step.answer,
               );
             },
           ).toList(),
@@ -51,11 +63,30 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
       },
     ).toList();
 
-    emit(state.copyWith(sections: sections));
+    for (final section in template.sections) {
+      for (final step in section.steps) {
+        final id = (sectionId: section.id, stepId: step.id);
+        _guidances[id] = step.guidances;
+      }
+    }
+
+    final activeStepId = _activeStepId;
+    final guidances = _guidances[activeStepId] ?? <Guidance>[];
+    final guidance = WorkspaceGuidance(
+      isNoneSelected: activeStepId == null,
+      guidances: guidances,
+    );
+
+    emit(
+      state.copyWith(
+        sections: sections,
+        guidance: guidance,
+      ),
+    );
   }
 
   void _updateStepAnswer(
-    UpdateSectionStepAnswer event,
+    UpdateStepAnswerEvent event,
     Emitter<WorkspaceState> emit,
   ) {
     final answer = event.data;
@@ -64,5 +95,21 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     } else {
       _answers.remove(event.id);
     }
+  }
+
+  void _handleActiveStepEvent(
+    ActiveStepChangedEvent event,
+    Emitter<WorkspaceState> emit,
+  ) {
+    _activeStepId = event.id;
+
+    final activeStepId = _activeStepId;
+    final guidances = _guidances[activeStepId] ?? <Guidance>[];
+    final guidance = WorkspaceGuidance(
+      isNoneSelected: activeStepId == null,
+      guidances: guidances,
+    );
+
+    emit(state.copyWith(guidance: guidance));
   }
 }
