@@ -3,4 +3,4 @@ services:
   test-app:
     image: test-app:latest
     ports:
-      - 8000:80
+      - "8000:80"
