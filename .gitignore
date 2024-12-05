@@ -122,3 +122,5 @@ test-results/
 /blob-report/
 /playwright/.cache/
 extensions/
+browser_extensions/
+!catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/extensions/

@@ -1,6 +1,6 @@
 //! Get Sync Status query
 
-use futures::StreamExt;
+use futures::stream::StreamExt;
 use tracing::{debug, warn};
 
 use super::update::row::SyncStatusQueryParams;
@@ -96,7 +96,15 @@ pub(crate) async fn get_sync_status() -> Vec<SyncStatus> {
     let session = session.get_raw_session();
 
     let mut results = match session.query_iter(GET_SYNC_STATUS, ()).await {
-        Ok(result) => result.into_typed::<SyncStatusQueryParams>(),
+        Ok(result) => {
+            match result.rows_stream::<SyncStatusQueryParams>() {
+                Ok(result) => result,
+                Err(err) => {
+                    warn!(error=%err, "Failed to get sync status results from query.");
+                    return synced_chunks;
+                },
+            }
+        },
         Err(err) => {
             warn!(error=%err, "Failed to get sync status results from query.");
             return synced_chunks;

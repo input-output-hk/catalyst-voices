@@ -10,14 +10,10 @@ abstract class DateFormatter {
   /// - Yesterday
   /// - 2 days ago
   /// - Other cases: yMMMMd date format.
-  static String formatRecentDate(
-    VoicesLocalizations l10n,
-    DateTime dateTime, {
-    DateTime? from,
-  }) {
-    from ??= DateTimeExt.now();
+  static String formatRecentDate(VoicesLocalizations l10n, DateTime dateTime) {
+    final now = DateTimeExt.now();
 
-    final today = DateTime(from.year, from.month, from.day, 12);
+    final today = DateTime(now.year, now.month, now.day, 12);
     if (dateTime.isSameDateAs(today)) return l10n.today;
 
     final tomorrow = today.plusDays(1);

@@ -1,7 +1,7 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
 use anyhow::anyhow;
 use der_parser::asn1_rs::ToDer;
-use futures::StreamExt as _;
+use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
 
