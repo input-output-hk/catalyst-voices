@@ -27,7 +27,7 @@ void main() {
             ProposalSectionStep(
               id: 'f14/0_${index}_1',
               name: 'Topic 1',
-              answer: index < 1 ? MarkdownString('Ans') : null,
+              answer: index < 1 ? const MarkdownString('Ans') : null,
             ),
           ],
         );
