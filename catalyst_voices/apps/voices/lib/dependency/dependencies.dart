@@ -115,12 +115,9 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
-
     registerLazySingleton<AccessControl>(AccessControl.new);
-
     registerLazySingleton<CampaignService>(
       () => CampaignService(get<CampaignRepository>()),
     );
-
   }
 }
