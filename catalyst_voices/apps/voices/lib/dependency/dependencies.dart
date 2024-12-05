@@ -60,6 +60,11 @@ final class Dependencies extends DependencyProvider {
           get<CampaignRepository>(),
         );
       })
+      ..registerLazySingleton<CampaignInfoCubit>(() {
+        return CampaignInfoCubit(
+          campaignService: get<CampaignService>(),
+        );
+      })
       // TODO(ryszard-schossler): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
@@ -110,6 +115,12 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+
     registerLazySingleton<AccessControl>(AccessControl.new);
+
+    registerLazySingleton<CampaignService>(
+      () => CampaignService(get<CampaignRepository>()),
+    );
+
   }
 }

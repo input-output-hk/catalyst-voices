@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
-final class CampaignRepository {
+class CampaignRepository {
   Future<Campaign> getCampaign({
     required String id,
   }) async {
@@ -31,6 +31,7 @@ final class CampaignRepository {
       endDate: now.add(const Duration(days: 92)),
       proposalsCount: 0,
       sections: sections,
+      publish: CampaignPublish.draft,
       proposalTemplate: const ProposalTemplate(),
     );
   }
