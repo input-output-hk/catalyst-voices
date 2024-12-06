@@ -59,7 +59,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     required this.id,
     this.secureStorage = const FlutterSecureStorage(),
     CryptoService? cryptoService,
-  }) : _cryptoService = cryptoService ?? VaultCryptoService();
+  }) : _cryptoService = cryptoService ?? LocalCryptoService();
 
   String get _instanceKeyPrefix => '$_keyPrefix.$id';
 

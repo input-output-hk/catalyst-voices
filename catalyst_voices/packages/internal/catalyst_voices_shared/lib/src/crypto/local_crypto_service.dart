@@ -6,19 +6,19 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 
-final _logger = Logger('VaultCryptoService');
+final _logger = Logger('LocalCryptoService');
 
 /// [CryptoService] implementation used by default in [Vault].
 ///
 /// It uses Pbkdf2 for key derivation as well as
 /// AesGcm for encryption/decryption.
 ///
-/// Only keys build by [VaultCryptoService.deriveKey] should be used
-/// for crypto operations are we're adding [VaultCryptoService] specific
+/// Only keys build by [LocalCryptoService.deriveKey] should be used
+/// for crypto operations are we're adding [LocalCryptoService] specific
 /// metadata to them.
 ///
 /// Supports version for future changes.
-final class VaultCryptoService implements CryptoService {
+final class LocalCryptoService implements CryptoService {
   /// Salt length for key derivation.
   static const int _saltLength = 16;
 
@@ -34,7 +34,7 @@ final class VaultCryptoService implements CryptoService {
 
   final Random _random;
 
-  VaultCryptoService({
+  LocalCryptoService({
     Random? random,
   }) : _random = random ?? Random.secure();
 

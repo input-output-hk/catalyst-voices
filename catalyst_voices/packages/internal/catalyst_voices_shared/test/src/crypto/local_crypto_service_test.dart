@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final cryptoService = VaultCryptoService();
+  final cryptoService = LocalCryptoService();
 
   group('key derivation', () {
     test(
