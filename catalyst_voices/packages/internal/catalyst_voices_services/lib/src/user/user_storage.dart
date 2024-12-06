@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 const _activeKeychainIdKey = 'activeKeychainId';
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_repositories/src/storage/secure_storage.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class DummyAuthStorage {
   FutureOr<String?> readEmail();

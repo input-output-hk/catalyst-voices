@@ -16,7 +16,6 @@ dependencies:
   chopper: ^8.0.3
   flutter:
     sdk: flutter
-  flutter_secure_storage: ^9.2.2
   http: ^1.2.2
   json_annotation: ^4.8.1
   result_type: ^0.2.0

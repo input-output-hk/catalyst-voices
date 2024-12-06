@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
-import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
-import 'package:catalyst_voices_services/src/vault/vault.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

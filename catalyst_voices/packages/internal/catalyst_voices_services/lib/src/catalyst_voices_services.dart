@@ -1,5 +1,4 @@
 export 'campaign/campaign_service.dart' show CampaignService;
-export 'crypto/key_derivation.dart';
 export 'downloader/downloader.dart';
 export 'keychain/keychain.dart';
 export 'keychain/keychain_provider.dart';
@@ -11,5 +10,3 @@ export 'registration/registration_service.dart' show RegistrationService;
 export 'registration/registration_transaction_builder.dart';
 export 'user/user_service.dart' show UserService;
 export 'user/user_storage.dart';
-export 'vault/secure_storage_vault.dart';
-export 'vault/vault.dart';

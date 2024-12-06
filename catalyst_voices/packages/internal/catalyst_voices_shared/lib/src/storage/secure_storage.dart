@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_repositories/src/storage/storage.dart';
-import 'package:catalyst_voices_repositories/src/storage/storage_string_mixin.dart';
+import 'package:catalyst_voices_shared/src/storage/storage.dart';
+import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _keyPrefix = 'SecureStorage';

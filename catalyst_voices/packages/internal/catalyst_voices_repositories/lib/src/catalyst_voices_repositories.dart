@@ -3,7 +3,4 @@ export 'campaign/campaign_repository.dart';
 export 'credentials_storage_repository.dart';
 export 'dummy_auth_storage.dart';
 export 'proposal/proposal_repository.dart';
-export 'storage/secure_storage.dart';
-export 'storage/storage.dart';
-export 'storage/storage_string_mixin.dart';
 export 'transaction/transaction_config_repository.dart';

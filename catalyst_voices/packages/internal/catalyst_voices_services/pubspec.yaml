@@ -16,17 +16,18 @@ dependencies:
     path: ../catalyst_voices_models
   catalyst_voices_repositories:
     path: ../catalyst_voices_repositories
+  catalyst_voices_shared:
+    path: ../catalyst_voices_shared
   convert: ^3.1.1
-  cryptography: ^2.7.0
-  ed25519_hd_key: ^2.3.0
-  equatable: ^2.0.7
+#  ed25519_hd_key: ^2.3.0
+#  equatable: ^2.0.7
   flutter:
     sdk: flutter
   flutter_driver:
     sdk: flutter
   flutter_secure_storage: ^9.2.2
   logging: ^1.2.0
-  path: ^1.9.0
+#  path: ^1.9.0
   rxdart: ^0.27.7
   uuid: ^4.5.1
   web: ^1.1.0

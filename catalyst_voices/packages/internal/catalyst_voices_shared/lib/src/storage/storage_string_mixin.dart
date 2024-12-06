@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:catalyst_voices_repositories/src/storage/storage.dart';
+import 'package:catalyst_voices_shared/src/storage/storage.dart';
 import 'package:flutter/foundation.dart';
 
 /// Utility mixin which implements all but String read/write of [Storage]
