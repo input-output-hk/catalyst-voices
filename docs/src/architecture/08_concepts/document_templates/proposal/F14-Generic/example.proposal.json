@@ -24,7 +24,11 @@
         },
         "problem": {
             "statement": "Current challenge in the Cardano ecosystem...",
-            "impact": ["Technical Infrastructure", "Developer Tooling", "Adoption"]
+            "impact": [
+                "Technical Infrastructure",
+                "Developer Tooling",
+                "Adoption"
+            ]
         },
         "solution": {
             "summary": "Our solution provides a comprehensive toolkit...",
@@ -51,7 +55,11 @@
             "primaryCategory": "Development & Tools",
             "subCategory": "Developer Tools"
         },
-        "tags": ["defi", "developer-tools", "infrastructure"],
+        "tags": [
+            "defi",
+            "developer-tools",
+            "infrastructure"
+        ],
         "impact": {
             "timeframe": "Medium-term (6-18 months)",
             "scale": "Global",
@@ -68,7 +76,10 @@
         "solution": {
             "description": "Our solution provides a comprehensive toolkit...",
             "uniqueValue": "First integrated testing framework for Cardano",
-            "targetAudience": ["Cardano Developers", "DApp Teams"],
+            "targetAudience": [
+                "Cardano Developers",
+                "DApp Teams"
+            ],
             "implementation": "We will use an agile development approach..."
         },
         "impact": {
@@ -94,6 +105,18 @@
         }
     },
     "milestones": {
+        "milestones": {
+            "declared": [
+                "a",
+                "bb",
+                "cccccccccccccccccccccccc",
+                "dd",
+                "eee",
+                "fff"
+            ]
+        }
+    },
+    "milestonez": {
         "milestonesConfig": {
             "grantAmount": 150000,
             "numberOfMilestones": 4
@@ -143,7 +166,10 @@
                 {
                     "name": "John Doe",
                     "role": "Project Lead",
-                    "expertise": ["Blockchain Development", "Smart Contracts"],
+                    "expertise": [
+                        "Blockchain Development",
+                        "Smart Contracts"
+                    ],
                     "experience": "10 years in software development",
                     "links": [
                         {
@@ -200,7 +226,10 @@
             "legalCompliance": true,
             "noConflictOfInterest": true,
             "accurateInformation": true,
-            "jurisdictions": ["US", "GB"],
+            "jurisdictions": [
+                "US",
+                "GB"
+            ],
             "timestamp": "2024-01-20T15:30:00Z"
         }
     }

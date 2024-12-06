@@ -38,16 +38,19 @@
             "format": "yes/no",
             "default": false
         },
+        "uri": {
+            "type": "string",
+            "format": "uri",
+            "contentMediaType": "text/plain",
+            "maxLength": 1024
+        },
         "uriList": {
             "type": "array",
             "format": "uriList",
             "uniqueItems": true,
             "default": [],
             "items": {
-                "type": "string",
-                "format": "uri",
-                "contentMediaType": "text/plain",
-                "maxLength": 1024
+                "$ref": "#/definitions/uri"
             }
         }
     },
