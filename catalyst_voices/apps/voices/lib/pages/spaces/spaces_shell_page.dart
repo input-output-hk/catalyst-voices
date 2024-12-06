@@ -53,60 +53,44 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState,
-        Map<Space, ShortcutActivator>>(
-      selector: (state) {
-        return switch (state) {
-          ActiveAccountSessionState(:final spacesShortcuts) => spacesShortcuts,
-          _ => {},
-        };
-      },
-      builder: (context, shortcuts) {
-        return CallbackShortcuts(
-          bindings: <ShortcutActivator, VoidCallback>{
-            for (final entry in shortcuts.entries)
-              entry.value: () => entry.key.go(context),
-            CampaignAdminToolsDialog.shortcut: _toggleCampaignAdminTools,
-          },
-          child: Stack(
-            children: [
-              BlocSelector<SessionCubit, SessionState,
-                  ({bool isUnlocked, bool isVisitor})>(
-                selector: (state) => (
-                  isUnlocked: state is ActiveAccountSessionState,
-                  isVisitor: state is VisitorSessionState
+    return _Shortcuts(
+      onToggleAdminTools: _toggleCampaignAdminTools,
+      child: Stack(
+        children: [
+          BlocSelector<SessionCubit, SessionState,
+              ({bool isUnlocked, bool isVisitor})>(
+            selector: (state) => (
+              isUnlocked: state is ActiveAccountSessionState,
+              isVisitor: state is VisitorSessionState
+            ),
+            builder: (context, state) {
+              return Scaffold(
+                appBar: VoicesAppBar(
+                  leading: state.isVisitor ? null : const DrawerToggleButton(),
+                  automaticallyImplyLeading: false,
+                  actions: _getActions(widget.space),
                 ),
-                builder: (context, state) {
-                  return Scaffold(
-                    appBar: VoicesAppBar(
-                      leading:
-                          state.isVisitor ? null : const DrawerToggleButton(),
-                      automaticallyImplyLeading: false,
-                      actions: _getActions(widget.space),
-                    ),
-                    drawer: state.isVisitor
-                        ? null
-                        : SpacesDrawer(
-                            space: widget.space,
-                            spacesShortcutsActivators:
-                                SpacesShellPage._spacesShortcutsActivators,
-                            isUnlocked: state.isUnlocked,
-                          ),
-                    body: widget.child,
-                  );
-                },
-              ),
-              if (_showAdminTools)
-                DraggableCampaignAdminToolsDialog(
-                  dialogKey: _adminToolsKey,
-                  selectedSpace: widget.space,
-                  onSpaceSelected: (space) => space.go(context),
-                  onClose: _closeCampaignAdminTools,
-                ),
-            ],
+                drawer: state.isVisitor
+                    ? null
+                    : SpacesDrawer(
+                        space: widget.space,
+                        spacesShortcutsActivators:
+                            SpacesShellPage._spacesShortcutsActivators,
+                        isUnlocked: state.isUnlocked,
+                      ),
+                body: widget.child,
+              );
+            },
           ),
-        );
-      },
+          if (_showAdminTools)
+            DraggableCampaignAdminToolsDialog(
+              dialogKey: _adminToolsKey,
+              selectedSpace: widget.space,
+              onSpaceSelected: (space) => space.go(context),
+              onClose: _closeCampaignAdminTools,
+            ),
+        ],
+      ),
     );
   }
 
@@ -135,5 +119,38 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     setState(() {
       _showAdminTools = false;
     });
+  }
+}
+
+class _Shortcuts extends StatelessWidget {
+  final VoidCallback onToggleAdminTools;
+  final Widget child;
+
+  const _Shortcuts({
+    required this.onToggleAdminTools,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<SessionCubit, SessionState,
+        Map<Space, ShortcutActivator>>(
+      selector: (state) {
+        return switch (state) {
+          ActiveAccountSessionState(:final spacesShortcuts) => spacesShortcuts,
+          _ => {},
+        };
+      },
+      builder: (context, shortcuts) {
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            for (final entry in shortcuts.entries)
+              entry.value: () => entry.key.go(context),
+            CampaignAdminToolsDialog.shortcut: onToggleAdminTools,
+          },
+          child: child,
+        );
+      },
+    );
   }
 }
