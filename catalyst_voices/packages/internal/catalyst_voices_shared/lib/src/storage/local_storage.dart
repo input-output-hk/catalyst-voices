@@ -45,11 +45,9 @@ base class LocalStorage with StorageAsStringMixin implements Storage {
   Future<void> clear() async {
     final keys = await _sharedPreferences.getKeys();
     final storageKeys =
-        List.of(keys).where((element) => element.startsWith(key));
+        keys.where((element) => element.startsWith(key)).toSet();
 
-    for (final key in storageKeys) {
-      await _sharedPreferences.remove(key);
-    }
+    await _sharedPreferences.clear(allowList: storageKeys);
   }
 
   String _effectiveKey(String value) {
