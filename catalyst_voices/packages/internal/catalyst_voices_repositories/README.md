@@ -30,8 +30,3 @@ If you are running the command on a **Linux** platform, you can omit this flag.
 In this way it's possible to locally generate the code using the same version of
 OpenAPI specs defined in the backend code and developers have full control of
 what should be committed.
-
-To ensure the consistency of the generated code (especially when backend changes
-occur) an earthly target is automatically executed on PR against main.
-This `+test-flutter-code-generator` generates the code on the CI and compares
-it with the code currently in repo, failing if there is an inconsistency.
