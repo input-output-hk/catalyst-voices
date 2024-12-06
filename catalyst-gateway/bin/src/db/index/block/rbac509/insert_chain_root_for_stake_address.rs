@@ -17,7 +17,7 @@ const INSERT_CHAIN_ROOT_FOR_STAKE_ADDRESS_QUERY: &str =
 #[derive(SerializeRow)]
 pub(super) struct Params {
     /// Stake Address Hash. 32 bytes.
-    stake_address: Vec<u8>,
+    stake_addr: Vec<u8>,
     /// Block Slot Number
     slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
@@ -29,7 +29,7 @@ pub(super) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_addr", &self.stake_addr)
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .field("chain_root", &self.chain_root)
@@ -39,9 +39,9 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(stake_address: &[u8], chain_root: &[u8], slot_no: u64, txn: i16) -> Self {
+    pub(super) fn new(stake_addr: &[u8], chain_root: &[u8], slot_no: u64, txn: i16) -> Self {
         Params {
-            stake_address: stake_address.to_vec(),
+            stake_addr: stake_addr.to_vec(),
             slot_no: num_bigint::BigInt::from(slot_no),
             txn,
             chain_root: chain_root.to_vec(),
