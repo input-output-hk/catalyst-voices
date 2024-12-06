@@ -10,12 +10,12 @@
             "format": "path",
             "readOnly": true
         },
-        "section": {
+        "segment": {
             "$comment": "UI - Logical Document Section Break.",
             "type": "object",
             "additionalProperties": false
         },
-        "subsection": {
+        "section": {
             "$comment": "UI - Logical Document Sub-Section Break.",
             "type": "object",
             "additionalProperties": false
@@ -82,12 +82,12 @@
             "const": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
         },
         "setup": {
-            "$ref": "#/definitions/section",
+            "$ref": "#/definitions/segment",
             "title": "proposal setup",
             "description": "Proposal title",
             "properties": {
                 "title": {
-                    "$ref": "#/definitions/subsection",
+                    "$ref": "#/definitions/section",
                     "title": "proposal setup",
                     "description": "Proposal title",
                     "properties": {
@@ -107,7 +107,7 @@
                     ]
                 },
                 "proposer": {
-                    "$ref": "#/definitions/subsection",
+                    "$ref": "#/definitions/section",
                     "properties": {
                         "applicant": {
                             "$ref": "#/definitions/singleLineTextEntry",
@@ -150,12 +150,12 @@
             ]
         },
         "summary": {
-            "$ref": "#/definitions/section",
+            "$ref": "#/definitions/segment",
             "title": "Proposal Summary",
             "description": "Key information about your proposal",
             "properties": {
                 "budget": {
-                    "$ref": "#/definitions/subsection",
+                    "$ref": "#/definitions/section",
                     "title": "Budget Information",
                     "properties": {
                         "requestedFunds": {
@@ -172,7 +172,7 @@
                     ]
                 },
                 "time": {
-                    "$ref": "#/definitions/subsection",
+                    "$ref": "#/definitions/section",
                     "properties": {
                         "duration": {
                             "$ref": "#/definitions.durationInMonths",
@@ -188,7 +188,7 @@
                     ]
                 },
                 "translation": {
-                    "$ref": "#/definitions/subsection",
+                    "$ref": "#/definitions/section",
                     "title": "Translation Information",
                     "description": "Information about the proposal's language and translation status",
                     "properties": {
@@ -242,7 +242,7 @@
                     }
                 },
                 "problem": {
-                    "$ref": "#/definitions/subsection",
+                    "$ref": "#/definitions/section",
                     "title": "Problem Statement",
                     "description": "Define the problem your proposal aims to solve",
                     "properties": {
@@ -283,7 +283,7 @@
                     ]
                 },
                 "solution": {
-                    "$ref": "#/definitions/subsection",
+                    "$ref": "#/definitions/section",
                     "title": "Solution Overview",
                     "description": "Describe your proposed solution to the problem",
                     "properties": {
