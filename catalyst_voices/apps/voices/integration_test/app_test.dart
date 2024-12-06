@@ -1,11 +1,11 @@
 import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'pageobject/dashboard_page.dart';
 import 'pageobject/spaces_drawer_page.dart';
-import 'types/types.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -25,24 +25,15 @@ void main() {
       // pump and settle every 100ms to simulate almost production-like FPS
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
 
-      await tester.tap(DashboardPage.userLockedBtn.last);
+      // click on locked user shortcut text link
+      await tester.tap(DashboardPage.userLockedShortcutBtn.last);
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
-      await tester.tap(DashboardPage.drawerButton);
+      // open and check spaces drawer
+      await tester.tap(DashboardPage.spacesDrawerButton);
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
-      // spaces drawer is opened
-      expect(SpacesDrawerPage.closeBtn, findsOneWidget);
+      SpacesDrawerPage.looksAsExpected();
 
-      //ToDo 1. check spaces chooser looks
-      expect(SpacesDrawerPage.allSpacesBtn, findsOneWidget);
-      expect(SpacesDrawerPage.chooserPrevBtn, findsOneWidget);
-      expect(SpacesDrawerPage.chooserNextBtn, findsOneWidget);
-      expect(SpacesDrawerPage.chooserItemContainer, findsExactly(5));
-      expect(
-        SpacesDrawerPage.chooserIcon(Space.discovery),
-        findsOneWidget,
-      );
-
-      //ToDo 2. iterate thru spaces and check sections buttons are there
+      //iterate thru spaces and check menu buttons are there
       for (final space in Space.values) {
         await tester.tap(SpacesDrawerPage.chooserItem(space));
         await tester.pumpAndSettle(const Duration(milliseconds: 100));
@@ -53,7 +44,7 @@ void main() {
         expect(children, findsAtLeast(1));
       }
     });
-    // test visitor > no menu button
-    // test user ? menu renders correctly
+    // add test visitor > no menu button
+    // add test logged user > menu renders correctly
   });
 }
