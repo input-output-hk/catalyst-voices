@@ -24,12 +24,7 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState, List<Space>>(
-      selector: (state) {
-        if (state is ActiveAccountSessionState) {
-          return state.spaces;
-        }
-        return [];
-      },
+      selector: (state) => state.spaces,
       builder: (context, state) {
         return VoicesDrawerChooser<Space>(
           items: state,

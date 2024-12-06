@@ -56,10 +56,10 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     return BlocSelector<SessionCubit, SessionState,
         Map<Space, ShortcutActivator>>(
       selector: (state) {
-        if (state is ActiveAccountSessionState) {
-          return state.spacesShortcuts;
-        }
-        return {};
+        return switch (state) {
+          ActiveAccountSessionState(:final spacesShortcuts) => spacesShortcuts,
+          _ => {},
+        };
       },
       builder: (context, shortcuts) {
         return CallbackShortcuts(

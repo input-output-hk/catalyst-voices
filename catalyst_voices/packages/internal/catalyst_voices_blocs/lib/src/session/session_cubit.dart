@@ -150,8 +150,8 @@ final class SessionCubit extends Cubit<SessionState>
       ActiveAccountSessionState(
         account: account,
         spaces: spaces,
-        spacesShortcuts: spacesShortcuts,
         overallSpaces: overallSpaces,
+        spacesShortcuts: spacesShortcuts,
       ),
     );
   }

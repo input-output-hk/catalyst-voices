@@ -35,12 +35,7 @@ class _SpacesListViewState extends State<SpacesListView> {
       alwaysVisible: true,
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: BlocSelector<SessionCubit, SessionState, List<Space>>(
-        selector: (state) {
-          if (state is ActiveAccountSessionState) {
-            return state.overallSpaces;
-          }
-          return [];
-        },
+        selector: (state) => state.overallSpaces,
         builder: (context, state) {
           return ListView.separated(
             controller: _scrollController,
