@@ -3,14 +3,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:catalyst_voices_services/src/storage/storage.dart';
-import 'package:catalyst_voices_services/src/storage/vault/secure_storage_vault.dart';
+import 'package:catalyst_voices_shared/src/storage/storage.dart';
 import 'package:flutter/foundation.dart';
 
 /// Utility mixin which implements all but String read/write of [Storage]
 /// interface. Every method is has its mapping to [readString]/[writeString].
-///
-/// See [SecureStorageVault] as example.
 mixin StorageAsStringMixin implements Storage {
   @override
   FutureOr<int?> readInt({required String key}) async {

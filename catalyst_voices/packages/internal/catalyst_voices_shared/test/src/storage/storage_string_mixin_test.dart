@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:catalyst_voices_services/src/storage/storage.dart';
-import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
 import 'package:test/test.dart';
 
 void main() {

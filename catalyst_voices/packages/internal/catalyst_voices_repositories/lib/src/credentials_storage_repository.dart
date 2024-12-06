@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_repositories/src/dummy_auth_storage.dart';
 import 'package:result_type/result_type.dart';
 
 /// This is a temporary implementation of CredentialsStorageRepository

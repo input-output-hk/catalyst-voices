@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
-import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
-import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
-import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -61,7 +59,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     required this.id,
     this.secureStorage = const FlutterSecureStorage(),
     CryptoService? cryptoService,
-  }) : _cryptoService = cryptoService ?? VaultCryptoService();
+  }) : _cryptoService = cryptoService ?? LocalCryptoService();
 
   String get _instanceKeyPrefix => '$_keyPrefix.$id';
 

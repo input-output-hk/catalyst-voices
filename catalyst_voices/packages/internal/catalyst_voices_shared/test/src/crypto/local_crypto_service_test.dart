@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final cryptoService = VaultCryptoService();
+  final cryptoService = LocalCryptoService();
 
   group('key derivation', () {
     test(

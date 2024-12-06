@@ -1,6 +1,6 @@
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/lockable.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class Keychain implements Lockable {
   String get id;
