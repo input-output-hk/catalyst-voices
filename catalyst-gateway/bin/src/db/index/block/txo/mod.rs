@@ -9,6 +9,7 @@ mod insert_unstaked_txo_asset;
 
 use std::sync::Arc;
 
+use pallas_crypto::hash::Hash;
 use scylla::Session;
 use tracing::{error, warn};
 
@@ -136,8 +137,8 @@ impl TxoInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64, txn_hash: &[u8],
-        txn: i16,
+        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64,
+        txn_hash: Hash<32>, txn: i16,
     ) {
         let txn_id = hex::encode_upper(txn_hash);
 

@@ -18,6 +18,8 @@ use crate::utils::blake2b_hash::blake2b_128;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Kid(pub [u8; 16]);
 
+// TODO: This is wrong.  The Kid should be the hash of the certificate, NOT the Verifying Key.
+// TODO: https://github.com/input-output-hk/catalyst-voices/issues/1312
 impl From<&VerifyingKey> for Kid {
     fn from(vk: &VerifyingKey) -> Self {
         Self(blake2b_128(vk.as_bytes()))

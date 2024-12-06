@@ -28,6 +28,20 @@ pub(crate) fn from_saturating<
     }
 }
 
+/// Convert a big uint to a u64, saturating if its out of range.
+pub(crate) fn big_uint_to_u64(value: &num_bigint::BigInt) -> u64 {
+    let (sign, digits) = value.to_u64_digits();
+    if sign == num_bigint::Sign::Minus || digits.is_empty() {
+        return 0;
+    }
+    if digits.len() > 1 {
+        return u64::MAX;
+    }
+    // 100% safe due to the above checks.
+    #[allow(clippy::indexing_slicing)]
+    digits[0]
+}
+
 #[cfg(test)]
 mod tests {
 

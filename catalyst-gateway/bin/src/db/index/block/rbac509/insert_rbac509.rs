@@ -3,6 +3,7 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::Metadata::cip509::Cip509;
+use pallas_crypto::hash::Hash;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
@@ -51,7 +52,7 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn: i16, cip509: &Cip509,
+        chain_root: Hash<32>, transaction_id: Hash<32>, slot_no: u64, txn: i16, cip509: &Cip509,
     ) -> Self {
         Params {
             chain_root: chain_root.to_vec(),

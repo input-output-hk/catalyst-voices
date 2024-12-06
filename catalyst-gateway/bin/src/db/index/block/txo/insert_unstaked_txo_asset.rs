@@ -2,6 +2,7 @@
 
 use std::sync::Arc;
 
+use pallas_crypto::hash::Hash;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -40,7 +41,7 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
-        txn_hash: &[u8], txo: i16, policy_id: &[u8], asset_name: &[u8], slot_no: u64, txn: i16,
+        txn_hash: Hash<32>, txo: i16, policy_id: &[u8], asset_name: &[u8], slot_no: u64, txn: i16,
         value: i128,
     ) -> Self {
         Self {

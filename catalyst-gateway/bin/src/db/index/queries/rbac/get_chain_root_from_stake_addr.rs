@@ -13,13 +13,13 @@ use crate::db::index::{
 };
 
 /// Get get chain root by stake address query string.
-const GET_CHAIN_ROOT: &str = include_str!("../cql/get_chain_root_for_transaction_id.cql");
+const GET_CHAIN_ROOT: &str = include_str!("../cql/get_chain_root_for_stake_addr.cql");
 
 /// Get chain root by stake address query params.
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
-    /// Transaction ID to look up.
-    pub(crate) transaction_id: Vec<u8>,
+    /// Stake address to get the chain root for.
+    pub(crate) stake_address: Vec<u8>,
 }
 
 /// Get chain root by stake address query.
@@ -27,10 +27,6 @@ pub(crate) struct QueryParams {
 pub(crate) struct Query {
     /// Chain root for the queries stake address.
     pub(crate) chain_root: Vec<u8>,
-    /// Slot Number the cert is in.
-    pub(crate) slot_no: num_bigint::BigInt,
-    /// Transaction Index.
-    pub(crate) txn: i16,
 }
 
 impl Query {

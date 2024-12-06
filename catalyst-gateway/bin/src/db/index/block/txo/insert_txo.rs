@@ -4,6 +4,7 @@
 
 use std::sync::Arc;
 
+use pallas_crypto::hash::Hash;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -39,7 +40,7 @@ impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
         stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, address: &str, value: u64,
-        txn_hash: &[u8],
+        txn_hash: Hash<32>,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
