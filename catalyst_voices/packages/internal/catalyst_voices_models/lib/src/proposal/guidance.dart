@@ -1,21 +1,35 @@
-import 'package:catalyst_voices_view_models/src/proposal/guidance/guidance_type.dart';
+import 'dart:core';
+
 import 'package:equatable/equatable.dart';
 
+enum GuidanceType {
+  mandatory(priority: 0),
+  education(priority: 1),
+  tips(priority: 2);
+
+  final int priority;
+
+  const GuidanceType({
+    required this.priority,
+  });
+}
+
 final class Guidance extends Equatable implements Comparable<Guidance> {
+  final String id;
   final String title;
   final String description;
   final GuidanceType type;
-  final int? weight; // This represents how important the guidance is in
-  //specific [GuidanceType].
+
+  /// This represents how important the guidance is in specific [GuidanceType].
+  final int? weight;
 
   const Guidance({
+    required this.id,
     required this.title,
     required this.description,
     required this.type,
     this.weight,
   });
-
-  String get weightText => weight?.toString() ?? '';
 
   @override
   int compareTo(Guidance other) {
@@ -31,9 +45,11 @@ final class Guidance extends Equatable implements Comparable<Guidance> {
 
   @override
   List<Object?> get props => [
+        id,
         title,
         description,
         type,
+        weight,
       ];
 }
 

@@ -8,3 +8,4 @@ export 'login/login.dart';
 export 'proposals/proposals.dart';
 export 'registration/registration.dart';
 export 'session/session.dart';
+export 'workspace/workspace.dart';

@@ -68,7 +68,12 @@ final class Dependencies extends DependencyProvider {
       // TODO(ryszard-schossler): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
-      );
+      )
+      ..registerFactory<WorkspaceBloc>(() {
+        return WorkspaceBloc(
+          get<CampaignService>(),
+        );
+      });
   }
 
   void _registerRepositories() {
@@ -116,8 +121,10 @@ final class Dependencies extends DependencyProvider {
       dispose: (service) => unawaited(service.dispose()),
     );
     registerLazySingleton<AccessControl>(AccessControl.new);
-    registerLazySingleton<CampaignService>(
-      () => CampaignService(get<CampaignRepository>()),
-    );
+    registerLazySingleton<CampaignService>(() {
+      return CampaignService(
+        get<CampaignRepository>(),
+      );
+    });
   }
 }
