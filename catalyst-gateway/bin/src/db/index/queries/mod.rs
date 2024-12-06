@@ -10,7 +10,7 @@ pub(crate) mod sync_status;
 
 use std::{fmt::Debug, sync::Arc};
 
-use anyhow::{bail, Context};
+use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use rbac::{
     get_chain_root::GetChainRootQuery, get_registrations::GetRegistrationsByChainRootQuery,
@@ -30,6 +30,7 @@ use staked_ada::{
     get_txo_by_stake_address::GetTxoByStakeAddressQuery, update_txo_spent::UpdateTxoSpentQuery,
 };
 use sync_status::update::SyncStatusInsertQuery;
+use tracing::error;
 
 use super::block::{
     certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
@@ -391,6 +392,8 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
     let mut results: Vec<QueryResult> = Vec::new();
 
     let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
+    let mut query_failed = false;
+    let query_str = format!("{query}");
 
     for chunk in chunks {
         let chunk_size: u16 = chunk.len().try_into()?;
@@ -399,12 +402,19 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
             bail!("No batch query found for size {}", chunk_size);
         };
         let batch_query_statements = batch_query.value().clone();
-        results.push(
-            session
-                .batch(&batch_query_statements, chunk)
-                .await
-                .context(format!("query={query}, chunk={chunk:?}"))?,
-        );
+        match session.batch(&batch_query_statements, chunk).await {
+            Ok(result) => results.push(result),
+            Err(err) => {
+                let chunk_str = format!("{chunk:?}");
+                error!(error=%err, query=query_str, chunk=chunk_str, "Query Execution Failed");
+                query_failed = true;
+                // Defer failure until all batches have been processed.
+            },
+        }
+    }
+
+    if query_failed {
+        bail!("Query Failed: {query_str}!");
     }
 
     Ok(results)

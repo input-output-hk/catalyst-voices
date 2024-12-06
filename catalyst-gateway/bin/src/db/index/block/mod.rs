@@ -82,13 +82,10 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         }
         match handle.await {
             Ok(join_res) => {
-                match join_res {
-                    Ok(_res) => {}, // debug!(res=?res,"Query OK")
-                    Err(error) => {
-                        // IF a query fails, assume everything else is broken.
-                        error!(error=%error,"Query Failed");
-                        result = Err(error);
-                    },
+                if let Err(error) = join_res {
+                    // IF a query fails, assume everything else is broken.
+                    error!(error=%error,"Query Failed");
+                    result = Err(error);
                 }
             },
             Err(error) => {
