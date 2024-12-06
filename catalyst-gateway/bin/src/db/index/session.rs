@@ -9,7 +9,7 @@ use std::{
 
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
-    frame::Compression, serialize::row::SerializeRow, transport::iterator::RowIterator,
+    frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
     ExecutionProfile, Session, SessionBuilder,
 };
 use tokio::fs;
@@ -111,7 +111,7 @@ impl CassandraSession {
     /// returns.
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
-    ) -> anyhow::Result<RowIterator>
+    ) -> anyhow::Result<QueryPager>
     where P: SerializeRow {
         let session = self.session.clone();
         let queries = self.queries.clone();
@@ -161,7 +161,7 @@ fn make_execution_profile(_cfg: &cassandra_db::EnvVars) -> ExecutionProfile {
     ExecutionProfile::builder()
         .consistency(scylla::statement::Consistency::LocalQuorum)
         .serial_consistency(Some(scylla::statement::SerialConsistency::LocalSerial))
-        .retry_policy(Box::new(scylla::retry_policy::DefaultRetryPolicy::new()))
+        .retry_policy(Arc::new(scylla::retry_policy::DefaultRetryPolicy::new()))
         .load_balancing_policy(
             scylla::load_balancing::DefaultPolicyBuilder::new()
                 .permit_dc_failover(true)

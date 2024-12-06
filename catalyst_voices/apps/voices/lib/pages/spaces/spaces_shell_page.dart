@@ -57,39 +57,50 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     final isVisitor = sessionBloc.state is VisitorSessionState;
     final isUnlocked = sessionBloc.state is ActiveAccountSessionState;
 
-    return CallbackShortcuts(
-      bindings: <ShortcutActivator, VoidCallback>{
-        for (final entry in SpacesShellPage._spacesShortcutsActivators.entries)
-          entry.value: () => entry.key.go(context),
-        CampaignAdminToolsDialog.shortcut: _toggleCampaignAdminTools,
+    return BlocSelector<SessionCubit, SessionState,
+        Map<Space, ShortcutActivator>>(
+      selector: (state) {
+        if (state is ActiveAccountSessionState) {
+          return state.spacesShortcuts;
+        }
+        return {};
       },
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: VoicesAppBar(
-              leading: isVisitor ? null : const DrawerToggleButton(),
-              automaticallyImplyLeading: false,
-              actions: _getActions(widget.space),
-            ),
-            drawer: isVisitor
-                ? null
-                : SpacesDrawer(
-                    space: widget.space,
-                    spacesShortcutsActivators:
-                        SpacesShellPage._spacesShortcutsActivators,
-                    isUnlocked: isUnlocked,
-                  ),
-            body: widget.child,
+      builder: (context, state) {
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            for (final entry in state.entries)
+              entry.value: () => entry.key.go(context),
+            CampaignAdminToolsDialog.shortcut: _toggleCampaignAdminTools,
+          },
+          child: Stack(
+            children: [
+              Scaffold(
+                appBar: VoicesAppBar(
+                  leading: isVisitor ? null : const DrawerToggleButton(),
+                  automaticallyImplyLeading: false,
+                  actions: _getActions(widget.space),
+                ),
+                drawer: isVisitor
+                    ? null
+                    : SpacesDrawer(
+                        space: widget.space,
+                        spacesShortcutsActivators:
+                            SpacesShellPage._spacesShortcutsActivators,
+                        isUnlocked: isUnlocked,
+                      ),
+                body: widget.child,
+              ),
+              if (_showAdminTools)
+                DraggableCampaignAdminToolsDialog(
+                  dialogKey: _adminToolsKey,
+                  selectedSpace: widget.space,
+                  onSpaceSelected: (space) => space.go(context),
+                  onClose: _closeCampaignAdminTools,
+                ),
+            ],
           ),
-          if (_showAdminTools)
-            DraggableCampaignAdminToolsDialog(
-              dialogKey: _adminToolsKey,
-              selectedSpace: widget.space,
-              onSpaceSelected: (space) => space.go(context),
-              onClose: _closeCampaignAdminTools,
-            ),
-        ],
-      ),
+        );
+      },
     );
   }
 

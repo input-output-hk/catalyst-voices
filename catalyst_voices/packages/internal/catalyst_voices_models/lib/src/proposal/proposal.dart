@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_models/src/proposal/proposal_section.dart';
 import 'package:equatable/equatable.dart';
 
 // Note. This enum may be deleted later. Its here for backwards compatibility.
@@ -18,14 +19,13 @@ final class Proposal extends Equatable {
   final ProposalStatus status;
   final ProposalPublish publish;
   final ProposalAccess access;
+  final List<ProposalSection> sections;
 
   // This may be a reference to class
   final String category;
 
   // Those may be getters.
   final int commentsCount;
-  final int completedSegments;
-  final int totalSegments;
 
   const Proposal({
     required this.id,
@@ -37,11 +37,16 @@ final class Proposal extends Equatable {
     required this.status,
     required this.publish,
     required this.access,
+    required this.sections,
     required this.category,
     required this.commentsCount,
-    required this.completedSegments,
-    required this.totalSegments,
   });
+
+  int get totalSegments => sections.length;
+
+  int get completedSegments {
+    return sections.where((element) => element.isCompleted).length;
+  }
 
   @override
   List<Object?> get props => [
@@ -53,9 +58,8 @@ final class Proposal extends Equatable {
         fundsRequested.value,
         publish,
         access,
+        sections,
         category,
         commentsCount,
-        completedSegments,
-        totalSegments,
       ];
 }

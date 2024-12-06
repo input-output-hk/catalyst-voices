@@ -8,16 +8,16 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 const sections = [
   CampaignSetup(
-    id: 0,
+    id: '0',
     steps: [
       DummyTopicStep(
-        id: 0,
-        sectionId: 0,
+        id: '0',
+        sectionId: '0',
         isEditable: false,
       ),
-      DummyTopicStep(id: 1, sectionId: 0),
-      DummyTopicStep(id: 2, sectionId: 0),
-      DummyTopicStep(id: 3, sectionId: 0),
+      DummyTopicStep(id: '1', sectionId: '0'),
+      DummyTopicStep(id: '2', sectionId: '0'),
+      DummyTopicStep(id: '3', sectionId: '0'),
     ],
   ),
 ];

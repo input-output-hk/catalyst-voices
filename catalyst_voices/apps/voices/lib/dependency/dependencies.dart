@@ -6,6 +6,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
 final class Dependencies extends DependencyProvider {
   static final Dependencies instance = Dependencies._();
@@ -37,6 +38,7 @@ final class Dependencies extends DependencyProvider {
             get<UserService>(),
             get<RegistrationService>(),
             get<RegistrationProgressNotifier>(),
+            get<AccessControl>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -66,7 +68,12 @@ final class Dependencies extends DependencyProvider {
       // TODO(ryszard-schossler): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
-      );
+      )
+      ..registerFactory<WorkspaceBloc>(() {
+        return WorkspaceBloc(
+          get<CampaignService>(),
+        );
+      });
   }
 
   void _registerRepositories() {
@@ -113,8 +120,11 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
-    registerLazySingleton<CampaignService>(
-      () => CampaignService(get<CampaignRepository>()),
-    );
+    registerLazySingleton<AccessControl>(AccessControl.new);
+    registerLazySingleton<CampaignService>(() {
+      return CampaignService(
+        get<CampaignRepository>(),
+      );
+    });
   }
 }

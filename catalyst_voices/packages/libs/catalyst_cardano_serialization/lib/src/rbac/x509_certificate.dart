@@ -245,54 +245,72 @@ class X509DistinguishedName with EquatableMixin {
     final countryName = this.countryName;
     if (countryName != null) {
       sequence.add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('c'))
-          ..add(ASN1PrintableString(countryName)),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('c'))
+              ..add(ASN1PrintableString(countryName)),
+          ),
       );
     }
 
     final stateOrProvinceName = this.stateOrProvinceName;
     if (stateOrProvinceName != null) {
       sequence.add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('st'))
-          ..add(ASN1PrintableString(stateOrProvinceName)),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('st'))
+              ..add(ASN1PrintableString(stateOrProvinceName)),
+          ),
       );
     }
 
     final localityName = this.localityName;
     if (localityName != null) {
       sequence.add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('l'))
-          ..add(ASN1PrintableString(localityName)),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('l'))
+              ..add(ASN1PrintableString(localityName)),
+          ),
       );
     }
 
     final organizationName = this.organizationName;
     if (organizationName != null) {
       sequence.add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('o'))
-          ..add(ASN1PrintableString(organizationName)),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('o'))
+              ..add(ASN1PrintableString(organizationName)),
+          ),
       );
     }
 
     final organizationalUnitName = this.organizationalUnitName;
     if (organizationalUnitName != null) {
       sequence.add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('ou'))
-          ..add(ASN1PrintableString(organizationalUnitName)),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('ou'))
+              ..add(ASN1PrintableString(organizationalUnitName)),
+          ),
       );
     }
 
     final commonName = this.commonName;
     if (commonName != null) {
       sequence.add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('cn'))
-          ..add(ASN1PrintableString(commonName)),
+        ASN1Set()
+          ..add(
+            ASN1Sequence()
+              ..add(ASN1ObjectIdentifier.fromName('cn'))
+              ..add(ASN1PrintableString(commonName)),
+          ),
       );
     }
 
@@ -313,7 +331,7 @@ class X509DistinguishedName with EquatableMixin {
 /// Extra extensions of the certificate.
 class X509CertificateExtensions with EquatableMixin {
   /// List of alternative subject names.
-  final List<String>? subjectAltName;
+  final List<X509String>? subjectAltName;
 
   /// The default constructor for the [X509CertificateExtensions].
   const X509CertificateExtensions({this.subjectAltName});
@@ -330,7 +348,7 @@ class X509CertificateExtensions with EquatableMixin {
     if (subjectAltName != null) {
       final subjectAltNameSequence = ASN1Sequence();
       for (final name in subjectAltName) {
-        subjectAltNameSequence.add(ASN1OctetString(name));
+        subjectAltNameSequence.add(name.toASN1());
       }
 
       extensionsSequence.add(
@@ -349,4 +367,36 @@ class X509CertificateExtensions with EquatableMixin {
 
   @override
   List<Object?> get props => [subjectAltName];
+}
+
+/// Represents an ASN1 encodable string
+/// that can be optionally tagged with [tag].
+class X509String with EquatableMixin {
+  /// An ASN1 tag for the uris.
+  static const int uriTag = 0x86;
+
+  /// An ASN1 tag for domain names.
+  static const int domainNameTag = 0x82;
+
+  /// The string value.
+  final String value;
+
+  /// The optional ASN1 tag.
+  final int tag;
+
+  /// The default constructor for the [X509String].
+  const X509String(
+    this.value, {
+    this.tag = OCTET_STRING_TYPE,
+  });
+
+  /// Encodes the data in ASN1 format.
+  ASN1Object toASN1() {
+    _ensureASN1FrequentNamesRegistered();
+
+    return ASN1OctetString(value, tag: tag);
+  }
+
+  @override
+  List<Object?> get props => [value, tag];
 }

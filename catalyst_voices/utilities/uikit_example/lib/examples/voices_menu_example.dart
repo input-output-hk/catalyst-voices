@@ -13,7 +13,7 @@ class VoicesMenuExample extends StatefulWidget {
 }
 
 class _VoicesMenuExampleState extends State<VoicesMenuExample> {
-  int? _selectedItemId;
+  String? _selectedItemId;
 
   @override
   void dispose() {
@@ -45,9 +45,9 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
                   },
                   selectedItemId: _selectedItemId,
                   items: const [
-                    VoicesNodeMenuItem(id: 0, label: 'Start'),
-                    VoicesNodeMenuItem(id: 1, label: 'Vote'),
-                    VoicesNodeMenuItem(id: 2, label: 'Results'),
+                    VoicesNodeMenuItem(id: '0', label: 'Start'),
+                    VoicesNodeMenuItem(id: '1', label: 'Vote'),
+                    VoicesNodeMenuItem(id: '2', label: 'Results'),
                   ],
                 ),
               ].separatedBy(const SizedBox(height: 12)).toList(),
@@ -71,28 +71,28 @@ class _MenuExample1 extends StatelessWidget {
       onTap: (menuItem) => debugPrint('Selected label: ${menuItem.label}'),
       menuItems: [
         MenuItem(
-          id: '1',
+          id: 1,
           label: 'Rename',
           icon: VoicesAssets.icons.pencil.buildIcon(),
         ),
         SubMenuItem(
-          id: '4',
+          id: 4,
           label: 'Move Private Team',
           icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
-          children: const [
-            MenuItem(id: '5', label: 'Team 1: The Vikings'),
-            MenuItem(id: '6', label: 'Team 2: Pure Hearts'),
+          children: [
+            MenuItem(id: 5, label: 'Team 1: The Vikings'),
+            MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
           ],
         ),
         MenuItem(
-          id: '2',
+          id: 2,
           label: 'Move to public',
           icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           showDivider: true,
-          isEnabled: false,
+          enabled: false,
         ),
         MenuItem(
-          id: '3',
+          id: 3,
           label: 'Delete',
           icon: VoicesAssets.icons.trash.buildIcon(),
         ),
@@ -118,27 +118,27 @@ class _MenuExample2 extends StatelessWidget {
       onTap: (menuItem) => debugPrint('Selected label: ${menuItem.label}'),
       menuItems: [
         MenuItem(
-          id: '1',
+          id: 1,
           label: 'Rename',
           icon: VoicesAssets.icons.pencil.buildIcon(),
         ),
         SubMenuItem(
-          id: '4',
+          id: 4,
           label: 'Move Private Team',
           icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
-          children: const [
-            MenuItem(id: '5', label: 'Team 1: The Vikings'),
-            MenuItem(id: '6', label: 'Team 2: Pure Hearts'),
+          children: [
+            MenuItem(id: 5, label: 'Team 1: The Vikings'),
+            MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
           ],
         ),
         MenuItem(
-          id: '2',
+          id: 2,
           label: 'Move to public',
           icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           showDivider: true,
         ),
         MenuItem(
-          id: '3',
+          id: 3,
           label: 'Delete',
           icon: VoicesAssets.icons.trash.buildIcon(),
         ),

@@ -9,33 +9,20 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 final class SectionsControllerState extends Equatable {
   final List<Section> sections;
-  final Set<int> openedSections;
+  final Set<String> openedSections;
   final SectionStepId? activeStepId;
   final Set<SectionStepId> editStepsIds;
-  final GuidanceType? activeGuidance;
 
   const SectionsControllerState({
     this.sections = const [],
     this.openedSections = const {},
     this.activeStepId,
     this.editStepsIds = const {},
-    this.activeGuidance,
   });
 
-  int? get activeSectionId => activeStepId?.sectionId;
+  String? get activeSectionId => activeStepId?.sectionId;
 
-  int? get activeStep => activeStepId?.stepId;
-
-  List<Guidance>? get activeStepGuidances {
-    final activeStepId = this.activeStepId;
-    if (activeStepId == null) {
-      return null;
-    } else {
-      return sections[activeStepId.sectionId]
-          .steps[activeStepId.stepId]
-          .guidances;
-    }
-  }
+  String? get activeStep => activeStepId?.stepId;
 
   bool get allSegmentsClosed => openedSections.isEmpty;
 
@@ -73,17 +60,15 @@ final class SectionsControllerState extends Equatable {
 
   SectionsControllerState copyWith({
     List<Section>? sections,
-    Set<int>? openedSections,
+    Set<String>? openedSections,
     Optional<SectionStepId>? activeStepId,
     Set<SectionStepId>? editStepsIds,
-    Optional<GuidanceType>? activeGuidance,
   }) {
     return SectionsControllerState(
       sections: sections ?? this.sections,
       openedSections: openedSections ?? this.openedSections,
       activeStepId: activeStepId.dataOr(this.activeStepId),
       editStepsIds: editStepsIds ?? this.editStepsIds,
-      activeGuidance: activeGuidance?.dataOr(this.activeGuidance),
     );
   }
 
@@ -93,7 +78,6 @@ final class SectionsControllerState extends Equatable {
         openedSections,
         activeStepId,
         editStepsIds,
-        activeGuidance,
       ];
 }
 
@@ -113,7 +97,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     _itemsScrollController = null;
   }
 
-  void toggleSection(int id) {
+  void toggleSection(String id) {
     final openedSections = {...value.openedSections};
     final allSegmentsClosed = value.allSegmentsClosed;
     final shouldOpen = !openedSections.contains(id);
@@ -159,7 +143,7 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     unawaited(_scrollToSectionStep(id));
   }
 
-  void focusSection(int id) {
+  void focusSection(String id) {
     unawaited(_scrollToSection(id));
   }
 
@@ -183,17 +167,13 @@ final class SectionsController extends ValueNotifier<SectionsControllerState> {
     );
   }
 
-  void setActiveGuidance(GuidanceType? type) {
-    value = value.copyWith(activeGuidance: Optional(type));
-  }
-
   @override
   void dispose() {
     detachItemsScrollController();
     super.dispose();
   }
 
-  Future<void> _scrollToSection(int id) async {
+  Future<void> _scrollToSection(String id) async {
     final index = value.listItems.indexWhere((e) => e is Section && e.id == id);
     if (index == -1) {
       return;

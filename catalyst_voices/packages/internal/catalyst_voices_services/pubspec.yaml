@@ -22,12 +22,15 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
+  flutter_driver:
+    sdk: flutter
   flutter_secure_storage: ^9.2.2
   logging: ^1.2.0
   path: ^1.9.0
   rxdart: ^0.27.7
   uuid: ^4.5.1
   web: ^1.1.0
+  webdriver: ^3.0.3
 
 dev_dependencies:
   catalyst_analysis: ^2.0.0
