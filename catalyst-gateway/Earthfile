@@ -86,7 +86,7 @@ package:
     FROM debian:12.7-slim
     WORKDIR /cat-gateway
     COPY +build/cat-gateway .
-    ENTRYPOINT [ "./cat-gateway", "--log-level", "debug", "run" ]
+    ENTRYPOINT [ "./cat-gateway","run","--log-level","debug"]
 
 # Publish cat-gateway
 docker:
