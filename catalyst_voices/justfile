@@ -27,7 +27,7 @@ check-code:
 test-code:
     earthly +test-unit
 
-# Generates gateway services in packages/internal/catalyst_voices_services
+# Generates gateway services in packages/internal/catalyst_voices_repositories
 generate-gateway-services:
     cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
