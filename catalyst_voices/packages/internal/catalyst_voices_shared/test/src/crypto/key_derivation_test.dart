@@ -1,6 +1,6 @@
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/crypto/key_derivation.dart';
+import 'package:catalyst_voices_shared/src/crypto/key_derivation.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 

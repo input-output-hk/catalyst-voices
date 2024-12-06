@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/lockable.dart';
-import 'package:catalyst_voices_services/src/storage/storage.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 /// Secure version of [Storage] where any read/write methods can take
 /// effect only when [isUnlocked] returns true.

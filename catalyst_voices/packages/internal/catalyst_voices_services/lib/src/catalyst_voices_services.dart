@@ -1,5 +1,4 @@
 export 'campaign/campaign_service.dart' show CampaignService;
-export 'crypto/key_derivation.dart';
 export 'downloader/downloader.dart';
 export 'keychain/keychain.dart';
 export 'keychain/keychain_provider.dart';
@@ -9,10 +8,5 @@ export 'keychain/vault_keychain_provider.dart';
 export 'registration/registration_progress_notifier.dart';
 export 'registration/registration_service.dart' show RegistrationService;
 export 'registration/registration_transaction_builder.dart';
-export 'storage/dummy_auth_storage.dart';
-export 'storage/secure_storage.dart';
-export 'storage/storage.dart';
-export 'storage/vault/secure_storage_vault.dart';
-export 'storage/vault/vault.dart';
 export 'user/user_service.dart' show UserService;
 export 'user/user_storage.dart';

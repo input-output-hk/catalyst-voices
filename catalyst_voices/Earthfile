@@ -19,13 +19,13 @@ builder:
     DO flutter-ci+BOOTSTRAP
 
 # Creates filtered OpenAPI spec
-# Takes json file from openapi-filter from /packages/internal/catalyst_voices_services
+# Takes json file from openapi-filter from /packages/internal/catalyst_voices_repositories
 filter-openapi:
     FROM node:18
-    WORKDIR /packages/internal/catalyst_voices_services
+    WORKDIR /packages/internal/catalyst_voices_repositories
 
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
-    COPY packages/internal/catalyst_voices_services/openapi-filters.json openapi-filters.json
+    COPY packages/internal/catalyst_voices_repositories/openapi-filters.json openapi-filters.json
 
     RUN npm install -g openapi-format
     RUN openapi-format openapi/cat-gateway-api.json -o openapi/filtered-openapi.json --filterFile openapi-filters.json --verbose
@@ -40,13 +40,13 @@ filter-openapi:
 # It accepts [save_locally] ARG that when true place the artifacts in the
 # proper folders 
 # It accepts [filter_openapi] ARG that when true filter the openapi spec
-# using filters from /packages/internal/catalyst_voices_services/openapi-filters.json
+# using filters from /packages/internal/catalyst_voices_repositories/openapi-filters.json
 code-generator:
     ARG save_locally=false 
     ARG filter_openapi=true
     FROM +builder
     LET gen_code_path  = lib/generated/api
-    LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/api/
+    LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
 
     RUN melos l10n
     RUN melos build_runner
@@ -60,7 +60,7 @@ code-generator:
     ELSE 
         SAVE ARTIFACT .
     END
-    WORKDIR packages/internal/catalyst_voices_services
+    WORKDIR packages/internal/catalyst_voices_repositories
 
     IF [ $filter_openapi = true ]
         COPY +filter-openapi/filtered-openapi.json openapi/cat-gateway.json
