@@ -1,31 +1,45 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/proposals/proposals_state.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the proposals.
 final class ProposalsCubit extends Cubit<ProposalsState> {
-  final ProposalRepository proposalRepository;
+  final CampaignService _campaignService;
+  final ProposalService _proposalService;
 
-  ProposalsCubit({required this.proposalRepository})
-      : super(const LoadingProposalsState());
+  ProposalsCubit(
+    this._campaignService,
+    this._proposalService,
+  ) : super(const LoadingProposalsState());
 
   /// Loads the proposals.
   Future<void> load() async {
-    const currentCampaignId = 'f14';
+    emit(const LoadingProposalsState());
 
-    final proposals = await proposalRepository.getDraftProposals(
-      campaignId: currentCampaignId,
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      emit(
+        const LoadedProposalsState(
+          proposals: [],
+          favoriteProposals: [],
+        ),
+      );
+      return;
+    }
+
+    final proposals = await _proposalService.getProposals(
+      campaignId: campaign.id,
     );
 
     final pendingProposals = proposals.map(
       (proposal) {
         return PendingProposal.fromProposal(
           proposal,
-          campaignName: 'F14',
+          campaignName: campaign.name,
         );
       },
     ).toList();
