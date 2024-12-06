@@ -37,6 +37,10 @@ void main() {
       for (final space in Space.values) {
         await tester.tap(SpacesDrawerPage.chooserItem(space));
         await tester.pumpAndSettle(const Duration(milliseconds: 100));
+        expect(
+          SpacesDrawerPage.chooserIcon(space),
+          findsOneWidget,
+        );
         final children = find.descendant(
           of: SpacesDrawerPage.guestMenuItems,
           matching: find.byWidgetPredicate((widget) => true),
