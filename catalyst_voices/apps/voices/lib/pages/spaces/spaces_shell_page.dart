@@ -53,10 +53,6 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
 
   @override
   Widget build(BuildContext context) {
-    final sessionBloc = context.watch<SessionCubit>();
-    final isVisitor = sessionBloc.state is VisitorSessionState;
-    final isUnlocked = sessionBloc.state is ActiveAccountSessionState;
-
     return BlocSelector<SessionCubit, SessionState,
         Map<Space, ShortcutActivator>>(
       selector: (state) {
@@ -65,30 +61,40 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         }
         return {};
       },
-      builder: (context, state) {
+      builder: (context, shortcuts) {
         return CallbackShortcuts(
           bindings: <ShortcutActivator, VoidCallback>{
-            for (final entry in state.entries)
+            for (final entry in shortcuts.entries)
               entry.value: () => entry.key.go(context),
             CampaignAdminToolsDialog.shortcut: _toggleCampaignAdminTools,
           },
           child: Stack(
             children: [
-              Scaffold(
-                appBar: VoicesAppBar(
-                  leading: isVisitor ? null : const DrawerToggleButton(),
-                  automaticallyImplyLeading: false,
-                  actions: _getActions(widget.space),
+              BlocSelector<SessionCubit, SessionState,
+                  ({bool isUnlocked, bool isVisitor})>(
+                selector: (state) => (
+                  isUnlocked: state is ActiveAccountSessionState,
+                  isVisitor: state is VisitorSessionState
                 ),
-                drawer: isVisitor
-                    ? null
-                    : SpacesDrawer(
-                        space: widget.space,
-                        spacesShortcutsActivators:
-                            SpacesShellPage._spacesShortcutsActivators,
-                        isUnlocked: isUnlocked,
-                      ),
-                body: widget.child,
+                builder: (context, state) {
+                  return Scaffold(
+                    appBar: VoicesAppBar(
+                      leading:
+                          state.isVisitor ? null : const DrawerToggleButton(),
+                      automaticallyImplyLeading: false,
+                      actions: _getActions(widget.space),
+                    ),
+                    drawer: state.isVisitor
+                        ? null
+                        : SpacesDrawer(
+                            space: widget.space,
+                            spacesShortcutsActivators:
+                                SpacesShellPage._spacesShortcutsActivators,
+                            isUnlocked: state.isUnlocked,
+                          ),
+                    body: widget.child,
+                  );
+                },
               ),
               if (_showAdminTools)
                 DraggableCampaignAdminToolsDialog(
