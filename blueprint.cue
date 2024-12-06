@@ -8,13 +8,13 @@ global: {
 			"^test(-.*)?$",
 		]
 		registries: [
-			ci.providers.aws.registry,
+			ci.providers.aws.ecr.registry,
 		]
 		providers: {
 			aws: {
-				region:   "eu-central-1"
-				registry: "332405224602.dkr.ecr.eu-central-1.amazonaws.com"
-				role:     "arn:aws:iam::332405224602:role/ci"
+				region: "eu-central-1"
+				ecr: registry: "332405224602.dkr.ecr.eu-central-1.amazonaws.com"
+				role: "arn:aws:iam::332405224602:role/ci"
 			}
 
 			docker: credentials: {
@@ -49,7 +49,7 @@ global: {
 		]
 	}
 	deployment: {
-		registry: ci.providers.aws.registry
+		registry: ci.providers.aws.ecr.registry
 		repo: {
 			url: "https://github.com/input-output-hk/catalyst-world"
 			ref: "master"
