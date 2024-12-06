@@ -62,6 +62,10 @@ project: {
 
 					env: [
 						{
+							name:  "RUST_LOG"
+							value: "error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+						},
+						{
 							name: "CASSANDRA_VOLATILE_URL"
 							valueFrom: {
 								secretKeyRef: {
