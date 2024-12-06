@@ -128,6 +128,7 @@ command:
       uuid: ^4.5.1
       sentry_flutter: ^8.8.0
       scrollable_positioned_list: ^0.3.8
+      shared_preferences: ^2.3.3
       # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
       # but here we import it explicitly to make sure the latest version is used which addresses
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
