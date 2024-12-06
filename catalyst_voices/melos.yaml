@@ -151,11 +151,11 @@ scripts:
     run: |
       melos exec -c 1 \
       --depends-on="build_runner" \
-      --ignore="catalyst_voices_services" -- \
+      --ignore="catalyst_voices_repositories" -- \
           dart run build_runner build --delete-conflicting-outputs
     description: |
       Run `build_runner` in every package which contains the build_runner dependency.
-      The catalyst_voices_services is skipped because to run a build_runner there you
+      The catalyst_voices_repositories is skipped because to run a build_runner there you
       must generate first swagger docs (see related Earthfile).
 
   metrics:
