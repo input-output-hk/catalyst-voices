@@ -10,6 +10,9 @@ default:
 scylla-dev-db:
     docker run --name scylla-node1 --volume /var/lib/scylla/1:/var/lib/scylla -d scylladb/scylla --developer-mode=1  --smp 1
 
+scylla-dev-db-macos:
+    docker run -p 9042:9042 --name scylla-node1 --volume ~/scylla:/var/lib/scylla -d scylladb/scylla
+
 # Local scylla dev DB Logs (Developer Mode) - Follow the running scylla DB logs.
 scylla-dev-db-logs:
     docker logs scylla-node1 -f

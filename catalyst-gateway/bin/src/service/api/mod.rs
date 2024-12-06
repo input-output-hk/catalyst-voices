@@ -18,6 +18,7 @@ pub(crate) mod cardano;
 mod config;
 mod health;
 mod legacy;
+mod tests;
 
 pub(crate) use health::started;
 
