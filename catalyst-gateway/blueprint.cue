@@ -15,7 +15,7 @@ project: {
 
 					image: {
 						repository: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/gateway"
-						tag:        "46f73442ccc187b7e1e6b792c53eeab38ee9054f"
+						tag:        _ @forge(name="GIT_HASH_OR_TAG")
 					}
 
 					containerPort: 8080
