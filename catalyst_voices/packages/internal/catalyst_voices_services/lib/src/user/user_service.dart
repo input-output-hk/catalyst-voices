@@ -228,8 +228,9 @@ User _dummyUser({
   /* cSpell:disable */
   final account = Account(
     keychainId: keychainId,
-    roles: {
-      AccountRole.root,
+    roles: const {
+      AccountRole.voter,
+      AccountRole.proposer,
     },
     walletInfo: WalletInfo(
       metadata: const WalletMetadata(

@@ -25,9 +25,9 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState, List<Space>>(
       selector: (state) => state.spaces,
-      builder: (context, state) {
+      builder: (context, spaces) {
         return VoicesDrawerChooser<Space>(
-          items: state,
+          items: spaces,
           selectedItem: currentSpace,
           onSelected: onChanged,
           itemBuilder: _itemBuilder,

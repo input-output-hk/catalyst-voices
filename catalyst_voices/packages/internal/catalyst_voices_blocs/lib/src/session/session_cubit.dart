@@ -142,6 +142,7 @@ final class SessionCubit extends Cubit<SessionState>
       emit(const GuestSessionState());
       return;
     }
+
     final spaces = _accessControl.spacesAccess(account);
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
