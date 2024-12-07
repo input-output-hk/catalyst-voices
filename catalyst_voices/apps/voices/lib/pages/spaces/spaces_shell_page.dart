@@ -49,47 +49,36 @@ class SpacesShellPage extends StatefulWidget {
 
 class _SpacesShellPageState extends State<SpacesShellPage> {
   final GlobalKey _adminToolsKey = GlobalKey(debugLabel: 'admin_tools');
-  bool _showAdminTools = false;
+  OverlayEntry? _adminToolsOverlay;
 
   @override
   Widget build(BuildContext context) {
     return _Shortcuts(
       onToggleAdminTools: _toggleCampaignAdminTools,
-      child: Stack(
-        children: [
-          BlocSelector<SessionCubit, SessionState,
-              ({bool isUnlocked, bool isVisitor})>(
-            selector: (state) => (
-              isUnlocked: state is ActiveAccountSessionState,
-              isVisitor: state is VisitorSessionState
+      child: BlocSelector<SessionCubit, SessionState,
+          ({bool isUnlocked, bool isVisitor})>(
+        selector: (state) => (
+          isUnlocked: state is ActiveAccountSessionState,
+          isVisitor: state is VisitorSessionState
+        ),
+        builder: (context, state) {
+          return Scaffold(
+            appBar: VoicesAppBar(
+              leading: state.isVisitor ? null : const DrawerToggleButton(),
+              automaticallyImplyLeading: false,
+              actions: _getActions(widget.space),
             ),
-            builder: (context, state) {
-              return Scaffold(
-                appBar: VoicesAppBar(
-                  leading: state.isVisitor ? null : const DrawerToggleButton(),
-                  automaticallyImplyLeading: false,
-                  actions: _getActions(widget.space),
-                ),
-                drawer: state.isVisitor
-                    ? null
-                    : SpacesDrawer(
-                        space: widget.space,
-                        spacesShortcutsActivators:
-                            SpacesShellPage._spacesShortcutsActivators,
-                        isUnlocked: state.isUnlocked,
-                      ),
-                body: widget.child,
-              );
-            },
-          ),
-          if (_showAdminTools)
-            DraggableCampaignAdminToolsDialog(
-              dialogKey: _adminToolsKey,
-              selectedSpace: widget.space,
-              onSpaceSelected: (space) => space.go(context),
-              onClose: _closeCampaignAdminTools,
-            ),
-        ],
+            drawer: state.isVisitor
+                ? null
+                : SpacesDrawer(
+                    space: widget.space,
+                    spacesShortcutsActivators:
+                        SpacesShellPage._spacesShortcutsActivators,
+                    isUnlocked: state.isUnlocked,
+                  ),
+            body: widget.child,
+          );
+        },
       ),
     );
   }
@@ -109,16 +98,33 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     }
   }
 
+  OverlayEntry _createAdminToolsOverlay() {
+    return OverlayEntry(
+      builder: (BuildContext context) {
+        return DraggableCampaignAdminToolsDialog(
+          dialogKey: _adminToolsKey,
+          selectedSpace: widget.space,
+          onSpaceSelected: (space) => space.go(context),
+          onClose: _closeCampaignAdminTools,
+        );
+      },
+    );
+  }
+
   void _toggleCampaignAdminTools() {
-    setState(() {
-      _showAdminTools = !_showAdminTools;
-    });
+    if (_adminToolsOverlay == null) {
+      final overlayEntry = _createAdminToolsOverlay();
+      Overlay.of(context, rootOverlay: true).insert(overlayEntry);
+      _adminToolsOverlay = overlayEntry;
+    } else {
+      _adminToolsOverlay?.remove();
+      _adminToolsOverlay = null;
+    }
   }
 
   void _closeCampaignAdminTools() {
-    setState(() {
-      _showAdminTools = false;
-    });
+    _adminToolsOverlay?.remove();
+    _adminToolsOverlay = null;
   }
 }
 
