@@ -11,7 +11,7 @@ use crate::service::{
         auth::none_or_rbac::NoneOrRBAC, objects::cardano::network::Network, tags::ApiTags,
         types::cardano::cip19_stake_address::Cip19StakeAddress,
     },
-    utilities::middleware::schema_validation::schema_version_validation,
+    utilities::middleware::event_db_schema_validation::event_db_schema_version_validation,
 };
 
 mod assets_get;
@@ -29,7 +29,7 @@ impl Api {
         path = "/draft/cardano/assets/:stake_address",
         method = "get",
         operation_id = "stakedAdaAmountGet",
-        transform = "schema_version_validation"
+        transform = "event_db_schema_version_validation"
     )]
     async fn staked_ada_get(
         &self,
