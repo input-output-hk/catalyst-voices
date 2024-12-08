@@ -155,12 +155,22 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
   OverlayEntry _createAdminToolsOverlay() {
     return OverlayEntry(
       builder: (BuildContext context) {
-        return DraggableCampaignAdminToolsDialog(
-          dialogKey: _adminToolsKey,
+        return StreamBuilder<Space>(
           // Passing it as a stream, not as a value because when the page
           // rebuilds the overlay entry is not rebuilt.
-          selectedSpace: _watchSpace,
-          onSpaceSelected: (space) => space.go(context),
+          stream: _watchSpace,
+          builder: (context, snapshot) {
+            final space = snapshot.data;
+            if (space == null) {
+              return const Offstage();
+            }
+
+            return DraggableCampaignAdminToolsDialog(
+              dialogKey: _adminToolsKey,
+              selectedSpace: space,
+              onSpaceSelected: (space) => space.go(context),
+            );
+          },
         );
       },
     );

@@ -25,7 +25,7 @@ class DraggableCampaignAdminToolsDialog extends StatefulWidget {
   final GlobalKey dialogKey;
 
   /// See [CampaignAdminToolsDialog.selectedSpace].
-  final Stream<Space> selectedSpace;
+  final Space selectedSpace;
 
   /// See [CampaignAdminToolsDialog.onSpaceSelected].
   final ValueChanged<Space> onSpaceSelected;
@@ -75,31 +75,21 @@ class _DraggableCampaignAdminToolsDialogState
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Space>(
-      stream: widget.selectedSpace,
-      builder: (context, snapshot) {
-        final space = snapshot.data;
-        if (space == null) {
-          return const Offstage();
-        }
+    final Widget child = CampaignAdminToolsDialog(
+      key: widget.dialogKey,
+      selectedSpace: widget.selectedSpace,
+      onSpaceSelected: widget.onSpaceSelected,
+    );
 
-        final Widget child = CampaignAdminToolsDialog(
-          key: widget.dialogKey,
-          selectedSpace: space,
-          onSpaceSelected: widget.onSpaceSelected,
-        );
-
-        return Positioned(
-          left: _position.dx,
-          top: _position.dy,
-          child: Draggable(
-            onDragUpdate: _onDragUpdate,
-            childWhenDragging: const Offstage(),
-            feedback: child,
-            child: child,
-          ),
-        );
-      },
+    return Positioned(
+      left: _position.dx,
+      top: _position.dy,
+      child: Draggable(
+        onDragUpdate: _onDragUpdate,
+        childWhenDragging: const Offstage(),
+        feedback: child,
+        child: child,
+      ),
     );
   }
 
@@ -280,7 +270,7 @@ class _BlocFooter extends StatelessWidget {
       builder: (context, spaces) {
         if (spaces.length <= 1) {
           // don't show footer with spaces if there's only once,
-          // the user can't change it to anything else
+          // since the user can't change it to anything else
           return const Offstage();
         }
 

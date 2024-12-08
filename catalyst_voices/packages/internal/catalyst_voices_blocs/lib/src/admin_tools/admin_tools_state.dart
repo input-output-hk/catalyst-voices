@@ -5,26 +5,26 @@ import 'package:equatable/equatable.dart';
 final class AdminToolsState extends Equatable {
   final bool enabled;
   final CampaignStage campaignStage;
-  final AuthenticationStatus authStatus;
+  final SessionStatus sessionStatus;
 
   const AdminToolsState({
     required this.enabled,
     required this.campaignStage,
-    required this.authStatus,
+    required this.sessionStatus,
   });
 
   AdminToolsState copyWith({
     bool? enabled,
     CampaignStage? campaignStage,
-    AuthenticationStatus? authStatus,
+    SessionStatus? sessionStatus,
   }) {
     return AdminToolsState(
       enabled: enabled ?? this.enabled,
       campaignStage: campaignStage ?? this.campaignStage,
-      authStatus: authStatus ?? this.authStatus,
+      sessionStatus: sessionStatus ?? this.sessionStatus,
     );
   }
 
   @override
-  List<Object?> get props => [enabled, campaignStage, authStatus];
+  List<Object?> get props => [enabled, campaignStage, sessionStatus];
 }

@@ -24,6 +24,9 @@ sealed class ProposalViewModel extends Equatable {
           ),
         );
       case CampaignStage.completed:
+        // TODO(dtscalac): whether proposal is funded or not should depend
+        // not on campaign stage but on the proposal properties.
+        // In the future when proposals are refined update this.
         return FundedProposalViewModel(
           data: FundedProposal.fromProposal(
             proposal,

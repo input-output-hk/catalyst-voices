@@ -74,15 +74,15 @@ class _CampaignAdminToolsEventsTabState
     });
   }
 
-  bool _canSelectPreviousStage(CampaignStage stage) {
+  bool _canSelectPreviousStage(CampaignStage currentStage) {
     // draft stage is not supported
 
-    final previousIndex = stage.index - 1;
+    final previousIndex = currentStage.index - 1;
     return previousIndex > CampaignStage.draft.index;
   }
 
-  bool _canSelectNextStage(CampaignStage stage) {
-    final nextIndex = stage.index + 1;
+  bool _canSelectNextStage(CampaignStage currentStage) {
+    final nextIndex = currentStage.index + 1;
     return nextIndex < CampaignStage.values.length;
   }
 

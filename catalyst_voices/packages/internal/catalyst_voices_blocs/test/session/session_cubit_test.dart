@@ -157,7 +157,7 @@ void main() {
         const AdminToolsState(
           enabled: true,
           campaignStage: CampaignStage.scheduled,
-          authStatus: AuthenticationStatus.actor,
+          sessionStatus: SessionStatus.actor,
         ),
       );
 

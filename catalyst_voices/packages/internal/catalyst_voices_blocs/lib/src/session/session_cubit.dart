@@ -181,17 +181,17 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   SessionState _createMockedSessionState() {
-    switch (_adminToolsState.authStatus) {
-      case AuthenticationStatus.actor:
+    switch (_adminToolsState.sessionStatus) {
+      case SessionStatus.actor:
         return ActiveAccountSessionState(
           account: _dummyUserService.getDummyAccount(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
         );
-      case AuthenticationStatus.guest:
+      case SessionStatus.guest:
         return const GuestSessionState();
-      case AuthenticationStatus.visitor:
+      case SessionStatus.visitor:
         return const VisitorSessionState(isRegistrationInProgress: false);
     }
   }

@@ -15,5 +15,6 @@ export 'proposal/pending_proposal.dart';
 export 'proposal/proposal_view_model.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
+export 'session/session_status.dart';
 export 'treasury/treasury_sections.dart';
 export 'workspace/workspace_sections.dart';

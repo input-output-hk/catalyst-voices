@@ -8,16 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// The "views" tab of the [CampaignAdminToolsDialog].
-class CampaignAdminToolsViewsTab extends StatefulWidget {
+class CampaignAdminToolsViewsTab extends StatelessWidget {
   const CampaignAdminToolsViewsTab({super.key});
 
-  @override
-  State<CampaignAdminToolsViewsTab> createState() =>
-      _CampaignAdminToolsViewsTabState();
-}
-
-class _CampaignAdminToolsViewsTabState
-    extends State<CampaignAdminToolsViewsTab> {
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -32,25 +25,7 @@ class _CampaignAdminToolsViewsTabState
               style: Theme.of(context).textTheme.labelLarge,
             ),
             const SizedBox(height: 16),
-            BlocBuilder<AdminToolsCubit, AdminToolsState>(
-              builder: (context, state) {
-                return VoicesSegmentedButton<AuthenticationStatus>(
-                  segments: [
-                    for (final userState in AuthenticationStatus.values)
-                      ButtonSegment(
-                        value: userState,
-                        label: Text(userState.name(context.l10n)),
-                      ),
-                  ],
-                  selected: {state.authStatus},
-                  onChanged: (selected) {
-                    context
-                        .read<AdminToolsCubit>()
-                        .updateAuthStatus(selected.first);
-                  },
-                );
-              },
-            ),
+            const _SessionStatus(),
           ],
         ),
       ),
@@ -58,12 +33,28 @@ class _CampaignAdminToolsViewsTabState
   }
 }
 
-extension _AuthenticationStatusExt on AuthenticationStatus {
-  String name(VoicesLocalizations l10n) {
-    return switch (this) {
-      AuthenticationStatus.actor => l10n.actor,
-      AuthenticationStatus.guest => l10n.guest,
-      AuthenticationStatus.visitor => l10n.visitor,
-    };
+class _SessionStatus extends StatelessWidget {
+  const _SessionStatus();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<AdminToolsCubit, AdminToolsState, SessionStatus>(
+      selector: (state) => state.sessionStatus,
+      builder: (context, sessionStatus) {
+        return VoicesSegmentedButton<SessionStatus>(
+          segments: [
+            for (final userState in SessionStatus.values)
+              ButtonSegment(
+                value: userState,
+                label: Text(userState.name(context.l10n)),
+              ),
+          ],
+          selected: {sessionStatus},
+          onChanged: (selected) {
+            context.read<AdminToolsCubit>().updateSessionStatus(selected.first);
+          },
+        );
+      },
+    );
   }
 }

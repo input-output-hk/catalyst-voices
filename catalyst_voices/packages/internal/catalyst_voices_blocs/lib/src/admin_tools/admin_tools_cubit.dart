@@ -11,7 +11,7 @@ final class AdminToolsCubit extends Cubit<AdminToolsState> {
           const AdminToolsState(
             enabled: false,
             campaignStage: CampaignStage.scheduled,
-            authStatus: AuthenticationStatus.actor,
+            sessionStatus: SessionStatus.actor,
           ),
         );
 
@@ -27,7 +27,7 @@ final class AdminToolsCubit extends Cubit<AdminToolsState> {
     emit(state.copyWith(campaignStage: stage));
   }
 
-  void updateAuthStatus(AuthenticationStatus status) {
-    emit(state.copyWith(authStatus: status));
+  void updateSessionStatus(SessionStatus status) {
+    emit(state.copyWith(sessionStatus: status));
   }
 }
