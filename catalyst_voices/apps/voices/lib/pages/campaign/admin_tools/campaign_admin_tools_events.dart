@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// The "events" tab of the [CampaignAdminToolsDialog].
 class CampaignAdminToolsEventsTab extends StatefulWidget {
@@ -22,7 +24,6 @@ class _CampaignAdminToolsEventsTabState
     extends State<CampaignAdminToolsEventsTab> {
   static const _defaultStageTransitionDelay = Duration(seconds: 5);
 
-  CampaignStage _stage = CampaignStage.scheduled;
   Timer? _stageTimer;
   DateTime? _stageTransitionAt;
   Duration _stageTransitionDelay = _defaultStageTransitionDelay;
@@ -35,22 +36,30 @@ class _CampaignAdminToolsEventsTabState
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: _CampaignStatusChooser(
-            selectedStage: _stage,
-            onStageSelected: _onStageSelected,
-          ),
-        ),
-        _EventTimelapseControls(
-          nextStageTransitionAt: _stageTransitionAt,
-          stageTransitionDelay: _stageTransitionDelay,
-          onPreviousStage: _canSelectPreviousStage ? _onPreviousStage : null,
-          onNextStage: _canSelectNextStage ? _onNextStage : null,
-          onTransitionDelayChanged: _onTransitionDelayChanged,
-        ),
-      ],
+    return BlocSelector<AdminToolsCubit, AdminToolsState, CampaignStage>(
+      selector: (state) => state.campaignStage,
+      builder: (context, stage) {
+        return Column(
+          children: [
+            Expanded(
+              child: _CampaignStatusChooser(
+                selectedStage: stage,
+                onStageSelected: _onStageSelected,
+              ),
+            ),
+            _EventTimelapseControls(
+              nextStageTransitionAt: _stageTransitionAt,
+              stageTransitionDelay: _stageTransitionDelay,
+              onPreviousStage: _canSelectPreviousStage(stage)
+                  ? () => _onPreviousStage(stage)
+                  : null,
+              onNextStage:
+                  _canSelectNextStage(stage) ? () => _onNextStage(stage) : null,
+              onTransitionDelayChanged: _onTransitionDelayChanged,
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -65,33 +74,34 @@ class _CampaignAdminToolsEventsTabState
     });
   }
 
-  bool get _canSelectPreviousStage {
+  bool _canSelectPreviousStage(CampaignStage currentStage) {
     // draft stage is not supported
 
-    final previousIndex = _stage.index - 1;
+    final previousIndex = currentStage.index - 1;
     return previousIndex > CampaignStage.draft.index;
   }
 
-  bool get _canSelectNextStage {
-    final nextIndex = _stage.index + 1;
+  bool _canSelectNextStage(CampaignStage currentStage) {
+    final nextIndex = currentStage.index + 1;
     return nextIndex < CampaignStage.values.length;
   }
 
-  void _onPreviousStage() {
-    if (!_canSelectPreviousStage) return;
+  void _onPreviousStage(CampaignStage currentStage) {
+    if (!_canSelectPreviousStage(currentStage)) return;
 
-    _onStageSelected(CampaignStage.values[_stage.index - 1]);
+    _onStageSelected(CampaignStage.values[currentStage.index - 1]);
   }
 
-  void _onNextStage() {
-    if (!_canSelectNextStage) return;
+  void _onNextStage(CampaignStage currentStage) {
+    if (!_canSelectNextStage(currentStage)) return;
 
-    _onStageSelected(CampaignStage.values[_stage.index + 1]);
+    _onStageSelected(CampaignStage.values[currentStage.index + 1]);
   }
 
   void _updateStage(CampaignStage stage) {
+    context.read<AdminToolsCubit>().updateCampaignStage(stage);
+
     setState(() {
-      _stage = stage;
       _stageTransitionAt = null;
     });
   }
@@ -186,14 +196,16 @@ class _EventItem extends StatelessWidget {
 
   SvgGenImage get _icon => switch (stage) {
         CampaignStage.draft => VoicesAssets.icons.clock,
+        CampaignStage.scheduled => VoicesAssets.icons.clock,
         CampaignStage.live => VoicesAssets.icons.flag,
-        _ => VoicesAssets.icons.calendar,
+        CampaignStage.completed => VoicesAssets.icons.calendar,
       };
 
   String _text(VoicesLocalizations l10n) => switch (stage) {
         CampaignStage.draft => l10n.campaignPreviewEventBefore,
+        CampaignStage.scheduled => l10n.campaignPreviewEventBefore,
         CampaignStage.live => l10n.campaignPreviewEventDuring,
-        _ => l10n.campaignPreviewEventAfter,
+        CampaignStage.completed => l10n.campaignPreviewEventAfter,
       };
 }
 

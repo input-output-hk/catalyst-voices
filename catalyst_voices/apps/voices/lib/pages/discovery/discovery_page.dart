@@ -4,7 +4,7 @@ import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.d
 import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
 import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
-import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
+import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -350,8 +350,8 @@ class _AllProposals extends StatelessWidget {
 }
 
 class _AllProposalsList extends StatelessWidget {
-  final List<PendingProposal> proposals;
-  final List<PendingProposal> favoriteProposals;
+  final List<ProposalViewModel> proposals;
+  final List<ProposalViewModel> favoriteProposals;
 
   const _AllProposalsList({
     required this.proposals,
@@ -365,7 +365,7 @@ class _AllProposalsList extends StatelessWidget {
       runSpacing: 16,
       children: [
         for (final proposal in proposals)
-          PendingProposalCard(
+          ProposalCard(
             image: _generateImageForProposal(proposal.id),
             proposal: proposal,
             showStatus: false,
@@ -412,7 +412,7 @@ class _FavoriteProposals extends StatelessWidget {
 }
 
 class _FavoriteProposalsList extends StatelessWidget {
-  final List<PendingProposal> proposals;
+  final List<ProposalViewModel> proposals;
 
   const _FavoriteProposalsList({required this.proposals});
 
@@ -423,7 +423,7 @@ class _FavoriteProposalsList extends StatelessWidget {
       runSpacing: 16,
       children: [
         for (final proposal in proposals)
-          PendingProposalCard(
+          ProposalCard(
             image: _generateImageForProposal(proposal.id),
             proposal: proposal,
             showStatus: false,

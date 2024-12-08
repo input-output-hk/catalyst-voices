@@ -148,7 +148,8 @@ final class RegistrationServiceImpl implements RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    // TODO(dtscalac): support more roles when backend is ready
+    // TODO(dtscalac): derive a key from the seed phrase and fetch
+    // from the backend info about the registration (roles, wallet, etc).
     final roles = {AccountRole.root};
     final keychainId = const Uuid().v4();
 
@@ -200,15 +201,10 @@ final class RegistrationServiceImpl implements RegistrationService {
         ),
       );
 
-      final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
-        masterKey: masterKey,
-        // TODO(dtscalac): support more roles when backend is ready
-        role: AccountRole.root,
-      );
-
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: config,
-        keyPair: keyPair,
+        keyDerivation: _keyDerivation,
+        masterKey: masterKey,
         networkId: networkId,
         roles: roles,
         changeAddress: changeAddress,
@@ -278,7 +274,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required SeedPhrase seedPhrase,
     required LockFactor lockFactor,
   }) async {
-    final roles = {AccountRole.root};
+    final roles = {AccountRole.voter, AccountRole.proposer};
     final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
 
     final keychain = await _keychainProvider.create(keychainId);

@@ -5,8 +5,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 class ProposalRepository {
   const ProposalRepository();
 
-  /// Fetches all draft proposals.
-  Future<List<Proposal>> getDraftProposals({
+  /// Fetches all proposals.
+  Future<List<Proposal>> getProposals({
     required String campaignId,
   }) async {
     // simulate network delay
