@@ -32,9 +32,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
     final campaign = await _campaignService.getActiveCampaign();
     if (campaign == null) {
-      emit(
-        const LoadedProposalsState(),
-      );
+      emit(const LoadedProposalsState());
       return;
     }
 
