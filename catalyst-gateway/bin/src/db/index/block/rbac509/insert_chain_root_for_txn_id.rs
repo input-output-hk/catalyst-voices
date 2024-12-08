@@ -48,7 +48,7 @@ impl Params {
             session.clone(),
             INSERT_CHAIN_ROOT_FOR_TXN_ID_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )

@@ -286,6 +286,7 @@ todos
 toggleable
 tojunit
 tomjs
+tolerations
 Traceback
 traefik
 trailings
@@ -331,3 +332,5 @@ xpub
 xpublic
 xvfb
 yoroi
+keyspaces
+Keyspaces

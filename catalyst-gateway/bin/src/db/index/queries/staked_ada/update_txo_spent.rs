@@ -43,7 +43,7 @@ impl UpdateTxoSpentQuery {
             session.clone(),
             UPDATE_TXO_SPENT_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )

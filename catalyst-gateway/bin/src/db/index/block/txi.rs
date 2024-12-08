@@ -60,7 +60,7 @@ impl TxiInsertQuery {
             session.clone(),
             INSERT_TXI_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )
