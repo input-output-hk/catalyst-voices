@@ -22,16 +22,6 @@ final class Dependencies extends DependencyProvider {
 
   void _registerBlocsWithDependencies() {
     this
-      ..registerSingleton<AuthenticationBloc>(
-        AuthenticationBloc(
-          authenticationRepository: get(),
-        ),
-      )
-      ..registerLazySingleton<LoginBloc>(
-        () => LoginBloc(
-          authenticationRepository: get(),
-        ),
-      )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
@@ -78,12 +68,6 @@ final class Dependencies extends DependencyProvider {
 
   void _registerRepositories() {
     this
-      ..registerLazySingleton<CredentialsStorageRepository>(
-        () => CredentialsStorageRepository(storage: get()),
-      )
-      ..registerLazySingleton<AuthenticationRepository>(
-        () => AuthenticationRepository(credentialsStorageRepository: get()),
-      )
       ..registerLazySingleton<TransactionConfigRepository>(
         TransactionConfigRepository.new,
       )
@@ -96,7 +80,6 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
     registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
     registerLazySingleton<KeychainProvider>(VaultKeychainProvider.new);
-    registerLazySingleton<DummyAuthStorage>(SecureDummyAuthStorage.new);
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
