@@ -54,13 +54,19 @@ void main() {
       ),
     );
 
+    late AdminToolsCubit adminToolsCubit;
+
+    setUp(() {
+      adminToolsCubit = AdminToolsCubit();
+    });
+
     blocTest<ProposalsCubit, ProposalsState>(
       'initial state is $LoadingProposalsState',
       build: () {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
           _FakeProposalService([]),
-          AdminToolsCubit(),
+          adminToolsCubit,
         );
       },
       verify: (cubit) {
@@ -74,10 +80,64 @@ void main() {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
           _FakeProposalService([proposal]),
-          AdminToolsCubit(),
+          adminToolsCubit,
         );
       },
       act: (cubit) async => cubit.load(),
+      expect: () => [
+        const LoadingProposalsState(),
+        LoadedProposalsState(
+          proposals: [pendingProposal],
+          favoriteProposals: const [],
+        ),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'admin tools override proposals in draft campaign state',
+      build: () {
+        return ProposalsCubit(
+          _FakeCampaignService(campaign),
+          _FakeProposalService([proposal]),
+          adminToolsCubit,
+        );
+      },
+      act: (cubit) async {
+        adminToolsCubit.emit(
+          const AdminToolsState(
+            enabled: true,
+            campaignStage: CampaignStage.draft,
+          ),
+        );
+        return Future<void>.delayed(const Duration(microseconds: 50));
+      },
+      expect: () => [
+        const LoadingProposalsState(),
+        const LoadedProposalsState(
+          proposals: [],
+          favoriteProposals: [],
+        ),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'admin tools override proposals in live campaign state',
+      build: () {
+        return ProposalsCubit(
+          _FakeCampaignService(campaign),
+          _FakeProposalService([proposal]),
+          adminToolsCubit,
+        );
+      },
+      act: (cubit) async {
+        adminToolsCubit.emit(
+          const AdminToolsState(
+            enabled: true,
+            campaignStage: CampaignStage.live,
+          ),
+        );
+        return Future<void>.delayed(const Duration(microseconds: 50));
+      },
       expect: () => [
         const LoadingProposalsState(),
         LoadedProposalsState(
@@ -93,7 +153,7 @@ void main() {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
           _FakeProposalService([proposal]),
-          AdminToolsCubit(),
+          adminToolsCubit,
         );
       },
       act: (cubit) async {
