@@ -29,9 +29,11 @@ final class Dependencies extends DependencyProvider {
         () {
           return SessionCubit(
             get<UserService>(),
+            get<DummyUserService>(),
             get<RegistrationService>(),
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
+            get<AdminToolsCubit>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -106,6 +108,7 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+    registerLazySingleton<DummyUserService>(DummyUserService.new);
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(

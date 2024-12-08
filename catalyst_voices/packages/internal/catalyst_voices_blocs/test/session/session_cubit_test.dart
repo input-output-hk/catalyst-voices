@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_blocs/src/session/session.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -11,9 +11,11 @@ void main() {
   late final UserStorage userStorage;
 
   late final UserService userService;
+  late final DummyUserService dummyUserService;
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
+  late final AdminToolsCubit adminToolsCubit;
 
   late SessionCubit sessionCubit;
 
@@ -25,18 +27,22 @@ void main() {
       keychainProvider: keychainProvider,
       userStorage: userStorage,
     );
+    dummyUserService = DummyUserService();
     registrationService = _MockRegistrationService();
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
+    adminToolsCubit = AdminToolsCubit();
   });
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
     sessionCubit = SessionCubit(
       userService,
+      dummyUserService,
       registrationService,
       notifier,
       accessControl,
+      adminToolsCubit,
     );
   });
 
@@ -142,6 +148,21 @@ void main() {
       expect(userService.keychain, isNotNull);
       expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
       expect(sessionCubit.state, isNot(isA<GuestSessionState>()));
+      expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+    });
+
+    test('when admin tools enabled is in mocked state', () async {
+      adminToolsCubit.emit(
+        const AdminToolsState(
+          enabled: true,
+          campaignStage: CampaignStage.scheduled,
+          authStatus: AuthenticationStatus.actor,
+        ),
+      );
+
+      // Gives time for stream to emit.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
       expect(sessionCubit.state, isA<ActiveAccountSessionState>());
     });
   });

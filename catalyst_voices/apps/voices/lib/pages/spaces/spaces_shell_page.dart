@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
@@ -49,11 +51,22 @@ class SpacesShellPage extends StatefulWidget {
 
 class _SpacesShellPageState extends State<SpacesShellPage> {
   final GlobalKey _adminToolsKey = GlobalKey(debugLabel: 'admin_tools');
+  final StreamController<Space> _selectedSpaceSC = StreamController.broadcast();
   OverlayEntry? _adminToolsOverlay;
+
+  @override
+  void didUpdateWidget(SpacesShellPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.space != widget.space) {
+      _selectedSpaceSC.add(widget.space);
+    }
+  }
 
   @override
   void dispose() {
     _hideAdminToolsOverlay();
+    unawaited(_selectedSpaceSC.close());
     super.dispose();
   }
 
@@ -144,11 +157,18 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
       builder: (BuildContext context) {
         return DraggableCampaignAdminToolsDialog(
           dialogKey: _adminToolsKey,
-          selectedSpace: widget.space,
+          // Passing it as a stream, not as a value because when the page
+          // rebuilds the overlay entry is not rebuilt.
+          selectedSpace: _watchSpace,
           onSpaceSelected: (space) => space.go(context),
         );
       },
     );
+  }
+
+  Stream<Space> get _watchSpace async* {
+    yield widget.space;
+    yield* _selectedSpaceSC.stream;
   }
 }
 

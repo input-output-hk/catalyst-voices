@@ -25,7 +25,7 @@ class DraggableCampaignAdminToolsDialog extends StatefulWidget {
   final GlobalKey dialogKey;
 
   /// See [CampaignAdminToolsDialog.selectedSpace].
-  final Space selectedSpace;
+  final Stream<Space> selectedSpace;
 
   /// See [CampaignAdminToolsDialog.onSpaceSelected].
   final ValueChanged<Space> onSpaceSelected;
@@ -75,21 +75,31 @@ class _DraggableCampaignAdminToolsDialogState
 
   @override
   Widget build(BuildContext context) {
-    final Widget child = CampaignAdminToolsDialog(
-      key: widget.dialogKey,
-      selectedSpace: widget.selectedSpace,
-      onSpaceSelected: widget.onSpaceSelected,
-    );
+    return StreamBuilder<Space>(
+      stream: widget.selectedSpace,
+      builder: (context, snapshot) {
+        final space = snapshot.data;
+        if (space == null) {
+          return const Offstage();
+        }
 
-    return Positioned(
-      left: _position.dx,
-      top: _position.dy,
-      child: Draggable(
-        onDragUpdate: _onDragUpdate,
-        childWhenDragging: const Offstage(),
-        feedback: child,
-        child: child,
-      ),
+        final Widget child = CampaignAdminToolsDialog(
+          key: widget.dialogKey,
+          selectedSpace: space,
+          onSpaceSelected: widget.onSpaceSelected,
+        );
+
+        return Positioned(
+          left: _position.dx,
+          top: _position.dy,
+          child: Draggable(
+            onDragUpdate: _onDragUpdate,
+            childWhenDragging: const Offstage(),
+            feedback: child,
+            child: child,
+          ),
+        );
+      },
     );
   }
 
