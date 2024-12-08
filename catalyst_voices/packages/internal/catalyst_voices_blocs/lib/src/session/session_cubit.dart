@@ -23,8 +23,6 @@ final class SessionCubit extends Cubit<SessionState>
   bool _hasKeychain = false;
   bool _isUnlocked = false;
   Account? _account;
-
-  /// Current admin tools state;
   AdminToolsState _adminToolsState;
 
   StreamSubscription<bool>? _keychainSub;
