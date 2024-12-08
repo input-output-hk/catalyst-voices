@@ -269,13 +269,13 @@
                     "title": "Translation Information",
                     "description": "Information about the proposal's language and translation status",
                     "properties": {
-                        "translated": {
+                        "isTranslated": {
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Auto-translated Status",
                             "description": "Indicate if your proposal has been auto-translated into English from another language",
                             "x-guidance": "<p>Tick YES if your proposal has been auto-translated into English from another language  so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections. Tick NO if your proposal has not been auto-translated into English from another language</p>"
                         },
-                        "original": {
+                        "originalLanguage": {
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Original Language",
                             "description": "If auto-translated, specify the original language of your proposal",
@@ -287,7 +287,7 @@
                                 "French"
                             ]
                         },
-                        "notes": {
+                        "translationNotes": {
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Translation Notes",
                             "description": "Additional notes about the translation or original language content",
@@ -391,7 +391,7 @@
                         "approach"
                     ]
                 },
-                "SupportingLinks": {
+                "supportingLinks": {
                     "$ref": "#/definitions/section",
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
