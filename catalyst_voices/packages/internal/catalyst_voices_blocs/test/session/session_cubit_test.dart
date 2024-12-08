@@ -15,8 +15,8 @@ void main() {
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
-  late final AdminToolsCubit adminToolsCubit;
 
+  late AdminToolsCubit adminToolsCubit;
   late SessionCubit sessionCubit;
 
   setUpAll(() {
