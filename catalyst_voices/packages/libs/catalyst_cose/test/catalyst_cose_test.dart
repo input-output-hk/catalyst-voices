@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
@@ -10,23 +12,36 @@ void main() {
   group('CatalystCose', () {
     late Ed25519 algorithm;
     late SimpleKeyPair keyPair;
-    late List<int> privateKey;
     late SimplePublicKey publicKey;
 
     setUp(() async {
       // Initialize the Ed25519 algorithm and generate a key pair
       algorithm = Ed25519();
       keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
-      privateKey = await keyPair.extractPrivateKeyBytes();
       publicKey = await keyPair.extractPublicKey();
     });
+
+    Future<Uint8List> signer(Uint8List data) async {
+      final signature = await algorithm.sign(data, keyPair: keyPair);
+      return Uint8List.fromList(signature.bytes);
+    }
+
+    Future<bool> verifier(Uint8List data, Uint8List signature) async {
+      return algorithm.verify(
+        data,
+        signature: Signature(
+          signature,
+          publicKey: publicKey,
+        ),
+      );
+    }
 
     test('sign1 generates a valid COSE_SIGN1 structure', () async {
       final payload = List<int>.generate(10, (i) => i); // Example payload
 
       // Call the sign1 method
       final coseSign1 = await CatalystCose.sign1(
-        privateKey: privateKey,
+        signer: signer,
         payload: payload,
         kid: CborBytes(publicKey.bytes),
       );
@@ -61,7 +76,7 @@ void main() {
 
       // Call the sign1 method
       final coseSign1 = await CatalystCose.sign1(
-        privateKey: privateKey,
+        signer: signer,
         payload: payload,
         kid: CborBytes(publicKey.bytes),
       );
@@ -83,7 +98,7 @@ void main() {
 
       // Call the sign1 method
       final coseSign1 = await CatalystCose.sign1(
-        privateKey: privateKey,
+        signer: signer,
         payload: payload,
         kid: CborBytes(publicKey.bytes),
       );
@@ -91,7 +106,7 @@ void main() {
       // Verify the signature
       final isValid = await CatalystCose.verifyCoseSign1(
         coseSign1: coseSign1,
-        publicKey: publicKey.bytes,
+        verifier: verifier,
       );
 
       expect(isValid, true); // Check that the signature is valid
@@ -102,8 +117,8 @@ void main() {
 
       // Call the sign1 method
       final coseSign1 = await CatalystCose.sign1(
-        privateKey: privateKey,
         payload: payload,
+        signer: signer,
         kid: CborBytes(publicKey.bytes),
       );
 
@@ -125,7 +140,7 @@ void main() {
       // Verify the tampered signature
       final isValid = await CatalystCose.verifyCoseSign1(
         coseSign1: tamperedCoseSign1,
-        publicKey: publicKey.bytes,
+        verifier: verifier,
       );
 
       expect(isValid, false); // Check that the signature is invalid
@@ -148,7 +163,7 @@ void main() {
       // Verify the invalid COSE_SIGN1 structure
       final isValid = await CatalystCose.verifyCoseSign1(
         coseSign1: invalidCoseSign1,
-        publicKey: publicKey.bytes,
+        verifier: verifier,
       );
 
       expect(isValid, false); // Check that the verification fails

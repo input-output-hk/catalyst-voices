@@ -32,6 +32,7 @@ dependencies:
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:cbor/cbor.dart';
@@ -41,20 +42,30 @@ import 'package:cryptography/cryptography.dart';
 Future<void> main() async {
   final algorithm = Ed25519();
   final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
-  final privateKey = await keyPair.extractPrivateKeyBytes();
   final publicKey = await keyPair.extractPublicKey().then((e) => e.bytes);
 
   final payload = utf8.encode('This is the content.');
 
   final coseSign1 = await CatalystCose.sign1(
-    privateKey: privateKey,
     payload: payload,
     kid: CborBytes(publicKey),
+    signer: (data) async {
+      final signature = await algorithm.sign(data, keyPair: keyPair);
+      return Uint8List.fromList(signature.bytes);
+    },
   );
 
   final verified = await CatalystCose.verifyCoseSign1(
     coseSign1: coseSign1,
-    publicKey: publicKey,
+    verifier: (data, signature) {
+      return algorithm.verify(
+        data,
+        signature: Signature(
+          signature,
+          publicKey: SimplePublicKey(publicKey, type: KeyPairType.ed25519),
+        ),
+      );
+    },
   );
 
   print('COSE_SIGN1:');

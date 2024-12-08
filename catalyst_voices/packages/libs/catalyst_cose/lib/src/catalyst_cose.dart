@@ -1,5 +1,21 @@
+import 'dart:typed_data';
+
 import 'package:cbor/cbor.dart';
-import 'package:cryptography/cryptography.dart';
+
+/// The typedef for the data signer callback.
+///
+/// The [data] should be signed with a private key
+/// and the resulting signature returned as [Uint8List].
+typedef CatalystCoseSigner = Future<Uint8List> Function(Uint8List data);
+
+/// The typedef for the signature verifier callback.
+///
+/// The [signature] should be verified against
+/// a known public/private key over the [data].
+typedef CatalystCoseVerifier = Future<bool> Function(
+  Uint8List data,
+  Uint8List signature,
+);
 
 /// A dart plugin implementing CBOR Object Signing and Encryption
 /// [RFC-9052](https://datatracker.ietf.org/doc/rfc9052/),
@@ -20,13 +36,10 @@ final class CatalystCose {
   ///
   /// Limited to EdDSA algorithm with Ed25519 curve.
   static Future<CborValue> sign1({
-    required List<int> privateKey,
+    required CatalystCoseSigner signer,
     required List<int> payload,
     CborValue? kid,
   }) async {
-    final algorithm = Ed25519();
-    final keyPair = await algorithm.newKeyPairFromSeed(privateKey);
-
     final protectedHeader = CborBytes(
       cbor.encode(
         CborMap({
@@ -49,17 +62,14 @@ final class CatalystCose {
       ),
     );
 
-    final signature = await algorithm.sign(
-      toBeSigned,
-      keyPair: keyPair,
-    );
+    final signature = await signer(Uint8List.fromList(toBeSigned));
 
     final coseSign1Structure = CborList(
       [
         protectedHeader,
         unprotectedHeader,
         CborBytes(payload),
-        CborBytes(signature.bytes),
+        CborBytes(signature),
       ],
       tags: [_coseSign1Tag],
     );
@@ -75,10 +85,8 @@ final class CatalystCose {
   /// Returns `true` if the signature is valid, `false` otherwise.
   static Future<bool> verifyCoseSign1({
     required CborValue coseSign1,
-    required List<int> publicKey,
+    required CatalystCoseVerifier verifier,
   }) async {
-    final algorithm = Ed25519();
-
     if (coseSign1 is! CborList ||
         coseSign1.tags.contains(_coseSign1Tag) != true) {
       return false;
@@ -115,14 +123,10 @@ final class CatalystCose {
     );
 
     try {
-      final verified = await algorithm.verify(
-        toBeSigned,
-        signature: Signature(
-          signatureBytes,
-          publicKey: SimplePublicKey(publicKey, type: KeyPairType.ed25519),
-        ),
+      return await verifier(
+        Uint8List.fromList(toBeSigned),
+        Uint8List.fromList(signatureBytes),
       );
-      return verified;
     } catch (e) {
       return false;
     }
