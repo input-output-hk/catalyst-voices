@@ -36,6 +36,7 @@ sealed class ProposalViewModel extends Equatable {
     }
   }
 
+  /// The proposal id.
   String get id;
 }
 

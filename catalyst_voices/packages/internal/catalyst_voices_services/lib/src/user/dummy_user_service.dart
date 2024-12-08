@@ -2,9 +2,14 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Creates dummy users and accounts.
-// ignore: one_member_abstracts
 abstract interface class DummyUserService {
-  static const String dummyKeychainId = 'TestUserKeychainID';
+  static const dummyKeychainId = 'TestUserKeychainID';
+  static const dummyUnlockFactor = PasswordLockFactor('Test1234');
+  static final dummySeedPhrase = SeedPhrase.fromMnemonic(
+    'few loyal swift champion rug peace dinosaur '
+    'erase bacon tone install universe',
+  );
+
   factory DummyUserService() {
     return const DummyUserServiceImpl();
   }

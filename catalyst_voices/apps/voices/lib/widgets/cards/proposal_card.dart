@@ -5,6 +5,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// A proposal card spanning proposals in different stages.
+///
+/// Designed to work with as many cases as [ProposalViewModel] will support.
 class ProposalCard extends StatelessWidget {
   final AssetGenImage image;
   final ProposalViewModel proposal;

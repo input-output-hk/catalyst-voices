@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,7 +42,7 @@ class _ToggleStateTextState extends State<ToggleStateText> {
 
       await sessionBloc
           .switchToDummyAccount()
-          .then((_) => sessionBloc.unlock(SessionCubit.dummyUnlockFactor));
+          .then((_) => sessionBloc.unlock(DummyUserService.dummyUnlockFactor));
     };
   }
 

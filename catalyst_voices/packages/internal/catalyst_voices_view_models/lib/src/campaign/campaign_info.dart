@@ -30,6 +30,7 @@ final class CampaignInfo extends Equatable {
     );
   }
 
+  /// Creates a mocked campaign info from [campaign] at given [campaignStage].
   factory CampaignInfo.mockStageFromCampaign(
     Campaign campaign,
     CampaignStage campaignStage,

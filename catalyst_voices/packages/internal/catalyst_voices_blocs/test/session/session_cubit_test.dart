@@ -32,11 +32,14 @@ void main() {
     registrationService = _MockRegistrationService();
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
-    adminToolsCubit = AdminToolsCubit();
   });
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
+
+    // each test might emit using this cubit, therefore we reset it here
+    adminToolsCubit = AdminToolsCubit();
+
     sessionCubit = SessionCubit(
       userService,
       dummyUserService,

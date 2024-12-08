@@ -30,12 +30,6 @@ final class SessionCubit extends Cubit<SessionState>
   StreamSubscription<Account?>? _accountSub;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
 
-  static const LockFactor dummyUnlockFactor = PasswordLockFactor('Test1234');
-  final _dummySeedPhrase = SeedPhrase.fromMnemonic(
-    'few loyal swift champion rug peace dinosaur '
-    'erase bacon tone install universe',
-  );
-
   SessionCubit(
     this._userService,
     this._dummyUserService,
@@ -87,8 +81,8 @@ final class SessionCubit extends Cubit<SessionState>
 
     final account = await _registrationService.registerTestAccount(
       keychainId: DummyUserService.dummyKeychainId,
-      seedPhrase: _dummySeedPhrase,
-      lockFactor: dummyUnlockFactor,
+      seedPhrase: DummyUserService.dummySeedPhrase,
+      lockFactor: DummyUserService.dummyUnlockFactor,
     );
 
     await _userService.useAccount(account);

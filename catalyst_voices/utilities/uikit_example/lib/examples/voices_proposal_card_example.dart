@@ -1,6 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -29,32 +28,36 @@ class VoicesProposalCardExample extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            FundedProposalCard(
+            ProposalCard(
               image: VoicesAssets.images.proposalBackground1,
-              proposal: FundedProposal(
-                id: 'f14/1',
-                campaignName: 'F14',
-                category: 'Cardano Use Cases / MVP',
-                title: 'Proposal Title that rocks the world',
-                fundedDate: DateTime(2025, 1, 28),
-                fundsRequested: Coin.fromAda(100000),
-                commentsCount: 0,
-                description: _description,
+              proposal: FundedProposalViewModel(
+                data: FundedProposal(
+                  id: 'f14/1',
+                  campaignName: 'F14',
+                  category: 'Cardano Use Cases / MVP',
+                  title: 'Proposal Title that rocks the world',
+                  fundedDate: DateTime(2025, 1, 28),
+                  fundsRequested: Coin.fromAda(100000),
+                  commentsCount: 0,
+                  description: _description,
+                ),
               ),
             ),
-            PendingProposalCard(
+            ProposalCard(
               image: VoicesAssets.images.proposalBackground2,
-              proposal: PendingProposal(
-                id: 'f14/2',
-                campaignName: 'F14',
-                category: 'Cardano Use Cases / MVP',
-                title: 'Proposal Title that rocks the world',
-                lastUpdateDate: DateTime.now().minusDays(2),
-                fundsRequested: Coin.fromAda(100000),
-                commentsCount: 0,
-                description: _description,
-                completedSegments: 7,
-                totalSegments: 13,
+              proposal: PendingProposalViewModel(
+                data: PendingProposal(
+                  id: 'f14/2',
+                  campaignName: 'F14',
+                  category: 'Cardano Use Cases / MVP',
+                  title: 'Proposal Title that rocks the world',
+                  lastUpdateDate: DateTime.now().minusDays(2),
+                  fundsRequested: Coin.fromAda(100000),
+                  commentsCount: 0,
+                  description: _description,
+                  completedSegments: 7,
+                  totalSegments: 13,
+                ),
               ),
             ),
           ],
