@@ -1,5 +1,5 @@
 -- Index of Chain Root For TX ID. RBAC 509 registrations.
-INSERT INTO chain_root_for_txn_id (
+INSERT INTO rbac_chain_root_for_txn_id (
     transaction_id,
     chain_root,
     slot_no,

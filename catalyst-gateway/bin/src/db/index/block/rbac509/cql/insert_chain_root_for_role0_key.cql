@@ -1,5 +1,5 @@
 -- Index of Chain Root For Role0 Key. RBAC 509 registrations.
-INSERT INTO chain_root_for_role0_key (
+INSERT INTO rbac_chain_root_for_role0_key (
     role0_key,
     slot_no,
     txn,
