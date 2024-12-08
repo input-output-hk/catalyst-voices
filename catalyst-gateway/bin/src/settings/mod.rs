@@ -56,6 +56,9 @@ const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
 
+/// Default number of slots used as overlap when purging Live Index data.
+const PURGE_SLOT_BUFFER_DEFAULT: u64 = 100;
+
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
 fn calculate_service_uuid() -> String {
@@ -148,6 +151,9 @@ struct EnvVars {
     /// Tick every N seconds until config exists in db
     #[allow(unused)]
     check_config_tick: Duration,
+
+    /// Slot buffer used as overlap when purging Live Index data.
+    purge_slot_buffer: u64,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -173,6 +179,8 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             Duration::from_secs(5)
         },
     };
+    let purge_slot_buffer =
+        StringEnvVar::new_as("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
 
     EnvVars {
         github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),
@@ -199,6 +207,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         chain_follower: chain_follower::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick,
+        purge_slot_buffer,
     }
 });
 
@@ -373,6 +382,11 @@ impl Settings {
         } else {
             false
         }
+    }
+
+    /// Slot buffer used as overlap when purging Live Index data.
+    pub(crate) fn purge_slot_buffer() -> u64 {
+        ENV_VARS.purge_slot_buffer
     }
 }
 
