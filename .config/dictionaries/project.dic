@@ -23,6 +23,7 @@ Autolayout
 autorecalculates
 autoresizing
 backendpython
+backgrounding
 bech
 bimap
 bindgen
@@ -277,6 +278,7 @@ tablestats
 tacho
 testcov
 testdocs
+testid
 testplan
 testunit
 thiserror
@@ -286,6 +288,7 @@ Toastify
 todos
 toggleable
 tojunit
+tomjs
 Traceback
 traefik
 trailings
