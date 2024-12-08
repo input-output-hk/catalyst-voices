@@ -2,13 +2,17 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use pallas_crypto::hash::Hash;
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
+use uuid::Uuid;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    cardano::types::TransactionHash,
+    db::index::{
+        block::from_saturating,
+        queries::{PreparedQueries, SizedBatch},
+    },
     settings::cassandra_db::EnvVars,
 };
 
@@ -22,14 +26,14 @@ pub(super) struct Params {
     chain_root: Vec<u8>,
     /// Transaction ID Hash. 32 bytes.
     transaction_id: Vec<u8>,
-    /// Purpose.`UUIDv4`. 16 bytes.
-    purpose: Uuid,
     /// Block Slot Number
     slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
     txn: i16,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<Vec<u8>>,
+    /// Purpose.`UUIDv4`. 16 bytes.
+    purpose: Uuid,
 }
 
 impl Debug for Params {
@@ -41,10 +45,10 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("chain_root", &self.chain_root)
             .field("transaction_id", &self.transaction_id)
-            .field("purpose", &self.purpose)
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .field("prv_txn_id", &prv_txn_id)
+            .field("purpose", &self.purpose)
             .finish()
     }
 }
@@ -52,14 +56,15 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        chain_root: Hash<32>, transaction_id: Hash<32>, slot_no: u64, txn: i16, cip509: &Cip509,
+        chain_root: TransactionHash, transaction_id: TransactionHash, slot_no: u64, txn_idx: usize,
+        cip509: &Cip509,
     ) -> Self {
         Params {
             chain_root: chain_root.to_vec(),
             transaction_id: transaction_id.to_vec(),
-            purpose: cip509.purpose.into(),
+            purpose: cip509.purpose,
             slot_no: num_bigint::BigInt::from(slot_no),
-            txn,
+            txn: from_saturating(txn_idx),
             prv_txn_id: if let Some(tx_id) = cip509.prv_tx_id {
                 MaybeUnset::Set(tx_id.to_vec())
             } else {

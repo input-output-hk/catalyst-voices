@@ -82,17 +82,17 @@ const SCHEMAS: &[(&str, &str)] = &[
     (
         // RBAC Chain Root For TX ID Registration Table Schema
         include_str!("./cql/rbac_chain_root_for_txn_id.cql"),
-        "Create Table RBAC Chain Root For TX ID Registration",
+        "Create Table RBAC Chain Root For TX ID",
     ),
     (
         // RBAC Chain Root For Role 0 Key Registration Table Schema
-        include_str!("./cql/rbac_chain_root_for_role0_key.cql"),
-        "Create Table RBAC Chain Root For Role 0 Key Registration",
+        include_str!("./cql/rbac_chain_root_for_role0_kid.cql"),
+        "Create Table RBAC Chain Root For Role 0 KID",
     ),
     (
         // RBAC Chain Root For Stake Address Registration Table Schema
         include_str!("./cql/rbac_chain_root_for_stake_addr.cql"),
-        "Create Table RBAC Chain Root For Stake Address Registration",
+        "Create Table RBAC Chain Root For Stake Address",
     ),
 ];
 

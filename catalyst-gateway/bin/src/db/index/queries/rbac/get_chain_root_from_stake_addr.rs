@@ -1,19 +1,40 @@
 //! Get chain root by stake address.
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
+use anyhow::bail;
+use futures::StreamExt;
+use moka::policy::EvictionPolicy;
+use moka::sync::Cache;
+use pallas::ledger::addresses::StakeAddress;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
 use tracing::error;
 
+use crate::db::index::block::rbac509::chain_root::{self, ChainRoot};
 use crate::db::index::{
     queries::{PreparedQueries, PreparedSelectQuery},
     session::CassandraSession,
 };
+use crate::service::utilities::convert::{big_uint_to_u64, from_saturating};
+
+/// Cached Chain Root By Stake Address.
+static CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, ChainRoot>> =
+    LazyLock::new(|| {
+        Cache::builder()
+            // Set Eviction Policy to `LRU`
+            .eviction_policy(EvictionPolicy::lru())
+            // Set the initial capacity
+            .initial_capacity(chain_root::LRU_MAX_CAPACITY)
+            // Set the maximum number of LRU entries
+            .max_capacity(chain_root::LRU_MAX_CAPACITY as u64)
+            // Create the cache.
+            .build()
+    });
 
 /// Get get chain root by stake address query string.
-const GET_CHAIN_ROOT: &str = include_str!("../cql/get_chain_root_for_stake_addr.cql");
+const GET_CHAIN_ROOT: &str = include_str!("../cql/get_rbac_chain_root_for_stake_addr.cql");
 
 /// Get chain root by stake address query params.
 #[derive(SerializeRow)]
@@ -25,8 +46,16 @@ pub(crate) struct QueryParams {
 /// Get chain root by stake address query.
 #[derive(DeserializeRow)]
 pub(crate) struct Query {
+    /// Slot Number the stake address was registered in.
+    pub(crate) slot_no: num_bigint::BigInt,
+    /// Transaction Offset the stake address was registered in.
+    pub(crate) txn: i16,
     /// Chain root for the queries stake address.
     pub(crate) chain_root: Vec<u8>,
+    /// Chain roots slot number
+    pub(crate) chain_root_slot: num_bigint::BigInt,
+    /// Chain roots txn index
+    pub(crate) chain_root_txn: i16,
 }
 
 impl Query {
@@ -48,7 +77,8 @@ impl Query {
     }
 
     /// Executes a get chain root by stake address query.
-    pub(crate) async fn execute(
+    /// Don't call directly, use one of the methods instead.
+    async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         let iter = session
@@ -58,4 +88,52 @@ impl Query {
 
         Ok(iter)
     }
+
+    /// Get latest Chain Root for a given stake address, uncached.
+    /// 
+    /// Unless you really know you need an uncached result, use the cached version.
+    pub(crate) async fn get_latest_uncached(
+        session: &CassandraSession, stake_addr: &StakeAddress,
+    ) -> anyhow::Result<Option<ChainRoot>> {
+        let mut result = Self::execute(
+            session,
+            QueryParams {
+                stake_address: stake_addr.to_vec(),
+            },
+        )
+        .await?;
+
+        match result.next().await {
+            Some(Ok(first_row)) => Ok(Some(ChainRoot::new(
+                first_row.chain_root.as_slice().into(),
+                big_uint_to_u64(&first_row.chain_root_slot),
+                from_saturating(first_row.chain_root_txn),
+            ))),
+            Some(Err(err)) => {
+                bail!(
+                    "Failed to get chain root by stake address query row: {}",
+                    err
+                );
+            },
+            None => Ok(None), // Nothing found, but query ran OK.
+        }
+    }
+
+    /// Get latest chain-root registration for a stake address.
+    pub(crate) async fn get_latest(
+        session: &CassandraSession, stake_addr: &StakeAddress,
+    ) -> anyhow::Result<Option<ChainRoot>> {
+        match CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.get(stake_addr) {
+            Some(chain_root) => Ok(Some(chain_root)),
+            None => {
+                // Look in DB for the stake registration
+                Self::get_latest_uncached(session, stake_addr).await
+            },
+        }
+    }
+}
+
+/// Update the cache when a rbac registration is indexed.
+pub(crate) fn cache_for_stake_addr(stake: &StakeAddress, chain_root: &ChainRoot) {
+    CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), chain_root.clone())
 }

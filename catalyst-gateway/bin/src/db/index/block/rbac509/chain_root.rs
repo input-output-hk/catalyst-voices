@@ -10,16 +10,22 @@ use pallas_crypto::hash::Hash;
 use tracing::{error, warn};
 
 use crate::{
-    db::index::queries::rbac::get_chain_root, service::utilities::convert::big_uint_to_u64,
+    cardano::types::TransactionHash,
+    db::index::{
+        block::from_saturating,
+        queries::rbac::{self, get_chain_root},
+    },
+    service::{common::auth::rbac::role0_kid::Role0Kid, utilities::convert::big_uint_to_u64},
+};
+
+use self::rbac::{
+    get_chain_root_from_stake_addr::cache_for_stake_addr, get_role0_chain_root::cache_for_role0_kid,
 };
 
 use super::CassandraSession;
 
-/// Transaction Id Hash
-type TransactionId = Hash<32>;
-
 /// Chain Root Id - Hash of the first transaction in an RBAC Chain.
-pub(crate) type ChainRootId = TransactionId;
+pub(crate) type ChainRootId = TransactionHash;
 
 /// The Chain Root for an RBAC Key Chain.
 #[derive(Debug, Clone)]
@@ -29,50 +35,44 @@ pub(crate) struct ChainRoot {
     /// What slot# the Chain root is found in on the blockchain
     pub slot: u64,
     /// What transaction in the block holds the chain root.
-    pub idx: i16,
+    pub idx: usize,
 }
 
+pub(crate) const LRU_MAX_CAPACITY: usize = 1024;
+
 /// Cached Chain Root By Transaction ID.
-static CHAIN_ROOT_BY_TXN_ID_CACHE: LazyLock<Cache<TransactionId, ChainRoot>> =
+static CHAIN_ROOT_BY_TXN_HASH_CACHE: LazyLock<Cache<TransactionHash, ChainRoot>> =
     LazyLock::new(|| {
         Cache::builder()
             // Set Eviction Policy to `LRU`
             .eviction_policy(EvictionPolicy::lru())
-            // Create the cache.
-            .build()
-    });
-
-/*
-/// Cached Chain Root By Role 0 Key.
-static CHAIN_ROOT_BY_ROLE0_KEY_CACHE: LazyLock<Cache<Role0Key, ChainRoot>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            // Set Eviction Policy to `LRU`
-            .eviction_policy(EvictionPolicy::lru())
-            // Create the cache.
-            .build()
-    });
-*/
-
-/// Cached Chain Root By Stake Address.
-static CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, ChainRoot>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            // Set Eviction Policy to `LRU`
-            .eviction_policy(EvictionPolicy::lru())
+            // Set the initial capacity
+            .initial_capacity(LRU_MAX_CAPACITY)
+            // Set the maximum number of LRU entries
+            .max_capacity(LRU_MAX_CAPACITY as u64)
             // Create the cache.
             .build()
     });
 
 impl ChainRoot {
-    /// Create a new `ChainRoot` from the given Transaction and its metadata.
-    pub(crate) async fn new(
-        session: &Arc<CassandraSession>, txn_hash: Hash<32>, txn_index: i16, slot_no: u64,
+    /// Create a new ChainRoot record
+    pub(crate) fn new(chain_root: TransactionHash, slot_no: u64, txn_idx: usize) -> Self {
+        Self {
+            txn_hash: chain_root,
+            slot: slot_no,
+            idx: txn_idx,
+        }
+    }
+
+    /// Gets a new `ChainRoot` from the given Transaction and its metadata.
+    ///
+    /// Will try and get it from the cache first, and fall back to the Index DB if not found.
+    pub(crate) async fn get(
+        session: &Arc<CassandraSession>, txn_hash: Hash<32>, txn_index: usize, slot_no: u64,
         cip509: &Cip509,
     ) -> Option<ChainRoot> {
-        if let Some(prv_tx_id) = cip509.prv_tx_id {
-            let prv_tx_id: Hash<32> = prv_tx_id.into();
-            match CHAIN_ROOT_BY_TXN_ID_CACHE.get(&prv_tx_id) {
+        if let Some(prv_tx_id) = cip509.cip509.prv_tx_id {
+            match CHAIN_ROOT_BY_TXN_HASH_CACHE.get(&prv_tx_id) {
                 Some(chain_root) => Some(chain_root), // Cached
                 None => {
                     // Not cached, need to see if its in the DB.
@@ -98,11 +98,11 @@ impl ChainRoot {
                             let new_root = Self {
                                 txn_hash,
                                 slot: big_uint_to_u64(&row.slot_no),
-                                idx: row.txn,
+                                idx: from_saturating(row.txn),
                             };
 
                             // Add the new Chain root to the cache.
-                            CHAIN_ROOT_BY_TXN_ID_CACHE.insert(txn_hash, new_root.clone());
+                            CHAIN_ROOT_BY_TXN_HASH_CACHE.insert(txn_hash, new_root.clone());
 
                             Some(new_root)
                         } else {
@@ -123,24 +123,19 @@ impl ChainRoot {
             };
 
             // Add the new Chain root to the cache.
-            CHAIN_ROOT_BY_TXN_ID_CACHE.insert(txn_hash, new_root.clone());
+            CHAIN_ROOT_BY_TXN_HASH_CACHE.insert(txn_hash, new_root.clone());
 
             Some(new_root)
         }
     }
 
-    /// Get ChainRoot for the given Stake Address.
-    pub(crate) async fn for_stake_addr(stake: &StakeAddress) -> Option<Self> {
-        match CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.get(stake) {
-            Some(chain_root) => Some(chain_root),
-            None => {
-                // Look in DB for the stake registration
-            },
-        }
+    /// Update the cache when a rbac registration is indexed.
+    pub(crate) fn cache_for_stake_addr(&self, stake: &StakeAddress) {
+        cache_for_stake_addr(stake, self);
     }
 
     /// Update the cache when a rbac registration is indexed.
-    pub(crate) fn cache_for_stake_addr(&self, stake: &StakeAddress) {
-        CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), self.clone())
+    pub(crate) fn cache_for_role0_kid(&self, kid: Role0Kid) {
+        cache_for_role0_kid(kid, self);
     }
 }

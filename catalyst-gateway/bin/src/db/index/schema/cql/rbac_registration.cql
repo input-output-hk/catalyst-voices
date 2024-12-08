@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS rbac_registration (
 
     -- Non-Key Data
     prv_txn_id          blob,           -- 32 Bytes from Previous Transaction Hash.
-    purpose             blob,           -- 16 Bytes of UUIDv4 Purpose.
+    purpose             uuid,           -- 16 Bytes of UUIDv4 Purpose.
 
     PRIMARY KEY (chain_root, transaction_id, slot_no, txn)
 )

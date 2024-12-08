@@ -4,10 +4,10 @@ description = "The Catalyst Data Gateway"
 keywords = ["cardano", "catalyst", "gateway"]
 categories = ["command-line-utilities"]
 version = "0.1.0"
-authors.workspace =  true
-edition.workspace =  true
-license.workspace =  true
-repository.workspace =  true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -94,9 +94,13 @@ jsonschema = "0.26.1"
 bech32 = "0.11.0"
 const_format = "0.2.33"
 regex = "1.11.1"
+as-slice = "0.2.1"
+to_vec = "0.1.0"
+minicbor = { version = "0.25.1", features = ["std"] }
 
 [dev-dependencies]
 proptest = "1.5.0"
+x509-cert = { version = "0.2.5", features = ["builder"] }
 
 [build-dependencies]
 build-info-build = "0.0.39"
