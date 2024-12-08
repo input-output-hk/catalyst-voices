@@ -6,36 +6,30 @@ mod insert_chain_root_for_stake_address;
 mod insert_chain_root_for_txn_id;
 mod insert_rbac509;
 
-use std::{
-    convert::TryInto,
-    sync::{Arc, LazyLock},
-};
+use std::sync::{Arc, LazyLock};
 
 use c509_certificate::{
     c509::C509,
     extensions::{alt_name::GeneralNamesOrText, extension::ExtensionValue},
     general_names::general_name::{GeneralNameTypeRegistry, GeneralNameValue},
 };
-use cardano_chain_follower::{
-    Metadata::{
-        self,
-        cip509::{
-            rbac::{
-                certs::{C509Cert, X509DerCert},
-                pub_key::SimplePublicKeyType,
-                role_data::{KeyReference, LocalRefInt},
-                Cip509RbacMetadata,
-            },
-            utils::extract_cip19_hash,
-            Cip509,
-        },
-    },
-    MultiEraBlock,
-};
 use chain_root::ChainRoot;
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas_crypto::hash::Hash;
+use cardano_chain_follower::{Metadata, MultiEraBlock};
+use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
+use moka::{policy::EvictionPolicy, sync::Cache};
+use rbac_registration::cardano::cip509::{
+    self,
+    rbac::{
+        certs::{C509Cert, X509DerCert},
+        pub_key::SimplePublicKeyType,
+        role_data::{KeyLocalRef, LocalRefInt},
+        Cip509RbacMetadata,
+    },
+    utils::cip19::extract_cip19_hash,
+};
 use scylla::Session;
 use tracing::debug;
 use x509_cert::{
@@ -150,18 +144,49 @@ impl Rbac509InsertQuery {
         &mut self, session: &Arc<CassandraSession>, txn_hash: Hash<32>, txn: usize, txn_index: i16,
         slot_no: u64, block: &MultiEraBlock,
     ) {
+<<<<<<< HEAD
         if let Some(decoded_metadata) = block.txn_metadata(txn, Metadata::cip509::LABEL) {
             if let Metadata::DecodedMetadataValues::Cip509(rbac) = &decoded_metadata.value {
                 // Valid RBAC always has a chain root.
                 if let Some(chain_root) =
                     ChainRoot::new(session, txn_hash, txn_index, slot_no, rbac).await
                 {
+=======
+        if let Some(decoded_metadata) = block.txn_metadata(txn, cip509::LABEL) {
+            #[allow(irrefutable_let_patterns)]
+            if let Metadata::DecodedMetadataValues::Cip509(rbac) = &decoded_metadata.value {
+                // Skip processing if the following validations fail
+                // if !(rbac.validation.valid_public_key
+                //    && rbac.validation.valid_payment_key
+                //    && rbac.validation.valid_txn_inputs_hash)
+                //{
+                //    return;
+                //}
+                let transaction_id = txn_hash.to_vec();
+
+                let chain_root = rbac
+                    .cip509
+                    .prv_tx_id
+                    .as_ref()
+                    .and_then(|tx_id| {
+                        // Attempt to get Chain Root for the previous transaction ID.
+                        debug!(prv_tx_id = hex::encode(tx_id), "RBAC looking for TX_ID");
+                        CHAIN_ROOT_BY_TXN_ID_CACHE.get(&tx_id.to_vec()).or_else(|| {
+                            // WIP: trace chain root by looking up previous transaction hashes from
+                            // chain follower or DB
+                            Some(tx_id.to_vec())
+                        })
+                    })
+                    .or(Some(transaction_id.clone()));
+
+                if let Some(chain_root) = chain_root {
+>>>>>>> main
                     self.registrations.push(insert_rbac509::Params::new(
                         chain_root.txn_hash,
                         txn_hash,
                         slot_no,
                         txn_index,
-                        rbac,
+                        &rbac.cip509,
                     ));
                     // Skip processing if the following validations fail
                     // if !(rbac.validation.valid_public_key
@@ -171,7 +196,17 @@ impl Rbac509InsertQuery {
                     //    return;
                     //}
 
+<<<<<<< HEAD
                     let rbac_metadata = &rbac.x509_chunks.0;
+=======
+                    CHAIN_ROOT_BY_TXN_ID_CACHE.insert(transaction_id.clone(), chain_root.clone());
+                    self.chain_root_for_txn_id
+                        .push(insert_chain_root_for_txn_id::Params::new(
+                            &transaction_id,
+                            &chain_root,
+                        ));
+                    let rbac_metadata = &rbac.cip509.x509_chunks.0;
+>>>>>>> main
                     if let Some(role_set) = &rbac_metadata.role_set {
                         for role in role_set.iter().filter(|role| role.role_number == 0) {
                             // Index Role 0 data
@@ -288,9 +323,14 @@ fn get_role0_x509_certs_from_reference(
 ) -> Option<x509_cert::Certificate> {
     x509_certs.and_then(|certs| {
         key_offset.and_then(|pk_idx| {
-            certs
-                .get(pk_idx)
-                .and_then(|cert| x509_cert::Certificate::from_der(&cert.0).ok())
+            certs.get(pk_idx).and_then(|cert| {
+                match cert {
+                    X509DerCert::X509Cert(der_cert) => {
+                        x509_cert::Certificate::from_der(der_cert).ok()
+                    },
+                    X509DerCert::Deleted | X509DerCert::Undefined => None,
+                }
+            })
         })
     })
 }
@@ -301,9 +341,20 @@ fn get_role0_c509_certs_from_reference(
 ) -> Option<&C509> {
     c509_certs.and_then(|certs| {
         key_offset.and_then(|pk_idx| {
+<<<<<<< HEAD
             certs.get(pk_idx).and_then(|cert| match cert {
                 C509Cert::C509Certificate(cert) => Some(cert.as_ref()),
                 C509Cert::C509CertInMetadatumReference(_) => None,
+=======
+            certs.get(pk_idx).and_then(|cert| {
+                match cert {
+                    C509Cert::C509Certificate(cert) => Some(cert.as_ref()),
+                    // Currently C509CertInMetadatumReference is unsupported
+                    C509Cert::C509CertInMetadatumReference(_)
+                    | C509Cert::Undefined
+                    | C509Cert::Deleted => None,
+                }
+>>>>>>> main
             })
         })
     })
@@ -311,8 +362,9 @@ fn get_role0_c509_certs_from_reference(
 
 /// Extract Role0 Key from `KeyReference`
 fn extract_role0_data(
-    key_reference: &KeyReference, rbac_metadata: &Cip509RbacMetadata,
+    key_local_ref: &KeyLocalRef, rbac_metadata: &Cip509RbacMetadata,
 ) -> Option<Role0CertificateData> {
+<<<<<<< HEAD
     match key_reference {
         KeyReference::KeyHash(role0_key) => Some(Role0CertificateData {
             role0_key: role0_key.clone(),
@@ -325,6 +377,12 @@ fn extract_role0_data(
                     rbac_metadata.x509_certs.as_ref(),
                     key_offset,
                 )
+=======
+    let key_offset: Option<usize> = key_local_ref.key_offset.try_into().ok();
+    match key_local_ref.local_ref {
+        LocalRefInt::X509Certs => {
+            get_role0_x509_certs_from_reference(rbac_metadata.x509_certs.as_ref(), key_offset)
+>>>>>>> main
                 .and_then(|der_cert| {
                     let role0_key = der_cert
                         .tbs_certificate
@@ -340,17 +398,26 @@ fn extract_role0_data(
                             stake_addresses,
                         }
                     })
+<<<<<<< HEAD
                 }),
                 LocalRefInt::C509Certs => get_role0_c509_certs_from_reference(
                     rbac_metadata.c509_certs.as_ref(),
                     key_offset,
                 )
                 .map(|cert| {
+=======
+                })
+        },
+        LocalRefInt::C509Certs => {
+            get_role0_c509_certs_from_reference(rbac_metadata.c509_certs.as_ref(), key_offset).map(
+                |cert| {
+>>>>>>> main
                     let stake_addresses = extract_stake_addresses_from_c509(cert);
                     Role0CertificateData {
                         role0_key: cert.tbs_cert().subject_public_key().to_vec(),
                         stake_addresses,
                     }
+<<<<<<< HEAD
                 }),
                 LocalRefInt::PubKeys => key_offset.and_then(|pk_idx| {
                     rbac_metadata.pub_keys.as_ref().and_then(|keys| {
@@ -364,6 +431,27 @@ fn extract_role0_data(
                     })
                 }),
             }
+=======
+                },
+            )
+        },
+        LocalRefInt::PubKeys => {
+            key_offset.and_then(|pk_idx| {
+                rbac_metadata.pub_keys.as_ref().and_then(|keys| {
+                    keys.get(pk_idx).and_then(|pk| {
+                        match pk {
+                            SimplePublicKeyType::Ed25519(pk_bytes) => {
+                                Some(Role0CertificateData {
+                                    role0_key: pk_bytes.to_bytes().to_vec(),
+                                    stake_addresses: None,
+                                })
+                            },
+                            _ => None,
+                        }
+                    })
+                })
+            })
+>>>>>>> main
         },
     }
 }
