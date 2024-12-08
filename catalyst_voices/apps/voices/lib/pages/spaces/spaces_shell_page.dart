@@ -52,33 +52,49 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
   OverlayEntry? _adminToolsOverlay;
 
   @override
+  void dispose() {
+    _hideAdminToolsOverlay();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return _Shortcuts(
-      onToggleAdminTools: _toggleCampaignAdminTools,
-      child: BlocSelector<SessionCubit, SessionState,
-          ({bool isUnlocked, bool isVisitor})>(
-        selector: (state) => (
-          isUnlocked: state is ActiveAccountSessionState,
-          isVisitor: state is VisitorSessionState
+    return BlocListener<AdminToolsCubit, AdminToolsState>(
+      listenWhen: (previous, current) => previous.enabled != current.enabled,
+      listener: (context, state) {
+        if (state.enabled) {
+          _showAdminToolsOverlay();
+        } else {
+          _hideAdminToolsOverlay();
+        }
+      },
+      child: _Shortcuts(
+        onToggleAdminTools: _toggleAdminTools,
+        child: BlocSelector<SessionCubit, SessionState,
+            ({bool isUnlocked, bool isVisitor})>(
+          selector: (state) => (
+            isUnlocked: state is ActiveAccountSessionState,
+            isVisitor: state is VisitorSessionState
+          ),
+          builder: (context, state) {
+            return Scaffold(
+              appBar: VoicesAppBar(
+                leading: state.isVisitor ? null : const DrawerToggleButton(),
+                automaticallyImplyLeading: false,
+                actions: _getActions(widget.space),
+              ),
+              drawer: state.isVisitor
+                  ? null
+                  : SpacesDrawer(
+                      space: widget.space,
+                      spacesShortcutsActivators:
+                          SpacesShellPage._spacesShortcutsActivators,
+                      isUnlocked: state.isUnlocked,
+                    ),
+              body: widget.child,
+            );
+          },
         ),
-        builder: (context, state) {
-          return Scaffold(
-            appBar: VoicesAppBar(
-              leading: state.isVisitor ? null : const DrawerToggleButton(),
-              automaticallyImplyLeading: false,
-              actions: _getActions(widget.space),
-            ),
-            drawer: state.isVisitor
-                ? null
-                : SpacesDrawer(
-                    space: widget.space,
-                    spacesShortcutsActivators:
-                        SpacesShellPage._spacesShortcutsActivators,
-                    isUnlocked: state.isUnlocked,
-                  ),
-            body: widget.child,
-          );
-        },
       ),
     );
   }
@@ -98,6 +114,31 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     }
   }
 
+  void _toggleAdminTools() {
+    final cubit = context.read<AdminToolsCubit>();
+    if (cubit.state.enabled) {
+      cubit.disable();
+    } else {
+      cubit.enable();
+    }
+  }
+
+  void _showAdminToolsOverlay() {
+    if (_adminToolsOverlay != null) {
+      // already shown
+      return;
+    }
+
+    final overlayEntry = _createAdminToolsOverlay();
+    Overlay.of(context, rootOverlay: true).insert(overlayEntry);
+    _adminToolsOverlay = overlayEntry;
+  }
+
+  void _hideAdminToolsOverlay() {
+    _adminToolsOverlay?.remove();
+    _adminToolsOverlay = null;
+  }
+
   OverlayEntry _createAdminToolsOverlay() {
     return OverlayEntry(
       builder: (BuildContext context) {
@@ -105,26 +146,9 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
           dialogKey: _adminToolsKey,
           selectedSpace: widget.space,
           onSpaceSelected: (space) => space.go(context),
-          onClose: _closeCampaignAdminTools,
         );
       },
     );
-  }
-
-  void _toggleCampaignAdminTools() {
-    if (_adminToolsOverlay == null) {
-      final overlayEntry = _createAdminToolsOverlay();
-      Overlay.of(context, rootOverlay: true).insert(overlayEntry);
-      _adminToolsOverlay = overlayEntry;
-    } else {
-      _adminToolsOverlay?.remove();
-      _adminToolsOverlay = null;
-    }
-  }
-
-  void _closeCampaignAdminTools() {
-    _adminToolsOverlay?.remove();
-    _adminToolsOverlay = null;
   }
 }
 

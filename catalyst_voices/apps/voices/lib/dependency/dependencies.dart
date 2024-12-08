@@ -22,6 +22,9 @@ final class Dependencies extends DependencyProvider {
 
   void _registerBlocsWithDependencies() {
     this
+      ..registerLazySingleton<AdminToolsCubit>(
+        AdminToolsCubit.new,
+      )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
