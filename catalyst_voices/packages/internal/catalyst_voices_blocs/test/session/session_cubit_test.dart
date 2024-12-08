@@ -10,8 +10,8 @@ void main() {
   late final KeychainProvider keychainProvider;
   late final UserStorage userStorage;
 
-  late final UserService userService;
   late final DummyUserService dummyUserService;
+  late final UserService userService;
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
@@ -23,11 +23,12 @@ void main() {
     keychainProvider = VaultKeychainProvider();
     userStorage = SecureUserStorage();
 
+    dummyUserService = DummyUserService();
     userService = UserService(
       keychainProvider: keychainProvider,
       userStorage: userStorage,
+      dummyUserService: dummyUserService,
     );
-    dummyUserService = DummyUserService();
     registrationService = _MockRegistrationService();
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();

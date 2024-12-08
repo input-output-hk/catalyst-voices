@@ -48,7 +48,11 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<ProposalsCubit>(
-        () => ProposalsCubit(get<CampaignService>(), get<ProposalService>()),
+        () => ProposalsCubit(
+          get<CampaignService>(),
+          get<ProposalService>(),
+          get<AdminToolsCubit>(),
+        ),
       )
       ..registerFactory<CampaignDetailsBloc>(() {
         return CampaignDetailsBloc(
@@ -57,8 +61,8 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<CampaignInfoCubit>(() {
         return CampaignInfoCubit(
-           get<CampaignService>(),
-           get<AdminToolsCubit>(),
+          get<CampaignService>(),
+          get<AdminToolsCubit>(),
         );
       })
       // TODO(ryszard-schossler): add repository for campaign management
@@ -105,6 +109,7 @@ final class Dependencies extends DependencyProvider {
         return UserService(
           keychainProvider: get<KeychainProvider>(),
           userStorage: get<UserStorage>(),
+          dummyUserService: get<DummyUserService>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),

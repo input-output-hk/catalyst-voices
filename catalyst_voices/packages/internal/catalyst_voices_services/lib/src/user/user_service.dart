@@ -64,9 +64,6 @@ final class UserServiceImpl implements UserService {
   Account? get account => _user?.activeAccount;
 
   @override
-  Account get dummyAccount => _dummyUserService.getDummyAccount();
-
-  @override
   Stream<Account?> get watchAccount async* {
     yield account;
     yield* _userSC.stream.map((user) => user?.activeAccount).distinct();

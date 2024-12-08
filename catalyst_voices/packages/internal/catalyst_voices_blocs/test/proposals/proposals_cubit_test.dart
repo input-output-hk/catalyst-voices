@@ -47,9 +47,11 @@ void main() {
       }),
     );
 
-    final pendingProposal = PendingProposal.fromProposal(
-      proposal,
-      campaignName: campaign.name,
+    final pendingProposal = PendingProposalViewModel(
+      data: PendingProposal.fromProposal(
+        proposal,
+        campaignName: campaign.name,
+      ),
     );
 
     blocTest<ProposalsCubit, ProposalsState>(
@@ -58,6 +60,7 @@ void main() {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
           _FakeProposalService([]),
+          AdminToolsCubit(),
         );
       },
       verify: (cubit) {
@@ -71,6 +74,7 @@ void main() {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
           _FakeProposalService([proposal]),
+          AdminToolsCubit(),
         );
       },
       act: (cubit) async => cubit.load(),
@@ -89,6 +93,7 @@ void main() {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
           _FakeProposalService([proposal]),
+          AdminToolsCubit(),
         );
       },
       act: (cubit) async {
