@@ -15,7 +15,7 @@ use crate::service::{
             generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
         },
     },
-    utilities::middleware::schema_validation::schema_version_validation,
+    utilities::middleware::event_db_schema_validation::event_db_schema_version_validation,
 };
 
 pub(crate) mod cip36;
@@ -38,7 +38,7 @@ impl Api {
         path = "/draft/cardano/sync_state",
         method = "get",
         operation_id = "syncStateGet",
-        transform = "schema_version_validation"
+        transform = "event_db_schema_version_validation"
     )]
     async fn sync_state_get(
         &self,
@@ -62,7 +62,7 @@ impl Api {
         path = "/draft/cardano/date_time_to_slot_number",
         method = "get",
         operation_id = "dateTimeToSlotNumberGet",
-        transform = "schema_version_validation"
+        transform = "event_db_schema_version_validation"
     )]
     async fn date_time_to_slot_number_get(
         &self,

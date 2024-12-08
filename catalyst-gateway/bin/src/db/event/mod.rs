@@ -21,7 +21,7 @@ pub(crate) mod schema_check;
 
 /// Database version this crate matches.
 /// Must equal the last Migrations Version Number from `event-db/migrations`.
-pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 9;
+pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 2;
 
 /// Postgres Connection Manager DB Pool
 type SqlDbPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;

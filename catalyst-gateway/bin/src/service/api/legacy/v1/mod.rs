@@ -14,7 +14,7 @@ use crate::service::{
         },
         tags::ApiTags,
     },
-    utilities::middleware::schema_validation::schema_version_validation,
+    utilities::middleware::event_db_schema_validation::event_db_schema_version_validation,
 };
 
 mod account_votes_get;
@@ -34,7 +34,7 @@ impl V1Api {
         path = "/votes/plan/account-votes/:account_id",
         method = "get",
         operation_id = "AccountVotes",
-        transform = "schema_version_validation",
+        transform = "event_db_schema_version_validation",
         deprecated = true
     )]
     async fn get_account_votes(
@@ -54,7 +54,7 @@ impl V1Api {
         path = "/fragments",
         method = "post",
         operation_id = "fragments",
-        transform = "schema_version_validation",
+        transform = "event_db_schema_version_validation",
         deprecated = true
     )]
     async fn fragments_post(
@@ -73,7 +73,7 @@ impl V1Api {
         path = "/fragments/statuses",
         method = "get",
         operation_id = "fragmentsStatuses",
-        transform = "schema_version_validation",
+        transform = "event_db_schema_version_validation",
         deprecated = true
     )]
     async fn fragments_statuses(

@@ -3,7 +3,7 @@ use poem_openapi::{payload::Binary, OpenApi};
 
 use crate::service::{
     common::{auth::none::NoAuthorization, tags::ApiTags},
-    utilities::middleware::schema_validation::schema_version_validation,
+    utilities::middleware::event_db_schema_validation::event_db_schema_version_validation,
 };
 mod message_post;
 mod plans_get;
@@ -35,7 +35,7 @@ impl V0Api {
         path = "/vote/active/plans",
         method = "get",
         operation_id = "GetActivePlans",
-        transform = "schema_version_validation",
+        transform = "event_db_schema_version_validation",
         deprecated = true
     )]
     async fn plans_get(&self, _auth: NoAuthorization) -> plans_get::AllResponses {

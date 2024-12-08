@@ -16,7 +16,7 @@ use crate::service::{
         responses::WithErrorResponses,
         tags::ApiTags,
     },
-    utilities::middleware::schema_validation::schema_version_validation,
+    utilities::middleware::event_db_schema_validation::event_db_schema_version_validation,
 };
 
 /// Registration API Endpoints
@@ -49,7 +49,7 @@ impl RegistrationApi {
         path = "/v1/registration/voter/:voting_key",
         method = "get",
         operation_id = "getVoterInfo",
-        transform = "schema_version_validation",
+        transform = "event_db_schema_version_validation",
         deprecated = true
     )]
     async fn get_voter_info(
