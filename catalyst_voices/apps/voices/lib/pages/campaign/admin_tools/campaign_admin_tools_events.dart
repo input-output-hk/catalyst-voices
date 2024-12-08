@@ -196,14 +196,16 @@ class _EventItem extends StatelessWidget {
 
   SvgGenImage get _icon => switch (stage) {
         CampaignStage.draft => VoicesAssets.icons.clock,
+        CampaignStage.scheduled => VoicesAssets.icons.clock,
         CampaignStage.live => VoicesAssets.icons.flag,
-        _ => VoicesAssets.icons.calendar,
+        CampaignStage.completed => VoicesAssets.icons.calendar,
       };
 
   String _text(VoicesLocalizations l10n) => switch (stage) {
         CampaignStage.draft => l10n.campaignPreviewEventBefore,
+        CampaignStage.scheduled => l10n.campaignPreviewEventBefore,
         CampaignStage.live => l10n.campaignPreviewEventDuring,
-        _ => l10n.campaignPreviewEventAfter,
+        CampaignStage.completed => l10n.campaignPreviewEventAfter,
       };
 }
 

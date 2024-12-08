@@ -82,12 +82,19 @@ class CampaignStageCard extends StatelessWidget {
   }
 
   String _getDateInformation(BuildContext context) {
-    if (campaign.stage != CampaignStage.completed) {
-      final formattedDate =
-          DateFormatter.formatDateTimeParts(campaign.startDate);
-      return campaign.localizedDate(context.l10n, formattedDate);
-    } else {
-      return '';
+    switch (campaign.stage) {
+      case CampaignStage.draft:
+      case CampaignStage.scheduled:
+        final formattedDate =
+            DateFormatter.formatDateTimeParts(campaign.startDate);
+        return context.l10n
+            .campaignBeginsOn(formattedDate.$1, formattedDate.$2);
+      case CampaignStage.live:
+        final formattedDate =
+            DateFormatter.formatDateTimeParts(campaign.endDate);
+        return context.l10n.campaignEndsOn(formattedDate.$1, formattedDate.$2);
+      case CampaignStage.completed:
+        return '';
     }
   }
 }
