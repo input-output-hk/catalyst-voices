@@ -30,7 +30,6 @@ final class SessionCubit extends Cubit<SessionState>
   StreamSubscription<Account?>? _accountSub;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
 
-  final String _dummyKeychainId = 'TestUserKeychainID';
   static const LockFactor dummyUnlockFactor = PasswordLockFactor('Test1234');
   final _dummySeedPhrase = SeedPhrase.fromMnemonic(
     'few loyal swift champion rug peace dinosaur '
@@ -77,15 +76,17 @@ final class SessionCubit extends Cubit<SessionState>
 
   Future<void> switchToDummyAccount() async {
     final keychains = await _userService.keychains;
-    final dummyKeychain = keychains
-        .firstWhereOrNull((keychain) => keychain.id == _dummyKeychainId);
+    final dummyKeychain = keychains.firstWhereOrNull(
+      (keychain) => keychain.id == DummyUserService.dummyKeychainId,
+    );
+
     if (dummyKeychain != null) {
       await _userService.useKeychain(dummyKeychain.id);
       return;
     }
 
     final account = await _registrationService.registerTestAccount(
-      keychainId: _dummyKeychainId,
+      keychainId: DummyUserService.dummyKeychainId,
       seedPhrase: _dummySeedPhrase,
       lockFactor: dummyUnlockFactor,
     );
@@ -183,7 +184,7 @@ final class SessionCubit extends Cubit<SessionState>
     switch (_adminToolsState.authStatus) {
       case AuthenticationStatus.actor:
         return ActiveAccountSessionState(
-          account: _dummyUserService.createDummyAccount(),
+          account: _dummyUserService.getDummyAccount(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:logging/logging.dart';
@@ -9,10 +8,12 @@ abstract interface class UserService {
   factory UserService({
     required KeychainProvider keychainProvider,
     required UserStorage userStorage,
+    required DummyUserService dummyUserService,
   }) {
     return UserServiceImpl(
       keychainProvider,
       userStorage,
+      dummyUserService,
     );
   }
 
@@ -42,6 +43,7 @@ abstract interface class UserService {
 final class UserServiceImpl implements UserService {
   final KeychainProvider _keychainProvider;
   final UserStorage _userStorage;
+  final DummyUserService _dummyUserService;
 
   final _logger = Logger('UserService');
 
@@ -55,10 +57,14 @@ final class UserServiceImpl implements UserService {
   UserServiceImpl(
     this._keychainProvider,
     this._userStorage,
+    this._dummyUserService,
   );
 
   @override
   Account? get account => _user?.activeAccount;
+
+  @override
+  Account get dummyAccount => _dummyUserService.getDummyAccount();
 
   @override
   Stream<Account?> get watchAccount async* {
@@ -189,7 +195,7 @@ final class UserServiceImpl implements UserService {
 
     final user = _user?.account.keychainId == keychain.id
         ? _user
-        : _dummyUser(keychainId: keychain.id);
+        : _dummyUserService.getDummyUser(keychainId: keychain.id);
 
     _updateUser(user);
   }
@@ -219,32 +225,4 @@ final class UserServiceImpl implements UserService {
       _userSC.add(user);
     }
   }
-}
-
-/// Temporary implementation for testing purposes.
-User _dummyUser({
-  required String keychainId,
-}) {
-  /* cSpell:disable */
-  final account = Account(
-    keychainId: keychainId,
-    roles: const {
-      AccountRole.voter,
-      AccountRole.proposer,
-    },
-    walletInfo: WalletInfo(
-      metadata: const WalletMetadata(
-        name: 'Dummy Wallet',
-        icon: null,
-      ),
-      balance: Coin.fromAda(10),
-      address: ShelleyAddress.fromBech32(
-        'addr_test1vzpwq95z3xyum8vqndgdd'
-        '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-      ),
-    ),
-  );
-
-  return User(accounts: [account]);
-  /* cSpell:enable */
 }
