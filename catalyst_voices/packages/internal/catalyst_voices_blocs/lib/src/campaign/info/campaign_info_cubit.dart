@@ -47,7 +47,7 @@ final class CampaignInfoCubit extends Cubit<CampaignInfoState> {
   Future<void> close() async {
     await _adminToolsSub?.cancel();
     _adminToolsSub = null;
-    
+
     return super.close();
   }
 

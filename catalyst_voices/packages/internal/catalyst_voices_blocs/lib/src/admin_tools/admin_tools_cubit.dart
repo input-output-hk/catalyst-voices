@@ -6,14 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 ///
 /// The admin tools can be used to override application state (UI).
 final class AdminToolsCubit extends Cubit<AdminToolsState> {
-  AdminToolsCubit()
-      : super(
-          const AdminToolsState(
-            enabled: false,
-            campaignStage: CampaignStage.scheduled,
-            sessionStatus: SessionStatus.actor,
-          ),
-        );
+  AdminToolsCubit() : super(const AdminToolsState());
 
   void enable() {
     emit(state.copyWith(enabled: true));

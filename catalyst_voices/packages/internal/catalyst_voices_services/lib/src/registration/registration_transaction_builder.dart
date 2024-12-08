@@ -18,7 +18,7 @@ final class RegistrationTransactionBuilder {
   /// The transaction config with current network parameters.
   final TransactionBuilderConfig transactionConfig;
 
-  /// The algorithm for deriving keys.
+  /// The algorithm for deriving keys.     
   final KeyDerivation keyDerivation;
 
   /// The master key derived from the seed phrase.

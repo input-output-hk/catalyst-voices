@@ -8,9 +8,9 @@ final class AdminToolsState extends Equatable {
   final SessionStatus sessionStatus;
 
   const AdminToolsState({
-    required this.enabled,
-    required this.campaignStage,
-    required this.sessionStatus,
+    this.enabled = false,
+    this.campaignStage = CampaignStage.scheduled,
+    this.sessionStatus = SessionStatus.actor,
   });
 
   AdminToolsState copyWith({

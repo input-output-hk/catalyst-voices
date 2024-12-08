@@ -4,7 +4,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(AdminToolsCubit(), () {
+  group(AdminToolsCubit, () {
     blocTest<AdminToolsCubit, AdminToolsState>(
       'initial state is disabled',
       build: AdminToolsCubit.new,
