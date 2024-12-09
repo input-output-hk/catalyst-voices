@@ -52,6 +52,13 @@ final class AccessControl {
     return defaultSpacesAccess;
   }
 
+  List<Space> overallSpaces(Account? account) {
+    if (account == null) return _votingAccess;
+    if (account.isAdmin) return _adminAccess;
+    if (_hasProposerOrDrepRole(account)) return _proposalAccess;
+    return _votingAccess;
+  }
+
   Map<Space, ShortcutActivator> spacesShortcutsActivators(
     Account? account,
   ) {
@@ -69,13 +76,6 @@ final class AccessControl {
       ]);
     }
     return allSpacesShortcutsActivators.useKeys([Space.discovery]);
-  }
-
-  List<Space> overallSpaces(Account? account) {
-    if (account == null) return _votingAccess;
-    if (account.isAdmin) return _adminAccess;
-    if (_hasProposerOrDrepRole(account)) return _proposalAccess;
-    return _votingAccess;
   }
 
   static bool _hasProposerOrDrepRole(Account account) {
