@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_blocs/src/session/session.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -10,20 +10,24 @@ void main() {
   late final KeychainProvider keychainProvider;
   late final UserStorage userStorage;
 
+  late final DummyUserFactory dummyUserFactory;
   late final UserService userService;
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
 
+  late AdminToolsCubit adminToolsCubit;
   late SessionCubit sessionCubit;
 
   setUpAll(() {
     keychainProvider = VaultKeychainProvider();
     userStorage = SecureUserStorage();
 
+    dummyUserFactory = DummyUserFactory();
     userService = UserService(
       keychainProvider: keychainProvider,
       userStorage: userStorage,
+      dummyUserFactory: dummyUserFactory,
     );
     registrationService = _MockRegistrationService();
     notifier = RegistrationProgressNotifier();
@@ -32,11 +36,17 @@ void main() {
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
+
+    // each test might emit using this cubit, therefore we reset it here
+    adminToolsCubit = AdminToolsCubit();
+
     sessionCubit = SessionCubit(
       userService,
+      dummyUserFactory,
       registrationService,
       notifier,
       accessControl,
+      adminToolsCubit,
     );
   });
 
@@ -142,6 +152,21 @@ void main() {
       expect(userService.keychain, isNotNull);
       expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
       expect(sessionCubit.state, isNot(isA<GuestSessionState>()));
+      expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+    });
+
+    test('when admin tools enabled is in mocked state', () async {
+      adminToolsCubit.emit(
+        const AdminToolsState(
+          enabled: true,
+          campaignStage: CampaignStage.scheduled,
+          sessionStatus: SessionStatus.actor,
+        ),
+      );
+
+      // Gives time for stream to emit.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
       expect(sessionCubit.state, isA<ActiveAccountSessionState>());
     });
   });

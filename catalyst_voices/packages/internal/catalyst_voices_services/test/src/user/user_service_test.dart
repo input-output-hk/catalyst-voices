@@ -7,13 +7,18 @@ import 'package:uuid/uuid.dart';
 void main() {
   final KeychainProvider provider = VaultKeychainProvider();
   final UserStorage storage = SecureUserStorage();
+  final dummyUserFactory = DummyUserFactory();
 
   late UserService service;
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
 
-    service = UserService(keychainProvider: provider, userStorage: storage);
+    service = UserService(
+      keychainProvider: provider,
+      userStorage: storage,
+      dummyUserFactory: dummyUserFactory,
+    );
   });
 
   group('Keychain', () {

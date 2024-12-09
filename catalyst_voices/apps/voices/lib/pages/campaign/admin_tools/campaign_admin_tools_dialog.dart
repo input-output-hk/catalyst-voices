@@ -3,12 +3,14 @@ import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_views.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// A draggable [CampaignAdminToolsDialog],
 /// should be used as a child of a [Stack].
@@ -28,9 +30,6 @@ class DraggableCampaignAdminToolsDialog extends StatefulWidget {
   /// See [CampaignAdminToolsDialog.onSpaceSelected].
   final ValueChanged<Space> onSpaceSelected;
 
-  /// See [CampaignAdminToolsDialog.onClose].
-  final VoidCallback onClose;
-
   /// The initial offset from bottom-left for the dialog.
   final Offset initialOffset;
 
@@ -39,7 +38,6 @@ class DraggableCampaignAdminToolsDialog extends StatefulWidget {
     required this.dialogKey,
     required this.selectedSpace,
     required this.onSpaceSelected,
-    required this.onClose,
     this.initialOffset = const Offset(32, 32),
   });
 
@@ -81,7 +79,6 @@ class _DraggableCampaignAdminToolsDialogState
       key: widget.dialogKey,
       selectedSpace: widget.selectedSpace,
       onSpaceSelected: widget.onSpaceSelected,
-      onClose: widget.onClose,
     );
 
     return Positioned(
@@ -150,14 +147,10 @@ class CampaignAdminToolsDialog extends StatelessWidget {
   /// In response to this event the app should navigate to given space.
   final ValueChanged<Space> onSpaceSelected;
 
-  /// Called when the user wants to close the admin tools.
-  final VoidCallback onClose;
-
   const CampaignAdminToolsDialog({
     super.key,
     required this.selectedSpace,
     required this.onSpaceSelected,
-    required this.onClose,
   });
 
   @override
@@ -178,14 +171,9 @@ class CampaignAdminToolsDialog extends StatelessWidget {
         type: MaterialType.transparency,
         child: Column(
           children: [
-            _Header(onClose: onClose),
+            const _Header(),
             const Expanded(child: _Tabs()),
-            const Divider(
-              height: 0,
-              indent: 0,
-              endIndent: 0,
-            ),
-            _Footer(
+            _BlocFooter(
               selectedSpace: selectedSpace,
               onSpaceSelected: onSpaceSelected,
             ),
@@ -197,11 +185,7 @@ class CampaignAdminToolsDialog extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  final VoidCallback onClose;
-
-  const _Header({
-    required this.onClose,
-  });
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +199,9 @@ class _Header extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
-          XButton(onTap: onClose),
+          XButton(
+            onTap: () => context.read<AdminToolsCubit>().disable(),
+          ),
         ],
       ),
     );
@@ -268,6 +254,34 @@ class _TabBar extends StatelessWidget {
   }
 }
 
+class _BlocFooter extends StatelessWidget {
+  final Space selectedSpace;
+  final ValueChanged<Space> onSpaceSelected;
+
+  const _BlocFooter({
+    required this.selectedSpace,
+    required this.onSpaceSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<SessionCubit, SessionState, List<Space>>(
+      selector: (state) => state.spaces,
+      builder: (context, spaces) {
+        return Offstage(
+          // don't show footer with spaces if there's only once,
+          // since the user can't change it to anything else
+          offstage: spaces.length <= 1,
+          child: _Footer(
+            selectedSpace: selectedSpace,
+            onSpaceSelected: onSpaceSelected,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _Footer extends StatelessWidget {
   final Space selectedSpace;
   final ValueChanged<Space> onSpaceSelected;
@@ -279,19 +293,29 @@ class _Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          for (final space in Space.values)
-            _SpaceItem(
-              space: space,
-              isActive: space == selectedSpace,
-              onTap: () => onSpaceSelected(space),
-            ),
-        ].separatedBy(const SizedBox(width: 8)).toList(),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Divider(
+          height: 0,
+          indent: 0,
+          endIndent: 0,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              for (final space in Space.values)
+                _SpaceItem(
+                  space: space,
+                  isActive: space == selectedSpace,
+                  onTap: () => onSpaceSelected(space),
+                ),
+            ].separatedBy(const SizedBox(width: 8)).toList(),
+          ),
+        ),
+      ],
     );
   }
 }
