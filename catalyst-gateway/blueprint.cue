@@ -90,10 +90,6 @@ project: {
 							}
 						},
 						{
-							name:  "CASSANDRA_VOLATILE_TLS_CERT"
-							value: "/tmp/sf-class2-root.crt"
-						},
-						{
 							name: "CASSANDRA_VOLATILE_DEPLOYMENT"
 							valueFrom: {
 								secretKeyRef: {
@@ -132,10 +128,6 @@ project: {
 									key: "cassandra-persistent-password"
 								}
 							}
-						},
-						{
-							name:  "CASSANDRA_PERSISTENT_TLS_CERT"
-							value: "/tmp/sf-class2-root.crt"
 						},
 						{
 							name: "CASSANDRA_PERSISTENT_DEPLOYMENT"
