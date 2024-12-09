@@ -1,0 +1,10 @@
+refinery_schema_history
+category_proposals
+config
+category
+proposal
+event
+campaign
+json_schema_type
+brand
+proposal_template
