@@ -6,10 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 base class LocalStorage with StorageAsStringMixin implements Storage {
   final String key;
+
+  /// See [SharedPreferencesAsync.clear].
+  final Set<String>? allowList;
   final SharedPreferencesAsync _sharedPreferences;
 
   LocalStorage({
     this.key = 'LocalStorage',
+    this.allowList,
     SharedPreferencesAsync? sharedPreferences,
   }) : _sharedPreferences = sharedPreferences ?? SharedPreferencesAsync();
 
@@ -43,11 +47,13 @@ base class LocalStorage with StorageAsStringMixin implements Storage {
 
   @override
   Future<void> clear() async {
-    final keys = await _sharedPreferences.getKeys();
-    final storageKeys =
-        keys.where((element) => element.startsWith(key)).toSet();
+    final keysToRemove = allowList?.map(_effectiveKey).toSet() ??
+        await () async {
+          final keys = await _sharedPreferences.getKeys();
+          return keys.where((element) => element.startsWith(key)).toSet();
+        }();
 
-    await _sharedPreferences.clear(allowList: storageKeys);
+    await _sharedPreferences.clear(allowList: keysToRemove);
   }
 
   String _effectiveKey(String value) {
