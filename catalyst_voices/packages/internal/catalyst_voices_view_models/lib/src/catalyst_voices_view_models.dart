@@ -10,8 +10,6 @@ export 'menu/popup_menu_item.dart';
 export 'navigation/sections_list_view_item.dart';
 export 'navigation/sections_navigation.dart';
 export 'proposal/comment.dart';
-export 'proposal/funded_proposal.dart';
-export 'proposal/pending_proposal.dart';
 export 'proposal/proposal_view_model.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';

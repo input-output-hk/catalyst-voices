@@ -22,7 +22,6 @@ class FundedProposalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fundedDate = proposal.fundedDate;
     return Container(
       width: 326,
       clipBehavior: Clip.antiAlias,
@@ -49,10 +48,8 @@ class FundedProposalCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 _Title(text: proposal.title),
-                if (fundedDate != null) ...[
-                  const SizedBox(height: 4),
-                  _FundedDate(dateTime: fundedDate),
-                ],
+                const SizedBox(height: 4),
+                _FundedDate(dateTime: proposal.fundedDate),
                 const SizedBox(height: 24),
                 _FundsAndComments(
                   funds: proposal.fundsRequested,

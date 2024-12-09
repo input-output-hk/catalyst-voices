@@ -31,10 +31,12 @@ class ProposalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final proposal = this.proposal;
+
     return switch (proposal) {
-      PendingProposalViewModel(:final data) => PendingProposalCard(
+      PendingProposal() => PendingProposalCard(
           image: image,
-          proposal: data,
+          proposal: proposal,
           showStatus: showStatus,
           showLastUpdate: showLastUpdate,
           showComments: showComments,
@@ -42,12 +44,13 @@ class ProposalCard extends StatelessWidget {
           isFavorite: isFavorite,
           onFavoriteChanged: onFavoriteChanged,
         ),
-      FundedProposalViewModel(:final data) => FundedProposalCard(
+      FundedProposal() => FundedProposalCard(
           image: image,
-          proposal: data,
+          proposal: proposal,
           isFavorite: isFavorite,
           onFavoriteChanged: onFavoriteChanged,
         ),
+      (_) => const Offstage(),
     };
   }
 }

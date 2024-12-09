@@ -47,11 +47,9 @@ void main() {
       }),
     );
 
-    final pendingProposal = PendingProposalViewModel(
-      data: PendingProposal.fromProposal(
-        proposal,
-        campaignName: campaign.name,
-      ),
+    final pendingProposal = PendingProposal.fromProposal(
+      proposal,
+      campaignName: campaign.name,
     );
 
     late AdminToolsCubit adminToolsCubit;
