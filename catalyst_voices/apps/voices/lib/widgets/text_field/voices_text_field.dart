@@ -20,6 +20,9 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.decoration]
   final VoicesTextFieldDecoration? decoration;
 
+  /// [VoicesTextField.autofocus].
+  final bool autofocus;
+
   /// [TextField.keyboardType]
   final TextInputType? keyboardType;
 
@@ -76,6 +79,7 @@ class VoicesTextField extends StatefulWidget {
     this.controller,
     this.focusNode,
     this.decoration,
+    this.autofocus = false,
     this.keyboardType,
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
@@ -180,6 +184,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           resizableVertically: resizable,
           child: TextFormField(
             textAlignVertical: TextAlignVertical.top,
+            autofocus: widget.autofocus,
             expands: resizable,
             controller: _obtainController(),
             focusNode: widget.focusNode,
