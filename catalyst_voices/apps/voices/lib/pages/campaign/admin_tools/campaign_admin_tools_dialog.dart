@@ -268,15 +268,14 @@ class _BlocFooter extends StatelessWidget {
     return BlocSelector<SessionCubit, SessionState, List<Space>>(
       selector: (state) => state.spaces,
       builder: (context, spaces) {
-        if (spaces.length <= 1) {
+        return Offstage(
           // don't show footer with spaces if there's only once,
           // since the user can't change it to anything else
-          return const Offstage();
-        }
-
-        return _Footer(
-          selectedSpace: selectedSpace,
-          onSpaceSelected: onSpaceSelected,
+          offstage: spaces.length <= 1,
+          child: _Footer(
+            selectedSpace: selectedSpace,
+            onSpaceSelected: onSpaceSelected,
+          ),
         );
       },
     );

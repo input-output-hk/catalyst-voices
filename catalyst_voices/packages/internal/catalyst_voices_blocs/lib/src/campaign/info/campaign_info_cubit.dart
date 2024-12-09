@@ -10,17 +10,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// Gets the campaign info.
 final class CampaignInfoCubit extends Cubit<CampaignInfoState> {
   final CampaignService _campaignService;
-  final AdminToolsCubit _adminToolsCubit;
+  final AdminTools _adminTools;
 
   AdminToolsState _adminToolsState;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
 
   CampaignInfoCubit(
     this._campaignService,
-    this._adminToolsCubit,
-  )   : _adminToolsState = _adminToolsCubit.state,
+    this._adminTools,
+  )   : _adminToolsState = _adminTools.state,
         super(const CampaignInfoState()) {
-    _adminToolsSub = _adminToolsCubit.stream.listen(_onAdminToolsChanged);
+    _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
   }
 
   /// Loads the currently active campaign.

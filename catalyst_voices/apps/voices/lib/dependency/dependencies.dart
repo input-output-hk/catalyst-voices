@@ -25,6 +25,9 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<AdminToolsCubit>(
         AdminToolsCubit.new,
       )
+      ..registerLazySingleton<AdminTools>(
+        () => get<AdminToolsCubit>(),
+      )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
@@ -33,7 +36,7 @@ final class Dependencies extends DependencyProvider {
             get<RegistrationService>(),
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
-            get<AdminToolsCubit>(),
+            get<AdminTools>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -51,7 +54,7 @@ final class Dependencies extends DependencyProvider {
         () => ProposalsCubit(
           get<CampaignService>(),
           get<ProposalService>(),
-          get<AdminToolsCubit>(),
+          get<AdminTools>(),
         ),
       )
       ..registerFactory<CampaignDetailsBloc>(() {
@@ -62,7 +65,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<CampaignInfoCubit>(() {
         return CampaignInfoCubit(
           get<CampaignService>(),
-          get<AdminToolsCubit>(),
+          get<AdminTools>(),
         );
       })
       // TODO(ryszard-schossler): add repository for campaign management

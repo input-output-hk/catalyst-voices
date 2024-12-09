@@ -65,7 +65,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
 
   @override
   void dispose() {
-    _hideAdminToolsOverlay();
+    _removeAdminToolsOverlay();
     unawaited(_selectedSpaceSC.close());
     super.dispose();
   }
@@ -76,9 +76,9 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
       listenWhen: (previous, current) => previous.enabled != current.enabled,
       listener: (context, state) {
         if (state.enabled) {
-          _showAdminToolsOverlay();
+          _insertAdminToolsOverlay();
         } else {
-          _hideAdminToolsOverlay();
+          _removeAdminToolsOverlay();
         }
       },
       child: _Shortcuts(
@@ -136,7 +136,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     }
   }
 
-  void _showAdminToolsOverlay() {
+  void _insertAdminToolsOverlay() {
     if (_adminToolsOverlay != null) {
       // already shown
       return;
@@ -147,7 +147,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     _adminToolsOverlay = overlayEntry;
   }
 
-  void _hideAdminToolsOverlay() {
+  void _removeAdminToolsOverlay() {
     _adminToolsOverlay?.remove();
     _adminToolsOverlay = null;
   }

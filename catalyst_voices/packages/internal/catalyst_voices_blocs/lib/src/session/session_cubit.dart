@@ -16,7 +16,7 @@ final class SessionCubit extends Cubit<SessionState>
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
   final AccessControl _accessControl;
-  final AdminToolsCubit _adminToolsCubit;
+  final AdminTools _adminTools;
 
   final _logger = Logger('SessionCubit');
 
@@ -36,8 +36,8 @@ final class SessionCubit extends Cubit<SessionState>
     this._registrationService,
     this._registrationProgressNotifier,
     this._accessControl,
-    this._adminToolsCubit,
-  )   : _adminToolsState = _adminToolsCubit.state,
+    this._adminTools,
+  )   : _adminToolsState = _adminTools.state,
         super(const VisitorSessionState(isRegistrationInProgress: false)) {
     _keychainSub = _userService.watchKeychain
         .map((keychain) => keychain != null)
@@ -53,7 +53,7 @@ final class SessionCubit extends Cubit<SessionState>
 
     _accountSub = _userService.watchAccount.listen(_onActiveAccountChanged);
 
-    _adminToolsSub = _adminToolsCubit.stream.listen(_onAdminToolsChanged);
+    _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
   }
 
   Future<bool> unlock(LockFactor lockFactor) {

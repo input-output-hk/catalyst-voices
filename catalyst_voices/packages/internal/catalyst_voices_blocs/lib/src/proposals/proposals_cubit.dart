@@ -12,7 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class ProposalsCubit extends Cubit<ProposalsState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  final AdminToolsCubit _adminToolsCubit;
+  final AdminTools _adminTools;
 
   AdminToolsState _adminToolsState;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
@@ -20,10 +20,10 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   ProposalsCubit(
     this._campaignService,
     this._proposalService,
-    this._adminToolsCubit,
-  )   : _adminToolsState = _adminToolsCubit.state,
+    this._adminTools,
+  )   : _adminToolsState = _adminTools.state,
         super(const LoadingProposalsState()) {
-    _adminToolsSub = _adminToolsCubit.stream.listen(_onAdminToolsChanged);
+    _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
   }
 
   /// Loads the proposals.
