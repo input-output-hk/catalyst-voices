@@ -1,0 +1,236 @@
+{
+    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+    "setup": {
+        "title": {
+            "title": "Example Catalyst Proposal"
+        },
+        "proposer": {
+            "applicant": "John Doe",
+            "type": "Individual",
+            "coproposers": []
+        }
+    },
+    "summary": {
+        "budget": {
+            "requestedFunds": 150000
+        },
+        "time": {
+            "duration": 6
+        },
+        "translation": {
+            "translated": false,
+            "original": "English",
+            "notes": "Original proposal in English"
+        },
+        "problem": {
+            "statement": "Current challenge in the Cardano ecosystem...",
+            "impact": [
+                "Technical Infrastructure",
+                "Developer Tooling",
+                "Adoption"
+            ]
+        },
+        "solution": {
+            "summary": "Our solution provides a comprehensive toolkit...",
+            "approach": "We will implement this solution using...",
+            "innovationAspects": [
+                "Novel testing framework",
+                "Automated integration tools"
+            ]
+        },
+        "SupportingLinks": {
+            "links": [
+                {
+                    "url": "https://github.com/example/project",
+                    "type": "GitHub Repository",
+                    "description": "Project's main repository"
+                }
+            ],
+            "mainRepository": "https://github.com/example/project",
+            "documentation": "https://docs.example.com"
+        }
+    },
+    "horizons": {
+        "category": {
+            "primaryCategory": "Development & Tools",
+            "subCategory": "Developer Tools"
+        },
+        "tags": [
+            "defi",
+            "developer-tools",
+            "infrastructure"
+        ],
+        "impact": {
+            "timeframe": "Medium-term (6-18 months)",
+            "scale": "Global",
+            "metrics": [
+                {
+                    "metric": "Developer Adoption",
+                    "target": "500 active developers",
+                    "measurement": "GitHub analytics"
+                }
+            ]
+        }
+    },
+    "proposalDetails": {
+        "solution": {
+            "description": "Our solution provides a comprehensive toolkit...",
+            "uniqueValue": "First integrated testing framework for Cardano",
+            "targetAudience": [
+                "Cardano Developers",
+                "DApp Teams"
+            ],
+            "implementation": "We will use an agile development approach..."
+        },
+        "impact": {
+            "communityBenefit": "Significantly reduces development time and improves code quality",
+            "metrics": [
+                {
+                    "name": "Developer Adoption",
+                    "description": "Number of active developers using the toolkit",
+                    "target": "500 developers",
+                    "measurement": "GitHub analytics and usage statistics"
+                }
+            ],
+            "outputs": [
+                "Testing Framework",
+                "Documentation",
+                "Training Materials"
+            ]
+        },
+        "capability": {
+            "teamExperience": "Our team has extensive experience in blockchain development...",
+            "feasibilityApproach": "We have already developed a proof of concept...",
+            "fundManagement": "Funds will be managed through a transparent process..."
+        }
+    },
+    "milestones": {
+        "milestones": {
+            "declared": [
+                "a",
+                "bb",
+                "cccccccccccccccccccccccc",
+                "dd",
+                "eee",
+                "fff"
+            ]
+        }
+    },
+    "milestonez": {
+        "milestonesConfig": {
+            "grantAmount": 150000,
+            "numberOfMilestones": 4
+        },
+        "milestonesList": [
+            {
+                "title": "Initial Setup and Planning",
+                "description": "Project setup and detailed planning phase",
+                "deliverables": [
+                    {
+                        "name": "Project Plan",
+                        "description": "Detailed project planning documentation",
+                        "type": "Documentation"
+                    }
+                ],
+                "acceptanceCriteria": [
+                    "Completed project plan",
+                    "Technical specifications approved"
+                ],
+                "evidenceOfCompletion": [
+                    {
+                        "type": "Documentation",
+                        "description": "Project planning documents and specifications"
+                    }
+                ],
+                "timeline": {
+                    "startDate": "2024-03-01",
+                    "endDate": "2024-04-01",
+                    "durationInWeeks": 4
+                },
+                "budget": {
+                    "amount": 37500,
+                    "breakdown": [
+                        {
+                            "category": "Development",
+                            "amount": 30000,
+                            "description": "Initial development work"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "finalPitch": {
+        "team": {
+            "members": [
+                {
+                    "name": "John Doe",
+                    "role": "Project Lead",
+                    "expertise": [
+                        "Blockchain Development",
+                        "Smart Contracts"
+                    ],
+                    "experience": "10 years in software development",
+                    "links": [
+                        {
+                            "type": "GitHub",
+                            "url": "https://github.com/johndoe",
+                            "description": "GitHub Profile"
+                        }
+                    ]
+                }
+            ]
+        },
+        "budget": {
+            "totalBudget": 150000,
+            "categories": [
+                {
+                    "category": "Development",
+                    "amount": 100000,
+                    "description": "Core development team costs"
+                }
+            ]
+        },
+        "valueProposition": {
+            "costBenefitAnalysis": "The project provides significant value...",
+            "longTermValue": "The solution will continue to benefit the ecosystem...",
+            "communityBenefits": [
+                "Increased developer productivity",
+                "Better code quality"
+            ]
+        }
+    },
+    "mandatoryAcknowledgments": {
+        "fundRules": {
+            "acknowledgment": true,
+            "version": "F14",
+            "timestamp": "2024-01-20T15:30:00Z"
+        },
+        "termsAndConditions": {
+            "acknowledgment": true,
+            "version": "1.0.0",
+            "documentUrl": "https://cardano.org/terms",
+            "timestamp": "2024-01-20T15:30:00Z"
+        },
+        "privacyPolicy": {
+            "acknowledgment": true,
+            "version": "1.0.0",
+            "documentUrl": "https://cardano.org/privacy",
+            "timestamp": "2024-01-20T15:30:00Z"
+        },
+        "intellectualProperty": {
+            "acknowledgment": true,
+            "timestamp": "2024-01-20T15:30:00Z"
+        },
+        "compliance": {
+            "legalCompliance": true,
+            "noConflictOfInterest": true,
+            "accurateInformation": true,
+            "jurisdictions": [
+                "US",
+                "GB"
+            ],
+            "timestamp": "2024-01-20T15:30:00Z"
+        }
+    }
+}
