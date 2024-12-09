@@ -15,7 +15,7 @@ use scylla::{
 };
 use serde_json::json;
 use tokio::fs;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use super::{
     queries::{
@@ -195,6 +195,8 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
         CompressionChoice::None => sb.compression(None),
     };
 
+    debug!("Cassandra session creation: TLS");
+
     if cfg.tls != TlsChoice::Disabled {
         let mut context_builder = SslContextBuilder::new(SslMethod::tls())?;
 
@@ -261,7 +263,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             },
         };
 
-        info!(db_type = db_type, "Connected to Cassandra DB...");
+        info!(db_type = db_type, "Connected to Cassandra DB!");
 
         if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
             let error = format!("{error:?}");
