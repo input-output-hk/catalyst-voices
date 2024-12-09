@@ -15,7 +15,7 @@ use scylla::{
 };
 use serde_json::json;
 use tokio::fs;
-use tracing::{debug, error, info};
+use tracing::{error, info};
 
 use super::{
     queries::{
@@ -194,8 +194,6 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
         CompressionChoice::Snappy => sb.compression(Some(Compression::Snappy)),
         CompressionChoice::None => sb.compression(None),
     };
-
-    debug!("Cassandra session creation: TLS");
 
     if cfg.tls != TlsChoice::Disabled {
         let mut context_builder = SslContextBuilder::new(SslMethod::tls())?;
