@@ -8,6 +8,7 @@
 //! the wrapped endpoint is called and its response is returned.
 
 use poem::{http::StatusCode, Endpoint, EndpointExt, Middleware, Request, Result};
+use tracing::error;
 
 use crate::db::event::EventDB;
 
@@ -35,7 +36,8 @@ impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
     async fn call(&self, req: Request) -> Result<Self::Output> {
         // Check if the inner schema version status is set to `Mismatch`,
         // if so, return the `StatusCode::SERVICE_UNAVAILABLE` code.
-        if EventDB::schema_version_check().await.is_err() {
+        if let Err(e) = EventDB::schema_version_check().await {
+            error!("Schema version check error: {e:?}");
             return Err(StatusCode::SERVICE_UNAVAILABLE.into());
         }
         // Calls the endpoint with the request, and returns the response.
