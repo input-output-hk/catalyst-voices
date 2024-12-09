@@ -90,7 +90,7 @@ project: {
 							}
 						},
 						{
-							name:  "CASSANDRA_VOLATILE_TLS"
+							name:  "CASSANDRA_VOLATILE_TLS_CERT"
 							value: "/tmp/sf-class2-root.crt"
 						},
 						{
@@ -134,7 +134,7 @@ project: {
 							}
 						},
 						{
-							name:  "CASSANDRA_PERSISTENT_TLS"
+							name:  "CASSANDRA_PERSISTENT_TLS_CERT"
 							value: "/tmp/sf-class2-root.crt"
 						},
 						{
