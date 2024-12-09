@@ -1,8 +1,6 @@
 //! Command line and environment variable settings for the service
 
-use std::env;
-
-use tracing::{debug, info};
+use tracing::info;
 
 use super::str_env_var::StringEnvVar;
 use crate::db::{
@@ -80,15 +78,6 @@ impl EnvVars {
 
         // We can actually change the namespace, but can't change the name used for env vars.
         let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace.into());
-
-        if let Some(v) = env::var_os("CASSANDRA_{name}_TLS") {
-            debug!(
-                "DEBUG CASSANDRA_{name}_TLS{:?}",
-                v.into_string().unwrap_or("DEBUG TLS not set".to_string())
-            );
-        } else {
-            debug!("DEBUG CASSANDRA_{name}_TLS is not set");
-        };
 
         let tls = StringEnvVar::new_as_enum(
             &format!("CASSANDRA_{name}_TLS"),

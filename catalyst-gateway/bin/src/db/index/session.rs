@@ -261,6 +261,8 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             },
         };
 
+        info!(db_type = db_type, "Connected to Cassandra DB...");
+
         if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
             let error = format!("{error:?}");
             error!(
