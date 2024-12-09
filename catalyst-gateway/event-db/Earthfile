@@ -3,7 +3,8 @@
 # the database and its associated software.
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.24 AS postgresql-ci
+# IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.24 AS postgresql-ci
+IMPORT ./../../../catalyst-ci/earthly/postgresql AS postgresql-ci
 
 # cspell: words
 
@@ -39,6 +40,22 @@ local:
     # Publish to the local development cluster
     IF [ "$local_registry" != "" ]
         SAVE IMAGE --push --insecure $local_registry/event-db:latest
+    END
+
+# Run the queries_tests.py
+test:
+    FROM postgresql-ci+postgres-base
+    
+    COPY --dir tests .
+    COPY --dir queries .
+
+    WITH DOCKER \
+        --compose "./tests/docker-compose.yml" \
+        --load +build \
+        --pull alpine:latest \
+        --service event-db-is-running \
+        --allow-privileged
+        RUN pytest ./tests/queries_tests.py
     END
 
 
