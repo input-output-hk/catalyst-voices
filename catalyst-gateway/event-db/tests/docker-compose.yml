@@ -13,7 +13,6 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
-      - WITH_SEED_DATA=test_data
     ports:
       - 5432:5432
     healthcheck:

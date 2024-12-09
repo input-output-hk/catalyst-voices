@@ -42,11 +42,12 @@ local:
         SAVE IMAGE --push --insecure $local_registry/event-db:latest
     END
 
-# select_signed_documents.sql query test
+# Run the queries_tests.py
 test:
     FROM postgresql-ci+postgres-base
     
     COPY --dir tests .
+    COPY --dir queries .
 
     WITH DOCKER \
         --compose "./tests/docker-compose.yml" \
@@ -54,7 +55,7 @@ test:
         --pull alpine:latest \
         --service event-db-is-running \
         --allow-privileged
-        RUN python3 ./tests/select_signed_documents.py
+        RUN pytest ./tests/queries_tests.py
     END
 
 
