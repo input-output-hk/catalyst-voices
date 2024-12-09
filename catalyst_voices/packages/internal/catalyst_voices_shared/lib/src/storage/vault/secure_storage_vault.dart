@@ -14,6 +14,7 @@ const _lockKey = 'LockKey';
 base class SecureStorageVault with StorageAsStringMixin implements Vault {
   @override
   final String id;
+  final String key;
   @protected
   final FlutterSecureStorage secureStorage;
   final CryptoService _cryptoService;
@@ -22,9 +23,12 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   bool __isUnlocked = false;
 
   /// Check if given [value] belongs to any [SecureStorageVault].
-  static bool isStorageKey(String value) {
+  static bool isStorageKey(
+    String value, {
+    String key = defaultKey,
+  }) {
     try {
-      getStorageId(value);
+      getStorageId(value, key: key);
       return true;
     } catch (e) {
       return false;
@@ -37,7 +41,10 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   ///
   /// See [isStorageKey] to make sure key is valid before
   /// calling [getStorageId].
-  static String getStorageId(String value) {
+  static String getStorageId(
+    String value, {
+    String key = defaultKey,
+  }) {
     final parts = value.split('.');
     if (parts.length != 3) {
       throw ArgumentError('Key sections count is invalid');
@@ -46,22 +53,23 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     final prefix = parts[0];
     final id = parts[1];
 
-    if (prefix != _keyPrefix) {
+    if (prefix != key) {
       throw ArgumentError('Key prefix does not match');
     }
 
     return id;
   }
 
-  static const _keyPrefix = 'SecureStorageVault';
+  static const defaultKey = 'SecureStorageVault';
 
   SecureStorageVault({
     required this.id,
+    this.key = defaultKey,
     this.secureStorage = const FlutterSecureStorage(),
     CryptoService? cryptoService,
   }) : _cryptoService = cryptoService ?? LocalCryptoService();
 
-  String get _instanceKeyPrefix => '$_keyPrefix.$id';
+  String get _instanceKeyPrefix => '$key.$id';
 
   bool get _isUnlocked => __isUnlocked;
 

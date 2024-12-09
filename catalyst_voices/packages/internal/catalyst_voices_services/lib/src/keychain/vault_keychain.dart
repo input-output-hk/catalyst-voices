@@ -15,19 +15,26 @@ const _allKeys = [
 
 final class VaultKeychain extends SecureStorageVault implements Keychain {
   /// See [SecureStorageVault.isStorageKey].
-  static bool isKeychainKey(String value) {
-    return SecureStorageVault.isStorageKey(value);
+  static bool isKeychainKey(
+    String value, {
+    String key = SecureStorageVault.defaultKey,
+  }) {
+    return SecureStorageVault.isStorageKey(value, key: key);
   }
 
   /// See [SecureStorageVault.getStorageId].
-  static String getStorageId(String value) {
-    return SecureStorageVault.getStorageId(value);
+  static String getStorageId(
+    String value, {
+    String key = SecureStorageVault.defaultKey,
+  }) {
+    return SecureStorageVault.getStorageId(value, key: key);
   }
 
   final _initializationCompleter = Completer<void>();
 
   VaultKeychain({
     required super.id,
+    super.key,
     super.secureStorage,
   }) {
     unawaited(_initialize());
