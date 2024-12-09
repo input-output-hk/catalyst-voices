@@ -327,6 +327,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
 
 /// Check if we are on AWS infra
 pub async fn on_aws(session: Arc<Session>) -> bool {
+    info!("On aws");
     /// Query to check if we are AWS infra
     const ON_AWS: &str = include_str!("schema/cql/on_aws.cql");
     session.query_unpaged(ON_AWS, []).await.is_ok()
