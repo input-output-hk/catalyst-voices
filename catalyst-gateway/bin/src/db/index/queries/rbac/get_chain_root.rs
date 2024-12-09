@@ -35,7 +35,7 @@ impl GetChainRootQuery {
         let get_chain_root_by_stake_address_query = PreparedQueries::prepare(
             session,
             GET_CHAIN_ROOT,
-            scylla::statement::Consistency::All,
+            scylla::statement::Consistency::LocalQuorum,
             true,
         )
         .await;

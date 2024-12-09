@@ -1,13 +1,15 @@
 //! Index Schema
 
-use std::sync::Arc;
+use std::{sync::Arc, thread, time::Duration};
 
 use anyhow::Context;
+use fancy_regex::Regex;
 use handlebars::Handlebars;
 use scylla::Session;
 use serde_json::json;
 use tracing::error;
 
+use super::session::{keyspace_creation_status, on_aws};
 use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_from_data};
 
 /// The version of the Index DB Schema we SHOULD BE using.
@@ -187,23 +189,34 @@ async fn create_namespace(
     // which transforms `<`, `>` symbols to `&lt`, `&gt`
     reg.register_escape_fn(|s| s.into());
     let query = reg
-        .render_template(CREATE_NAMESPACE_CQL, &json!({"keyspace": keyspace}))
+        .render_template(
+            CREATE_NAMESPACE_CQL,
+            &json!({"keyspace": keyspace,"options": cfg.deployment.clone().to_string()}),
+        )
         .context(format!("Keyspace: {keyspace}"))?;
 
-    // Create the Keyspace if it doesn't exist already.
-    let stmt = session
-        .prepare(query)
-        .await
-        .context(format!("Keyspace: {keyspace}"))?;
     session
-        .execute_unpaged(&stmt, ())
+        .query_unpaged(query, ())
         .await
         .context(format!("Keyspace: {keyspace}"))?;
 
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
 
-    // Set the Keyspace to use for this session.
+    // if on aws, wait until keyspace exists due to remote aws latency
+    if on_aws(session.clone()).await {
+        while keyspace_creation_status(session.clone(), keyspace.clone())
+            .await
+            .is_err()
+        {}
+
+        // induce latency as aws remote resources are not available immediately despite saying
+        // so..
+        if let Some(latency) = cfg.deployment_latency {
+            thread::sleep(Duration::from_secs(latency));
+        }
+    }
+
     if let Err(error) = session.use_keyspace(keyspace.clone(), false).await {
         error!(keyspace = keyspace, error = %error, "Failed to set keyspace");
     }
@@ -219,21 +232,10 @@ pub(crate) async fn create_schema(
         .await
         .context("Creating Namespace")?;
 
-    let mut failed = false;
+    let failed = false;
 
-    for (schema, schema_name) in SCHEMAS {
-        match session.prepare(*schema).await {
-            Ok(stmt) => {
-                if let Err(err) = session.execute_unpaged(&stmt, ()).await {
-                    failed = true;
-                    error!(schema=schema_name, error=%err, "Failed to Execute Create Schema Query");
-                };
-            },
-            Err(err) => {
-                failed = true;
-                error!(schema=schema_name, error=%err, "Failed to Prepare Create Schema Query");
-            },
-        }
+    for (schema, _schema_name) in SCHEMAS {
+        session.query_unpaged((*schema).to_string(), &[]).await?;
     }
 
     anyhow::ensure!(!failed, "Failed to Create Schema");
@@ -244,9 +246,63 @@ pub(crate) async fn create_schema(
     Ok(())
 }
 
+/// Get table names from schema
+/// `https://regex101.com/r/pPF7NI/1`
+pub fn get_table_names() -> anyhow::Result<Vec<String>> {
+    // Extract table names from schemas
+    // Using Positive Lookbehind hence fancy regex
+    let re = Regex::new(r"(?<=CREATE TABLE IF NOT EXISTS).* ")?;
+
+    // collect table names
+    let mut table_names = Vec::new();
+
+    for (schema, _schema_name) in SCHEMAS {
+        for cql_file_line in schema.lines() {
+            // Extract table name
+            let Ok(captures) = re.captures(cql_file_line) else {
+                continue;
+            };
+
+            // Extract captures
+            let Some(cc) = captures else { continue };
+
+            // Should be just 1 match
+            let group = match cc.get(0) {
+                Some(g) => g.as_str().replace(' ', "").to_ascii_lowercase(),
+                None => continue,
+            };
+
+            table_names.push(group.as_str().to_string());
+
+            // Table name successfully extracted from cql file, no further processing needed in this
+            // file.
+            break;
+        }
+    }
+    Ok(table_names)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// List of tables
+    pub const TABLES: &[&str] = &[
+        "sync_status",
+        "txo_by_stake",
+        "txo_assets_by_stake",
+        "unstaked_txo_by_txn_hash",
+        "unstaked_txo_assets_by_txn_hash",
+        "txi_by_txn_hash",
+        "stake_registration",
+        "cip36_registration",
+        "cip36_registration_invalid",
+        "cip36_registration_for_vote_key",
+        "rbac509_registration",
+        "chain_root_for_txn_id",
+        "chain_root_for_role0_key",
+        "chain_root_for_stake_addr",
+    ];
 
     #[test]
     /// This test is designed to fail if the schema version has changed.
@@ -298,5 +354,12 @@ mod tests {
         let input = "   \n  -- comment here\n   ";
         let expected_output = "";
         assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
+
+    #[test]
+    fn test_table_name_extraction() {
+        let tables = get_table_names().unwrap();
+        let matching = TABLES.iter().zip(&tables).filter(|&(a, b)| a == b).count();
+        assert!(matching == TABLES.len() && matching == tables.len());
     }
 }

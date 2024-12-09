@@ -33,6 +33,10 @@ pub(crate) const MIN_BATCH_SIZE: i64 = 1;
 /// Maximum possible batch size.
 const MAX_BATCH_SIZE: i64 = 256;
 
+/// AWS remote latency, resources are not created instantly hence we need to add delays
+/// before we access them.
+const LATENCY_DEFAULT: u64 = 60;
+
 /// Configuration for an individual cassandra cluster.
 #[derive(Clone)]
 pub(crate) struct EnvVars {
@@ -59,6 +63,12 @@ pub(crate) struct EnvVars {
 
     /// Maximum Configured Batch size.
     pub(crate) max_batch_size: i64,
+
+    /// Config options for deployment i.e replication strategy
+    pub(crate) deployment: StringEnvVar,
+
+    /// AWS infra latency in seconds, remote resources are not created instantly
+    pub(crate) deployment_latency: Option<u64>,
 }
 
 impl EnvVars {
@@ -69,8 +79,11 @@ impl EnvVars {
         // We can actually change the namespace, but can't change the name used for env vars.
         let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace.into());
 
-        let tls =
-            StringEnvVar::new_as_enum(&format!("CASSANDRA_{name}_TLS"), TlsChoice::Disabled, false);
+        let tls = StringEnvVar::new_as_enum(
+            &format!("CASSANDRA_{name}_TLS"),
+            TlsChoice::Unverified,
+            false,
+        );
         let compression = StringEnvVar::new_as_enum(
             &format!("CASSANDRA_{name}_COMPRESSION"),
             CompressionChoice::Lz4,
@@ -91,6 +104,16 @@ impl EnvVars {
                 MIN_BATCH_SIZE,
                 MAX_BATCH_SIZE,
             ),
+            deployment: StringEnvVar::new(
+                &format!("CASSANDRA_{name}_DEPLOYMENT"),
+                "{'class': 'NetworkTopologyStrategy','replication_factor': 1}".into(),
+            ),
+            deployment_latency: Some(StringEnvVar::new_as(
+                &format!("CASSANDRA_{name}_DEPLOYMENT_LATENCY"),
+                LATENCY_DEFAULT,
+                LATENCY_DEFAULT,
+                LATENCY_DEFAULT,
+            )),
         }
     }
 

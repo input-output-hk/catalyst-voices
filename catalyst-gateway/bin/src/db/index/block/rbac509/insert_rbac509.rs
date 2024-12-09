@@ -75,7 +75,7 @@ impl Params {
             session.clone(),
             INSERT_RBAC509_QUERY,
             cfg,
-            scylla::statement::Consistency::Any,
+            scylla::statement::Consistency::LocalQuorum,
             true,
             false,
         )
