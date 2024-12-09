@@ -3,13 +3,28 @@ use std::{error::Error, sync::LazyLock, time::Duration};
 
 use dashmap::DashMap;
 use ed25519_dalek::{VerifyingKey, PUBLIC_KEY_LENGTH};
+use futures::StreamExt;
 use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
-use poem_openapi::{auth::Bearer, SecurityScheme};
+use poem_openapi::{auth::Bearer, payload::Json, SecurityScheme};
 use tracing::error;
 
 use super::token::CatalystRBACTokenV1;
-use crate::service::common::responses::ErrorResponses;
+use crate::{
+    db::index::{
+        queries::rbac::get_role0_chain_root::{
+            GetRole0ChainRootQuery, GetRole0ChainRootQueryParams,
+        },
+        session::CassandraSession,
+    },
+    service::common::{
+        responses::{
+            code_500_internal_server_error::InternalServerError,
+            code_503_service_unavailable::ServiceUnavailable, ErrorResponses,
+        },
+        types::headers::retry_after::RetryAfterHeader,
+    },
+};
 
 /// Auth token in the form of catv1..
 pub type EncodedAuthToken = String;
@@ -133,13 +148,57 @@ async fn checker_api_catalyst_auth(
     // Check that the token is able to be authorized.
 
     // Get pub key from CERTS state given decoded KID from decoded bearer token
-    // TODO: Look up certs from the Kid based on RBAC Registrations.
+    // TODO: FIXME: Remove CERTS?..
     let pub_key_bytes = if let Some(cert) = CERTS.get(&hex::encode(token.kid.0)) {
         *cert
     } else {
         error!("Invalid KID {:?}", token.kid);
         Err(AuthTokenAccessViolation(vec!["UNREGISTERED".to_string()]))?
     };
+
+    // TODO: FIXME: Better error handling?
+    let Some(session) = CassandraSession::get(true) else {
+        let error = ServiceUnavailable::new(None);
+        let retry = RetryAfterHeader::default();
+        error!(id=%error.id(), error = "Failed to acquire db session", retry_after=?retry);
+        return Err(ErrorResponses::ServiceUnavailable(Json(error), Some(retry)).into());
+    };
+
+    let query_res = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
+        role0_key: token.kid.0.into(),
+    })
+    .await;
+    let chain_root = match query_res {
+        Ok(mut iter) => {
+            // The clustering order is descending, so the first "historical" value is the last one.
+            let mut chain_root = None;
+            while let Some(val) = iter.next().await {
+                match val {
+                    Ok(val) => chain_root = Some(val.chain_root),
+                    Err(e) => {
+                        error!("Failed to parse 'get chain root by role 0 key' query: {e:?}");
+                        let error = InternalServerError::new(None);
+                        return Err(ErrorResponses::ServerError(Json(error)).into());
+                    },
+                }
+            }
+
+            let Some(chain_root) = chain_root else {
+                error!("Invalid KID {:?}", token.kid);
+                Err(AuthTokenAccessViolation(vec!["UNREGISTERED".to_string()]))?
+            };
+            chain_root
+        },
+        Err(e) => {
+            error!("Failed to execute 'get chain root by role 0 key' query: {e:?}");
+            let error = InternalServerError::new(None);
+            return Err(ErrorResponses::ServerError(Json(error)).into());
+        },
+    };
+    let _fixme = chain_root;
+
+    // TODO: FIXME: Check if the latest KID.
+    // TODO: FIXME: Get the cert.
 
     // Verify the token signature using the public key.
     let public_key = match VerifyingKey::from_bytes(&pub_key_bytes) {
