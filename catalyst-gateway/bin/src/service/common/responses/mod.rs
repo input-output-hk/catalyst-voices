@@ -23,7 +23,7 @@ mod code_403_forbidden;
 mod code_422_unprocessable_content;
 mod code_429_too_many_requests;
 pub(crate) mod code_500_internal_server_error;
-mod code_503_service_unavailable;
+pub(crate) mod code_503_service_unavailable;
 
 use code_500_internal_server_error::InternalServerError;
 
