@@ -114,7 +114,9 @@ impl CassandraSession {
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let session = self.session.clone();
         let queries = self.queries.clone();
 
@@ -283,6 +285,8 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                 },
             }
 
+            info!("On aws");
+
             // poll until the status of all tables are ACTIVE
             while check_all_tables(session.clone(), key_space.clone())
                 .await
@@ -327,7 +331,6 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
 
 /// Check if we are on AWS infra
 pub async fn on_aws(session: Arc<Session>) -> bool {
-    info!("On aws");
     /// Query to check if we are AWS infra
     const ON_AWS: &str = include_str!("schema/cql/on_aws.cql");
     session.query_unpaged(ON_AWS, []).await.is_ok()
