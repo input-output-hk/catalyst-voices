@@ -10,7 +10,7 @@ void main() {
   late final KeychainProvider keychainProvider;
   late final UserStorage userStorage;
 
-  late final DummyUserService dummyUserService;
+  late final DummyUserFactory dummyUserFactory;
   late final UserService userService;
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
@@ -23,11 +23,11 @@ void main() {
     keychainProvider = VaultKeychainProvider();
     userStorage = SecureUserStorage();
 
-    dummyUserService = DummyUserService();
+    dummyUserFactory = DummyUserFactory();
     userService = UserService(
       keychainProvider: keychainProvider,
       userStorage: userStorage,
-      dummyUserService: dummyUserService,
+      dummyUserFactory: dummyUserFactory,
     );
     registrationService = _MockRegistrationService();
     notifier = RegistrationProgressNotifier();
@@ -42,7 +42,7 @@ void main() {
 
     sessionCubit = SessionCubit(
       userService,
-      dummyUserService,
+      dummyUserFactory,
       registrationService,
       notifier,
       accessControl,

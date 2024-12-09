@@ -12,7 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class SessionCubit extends Cubit<SessionState>
     with BlocErrorEmitterMixin {
   final UserService _userService;
-  final DummyUserService _dummyUserService;
+  final DummyUserFactory _dummyUserFactory;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
   final AccessControl _accessControl;
@@ -32,7 +32,7 @@ final class SessionCubit extends Cubit<SessionState>
 
   SessionCubit(
     this._userService,
-    this._dummyUserService,
+    this._dummyUserFactory,
     this._registrationService,
     this._registrationProgressNotifier,
     this._accessControl,
@@ -71,7 +71,7 @@ final class SessionCubit extends Cubit<SessionState>
   Future<void> switchToDummyAccount() async {
     final keychains = await _userService.keychains;
     final dummyKeychain = keychains.firstWhereOrNull(
-      (keychain) => keychain.id == DummyUserService.dummyKeychainId,
+      (keychain) => keychain.id == DummyUserFactory.dummyKeychainId,
     );
 
     if (dummyKeychain != null) {
@@ -80,9 +80,9 @@ final class SessionCubit extends Cubit<SessionState>
     }
 
     final account = await _registrationService.registerTestAccount(
-      keychainId: DummyUserService.dummyKeychainId,
-      seedPhrase: DummyUserService.dummySeedPhrase,
-      lockFactor: DummyUserService.dummyUnlockFactor,
+      keychainId: DummyUserFactory.dummyKeychainId,
+      seedPhrase: DummyUserFactory.dummySeedPhrase,
+      lockFactor: DummyUserFactory.dummyUnlockFactor,
     );
 
     await _userService.useAccount(account);
@@ -178,7 +178,7 @@ final class SessionCubit extends Cubit<SessionState>
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
         return ActiveAccountSessionState(
-          account: _dummyUserService.getDummyAccount(),
+          account: _dummyUserFactory.buildDummyAccount(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,

@@ -2,7 +2,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Creates dummy users and accounts.
-abstract interface class DummyUserService {
+abstract interface class DummyUserFactory {
   static const dummyKeychainId = 'TestUserKeychainID';
   static const dummyUnlockFactor = PasswordLockFactor('Test1234');
   static final dummySeedPhrase = SeedPhrase.fromMnemonic(
@@ -10,30 +10,30 @@ abstract interface class DummyUserService {
     'erase bacon tone install universe',
   );
 
-  factory DummyUserService() {
-    return const DummyUserServiceImpl();
+  factory DummyUserFactory() {
+    return const DummyUserFactoryImpl();
   }
 
-  User getDummyUser({String keychainId = dummyKeychainId});
+  User buildDummyUser({String keychainId = dummyKeychainId});
 
-  Account getDummyAccount({String keychainId = dummyKeychainId});
+  Account buildDummyAccount({String keychainId = dummyKeychainId});
 }
 
-final class DummyUserServiceImpl implements DummyUserService {
-  const DummyUserServiceImpl();
+final class DummyUserFactoryImpl implements DummyUserFactory {
+  const DummyUserFactoryImpl();
 
   @override
-  User getDummyUser({String keychainId = DummyUserService.dummyKeychainId}) {
+  User buildDummyUser({String keychainId = DummyUserFactory.dummyKeychainId}) {
     return User(
       accounts: [
-        getDummyAccount(keychainId: keychainId),
+        buildDummyAccount(keychainId: keychainId),
       ],
     );
   }
 
   @override
-  Account getDummyAccount({
-    String keychainId = DummyUserService.dummyKeychainId,
+  Account buildDummyAccount({
+    String keychainId = DummyUserFactory.dummyKeychainId,
   }) {
     return Account(
       keychainId: keychainId,

@@ -42,7 +42,7 @@ class _ToggleStateTextState extends State<ToggleStateText> {
 
       await sessionBloc
           .switchToDummyAccount()
-          .then((_) => sessionBloc.unlock(DummyUserService.dummyUnlockFactor));
+          .then((_) => sessionBloc.unlock(DummyUserFactory.dummyUnlockFactor));
     };
   }
 

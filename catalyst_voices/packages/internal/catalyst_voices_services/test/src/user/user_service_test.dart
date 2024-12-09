@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 void main() {
   final KeychainProvider provider = VaultKeychainProvider();
   final UserStorage storage = SecureUserStorage();
-  final dummyUserService = DummyUserService();
+  final dummyUserFactory = DummyUserFactory();
 
   late UserService service;
 
@@ -17,7 +17,7 @@ void main() {
     service = UserService(
       keychainProvider: provider,
       userStorage: storage,
-      dummyUserService: dummyUserService,
+      dummyUserFactory: dummyUserFactory,
     );
   });
 

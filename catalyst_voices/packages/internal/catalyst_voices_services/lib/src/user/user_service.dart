@@ -8,12 +8,12 @@ abstract interface class UserService {
   factory UserService({
     required KeychainProvider keychainProvider,
     required UserStorage userStorage,
-    required DummyUserService dummyUserService,
+    required DummyUserFactory dummyUserFactory,
   }) {
     return UserServiceImpl(
       keychainProvider,
       userStorage,
-      dummyUserService,
+      dummyUserFactory,
     );
   }
 
@@ -43,7 +43,7 @@ abstract interface class UserService {
 final class UserServiceImpl implements UserService {
   final KeychainProvider _keychainProvider;
   final UserStorage _userStorage;
-  final DummyUserService _dummyUserService;
+  final DummyUserFactory _dummyUserFactory;
 
   final _logger = Logger('UserService');
 
@@ -57,7 +57,7 @@ final class UserServiceImpl implements UserService {
   UserServiceImpl(
     this._keychainProvider,
     this._userStorage,
-    this._dummyUserService,
+    this._dummyUserFactory,
   );
 
   @override
@@ -192,7 +192,7 @@ final class UserServiceImpl implements UserService {
 
     final user = _user?.account.keychainId == keychain.id
         ? _user
-        : _dummyUserService.getDummyUser(keychainId: keychain.id);
+        : _dummyUserFactory.buildDummyUser(keychainId: keychain.id);
 
     _updateUser(user);
   }

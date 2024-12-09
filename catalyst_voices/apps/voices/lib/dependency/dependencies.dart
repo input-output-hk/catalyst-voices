@@ -32,7 +32,7 @@ final class Dependencies extends DependencyProvider {
         () {
           return SessionCubit(
             get<UserService>(),
-            get<DummyUserService>(),
+            get<DummyUserFactory>(),
             get<RegistrationService>(),
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
@@ -112,12 +112,12 @@ final class Dependencies extends DependencyProvider {
         return UserService(
           keychainProvider: get<KeychainProvider>(),
           userStorage: get<UserStorage>(),
-          dummyUserService: get<DummyUserService>(),
+          dummyUserFactory: get<DummyUserFactory>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
     );
-    registerLazySingleton<DummyUserService>(DummyUserService.new);
+    registerLazySingleton<DummyUserFactory>(DummyUserFactory.new);
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
