@@ -104,7 +104,7 @@ pub fn extract_stake_credentials_from_certs(
                         StakeCredential::AddrKeyhash(stake_credential) => {
                             stake_credentials.push(hex::encode(stake_credential.as_slice()));
                         },
-                        StakeCredential::Scripthash(_) => (),
+                        StakeCredential::ScriptHash(_) => (),
                     }
                 },
                 _ => continue,

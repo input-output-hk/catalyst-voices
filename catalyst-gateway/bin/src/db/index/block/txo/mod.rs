@@ -136,8 +136,8 @@ impl TxoInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64, txn_hash: &[u8],
-        txn: i16,
+        &mut self, txs: &pallas::ledger::traverse::MultiEraTxWithRawAuxiliary<'_>, slot_no: u64,
+        txn_hash: &[u8], txn: i16,
     ) {
         let txn_id = hex::encode_upper(txn_hash);
 
@@ -159,7 +159,7 @@ impl TxoInsertQuery {
                     txn,
                     txo_index,
                     &address,
-                    txo.lovelace_amount(),
+                    txo.value().coin(),
                     txn_hash,
                 );
 
@@ -171,13 +171,13 @@ impl TxoInsertQuery {
                     slot_no,
                     txn,
                     &address,
-                    txo.lovelace_amount(),
+                    txo.value().coin(),
                 );
 
                 self.unstaked_txo.push(params);
             }
 
-            for asset in txo.non_ada_assets() {
+            for asset in txo.value().assets() {
                 let policy_id = asset.policy().to_vec();
                 for policy_asset in asset.assets() {
                     if policy_asset.is_output() {
