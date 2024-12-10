@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_shared/src/cache/ttl_cache.dart';
 
 base class LocalTllCache extends LocalStorage
     implements TtlCache<String, String> {

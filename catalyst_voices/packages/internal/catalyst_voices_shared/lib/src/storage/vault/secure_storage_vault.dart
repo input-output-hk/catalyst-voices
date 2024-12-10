@@ -9,6 +9,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _lockKey = 'LockKey';
 const _createDateKey = 'CreateDate';
+const _isUnlockedKey = 'IsUnlocked';
 
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
@@ -17,11 +18,10 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   final String id;
   final String _key;
   final FlutterSecureStorage _secureStorage;
+  final TtlCache<String, String> _ttlCache;
   final CryptoService _cryptoService;
 
   final _isUnlockedSC = StreamController<bool>.broadcast();
-  bool __isUnlocked = false;
-
   final _initializationCompleter = Completer<void>();
 
   /// Check if given [value] belongs to any [SecureStorageVault].
@@ -68,23 +68,19 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     required this.id,
     String key = defaultKey,
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
+    TtlCache<String, String>? ttlCache,
     CryptoService? cryptoService,
   })  : _key = key,
         _secureStorage = secureStorage,
+        _ttlCache = ttlCache ??
+            LocalTllCache(
+              defaultTtl: const Duration(hours: 1),
+            ),
         _cryptoService = cryptoService ?? LocalCryptoService() {
     unawaited(_initialize());
   }
 
   String get _instanceKey => '$_key.$id';
-
-  bool get _isUnlocked => __isUnlocked;
-
-  set _isUnlocked(bool value) {
-    if (__isUnlocked != value) {
-      __isUnlocked = value;
-      _isUnlockedSC.add(value);
-    }
-  }
 
   Future<Uint8List?> get _lock async {
     final effectiveKey = _buildKey(_lockKey);
@@ -106,18 +102,16 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
-  Future<bool> get isUnlocked => Future(() => _isUnlocked);
+  Future<bool> get isUnlocked => _isUnlocked();
 
   @override
   Stream<bool> get watchIsUnlocked async* {
-    yield _isUnlocked;
+    yield await _isUnlocked();
     yield* _isUnlockedSC.stream;
   }
 
   @override
-  Future<void> lock() async {
-    _isUnlocked = false;
-  }
+  Future<void> lock() => _updateUnlocked(false);
 
   @override
   Future<bool> unlock(LockFactor unlock) async {
@@ -130,7 +124,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     final seed = unlock.seed;
     final lock = await _requireLock;
 
-    _isUnlocked = await _cryptoService.verifyKey(seed, key: lock);
+    final isVerified = await _cryptoService.verifyKey(seed, key: lock);
+    await _updateUnlocked(isVerified);
 
     _erase(lock);
 
@@ -244,6 +239,25 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     final isUnlocked = await this.isUnlocked;
     if (!isUnlocked) {
       throw const VaultLockedException();
+    }
+  }
+
+  Future<bool> _isUnlocked() async {
+    final value = await _ttlCache.get(key: _isUnlockedKey);
+    final isUnlocked = value == 'true';
+
+    if (isUnlocked) {
+      _ttlCache.extendExpiration(key: _isUnlockedKey);
+    }
+
+    return isUnlocked;
+  }
+
+  Future<void> _updateUnlocked(bool value) async {
+    final isUnlocked = await _isUnlocked();
+    if (isUnlocked != value) {
+      await _ttlCache.set('$value', key: _isUnlockedKey);
+      _isUnlockedSC.add(value);
     }
   }
 
