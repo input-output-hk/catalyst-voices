@@ -50,8 +50,8 @@ test:
 
     WITH DOCKER \
         --compose "./tests/docker-compose.yml" \
-        --load +build \
-        --pull alpine:latest \
+        --load event-db:latest=+build \
+        --pull alpine:3.20.3 \
         --service event-db-is-running \
         --allow-privileged
         RUN pytest ./tests/queries_tests.py
