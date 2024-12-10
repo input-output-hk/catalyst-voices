@@ -1,4 +1,5 @@
 import psycopg
+import pytest
 
 
 class SignedData:
@@ -35,6 +36,7 @@ class SignedData:
 EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
 
+@pytest.mark.ci
 def test_signed_docs_queries():
     with psycopg.connect(EVENT_DB_URL) as conn:
         docs = [
@@ -62,6 +64,7 @@ def test_signed_docs_queries():
         # try insert the same values
         insert_signed_documents_query(conn, docs)
         select_signed_documents_query(conn, docs)
+        select_signed_documents_2_query(conn, docs)
 
         # try insert the same id and ver, but with the different other data
         docs[0].author = "Sasha"
@@ -73,6 +76,10 @@ def test_signed_docs_queries():
         should_panic(
             lambda: select_signed_documents_query(conn, docs),
             "select_signed_documents_query should fail",
+        )
+        should_panic(
+            lambda: select_signed_documents_2_query(conn, docs),
+            "select_signed_documents_2_query should fail",
         )
 
 
@@ -113,6 +120,31 @@ def select_signed_documents_query(conn, docs: [SignedData]):
         assert str(metadata) == doc.metadata
         assert str(payload) == doc.payload
         assert raw == doc.raw
+
+
+def select_signed_documents_2_query(conn, docs: [SignedData]):
+    select_signed_documents_sql = open(
+        "./queries/select_signed_documents_2.sql", "r"
+    ).read()
+    select_signed_documents_sql = (
+        select_signed_documents_sql.replace("$1", "%s")
+        .replace("$2", "%s")
+        .replace("$3", "%s")
+        .replace("$4", "%s")
+    )
+    limit = 1
+    offset = 0
+    for doc in docs:
+        cur = conn.execute(
+            select_signed_documents_sql,
+            (doc.id, doc.ver, limit, offset),
+        )
+        (id, ver, doc_type, author, metadata) = cur.fetchone()
+        assert str(id) == doc.id
+        assert str(ver) == doc.ver
+        assert str(doc_type) == doc.doc_type
+        assert author == doc.author
+        assert str(metadata) == doc.metadata
 
 
 def should_panic(func, msg: str):
