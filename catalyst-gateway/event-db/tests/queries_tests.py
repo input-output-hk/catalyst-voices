@@ -59,6 +59,9 @@ def test_signed_docs_queries():
         ]
 
         insert_signed_documents_query(conn, docs)
+        # try insert the same values
+        insert_signed_documents_query(conn, docs)
+
         select_signed_documents_query(conn, docs)
 
 
@@ -75,6 +78,7 @@ def insert_signed_documents_query(conn, docs: [SignedData]):
         .replace("$6", "%s")
         .replace("$7", "%s")
     )
+    print()
     for doc in docs:
         conn.execute(insert_signed_documents_sql, doc.to_tuple())
 
