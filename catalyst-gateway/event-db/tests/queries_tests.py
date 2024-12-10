@@ -61,8 +61,19 @@ def test_signed_docs_queries():
         insert_signed_documents_query(conn, docs)
         # try insert the same values
         insert_signed_documents_query(conn, docs)
-
         select_signed_documents_query(conn, docs)
+
+        # try insert the same id and ver, but with the different other data
+        docs[0].author = "Sasha"
+        docs[1].author = "Sasha"
+        should_panic(
+            lambda: insert_signed_documents_query(conn, docs),
+            "insert_signed_documents_query should fail",
+        )
+        should_panic(
+            lambda: select_signed_documents_query(conn, docs),
+            "select_signed_documents_query should fail",
+        )
 
 
 def insert_signed_documents_query(conn, docs: [SignedData]):
@@ -78,7 +89,6 @@ def insert_signed_documents_query(conn, docs: [SignedData]):
         .replace("$6", "%s")
         .replace("$7", "%s")
     )
-    print()
     for doc in docs:
         conn.execute(insert_signed_documents_sql, doc.to_tuple())
 
@@ -103,3 +113,11 @@ def select_signed_documents_query(conn, docs: [SignedData]):
         assert str(metadata) == doc.metadata
         assert str(payload) == doc.payload
         assert raw == doc.raw
+
+
+def should_panic(func, msg: str):
+    try:
+        func()
+        assert False, msg
+    except:
+        pass
