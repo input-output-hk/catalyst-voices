@@ -35,24 +35,9 @@ project: {
 								claimName: "pvc"
 							}
 						},
-						{
-							name: "keyspaces-certificate"
-							secret: {
-								items: [
-									{
-										key:  "keyspaces-crt"
-										path: "sf-class2-root.crt"
-									},
-								]
-							}
-						},
 					]
 
 					volumeMounts: [
-						{
-							name:      "keyspaces-certificate"
-							mountPath: "/tmp"
-						},
 						{
 							name:      "data"
 							mountPath: "/data"
@@ -88,6 +73,10 @@ project: {
 									key: "cassandra-volatile-password"
 								}
 							}
+						},
+						{
+							name:  "CASSANDRA_VOLATILE_TLS"
+							value: "/tmp/keyspaces.crt"
 						},
 						{
 							name: "CASSANDRA_VOLATILE_DEPLOYMENT"
@@ -128,6 +117,10 @@ project: {
 									key: "cassandra-persistent-password"
 								}
 							}
+						},
+						{
+							name:  "CASSANDRA_PERSISTENT_TLS"
+							value: "/tmp/keyspaces.crt"
 						},
 						{
 							name: "CASSANDRA_PERSISTENT_DEPLOYMENT"
