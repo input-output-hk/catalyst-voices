@@ -20,7 +20,7 @@ class GetStartedPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          key: const Key('get_started_message'),
+          key: const Key('GetStartedMessage'),
           title: Text(context.l10n.accountCreationGetStartedTitle),
           subtitle: Text(context.l10n.accountCreationGetStatedDesc),
           spacing: 12,
