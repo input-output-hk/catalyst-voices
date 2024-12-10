@@ -13,6 +13,8 @@ export 'platform_aware_builder/platform_aware_builder.dart';
 export 'responsive/responsive_builder.dart';
 export 'responsive/responsive_child.dart';
 export 'responsive/responsive_padding.dart';
+export 'storage/local_storage.dart';
+export 'storage/memory_storage.dart';
 export 'storage/secure_storage.dart';
 export 'storage/storage.dart';
 export 'storage/vault/secure_storage_vault.dart';
