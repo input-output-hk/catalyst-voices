@@ -1,17 +1,17 @@
 INSERT INTO signed_docs
 (
-  id, 
-  ver, 
-  type, 
-  author, 
+  id,
+  ver,
+  type,
+  author,
   metadata,
-  payload, 
+  payload,
   raw
 )
 VALUES
 ($1, $2, $3, $4, $5, $6, $7)
 ON CONFLICT (id, ver) DO UPDATE
-SET 
+SET
   type = signed_docs.type
 WHERE 
   signed_docs.type = EXCLUDED.type
