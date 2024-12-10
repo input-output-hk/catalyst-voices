@@ -1,0 +1,16 @@
+SELECT
+  signed_docs.id,
+  signed_docs.ver,
+  signed_docs.type,
+  signed_docs.author,
+  signed_docs.metadata
+FROM signed_docs
+WHERE
+  TRUE
+  {{#if id }} AND signed_docs.id = '{{ id }}' {{/if}}
+  {{#if ver }} AND signed_docs.ver = '{{ ver }}' {{/if}}
+  {{#if type }} AND signed_docs.type = '{{ type }}' {{/if}}
+  {{#if author }} AND signed_docs.author = '{{ author }}' {{/if}}
+ORDER BY signed_docs.id DESC, signed_docs.ver DESC
+LIMIT {{ limit }}
+OFFSET {{ offset }}

@@ -124,22 +124,17 @@ def select_signed_documents_query(conn, docs: [SignedData]):
 
 
 def select_signed_documents_2_query(conn, docs: [SignedData]):
-    select_signed_documents_sql = open(
-        "./queries/select_signed_documents_2.sql", "r"
+    select_signed_documents_sql_hbs = open(
+        "./queries/select_signed_documents_2.sql.hbs", "r"
     ).read()
-    select_signed_documents_sql = (
-        select_signed_documents_sql.replace("$1", "%s")
-        .replace("$2", "%s")
-        .replace("$3", "%s")
-        .replace("$4", "%s")
+    select_signed_documents_sql_template = pybars.Compiler().compile(
+        select_signed_documents_sql_hbs
     )
-    limit = 1
-    offset = 0
     for doc in docs:
-        cur = conn.execute(
-            select_signed_documents_sql,
-            (doc.id, doc.ver, limit, offset),
+        sql_stmt = select_signed_documents_sql_template(
+            {"id": doc.id, "limit": 1, "offset": 0}
         )
+        cur = conn.execute(sql_stmt)
         (id, ver, doc_type, author, metadata) = cur.fetchone()
         assert str(id) == doc.id
         assert str(ver) == doc.ver
