@@ -48,8 +48,6 @@ void main() {
         expect(children, findsAtLeast(1));
       }
     });
-    // add test visitor > no menu button
-    // add test logged user > menu renders correctly
   });
 }
 //TODO(oldgreg5): add test clicking on prev/next buttons on chooser
