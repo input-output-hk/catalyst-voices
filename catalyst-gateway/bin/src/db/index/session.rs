@@ -273,6 +273,8 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             continue;
         }
 
+        info!(db_type = db_type, "Created schema");
+
         // Check if we are on AWS infrastructure
         if on_aws(session.clone()).await {
             let key_space = namespace(&cfg);
