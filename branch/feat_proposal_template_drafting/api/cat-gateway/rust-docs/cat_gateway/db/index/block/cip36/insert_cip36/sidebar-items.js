@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["INSERT_CIP36_REGISTRATION_QUERY"],"struct":["Params"]};
