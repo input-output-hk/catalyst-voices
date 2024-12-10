@@ -52,3 +52,10 @@ void main() {
     // add test logged user > menu renders correctly
   });
 }
+//TODO(oldgreg5): add test clicking on prev/next buttons on chooser
+//TODO(oldgreg5): add test visitor > no menu button
+//TODO(oldgreg5): add test logged user > menu renders correctly
+//TODO(oldgreg5): add test reporting (simple summary with errors for starters)
+//TODO(oldgreg5): add screenshots capturing
+//TODO(oldgreg5): add redirecting output to local console/file instead of chrome console
+//TODO(oldgreg5): add running in debug, being able to pause and debug test
