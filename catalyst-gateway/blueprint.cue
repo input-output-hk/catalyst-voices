@@ -137,19 +137,20 @@ project: {
 						},
 					]
 
-					readinessProbe: {
-						httpGet: {
-							path: "/v1/health/ready"
-							port: 8080
-						}
-					}
+					// TODO: Re-enable when deployment is working
+					// readinessProbe: {
+					// 	httpGet: {
+					// 		path: "/v1/health/ready"
+					// 		port: 8080
+					// 	}
+					// }
 
-					livenessProbe: {
-						httpGet: {
-							path: "/v1/health/live"
-							port: 8080
-						}
-					}
+					// livenessProbe: {
+					// 	httpGet: {
+					// 		path: "/v1/health/live"
+					// 		port: 8080
+					// 	}
+					// }
 
 					nodeSelector: {
 						"node-group": "catalyst-gateway"
