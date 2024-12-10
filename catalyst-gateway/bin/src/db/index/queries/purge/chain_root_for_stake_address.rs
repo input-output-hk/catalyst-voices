@@ -42,7 +42,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_addr", &self.stake_addr)
+            .field("stake_addr", &hex::encode(&self.stake_addr))
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .finish()

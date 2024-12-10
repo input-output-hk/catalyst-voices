@@ -22,7 +22,7 @@ pub(crate) mod result {
     //! Return values for TXI by hash purge queries.
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, i16);
+    pub(crate) type PrimaryKey = (Vec<u8>, i16, num_bigint::BigInt);
 }
 
 /// Select primary keys for TXI by hash.
@@ -40,7 +40,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("txn_hash", &self.txn_hash)
+            .field("txn_hash", &hex::encode(&self.txn_hash))
             .field("txo", &self.txo)
             .finish()
     }

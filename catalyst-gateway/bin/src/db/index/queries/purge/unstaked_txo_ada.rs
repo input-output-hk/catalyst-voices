@@ -23,7 +23,7 @@ pub(crate) mod result {
     //! Return values for Unstaked TXO ADA purge queries.
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, i16);
+    pub(crate) type PrimaryKey = (Vec<u8>, i16, num_bigint::BigInt);
 }
 
 /// Select primary keys for Unstaked TXO ADA.

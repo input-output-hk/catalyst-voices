@@ -20,9 +20,14 @@ use crate::{
 
 pub(crate) mod result {
     //! Return values for Chain Root For TX ID registration purge queries.
+    use scylla::DeserializeRow;
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16);
+    #[derive(DeserializeRow)]
+    pub(crate) struct PrimaryKey {
+        /// TXN ID HASH - Binary 32 bytes.
+        pub(crate) transaction_id: Vec<u8>,
+    }
 }
 
 /// Select primary keys for Chain Root For TX ID registration.
@@ -31,14 +36,14 @@ const SELECT_QUERY: &str = include_str!("./cql/get_chain_root_for_txn_id.cql");
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// TX ID - Binary 32 bytes.
+    /// TXN ID HASH - Binary 32 bytes.
     pub(crate) transaction_id: Vec<u8>,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("transaction_id", &self.transaction_id)
+            .field("transaction_id", &hex::encode(&self.transaction_id))
             .finish()
     }
 }
@@ -46,7 +51,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            transaction_id: value.0,
+            transaction_id: value.transaction_id,
         }
     }
 }

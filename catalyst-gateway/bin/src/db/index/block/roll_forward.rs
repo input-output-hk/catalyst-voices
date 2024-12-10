@@ -1,6 +1,6 @@
 //! Immutable Roll Forward logic.
 
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
 use futures::StreamExt;
 
@@ -22,18 +22,18 @@ pub(crate) async fn purge_live_index(purge_slot: u64) -> anyhow::Result<()> {
         .saturating_sub(Settings::purge_slot_buffer())
         .into();
 
+    let txn_hashes = purge_txi_by_hash(&session, &purge_to_slot).await?;
     purge_chain_root_for_role0_key(&session, &purge_to_slot).await?;
     purge_chain_root_for_stake_address(&session, &purge_to_slot).await?;
-    purge_chain_root_for_txn_id(&session, &purge_to_slot).await?;
+    purge_chain_root_for_txn_id(&session, &txn_hashes).await?;
     purge_cip36_registration(&session, &purge_to_slot).await?;
     purge_cip36_registration_for_vote_key(&session, &purge_to_slot).await?;
     purge_cip36_registration_invalid(&session, &purge_to_slot).await?;
     purge_rbac509_registration(&session, &purge_to_slot).await?;
     purge_stake_registration(&session, &purge_to_slot).await?;
-    purge_txi_by_hash(&session, &purge_to_slot).await?; // WIP
     purge_txo_ada(&session, &purge_to_slot).await?;
     purge_txo_assets(&session, &purge_to_slot).await?;
-    purge_unstaked_txo_ada(&session, &purge_to_slot).await?; // WIP
+    purge_unstaked_txo_ada(&session, &purge_to_slot).await?;
     purge_unstaked_txo_assets(&session, &purge_to_slot).await?;
 
     Ok(())
@@ -83,7 +83,7 @@ async fn purge_chain_root_for_stake_address(
 
 /// Purge data from `chain_root_for_txn_id`.
 async fn purge_chain_root_for_txn_id(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, txn_hashes: &HashSet<Vec<u8>>,
 ) -> anyhow::Result<()> {
     use purge::chain_root_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -93,7 +93,7 @@ async fn purge_chain_root_for_txn_id(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if txn_hashes.contains(&params.transaction_id) {
             delete_params.push(params);
         }
     }
@@ -210,10 +210,25 @@ async fn purge_stake_registration(
 /// Purge data from `txi_by_hash`.
 #[allow(clippy::unused_async)]
 async fn purge_txi_by_hash(
-    _session: &Arc<CassandraSession>, _purge_to_slot: &num_bigint::BigInt,
-) -> anyhow::Result<()> {
-    // WIP: Get TXN hashes from other queries
-    Ok(())
+    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+) -> anyhow::Result<HashSet<Vec<u8>>> {
+    use purge::txi_by_hash::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    // Get all keys
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+    // Filter
+    let mut delete_params: Vec<Params> = Vec::new();
+    let mut txn_hashes: HashSet<Vec<u8>> = HashSet::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        if &primary_key.2 <= purge_to_slot {
+            let params: Params = primary_key.into();
+            txn_hashes.insert(params.txn_hash.clone());
+            delete_params.push(params);
+        }
+    }
+    // Delete filtered keys
+    DeleteQuery::execute(session, delete_params).await?;
+    Ok(txn_hashes)
 }
 
 /// Purge data from `txo_ada`.
@@ -261,10 +276,22 @@ async fn purge_txo_assets(
 /// Purge data from `unstaked_txo_ada`.
 #[allow(clippy::unused_async)]
 async fn purge_unstaked_txo_ada(
-    _session: &Arc<CassandraSession>, _purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
 ) -> anyhow::Result<()> {
-    // use purge::unstaked_txo_ada::{DeleteQuery, Params, PrimaryKeyQuery};
-    // WIP: Get TXN hashes from other queries
+    use purge::unstaked_txo_ada::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    // Get all keys
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+    // Filter
+    let mut delete_params: Vec<Params> = Vec::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        if &primary_key.2 <= purge_to_slot {
+            let params: Params = primary_key.into();
+            delete_params.push(params);
+        }
+    }
+    // Delete filtered keys
+    DeleteQuery::execute(session, delete_params).await?;
     Ok(())
 }
 
