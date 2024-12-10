@@ -4,12 +4,12 @@ import 'dart:convert';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
+import 'package:catalyst_voices_shared/src/storage/vault/secure_storage_vault_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _lockKey = 'LockKey';
 const _createDateKey = 'CreateDate';
-const _isUnlockedKey = 'IsUnlocked';
 
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
@@ -18,7 +18,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   final String id;
   final String _key;
   final FlutterSecureStorage _secureStorage;
-  final TtlCache<String, String> _cache;
+  final SecureStorageVaultCache _cache;
   final CryptoService _cryptoService;
 
   final _isUnlockedSC = StreamController<bool>.broadcast();
@@ -68,11 +68,11 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     required this.id,
     String key = defaultKey,
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
-    TtlCache<String, String>? cache,
+    SecureStorageVaultCache? cache,
     CryptoService? cryptoService,
   })  : _key = key,
         _secureStorage = secureStorage,
-        _cache = cache ?? LocalTllCache(defaultTtl: const Duration(hours: 1)),
+        _cache = cache ?? SecureStorageVaultTtlCache(key: '$key.$id.Cache'),
         _cryptoService = cryptoService ?? LocalCryptoService() {
     unawaited(_initialize());
   }
@@ -123,6 +123,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
     final isVerified = await _cryptoService.verifyKey(seed, key: lock);
     await _updateUnlocked(isVerified);
+
+    // TODO(damian): schedule auto update.
 
     _erase(lock);
 
@@ -239,23 +241,12 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     }
   }
 
-  Future<bool> _isUnlocked() async {
-    final effectiveKey = _buildKey(_isUnlockedKey);
-    final value = await _cache.get(key: effectiveKey);
-    final isUnlocked = value == 'true';
-
-    if (isUnlocked) {
-      _cache.extendExpiration(key: effectiveKey);
-    }
-
-    return isUnlocked;
-  }
+  Future<bool> _isUnlocked() => _cache.getIsUnlocked();
 
   Future<void> _updateUnlocked(bool value) async {
-    final effectiveKey = _buildKey(_isUnlockedKey);
     final isUnlocked = await _isUnlocked();
     if (isUnlocked != value) {
-      await _cache.set('$value', key: effectiveKey);
+      await _cache.setIsUnlocked(value: value);
       _isUnlockedSC.add(value);
     }
   }
