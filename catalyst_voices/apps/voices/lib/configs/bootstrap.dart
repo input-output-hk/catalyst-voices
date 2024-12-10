@@ -81,7 +81,7 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
 ///
 /// Initialization logic that is relevant for [runApp] scenario
 /// only should be added to [_doBootstrapAndRun], not here.
-Future<BootstrapArgs> bootstrap() async {
+Future<BootstrapArgs> bootstrap({String? initialLocation}) async {
   _loggingService
     ..level = kDebugMode ? Level.FINER : Level.OFF
     ..printLogs = kDebugMode;
@@ -95,6 +95,7 @@ Future<BootstrapArgs> bootstrap() async {
   await CatalystKeyDerivation.init();
 
   final router = AppRouter.init(
+    initialLocation: initialLocation,
     guards: const [
       MilestoneGuard(),
     ],

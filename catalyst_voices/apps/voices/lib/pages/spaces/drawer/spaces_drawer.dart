@@ -65,6 +65,7 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
   Widget build(BuildContext context) {
     return VoicesDrawer(
       bottom: VoicesDrawerSpaceChooser(
+        key: const ValueKey('DrawerSpaceChooser'),
         currentSpace: widget.space,
         onChanged: (space) => space.go(context),
         onOverallTap: () {
