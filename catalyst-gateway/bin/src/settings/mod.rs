@@ -76,10 +76,6 @@ fn calculate_service_uuid() -> String {
 #[derive(Args, Clone)]
 #[clap(version = BUILD_INFO)]
 pub(crate) struct ServiceSettings {
-    /// Url to the postgres event db
-    #[clap(long, env)]
-    pub(crate) event_db_url: Option<String>,
-
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
