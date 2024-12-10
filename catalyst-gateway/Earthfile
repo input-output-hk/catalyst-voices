@@ -86,7 +86,7 @@ package:
     FROM debian:12.7-slim
 
     WORKDIR /app
-
+    RUN apt-get install -y \
     RUN curl https://certs.secureserver.net/repository/sf-class2-root.crt -o /tmp/keyspaces.crt
 
     COPY +build/cat-gateway .
