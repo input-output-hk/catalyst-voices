@@ -18,7 +18,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   final String id;
   final String _key;
   final FlutterSecureStorage _secureStorage;
-  final TtlCache<String, String> _ttlCache;
+  final TtlCache<String, String> _cache;
   final CryptoService _cryptoService;
 
   final _isUnlockedSC = StreamController<bool>.broadcast();
@@ -68,14 +68,11 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     required this.id,
     String key = defaultKey,
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
-    TtlCache<String, String>? ttlCache,
+    TtlCache<String, String>? cache,
     CryptoService? cryptoService,
   })  : _key = key,
         _secureStorage = secureStorage,
-        _ttlCache = ttlCache ??
-            LocalTllCache(
-              defaultTtl: const Duration(hours: 1),
-            ),
+        _cache = cache ?? LocalTllCache(defaultTtl: const Duration(hours: 1)),
         _cryptoService = cryptoService ?? LocalCryptoService() {
     unawaited(_initialize());
   }
@@ -243,20 +240,22 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   Future<bool> _isUnlocked() async {
-    final value = await _ttlCache.get(key: _isUnlockedKey);
+    final effectiveKey = _buildKey(_isUnlockedKey);
+    final value = await _cache.get(key: effectiveKey);
     final isUnlocked = value == 'true';
 
     if (isUnlocked) {
-      _ttlCache.extendExpiration(key: _isUnlockedKey);
+      _cache.extendExpiration(key: effectiveKey);
     }
 
     return isUnlocked;
   }
 
   Future<void> _updateUnlocked(bool value) async {
+    final effectiveKey = _buildKey(_isUnlockedKey);
     final isUnlocked = await _isUnlocked();
     if (isUnlocked != value) {
-      await _ttlCache.set('$value', key: _isUnlockedKey);
+      await _cache.set('$value', key: effectiveKey);
       _isUnlockedSC.add(value);
     }
   }
