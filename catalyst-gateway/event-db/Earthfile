@@ -54,6 +54,5 @@ test:
         --pull alpine:3.20.3 \
         --service event-db-is-running \
         --allow-privileged
-        RUN echo "Hello"
-        # RUN pytest ./tests/queries_tests.py
+        RUN pytest ./tests/queries_tests.py
     END
