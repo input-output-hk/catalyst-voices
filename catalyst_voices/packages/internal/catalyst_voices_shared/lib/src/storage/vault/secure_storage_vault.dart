@@ -8,19 +8,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _lockKey = 'LockKey';
+const _createDateKey = 'CreateDate';
 
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
 base class SecureStorageVault with StorageAsStringMixin implements Vault {
   @override
   final String id;
-  final String key;
-  @protected
-  final FlutterSecureStorage secureStorage;
+  final String _key;
+  final FlutterSecureStorage _secureStorage;
   final CryptoService _cryptoService;
 
   final _isUnlockedSC = StreamController<bool>.broadcast();
   bool __isUnlocked = false;
+
+  final _initializationCompleter = Completer<void>();
 
   /// Check if given [value] belongs to any [SecureStorageVault].
   static bool isStorageKey(
@@ -64,12 +66,16 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   SecureStorageVault({
     required this.id,
-    this.key = defaultKey,
-    this.secureStorage = const FlutterSecureStorage(),
+    String key = defaultKey,
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
     CryptoService? cryptoService,
-  }) : _cryptoService = cryptoService ?? LocalCryptoService();
+  })  : _key = key,
+        _secureStorage = secureStorage,
+        _cryptoService = cryptoService ?? LocalCryptoService() {
+    unawaited(_initialize());
+  }
 
-  String get _instanceKeyPrefix => '$key.$id';
+  String get _instanceKey => '$_key.$id';
 
   bool get _isUnlocked => __isUnlocked;
 
@@ -81,8 +87,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   Future<Uint8List?> get _lock async {
-    final effectiveKey = buildKey(_lockKey);
-    final encodedLock = await secureStorage.read(key: effectiveKey);
+    final effectiveKey = _buildKey(_lockKey);
+    final encodedLock = await _secureStorage.read(key: effectiveKey);
     return encodedLock != null ? base64.decode(encodedLock) : null;
   }
 
@@ -95,8 +101,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   Future<bool> get _hasLock {
-    final effectiveKey = buildKey(_lockKey);
-    return secureStorage.containsKey(key: effectiveKey);
+    final effectiveKey = _buildKey(_lockKey);
+    return _secureStorage.containsKey(key: effectiveKey);
   }
 
   @override
@@ -115,6 +121,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   @override
   Future<bool> unlock(LockFactor unlock) async {
+    await _initializationCompleter.future;
+
     if (!await _hasLock) {
       throw const LockNotFoundException('Set lock before unlocking Vault');
     }
@@ -131,6 +139,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   @override
   Future<void> setLock(LockFactor lock) async {
+    await _initializationCompleter.future;
+
     if (await _hasLock && !await isUnlocked) {
       throw const VaultLockedException();
     }
@@ -139,18 +149,17 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     final key = await _cryptoService.deriveKey(seed);
     final encodedKey = base64.encode(key);
 
-    final effectiveLockKey = buildKey(_lockKey);
+    final effectiveLockKey = _buildKey(_lockKey);
 
-    await secureStorage.write(key: effectiveLockKey, value: encodedKey);
+    await _secureStorage.write(key: effectiveLockKey, value: encodedKey);
   }
-
-  @protected
-  String buildKey(String key) => '$_instanceKeyPrefix.$key';
 
   @override
   Future<bool> contains({required String key}) async {
-    final effectiveKey = buildKey(key);
-    return secureStorage.containsKey(key: effectiveKey);
+    await _initializationCompleter.future;
+
+    final effectiveKey = _buildKey(key);
+    return _secureStorage.containsKey(key: effectiveKey);
   }
 
   @override
@@ -166,12 +175,14 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   @override
   Future<void> clear() async {
-    final all = await secureStorage.readAll();
+    await _initializationCompleter.future;
+
+    final all = await _secureStorage.readAll();
     final vaultKeys =
-        List.of(all.keys).where((key) => key.startsWith(_instanceKeyPrefix));
+        List.of(all.keys).where((key) => key.startsWith(_instanceKey));
 
     for (final key in vaultKeys) {
-      await secureStorage.delete(key: key);
+      await _secureStorage.delete(key: key);
     }
   }
 
@@ -186,10 +197,11 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   Future<String?> _guardedRead({
     required String key,
   }) async {
+    await _initializationCompleter.future;
     await _ensureUnlocked();
 
-    final effectiveKey = buildKey(key);
-    final encryptedData = await secureStorage.read(key: effectiveKey);
+    final effectiveKey = _buildKey(key);
+    final encryptedData = await _secureStorage.read(key: effectiveKey);
     if (encryptedData == null) {
       return null;
     }
@@ -210,12 +222,13 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     String? value, {
     required String key,
   }) async {
+    await _initializationCompleter.future;
     await _ensureUnlocked();
 
-    final effectiveKey = buildKey(key);
+    final effectiveKey = _buildKey(key);
 
     if (value == null) {
-      await secureStorage.delete(key: effectiveKey);
+      await _secureStorage.delete(key: effectiveKey);
       return;
     }
 
@@ -224,7 +237,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
     _erase(lock);
 
-    await secureStorage.write(key: effectiveKey, value: encryptedData);
+    await _secureStorage.write(key: effectiveKey, value: encryptedData);
   }
 
   Future<void> _ensureUnlocked() async {
@@ -233,6 +246,20 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
       throw const VaultLockedException();
     }
   }
+
+  Future<void> _initialize() async {
+    final effectiveKey = _buildKey(_createDateKey);
+    final contains = await _secureStorage.containsKey(key: effectiveKey);
+    if (!contains) {
+      final now = DateTimeExt.now();
+      final timestamp = now.toIso8601String();
+      await _secureStorage.write(key: effectiveKey, value: timestamp);
+    }
+
+    _initializationCompleter.complete();
+  }
+
+  String _buildKey(String key) => '$_instanceKey.$key';
 
   Future<String> _encrypt(
     String data, {
