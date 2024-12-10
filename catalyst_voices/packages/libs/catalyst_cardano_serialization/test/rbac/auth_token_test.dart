@@ -5,7 +5,6 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:test/test.dart';
-import 'package:ulid/ulid.dart';
 
 // The certificate provided in the request
 final _c509Cert = C509Certificate.fromHex(
@@ -55,19 +54,20 @@ void main() {
       expect(decodedCbor.length, 3);
 
       final decodedKid = decodedCbor[0] as CborBytes;
-      final decodedUlid = decodedCbor[1] as CborBytes;
+      final decodedUuid = decodedCbor[1] as CborBytes;
       final decodedSignature = decodedCbor[2] as CborBytes;
 
       expect(decodedKid.bytes, (kid.toCbor() as CborBytes).bytes);
+
       expect(
-        Ulid.fromBytes(decodedUlid.bytes).toMillis(),
-        timestamp.millisecondsSinceEpoch,
+        UuidV7.parseTimestamp(String.fromCharCodes(decodedUuid.bytes)),
+        timestamp,
       );
 
       // Verify the signature
       final toBeSigned = [
         ...cbor.encode(kid.toCbor()),
-        ...cbor.encode(decodedUlid),
+        ...cbor.encode(decodedUuid),
       ];
 
       final publicKey = await privateKey.derivePublicKey();
