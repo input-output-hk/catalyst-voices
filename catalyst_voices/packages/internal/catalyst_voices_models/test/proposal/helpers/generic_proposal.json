@@ -1,0 +1,104 @@
+{
+    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+    "setup": {
+        "title": {
+            "title": "Example Catalyst Proposal"
+        },
+        "proposer": {
+            "applicant": "John Doe",
+            "type": "Individual",
+            "coproposers": []
+        }
+    },
+    "summary": {
+        "budget": {
+            "requestedFunds": 150000
+        },
+        "time": {
+            "duration": 6
+        },
+        "translation": {
+            "isTranslated": true,
+            "originalLanguage": "Spanish",
+            "translationNotes": "Translated using DeepL with manual review"
+        },
+        "problem": {
+            "statement": "Current challenge in the Cardano ecosystem...",
+            "impact": [
+                "Technical Infrastructure",
+                "Developer Tooling",
+                "Adoption"
+            ]
+        },
+        "solution": {
+            "summary": "Our solution provides a comprehensive toolkit...",
+            "approach": "We will implement this solution using...",
+            "innovationAspects": [
+                "Novel testing framework",
+                "Automated integration tools"
+            ]
+        },
+        "supportingLinks": {
+            "mainRepository": "https://github.com/example/project",
+            "documentation": "https://docs.example.com",
+            "other": [
+                "https://github.com/example/project"
+            ]
+        },
+        "dependencies": {
+            "details": []
+        },
+        "open_source": {
+            "source_code": "MIT",
+            "documentation": "MIT",
+            "note": "All project outputs will be open source under MIT license"
+        }
+    },
+    "horizons": {
+        "theme": {
+            "grouped_tag": {
+                "group": "DeFi",
+                "tag": "Staking"
+            }
+        }
+    },
+    "details": {
+        "solution": {
+            "solution": "Our solution provides a comprehensive toolkit..."
+        },
+        "impact": {
+            "impact": "The project will significantly impact developer productivity..."
+        },
+        "feasibility": {
+            "feasibility": "Our team has extensive experience in blockchain development..."
+        }
+    },
+    "milestones": {
+        "milestones": {
+            "declared": [
+                "# Initial Setup and Planning\n\nProject setup and infrastructure...",
+                "# Core Development\n\nImplementation of main features...",
+                "# Testing and Documentation\n\nComprehensive testing and documentation...",
+                "# Final Release\n\nProject completion and deployment with Project Close-out Report and Video..."
+            ]
+        }
+    },
+    "pitch": {
+        "team": {
+            "who": "Our team consists of experienced blockchain developers..."
+        },
+        "budget": {
+            "costs": "Budget breakdown:\n- Development: 70%\n- Testing: 15%\n- Documentation: 15%"
+        },
+        "value": {
+            "note": "This project provides excellent value for money..."
+        }
+    },
+    "agreements": {
+        "mandatory": {
+            "fund_rules": true,
+            "terms_and_conditions": true,
+            "privacy_policy": true
+        }
+    }
+}
