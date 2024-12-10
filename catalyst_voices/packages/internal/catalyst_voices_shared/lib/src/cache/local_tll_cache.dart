@@ -53,10 +53,9 @@ base class LocalTllCache extends LocalStorage
 
     final effectiveTtl = ttl ?? _defaultTtl;
     final now = DateTimeExt.now();
-    final expireDate = await _readExpireDate(key: key);
 
-    final updatedExpireDate = (expireDate ?? now).add(effectiveTtl);
-    final expireDateTimestamp = updatedExpireDate.toIso8601String();
+    final expireDate = now.add(effectiveTtl);
+    final expireDateTimestamp = expireDate.toIso8601String();
     final expireDateKey = _buildExpireKey(key);
 
     await writeString(expireDateTimestamp, key: expireDateKey);
