@@ -46,6 +46,11 @@ project: {
 					]
 
 					env: [
+						// TODO: Remove after deployment is working
+						{
+							name:  "DEBUG_SLEEP_ERR"
+							value: "3600"
+						},
 						{
 							name:  "RUST_LOG"
 							value: "error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
@@ -87,7 +92,7 @@ project: {
 							}
 						},
 						{
-							name: "CASSANDRA_VOLATILE_DEPLOYMENT_LATENCY"
+							name:  "CASSANDRA_VOLATILE_DEPLOYMENT_LATENCY"
 							value: "90"
 						},
 						{
@@ -127,7 +132,7 @@ project: {
 							}
 						},
 						{
-							name: "CASSANDRA_PERSISTENT_DEPLOYMENT_LATENCY"
+							name:  "CASSANDRA_PERSISTENT_DEPLOYMENT_LATENCY"
 							value: "90"
 						},
 					]
