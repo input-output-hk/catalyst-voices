@@ -22,23 +22,21 @@ final class Dependencies extends DependencyProvider {
 
   void _registerBlocsWithDependencies() {
     this
-      ..registerSingleton<AuthenticationBloc>(
-        AuthenticationBloc(
-          authenticationRepository: get(),
-        ),
+      ..registerLazySingleton<AdminToolsCubit>(
+        AdminToolsCubit.new,
       )
-      ..registerLazySingleton<LoginBloc>(
-        () => LoginBloc(
-          authenticationRepository: get(),
-        ),
+      ..registerLazySingleton<AdminTools>(
+        () => get<AdminToolsCubit>(),
       )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
             get<UserService>(),
+            get<DummyUserFactory>(),
             get<RegistrationService>(),
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
+            get<AdminTools>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -53,7 +51,11 @@ final class Dependencies extends DependencyProvider {
         );
       })
       ..registerLazySingleton<ProposalsCubit>(
-        () => ProposalsCubit(proposalRepository: get<ProposalRepository>()),
+        () => ProposalsCubit(
+          get<CampaignService>(),
+          get<ProposalService>(),
+          get<AdminTools>(),
+        ),
       )
       ..registerFactory<CampaignDetailsBloc>(() {
         return CampaignDetailsBloc(
@@ -62,7 +64,8 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<CampaignInfoCubit>(() {
         return CampaignInfoCubit(
-          campaignService: get<CampaignService>(),
+          get<CampaignService>(),
+          get<AdminTools>(),
         );
       })
       // TODO(ryszard-schossler): add repository for campaign management
@@ -78,12 +81,6 @@ final class Dependencies extends DependencyProvider {
 
   void _registerRepositories() {
     this
-      ..registerLazySingleton<CredentialsStorageRepository>(
-        () => CredentialsStorageRepository(storage: get()),
-      )
-      ..registerLazySingleton<AuthenticationRepository>(
-        () => AuthenticationRepository(credentialsStorageRepository: get()),
-      )
       ..registerLazySingleton<TransactionConfigRepository>(
         TransactionConfigRepository.new,
       )
@@ -96,7 +93,6 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
     registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
     registerLazySingleton<KeychainProvider>(VaultKeychainProvider.new);
-    registerLazySingleton<DummyAuthStorage>(SecureDummyAuthStorage.new);
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
@@ -116,14 +112,21 @@ final class Dependencies extends DependencyProvider {
         return UserService(
           keychainProvider: get<KeychainProvider>(),
           userStorage: get<UserStorage>(),
+          dummyUserFactory: get<DummyUserFactory>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+    registerLazySingleton<DummyUserFactory>(DummyUserFactory.new);
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
         get<CampaignRepository>(),
+      );
+    });
+    registerLazySingleton<ProposalService>(() {
+      return ProposalService(
+        get<ProposalRepository>(),
       );
     });
   }

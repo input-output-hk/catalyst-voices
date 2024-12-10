@@ -38,11 +38,8 @@ class _AppState extends State<App> {
 
   List<BlocProvider> _multiBlocProviders() {
     return [
-      BlocProvider<AuthenticationBloc>(
-        create: (_) => Dependencies.instance.get<AuthenticationBloc>(),
-      ),
-      BlocProvider<LoginBloc>(
-        create: (_) => Dependencies.instance.get<LoginBloc>(),
+      BlocProvider<AdminToolsCubit>(
+        create: (_) => Dependencies.instance.get<AdminToolsCubit>(),
       ),
       BlocProvider<SessionCubit>(
         create: (_) => Dependencies.instance.get<SessionCubit>(),
