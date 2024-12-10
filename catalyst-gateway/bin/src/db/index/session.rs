@@ -287,7 +287,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                 },
             }
 
-            info!("On aws");
+            info!("On aws!");
 
             // poll until the status of all tables are ACTIVE
             while check_all_tables(session.clone(), key_space.clone())
