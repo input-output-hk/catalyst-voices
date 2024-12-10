@@ -15,7 +15,7 @@ class DrawerToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIconButton(
-      key: const Key('drawer_button'),
+      key: const Key('DrawerButton'),
       onTap: () => Scaffold.maybeOf(context)?.openDrawer(),
       child: VoicesAssets.icons.menu.buildIcon(),
     );

@@ -39,7 +39,7 @@ class _GetStartedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      key: const Key('getStartedButton'),
+      key: const Key('GetStartedButton'),
       onTap: () => unawaited(RegistrationDialog.show(context)),
       child: Text(context.l10n.getStarted),
     );

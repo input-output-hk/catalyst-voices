@@ -58,7 +58,7 @@ class _ToggleStateTextState extends State<ToggleStateText> {
     final theme = Theme.of(context);
 
     return Text.rich(
-      key: const Key('toggleStateText'),
+      key: const Key('ToggleStateText'),
       TextSpan(
         children: [
           const TextSpan(text: 'Toggle between'),

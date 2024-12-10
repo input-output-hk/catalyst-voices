@@ -19,7 +19,7 @@ class VoicesThemeModeSwitch extends StatelessWidget {
         Text('${context.l10n.themeLight} / ${context.l10n.themeDark}'),
         const SizedBox(width: 8),
         VoicesSwitch(
-          key: const Key('theme_switch'),
+          key: const Key('ThemeSwitch'),
           value: Theme.of(context).brightness == Brightness.dark,
           onChanged: (value) {
             onChanged(
