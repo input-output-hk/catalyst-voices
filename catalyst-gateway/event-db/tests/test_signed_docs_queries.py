@@ -1,5 +1,6 @@
 import psycopg
 import pytest
+import pybars
 
 
 class SignedData:
