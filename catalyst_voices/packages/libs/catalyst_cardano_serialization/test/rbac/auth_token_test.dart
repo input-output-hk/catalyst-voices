@@ -5,6 +5,7 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:test/test.dart';
+import 'package:uuid/parsing.dart';
 
 // The certificate provided in the request
 final _c509Cert = C509Certificate.fromHex(
@@ -59,8 +60,10 @@ void main() {
 
       expect(decodedKid.bytes, (kid.toCbor() as CborBytes).bytes);
 
+      final decodedUuidBytes = decodedUuid.bytes;
+      expect(decodedUuidBytes, hasLength(16));
       expect(
-        UuidV7.parseTimestamp(String.fromCharCodes(decodedUuid.bytes)),
+        UuidV7.parseTimestamp(UuidParsing.unparse(decodedUuidBytes)),
         timestamp,
       );
 

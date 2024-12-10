@@ -47,7 +47,9 @@ final class AuthToken {
     required DateTime timestamp,
   }) async {
     final uuidConfig = V7Options(timestamp.millisecondsSinceEpoch, null);
-    final uuid = CborBytes((const Uuid().v7(config: uuidConfig)).codeUnits);
+    final uuidString = const Uuid().v7(config: uuidConfig);
+    final uuidBytes = Uuid.parse(uuidString);
+    final uuid = CborBytes(uuidBytes);
 
     final toBeSigned = [
       ...cbor.encode(kid.toCbor()),
