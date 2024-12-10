@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:uuid/data.dart';
@@ -49,7 +50,7 @@ final class AuthToken {
     final uuidConfig = V7Options(timestamp.millisecondsSinceEpoch, null);
     final uuidString = const Uuid().v7(config: uuidConfig);
     final uuidBytes = Uuid.parse(uuidString);
-    final uuid = CborBytes(uuidBytes);
+    final uuid = CborBytes(uuidBytes, tags: [CborCustomTags.uuid]);
 
     final toBeSigned = [
       ...cbor.encode(kid.toCbor()),
