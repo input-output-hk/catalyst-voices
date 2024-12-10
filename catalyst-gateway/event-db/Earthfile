@@ -56,25 +56,3 @@ test:
         --allow-privileged
         RUN pytest ./tests/queries_tests.py
     END
-
-
-# test the event db database schema
-#   CI target : true
-#test:
-#    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.2+postgres-base
-
-#    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:v2.9.2+shell-assert/assert.sh .
-
-#    COPY ./docker-compose.yml .
-#    WITH DOCKER \
-#        --compose docker-compose.yml \
-#        --load event-db:latest=(+build --with_historic_data=false) \
-#        --service event-db \
-#        --allow-privileged
-#        RUN sleep 65;\
-#            res=$(psql postgresql://catalyst-event-dev:CHANGE_ME@0.0.0.0:5432/CatalystEventDev -c "SELECT COUNT(*) FROM event");\
-
-#            source assert.sh;\
-#            expected=$(printf " count \n-------\n     5\n(1 row)");\
-#            assert_eq "$expected" "$res"
-#    END
