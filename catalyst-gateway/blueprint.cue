@@ -88,11 +88,7 @@ project: {
 						},
 						{
 							name: "CASSANDRA_VOLATILE_DEPLOYMENT_LATENCY"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-volatile-deployment-latency"
-								}
-							}
+							value: "90"
 						},
 						{
 							name: "CASSANDRA_PERSISTENT_URL"
@@ -132,11 +128,7 @@ project: {
 						},
 						{
 							name: "CASSANDRA_PERSISTENT_DEPLOYMENT_LATENCY"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-persistent-deployment-latency"
-								}
-							}
+							value: "90"
 						},
 					]
 
