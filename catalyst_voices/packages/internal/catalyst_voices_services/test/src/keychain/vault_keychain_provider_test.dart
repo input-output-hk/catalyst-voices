@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  final provider = VaultKeychainProvider();
+  final provider = VaultKeychainProvider(cacheConfig: const CacheConfig());
 
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});

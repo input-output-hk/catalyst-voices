@@ -7,6 +7,8 @@ final _logger = Logger('VaultKeychainProvider');
 
 final class VaultKeychainProvider implements KeychainProvider {
   final FlutterSecureStorage _secureStorage;
+
+  // ignore: unused_field
   final CacheConfig _cacheConfig;
 
   VaultKeychainProvider({

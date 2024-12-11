@@ -20,7 +20,7 @@ void main() {
   late SessionCubit sessionCubit;
 
   setUpAll(() {
-    keychainProvider = VaultKeychainProvider();
+    keychainProvider = VaultKeychainProvider(cacheConfig: const CacheConfig());
     userStorage = SecureUserStorage();
 
     dummyUserFactory = DummyUserFactory();

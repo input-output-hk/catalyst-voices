@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:test/expect.dart';
@@ -5,7 +6,9 @@ import 'package:test/scaffolding.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  final KeychainProvider provider = VaultKeychainProvider();
+  final KeychainProvider provider = VaultKeychainProvider(
+    cacheConfig: const CacheConfig(),
+  );
   final UserStorage storage = SecureUserStorage();
   final dummyUserFactory = DummyUserFactory();
 
