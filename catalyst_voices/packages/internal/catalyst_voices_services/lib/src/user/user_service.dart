@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:logging/logging.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-abstract interface class UserService {
+abstract interface class UserService implements ActiveAware {
   factory UserService({
     required KeychainProvider keychainProvider,
     required UserStorage userStorage,
@@ -52,6 +52,8 @@ final class UserServiceImpl implements UserService {
   final _keychainSC = StreamController<Keychain?>.broadcast();
   StreamSubscription<bool>? _keychainUnlockSub;
 
+  bool _isActive = true;
+
   UserServiceImpl(
     this._keychainProvider,
     this._userStorage,
@@ -76,6 +78,17 @@ final class UserServiceImpl implements UserService {
   Stream<Keychain?> get watchKeychain async* {
     yield _keychain;
     yield* _keychainSC.stream;
+  }
+
+  @override
+  bool get isActive => _isActive;
+
+  @override
+  set isActive(bool value) {
+    if (_isActive != value) {
+      _isActive = value;
+      _keychain?.isActive = value;
+    }
   }
 
   @override
@@ -207,7 +220,11 @@ final class UserServiceImpl implements UserService {
   void _updateActiveKeychain(Keychain? keychain) {
     if (_keychain?.id != keychain?.id) {
       _logger.finest('Keychain changed to $keychain');
+
+      _keychain?.isActive = false;
       _keychain = keychain;
+      _keychain?.isActive = _isActive;
+
       _keychainSC.add(keychain);
     }
   }

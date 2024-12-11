@@ -1,3 +1,5 @@
+import 'package:catalyst_voices/dependency/dependencies.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/material.dart';
 
 class AppActiveStateListener extends StatefulWidget {
@@ -36,10 +38,10 @@ class _AppActiveStateListenerState extends State<AppActiveStateListener> {
   }
 
   Future<void> _handleResumed() async {
-    //
+    Dependencies.instance.get<UserService>().isActive = true;
   }
 
   Future<void> _handleInactive() async {
-    //
+    Dependencies.instance.get<UserService>().isActive = false;
   }
 }
