@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><database name="public" schema="public" type="PostgreSQL - 16.4 (Debian 16.4-1.pgdg120+2)">
+   <sequences>
+      <sequence increment="1" name="config_row_id_seq" startValue="1"/>
+   </sequences>
+   <tables>
+      <table name="brand" remarks="Defintion of a Brand." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="gen_random_uuid()" digits="0" id="0" name="id" nullable="false" remarks="Synthetic Unique ID for the brand (UUIDv4)." size="2147483647" type="uuid" typeCode="1111">
+            <child column="brand_id" foreignKey="fk_brand" implied="false" onDeleteCascade="true" schema="public" table="campaign"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="The UNIQUE name for the brand." size="2147483647" type="text" typeCode="12"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="brand_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="brand_name_key" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="campaign" remarks="Defintion of a Campaign." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="gen_random_uuid()" digits="0" id="0" name="id" nullable="false" remarks="Synthetic Unique ID for the campaign (UUIDv4)." size="2147483647" type="uuid" typeCode="1111">
+            <child column="campaign_id" foreignKey="fk_campaign" implied="false" onDeleteCascade="true" schema="public" table="event"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="brand_id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="fk_brand" implied="false" onDeleteCascade="true" schema="public" table="brand"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="The UNIQUE name for the campaign." size="2147483647" type="text" typeCode="12"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="campaign_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="campaign_name_key" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="category" remarks="Defintion of a Category." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="gen_random_uuid()" digits="0" id="0" name="id" nullable="false" remarks="Synthetic ID for the category (UUIDv4) the proposal is linked to." size="2147483647" type="uuid" typeCode="1111">
+            <child column="category_id" foreignKey="fk_category" implied="false" onDeleteCascade="true" schema="public" table="category_proposals"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="event_id" nullable="false" remarks="Synthetic ID for the proposal (UUIDv4) being submitted to the category." size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="fk_event" implied="false" onDeleteCascade="true" schema="public" table="event"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="The name for the category." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="proposal_template" nullable="false" remarks="The template all proposals in this category must use." size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="fk_proposal_template" implied="false" onDeleteCascade="false" schema="public" table="proposal_template"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="category_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="category_proposals" remarks="Proposals that are submitted into the linked category." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="gen_random_uuid()" digits="0" id="0" name="id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="category_id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="fk_category" implied="false" onDeleteCascade="true" schema="public" table="category"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="proposal_id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="fk_proposal_id" implied="false" onDeleteCascade="true" schema="public" table="proposal"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="category_proposals_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="config" remarks="General JSON Configuration and Data Values.&#10;Defined  Data Formats:&#10;  Currently None" schema="public" type="TABLE">
+         <column autoUpdated="true" defaultValue="nextval('config_row_id_seq'::regclass)" digits="0" id="0" name="row_id" nullable="false" remarks="Synthetic unique key. &#10;Always lookup using `cardano.follower.preview`" size="10" type="serial" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="id1" nullable="false" remarks="The primary ID of the config." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="id2" nullable="false" remarks="The secondary ID of the config.&#10;Must be defined, use &quot;&quot; if not required." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="id3" nullable="false" remarks="The tertiary ID of the config.&#10;Must be defined, use &quot;&quot; if not required." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="4" name="value" nullable="true" remarks="The configuration value in JSON format." size="2147483647" type="jsonb" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="value_schema" nullable="true" remarks="The Schema the Config Value conforms to.&#10;The `value` field must conform to this schema." size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="config_value_schema_fkey" implied="false" onDeleteCascade="true" schema="public" table="json_schema_type"/>
+         </column>
+         <primaryKey column="row_id" sequenceNumberInPK="1"/>
+         <index name="config_pkey" unique="true">
+            <column ascending="true" name="row_id"/>
+         </index>
+         <index name="config_idx" unique="true">
+            <column ascending="true" name="id1"/>
+            <column ascending="true" name="id2"/>
+            <column ascending="true" name="id3"/>
+         </index>
+      </table>
+      <table name="event" remarks="Defintion of an Event." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="gen_random_uuid()" digits="0" id="0" name="id" nullable="false" remarks="Synthetic Unique ID for the event (UUIDv4)." size="2147483647" type="uuid" typeCode="1111">
+            <child column="event_id" foreignKey="fk_event" implied="false" onDeleteCascade="true" schema="public" table="category"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="campaign_id" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="fk_campaign" implied="false" onDeleteCascade="true" schema="public" table="campaign"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="The UNIQUE name for the event." size="2147483647" type="text" typeCode="12"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="event_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="event_name_key" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="json_schema_type" remarks="Library of defined json schemas used to validate JSONB field contents." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="id" nullable="false" remarks="Synthetic Unique ID for each json_schema_type (UUIDv4).&#10;Must match the `UUID` component of the $id URI inside the schema." size="2147483647" type="uuid" typeCode="1111">
+            <child column="value_schema" foreignKey="config_value_schema_fkey" implied="false" onDeleteCascade="true" schema="public" table="config"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="type" nullable="false" remarks="The type of the json schema type.&#10;eg. &quot;event&quot;&#10;Must match the `type` component of the $id URI inside the schema." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="name" nullable="false" remarks="The name of the json schema type.&#10;eg. &quot;catalyst_v1&quot;&#10;Must match the `name` component of the $id URI inside the schema." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="schema" nullable="false" remarks="" size="2147483647" type="jsonb" typeCode="1111"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="json_schema_type_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="json_schema_type_idx" unique="false">
+            <column ascending="true" name="type"/>
+         </index>
+         <index name="json_schema_type_name_idx" unique="true">
+            <column ascending="true" name="type"/>
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="proposal" remarks="An individual Proposal." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="gen_random_uuid()" digits="0" id="0" name="id" nullable="false" remarks="The Synthetic Unique ID for the proposal (UUIDv4)." size="2147483647" type="uuid" typeCode="1111">
+            <child column="proposal_id" foreignKey="fk_proposal_id" implied="false" onDeleteCascade="true" schema="public" table="category_proposals"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="template_id" nullable="false" remarks="The Template this proposal conforms to." size="2147483647" type="uuid" typeCode="1111">
+            <parent column="id" foreignKey="fk_proposal_template" implied="false" onDeleteCascade="false" schema="public" table="proposal_template"/>
+         </column>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="proposal_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+      </table>
+      <table name="proposal_template" remarks="Defintion of a Proposal Template." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="gen_random_uuid()" digits="0" id="0" name="id" nullable="false" remarks="Synthetic Unique ID for the proposal template (UUIDv4)." size="2147483647" type="uuid" typeCode="1111">
+            <child column="proposal_template" foreignKey="fk_proposal_template" implied="false" onDeleteCascade="false" schema="public" table="category"/>
+            <child column="template_id" foreignKey="fk_proposal_template" implied="false" onDeleteCascade="false" schema="public" table="proposal"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="false" remarks="The UNIQUE name for the proposal template." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="template" nullable="true" remarks="The JSON Schema which must match the data contained in the proposal." size="2147483647" type="jsonb" typeCode="1111"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="proposal_template_pkey" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="proposal_template_name_key" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="refinery_schema_history" remarks="History of Schema Updates to the Database.&#10;Managed by the `refinery` cli tool." schema="public" type="TABLE">
+         <column autoUpdated="false" defaultValue="null" digits="0" id="0" name="version" nullable="false" remarks="" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="name" nullable="true" remarks="" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="2" name="applied_on" nullable="true" remarks="" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="3" name="checksum" nullable="true" remarks="" size="255" type="varchar" typeCode="12"/>
+         <primaryKey column="version" sequenceNumberInPK="1"/>
+         <index name="refinery_schema_history_pkey" unique="true">
+            <column ascending="true" name="version"/>
+         </index>
+      </table>
+   </tables>
+</database>

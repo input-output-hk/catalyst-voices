@@ -1,0 +1,257 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `bin/src/service/api/auth/endpoint.rs`."><title>endpoint.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../static.files/rustdoc-42fa08075bb476ff.css"><meta name="rustdoc-vars" data-root-path="../../../../../" data-static-root-path="../../../../../static.files/" data-current-crate="cat_gateway" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0-nightly (2bd1e894e 2024-09-26)" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../../../src-files.js"></script><script defer src="../../../../../static.files/main-54bc299d2a5e4e43.js"></script><noscript><link rel="stylesheet" href="../../../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">cat_gateway/service/api/auth/</div>endpoint.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{sync::LazyLock, time::Duration};
+
+<span class="kw">use </span>dashmap::DashMap;
+<span class="kw">use </span>ed25519_dalek::{Signature, VerifyingKey, PUBLIC_KEY_LENGTH};
+<span class="kw">use </span>moka::future::Cache;
+<span class="kw">use </span>poem::{error::ResponseError, http::StatusCode, Request};
+<span class="kw">use </span>poem_openapi::{auth::Bearer, SecurityScheme};
+<span class="kw">use </span>tracing::error;
+
+<span class="kw">use </span><span class="kw">super</span>::token::{Kid, SignatureEd25519, UlidBytes};
+<span class="kw">use </span><span class="kw">crate</span>::service::api::auth::token::decode_auth_token_ed25519;
+
+<span class="doccomment">/// Decoded token consists of a Kid, Ulid and Signature
+</span><span class="kw">pub type </span>DecodedAuthToken = (Kid, UlidBytes, SignatureEd25519);
+
+<span class="doccomment">/// Auth token in the form of catv1..
+</span><span class="kw">pub type </span>EncodedAuthToken = String;
+
+<span class="doccomment">/// Cached auth tokens
+</span><span class="kw">static </span>CACHE: LazyLock&lt;Cache&lt;EncodedAuthToken, DecodedAuthToken&gt;&gt; = LazyLock::new(|| {
+    Cache::builder()
+        <span class="comment">// Time to live (TTL): 30 minutes
+        </span>.time_to_live(Duration::from_secs(<span class="number">30 </span>* <span class="number">60</span>))
+        <span class="comment">// Time to idle (TTI):  5 minutes
+        </span>.time_to_idle(Duration::from_secs(<span class="number">5 </span>* <span class="number">60</span>))
+        <span class="comment">// Create the cache.
+        </span>.build()
+});
+
+<span class="doccomment">/// Mocked Valid certificates
+/// TODO: the following is temporary state for POC until RBAC database is complete.
+</span><span class="kw">static </span>CERTS: LazyLock&lt;DashMap&lt;String, [u8; PUBLIC_KEY_LENGTH]&gt;&gt; = LazyLock::new(|| {
+    <span class="doccomment">/// Mock KID
+    </span><span class="kw">const </span>KID: <span class="kw-2">&amp;</span>str = <span class="string">"0467de6bd945b9207bfa09d846b77ef5"</span>;
+
+    <span class="kw">let </span>public_key_bytes: [u8; PUBLIC_KEY_LENGTH] = [
+        <span class="number">180</span>, <span class="number">91</span>, <span class="number">130</span>, <span class="number">149</span>, <span class="number">226</span>, <span class="number">112</span>, <span class="number">29</span>, <span class="number">45</span>, <span class="number">188</span>, <span class="number">141</span>, <span class="number">64</span>, <span class="number">147</span>, <span class="number">250</span>, <span class="number">233</span>, <span class="number">75</span>, <span class="number">151</span>, <span class="number">151</span>, <span class="number">53</span>, <span class="number">248</span>,
+        <span class="number">197</span>, <span class="number">225</span>, <span class="number">122</span>, <span class="number">24</span>, <span class="number">67</span>, <span class="number">207</span>, <span class="number">100</span>, <span class="number">162</span>, <span class="number">152</span>, <span class="number">232</span>, <span class="number">102</span>, <span class="number">89</span>, <span class="number">162</span>,
+    ];
+
+    <span class="kw">let </span>cert_map = DashMap::new();
+    cert_map.insert(KID.to_string(), public_key_bytes);
+    cert_map
+});
+
+<span class="attr">#[derive(SecurityScheme)]
+#[oai(
+    rename = <span class="string">"CatalystSecurityScheme"</span>,
+    ty = <span class="string">"bearer"</span>,
+    key_in = <span class="string">"header"</span>,
+    key_name = <span class="string">"Bearer"</span>,
+    checker = <span class="string">"checker_api_catalyst_auth"
+</span>)]
+#[allow(dead_code)]
+</span><span class="doccomment">/// Auth token security scheme
+/// Add to endpoint params e.g async fn endpoint(&amp;self, auth: `CatalystSecurityScheme`)
+</span><span class="kw">pub struct </span>CatalystSecurityScheme(<span class="kw">pub </span>DecodedAuthToken);
+
+<span class="attr">#[derive(Debug, thiserror::Error)]
+#[error(<span class="string">"Corrupt Auth Token"</span>)]
+</span><span class="kw">pub struct </span>AuthTokenError;
+
+<span class="kw">impl </span>ResponseError <span class="kw">for </span>AuthTokenError {
+    <span class="kw">fn </span>status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StatusCode {
+        StatusCode::FORBIDDEN
+    }
+}
+
+<span class="doccomment">/// When added to an endpoint, this hook is called per request to verify the bearer token
+/// is valid.
+</span><span class="kw">async fn </span>checker_api_catalyst_auth(
+    _req: <span class="kw-2">&amp;</span>Request, bearer: Bearer,
+) -&gt; poem::Result&lt;DecodedAuthToken&gt; {
+    <span class="kw">if </span>CACHE.contains_key(<span class="kw-2">&amp;</span>bearer.token) {
+        <span class="comment">// This get() will extend the entry life for another 5 minutes.
+        // Even though we keep calling get(), the entry will expire
+        // after 30 minutes (TTL) from the origin insert().
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>((kid, ulid, sig)) = CACHE.get(<span class="kw-2">&amp;</span>bearer.token).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>((kid, ulid, sig))
+        } <span class="kw">else </span>{
+            <span class="macro">error!</span>(<span class="string">"Auth token is not in the cache: {:?}"</span>, bearer.token);
+            <span class="prelude-val">Err</span>(AuthTokenError)<span class="question-mark">?
+        </span>}
+    } <span class="kw">else </span>{
+        <span class="comment">// Decode bearer token
+        </span><span class="kw">let </span>(kid, ulid, sig, msg) = <span class="kw">match </span>decode_auth_token_ed25519(<span class="kw-2">&amp;</span>bearer.token.clone()) {
+            <span class="prelude-val">Ok</span>((kid, ulid, sig, msg)) =&gt; (kid, ulid, sig, msg),
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">error!</span>(<span class="string">"Corrupt auth token: {:?}"</span>, err);
+                <span class="prelude-val">Err</span>(AuthTokenError)<span class="question-mark">?
+            </span>},
+        };
+
+        <span class="comment">// Get pub key from CERTS state given decoded KID from decoded bearer token
+        </span><span class="kw">let </span>pub_key_bytes = <span class="kw">if let </span><span class="prelude-val">Some</span>(cert) = CERTS.get(<span class="kw-2">&amp;</span>hex::encode(kid.<span class="number">0</span>)) {
+            <span class="kw-2">*</span>cert
+        } <span class="kw">else </span>{
+            <span class="macro">error!</span>(<span class="string">"Invalid KID {:?}"</span>, kid);
+            <span class="prelude-val">Err</span>(AuthTokenError)<span class="question-mark">?
+        </span>};
+
+        <span class="kw">let </span>public_key = <span class="kw">match </span>VerifyingKey::from_bytes(<span class="kw-2">&amp;</span>pub_key_bytes) {
+            <span class="prelude-val">Ok</span>(pub_key) =&gt; pub_key,
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="macro">error!</span>(<span class="string">"Invalid public key: {:?}"</span>, err);
+                <span class="prelude-val">Err</span>(AuthTokenError)<span class="question-mark">?
+            </span>},
+        };
+
+        <span class="comment">// Strictly verify a signature on a message with this key-pair public key.
+        </span><span class="kw">if </span>public_key
+            .verify_strict(<span class="kw-2">&amp;</span>msg, <span class="kw-2">&amp;</span>Signature::from_bytes(<span class="kw-2">&amp;</span>sig.<span class="number">0</span>))
+            .is_err()
+        {
+            <span class="macro">error!</span>(
+                <span class="string">"Message {:?} was not signed by this key-pair {:?}"</span>,
+                hex::encode(msg),
+                public_key,
+            );
+            <span class="prelude-val">Err</span>(AuthTokenError)<span class="question-mark">?</span>;
+        }
+
+        <span class="comment">// This entry will expire after 5 minutes (TTI) if there is no get().
+        </span>CACHE.insert(bearer.token, (kid, ulid, sig.clone())).<span class="kw">await</span>;
+
+        <span class="prelude-val">Ok</span>((kid, ulid, sig))
+    }
+}
+</code></pre></div></section></main></body></html>

@@ -1,0 +1,70 @@
+VOTE-TX           = SIZE-BYTES-32BIT %x00 %x0b VOTE-PAYLOAD
+
+VOTE-PAYLOAD      = CAST-CERT IOW
+CAST-CERT         = VOTE-PLAN-ID PROPOSAL-INDEX CAST-PAYLOAD
+
+VOTE-PLAN-ID      = SIZE-BYTES-32BYTE               ; Jörmungandr specific vote plan identifier, Blake2b hash of the vote plan bytes
+PROPOSAL-INDEX    = U8                              ; Jörmungandr specific proposal identifier
+CAST-PAYLOAD      = %x01 CHOICE                     ; Public payload
+                   / %x02 ENCRYPTED-VOTE PROOF-VOTE ; Private payload
+
+CHOICE            = U8
+ENCRYPTED-VOTE    = SIZE-BYTES-8BIT *CIPHERTEXT
+PROOF-VOTE        = SIZE-BYTES-8BIT *ANNOUNCEMENT *CIPHERTEXT *R-RESPONSE SCALAR ; size of the *ANNOUNCEMENT, *CIPHERTEXT, *R-RESPONSE are equal to SIZE-BYTES-8BIT value
+
+CIPHERTEXT        = E1 E2
+ANNOUNCEMENT      = I A B
+R-RESPONSE        = 3 * SCALAR
+I                 = GROUP-ELEMENT
+A                 = GROUP-ELEMENT
+B                 = GROUP-ELEMENT
+E1                = GROUP-ELEMENT
+E2                = GROUP-ELEMENT
+
+; ####################
+; IOW stand for Inputs-Outputs-Witnesses
+; ####################
+
+IOW               = BLOCK-DATE
+                    %x01              ; number of inputs and witness
+                    %x00              ; number of outputs
+                    INPUT             ; one input
+                    WITNESS           ; one witness
+
+INPUT             = %xff
+                    VALUE
+                    ED25519-PUBLICKEY
+
+WITNESS           = %x02
+                    NONCE
+                    ED25519-SIGNATURE
+
+VALUE                = U64 ; could be anything, not processed anymore, recommended set to zero
+NONCE                = U32 ; could be anything, not processed anymore, recommended set to zero
+BLOCK-DATE           = BLOCK-EPOCH BLOCK-SLOT ; expiration date, could be anything, not processed anymore, recommended set to zeros
+BLOCK-EPOCH          = U32
+BLOCK-SLOT           = U32
+
+; ####################
+; CRYPTO
+; ####################
+
+ED25519-PUBLICKEY = SIZE-BYTES-32BYTE
+ED25519-SIGNATURE = SIZE-BYTES-64BYTE
+
+; ####################
+; PRIMITIVES
+; ####################
+
+SIZE-BYTES-8BIT    = U8  ; size in elements (8 bits)
+SIZE-BYTES-16BIT   = U16 ; size in bytes (16 bits)
+SIZE-BYTES-32BIT   = U32 ; size in bytes (32 bits)
+U8                 = OCTET   ; unsigned integer 8 bit
+U16                = 2OCTET ; unsigned integer 16 bit (BE)
+U32                = 4OCTET ; unsigned integer 32 bit (BE)
+U64                = 8OCTET ; unsigned integer 64 bit (BE)
+SIZE-BYTES-32BYTE  = 32OCTET ; unsigned integer 256 bit (32 bytes) (BE)
+SIZE-BYTES-64BYTE  = 64OCTET ; unsigned integer 512 bit (64 bytes) (BE)
+SIZE-BYTES-65BYTE  = 65OCTET ; unsigned integer 520 bit (65 bytes) (BE)
+SCALAR             = SIZE-BYTES-32BYTE
+GROUP-ELEMENT      = SIZE-BYTES-32BYTE ; ristretto255 group element
