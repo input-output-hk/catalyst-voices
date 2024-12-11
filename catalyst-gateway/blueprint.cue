@@ -25,7 +25,7 @@ project: {
 						{
 							name:             "pvc"
 							storageClassName: "ebs-io1"
-							storage:          "150Gi"
+							storage:          "250Gi"
 						},
 					]
 
@@ -80,7 +80,7 @@ project: {
 								}
 							}
 						},
-						
+
 						{
 							name: "CASSANDRA_VOLATILE_DEPLOYMENT"
 							valueFrom: {
@@ -121,7 +121,7 @@ project: {
 								}
 							}
 						},
-						
+
 						{
 							name: "CASSANDRA_PERSISTENT_DEPLOYMENT"
 							valueFrom: {
