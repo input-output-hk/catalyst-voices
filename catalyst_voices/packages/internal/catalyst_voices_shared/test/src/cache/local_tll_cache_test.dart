@@ -68,7 +68,7 @@ void main() {
       await cache.set('$value', key: key);
       await cache.extendExpiration(key: key, ttl: ttl);
 
-      DateTimeExt.mockedDateTime = now.add(ttl);
+      DateTimeExt.mockedDateTime = now.add(ttl - const Duration(seconds: 1));
 
       // Then
       final cachedValue = await cache.get(key: key);

@@ -9,9 +9,13 @@ abstract interface class SecureStorageVaultCache {
 
   Future<void> setIsUnlocked({required bool value});
 
+  Future<bool> containsIsUnlocked();
+
   Future<bool> isUnlockedExpired();
 
   Future<void> extendIsUnlocked();
+
+  Future<void> clear();
 }
 
 final class SecureStorageVaultTtlCache extends LocalTllCache
@@ -33,6 +37,9 @@ final class SecureStorageVaultTtlCache extends LocalTllCache
   Future<void> setIsUnlocked({required bool value}) {
     return set('$value', key: _isUnlockedKey);
   }
+
+  @override
+  Future<bool> containsIsUnlocked() => contains(key: _isUnlockedKey);
 
   @override
   Future<bool> isUnlockedExpired() => isExpired(key: _isUnlockedKey);

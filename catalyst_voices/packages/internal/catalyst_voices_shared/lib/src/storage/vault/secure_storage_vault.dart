@@ -123,7 +123,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
       // When vault becomes inactive we should extend ttl for last unlock state.
       if (!value) {
-        unawaited(_cache.extendIsUnlocked());
+        unawaited(_extendIsUnlockedExpirationDate());
       }
     }
   }
@@ -197,6 +197,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     for (final key in vaultKeys) {
       await _secureStorage.delete(key: key);
     }
+
+    await _cache.clear();
   }
 
   @override
@@ -267,11 +269,17 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   Future<bool> _getIsUnlocked() async {
-    if (isActive && await _cache.isUnlockedExpired()) {
-      await _cache.extendIsUnlocked();
+    if (isActive) {
+      await _extendIsUnlockedExpirationDate();
     }
 
     return _cache.getIsUnlocked();
+  }
+
+  Future<void> _extendIsUnlockedExpirationDate() async {
+    if (await _cache.containsIsUnlocked()) {
+      await _cache.extendIsUnlocked();
+    }
   }
 
   Future<void> _updateUnlocked(bool value) async {

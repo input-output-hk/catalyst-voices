@@ -70,7 +70,10 @@ base class LocalTllCache extends LocalStorage
 
     final other = expireDate ?? now;
 
-    return now.isAfter(other) || now.isAtSameMomentAs(other);
+    final after = now.isAfter(other);
+    final atSameMoment = now.isAtSameMomentAs(other);
+
+    return after || atSameMoment;
   }
 
   Future<DateTime?> _readExpireDate({required String key}) async {
