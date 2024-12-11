@@ -25,7 +25,7 @@ project: {
 						{
 							name:             "pvc"
 							storageClassName: "ebs-io1"
-							storage:          "50Gi"
+							storage:          "150Gi"
 						},
 					]
 
