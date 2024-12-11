@@ -6,11 +6,7 @@ SELECT
   signed_docs.metadata
 FROM signed_docs
 WHERE
-  TRUE
-  {{#if id }} AND signed_docs.id = '{{ id }}' {{/if}}
-  {{#if ver }} AND signed_docs.ver = '{{ ver }}' {{/if}}
-  {{#if type }} AND signed_docs.type = '{{ type }}' {{/if}}
-  {{#if author }} AND signed_docs.author = '{{ author }}' {{/if}}
+  {{ conditions }}
 ORDER BY signed_docs.id DESC, signed_docs.ver DESC
-LIMIT {{ limit }}
-OFFSET {{ offset }}
+{{#if limit }} LIMIT {{ limit }} {{/if}}
+{{#if offset }} OFFSET {{ offset }} {{/if}}
