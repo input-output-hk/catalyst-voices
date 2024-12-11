@@ -1,0 +1,1 @@
+SELECT * FROM system_schema.keyspaces WHERE keyspace_name='system_schema_mcs';

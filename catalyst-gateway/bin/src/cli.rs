@@ -48,7 +48,11 @@ impl Cli {
                 db::event::establish_connection();
 
                 // Start the chain indexing follower.
-                start_followers().await?;
+                // TEMPORARY TEST: ENSURE CASSANDRA CONNECTION IN DEPLOYMENT
+                match start_followers().await {
+                    Ok(()) => info!("Followers started ok"),
+                    Err(err) => error!("can't start followers {:?}", err),
+                };
 
                 let handle = tokio::spawn(async move {
                     match service::run().await {

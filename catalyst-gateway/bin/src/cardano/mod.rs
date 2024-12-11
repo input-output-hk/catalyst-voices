@@ -42,7 +42,7 @@ async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
     info!(chain = %chain, "Starting Blockchain Sync");
 
     if let Err(error) = cfg.run().await {
-        error!(chain=%chain, error=%error, "Failed to start chain sync task");
+        error!(chain=%chain, error=%error, "Failed to start chain sync task {:?}",error);
         Err(error)?;
     }
 

@@ -7,11 +7,13 @@ use std::{
     time::Duration,
 };
 
+use handlebars::Handlebars;
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
     frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
     ExecutionProfile, Session, SessionBuilder,
 };
+use serde_json::json;
 use tokio::fs;
 use tracing::{error, info};
 
@@ -20,10 +22,10 @@ use super::{
         FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
         PreparedUpsertQuery,
     },
-    schema::create_schema,
+    schema::{create_schema, get_table_names},
 };
 use crate::{
-    db::index::queries,
+    db::index::{queries, schema::namespace},
     settings::{cassandra_db, Settings},
 };
 
@@ -227,6 +229,7 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
+#[allow(clippy::match_same_arms)]
 async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
@@ -258,7 +261,8 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             },
         };
 
-        // Set up the Schema for it.
+        info!(db_type = db_type, "Connected to Cassandra DB!");
+
         if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
             let error = format!("{error:?}");
             error!(
@@ -267,6 +271,29 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                 "Failed to Create Cassandra DB Schema"
             );
             continue;
+        }
+
+        info!(db_type = db_type, "Created schema");
+
+        // Check if we are on AWS infrastructure
+        if on_aws(session.clone()).await {
+            let key_space = namespace(&cfg);
+
+            match session.use_keyspace(key_space.clone(), false).await {
+                Ok(()) => (),
+                Err(err) => {
+                    error!("Failed to set keyspace, continue trying... {:?}", err);
+                    continue;
+                },
+            }
+
+            info!("On aws!!");
+
+            // poll until the status of all tables are ACTIVE
+            while check_all_tables(session.clone(), key_space.clone())
+                .await
+                .is_err()
+            {}
         }
 
         let queries = match queries::PreparedQueries::new(session.clone(), &cfg).await {
@@ -284,7 +311,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         let cassandra_session = CassandraSession {
             persistent,
             cfg: Arc::new(cfg),
-            session,
+            session: session.clone(),
             queries,
         };
 
@@ -302,4 +329,73 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
     }
 
     info!(db_type = db_type, "Index DB Session Creation: OK.");
+}
+
+/// Check if we are on AWS infra
+pub async fn on_aws(session: Arc<Session>) -> bool {
+    /// Query to check if we are AWS infra
+    const ON_AWS: &str = include_str!("schema/cql/on_aws.cql");
+    session.query_unpaged(ON_AWS, []).await.is_ok()
+}
+
+/// Check tables are active in AWS key spaces
+async fn check_all_tables(session: Arc<Session>, keyspace: String) -> anyhow::Result<()> {
+    for table in get_table_names()? {
+        table_creation_status_keyspaces(session.clone(), keyspace.clone(), table).await?;
+    }
+
+    Ok(())
+}
+
+/// Check if AWS table has been created and status is ACTIVE.
+/// `https://docs.aws.amazon.com/keyspaces/latest/devguide/tables-create.html`
+async fn table_creation_status_keyspaces(
+    session: Arc<Session>, keyspace: String, table_name: String,
+) -> anyhow::Result<bool> {
+    /// Query to check status of tables
+    const AWS_TABLE_CHECK: &str = include_str!("schema/cql/aws_table_check.cql");
+
+    let mut reg = Handlebars::new();
+    reg.register_escape_fn(|s| s.into());
+    let query = reg.render_template(
+        AWS_TABLE_CHECK,
+        &json!({"keyspace_name": keyspace,"table_name":table_name}),
+    )?;
+
+    let table_status: (String,) = session
+        .query_unpaged(query, &[])
+        .await?
+        .into_rows_result()?
+        .first_row::<(String,)>()?;
+
+    if table_status.0 == "ACTIVE" {
+        Ok(true)
+    } else {
+        Err(anyhow::anyhow!("Table not active yet {:?}", table_name))
+    }
+}
+
+/// Check keyspace creation status in Amazon Keyspaces
+/// `https://docs.aws.amazon.com/keyspaces/latest/devguide/keyspaces-create.htmll`
+pub async fn keyspace_creation_status(
+    session: Arc<Session>, keyspace: String,
+) -> anyhow::Result<bool> {
+    /// Query to check if keyspace exists
+    const AWS_KEYSPACE_CHECK: &str = include_str!("schema/cql/aws_check_keyspace_exists.cql");
+
+    let mut reg = Handlebars::new();
+    reg.register_escape_fn(|s| s.into());
+    let query = reg.render_template(AWS_KEYSPACE_CHECK, &json!({"keyspace_name": keyspace}))?;
+
+    let keyspace_name: (String,) = session
+        .query_unpaged(query, &[])
+        .await?
+        .into_rows_result()?
+        .first_row::<(String,)>()?;
+
+    if keyspace_name.0 == keyspace {
+        Ok(true)
+    } else {
+        Err(anyhow::anyhow!("Keyspace not created yet {:?}", keyspace))
+    }
 }
