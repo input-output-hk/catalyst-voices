@@ -1,5 +1,6 @@
 library catalyst_voices_models;
 
+export 'app_config.dart';
 export 'auth/password_strength.dart';
 export 'campaign/campaign.dart';
 export 'campaign/campaign_category.dart';
