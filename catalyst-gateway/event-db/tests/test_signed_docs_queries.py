@@ -1,4 +1,6 @@
 import psycopg
+import pytest
+import pybars
 
 
 class SignedData:
@@ -35,6 +37,7 @@ class SignedData:
 EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
 
+@pytest.mark.ci
 def test_signed_docs_queries():
     with psycopg.connect(EVENT_DB_URL) as conn:
         docs = [
@@ -62,6 +65,7 @@ def test_signed_docs_queries():
         # try insert the same values
         insert_signed_documents_query(conn, docs)
         select_signed_documents_query(conn, docs)
+        select_signed_documents_2_query(conn, docs)
 
         # try insert the same id and ver, but with the different other data
         docs[0].author = "Sasha"
@@ -73,6 +77,10 @@ def test_signed_docs_queries():
         should_panic(
             lambda: select_signed_documents_query(conn, docs),
             "select_signed_documents_query should fail",
+        )
+        should_panic(
+            lambda: select_signed_documents_2_query(conn, docs),
+            "select_signed_documents_2_query should fail",
         )
 
 
@@ -113,6 +121,26 @@ def select_signed_documents_query(conn, docs: [SignedData]):
         assert str(metadata) == doc.metadata
         assert str(payload) == doc.payload
         assert raw == doc.raw
+
+
+def select_signed_documents_2_query(conn, docs: [SignedData]):
+    select_signed_documents_sql_hbs = open(
+        "./queries/select_signed_documents_2.sql.hbs", "r"
+    ).read()
+    select_signed_documents_sql_template = pybars.Compiler().compile(
+        select_signed_documents_sql_hbs
+    )
+    for doc in docs:
+        sql_stmt = select_signed_documents_sql_template(
+            {"id": doc.id, "limit": 1, "offset": 0}
+        )
+        cur = conn.execute(sql_stmt)
+        (id, ver, doc_type, author, metadata) = cur.fetchone()
+        assert str(id) == doc.id
+        assert str(ver) == doc.ver
+        assert str(doc_type) == doc.doc_type
+        assert author == doc.author
+        assert str(metadata) == doc.metadata
 
 
 def should_panic(func, msg: str):

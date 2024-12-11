@@ -1,0 +1,23 @@
+# cspell: words bitcoinlib
+
+[tool.poetry]
+name = "tests"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "Readme.md"
+license = "MIT or Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+loguru = "^0.7.2"
+pytest = "^8.0.0"
+psycopg = "3.2.3"
+psycopg-binary = "^3.2.3"
+pybars3 = "^0.9.7"
+
+[tool.pytest.ini_options]
+markers = [
+    "ci: marks tests to be run in ci",
+    "nightly: marks tests to be run nightly",
+]
