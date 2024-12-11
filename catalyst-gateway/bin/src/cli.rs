@@ -44,15 +44,11 @@ impl Cli {
                 info!("Catalyst Gateway - Starting");
 
                 // Start the DB's
-                CassandraSession::init();
+                CassandraSession::init().await;
                 db::event::establish_connection();
 
                 // Start the chain indexing follower.
-                // TEMPORARY TEST: ENSURE CASSANDRA CONNECTION IN DEPLOYMENT
-                match start_followers().await {
-                    Ok(()) => info!("Followers started ok"),
-                    Err(err) => error!("can't start followers {:?}", err),
-                };
+                start_followers().await?;
 
                 let handle = tokio::spawn(async move {
                     match service::run().await {

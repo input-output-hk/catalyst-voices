@@ -75,11 +75,13 @@ static VOLATILE_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 
 impl CassandraSession {
     /// Initialise the Cassandra Cluster Connections.
-    pub(crate) fn init() {
+    pub(crate) async fn init() {
         let (persistent, volatile) = Settings::cassandra_db_cfg();
 
-        let _join_handle = tokio::task::spawn(async move { retry_init(persistent, true).await });
-        let _join_handle = tokio::task::spawn(async move { retry_init(volatile, false).await });
+        // wait until persistent has been created
+        if retry_init(persistent, true).await.is_ok() {
+            let _unused = retry_init(volatile, false).await;
+        };
     }
 
     /// Check to see if the Cassandra Indexing DB is ready for use
@@ -230,7 +232,7 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
 #[allow(clippy::match_same_arms)]
-async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
+async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) -> anyhow::Result<()> {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
 
@@ -261,7 +263,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             },
         };
 
-        info!(db_type = db_type, "Connected to Cassandra DB!");
+        info!(db_type = db_type, "Connected to Cassandra DB");
 
         if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
             let error = format!("{error:?}");
@@ -286,8 +288,6 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                     continue;
                 },
             }
-
-            info!("On aws!!");
 
             // poll until the status of all tables are ACTIVE
             while check_all_tables(session.clone(), key_space.clone())
@@ -329,6 +329,8 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
     }
 
     info!(db_type = db_type, "Index DB Session Creation: OK.");
+
+    Ok(())
 }
 
 /// Check if we are on AWS infra
