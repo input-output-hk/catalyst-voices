@@ -167,16 +167,16 @@ scripts:
 
   format-apply:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix"
+      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix"
     description: Run `dart format` for all packages.
 
   format-check:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
+      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
+      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
     description: Run `dart format` checks for all packages.
 
   license-check:
