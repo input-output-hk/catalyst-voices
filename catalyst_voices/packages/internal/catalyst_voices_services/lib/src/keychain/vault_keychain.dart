@@ -31,6 +31,8 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     required super.id,
     super.key,
     super.secureStorage,
+    super.unlockTtl,
+    super.cryptoService,
   });
 
   @override

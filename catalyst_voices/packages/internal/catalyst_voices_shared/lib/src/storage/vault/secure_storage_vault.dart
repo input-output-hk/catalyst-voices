@@ -71,12 +71,13 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     required this.id,
     String key = defaultKey,
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
+    Duration unlockTtl = const Duration(hours: 1),
     CryptoService? cryptoService,
   })  : _key = key,
         _secureStorage = secureStorage,
         _cache = SecureStorageVaultTtlCache(
           key: '$key.$id.Cache',
-          defaultTtl: const Duration(hours: 1),
+          defaultTtl: unlockTtl,
         ),
         _cryptoService = cryptoService ?? LocalCryptoService() {
     unawaited(_initialize());
