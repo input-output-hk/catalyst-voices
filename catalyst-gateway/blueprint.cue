@@ -24,8 +24,8 @@ project: {
 					persistentVolumeClaims: [
 						{
 							name:             "pvc"
-							storageClassName: "ebs"
-							storage:          "10Gi"
+							storageClassName: "ebs-io1"
+							storage:          "50Gi"
 						},
 					]
 
@@ -41,7 +41,7 @@ project: {
 					volumeMounts: [
 						{
 							name:      "data"
-							mountPath: "/var/lib"
+							mountPath: "/root/.local/share/cat-gateway"
 							readOnly:  false
 						},
 					]
