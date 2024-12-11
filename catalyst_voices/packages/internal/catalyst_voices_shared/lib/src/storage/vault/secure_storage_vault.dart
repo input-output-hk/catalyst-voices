@@ -119,6 +119,11 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   set isActive(bool value) {
     if (_isActive != value) {
       _isActive = value;
+
+      // When vault becomes inactive we should extend ttl for last unlock state.
+      if (!value) {
+        unawaited(_cache.extendIsUnlocked());
+      }
     }
   }
 
