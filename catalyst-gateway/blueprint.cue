@@ -93,10 +93,6 @@ project: {
 							}
 						},
 						{
-							name:  "CASSANDRA_VOLATILE_DEPLOYMENT_LATENCY"
-							value: "90"
-						},
-						{
 							name: "CASSANDRA_PERSISTENT_URL"
 							valueFrom: {
 								secretKeyRef: {
@@ -131,10 +127,6 @@ project: {
 									key: "cassandra-persistent-deployment"
 								}
 							}
-						},
-						{
-							name:  "CASSANDRA_PERSISTENT_DEPLOYMENT_LATENCY"
-							value: "90"
 						},
 					]
 

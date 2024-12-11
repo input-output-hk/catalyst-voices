@@ -80,6 +80,7 @@ impl CassandraSession {
 
         // wait until persistent has been created
         if retry_init(persistent, true).await.is_ok() {
+            info!("Persistent created");
             let _unused = retry_init(volatile, false).await;
         };
     }
@@ -116,7 +117,9 @@ impl CassandraSession {
     pub(crate) async fn execute_iter<P>(
         &self, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let session = self.session.clone();
         let queries = self.queries.clone();
 

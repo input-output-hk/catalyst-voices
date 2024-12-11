@@ -35,7 +35,7 @@ const MAX_BATCH_SIZE: i64 = 256;
 
 /// AWS remote latency, resources are not created instantly hence we need to add delays
 /// before we access them.
-const LATENCY_DEFAULT: u64 = 60;
+const LATENCY_DEFAULT: u64 = 90;
 
 /// Configuration for an individual cassandra cluster.
 #[derive(Clone)]

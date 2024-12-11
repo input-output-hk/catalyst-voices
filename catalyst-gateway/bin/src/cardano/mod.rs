@@ -39,6 +39,7 @@ async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
 
     let mut cfg = ChainSyncConfig::default_for(chain);
     cfg.mithril_cfg = cfg.mithril_cfg.with_dl_config(dl_config);
+
     info!(chain = %chain, "Starting Blockchain Sync");
 
     if let Err(error) = cfg.run().await {
