@@ -20,6 +20,7 @@ dependencies:
   get_it: ^7.6.7
   intl: ^0.19.0
   logging: ^1.2.0
+  shared_preferences: ^2.3.3
   web: ^1.1.0
 
 dev_dependencies:
@@ -27,4 +28,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.1
+  shared_preferences_platform_interface: ^2.4.1
   test: ^1.24.9

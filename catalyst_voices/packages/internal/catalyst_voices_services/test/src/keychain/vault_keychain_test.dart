@@ -4,6 +4,8 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
@@ -11,6 +13,10 @@ void main() {
   group(VaultKeychain, () {
     setUpAll(() {
       FlutterSecureStorage.setMockInitialValues({});
+
+      final store = InMemorySharedPreferencesAsync.empty();
+      SharedPreferencesAsyncPlatform.instance = store;
+
       Bip32Ed25519XPrivateKeyFactory.instance =
           _FakeBip32Ed25519XPrivateKeyFactory();
     });
@@ -44,30 +50,6 @@ void main() {
       expect(await vault.isEmpty, isFalse);
     });
 
-    test('metadata is updated after writing master key', () async {
-      // Given
-      final id = const Uuid().v4();
-      const lock = PasswordLockFactor('Test1234');
-      final key = Bip32Ed25519XPrivateKeyFactory.instance.fromHex(
-        '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
-      );
-
-      // When
-      final vault = VaultKeychain(id: id);
-      await vault.setLock(lock);
-      await vault.unlock(lock);
-
-      // Then
-      final metadataBefore = await vault.metadata;
-      await vault.setMasterKey(key);
-      final metadataAfter = await vault.metadata;
-
-      expect(
-        metadataBefore.updatedAt.isBefore(metadataAfter.updatedAt),
-        isTrue,
-      );
-    });
-
     test('are not equal when id is matching', () async {
       // Given
       final id = const Uuid().v4();
@@ -78,21 +60,6 @@ void main() {
 
       // Then
       expect(vaultOne, isNot(equals(vaultTwo)));
-    });
-
-    test('metadata dates are in UTC', () async {
-      // Given
-      final id = const Uuid().v4();
-
-      // When
-      final vault = VaultKeychain(id: id);
-
-      // Then
-
-      final metadata = await vault.metadata;
-
-      expect(metadata.createdAt.isUtc, isTrue);
-      expect(metadata.updatedAt.isUtc, isTrue);
     });
   });
 }

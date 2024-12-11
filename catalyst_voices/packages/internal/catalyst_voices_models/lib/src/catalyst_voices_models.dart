@@ -5,7 +5,6 @@ export 'campaign/campaign.dart';
 export 'campaign/campaign_category.dart';
 export 'campaign/campaign_publish.dart';
 export 'campaign/campaign_section.dart';
-export 'crypto/keychain_metadata.dart';
 export 'crypto/lock_factor.dart';
 export 'errors/errors.dart';
 export 'file/voices_file.dart';
