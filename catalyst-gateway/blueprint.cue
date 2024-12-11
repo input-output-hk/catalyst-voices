@@ -81,7 +81,7 @@ project: {
 							}
 						},
 						{
-							name:  "CASSANDRA_VOLATILE_TLS"
+							name:  "CASSANDRA_VOLATILE_TLS_CERT"
 							value: "/tmp/keyspaces.crt"
 						},
 						{
@@ -121,7 +121,7 @@ project: {
 							}
 						},
 						{
-							name:  "CASSANDRA_PERSISTENT_TLS"
+							name:  "CASSANDRA_PERSISTENT_TLS_CERT"
 							value: "/tmp/keyspaces.crt"
 						},
 						{
