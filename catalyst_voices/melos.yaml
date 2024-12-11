@@ -124,7 +124,6 @@ command:
       convert: ^3.1.1
       path: ^1.9.0
       pinenacl: ^0.6.0
-      ulid: ^2.0.0
       uuid: ^4.5.1
       sentry_flutter: ^8.8.0
       scrollable_positioned_list: ^0.3.8

@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_blocs/src/bloc_error_emitter_mixin.dart';
-import 'package:catalyst_voices_blocs/src/session/session_state.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -13,33 +12,33 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class SessionCubit extends Cubit<SessionState>
     with BlocErrorEmitterMixin {
   final UserService _userService;
+  final DummyUserFactory _dummyUserFactory;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
   final AccessControl _accessControl;
+  final AdminTools _adminTools;
 
   final _logger = Logger('SessionCubit');
 
   bool _hasKeychain = false;
   bool _isUnlocked = false;
   Account? _account;
+  AdminToolsState _adminToolsState;
 
   StreamSubscription<bool>? _keychainSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
   StreamSubscription<Account?>? _accountSub;
-
-  final String _dummyKeychainId = 'TestUserKeychainID';
-  static const LockFactor dummyUnlockFactor = PasswordLockFactor('Test1234');
-  final _dummySeedPhrase = SeedPhrase.fromMnemonic(
-    'few loyal swift champion rug peace dinosaur '
-    'erase bacon tone install universe',
-  );
+  StreamSubscription<AdminToolsState>? _adminToolsSub;
 
   SessionCubit(
     this._userService,
+    this._dummyUserFactory,
     this._registrationService,
     this._registrationProgressNotifier,
     this._accessControl,
-  ) : super(const VisitorSessionState(isRegistrationInProgress: false)) {
+    this._adminTools,
+  )   : _adminToolsState = _adminTools.state,
+        super(const VisitorSessionState(isRegistrationInProgress: false)) {
     _keychainSub = _userService.watchKeychain
         .map((keychain) => keychain != null)
         .distinct()
@@ -53,6 +52,8 @@ final class SessionCubit extends Cubit<SessionState>
     _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
     _accountSub = _userService.watchAccount.listen(_onActiveAccountChanged);
+
+    _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
   }
 
   Future<bool> unlock(LockFactor lockFactor) {
@@ -69,17 +70,19 @@ final class SessionCubit extends Cubit<SessionState>
 
   Future<void> switchToDummyAccount() async {
     final keychains = await _userService.keychains;
-    final dummyKeychain = keychains
-        .firstWhereOrNull((keychain) => keychain.id == _dummyKeychainId);
+    final dummyKeychain = keychains.firstWhereOrNull(
+      (keychain) => keychain.id == DummyUserFactory.dummyKeychainId,
+    );
+
     if (dummyKeychain != null) {
       await _userService.useKeychain(dummyKeychain.id);
       return;
     }
 
     final account = await _registrationService.registerTestAccount(
-      keychainId: _dummyKeychainId,
-      seedPhrase: _dummySeedPhrase,
-      lockFactor: dummyUnlockFactor,
+      keychainId: DummyUserFactory.dummyKeychainId,
+      seedPhrase: DummyUserFactory.dummySeedPhrase,
+      lockFactor: DummyUserFactory.dummyUnlockFactor,
     );
 
     await _userService.useAccount(account);
@@ -98,6 +101,9 @@ final class SessionCubit extends Cubit<SessionState>
 
     await _accountSub?.cancel();
     _accountSub = null;
+
+    await _adminToolsSub?.cancel();
+    _adminToolsSub = null;
 
     return super.close();
   }
@@ -127,32 +133,60 @@ final class SessionCubit extends Cubit<SessionState>
     _updateState();
   }
 
+  void _onAdminToolsChanged(AdminToolsState adminTools) {
+    _logger.fine('Admin tools changed: $adminTools');
+
+    _adminToolsState = adminTools;
+    _updateState();
+  }
+
   void _updateState() {
+    if (_adminToolsState.enabled) {
+      emit(_createMockedSessionState());
+    } else {
+      emit(_createSessionState());
+    }
+  }
+
+  SessionState _createSessionState() {
     final hasKeychain = _hasKeychain;
     final isUnlocked = _isUnlocked;
     final account = _account;
 
     if (!hasKeychain) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
-      emit(VisitorSessionState(isRegistrationInProgress: !isEmpty));
-      return;
+      return VisitorSessionState(isRegistrationInProgress: !isEmpty);
     }
 
     if (!isUnlocked) {
-      emit(const GuestSessionState());
-      return;
+      return const GuestSessionState();
     }
+
     final spaces = _accessControl.spacesAccess(account);
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
-    emit(
-      ActiveAccountSessionState(
-        account: account,
-        spaces: spaces,
-        spacesShortcuts: spacesShortcuts,
-        overallSpaces: overallSpaces,
-      ),
+    return ActiveAccountSessionState(
+      account: account,
+      spaces: spaces,
+      overallSpaces: overallSpaces,
+      spacesShortcuts: spacesShortcuts,
     );
+  }
+
+  SessionState _createMockedSessionState() {
+    switch (_adminToolsState.sessionStatus) {
+      case SessionStatus.actor:
+        return ActiveAccountSessionState(
+          account: _dummyUserFactory.buildDummyAccount(),
+          spaces: Space.values,
+          overallSpaces: Space.values,
+          spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
+        );
+      case SessionStatus.guest:
+        return const GuestSessionState();
+      case SessionStatus.visitor:
+        return const VisitorSessionState(isRegistrationInProgress: false);
+    }
   }
 }
