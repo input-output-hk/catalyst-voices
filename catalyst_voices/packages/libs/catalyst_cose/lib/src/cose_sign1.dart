@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
-import 'package:catalyst_cose/src/catalyst_cose.dart';
 import 'package:catalyst_cose/src/cose_constants.dart';
 import 'package:catalyst_cose/src/types/cose_headers.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
 /// The COSE_SIGN1 structure implementation, supporting a single signature.
+///
+/// [RFC-9052](https://datatracker.ietf.org/doc/rfc9052/),
+/// [RFC 9053](https://datatracker.ietf.org/doc/rfc9053/).
 final class CoseSign1 extends Equatable {
   /// The protected headers that are protected by the cryptographic [signature].
   final CoseHeaders protectedHeaders;

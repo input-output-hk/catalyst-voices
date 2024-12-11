@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cbor/cbor.dart';
 
 /// Holds commonly used tags in COSE.
@@ -65,3 +67,18 @@ final class CoseValues {
   /// The brotli compression content encoding.
   static const brotliContentEncoding = 'br';
 }
+
+/// The typedef for the data signer callback.
+///
+/// The [data] should be signed with a private key
+/// and the resulting signature returned as [Uint8List].
+typedef CatalystCoseSigner = Future<Uint8List> Function(Uint8List data);
+
+/// The typedef for the signature verifier callback.
+///
+/// The [signature] should be verified against
+/// a known public/private key over the [data].
+typedef CatalystCoseVerifier = Future<bool> Function(
+  Uint8List data,
+  Uint8List signature,
+);
