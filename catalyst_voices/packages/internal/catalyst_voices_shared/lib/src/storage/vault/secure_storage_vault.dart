@@ -109,7 +109,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   @override
   Stream<bool> get watchIsUnlocked async* {
-    yield _isUnlocked;
+    yield await _getIsUnlockedAndSync();
     yield* _isUnlockedSC.stream;
   }
 
