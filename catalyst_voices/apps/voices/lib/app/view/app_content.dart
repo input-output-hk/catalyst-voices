@@ -52,10 +52,14 @@ class AppContentState extends State<AppContent> {
         brightness: Brightness.dark,
       ),
       builder: (context, child) {
-        return AppActiveStateListener(
-          child: GlobalPrecacheImages(
-            child: GlobalSessionListener(
-              child: child ?? const SizedBox.shrink(),
+        return Scaffold(
+          primary: false,
+          backgroundColor: Colors.transparent,
+          body: AppActiveStateListener(
+            child: GlobalPrecacheImages(
+              child: GlobalSessionListener(
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         );
