@@ -51,9 +51,13 @@ class AppContentState extends State<AppContent> {
         brightness: Brightness.dark,
       ),
       builder: (context, child) {
-        return GlobalPrecacheImages(
-          child: GlobalSessionListener(
-            child: child ?? const SizedBox.shrink(),
+        return Scaffold(
+          primary: false,
+          backgroundColor: Colors.transparent,
+          body: GlobalPrecacheImages(
+            child: GlobalSessionListener(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         );
       },
