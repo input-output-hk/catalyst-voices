@@ -80,10 +80,7 @@ project: {
 								}
 							}
 						},
-						{
-							name:  "CASSANDRA_VOLATILE_TLS_CERT"
-							value: "/tmp/keyspaces.crt"
-						},
+						
 						{
 							name: "CASSANDRA_VOLATILE_DEPLOYMENT"
 							valueFrom: {
@@ -116,10 +113,7 @@ project: {
 								}
 							}
 						},
-						{
-							name:  "CASSANDRA_PERSISTENT_TLS_CERT"
-							value: "/tmp/keyspaces.crt"
-						},
+						
 						{
 							name: "CASSANDRA_PERSISTENT_DEPLOYMENT"
 							valueFrom: {
