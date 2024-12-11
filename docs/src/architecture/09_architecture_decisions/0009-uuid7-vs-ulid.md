@@ -11,7 +11,9 @@
 
 ## Context
 
-The system needs globally unique identifiers for various entities and resources. Currently, we use ULIDs (Universally Unique Lexicographically Sortable Identifiers) in some parts of the system. With the recent standardization of UUIDv7 through [RFC 9562], we need to evaluate our identifier strategy.
+The system needs globally unique identifiers for various entities and resources.
+Currently, we use ULIDs (Universally Unique Lexicographically Sortable Identifiers) in some parts of the system.
+With the recent standardization of UUIDv7 through [RFC 9562], we need to evaluate our identifier strategy.
 
 ## Assumptions
 
