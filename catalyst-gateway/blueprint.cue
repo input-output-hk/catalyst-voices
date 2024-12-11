@@ -41,7 +41,7 @@ project: {
 					volumeMounts: [
 						{
 							name:      "data"
-							mountPath: "/data"
+							mountPath: "/var/lib"
 							readOnly:  false
 						},
 					]
