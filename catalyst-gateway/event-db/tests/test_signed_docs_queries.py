@@ -1,12 +1,12 @@
 import psycopg
 import pytest
-import pybars
 import jinja2
 
 
 jinja_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader("./queries/"),
 )
+EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
 
 class SignedData:
@@ -27,20 +27,6 @@ class SignedData:
         self.metadata = metadata
         self.payload = payload
         self.raw = raw
-
-    def to_tuple(self):
-        return (
-            self.id,
-            self.ver,
-            self.doc_type,
-            self.author,
-            self.metadata,
-            self.payload,
-            self.raw,
-        )
-
-
-EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
 
 @pytest.mark.ci
@@ -91,11 +77,9 @@ def test_signed_docs_queries():
 
 
 def insert_signed_documents_query(conn, docs: [SignedData]):
-    insert_signed_documents_sql = open(
-        "./queries/insert_signed_documents.sql", "r"
-    ).read()
-    insert_signed_documents_sql = (
-        insert_signed_documents_sql.replace("$1", "%s")
+    sql_stmt = open("./queries/insert_signed_documents.sql", "r").read()
+    sql_stmt = (
+        sql_stmt.replace("$1", "%s")
         .replace("$2", "%s")
         .replace("$3", "%s")
         .replace("$4", "%s")
@@ -104,24 +88,31 @@ def insert_signed_documents_query(conn, docs: [SignedData]):
         .replace("$7", "%s")
     )
     for doc in docs:
-        conn.execute(insert_signed_documents_sql, doc.to_tuple())
+        conn.execute(
+            sql_stmt,
+            (
+                doc.id,
+                doc.ver,
+                doc.doc_type,
+                doc.author,
+                doc.metadata,
+                doc.payload,
+                doc.raw,
+            ),
+        )
 
 
 def select_signed_documents_query(conn, docs: [SignedData]):
-    select_signed_documents_sql = open(
-        "./queries/select_signed_documents.sql", "r"
-    ).read()
-    select_signed_documents_sql = select_signed_documents_sql.replace(
-        "$1", "%s"
-    ).replace("$2", "%s")
+    template = jinja_env.get_template("select_signed_documents.sql.jinja")
     for doc in docs:
-        cur = conn.execute(
-            select_signed_documents_sql,
-            (doc.id, doc.ver),
+        sql_stmt = template.render(
+            {
+                "id": doc.id,
+                "ver": doc.ver,
+            }
         )
-        (id, ver, doc_type, author, metadata, payload, raw) = cur.fetchone()
-        assert str(id) == doc.id
-        assert str(ver) == doc.ver
+        cur = conn.execute(sql_stmt)
+        (doc_type, author, metadata, payload, raw) = cur.fetchone()
         assert str(doc_type) == doc.doc_type
         assert author == doc.author
         assert str(metadata) == doc.metadata

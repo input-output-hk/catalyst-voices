@@ -1,6 +1,4 @@
 SELECT
-  signed_docs.id,
-  signed_docs.ver,
   signed_docs.type,
   signed_docs.author,
   signed_docs.metadata,
@@ -8,5 +6,7 @@ SELECT
   signed_docs.raw
 FROM signed_docs
 WHERE
-  signed_docs.id = $1
-  AND signed_docs.ver = $2
+  signed_docs.id = '{{ id }}'
+  {% if ver %} AND signed_docs.ver = '{{ ver }}' {% endif %}
+ORDER BY signed_docs.ver DESC
+LIMIT 1
