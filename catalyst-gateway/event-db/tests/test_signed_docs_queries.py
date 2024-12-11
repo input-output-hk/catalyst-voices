@@ -1,6 +1,12 @@
 import psycopg
 import pytest
 import pybars
+import jinja2
+
+
+jinja_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader("./queries/"),
+)
 
 
 class SignedData:
@@ -124,15 +130,14 @@ def select_signed_documents_query(conn, docs: [SignedData]):
 
 
 def select_signed_documents_2_query(conn, docs: [SignedData]):
-    select_signed_documents_sql_hbs = open(
-        "./queries/select_signed_documents_2.sql.hbs", "r"
-    ).read()
-    select_signed_documents_sql_template = pybars.Compiler().compile(
-        select_signed_documents_sql_hbs
-    )
+    template = jinja_env.get_template("select_signed_documents_2.sql.jinja")
     for doc in docs:
-        sql_stmt = select_signed_documents_sql_template(
-            {"id": doc.id, "limit": 1, "offset": 0}
+        sql_stmt = template.render(
+            {
+                "conditions": f"signed_docs.id = '{doc.id}' AND signed_docs.ver = '{doc.ver}'",
+                "limit": 1,
+                "offset": 0,
+            }
         )
         cur = conn.execute(sql_stmt)
         (id, ver, doc_type, author, metadata) = cur.fetchone()
