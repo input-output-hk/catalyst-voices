@@ -21,13 +21,12 @@ void main() {
           await bootstrap(initialLocation: const DiscoveryRoute().location);
       await tester.pumpWidget(App(routerConfig: args.routerConfig));
       // let the application load
-      await tester.pump(const Duration(seconds: 8));
+      await tester.pump(const Duration(seconds: 5));
       // pump and settle every 100ms to simulate almost production-like FPS
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
-
-      // click on locked user shortcut text link
-      await tester.tap(DashboardPage.userLockedShortcutBtn.last);
-      await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      print('App loaded');
+      await tester.tap(DashboardPage.guestShortcutBtn.first);
+      await tester.pumpAndSettle(const Duration(milliseconds: 1000));
       // open and check spaces drawer
       await tester.tap(DashboardPage.spacesDrawerButton);
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
@@ -53,6 +52,7 @@ void main() {
 //TODO(oldgreg5): add test clicking on prev/next buttons on chooser
 //TODO(oldgreg5): add test visitor > no menu button
 //TODO(oldgreg5): add test logged user > menu renders correctly
+
 //TODO(oldgreg5): add test reporting (simple summary with errors for starters)
 //TODO(oldgreg5): add screenshots capturing
 //TODO(oldgreg5): add redirecting output to local console/file instead of chrome console
