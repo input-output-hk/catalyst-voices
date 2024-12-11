@@ -71,7 +71,7 @@ void main() {
         protectedHeaders: const CoseHeaders.protected(),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         payload: utf8.encode('Test payload'),
-        signature: Uint8List(0),
+        signature: Uint8List(64),
       );
 
       // test whether signature is valid

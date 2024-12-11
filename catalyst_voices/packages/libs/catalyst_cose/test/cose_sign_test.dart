@@ -75,7 +75,7 @@ void main() {
           CoseSignature(
             protectedHeaders: const CoseHeaders.protected(),
             unprotectedHeaders: const CoseHeaders.unprotected(),
-            signature: Uint8List(0),
+            signature: Uint8List(64),
           ),
         ],
       );
