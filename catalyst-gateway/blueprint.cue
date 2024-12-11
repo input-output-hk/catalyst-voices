@@ -106,6 +106,14 @@ project: {
 							}
 						},
 						{
+							name:  "CASSANDRA_VOLATILE_TLS_CERT"
+							value: "/tmp/keyspaces.crt"
+						},
+						{
+							name:  "CASSANDRA_PERSISTENT_TLS_CERT"
+							value: "/tmp/keyspaces.crt"
+						},
+						{
 							name: "CASSANDRA_PERSISTENT_PASSWORD"
 							valueFrom: {
 								secretKeyRef: {
