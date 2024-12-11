@@ -33,7 +33,7 @@ final class SentryConfig extends Equatable {
   final String release;
 
   const SentryConfig({
-    // TODO(damian): default values here are temporary and should be changed.
+    // TODO(damian-molinski): default values should be changed.
     this.dns = 'https://example.com',
     this.environment = 'dev',
     this.release = '1.0.0',
