@@ -24,6 +24,9 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   final _isUnlockedSC = StreamController<bool>.broadcast();
   final _initializationCompleter = Completer<void>();
 
+  bool _isUnlocked = false;
+  bool _isActive = false;
+
   /// Check if given [value] belongs to any [SecureStorageVault].
   static bool isStorageKey(
     String value, {
@@ -101,12 +104,22 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
-  Future<bool> get isUnlocked => _isUnlocked();
+  Future<bool> get isUnlocked => _getIsUnlockedAndSync();
 
   @override
   Stream<bool> get watchIsUnlocked async* {
-    yield await _isUnlocked();
+    yield await _getIsUnlockedAndSync();
     yield* _isUnlockedSC.stream;
+  }
+
+  @override
+  bool get isActive => _isActive;
+
+  @override
+  set isActive(bool value) {
+    if (_isActive != value) {
+      _isActive = value;
+    }
   }
 
   @override
@@ -125,8 +138,6 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
     final isVerified = await _cryptoService.verifyKey(seed, key: lock);
     await _updateUnlocked(isVerified);
-
-    // TODO(damian): schedule auto update.
 
     _erase(lock);
 
@@ -243,12 +254,26 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     }
   }
 
-  Future<bool> _isUnlocked() => _cache.getIsUnlocked();
+  Future<bool> _getIsUnlockedAndSync() async {
+    final isUnlocked = await _getIsUnlocked();
+    await _updateUnlocked(isUnlocked);
+    return isUnlocked;
+  }
+
+  Future<bool> _getIsUnlocked() async {
+    if (isActive && await _cache.isUnlockedExpired()) {
+      await _cache.extendIsUnlocked();
+    }
+
+    return _cache.getIsUnlocked();
+  }
 
   Future<void> _updateUnlocked(bool value) async {
-    final isUnlocked = await _isUnlocked();
-    if (isUnlocked != value) {
+    if (_isUnlocked != value) {
+      _isUnlocked = value;
+
       await _cache.setIsUnlocked(value: value);
+
       _isUnlockedSC.add(value);
     }
   }

@@ -10,6 +10,8 @@ abstract interface class TtlCache<K, V> implements Cache<K, V> {
     Duration? ttl,
   });
 
+  Future<bool> isExpired({required K key});
+
   FutureOr<void> extendExpiration({
     required K key,
     Duration? ttl,

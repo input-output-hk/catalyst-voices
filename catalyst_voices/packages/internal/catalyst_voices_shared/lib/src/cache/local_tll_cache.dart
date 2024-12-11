@@ -41,6 +41,9 @@ base class LocalTllCache extends LocalStorage
   }
 
   @override
+  Future<bool> isExpired({required String key}) => _isExpired(key: key);
+
+  @override
   Future<void> extendExpiration({
     required String key,
     Duration? ttl,
