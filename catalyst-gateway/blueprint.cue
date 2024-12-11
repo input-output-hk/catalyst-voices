@@ -8,7 +8,7 @@ project: {
 		environment: "dev"
 		modules: main: {
 			container: "blueprint-deployment"
-			version:   "0.2.3"
+			version:   "0.2.4"
 			values: {
 				app: {
 					environment: "dev"
@@ -19,6 +19,7 @@ project: {
 					}
 
 					containerPort: 8080
+					strategy:      "Recreate"
 
 					persistentVolumeClaims: [
 						{
@@ -136,6 +137,13 @@ project: {
 							value: "90"
 						},
 					]
+
+					resources: {
+						requests: {
+							cpu:    "1"
+							memory: "2Gi"
+						}
+					}
 
 					// TODO: Re-enable when deployment is working
 					// readinessProbe: {
