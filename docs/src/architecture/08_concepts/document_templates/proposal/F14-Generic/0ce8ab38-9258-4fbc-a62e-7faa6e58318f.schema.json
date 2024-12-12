@@ -282,44 +282,56 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Original Language",
                             "description": "If auto-translated, specify the original language of your proposal",
-                            "minLength": 2,
-                            "maxLength": 50,
-                            "examples": [
-                                "Spanish",
+                            "enum": [
+                                "Arabic",
+                                "Chinese",
+                                "French",
+                                "German",
+                                "Indonesian",
+                                "Italian",
                                 "Japanese",
-                                "French"
+                                "Korean",
+                                "Portuguese",
+                                "Russian",
+                                "Spanish",
+                                "Turkish",
+                                "Vietnamese",
+                                "Other"
                             ]
                         },
-                        "translationNotes": {
-                            "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "Translation Notes",
-                            "description": "Additional notes about the translation or original language content",
-                            "maxLength": 500
+                        "originalDocumentLink": {
+                            "$ref": "#/definitions/singleLineHttpsURLEntry",
+                            "title": "Original Document Link",
+                            "description": "Provide a link to the original proposal document in its original language"
                         }
-                    },
-                    "required": [
-                        "isTranslated"
-                    ],
-                    "dependencies": {
-                        "originalLanguage": [
-                            "isTranslated"
-                        ],
-                        "translationNotes": [
-                            "isTranslated"
-                        ]
                     },
                     "if": {
                         "properties": {
-                            "isTranslated": {
-                                "const": true
-                            }
+                            "isTranslated": { "const": "Yes" }
                         }
                     },
                     "then": {
-                        "required": [
-                            "originalLanguage"
-                        ]
-                    }
+                        "required": ["originalLanguage", "originalDocumentLink"],
+                        "properties": {
+                            "originalLanguage": {
+                                "description": "Original language is required when the proposal is translated"
+                            },
+                            "originalDocumentLink": {
+                                "description": "Link to the original document is required when the proposal is translated"
+                            }
+                        }
+                    },
+                    "else": {
+                        "properties": {
+                            "originalLanguage": {
+                                "not": {}
+                            },
+                            "originalDocumentLink": {
+                                "not": {}
+                            }
+                        }
+                    },
+                    "required": ["isTranslated"]
                 },
                 "problem": {
                     "$ref": "#/definitions/section",
