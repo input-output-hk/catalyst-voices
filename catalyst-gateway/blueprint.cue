@@ -59,7 +59,7 @@ project: {
 						// TODO: Potentially raise this after troubleshooting
 						{
 							name:  "CHAIN_FOLLOWER_SYNC_TASKS"
-							value: "1"
+							value: "8"
 						},
 						{
 							name: "CASSANDRA_VOLATILE_URL"
