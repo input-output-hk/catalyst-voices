@@ -1,4 +1,6 @@
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
@@ -6,7 +8,7 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   final KeychainProvider provider = VaultKeychainProvider();
-  final UserStorage storage = SecureUserStorage();
+  final repository = UserRepository(SecureUserStorage());
   final dummyUserFactory = DummyUserFactory();
 
   late UserService service;
@@ -16,7 +18,7 @@ void main() {
 
     service = UserService(
       keychainProvider: provider,
-      userStorage: storage,
+      userRepository: repository,
       dummyUserFactory: dummyUserFactory,
     );
   });

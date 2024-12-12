@@ -1,18 +1,19 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:logging/logging.dart';
 
 abstract interface class UserService {
   factory UserService({
     required KeychainProvider keychainProvider,
-    required UserStorage userStorage,
+    required UserRepository userRepository,
     required DummyUserFactory dummyUserFactory,
   }) {
     return UserServiceImpl(
       keychainProvider,
-      userStorage,
+      userRepository,
       dummyUserFactory,
     );
   }
@@ -42,7 +43,7 @@ abstract interface class UserService {
 
 final class UserServiceImpl implements UserService {
   final KeychainProvider _keychainProvider;
-  final UserStorage _userStorage;
+  final UserRepository _userRepository;
   final DummyUserFactory _dummyUserFactory;
 
   final _logger = Logger('UserService');
@@ -56,7 +57,7 @@ final class UserServiceImpl implements UserService {
 
   UserServiceImpl(
     this._keychainProvider,
-    this._userStorage,
+    this._userRepository,
     this._dummyUserFactory,
   );
 
