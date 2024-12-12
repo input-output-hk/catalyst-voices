@@ -11,8 +11,30 @@ import 'pageobject/spaces_drawer_page.dart';
 
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  // var args = bootstrap(initialLocation: const DiscoveryRoute().location);
+  try {
+    // final logFile = File('test_output.log')
+    // ..openWrite(); //throws Error:Unsupported operation:_Namespace
+    // final logSink = logFile.openWrite();
+  } catch (e, stack) {
+    print('Error: $e');
+    print('Stack: $stack');
+  }
+
+  // debugPrint = (String? message, {int? wrapWidth}) {
+  //   logSink.writeln(message);
+  //   logSink.flush(); // Ensure the log is written
+  // };
+
+  setUp(() async {
+    // args =
+    // await bootstrap(initialLocation: const DiscoveryRoute().location);
+    // This is required prior to taking the screenshot (Android only).
+    // await binding.convertFlutterSurfaceToImage();
+  });
 
   tearDownAll(() async {
+    // await logSink.close(); // Ensure logs are written to the file
     // enable to make sure chrome window stays open after test to check console prints or something
     // await Future<void>.delayed(const Duration(minutes: 5));
   });
@@ -28,28 +50,18 @@ void main() async {
     await tester(DashboardPage.spacesDrawerButton).tap();
     SpacesDrawerPage.looksAsExpected();
 
-      //iterate thru spaces and check menu buttons are there
-      for (final space in Space.values) {
-        await tester.tap(SpacesDrawerPage.chooserItem(space));
-        await tester.pumpAndSettle(const Duration(milliseconds: 100));
-        expect(
-          SpacesDrawerPage.chooserIcon(space),
-          findsOneWidget,
-        );
-        final children = find.descendant(
-          of: SpacesDrawerPage.guestMenuItems,
-          matching: find.byWidgetPredicate((widget) => true),
-        );
-        expect(children, findsAtLeast(1));
-      }
-    });
+    //iterate thru spaces and check menu buttons are there
+    for (final space in Space.values) {
+      await tester(SpacesDrawerPage.chooserItem(space)).tap();
+      expect(
+        SpacesDrawerPage.chooserIcon(space),
+        findsOneWidget,
+      );
+      final children = find.descendant(
+        of: SpacesDrawerPage.guestMenuItems,
+        matching: find.byWidgetPredicate((widget) => true),
+      );
+      expect(children, findsAtLeast(1));
+    }
   });
 }
-//TODO(oldgreg5): add test clicking on prev/next buttons on chooser
-//TODO(oldgreg5): add test visitor > no menu button
-//TODO(oldgreg5): add test logged user > menu renders correctly
-
-//TODO(oldgreg5): add test reporting (simple summary with errors for starters)
-//TODO(oldgreg5): add screenshots capturing
-//TODO(oldgreg5): add redirecting output to local console/file instead of chrome console
-//TODO(oldgreg5): add running in debug, being able to pause and debug test
