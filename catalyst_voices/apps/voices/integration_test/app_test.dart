@@ -4,10 +4,12 @@ import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
+
 import 'pageobject/dashboard_page.dart';
 import 'pageobject/spaces_drawer_page.dart';
 
-void main() {
+void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   tearDownAll(() async {
@@ -15,22 +17,16 @@ void main() {
     // await Future<void>.delayed(const Duration(minutes: 5));
   });
 
-  group('End to end tests', () {
-    testWidgets('Spaces drawer guest menu renders correctly', (tester) async {
-      final args =
-          await bootstrap(initialLocation: const DiscoveryRoute().location);
-      await tester.pumpWidget(App(routerConfig: args.routerConfig));
-      // let the application load
-      await tester.pump(const Duration(seconds: 5));
-      // pump and settle every 100ms to simulate almost production-like FPS
-      await tester.pumpAndSettle(const Duration(milliseconds: 100));
-      print('App loaded');
-      await tester.tap(DashboardPage.guestShortcutBtn.first);
-      await tester.pumpAndSettle(const Duration(milliseconds: 1000));
-      // open and check spaces drawer
-      await tester.tap(DashboardPage.spacesDrawerButton);
-      await tester.pumpAndSettle(const Duration(milliseconds: 100));
-      SpacesDrawerPage.looksAsExpected();
+  // group('End to end tests', () {
+  patrolWidgetTest('Spaces drawer guest menu renders correctly',
+      (tester) async {
+    final args =
+        await bootstrap(initialLocation: const DiscoveryRoute().location);
+    await tester.pumpWidgetAndSettle(App(routerConfig: args.routerConfig));
+    print('App loaded');
+    await tester(DashboardPage.guestShortcutBtn.first).tap();
+    await tester(DashboardPage.spacesDrawerButton).tap();
+    SpacesDrawerPage.looksAsExpected();
 
       //iterate thru spaces and check menu buttons are there
       for (final space in Space.values) {
