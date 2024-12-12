@@ -12,11 +12,6 @@ import 'pageobject/spaces_drawer_page.dart';
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  tearDownAll(() async {
-    // enable to make sure chrome window stays open after test to check console prints or something
-    // await Future<void>.delayed(const Duration(minutes: 5));
-  });
-
   patrolWidgetTest('Spaces drawer guest menu renders correctly',
       (tester) async {
     final args =
