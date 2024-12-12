@@ -1,0 +1,361 @@
+<testsuites id="" name="" tests="35" failures="1" skipped="14" errors="0" time="321.741554">
+<testsuite name="wallets.spec.ts" timestamp="2024-12-13T06:54:01.801Z" hostname="chromium" tests="35" failures="1" skipped="14" time="195.993" errors="0">
+<testcase name="Testing with Lace › Get wallet details for Lace" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/1190">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Lace › Sign data with Lace" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/1190">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Lace › Sign and submit tx with Lace" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/1190">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Lace › Sign and submit RBAC tx with Lace" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/1190">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Lace › Fail to Sign data with incorrect password Lace" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/1190">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Lace › Fail to Sign &amp; submit tx with incorrect passwordLace" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/1190">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Lace › Fail to Sign &amp; submit RBAC tx with incorrect passwordLace" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/1190">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Typhon › Get wallet details for Typhon" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/753">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Typhon › Sign data with Typhon" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/753">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Typhon › Sign and submit tx with Typhon" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/753">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Typhon › Sign and submit RBAC tx with Typhon" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/753">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Typhon › Fail to Sign data with incorrect password Typhon" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/753">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Typhon › Fail to Sign &amp; submit tx with incorrect passwordTyphon" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/753">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Typhon › Fail to Sign &amp; submit RBAC tx with incorrect passwordTyphon" classname="wallets.spec.ts" time="0">
+<properties>
+<property name="skip" value="https://github.com/input-output-hk/catalyst-voices/issues/753">
+</property>
+</properties>
+<skipped>
+</skipped>
+</testcase>
+<testcase name="Testing with Eternl › Get wallet details for Eternl" classname="wallets.spec.ts" time="4.7">
+<system-out>
+<![CDATA[Extension has been downloaded to: /wallet-automation/extensions/kmhcihpebfmpgmihbkipmjlmmioameka.crx
+Extension has been extracted to: /wallet-automation/extensions/kmhcihpebfmpgmihbkipmjlmmioameka
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Eternl-Get-wallet-details-for-Eternl-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Eternl › Sign data with Eternl" classname="wallets.spec.ts" time="7.166">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Eternl-Sign-data-with-Eternl-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Eternl › Sign and submit tx with Eternl" classname="wallets.spec.ts" time="10.005">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Eternl-Sign-and-submit-tx-with-Eternl-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Eternl › Sign and submit RBAC tx with Eternl" classname="wallets.spec.ts" time="9.466">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Etern-cdece--submit-RBAC-tx-with-Eternl-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Eternl › Fail to Sign data with incorrect password Eternl" classname="wallets.spec.ts" time="9.112">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Etern-8d5a7-h-incorrect-password-Eternl-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Eternl › Fail to Sign &amp; submit tx with incorrect passwordEternl" classname="wallets.spec.ts" time="9.389">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Etern-74e01-th-incorrect-passwordEternl-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Eternl › Fail to Sign &amp; submit RBAC tx with incorrect passwordEternl" classname="wallets.spec.ts" time="9.474">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Etern-2b9bc-th-incorrect-passwordEternl-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Yoroi › Get wallet details for Yoroi" classname="wallets.spec.ts" time="4.569">
+<system-out>
+<![CDATA[Extension has been downloaded to: /wallet-automation/extensions/poonlenmfdfbjfeeballhiibknlknepo.crx
+Extension has been extracted to: /wallet-automation/extensions/poonlenmfdfbjfeeballhiibknlknepo
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-Get-wallet-details-for-Yoroi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Yoroi › Sign data with Yoroi" classname="wallets.spec.ts" time="6.037">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-Sign-data-with-Yoroi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Yoroi › Sign and submit tx with Yoroi" classname="wallets.spec.ts" time="26.237">
+<failure message="wallets.spec.ts:47:9 Sign and submit tx with Yoroi" type="FAILURE">
+<![CDATA[  [chromium] › wallets.spec.ts:47:9 › Testing with Yoroi › Sign and submit tx with Yoroi ───────────
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByText('Tx hash:')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - expect.toBeVisible with timeout 5000ms
+      - waiting for getByText('Tx hash:')
+
+
+       at ../pages/modal.ts:62
+
+      60 |     await this.page.waitForTimeout(2000);
+      61 |     await expect(this.modalHeader).toBeVisible();
+    > 62 |     await expect(this.modalBody).toBeVisible();
+         |                                  ^
+      63 |   }
+      64 | }
+      65 |
+
+        at Modal.assertModalIsVisible (/wallet-automation/pages/modal.ts:62:34)
+        at HomePage.assertModal (/wallet-automation/pages/homePage.ts:102:5)
+        at /wallet-automation/tests/wallets.spec.ts:60:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+
+    Locator: getByText('Tx hash:')
+    Expected: visible
+    Received: <element(s) not found>
+    Call log:
+      - expect.toBeVisible with timeout 5000ms
+      - waiting for getByText('Tx hash:')
+
+
+       at ../pages/modal.ts:62
+
+      60 |     await this.page.waitForTimeout(2000);
+      61 |     await expect(this.modalHeader).toBeVisible();
+    > 62 |     await expect(this.modalBody).toBeVisible();
+         |                                  ^
+      63 |   }
+      64 | }
+      65 |
+
+        at Modal.assertModalIsVisible (/wallet-automation/pages/modal.ts:62:34)
+        at HomePage.assertModal (/wallet-automation/pages/homePage.ts:102:5)
+        at /wallet-automation/tests/wallets.spec.ts:60:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium/test-failed-2.png]]
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium/trace.zip]]
+Extension already exists at: /wallet-automation/extensions/poonlenmfdfbjfeeballhiibknlknepo
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium-retry1/test-failed-1.png]]
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-Sign-and-submit-tx-with-Yoroi-chromium-retry1/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Yoroi › Sign and submit RBAC tx with Yoroi" classname="wallets.spec.ts" time="8.702">
+<system-out>
+<![CDATA[Extension already exists at: /wallet-automation/extensions/poonlenmfdfbjfeeballhiibknlknepo
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-55abc-d-submit-RBAC-tx-with-Yoroi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Yoroi › Fail to Sign data with incorrect password Yoroi" classname="wallets.spec.ts" time="8.263">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-83bc6-th-incorrect-password-Yoroi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Yoroi › Fail to Sign &amp; submit tx with incorrect passwordYoroi" classname="wallets.spec.ts" time="8.981">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-12495-ith-incorrect-passwordYoroi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Yoroi › Fail to Sign &amp; submit RBAC tx with incorrect passwordYoroi" classname="wallets.spec.ts" time="8.612">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Yoroi-a2206-ith-incorrect-passwordYoroi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Nufi › Get wallet details for Nufi" classname="wallets.spec.ts" time="6.515">
+<system-out>
+<![CDATA[Extension has been downloaded to: /wallet-automation/extensions/nufi-cwe-testnet-latest.zip
+Extension has been extracted to: /wallet-automation/extensions/hbklpdnlgiadjhdadfnfmemmklbopbcm
+
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Nufi-Get-wallet-details-for-Nufi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Nufi › Sign data with Nufi" classname="wallets.spec.ts" time="7.916">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Nufi-Sign-data-with-Nufi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Nufi › Sign and submit tx with Nufi" classname="wallets.spec.ts" time="10.397">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Nufi-Sign-and-submit-tx-with-Nufi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Nufi › Sign and submit RBAC tx with Nufi" classname="wallets.spec.ts" time="10.297">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Nufi-Sign-and-submit-RBAC-tx-with-Nufi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Nufi › Fail to Sign data with incorrect password Nufi" classname="wallets.spec.ts" time="9.972">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Nufi--a180f-ith-incorrect-password-Nufi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Nufi › Fail to Sign &amp; submit tx with incorrect passwordNufi" classname="wallets.spec.ts" time="10.348">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Nufi--e509b-with-incorrect-passwordNufi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Testing with Nufi › Fail to Sign &amp; submit RBAC tx with incorrect passwordNufi" classname="wallets.spec.ts" time="9.835">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|../wallet-automation/test-results/wallets-Testing-with-Nufi--58417-with-incorrect-passwordNufi-chromium/trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
