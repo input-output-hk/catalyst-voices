@@ -92,7 +92,7 @@ final class CoseSign extends Equatable {
       final signature = CoseSignature(
         protectedHeaders: signatureProtectedHeaders,
         unprotectedHeaders: const CoseHeaders.unprotected(),
-        signature: await signer(toBeSigned),
+        signature: await signer.sign(toBeSigned),
       );
 
       signatures.add(signature);
@@ -141,7 +141,7 @@ final class CoseSign extends Equatable {
         ),
       );
 
-      final isVerified = await verifier(
+      final isVerified = await verifier.verify(
         Uint8List.fromList(toBeSigned),
         Uint8List.fromList(signature.signature),
       );

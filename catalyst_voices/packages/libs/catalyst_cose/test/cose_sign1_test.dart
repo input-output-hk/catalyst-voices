@@ -9,31 +9,16 @@ import 'package:test/test.dart';
 void main() {
   group(CoseSign1, () {
     const uuidV7 = '0193b535-7196-7cd1-84e6-ad9c316cf2d2';
-    late Ed25519 algorithm;
-    late SimpleKeyPair keyPair;
     late SimplePublicKey publicKey;
+    late _SignerVerifier signerVerifier;
 
     setUp(() async {
       // Initialize the Ed25519 algorithm and generate a key pair
-      algorithm = Ed25519();
-      keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
+      final algorithm = Ed25519();
+      final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
       publicKey = await keyPair.extractPublicKey();
+      signerVerifier = _SignerVerifier(algorithm, keyPair);
     });
-
-    Future<Uint8List> signer(Uint8List data) async {
-      final signature = await algorithm.sign(data, keyPair: keyPair);
-      return Uint8List.fromList(signature.bytes);
-    }
-
-    Future<bool> verifier(Uint8List data, Uint8List signature) async {
-      return algorithm.verify(
-        data,
-        signature: Signature(
-          signature,
-          publicKey: publicKey,
-        ),
-      );
-    }
 
     test('sign generates a valid COSE_SIGN1 structure', () async {
       final coseSign1 = await CoseSign1.sign(
@@ -52,12 +37,12 @@ void main() {
           collabs: const ['test@domain.com'],
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
-        signer: signer,
+        signer: signerVerifier,
         payload: utf8.encode('Test payload'),
       );
 
       // test whether signature is valid
-      final isValid = await coseSign1.verify(verifier: verifier);
+      final isValid = await coseSign1.verify(verifier: signerVerifier);
       expect(isValid, isTrue);
 
       // test whether serialization/deserialization works
@@ -75,8 +60,34 @@ void main() {
       );
 
       // test whether signature is valid
-      final isValid = await coseSign1.verify(verifier: verifier);
+      final isValid = await coseSign1.verify(verifier: signerVerifier);
       expect(isValid, isFalse);
     });
   });
+}
+
+final class _SignerVerifier
+    implements CatalystCoseSigner, CatalystCoseVerifier {
+  final SignatureAlgorithm _algorithm;
+  final SimpleKeyPair _keyPair;
+
+  const _SignerVerifier(this._algorithm, this._keyPair);
+
+  @override
+  Future<Uint8List> sign(Uint8List data) async {
+    final signature = await _algorithm.sign(data, keyPair: _keyPair);
+    return Uint8List.fromList(signature.bytes);
+  }
+
+  @override
+  Future<bool> verify(Uint8List data, Uint8List signature) async {
+    final publicKey = await _keyPair.extractPublicKey();
+    return _algorithm.verify(
+      data,
+      signature: Signature(
+        signature,
+        publicKey: SimplePublicKey(publicKey.bytes, type: KeyPairType.ed25519),
+      ),
+    );
+  }
 }

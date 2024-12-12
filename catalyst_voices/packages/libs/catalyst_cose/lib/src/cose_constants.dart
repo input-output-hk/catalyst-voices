@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'package:cbor/cbor.dart';
 
 /// Holds commonly used tags in COSE.
-final class CoseTags {
-  const CoseTags._();
-
+///
+/// Defined in [RFC-9052](https://datatracker.ietf.org/doc/rfc9052).
+abstract final class CoseTags {
   /// The tag that describes a COSE_SIGN1 structure.
   static const int coseSign1 = 18;
 
@@ -68,17 +68,18 @@ final class CoseValues {
   static const brotliContentEncoding = 'br';
 }
 
-/// The typedef for the data signer callback.
-///
-/// The [data] should be signed with a private key
-/// and the resulting signature returned as [Uint8List].
-typedef CatalystCoseSigner = Future<Uint8List> Function(Uint8List data);
+/// The interface for the data signer callback.
+// ignore: one_member_abstracts
+abstract interface class CatalystCoseSigner {
+  /// The [data] should be signed with a private key
+  /// and the resulting signature returned as [Uint8List].
+  Future<Uint8List> sign(Uint8List data);
+}
 
-/// The typedef for the signature verifier callback.
-///
-/// The [signature] should be verified against
-/// a known public/private key over the [data].
-typedef CatalystCoseVerifier = Future<bool> Function(
-  Uint8List data,
-  Uint8List signature,
-);
+/// The interface for the signature verifier callback.
+// ignore: one_member_abstracts
+abstract interface class CatalystCoseVerifier {
+  /// The [signature] should be verified against
+  /// a known public/private key over the [data].
+  Future<bool> verify(Uint8List data, Uint8List signature);
+}

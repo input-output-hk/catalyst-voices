@@ -84,7 +84,7 @@ final class CoseSign1 extends Equatable {
       protectedHeaders: protectedHeaders,
       unprotectedHeaders: unprotectedHeaders,
       payload: payload,
-      signature: await signer(toBeSigned),
+      signature: await signer.sign(toBeSigned),
     );
   }
 
@@ -106,7 +106,7 @@ final class CoseSign1 extends Equatable {
     );
 
     try {
-      return await verifier(
+      return await verifier.verify(
         Uint8List.fromList(toBeSigned),
         Uint8List.fromList(signature),
       );

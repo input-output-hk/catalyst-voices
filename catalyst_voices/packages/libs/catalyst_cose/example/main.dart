@@ -17,21 +17,7 @@ Future<void> _coseSign1() async {
   final algorithm = Ed25519();
   final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
   final publicKey = await keyPair.extractPublicKey().then((e) => e.bytes);
-
-  Future<Uint8List> signer(Uint8List data) async {
-    final signature = await algorithm.sign(data, keyPair: keyPair);
-    return Uint8List.fromList(signature.bytes);
-  }
-
-  Future<bool> verifier(Uint8List data, Uint8List signature) async {
-    return algorithm.verify(
-      data,
-      signature: Signature(
-        signature,
-        publicKey: SimplePublicKey(publicKey, type: KeyPairType.ed25519),
-      ),
-    );
-  }
+  final signerVerifier = _SignerVerifier(algorithm, keyPair);
 
   final coseSign1 = await CoseSign1.sign(
     protectedHeaders: CoseHeaders.protected(
@@ -39,12 +25,12 @@ Future<void> _coseSign1() async {
       kid: hex.encode(publicKey),
     ),
     unprotectedHeaders: const CoseHeaders.unprotected(),
-    signer: signer,
+    signer: signerVerifier,
     payload: utf8.encode('This is the content.'),
   );
 
   final verified = await coseSign1.verify(
-    verifier: verifier,
+    verifier: signerVerifier,
   );
 
   print('COSE_SIGN1:');
@@ -62,21 +48,7 @@ Future<void> _coseSign() async {
   final algorithm = Ed25519();
   final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
   final publicKey = await keyPair.extractPublicKey().then((e) => e.bytes);
-
-  Future<Uint8List> signer(Uint8List data) async {
-    final signature = await algorithm.sign(data, keyPair: keyPair);
-    return Uint8List.fromList(signature.bytes);
-  }
-
-  Future<bool> verifier(Uint8List data, Uint8List signature) async {
-    return algorithm.verify(
-      data,
-      signature: Signature(
-        signature,
-        publicKey: SimplePublicKey(publicKey, type: KeyPairType.ed25519),
-      ),
-    );
-  }
+  final signerVerifier = _SignerVerifier(algorithm, keyPair);
 
   final coseSign = await CoseSign.sign(
     protectedHeaders: CoseHeaders.protected(
@@ -84,12 +56,12 @@ Future<void> _coseSign() async {
       kid: hex.encode(publicKey),
     ),
     unprotectedHeaders: const CoseHeaders.unprotected(),
-    signers: [signer],
+    signers: [signerVerifier],
     payload: utf8.encode('This is the content.'),
   );
 
   final verified = await coseSign.verify(
-    verifiers: [verifier],
+    verifiers: [signerVerifier],
   );
 
   print('COSE_SIGN:');
@@ -101,4 +73,30 @@ Future<void> _coseSign() async {
     'The signature proves that given COSE_SIGN structure has been '
     'signed by the owner of the given public key',
   );
+}
+
+final class _SignerVerifier
+    implements CatalystCoseSigner, CatalystCoseVerifier {
+  final SignatureAlgorithm _algorithm;
+  final SimpleKeyPair _keyPair;
+
+  const _SignerVerifier(this._algorithm, this._keyPair);
+
+  @override
+  Future<Uint8List> sign(Uint8List data) async {
+    final signature = await _algorithm.sign(data, keyPair: _keyPair);
+    return Uint8List.fromList(signature.bytes);
+  }
+
+  @override
+  Future<bool> verify(Uint8List data, Uint8List signature) async {
+    final publicKey = await _keyPair.extractPublicKey();
+    return _algorithm.verify(
+      data,
+      signature: Signature(
+        signature,
+        publicKey: SimplePublicKey(publicKey.bytes, type: KeyPairType.ed25519),
+      ),
+    );
+  }
 }
