@@ -11,35 +11,12 @@ import 'pageobject/spaces_drawer_page.dart';
 
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  // var args = bootstrap(initialLocation: const DiscoveryRoute().location);
-  try {
-    // final logFile = File('test_output.log')
-    // ..openWrite(); //throws Error:Unsupported operation:_Namespace
-    // final logSink = logFile.openWrite();
-  } catch (e, stack) {
-    print('Error: $e');
-    print('Stack: $stack');
-  }
-
-  // debugPrint = (String? message, {int? wrapWidth}) {
-  //   logSink.writeln(message);
-  //   logSink.flush(); // Ensure the log is written
-  // };
-
-  setUp(() async {
-    // args =
-    // await bootstrap(initialLocation: const DiscoveryRoute().location);
-    // This is required prior to taking the screenshot (Android only).
-    // await binding.convertFlutterSurfaceToImage();
-  });
 
   tearDownAll(() async {
-    // await logSink.close(); // Ensure logs are written to the file
     // enable to make sure chrome window stays open after test to check console prints or something
     // await Future<void>.delayed(const Duration(minutes: 5));
   });
 
-  // group('End to end tests', () {
   patrolWidgetTest('Spaces drawer guest menu renders correctly',
       (tester) async {
     final args =
