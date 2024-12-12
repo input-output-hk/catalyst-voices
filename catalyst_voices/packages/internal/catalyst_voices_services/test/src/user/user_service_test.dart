@@ -1,6 +1,6 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   final KeychainProvider provider = VaultKeychainProvider();
-  final repository = UserRepository(SecureUserStorage());
+  final userRepository = UserRepository(SecureUserStorage());
   final dummyUserFactory = DummyUserFactory();
 
   late UserService service;
@@ -18,7 +18,7 @@ void main() {
 
     service = UserService(
       keychainProvider: provider,
-      userRepository: repository,
+      userRepository: userRepository,
       dummyUserFactory: dummyUserFactory,
     );
   });
@@ -94,7 +94,13 @@ void main() {
       // When
       final expectedKeychain = await provider.create(keychainId);
 
-      await storage.setUsedKeychainId(expectedKeychain.id);
+      final user = User(
+        accounts: [
+          Account.dummy(keychainId: expectedKeychain.id),
+        ],
+        activeKeychainId: expectedKeychain.id,
+      );
+      await userRepository.saveUser(user);
 
       await service.useLastAccount();
 
@@ -120,7 +126,13 @@ void main() {
       // When
       final currentKeychain = await provider.create(keychainId);
 
-      await storage.setUsedKeychainId(currentKeychain.id);
+      final user = User(
+        accounts: [
+          Account.dummy(keychainId: currentKeychain.id),
+        ],
+        activeKeychainId: currentKeychain.id,
+      );
+      await userRepository.saveUser(user);
 
       await service.useLastAccount();
 

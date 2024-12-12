@@ -16,6 +16,7 @@ final class Dependencies extends DependencyProvider {
   Future<void> init() async {
     DependencyProvider.instance = this;
     _registerServices();
+    _registerStorages();
     _registerRepositories();
     _registerBlocsWithDependencies();
   }
@@ -79,13 +80,22 @@ final class Dependencies extends DependencyProvider {
       });
   }
 
+  void _registerStorages() {
+    registerLazySingleton<UserStorage>(SecureUserStorage.new);
+  }
+
   void _registerRepositories() {
     this
       ..registerLazySingleton<TransactionConfigRepository>(
         TransactionConfigRepository.new,
       )
       ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
-      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new);
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<UserRepository>(() {
+        return UserRepository(
+          get<UserStorage>(),
+        );
+      });
   }
 
   void _registerServices() {
@@ -111,7 +121,7 @@ final class Dependencies extends DependencyProvider {
       () {
         return UserService(
           keychainProvider: get<KeychainProvider>(),
-          userStorage: get<UserStorage>(),
+          userRepository: get<UserRepository>(),
           dummyUserFactory: get<DummyUserFactory>(),
         );
       },

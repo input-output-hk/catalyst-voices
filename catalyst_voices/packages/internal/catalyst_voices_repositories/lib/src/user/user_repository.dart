@@ -19,14 +19,16 @@ final class UserRepositoryImpl implements UserRepository {
   );
 
   @override
-  Future<User> getUser() {
-    // TODO: implement getUser
-    throw UnimplementedError();
+  Future<User> getUser() async {
+    final localUser = await _storage.readUser();
+
+    final user = localUser ?? const User.empty();
+
+    return user;
   }
 
   @override
   Future<void> saveUser(User user) {
-    // TODO: implement saveUser
-    throw UnimplementedError();
+    return _storage.writeUser(user);
   }
 }

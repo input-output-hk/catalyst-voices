@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -8,7 +9,7 @@ import 'package:mocktail/mocktail.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
-  late final UserStorage userStorage;
+  late final UserRepository userRepository;
 
   late final DummyUserFactory dummyUserFactory;
   late final UserService userService;
@@ -21,12 +22,12 @@ void main() {
 
   setUpAll(() {
     keychainProvider = VaultKeychainProvider();
-    userStorage = SecureUserStorage();
+    userRepository = UserRepository(SecureUserStorage());
 
     dummyUserFactory = DummyUserFactory();
     userService = UserService(
       keychainProvider: keychainProvider,
-      userStorage: userStorage,
+      userRepository: userRepository,
       dummyUserFactory: dummyUserFactory,
     );
     registrationService = _MockRegistrationService();

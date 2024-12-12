@@ -48,11 +48,15 @@ final class UserServiceImpl implements UserService {
 
   final _logger = Logger('UserService');
 
-  User? _user;
+  User _user = const User.empty();
   final _userSC = StreamController<User?>.broadcast();
 
   Keychain? _keychain;
   final _keychainSC = StreamController<Keychain?>.broadcast();
+
+  Account? _account;
+  final _accountSC = StreamController<Account?>.broadcast();
+
   StreamSubscription<bool>? _keychainUnlockSub;
 
   UserServiceImpl(
@@ -62,12 +66,12 @@ final class UserServiceImpl implements UserService {
   );
 
   @override
-  Account? get account => _user?.activeAccount;
+  Account? get account => _account;
 
   @override
   Stream<Account?> get watchAccount async* {
     yield account;
-    yield* _userSC.stream.map((user) => user?.activeAccount).distinct();
+    yield* _accountSC.stream;
   }
 
   @override
@@ -84,20 +88,16 @@ final class UserServiceImpl implements UserService {
 
   @override
   Future<void> useLastAccount() async {
-    final keychainId = await _userStorage.getLastKeychainId();
-    if (keychainId == null) {
+    final user = await _userRepository.getUser();
+    final activeAccount = user.activeAccount;
+
+    if (activeAccount == null) {
       await _clearUser();
       await _useKeychain(null);
       return;
     }
 
-    final keychain = await _findKeychain(keychainId);
-    if (keychain == null) {
-      _logger.severe('Active keychain[$keychainId] was not found!');
-    }
-
-    await _clearUser();
-    await _useKeychain(keychain);
+    await useAccount(activeAccount);
   }
 
   @override
@@ -156,8 +156,6 @@ final class UserServiceImpl implements UserService {
   }
 
   Future<void> _useKeychain(Keychain? keychain) async {
-    await _userStorage.setUsedKeychainId(keychain?.id);
-
     await _keychainUnlockSub?.cancel();
     _keychainUnlockSub = null;
 
@@ -191,7 +189,7 @@ final class UserServiceImpl implements UserService {
   Future<void> _fetchUserDetails(Keychain keychain) async {
     await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    final user = _user?.account.keychainId == keychain.id
+    final user = _user.activeAccount?.keychainId == keychain.id
         ? _user
         : _dummyUserFactory.buildDummyUser(keychainId: keychain.id);
 
@@ -199,7 +197,7 @@ final class UserServiceImpl implements UserService {
   }
 
   Future<void> _clearUser() async {
-    _updateUser(null);
+    _updateUser(const User.empty());
   }
 
   Future<Keychain?> _findKeychain(String id) async {
@@ -216,7 +214,7 @@ final class UserServiceImpl implements UserService {
     }
   }
 
-  void _updateUser(User? user) {
+  void _updateUser(User user) {
     if (_user != user) {
       _logger.finest('User changed to $user');
       _user = user;
