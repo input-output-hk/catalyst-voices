@@ -17,7 +17,6 @@ void main() async {
     final args =
         await bootstrap(initialLocation: const DiscoveryRoute().location);
     await tester.pumpWidgetAndSettle(App(routerConfig: args.routerConfig));
-    print('App loaded');
     await tester(DashboardPage.guestShortcutBtn.first).tap();
     await tester(DashboardPage.spacesDrawerButton).tap();
     SpacesDrawerPage.looksAsExpected();
