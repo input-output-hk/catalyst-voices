@@ -58,6 +58,7 @@ codepoints
 collabs
 commitlog
 concatcp
+COSE
 coti
 coverallsapp
 CQLSH
@@ -289,6 +290,7 @@ tojunit
 Traceback
 traefik
 trailings
+tstr
 TXNZD
 txos
 Typer
