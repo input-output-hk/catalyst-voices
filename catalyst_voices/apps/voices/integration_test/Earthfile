@@ -21,7 +21,7 @@ integration-test-web:
     # IF [ $browser = "edge" && $TARGETARCH = "amd64" ]]
     #    LET driver = "msedgedriver"
     # END
-    
+
     WORKDIR /frontend/apps/voices
 
     RUN ($driver --port=$driver_port > $driver.log &) && \
@@ -49,7 +49,6 @@ integration-test-web:
 # TODO(dtscalac): disabled integration tests due to them being flaky,
 # reenable when enable-threads.js workaround is removed
 # and https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407 closed
-disabled-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome \
             --browser=firefox
