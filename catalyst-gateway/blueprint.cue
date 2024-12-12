@@ -56,6 +56,11 @@ project: {
 							name:  "RUST_LOG"
 							value: "error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
 						},
+						// TODO: Potentially raise this after troubleshooting
+						{
+							name:  "CHAIN_FOLLOWER_SYNC_TASKS"
+							value: "1"
+						},
 						{
 							name: "CASSANDRA_VOLATILE_URL"
 							valueFrom: {
