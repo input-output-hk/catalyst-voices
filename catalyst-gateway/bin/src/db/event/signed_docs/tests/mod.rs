@@ -53,5 +53,18 @@ async fn some_test() {
         assert_eq!(doc, &res_doc);
         let res_doc = select_signed_docs(&doc.id, &Some(doc.ver)).await.unwrap();
         assert_eq!(doc, &res_doc);
+
+        let res_doc = advanced_select_signed_docs(
+            format!(
+                "signed_docs.id = '{}' AND signed_docs.ver = '{}'",
+                doc.id, doc.ver
+            )
+            .as_str(),
+            None,
+            None,
+        )
+        .await
+        .unwrap();
+        assert_eq!(doc, &res_doc);
     }
 }

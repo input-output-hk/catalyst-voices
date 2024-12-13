@@ -15,6 +15,12 @@ pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplat
     source: include_str!("./sql/select_signed_documents.sql.jinja"),
 };
 
+/// Advanced select sql query jinja template
+pub(crate) const ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
+    name: "advanced_select_signed_documents.jinja.template",
+    source: include_str!("./sql/advanced_select_signed_documents.sql.jinja"),
+};
+
 /// signed doc event db struct
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct SignedDoc {
@@ -34,7 +40,7 @@ pub(crate) struct SignedDoc {
     raw: Vec<u8>,
 }
 
-/// Make an insert query into the `event-db` by adding data into the `signed_docs` table
+/// Make an insert query into the `event-db` by adding data into the `signed_docs` table.
 ///
 /// * IF the record primary key (id,ver) does not exist, then add the new record. Return
 ///   success.
@@ -72,7 +78,7 @@ pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Make an select query into the `event-db` by getting data from the `signed_docs` table
+/// Make a select query into the `event-db` by getting data from the `signed_docs` table.
 ///
 /// * This returns a single document. All data from the document is returned, including
 ///   the `payload` and `raw` fields.
@@ -107,6 +113,48 @@ pub(crate) async fn select_signed_docs(
 
     Ok(SignedDoc {
         id: *id,
+        ver,
+        doc_type,
+        author,
+        metadata,
+        payload,
+        raw,
+    })
+}
+
+/// Make an advanced select query into the `event-db` by getting data from the
+/// `signed_docs` table.
+///
+/// * This returns a single document. All data from the document is returned, including
+///   the `payload` and `raw` fields.
+/// * `ver` should be able to be optional, in which case get the latest ver of the given
+///   `id`.
+///
+/// # Arguments:
+///  - `id` is a UUID v7
+///  - `ver` is a UUID v7
+#[allow(dead_code)]
+pub(crate) async fn advanced_select_signed_docs(
+    conditions: &str, limit: Option<u64>, offset: Option<u64>,
+) -> anyhow::Result<SignedDoc> {
+    let query_template = get_template(&ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE)?;
+    let query = query_template.render(serde_json::json!({
+        "conditions": conditions,
+        "limit": limit,
+        "offset": offset,
+    }))?;
+    let res = EventDB::query_one(&query, &[]).await?;
+
+    let id = res.try_get("id")?;
+    let ver = res.try_get("ver")?;
+    let doc_type = res.try_get("type")?;
+    let author = res.try_get("author")?;
+    let metadata = res.try_get("metadata")?;
+    let payload = res.try_get("payload")?;
+    let raw = res.try_get("raw")?;
+
+    Ok(SignedDoc {
+        id,
         ver,
         doc_type,
         author,
