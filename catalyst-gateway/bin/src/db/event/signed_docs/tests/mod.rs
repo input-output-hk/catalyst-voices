@@ -40,15 +40,12 @@ async fn some_test() {
 
     for doc in &docs {
         insert_signed_docs(doc).await.unwrap();
+        // try to insert the same data again
+        insert_signed_docs(doc).await.unwrap();
 
         let res_doc = select_signed_docs(&doc.id, &None).await.unwrap();
         assert_eq!(doc, &res_doc);
         let res_doc = select_signed_docs(&doc.id, &Some(doc.ver)).await.unwrap();
         assert_eq!(doc, &res_doc);
-
-        // // try to insert the same data again
-        // insert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
-        //     .await
-        //     .unwrap();
     }
 }

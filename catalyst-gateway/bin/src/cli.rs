@@ -7,6 +7,7 @@ use tracing::{error, info};
 use crate::{
     cardano::start_followers,
     db::{self, index::session::CassandraSession},
+    jinja,
     service::{self, started},
     settings::{DocsSettings, ServiceSettings, Settings},
 };
@@ -37,6 +38,7 @@ impl Cli {
     pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
+                jinja::init_jinja();
                 Settings::init(settings)?;
 
                 let mut tasks = Vec::new();

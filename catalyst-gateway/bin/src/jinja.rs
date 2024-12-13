@@ -2,7 +2,7 @@
 
 use std::sync::LazyLock;
 
-use minijinja::Environment;
+use minijinja::{Environment, Template};
 
 use crate::db::event::signed_docs::SELECT_SIGNED_DOCS_TEMPLATE;
 
@@ -16,7 +16,7 @@ pub(crate) struct JinjaTemplateSource {
 
 /// Global static `minijinja::Environment` with all preloaded templates
 #[allow(clippy::unwrap_used, dead_code)]
-pub(crate) static JINJA_ENV: LazyLock<Environment> = LazyLock::new(|| {
+static JINJA_ENV: LazyLock<Environment> = LazyLock::new(|| {
     let mut env = minijinja::Environment::new();
 
     // Preload templates
@@ -28,3 +28,14 @@ pub(crate) static JINJA_ENV: LazyLock<Environment> = LazyLock::new(|| {
 
     env
 });
+
+/// Initializes `JINJA_ENV`
+pub(crate) fn init_jinja() {
+    let _unused = &*JINJA_ENV;
+}
+
+/// Returns a template from the jinja environment, returns error if it does not exit.
+pub(crate) fn get_template(temp: &JinjaTemplateSource) -> anyhow::Result<Template<'static, '_>> {
+    let template = JINJA_ENV.get_template(temp.name)?;
+    Ok(template)
+}

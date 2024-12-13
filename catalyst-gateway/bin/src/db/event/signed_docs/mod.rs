@@ -4,7 +4,7 @@
 mod tests;
 
 use super::{EventDB, NotFoundError};
-use crate::jinja::{JinjaTemplateSource, JINJA_ENV};
+use crate::jinja::{get_template, JinjaTemplateSource};
 
 /// Insert sql query
 const INSERT_SIGNED_DOCS: &str = include_str!("./sql/insert_signed_documents.sql");
@@ -86,7 +86,7 @@ pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
 pub(crate) async fn select_signed_docs(
     id: &uuid::Uuid, ver: &Option<uuid::Uuid>,
 ) -> anyhow::Result<SignedDoc> {
-    let query_template = JINJA_ENV.get_template(SELECT_SIGNED_DOCS_TEMPLATE.name)?;
+    let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
         "id": id,
         "ver": ver,
