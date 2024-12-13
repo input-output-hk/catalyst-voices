@@ -15,7 +15,7 @@ pub(crate) struct JinjaTemplateSource {
 }
 
 /// Global static `minijinja::Environment` with all preloaded templates
-#[allow(clippy::unwrap_used, dead_code)]
+#[allow(clippy::unwrap_used)]
 static JINJA_ENV: LazyLock<Environment> = LazyLock::new(|| {
     let mut env = minijinja::Environment::new();
 

@@ -42,20 +42,16 @@ async fn some_test() {
         insert_signed_docs(doc).await.unwrap();
         // try to insert the same data again
         insert_signed_docs(doc).await.unwrap();
-
-        let res_doc = select_signed_docs(&doc.id, &None).await.unwrap();
-        assert_eq!(doc, &res_doc);
-        let res_doc = select_signed_docs(&doc.id, &Some(doc.ver)).await.unwrap();
-        assert_eq!(doc, &res_doc);
-
+        // try another doc with different `author` and same other fields
         let another_doc = SignedDoc {
             author: "Neil".to_string(),
             ..doc.clone()
         };
         assert!(insert_signed_docs(&another_doc).await.is_err());
-        assert!(select_signed_docs(&another_doc.id, &None).await.is_err());
-        assert!(select_signed_docs(&another_doc.id, &Some(another_doc.ver))
-            .await
-            .is_err());
+
+        let res_doc = select_signed_docs(&doc.id, &None).await.unwrap();
+        assert_eq!(doc, &res_doc);
+        let res_doc = select_signed_docs(&doc.id, &Some(doc.ver)).await.unwrap();
+        assert_eq!(doc, &res_doc);
     }
 }
