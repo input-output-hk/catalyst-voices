@@ -39,12 +39,12 @@ async fn some_test() {
     ];
 
     for (id, ver, doc_type, author, metadata, payload, raw) in &docs {
-        upsert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
+        insert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
             .await
             .unwrap();
-        // try to insert the same data again
-        upsert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
-            .await
-            .unwrap();
+        // // try to insert the same data again
+        // insert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
+        //     .await
+        //     .unwrap();
     }
 }

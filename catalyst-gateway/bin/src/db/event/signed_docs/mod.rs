@@ -5,10 +5,10 @@ mod tests;
 
 use super::EventDB;
 
-/// Upsert sql query
-const UPSERT_SIGNED_DOCS: &str = include_str!("./sql/upsert_signed_documents.sql");
+/// Insert sql query
+const INSERT_SIGNED_DOCS: &str = include_str!("./sql/insert_signed_documents.sql");
 
-/// Make an upsert query into the `event-db` by adding data into the `signed_docs` table
+/// Make an insert query into the `event-db` by adding data into the `signed_docs` table
 ///
 /// * IF the record primary key (id,ver) does not exist, then add the new record. Return
 ///   success.
@@ -20,11 +20,11 @@ const UPSERT_SIGNED_DOCS: &str = include_str!("./sql/upsert_signed_documents.sql
 ///  - `ver` is a UUID v7
 ///  - `doc_type` is a UUID v4
 #[allow(dead_code)]
-pub(crate) async fn upsert_signed_docs(
+pub(crate) async fn insert_signed_docs(
     id: &uuid::Uuid, ver: &uuid::Uuid, doc_type: &uuid::Uuid, author: &String,
     metadata: &Option<serde_json::Value>, payload: &Option<serde_json::Value>, raw: &Vec<u8>,
 ) -> anyhow::Result<()> {
-    EventDB::modify(UPSERT_SIGNED_DOCS, &[
+    EventDB::modify(INSERT_SIGNED_DOCS, &[
         id, ver, doc_type, author, metadata, payload, raw,
     ])
     .await?;
