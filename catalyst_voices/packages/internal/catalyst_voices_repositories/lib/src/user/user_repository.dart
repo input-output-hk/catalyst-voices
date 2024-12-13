@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/dtos/user_dto.dart';
 import 'package:catalyst_voices_repositories/src/user/user_storage.dart';
 
 abstract interface class UserRepository {
@@ -20,15 +21,17 @@ final class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<User> getUser() async {
-    final localUser = await _storage.readUser();
+    final dto = await _storage.readUser();
 
-    final user = localUser ?? const User.empty();
+    final user = dto?.toModel() ?? const User.empty();
 
     return user;
   }
 
   @override
   Future<void> saveUser(User user) {
-    return _storage.writeUser(user);
+    final dto = UserDto.fromModel(user);
+
+    return _storage.writeUser(dto);
   }
 }

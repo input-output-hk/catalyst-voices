@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/dtos/user_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 const _userKey = 'User';
 
 abstract interface class UserStorage {
-  Future<User?> readUser();
+  Future<UserDto?> readUser();
 
-  Future<void> writeUser(User user);
+  Future<void> writeUser(UserDto user);
 
   Future<void> deleteUser();
 }
@@ -19,7 +19,7 @@ final class SecureUserStorage extends SecureStorage implements UserStorage {
   });
 
   @override
-  Future<User?> readUser() async {
+  Future<UserDto?> readUser() async {
     final encoded = await readString(key: _userKey);
     if (encoded == null) {
       return null;
@@ -27,11 +27,11 @@ final class SecureUserStorage extends SecureStorage implements UserStorage {
 
     final decoded = json.decode(encoded) as Map<String, dynamic>;
 
-    return User.fromJson(decoded);
+    return UserDto.fromJson(decoded);
   }
 
   @override
-  Future<void> writeUser(User user) async {
+  Future<void> writeUser(UserDto user) async {
     final encoded = json.encode(user.toJson());
     await writeString(encoded, key: _userKey);
   }

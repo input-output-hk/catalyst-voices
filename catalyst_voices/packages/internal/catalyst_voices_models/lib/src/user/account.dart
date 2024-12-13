@@ -1,13 +1,9 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
-import 'package:json_annotation/json_annotation.dart';
-
-part 'account.g.dart';
 
 /// Defines singular account used by [User] (physical person).
 /// One [User] may have multiple [Account]'s.
-@JsonSerializable()
 final class Account extends Equatable {
   final String keychainId;
   final Set<AccountRole> roles;
@@ -48,16 +44,10 @@ final class Account extends Equatable {
     );
   }
 
-  factory Account.fromJson(Map<String, dynamic> json) {
-    return _$AccountFromJson(json);
-  }
-
   // Note. this is not defined yet what we will show here.
   String get acronym => 'A';
 
   bool get isAdmin => true;
-
-  Map<String, dynamic> toJson() => _$AccountToJson(this);
 
   Account copyWith({
     String? keychainId,

@@ -159,6 +159,16 @@ scripts:
       The catalyst_voices_repositories is skipped because to run a build_runner there you
       must generate first swagger docs (see related Earthfile).
 
+  build_runner_repository:
+    run: |
+      melos exec -c 1 \
+      --depends-on="build_runner" \
+      --scope="catalyst_voices_repositories" -- \
+          dart run build_runner build --delete-conflicting-outputs \
+              --build-filter="lib/src/dtos/*"
+    description: |
+      Run `build_runner` in catalyst_voices_repositories package only in selected folders
+
   metrics:
     run: |
       melos exec -c 1 -- \
