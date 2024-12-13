@@ -9,39 +9,43 @@ async fn some_test() {
     establish_connection();
 
     let docs = [
-        (
-            uuid::Uuid::now_v7(),
-            uuid::Uuid::now_v7(),
-            uuid::Uuid::new_v4(),
-            "Alex".to_string(),
-            &Some(serde_json::Value::Null),
-            &Some(serde_json::Value::Null),
-            vec![1, 2, 3, 4],
-        ),
-        (
-            uuid::Uuid::now_v7(),
-            uuid::Uuid::now_v7(),
-            uuid::Uuid::new_v4(),
-            "Steven".to_string(),
-            &Some(serde_json::Value::Null),
-            &Some(serde_json::Value::Null),
-            vec![5, 6, 7, 8],
-        ),
-        (
-            uuid::Uuid::now_v7(),
-            uuid::Uuid::now_v7(),
-            uuid::Uuid::new_v4(),
-            "Sasha".to_string(),
-            &None,
-            &None,
-            vec![9, 10, 11, 12],
-        ),
+        SignedDoc {
+            id: uuid::Uuid::now_v7(),
+            ver: uuid::Uuid::now_v7(),
+            doc_type: uuid::Uuid::new_v4(),
+            author: "Alex".to_string(),
+            metadata: Some(serde_json::Value::Null),
+            payload: Some(serde_json::Value::Null),
+            raw: vec![1, 2, 3, 4],
+        },
+        SignedDoc {
+            id: uuid::Uuid::now_v7(),
+            ver: uuid::Uuid::now_v7(),
+            doc_type: uuid::Uuid::new_v4(),
+            author: "Steven".to_string(),
+            metadata: Some(serde_json::Value::Null),
+            payload: Some(serde_json::Value::Null),
+            raw: vec![5, 6, 7, 8],
+        },
+        SignedDoc {
+            id: uuid::Uuid::now_v7(),
+            ver: uuid::Uuid::now_v7(),
+            doc_type: uuid::Uuid::new_v4(),
+            author: "Sasha".to_string(),
+            metadata: None,
+            payload: None,
+            raw: vec![9, 10, 11, 12],
+        },
     ];
 
-    for (id, ver, doc_type, author, metadata, payload, raw) in &docs {
-        insert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
-            .await
-            .unwrap();
+    for doc in &docs {
+        insert_signed_docs(doc).await.unwrap();
+
+        let res_doc = select_signed_docs(&doc.id, &None).await.unwrap();
+        assert_eq!(doc, &res_doc);
+        let res_doc = select_signed_docs(&doc.id, &Some(doc.ver)).await.unwrap();
+        assert_eq!(doc, &res_doc);
+
         // // try to insert the same data again
         // insert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
         //     .await
