@@ -1,15 +1,19 @@
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final _logger = Logger('VaultKeychainProvider');
 
 final class VaultKeychainProvider implements KeychainProvider {
   final FlutterSecureStorage _secureStorage;
+  final SharedPreferencesAsync _sharedPreferences;
 
   VaultKeychainProvider({
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
-  }) : _secureStorage = secureStorage;
+    required FlutterSecureStorage secureStorage,
+    required SharedPreferencesAsync sharedPreferences,
+  })  : _secureStorage = secureStorage,
+        _sharedPreferences = sharedPreferences;
 
   @override
   Future<Keychain> create(String id) async {
@@ -32,12 +36,7 @@ final class VaultKeychainProvider implements KeychainProvider {
   }
 
   @override
-  Future<Keychain> get(String id) async {
-    return VaultKeychain(
-      id: id,
-      secureStorage: _secureStorage,
-    );
-  }
+  Future<Keychain> get(String id) async => _get(id);
 
   @override
   Future<List<Keychain>> getAll() async {
@@ -47,19 +46,13 @@ final class VaultKeychainProvider implements KeychainProvider {
         .then((keys) => keys.where(VaultKeychain.isKeychainKey))
         .then((keys) => keys.map(VaultKeychain.getStorageId).toSet());
 
-    final keychains = keychainsIds
-        .map((id) => VaultKeychain(id: id, secureStorage: _secureStorage))
-        .cast<Keychain>()
-        .toList();
+    final keychains = keychainsIds.map(_get).cast<Keychain>().toList();
 
     return keychains;
   }
 
   Future<Keychain> _buildKeychain(String id) async {
-    final Keychain keychain = VaultKeychain(
-      id: id,
-      secureStorage: _secureStorage,
-    );
+    final keychain = _get(id);
 
     if (!await keychain.isEmpty) {
       _logger.warning('Overriding existing keychain[$id]');
@@ -84,5 +77,13 @@ final class VaultKeychainProvider implements KeychainProvider {
     for (final key in keys) {
       await _secureStorage.delete(key: key);
     }
+  }
+
+  Keychain _get(String id) {
+    return VaultKeychain(
+      id: id,
+      secureStorage: _secureStorage,
+      sharedPreferences: _sharedPreferences,
+    );
   }
 }
