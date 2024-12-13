@@ -12,7 +12,7 @@ async fn some_test() {
         (
             uuid::Uuid::now_v7(),
             uuid::Uuid::now_v7(),
-            uuid::Uuid::now_v7(),
+            uuid::Uuid::new_v4(),
             "Alex".to_string(),
             serde_json::Value::Null,
             serde_json::Value::Null,
@@ -21,7 +21,7 @@ async fn some_test() {
         (
             uuid::Uuid::now_v7(),
             uuid::Uuid::now_v7(),
-            uuid::Uuid::now_v7(),
+            uuid::Uuid::new_v4(),
             "Steven".to_string(),
             serde_json::Value::Null,
             serde_json::Value::Null,
