@@ -14,6 +14,11 @@ const UPSERT_SIGNED_DOCS: &str = include_str!("./sql/upsert_signed_documents.sql
 ///   success.
 /// * IF the record does exist, but all values are the same as stored, return Success.
 /// * Otherwise return an error. (Can not over-write an existing record with new data).
+///
+/// # Arguments:
+///  - `id` is a UUID v7
+///  - `ver` is a UUID v7
+///  - `doc_type` is a UUID v4
 #[allow(dead_code)]
 pub(crate) async fn upsert_signed_docs(
     id: &uuid::Uuid, ver: &uuid::Uuid, doc_type: &uuid::Uuid, author: &String,

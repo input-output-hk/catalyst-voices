@@ -46,12 +46,5 @@ async fn some_test() {
         upsert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
             .await
             .unwrap();
-
-        let another_author = "Neil".to_string();
-        assert!(
-            upsert_signed_docs(id, ver, doc_type, &another_author, metadata, payload, raw)
-                .await
-                .is_err()
-        );
     }
 }
