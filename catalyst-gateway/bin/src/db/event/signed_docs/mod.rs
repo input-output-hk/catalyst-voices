@@ -17,7 +17,7 @@ const UPSERT_SIGNED_DOCS: &str = include_str!("./sql/upsert_signed_documents.sql
 #[allow(dead_code)]
 pub(crate) async fn upsert_signed_docs(
     id: &uuid::Uuid, ver: &uuid::Uuid, doc_type: &uuid::Uuid, author: &String,
-    metadata: &serde_json::Value, payload: &serde_json::Value, raw: &Vec<u8>,
+    metadata: &Option<serde_json::Value>, payload: &Option<serde_json::Value>, raw: &Vec<u8>,
 ) -> anyhow::Result<()> {
     EventDB::modify(UPSERT_SIGNED_DOCS, &[
         id, ver, doc_type, author, metadata, payload, raw,

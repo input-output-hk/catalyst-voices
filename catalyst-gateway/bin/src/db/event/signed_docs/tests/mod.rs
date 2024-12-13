@@ -14,8 +14,8 @@ async fn some_test() {
             uuid::Uuid::now_v7(),
             uuid::Uuid::new_v4(),
             "Alex".to_string(),
-            serde_json::Value::Null,
-            serde_json::Value::Null,
+            &Some(serde_json::Value::Null),
+            &Some(serde_json::Value::Null),
             vec![1, 2, 3, 4],
         ),
         (
@@ -23,9 +23,18 @@ async fn some_test() {
             uuid::Uuid::now_v7(),
             uuid::Uuid::new_v4(),
             "Steven".to_string(),
-            serde_json::Value::Null,
-            serde_json::Value::Null,
+            &Some(serde_json::Value::Null),
+            &Some(serde_json::Value::Null),
             vec![5, 6, 7, 8],
+        ),
+        (
+            uuid::Uuid::now_v7(),
+            uuid::Uuid::now_v7(),
+            uuid::Uuid::new_v4(),
+            "Sasha".to_string(),
+            &None,
+            &None,
+            vec![9, 10, 11, 12],
         ),
     ];
 
@@ -37,5 +46,12 @@ async fn some_test() {
         upsert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
             .await
             .unwrap();
+
+        let another_author = "Neil".to_string();
+        assert!(
+            upsert_signed_docs(id, ver, doc_type, &another_author, metadata, payload, raw)
+                .await
+                .is_err()
+        );
     }
 }
