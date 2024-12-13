@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/json_converters.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
