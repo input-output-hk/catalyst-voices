@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod tests;
 
-use super::EventDB;
+use super::{EventDB, NotFoundError};
 use crate::jinja::{JinjaTemplateSource, JINJA_ENV};
 
 /// Insert sql query
@@ -47,6 +47,18 @@ pub(crate) struct SignedDoc {
 ///  - `doc_type` is a UUID v4
 #[allow(dead_code)]
 pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
+    match select_signed_docs(&doc.id, &Some(doc.ver)).await {
+        Ok(res_doc) => {
+            anyhow::ensure!(
+                &res_doc == doc,
+                "Document with the same `id` and `ver` already exists"
+            );
+            return Ok(());
+        },
+        Err(err) if err.is::<NotFoundError>() => {},
+        Err(err) => return Err(err),
+    }
+
     EventDB::modify(INSERT_SIGNED_DOCS, &[
         &doc.id,
         &doc.ver,

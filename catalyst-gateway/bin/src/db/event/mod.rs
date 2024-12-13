@@ -9,6 +9,7 @@ use std::{
 
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
+use error::NotFoundError;
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
@@ -104,7 +105,10 @@ impl EventDB {
         }
         let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
         let conn = pool.get().await?;
-        let row = conn.query_one(stmt, params).await?;
+        let row = conn
+            .query_opt(stmt, params)
+            .await?
+            .ok_or::<anyhow::Error>(NotFoundError.into())?;
         Ok(row)
     }
 
