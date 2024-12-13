@@ -19,19 +19,6 @@ pub(crate) async fn upsert_signed_docs(
     id: &uuid::Uuid, ver: &uuid::Uuid, doc_type: &uuid::Uuid, author: &String,
     metadata: &serde_json::Value, payload: &serde_json::Value, raw: &Vec<u8>,
 ) -> anyhow::Result<()> {
-    anyhow::ensure!(
-        id.get_version() == Some(uuid::Version::SortRand),
-        "`id` must be a UUID v7"
-    );
-    anyhow::ensure!(
-        ver.get_version() == Some(uuid::Version::SortRand),
-        "`ver` must be a UUID v7"
-    );
-    anyhow::ensure!(
-        doc_type.get_version() == Some(uuid::Version::Random),
-        "`doc_type` must be a UUID v4"
-    );
-
     EventDB::modify(UPSERT_SIGNED_DOCS, &[
         id, ver, doc_type, author, metadata, payload, raw,
     ])
