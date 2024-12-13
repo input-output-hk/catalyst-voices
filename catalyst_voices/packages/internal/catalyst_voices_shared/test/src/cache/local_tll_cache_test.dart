@@ -26,7 +26,7 @@ void main() {
   group(LocalTllCache, () {
     test('when key is not expired value is returned', () async {
       // Given
-      final cache = LocalTllCache();
+      final cache = LocalTllCache(sharedPreferences: sharedPreferences);
       const key = 'isUnlocked';
       const value = true;
 
@@ -41,7 +41,7 @@ void main() {
 
     test('when key is expired null is returned', () async {
       // Given
-      final cache = LocalTllCache();
+      final cache = LocalTllCache(sharedPreferences: sharedPreferences);
       const key = 'isUnlocked';
       const value = true;
       const ttl = Duration(hours: 1);
@@ -59,7 +59,7 @@ void main() {
 
     test('extend expiration makes key valid for longer', () async {
       // Given
-      final cache = LocalTllCache();
+      final cache = LocalTllCache(sharedPreferences: sharedPreferences);
       const key = 'isUnlocked';
       const value = true;
       const ttl = Duration(hours: 1);

@@ -7,6 +7,8 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final class Dependencies extends DependencyProvider {
   static final Dependencies instance = Dependencies._();
@@ -15,6 +17,7 @@ final class Dependencies extends DependencyProvider {
 
   Future<void> init() async {
     DependencyProvider.instance = this;
+    _registerStorages();
     _registerServices();
     _registerRepositories();
     _registerBlocsWithDependencies();
@@ -92,7 +95,12 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<Storage>(() => const SecureStorage());
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
     registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
-    registerLazySingleton<KeychainProvider>(VaultKeychainProvider.new);
+    registerLazySingleton<KeychainProvider>(() {
+      return VaultKeychainProvider(
+        secureStorage: get<FlutterSecureStorage>(),
+        sharedPreferences: get<SharedPreferencesAsync>(),
+      );
+    });
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
@@ -129,5 +137,10 @@ final class Dependencies extends DependencyProvider {
         get<ProposalRepository>(),
       );
     });
+  }
+
+  void _registerStorages() {
+    registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
+    registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
   }
 }

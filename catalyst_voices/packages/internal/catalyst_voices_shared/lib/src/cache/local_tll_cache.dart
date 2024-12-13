@@ -9,7 +9,7 @@ base class LocalTllCache extends LocalStorage
   LocalTllCache({
     super.key = 'LocalTllCache',
     Set<String>? allowList,
-    super.sharedPreferences,
+    required super.sharedPreferences,
     Duration defaultTtl = const Duration(minutes: 1),
   })  : _defaultTtl = defaultTtl,
         super(

@@ -10,6 +10,7 @@ import 'package:test/test.dart';
 
 void main() {
   late final FlutterSecureStorage flutterSecureStorage;
+  late final SharedPreferencesAsync sharedPreferences;
   late final SecureStorageVault vault;
 
   setUpAll(() {
@@ -19,15 +20,17 @@ void main() {
     SharedPreferencesAsyncPlatform.instance = store;
 
     flutterSecureStorage = const FlutterSecureStorage();
+    sharedPreferences = SharedPreferencesAsync();
     vault = SecureStorageVault(
       id: 'id',
       secureStorage: flutterSecureStorage,
+      sharedPreferences: sharedPreferences,
     );
   });
 
   tearDown(() async {
     await flutterSecureStorage.deleteAll();
-    await SharedPreferencesAsync().clear();
+    await sharedPreferences.clear();
   });
 
   test('lock and unlock factor fallbacks to lock state', () async {

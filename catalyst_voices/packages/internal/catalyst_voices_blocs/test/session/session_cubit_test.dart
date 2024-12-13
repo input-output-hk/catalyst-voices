@@ -23,10 +23,15 @@ void main() {
   late SessionCubit sessionCubit;
 
   setUpAll(() {
+    FlutterSecureStorage.setMockInitialValues({});
+
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
 
-    keychainProvider = VaultKeychainProvider();
+    keychainProvider = VaultKeychainProvider(
+      secureStorage: const FlutterSecureStorage(),
+      sharedPreferences: SharedPreferencesAsync(),
+    );
     userStorage = SecureUserStorage();
 
     dummyUserFactory = DummyUserFactory();
@@ -41,8 +46,6 @@ void main() {
   });
 
   setUp(() {
-    FlutterSecureStorage.setMockInitialValues({});
-
     // each test might emit using this cubit, therefore we reset it here
     adminToolsCubit = AdminToolsCubit();
 
@@ -59,6 +62,7 @@ void main() {
   tearDown(() async {
     await sessionCubit.close();
 
+    await const FlutterSecureStorage().deleteAll();
     await SharedPreferencesAsync().clear();
 
     reset(registrationService);

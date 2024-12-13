@@ -4,6 +4,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/test.dart';
@@ -11,22 +12,41 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   group(VaultKeychain, () {
+    late final FlutterSecureStorage secureStorage;
+    late final SharedPreferencesAsync sharedPreferences;
+
     setUpAll(() {
       FlutterSecureStorage.setMockInitialValues({});
 
       final store = InMemorySharedPreferencesAsync.empty();
       SharedPreferencesAsyncPlatform.instance = store;
 
+      secureStorage = const FlutterSecureStorage();
+      sharedPreferences = SharedPreferencesAsync();
+
       Bip32Ed25519XPrivateKeyFactory.instance =
           _FakeBip32Ed25519XPrivateKeyFactory();
     });
+
+    tearDown(() async {
+      await secureStorage.deleteAll();
+      await sharedPreferences.clear();
+    });
+
+    VaultKeychain buildKeychain(String id) {
+      return VaultKeychain(
+        id: id,
+        secureStorage: secureStorage,
+        sharedPreferences: sharedPreferences,
+      );
+    }
 
     test('is considered empty even with metadata in it', () async {
       // Given
       final id = const Uuid().v4();
 
       // When
-      final vault = VaultKeychain(id: id);
+      final vault = buildKeychain(id);
 
       // Then
       expect(await vault.isEmpty, isTrue);
@@ -41,7 +61,7 @@ void main() {
       );
 
       // When
-      final vault = VaultKeychain(id: id);
+      final vault = buildKeychain(id);
       await vault.setLock(lock);
       await vault.unlock(lock);
 
@@ -55,8 +75,8 @@ void main() {
       final id = const Uuid().v4();
 
       // When
-      final vaultOne = VaultKeychain(id: id);
-      final vaultTwo = VaultKeychain(id: id);
+      final vaultOne = buildKeychain(id);
+      final vaultTwo = buildKeychain(id);
 
       // Then
       expect(vaultOne, isNot(equals(vaultTwo)));

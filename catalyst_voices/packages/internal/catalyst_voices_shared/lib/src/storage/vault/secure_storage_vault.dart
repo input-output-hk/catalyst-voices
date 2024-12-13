@@ -7,6 +7,7 @@ import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
 import 'package:catalyst_voices_shared/src/storage/vault/secure_storage_vault_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const _lockKey = 'LockKey';
 const _createDateKey = 'CreateDate';
@@ -70,13 +71,15 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   SecureStorageVault({
     required this.id,
     String key = defaultKey,
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
+    required FlutterSecureStorage secureStorage,
+    required SharedPreferencesAsync sharedPreferences,
     Duration unlockTtl = const Duration(hours: 1),
     CryptoService? cryptoService,
   })  : _key = key,
         _secureStorage = secureStorage,
         _cache = SecureStorageVaultTtlCache(
           key: '$key.$id.Cache',
+          sharedPreferences: sharedPreferences,
           defaultTtl: unlockTtl,
         ),
         _cryptoService = cryptoService ?? LocalCryptoService() {

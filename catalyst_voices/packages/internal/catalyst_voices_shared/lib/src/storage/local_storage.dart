@@ -14,8 +14,8 @@ base class LocalStorage with StorageAsStringMixin implements Storage {
   LocalStorage({
     this.key = 'LocalStorage',
     this.allowList,
-    SharedPreferencesAsync? sharedPreferences,
-  }) : _sharedPreferences = sharedPreferences ?? SharedPreferencesAsync();
+    required SharedPreferencesAsync sharedPreferences,
+  }) : _sharedPreferences = sharedPreferences;
 
   @override
   Future<bool> contains({required String key}) {

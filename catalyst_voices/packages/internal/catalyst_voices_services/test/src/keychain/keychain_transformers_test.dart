@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/expect.dart';
@@ -17,9 +18,17 @@ void main() {
   });
 
   group(KeychainToUnlockTransformer, () {
+    VaultKeychain buildKeychain(String id) {
+      return VaultKeychain(
+        id: id,
+        secureStorage: const FlutterSecureStorage(),
+        sharedPreferences: SharedPreferencesAsync(),
+      );
+    }
+
     test('emits keychain unlock stage changes when keychain is set', () async {
       // Given
-      final keychain = VaultKeychain(id: 'id');
+      final keychain = buildKeychain('id');
       const lockFactor = PasswordLockFactor('Test1234');
       final keychainSC = StreamController<Keychain?>.broadcast();
 

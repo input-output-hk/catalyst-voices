@@ -22,7 +22,7 @@ final class SecureStorageVaultTtlCache extends LocalTllCache
     implements SecureStorageVaultCache {
   SecureStorageVaultTtlCache({
     super.key,
-    super.sharedPreferences,
+    required super.sharedPreferences,
     super.defaultTtl = const Duration(hours: 1),
   }) : super(
           allowList: {_isUnlockedKey},

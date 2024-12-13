@@ -8,7 +8,7 @@ import 'package:test/scaffolding.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  final KeychainProvider provider = VaultKeychainProvider();
+  late final KeychainProvider provider;
   final UserStorage storage = SecureUserStorage();
   final dummyUserFactory = DummyUserFactory();
 
@@ -17,11 +17,15 @@ void main() {
   setUpAll(() {
     final store = InMemorySharedPreferencesAsync.empty();
     SharedPreferencesAsyncPlatform.instance = store;
+    FlutterSecureStorage.setMockInitialValues({});
+
+    provider = VaultKeychainProvider(
+      secureStorage: const FlutterSecureStorage(),
+      sharedPreferences: SharedPreferencesAsync(),
+    );
   });
 
   setUp(() {
-    FlutterSecureStorage.setMockInitialValues({});
-
     service = UserService(
       keychainProvider: provider,
       userStorage: storage,
@@ -30,6 +34,7 @@ void main() {
   });
 
   tearDown(() async {
+    await const FlutterSecureStorage().deleteAll();
     await SharedPreferencesAsync().clear();
   });
 
