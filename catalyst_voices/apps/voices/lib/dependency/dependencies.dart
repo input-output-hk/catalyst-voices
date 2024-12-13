@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -15,8 +16,13 @@ final class Dependencies extends DependencyProvider {
 
   Dependencies._();
 
-  Future<void> init() async {
+  Future<void> init({
+    required AppConfig config,
+  }) async {
     DependencyProvider.instance = this;
+
+    registerSingleton<AppConfig>(config);
+
     _registerStorages();
     _registerServices();
     _registerRepositories();
@@ -88,7 +94,8 @@ final class Dependencies extends DependencyProvider {
         TransactionConfigRepository.new,
       )
       ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
-      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new);
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new);
   }
 
   void _registerServices() {
@@ -99,6 +106,7 @@ final class Dependencies extends DependencyProvider {
       return VaultKeychainProvider(
         secureStorage: get<FlutterSecureStorage>(),
         sharedPreferences: get<SharedPreferencesAsync>(),
+        cacheConfig: get<AppConfig>().cache,
       );
     });
     registerLazySingleton<Downloader>(Downloader.new);
@@ -135,6 +143,11 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<ProposalService>(() {
       return ProposalService(
         get<ProposalRepository>(),
+      );
+    });
+    registerLazySingleton<ConfigService>(() {
+      return ConfigService(
+        get<ConfigRepository>(),
       );
     });
   }

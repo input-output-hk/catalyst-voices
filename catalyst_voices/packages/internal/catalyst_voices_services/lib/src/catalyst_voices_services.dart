@@ -1,4 +1,5 @@
 export 'campaign/campaign_service.dart' show CampaignService;
+export 'config/config_service.dart' show ConfigService;
 export 'downloader/downloader.dart';
 export 'keychain/keychain.dart';
 export 'keychain/keychain_provider.dart';

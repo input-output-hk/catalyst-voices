@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logging/logging.dart';
@@ -8,12 +9,15 @@ final _logger = Logger('VaultKeychainProvider');
 final class VaultKeychainProvider implements KeychainProvider {
   final FlutterSecureStorage _secureStorage;
   final SharedPreferencesAsync _sharedPreferences;
+  final CacheConfig _cacheConfig;
 
   VaultKeychainProvider({
     required FlutterSecureStorage secureStorage,
     required SharedPreferencesAsync sharedPreferences,
+    required CacheConfig cacheConfig,
   })  : _secureStorage = secureStorage,
-        _sharedPreferences = sharedPreferences;
+        _sharedPreferences = sharedPreferences,
+        _cacheConfig = cacheConfig;
 
   @override
   Future<Keychain> create(String id) async {
@@ -84,6 +88,7 @@ final class VaultKeychainProvider implements KeychainProvider {
       id: id,
       secureStorage: _secureStorage,
       sharedPreferences: _sharedPreferences,
+      unlockTtl: _cacheConfig.expiryDuration.keychainUnlock,
     );
   }
 }

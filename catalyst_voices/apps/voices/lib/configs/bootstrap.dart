@@ -7,6 +7,9 @@ import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/guards/milestone_guard.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -89,7 +92,12 @@ Future<BootstrapArgs> bootstrap() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
-  await Dependencies.instance.init();
+  final configService = ConfigService(ConfigRepository());
+  final config = await configService
+      .getAppConfig()
+      .onError((error, stackTrace) => const AppConfig());
+
+  await Dependencies.instance.init(config: config);
 
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();

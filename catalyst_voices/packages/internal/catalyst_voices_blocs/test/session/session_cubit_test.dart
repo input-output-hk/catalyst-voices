@@ -31,6 +31,7 @@ void main() {
     keychainProvider = VaultKeychainProvider(
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
+      cacheConfig: const CacheConfig(),
     );
     userStorage = SecureUserStorage();
 
