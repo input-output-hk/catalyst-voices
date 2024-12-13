@@ -6,6 +6,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 ///
 /// In order to unlock [Vault] sufficient [LockFactor] have to be
 /// set via [unlock] that can unlock [LockFactor] from [setLock].
-abstract interface class Vault implements Storage, Lockable {
+abstract interface class Vault implements Storage, Lockable, ActiveAware {
+  /// Identifier of instance.
   String get id;
 }

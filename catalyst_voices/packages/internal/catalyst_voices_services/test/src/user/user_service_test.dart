@@ -2,25 +2,44 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  final KeychainProvider provider = VaultKeychainProvider();
-  final userRepository = UserRepository(SecureUserStorage());
+  late final KeychainProvider provider;
+  late final UserRepository userRepository;
   final dummyUserFactory = DummyUserFactory();
 
   late UserService service;
 
-  setUp(() {
+  setUpAll(() {
+    final store = InMemorySharedPreferencesAsync.empty();
+    SharedPreferencesAsyncPlatform.instance = store;
     FlutterSecureStorage.setMockInitialValues({});
 
+    provider = VaultKeychainProvider(
+      secureStorage: const FlutterSecureStorage(),
+      sharedPreferences: SharedPreferencesAsync(),
+      cacheConfig: const CacheConfig(),
+    );
+    userRepository = UserRepository(SecureUserStorage());
+  });
+
+  setUp(() {
     service = UserService(
       keychainProvider: provider,
       userRepository: userRepository,
       dummyUserFactory: dummyUserFactory,
     );
+  });
+
+  tearDown(() async {
+    await const FlutterSecureStorage().deleteAll();
+    await SharedPreferencesAsync().clear();
   });
 
   group('Keychain', () {

@@ -4,14 +4,31 @@ import 'package:catalyst_voices_services/src/keychain/vault_keychain_provider.da
 import 'package:convert/convert.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  final provider = VaultKeychainProvider();
+  late final VaultKeychainProvider provider;
 
-  setUp(() {
+  setUpAll(() {
     FlutterSecureStorage.setMockInitialValues({});
+
+    final store = InMemorySharedPreferencesAsync.empty();
+    SharedPreferencesAsyncPlatform.instance = store;
+
+    provider = VaultKeychainProvider(
+      secureStorage: const FlutterSecureStorage(),
+      sharedPreferences: SharedPreferencesAsync(),
+      cacheConfig: const CacheConfig(),
+    );
+  });
+
+  tearDown(() async {
+    await const FlutterSecureStorage().deleteAll();
+    await SharedPreferencesAsync().clear();
   });
 
   group(VaultKeychainProvider, () {

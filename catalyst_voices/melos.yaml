@@ -127,6 +127,8 @@ command:
       uuid: ^4.5.1
       sentry_flutter: ^8.8.0
       scrollable_positioned_list: ^0.3.8
+      shared_preferences: ^2.3.3
+      shared_preferences_platform_interface: ^2.4.1
       # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
       # but here we import it explicitly to make sure the latest version is used which addresses
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
@@ -167,16 +169,16 @@ scripts:
 
   format-apply:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix"
+      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix"
     description: Run `dart format` for all packages.
 
   format-check:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
+      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
+      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
     description: Run `dart format` checks for all packages.
 
   license-check:
