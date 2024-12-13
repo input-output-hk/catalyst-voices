@@ -27,6 +27,7 @@ dependencies:
   logging: ^1.2.0
   path: ^1.9.0
   rxdart: ^0.27.7
+  shared_preferences: ^2.3.3
   uuid: ^4.5.1
   web: ^1.1.0
   webdriver: ^3.0.3
@@ -34,4 +35,5 @@ dependencies:
 dev_dependencies:
   catalyst_analysis: ^2.0.0
   mocktail: ^1.0.1
+  shared_preferences_platform_interface: ^2.4.1
   test: ^1.24.9

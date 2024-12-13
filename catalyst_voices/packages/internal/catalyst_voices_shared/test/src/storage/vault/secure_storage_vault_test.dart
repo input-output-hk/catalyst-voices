@@ -3,24 +3,34 @@ import 'dart:convert';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/src/storage/vault/secure_storage_vault.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/test.dart';
 
 void main() {
   late final FlutterSecureStorage flutterSecureStorage;
+  late final SharedPreferencesAsync sharedPreferences;
   late final SecureStorageVault vault;
 
   setUpAll(() {
     FlutterSecureStorage.setMockInitialValues({});
 
+    final store = InMemorySharedPreferencesAsync.empty();
+    SharedPreferencesAsyncPlatform.instance = store;
+
     flutterSecureStorage = const FlutterSecureStorage();
+    sharedPreferences = SharedPreferencesAsync();
     vault = SecureStorageVault(
       id: 'id',
       secureStorage: flutterSecureStorage,
+      sharedPreferences: sharedPreferences,
     );
   });
 
   tearDown(() async {
     await flutterSecureStorage.deleteAll();
+    await sharedPreferences.clear();
   });
 
   test('lock and unlock factor fallbacks to lock state', () async {
@@ -120,14 +130,11 @@ void main() {
 
     await vault.clear();
 
-    final futures =
-        vaultKeyValues.keys.map((e) => vault.readString(key: e)).toList();
-
-    final values = await Future.wait(futures);
+    final isUnlocked = await vault.isUnlocked;
     final fValues = await flutterSecureStorage.readAll();
 
     // Then
-    expect(values, everyElement(isNull));
+    expect(isUnlocked, isFalse);
     expect(fValues, nonVaultKeyValues);
   });
 

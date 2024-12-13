@@ -5,6 +5,9 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
@@ -20,7 +23,16 @@ void main() {
   late SessionCubit sessionCubit;
 
   setUpAll(() {
-    keychainProvider = VaultKeychainProvider(cacheConfig: const CacheConfig());
+    FlutterSecureStorage.setMockInitialValues({});
+
+    final store = InMemorySharedPreferencesAsync.empty();
+    SharedPreferencesAsyncPlatform.instance = store;
+
+    keychainProvider = VaultKeychainProvider(
+      secureStorage: const FlutterSecureStorage(),
+      sharedPreferences: SharedPreferencesAsync(),
+      cacheConfig: const CacheConfig(),
+    );
     userStorage = SecureUserStorage();
 
     dummyUserFactory = DummyUserFactory();
@@ -35,8 +47,6 @@ void main() {
   });
 
   setUp(() {
-    FlutterSecureStorage.setMockInitialValues({});
-
     // each test might emit using this cubit, therefore we reset it here
     adminToolsCubit = AdminToolsCubit();
 
@@ -52,6 +62,9 @@ void main() {
 
   tearDown(() async {
     await sessionCubit.close();
+
+    await const FlutterSecureStorage().deleteAll();
+    await SharedPreferencesAsync().clear();
 
     reset(registrationService);
   });
