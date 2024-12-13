@@ -47,5 +47,15 @@ async fn some_test() {
         assert_eq!(doc, &res_doc);
         let res_doc = select_signed_docs(&doc.id, &Some(doc.ver)).await.unwrap();
         assert_eq!(doc, &res_doc);
+
+        let another_doc = SignedDoc {
+            author: "Neil".to_string(),
+            ..doc.clone()
+        };
+        assert!(insert_signed_docs(&another_doc).await.is_err());
+        assert!(select_signed_docs(&another_doc.id, &None).await.is_err());
+        assert!(select_signed_docs(&another_doc.id, &Some(another_doc.ver))
+            .await
+            .is_err());
     }
 }
