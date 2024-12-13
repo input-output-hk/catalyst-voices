@@ -116,7 +116,6 @@ final class Dependencies extends DependencyProvider {
     });
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
-    registerLazySingleton<UserStorage>(SecureUserStorage.new);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,
     );

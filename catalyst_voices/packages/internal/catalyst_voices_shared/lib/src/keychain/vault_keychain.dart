@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 const _rootKey = 'rootKey';

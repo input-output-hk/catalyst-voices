@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-part 'app_config.g.dart';
-
 final class AppConfig extends Equatable {
   final SentryConfig sentry;
   final CacheConfig cache;

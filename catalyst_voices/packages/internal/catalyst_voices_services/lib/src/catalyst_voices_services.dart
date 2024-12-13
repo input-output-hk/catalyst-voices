@@ -1,11 +1,6 @@
 export 'campaign/campaign_service.dart' show CampaignService;
 export 'config/config_service.dart' show ConfigService;
 export 'downloader/downloader.dart';
-export 'keychain/keychain.dart';
-export 'keychain/keychain_provider.dart';
-export 'keychain/keychain_transformers.dart';
-export 'keychain/vault_keychain.dart';
-export 'keychain/vault_keychain_provider.dart';
 export 'proposal/proposal_service.dart' show ProposalService;
 export 'registration/registration_progress_notifier.dart';
 export 'registration/registration_service.dart' show RegistrationService;

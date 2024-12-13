@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 final class KeychainToUnlockTransformer
     extends StreamTransformerBase<Keychain?, bool> {

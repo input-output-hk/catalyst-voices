@@ -18,7 +18,6 @@ dependencies:
     path: ../catalyst_voices_repositories
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
-  convert: ^3.1.1
   flutter:
     sdk: flutter
   flutter_driver:
