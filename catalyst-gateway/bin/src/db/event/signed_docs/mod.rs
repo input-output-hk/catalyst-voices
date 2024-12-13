@@ -1,5 +1,8 @@
 //! Signed docs queries
 
+#[cfg(test)]
+mod tests;
+
 use super::EventDB;
 
 /// Upsert sql query
