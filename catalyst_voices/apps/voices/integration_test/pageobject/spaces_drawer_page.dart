@@ -3,35 +3,32 @@ library spaces_drawer_page;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:patrol_finders/patrol_finders.dart';
 
 class SpacesDrawerPage {
-  static final closeBtn = find.byKey(const Key('MenuCloseButton'));
-  static final guestMenuItems = find.byKey(const Key('GuestMenuItems'));
-  static final allSpacesBtn =
-      find.byKey(const Key('DrawerChooserAllSpacesButton'));
-  static final chooserPrevBtn =
-      find.byKey(const Key('DrawerChooserPreviousButton'));
-  static final chooserNextBtn =
-      find.byKey(const Key('DrawerChooserNextButton'));
-  static final chooserItemContainer =
-      find.byKey(const Key('DrawerChooserItem'));
+  static const closeBtn = Key('MenuCloseButton');
+  static const guestMenuItems = Key('GuestMenuItems');
+  static const allSpacesBtn = Key('DrawerChooserAllSpacesButton');
+  static const chooserPrevBtn = Key('DrawerChooserPreviousButton');
+  static const chooserNextBtn = Key('DrawerChooserNextButton');
+  static const chooserItemContainer = Key('DrawerChooserItem');
 
-  static Finder chooserItem(Space space) {
-    return find.byKey(Key('DrawerChooser$space'));
+  static Key chooserItem(Space space) {
+    return Key('DrawerChooser$space');
   }
 
-  static Finder chooserIcon(Space space) {
-    return find.byKey(Key('DrawerChooser${space}AvatarKey'));
+  static Key chooserIcon(Space space) {
+    return Key('DrawerChooser${space}AvatarKey');
   }
 
-  static void looksAsExpected() {
-    expect(closeBtn, findsOneWidget);
-    expect(allSpacesBtn, findsOneWidget);
-    expect(chooserPrevBtn, findsOneWidget);
-    expect(chooserNextBtn, findsOneWidget);
-    expect(chooserItemContainer, findsExactly(5));
+  static void looksAsExpected(PatrolTester $) {
+    expect($(closeBtn), findsOneWidget);
+    expect($(allSpacesBtn), findsOneWidget);
+    expect($(chooserPrevBtn), findsOneWidget);
+    expect($(chooserNextBtn), findsOneWidget);
+    expect($(chooserItemContainer), findsExactly(5));
     expect(
-      chooserIcon(Space.discovery),
+      $(chooserIcon(Space.discovery)),
       findsOneWidget,
     );
   }

@@ -13,26 +13,28 @@ void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   patrolWidgetTest('Spaces drawer guest menu renders correctly',
-      (tester) async {
+      (PatrolTester $) async {
     final args =
         await bootstrap(initialLocation: const DiscoveryRoute().location);
-    await tester.pumpWidgetAndSettle(App(routerConfig: args.routerConfig));
-    await tester(DashboardPage.guestShortcutBtn.first).tap();
-    await tester(DashboardPage.spacesDrawerButton).tap();
-    SpacesDrawerPage.looksAsExpected();
+    await $.pumpWidgetAndSettle(App(routerConfig: args.routerConfig));
+    await $(DashboardPage.guestShortcutBtn).tap();
+    await $.pumpAndSettle();
+    await Future<void>.delayed(const Duration(seconds: 5));
+    await $(DashboardPage.spacesDrawerButton).waitUntilVisible().tap();
+    SpacesDrawerPage.looksAsExpected($);
 
     //iterate thru spaces and check menu buttons are there
     for (final space in Space.values) {
-      await tester(SpacesDrawerPage.chooserItem(space)).tap();
+      await $(SpacesDrawerPage.chooserItem(space)).tap();
       expect(
-        SpacesDrawerPage.chooserIcon(space),
+        $(SpacesDrawerPage.chooserIcon(space)),
         findsOneWidget,
       );
       final children = find.descendant(
-        of: SpacesDrawerPage.guestMenuItems,
+        of: $(SpacesDrawerPage.guestMenuItems),
         matching: find.byWidgetPredicate((widget) => true),
       );
-      expect(children, findsAtLeast(1));
+      expect($(children), findsAtLeast(1));
     }
   });
 }
