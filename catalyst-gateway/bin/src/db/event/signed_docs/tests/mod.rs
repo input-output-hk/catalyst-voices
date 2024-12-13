@@ -33,5 +33,9 @@ async fn some_test() {
         upsert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
             .await
             .unwrap();
+        // try to insert the same data again
+        upsert_signed_docs(id, ver, doc_type, author, metadata, payload, raw)
+            .await
+            .unwrap();
     }
 }
