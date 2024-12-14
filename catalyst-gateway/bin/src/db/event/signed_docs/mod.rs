@@ -125,14 +125,8 @@ pub(crate) async fn select_signed_docs(
 /// Make an advanced select query into the `event-db` by getting data from the
 /// `signed_docs` table.
 ///
-/// * This returns a single document. All data from the document is returned, including
-///   the `payload` and `raw` fields.
-/// * `ver` should be able to be optional, in which case get the latest ver of the given
-///   `id`.
-///
 /// # Arguments:
-///  - `id` is a UUID v7
-///  - `ver` is a UUID v7
+///  - `conditions` an SQL `WHERE` statements
 #[allow(dead_code)]
 pub(crate) async fn advanced_select_signed_docs(
     conditions: &str, limit: Option<u64>, offset: Option<u64>,
