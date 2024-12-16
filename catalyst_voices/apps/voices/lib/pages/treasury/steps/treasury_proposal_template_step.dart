@@ -4,10 +4,10 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class TreasuryDummyTopicStep extends StatelessWidget {
-  final DummyTopicStep step;
+class TreasuryProposalTemplateStep extends StatelessWidget {
+  final TreasurySectionStep step;
 
-  const TreasuryDummyTopicStep({
+  const TreasuryProposalTemplateStep({
     super.key,
     required this.step,
   });
@@ -18,7 +18,7 @@ class TreasuryDummyTopicStep extends StatelessWidget {
       id: step.sectionStepId,
       builder: (context, value, child) {
         return WorkspaceTextTileContainer(
-          name: step.localizedName(context),
+          name: step.localizedDesc(context),
           isSelected: value.isSelected,
           headerActions: [
             VoicesTextButton(
