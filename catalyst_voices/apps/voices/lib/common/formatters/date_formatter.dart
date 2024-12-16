@@ -75,8 +75,9 @@ abstract class DateFormatter {
   /// Example:
   /// - GMT+01:00 Central European Standard Time
   static String formatTimezone(DateTime dateTime) {
-    return 'GMT${_formatTimezoneOffset(dateTime.timeZoneOffset)} '
-        '${dateTime.timeZoneName}';
+    final offset = _formatTimezoneOffset(dateTime.timeZoneOffset);
+    final timezone = dateTime.timeZoneName;
+    return 'GMT$offset $timezone';
   }
 
   static String _formatTimezoneOffset(Duration offset) {

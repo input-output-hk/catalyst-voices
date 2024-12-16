@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_categories_step.dart';
 import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_details_step.dart';
-import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_stages_step.dart';
+import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_stages_edit_step.dart';
+import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_stages_view_step.dart';
 import 'package:catalyst_voices/pages/treasury/steps/treasury_proposal_template_step.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -27,7 +28,7 @@ class TreasuryBody extends StatelessWidget {
               case SetupCampaignDetailsStep():
                 return TreasuryCampaignDetailsStep(step: step);
               case SetupCampaignStagesStep():
-                return TreasuryCampaignStagesStep(step: step);
+                return _TreasuryCampaignStagesStep(step: step);
               case SetupProposalTemplateStep():
                 return TreasuryProposalTemplateStep(step: step);
               case SetupCampaignCategoriesStep():
@@ -35,6 +36,25 @@ class TreasuryBody extends StatelessWidget {
             }
           },
         );
+      },
+    );
+  }
+}
+
+class _TreasuryCampaignStagesStep extends StatelessWidget {
+  final TreasurySectionStep step;
+
+  const _TreasuryCampaignStagesStep({required this.step});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: SectionsControllerScope.of(context),
+      builder: (context, sectionsState, child) {
+        final isEditing = sectionsState.isEditing(step.sectionStepId);
+        return isEditing
+            ? TreasuryCampaignStagesEditStep(step: step)
+            : TreasuryCampaignStagesViewStep(step: step);
       },
     );
   }

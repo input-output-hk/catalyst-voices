@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -32,11 +34,7 @@ class _CampaignManagementState extends State<CampaignManagement> {
           children: [
             VoicesOutlinedButton(
               child: Text(context.l10n.campaignManagement),
-              onTap: () async {
-                final result =
-                    await CampaignManagementDialog.show(context, publish);
-                _handleDialogResult(result);
-              },
+              onTap: () => unawaited(_showManagementDialog(publish)),
             ),
             _CampaignStatusIndicator(
               campaignStatus: CampaignPublish.draft,
@@ -50,6 +48,13 @@ class _CampaignManagementState extends State<CampaignManagement> {
         );
       },
     );
+  }
+
+  Future<void> _showManagementDialog(CampaignPublish? publish) async {
+    final result = await CampaignManagementDialog.show(context, publish);
+    if (mounted) {
+      _handleDialogResult(result);
+    }
   }
 
   void _handleDialogResult(CampaignPublish? newPublish) {

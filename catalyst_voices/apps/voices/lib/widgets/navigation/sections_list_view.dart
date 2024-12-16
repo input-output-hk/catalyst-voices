@@ -33,7 +33,12 @@ class SectionsListView<T extends Section, T2 extends SectionStep>
   @override
   Widget build(BuildContext context) {
     return ScrollConfiguration(
-      behavior: const _DisableOverscrollBehavior(),
+      behavior: ScrollConfiguration.of(context).copyWith(
+        // Disables the iOS like overscroll behavior to avoid jumping UI.
+        // TODO(dtscalac): remove the workaround when
+        // https://github.com/google/flutter.widgets/issues/276 is fixed
+        physics: const ClampingScrollPhysics(),
+      ),
       child: ScrollablePositionedList.separated(
         padding: padding?.resolve(Directionality.of(context)),
         itemScrollController: itemScrollController,
@@ -75,17 +80,4 @@ Widget _defaultHeaderBuilder(BuildContext context, Section section) {
   return SectionHeader(
     section: section,
   );
-}
-
-/// Disables the iOS like overscroll behavior to avoid jumping UI.
-///
-// TODO(dtscalac): remove the workaround when
-// https://github.com/google/flutter.widgets/issues/276 is fixed
-class _DisableOverscrollBehavior extends ScrollBehavior {
-  const _DisableOverscrollBehavior();
-
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    return const ClampingScrollPhysics();
-  }
 }
