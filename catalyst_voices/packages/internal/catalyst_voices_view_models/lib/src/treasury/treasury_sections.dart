@@ -29,7 +29,7 @@ final class SetupCampaignDetailsStep extends TreasurySectionStep {
   const SetupCampaignDetailsStep({
     required super.id,
     required super.sectionId,
-  }) : super();
+  });
 
   @override
   String localizedName(BuildContext context) {
@@ -41,7 +41,7 @@ final class SetupCampaignStagesStep extends TreasurySectionStep {
   const SetupCampaignStagesStep({
     required super.id,
     required super.sectionId,
-  }) : super();
+  });
 
   @override
   String localizedName(BuildContext context) {
@@ -53,7 +53,7 @@ final class SetupProposalTemplateStep extends TreasurySectionStep {
   const SetupProposalTemplateStep({
     required super.id,
     required super.sectionId,
-  }) : super();
+  });
 
   @override
   String localizedName(BuildContext context) {
@@ -70,7 +70,7 @@ final class SetupCampaignCategoriesStep extends TreasurySectionStep {
   const SetupCampaignCategoriesStep({
     required super.id,
     required super.sectionId,
-  }) : super();
+  });
 
   @override
   String localizedName(BuildContext context) {
