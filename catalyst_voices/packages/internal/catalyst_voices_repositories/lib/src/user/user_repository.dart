@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dtos/user_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user_dto.dart';
 import 'package:catalyst_voices_repositories/src/user/user_storage.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 

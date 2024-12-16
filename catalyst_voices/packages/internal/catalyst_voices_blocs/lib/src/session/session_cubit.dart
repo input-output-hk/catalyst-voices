@@ -161,7 +161,7 @@ final class SessionCubit extends Cubit<SessionState>
   Future<SessionState> _createMockedSessionState() async {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
-        // TODO(damian-molinski): Try limiting exposed Account so its not future.
+        // TODO(damian-molinski): Limiting exposed Account so its not future.
         final dummyAccount = await _getDummyAccount();
 
         return ActiveAccountSessionState(
