@@ -53,13 +53,6 @@ abstract interface class RegistrationService {
     required SeedPhrase seedPhrase,
   });
 
-  /// Creates [Keychain] for given [account] with [lockFactor].
-  Future<Keychain> createKeychainFor({
-    required Account account,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  });
-
   /// Builds an unsigned registration transaction from given parameters.
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
@@ -151,11 +144,13 @@ final class RegistrationServiceImpl implements RegistrationService {
     // TODO(dtscalac): derive a key from the seed phrase and fetch
     // from the backend info about the registration (roles, wallet, etc).
     final roles = {AccountRole.root};
+
     final keychainId = const Uuid().v4();
+    final keychain = await _keychainProvider.create(keychainId);
 
     // Note. with rootKey query backend for account details.
     return Account(
-      keychainId: keychainId,
+      keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),
@@ -163,23 +158,6 @@ final class RegistrationServiceImpl implements RegistrationService {
         address: _testNetAddress,
       ),
     );
-  }
-
-  @override
-  Future<Keychain> createKeychainFor({
-    required Account account,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  }) async {
-    final keychainId = account.keychainId;
-    final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
-
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
-
-    return keychain;
   }
 
   @override
@@ -253,7 +231,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       final address = await enabledWallet.getChangeAddress();
 
       return Account(
-        keychainId: keychainId,
+        keychain: keychain,
         roles: roles,
         walletInfo: WalletInfo(
           metadata: WalletMetadata.fromCardanoWallet(wallet),
@@ -283,7 +261,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.setMasterKey(masterKey);
 
     return Account(
-      keychainId: keychainId,
+      keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),

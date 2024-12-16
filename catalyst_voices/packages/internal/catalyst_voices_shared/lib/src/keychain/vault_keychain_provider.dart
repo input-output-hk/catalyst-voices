@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final _logger = Logger('VaultKeychainProvider');
@@ -60,7 +59,7 @@ final class VaultKeychainProvider implements KeychainProvider {
 
     if (!await keychain.isEmpty) {
       _logger.warning('Overriding existing keychain[$id]');
-      await keychain.clear();
+      await keychain.erase();
       return _buildKeychain(id);
     }
 

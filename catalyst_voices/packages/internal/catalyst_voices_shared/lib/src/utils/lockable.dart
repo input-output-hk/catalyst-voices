@@ -1,6 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 abstract interface class Lockable {
+  /// Returns last known state of unlock. Effectively synchronous getter for
+  /// [watchIsUnlocked].
+  bool get lastIsUnlocked;
+
   /// Returns true when have sufficient [LockFactor] from [unlock].
   Future<bool> get isUnlocked;
 

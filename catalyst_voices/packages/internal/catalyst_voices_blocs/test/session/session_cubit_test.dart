@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,9 +13,8 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 
 void main() {
   late final KeychainProvider keychainProvider;
-  late final UserStorage userStorage;
+  late final UserRepository userRepository;
 
-  late final DummyUserFactory dummyUserFactory;
   late final UserService userService;
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
@@ -33,15 +34,15 @@ void main() {
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: const CacheConfig(),
     );
-    userStorage = SecureUserStorage();
-
-    dummyUserFactory = DummyUserFactory();
-    userService = UserService(
-      keychainProvider: keychainProvider,
-      userStorage: userStorage,
-      dummyUserFactory: dummyUserFactory,
+    userRepository = UserRepository(
+      SecureUserStorage(),
+      keychainProvider,
     );
-    registrationService = _MockRegistrationService();
+
+    userService = UserService(
+      userRepository: userRepository,
+    );
+    registrationService = _MockRegistrationService(keychainProvider);
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
   });
@@ -52,7 +53,6 @@ void main() {
 
     sessionCubit = SessionCubit(
       userService,
-      dummyUserFactory,
       registrationService,
       notifier,
       accessControl,
@@ -63,6 +63,11 @@ void main() {
   tearDown(() async {
     await sessionCubit.close();
 
+    final user = await userService.getUser();
+    for (final account in user.accounts) {
+      await userService.removeAccount(account);
+    }
+
     await const FlutterSecureStorage().deleteAll();
     await SharedPreferencesAsync().clear();
 
@@ -70,14 +75,17 @@ void main() {
   });
 
   group(SessionCubit, () {
-    test('when no keychain is found session is in Visitor state', () async {
+    test('when no account is found session is in Visitor state', () async {
       // Given
 
       // When
-      await userService.removeCurrentKeychain();
+      final account = userService.account;
+      if (account != null) {
+        await userService.removeAccount(account);
+      }
 
       // Then
-      expect(userService.keychain, isNull);
+      expect(userService.account, isNull);
       expect(sessionCubit.state, isA<VisitorSessionState>());
     });
 
@@ -85,13 +93,16 @@ void main() {
       // Given
 
       // When
-      await userService.removeCurrentKeychain();
+      final account = userService.account;
+      if (account != null) {
+        await userService.removeAccount(account);
+      }
 
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.keychain, isNull);
+      expect(userService.account, isNull);
       expect(sessionCubit.state, isA<VisitorSessionState>());
       expect(
         sessionCubit.state,
@@ -111,13 +122,16 @@ void main() {
       // When
       notifier.value = RegistrationProgress(keychainProgress: keychainProgress);
 
-      await userService.removeCurrentKeychain();
+      final account = userService.account;
+      if (account != null) {
+        await userService.removeAccount(account);
+      }
 
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.keychain, isNull);
+      expect(userService.account, isNull);
       expect(sessionCubit.state, isA<VisitorSessionState>());
       expect(
         sessionCubit.state,
@@ -135,13 +149,16 @@ void main() {
       await keychain.setLock(lockFactor);
       await keychain.lock();
 
-      await userService.useKeychain(keychainId);
+      final account = Account.dummy(keychain: keychain);
+
+      await userService.useAccount(account);
 
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.keychain, isNotNull);
+      expect(userService.account, isNotNull);
+      expect(userService.account?.id, account.id);
       expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
       expect(sessionCubit.state, isA<GuestSessionState>());
     });
@@ -155,14 +172,16 @@ void main() {
       final keychain = await keychainProvider.create(keychainId);
       await keychain.setLock(lockFactor);
 
-      await userService.useKeychain(keychainId);
-      await userService.keychain?.unlock(lockFactor);
+      final account = Account.dummy(keychain: keychain);
+
+      await userService.useAccount(account);
+      await account.keychain.unlock(lockFactor);
 
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.keychain, isNotNull);
+      expect(userService.account, isNotNull);
       expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
       expect(sessionCubit.state, isNot(isA<GuestSessionState>()));
       expect(sessionCubit.state, isA<ActiveAccountSessionState>());
@@ -185,4 +204,22 @@ void main() {
   });
 }
 
-class _MockRegistrationService extends Mock implements RegistrationService {}
+class _MockRegistrationService extends Mock implements RegistrationService {
+  final KeychainProvider keychainProvider;
+
+  _MockRegistrationService(this.keychainProvider);
+
+  @override
+  Future<Account> registerTestAccount({
+    required String keychainId,
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+  }) async {
+    final keychain = await keychainProvider.create(keychainId);
+
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+
+    return Account.dummy(keychain: keychain);
+  }
+}

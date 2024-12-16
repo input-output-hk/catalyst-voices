@@ -41,7 +41,6 @@ final class Dependencies extends DependencyProvider {
         () {
           return SessionCubit(
             get<UserService>(),
-            get<DummyUserFactory>(),
             get<RegistrationService>(),
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
@@ -95,7 +94,13 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
-      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new);
+      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
+      ..registerLazySingleton<UserRepository>(() {
+        return UserRepository(
+          get<UserStorage>(),
+          get<KeychainProvider>(),
+        );
+      });
   }
 
   void _registerServices() {
@@ -111,7 +116,6 @@ final class Dependencies extends DependencyProvider {
     });
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
-    registerLazySingleton<UserStorage>(SecureUserStorage.new);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,
     );
@@ -126,14 +130,11 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<UserService>(
       () {
         return UserService(
-          keychainProvider: get<KeychainProvider>(),
-          userStorage: get<UserStorage>(),
-          dummyUserFactory: get<DummyUserFactory>(),
+          userRepository: get<UserRepository>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
     );
-    registerLazySingleton<DummyUserFactory>(DummyUserFactory.new);
     registerLazySingleton<AccessControl>(AccessControl.new);
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
@@ -155,5 +156,6 @@ final class Dependencies extends DependencyProvider {
   void _registerStorages() {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
+    registerLazySingleton<UserStorage>(SecureUserStorage.new);
   }
 }
