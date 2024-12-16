@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod tests;
 
-use super::{EventDB, NotFoundError};
+use super::{common::QueryLimits, EventDB, NotFoundError};
 use crate::jinja::{get_template, JinjaTemplateSource};
 
 /// Insert sql query
@@ -122,6 +122,13 @@ pub(crate) async fn select_signed_docs(
     })
 }
 
+/// A `select_signed_docs` query filtering argument.
+#[allow(dead_code)]
+pub(crate) enum DocQueryFilter {
+    /// All entries
+    All,
+}
+
 /// Make an advanced select query into the `event-db` by getting data from the
 /// `signed_docs` table.
 ///
@@ -129,13 +136,12 @@ pub(crate) async fn select_signed_docs(
 ///  - `conditions` an SQL `WHERE` statements
 #[allow(dead_code)]
 pub(crate) async fn advanced_select_signed_docs(
-    conditions: &str, limit: Option<u64>, offset: Option<u64>,
+    conditions: &str, query_limits: &QueryLimits,
 ) -> anyhow::Result<SignedDoc> {
     let query_template = get_template(&ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
         "conditions": conditions,
-        "limit": limit,
-        "offset": offset,
+        "query_limits": query_limits.query_limit_stmt(),
     }))?;
     let res = EventDB::query_one(&query, &[]).await?;
 

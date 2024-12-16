@@ -10,5 +10,4 @@ FROM signed_docs
 WHERE
   {{ conditions }}
 ORDER BY signed_docs.type DESC, signed_docs.id DESC, signed_docs.ver DESC
-{% if limit %} LIMIT {{ limit }} {% endif %}
-{% if offset %} OFFSET {{ offset }} {% endif %}
+  {{ query_limits }}

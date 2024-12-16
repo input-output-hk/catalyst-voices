@@ -60,8 +60,7 @@ async fn some_test() {
                 doc.id, doc.ver
             )
             .as_str(),
-            None,
-            None,
+            &QueryLimits::One,
         )
         .await
         .unwrap();
