@@ -143,11 +143,8 @@ impl DocsQueryFilter {
     }
 }
 
-/// Make an advanced select query into the `event-db` by getting data from the
+/// Make an filtered select query into the `event-db` by getting data from the
 /// `signed_docs` table.
-///
-/// # Arguments:
-///  - `conditions` an SQL `WHERE` statements
 #[allow(dead_code)]
 pub(crate) async fn filtered_select_signed_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
