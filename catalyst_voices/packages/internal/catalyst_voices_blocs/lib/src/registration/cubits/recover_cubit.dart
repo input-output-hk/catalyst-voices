@@ -141,12 +141,14 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     }
 
     final lockFactor = PasswordLockFactor(password.value);
-
-    await _registrationService.createKeychainFor(
-      account: account,
+    final masterKey = await _registrationService.deriveMasterKey(
       seedPhrase: seedPhrase,
-      lockFactor: lockFactor,
     );
+
+    final keychain = account.keychain;
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+    await keychain.setMasterKey(masterKey);
 
     await _userService.useAccount(account);
 
@@ -162,7 +164,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   Future<void> reset() async {
     final recoveredAccount = _recoveredAccount;
     if (recoveredAccount != null) {
-      await _userService.removeKeychain(recoveredAccount.keychainId);
+      await _userService.removeAccount(recoveredAccount);
     }
 
     _recoveredAccount = null;

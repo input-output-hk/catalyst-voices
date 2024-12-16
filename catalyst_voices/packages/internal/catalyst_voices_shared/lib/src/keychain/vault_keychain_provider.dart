@@ -59,7 +59,7 @@ final class VaultKeychainProvider implements KeychainProvider {
 
     if (!await keychain.isEmpty) {
       _logger.warning('Overriding existing keychain[$id]');
-      await keychain.clear();
+      await keychain.erase();
       return _buildKeychain(id);
     }
 

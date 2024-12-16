@@ -60,5 +60,8 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   @override
+  Future<void> erase() => clear();
+
+  @override
   String toString() => 'VaultKeychain[$id]';
 }

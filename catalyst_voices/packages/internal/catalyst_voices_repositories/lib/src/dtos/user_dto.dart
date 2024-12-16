@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/utils/json_converters.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_dto.g.dart';
@@ -18,7 +19,7 @@ final class UserDto {
   UserDto.fromModel(User data)
       : this(
           accounts: data.accounts.map(AccountDto.fromModel).toList(),
-          activeKeychainId: data.activeKeychainId,
+          activeKeychainId: data.activeAccount?.keychain.id,
         );
 
   factory UserDto.fromJson(Map<String, dynamic> json) {
@@ -27,10 +28,22 @@ final class UserDto {
 
   Map<String, dynamic> toJson() => _$UserDtoToJson(this);
 
-  User toModel() {
+  Future<User> toModel({
+    required KeychainProvider keychainProvider,
+  }) async {
+    final accounts = <Account>[];
+
+    for (final accountDto in this.accounts) {
+      final account = await accountDto.toModel(
+        activeKeychainId: activeKeychainId,
+        keychainProvider: keychainProvider,
+      );
+
+      accounts.add(account);
+    }
+
     return User(
-      accounts: accounts.map((e) => e.toModel()).toList(),
-      activeKeychainId: activeKeychainId,
+      accounts: accounts,
     );
   }
 }
@@ -51,7 +64,7 @@ final class AccountDto {
 
   AccountDto.fromModel(Account data)
       : this(
-          keychainId: data.keychainId,
+          keychainId: data.keychain.id,
           roles: data.roles,
           walletInfo: AccountWalletInfoDto.fromModel(data.walletInfo),
           isProvisional: data.isProvisional,
@@ -63,11 +76,17 @@ final class AccountDto {
 
   Map<String, dynamic> toJson() => _$AccountDtoToJson(this);
 
-  Account toModel() {
+  Future<Account> toModel({
+    required String? activeKeychainId,
+    required KeychainProvider keychainProvider,
+  }) async {
+    final keychain = await keychainProvider.get(keychainId);
+
     return Account(
-      keychainId: keychainId,
+      keychain: keychain,
       roles: roles,
       walletInfo: walletInfo.toModel(),
+      isActive: keychainId == activeKeychainId,
       isProvisional: isProvisional,
     );
   }
