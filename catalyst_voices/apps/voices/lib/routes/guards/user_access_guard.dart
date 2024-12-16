@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 final class UserAccessGuard implements RouteGuard {
   const UserAccessGuard();
+
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
     final account = context.read<SessionCubit>().state.account;

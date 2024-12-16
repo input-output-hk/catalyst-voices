@@ -155,6 +155,7 @@ class _UnlockPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesPasswordTextField(
       controller: controller,
+      autofocus: true,
       decoration: VoicesTextFieldDecoration(
         labelText: context.l10n.unlockDialogHint,
         errorText: error?.message(context),

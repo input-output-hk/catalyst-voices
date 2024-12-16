@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -24,32 +26,40 @@ class _CampaignManagementState extends State<CampaignManagement> {
 
   @override
   Widget build(BuildContext context) {
-    final currentStatus = context.watch<CampaignBuilderCubit>().campaignStatus;
-    return Row(
-      children: [
-        VoicesOutlinedButton(
-          child: Text(context.l10n.campaignManagement),
-          onTap: () async {
-            final result =
-                await CampaignManagementDialog.show(context, currentStatus);
-            _handleDialogResult(result);
-          },
-        ),
-        _CampaignStatusIndicator(
-          campaignStatus: CampaignPublish.draft,
-          currentStatus: currentStatus,
-        ),
-        _CampaignStatusIndicator(
-          campaignStatus: CampaignPublish.published,
-          currentStatus: currentStatus,
-        ),
-      ],
+    return BlocSelector<CampaignBuilderCubit, CampaignBuilderState,
+        CampaignPublish?>(
+      selector: (state) => state.publish,
+      builder: (context, publish) {
+        return Row(
+          children: [
+            VoicesOutlinedButton(
+              child: Text(context.l10n.campaignManagement),
+              onTap: () => unawaited(_showManagementDialog(publish)),
+            ),
+            _CampaignStatusIndicator(
+              campaignStatus: CampaignPublish.draft,
+              currentStatus: publish,
+            ),
+            _CampaignStatusIndicator(
+              campaignStatus: CampaignPublish.published,
+              currentStatus: publish,
+            ),
+          ],
+        );
+      },
     );
   }
 
-  void _handleDialogResult(CampaignPublish? newStatus) {
-    if (newStatus == null) return;
-    context.read<CampaignBuilderCubit>().updateCampaignStatus(newStatus);
+  Future<void> _showManagementDialog(CampaignPublish? publish) async {
+    final result = await CampaignManagementDialog.show(context, publish);
+    if (mounted) {
+      _handleDialogResult(result);
+    }
+  }
+
+  void _handleDialogResult(CampaignPublish? newPublish) {
+    if (newPublish == null) return;
+    context.read<CampaignBuilderCubit>().updateCampaignPublish(newPublish);
   }
 }
 

@@ -1,21 +1,32 @@
 part of 'campaign_builder_cubit.dart';
 
-sealed class CampaignBuilderState extends Equatable {
-  const CampaignBuilderState();
-}
+final class CampaignBuilderState extends Equatable {
+  final bool isLoading;
+  final CampaignPublish? publish;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
-final class LoadingCampaignBuilderState extends CampaignBuilderState {
-  const LoadingCampaignBuilderState();
+  const CampaignBuilderState({
+    this.isLoading = false,
+    this.publish,
+    this.startDate,
+    this.endDate,
+  });
+
+  CampaignBuilderState copyWith({
+    bool? isLoading,
+    Optional<CampaignPublish>? publish,
+    Optional<DateTime>? startDate,
+    Optional<DateTime>? endDate,
+  }) {
+    return CampaignBuilderState(
+      isLoading: isLoading ?? this.isLoading,
+      publish: publish.dataOr(this.publish),
+      startDate: startDate.dataOr(this.startDate),
+      endDate: endDate.dataOr(this.endDate),
+    );
+  }
 
   @override
-  List<Object?> get props => [];
-}
-
-final class ChangedCampaignBuilderState extends CampaignBuilderState {
-  final CampaignPublish status;
-
-  const ChangedCampaignBuilderState(this.status);
-
-  @override
-  List<Object?> get props => [status];
+  List<Object?> get props => [isLoading, publish, startDate, endDate];
 }

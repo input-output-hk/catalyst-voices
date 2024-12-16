@@ -28,12 +28,12 @@ class CampaignManagementDialog extends StatefulWidget {
 }
 
 class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
-  late CampaignPublish _campaignSetup;
+  late CampaignPublish _campaignPublish;
 
   @override
   void initState() {
     super.initState();
-    _campaignSetup = widget.initialValue ?? CampaignPublish.draft;
+    _campaignPublish = widget.initialValue ?? CampaignPublish.draft;
   }
 
   @override
@@ -56,8 +56,8 @@ class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
             ),
             const SizedBox(height: 8),
             _CampaignPublishSegmentButton(
-              value: _campaignSetup,
-              onChanged: (value) => _campaignSetup = value,
+              value: _campaignPublish,
+              onChanged: (value) => _campaignPublish = value,
             ),
             const Spacer(),
             Align(
@@ -65,10 +65,10 @@ class _CampaignManagementDialogState extends State<CampaignManagementDialog> {
               child: VoicesFilledButton(
                 child: Text(context.l10n.saveButtonText),
                 onTap: () {
-                  Navigator.of(context).pop(_campaignSetup);
+                  Navigator.of(context).pop(_campaignPublish);
                   context
                       .read<CampaignBuilderCubit>()
-                      .updateCampaignStatus(_campaignSetup);
+                      .updateCampaignPublish(_campaignPublish);
                 },
               ),
             ),

@@ -1,23 +1,22 @@
 library catalyst_voices_models;
 
-export 'auth/authentication_status.dart';
+export 'app_config.dart';
 export 'auth/password_strength.dart';
 export 'campaign/campaign.dart';
 export 'campaign/campaign_category.dart';
 export 'campaign/campaign_publish.dart';
 export 'campaign/campaign_section.dart';
-export 'crypto/keychain_metadata.dart';
 export 'crypto/lock_factor.dart';
-export 'document/document_json.dart';
 export 'errors/errors.dart';
 export 'file/voices_file.dart';
+export 'markdown_data.dart';
 export 'optional.dart';
+export 'proposal/guidance.dart';
 export 'proposal/proposal.dart';
-export 'proposal/proposal_builder.dart';
+export 'proposal/proposal_section.dart';
 export 'proposal/proposal_template.dart';
 export 'registration/registration.dart';
 export 'seed_phrase.dart';
-export 'session_data.dart';
 export 'space.dart';
 export 'user/account.dart';
 export 'user/account_role.dart';

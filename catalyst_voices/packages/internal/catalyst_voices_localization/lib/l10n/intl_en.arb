@@ -48,18 +48,6 @@
   "@passwordErrorText": {
     "description": "Text shown in  password field when input is invalid"
   },
-  "loginTitleText": "Login",
-  "@loginTitleText": {
-    "description": "Text shown in the login screen title"
-  },
-  "loginButtonText": "Login",
-  "@loginButtonText": {
-    "description": "Text shown in the login screen for the login button"
-  },
-  "loginScreenErrorMessage": "Wrong credentials",
-  "@loginScreenErrorMessage": {
-    "description": "Text shown in the login screen when the user enters wrong credentials"
-  },
   "homeScreenText": "Catalyst Voices",
   "@homeScreenText": {
     "description": "Text shown in the home screen"
@@ -275,13 +263,53 @@
   "@treasuryCampaignBuilderSegments": {
     "description": "Tab name in campaign builder panel"
   },
-  "treasuryCampaignSetup": "Setup Campaign",
-  "@treasuryCampaignSetup": {
+  "treasuryCreateCampaign": "Create Campaign",
+  "@treasuryCreateCampaign": {
     "description": "Segment name"
   },
-  "treasuryCampaignTitle": "Campaign title",
-  "@treasuryCampaignTitle": {
-    "description": "Campaign title"
+  "setupCampaignDetails": "Setup Campaign Details",
+  "@setupCampaignDetails": {
+    "description": "Segment step for entering campaign details."
+  },
+  "setupCampaignStages": "Setup Campaign Stages",
+  "@setupCampaignStages": {
+    "description": "Segment step for entering campaign start and end dates."
+  },
+  "setupCampaignStagesTimezone": "You are setting date and times using this Timezone:",
+  "@setupCampaignStagesTimezone": {
+    "description": "The description of a timezone in which the user sets campaign stages."
+  },
+  "startAndEndDates": "Start & End Dates",
+  "@startAndEndDates": {
+    "description": "Refers to a date & time range (start & end)."
+  },
+  "campaignStart": "Campaign Start",
+  "@campaignStart": {
+    "description": "Label for the campaign start date."
+  },
+  "campaignEnd": "Campaign End",
+  "@campaignEnd": {
+    "description": "Label for the campaign end date."
+  },
+  "campaignDates": "Campaign Dates",
+  "@campaignDates": {
+    "description": "Label for the campaign start & end date."
+  },
+  "noDateTimeSelected": "No date & time selected",
+  "@noDateTimeSelected": {
+    "description": "Placeholder when date & time not selected."
+  },
+  "setupBaseProposalTemplate": "Setup Base Proposal Template",
+  "@setupBaseProposalTemplate": {
+    "description": "Segment step for entering a proposal template for a campaign."
+  },
+  "setupBaseQuestions": "Setup Base Questions",
+  "@setupBaseQuestions": {
+    "description": "Segment description for entering a proposal template for a campaign."
+  },
+  "setupCategories": "Setup Categories",
+  "@setupCategories": {
+    "description": "Segment step for entering campaign categories."
   },
   "stepEdit": "Edit",
   "@stepEdit": {

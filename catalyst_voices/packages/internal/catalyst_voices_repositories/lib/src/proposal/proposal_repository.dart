@@ -5,8 +5,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 class ProposalRepository {
   const ProposalRepository();
 
-  /// Fetches all draft proposals.
-  Future<List<Proposal>> getDraftProposals({
+  /// Fetches all proposals.
+  Future<List<Proposal>> getProposals({
     required String campaignId,
   }) async {
     // simulate network delay
@@ -36,8 +36,18 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    completedSegments: 0,
-    totalSegments: 13,
+    sections: List.generate(13, (index) {
+      return ProposalSection(
+        id: 'f14/0_$index',
+        name: 'Section_$index',
+        steps: [
+          ProposalSectionStep(
+            id: 'f14/0_${index}_1',
+            name: 'Topic 1',
+          ),
+        ],
+      );
+    }),
   ),
   Proposal(
     id: 'f14/1',
@@ -50,8 +60,19 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    completedSegments: 7,
-    totalSegments: 13,
+    sections: List.generate(13, (index) {
+      return ProposalSection(
+        id: 'f14/0_$index',
+        name: 'Section_$index',
+        steps: [
+          ProposalSectionStep(
+            id: 'f14/0_${index}_1',
+            name: 'Topic 1',
+            answer: index < 7 ? const MarkdownData('Ans') : null,
+          ),
+        ],
+      );
+    }),
   ),
   Proposal(
     id: 'f14/2',
@@ -64,7 +85,18 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    completedSegments: 13,
-    totalSegments: 13,
+    sections: List.generate(13, (index) {
+      return ProposalSection(
+        id: 'f14/0_$index',
+        name: 'Section_$index',
+        steps: [
+          ProposalSectionStep(
+            id: 'f14/0_${index}_1',
+            name: 'Topic 1',
+            answer: const MarkdownData('Ans'),
+          ),
+        ],
+      );
+    }),
   ),
 ];

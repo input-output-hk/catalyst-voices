@@ -2,7 +2,7 @@ import 'package:catalyst_voices/common/ext/guidance_ext.dart';
 import 'package:catalyst_voices/widgets/cards/guidance_card.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class GuidanceView extends StatefulWidget {
