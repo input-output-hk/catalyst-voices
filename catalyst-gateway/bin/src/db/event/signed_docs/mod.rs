@@ -21,9 +21,9 @@ pub(crate) const ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = Jin
     source: include_str!("./sql/advanced_select_signed_documents.sql.jinja"),
 };
 
-/// signed doc event db struct
+/// Signed doc body event db struct
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct SignedDoc {
+pub(crate) struct SignedDocBody {
     /// `signed_doc` table `id` field
     id: uuid::Uuid,
     /// `signed_doc` table `ver` field
@@ -34,6 +34,13 @@ pub(crate) struct SignedDoc {
     author: String,
     /// `signed_doc` table `metadata` field
     metadata: Option<serde_json::Value>,
+}
+
+/// Full signed doc event db struct
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct FullSignedDoc {
+    /// Signed doc body
+    body: SignedDocBody,
     /// `signed_doc` table `payload` field
     payload: Option<serde_json::Value>,
     /// `signed_doc` table `raw` field
@@ -52,8 +59,8 @@ pub(crate) struct SignedDoc {
 ///  - `ver` is a UUID v7
 ///  - `doc_type` is a UUID v4
 #[allow(dead_code)]
-pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
-    match select_signed_docs(&doc.id, &doc.ver).await {
+pub(crate) async fn insert_signed_docs(doc: &FullSignedDoc) -> anyhow::Result<()> {
+    match select_signed_docs(&doc.body.id, &doc.body.ver).await {
         Ok(res_doc) => {
             anyhow::ensure!(
                 &res_doc == doc,
@@ -66,11 +73,11 @@ pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
     }
 
     EventDB::modify(INSERT_SIGNED_DOCS, &[
-        &doc.id,
-        &doc.ver,
-        &doc.doc_type,
-        &doc.author,
-        &doc.metadata,
+        &doc.body.id,
+        &doc.body.ver,
+        &doc.body.doc_type,
+        &doc.body.author,
+        &doc.body.metadata,
         &doc.payload,
         &doc.raw,
     ])
@@ -79,7 +86,7 @@ pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
 }
 
 /// Make a select query into the `event-db` by getting data from the `signed_docs` table.
-async fn select_signed_docs(id: &uuid::Uuid, ver: &uuid::Uuid) -> anyhow::Result<SignedDoc> {
+async fn select_signed_docs(id: &uuid::Uuid, ver: &uuid::Uuid) -> anyhow::Result<FullSignedDoc> {
     let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
         "id": id,
@@ -93,12 +100,14 @@ async fn select_signed_docs(id: &uuid::Uuid, ver: &uuid::Uuid) -> anyhow::Result
     let payload = res.try_get("payload")?;
     let raw = res.try_get("raw")?;
 
-    Ok(SignedDoc {
-        id: *id,
-        ver: *ver,
-        doc_type,
-        author,
-        metadata,
+    Ok(FullSignedDoc {
+        body: SignedDocBody {
+            id: *id,
+            ver: *ver,
+            doc_type,
+            author,
+            metadata,
+        },
         payload,
         raw,
     })
@@ -142,7 +151,7 @@ impl DocsQueryFilter {
 #[allow(dead_code)]
 pub(crate) async fn filtered_select_signed_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-) -> anyhow::Result<Vec<SignedDoc>> {
+) -> anyhow::Result<Vec<SignedDocBody>> {
     let query_template = get_template(&ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
         "conditions": conditions.query_stmt(),
@@ -158,16 +167,12 @@ pub(crate) async fn filtered_select_signed_docs(
             let doc_type = row.try_get("type")?;
             let author = row.try_get("author")?;
             let metadata = row.try_get("metadata")?;
-            let payload = row.try_get("payload")?;
-            let raw = row.try_get("raw")?;
-            Ok(SignedDoc {
+            Ok(SignedDocBody {
                 id,
                 ver,
                 doc_type,
                 author,
                 metadata,
-                payload,
-                raw,
             })
         })
         .collect::<anyhow::Result<_>>()?;
