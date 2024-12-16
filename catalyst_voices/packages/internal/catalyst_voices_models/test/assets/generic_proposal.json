@@ -19,8 +19,8 @@
         },
         "translation": {
             "isTranslated": true,
-            "originalLanguage": "Spanish",
-            "translationNotes": "Translated using DeepL with manual review"
+            "originalLanguage": "German",
+            "originalDocumentLink": "https://example.com/proposal.pdf"
         },
         "problem": {
             "statement": "Current challenge in the Cardano ecosystem...",
@@ -57,8 +57,7 @@
     "horizons": {
         "theme": {
             "grouped_tag": {
-                "group": "DeFi",
-                "tag": "Staking"
+                "group": "Governance"
             }
         }
     },
@@ -75,6 +74,7 @@
     },
     "milestones": {
         "milestones": {
+            "milestone_list": [],
             "declared": [
                 "# Initial Setup and Planning\n\nProject setup and infrastructure...",
                 "# Core Development\n\nImplementation of main features...",

@@ -13,49 +13,57 @@
         "segment": {
             "$comment": "UI - Logical Document Section Break.",
             "type": "object",
-            "additionalProperties": false
+            "additionalProperties": false,
+            "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
         },
         "section": {
             "$comment": "UI - Logical Document Sub-Section Break.",
             "type": "object",
-            "additionalProperties": false
+            "additionalProperties": false,
+            "x-note": "Subsections containing specific details about the proposal."
         },
         "singleLineTextEntry": {
             "$comment": "UI - Single Line text entry without any markup or rich text capability.",
             "type": "string",
             "contentMediaType": "text/plain",
-            "pattern": "^.*$"
+            "pattern": "^.*$",
+            "x-note": "Enter a single line of text. No formatting, line breaks, or special characters are allowed."
         },
         "singleLineHttpsURLEntry": {
             "$comment": "UI - Single Line text entry for HTTPS Urls.",
             "type": "string",
             "format": "uri",
-            "pattern": "^https:.*"
+            "pattern": "^https:.*",
+            "x-note": "Enter a valid HTTPS URL. Must start with 'https://' and be a complete, working web address."
         },
         "multiLineTextEntry": {
             "$comment": "UI - Multiline text entry without any markup or rich text capability.",
             "type": "string",
             "contentMediaType": "text/plain",
-            "pattern": "^[\\S\\s]*$"
+            "pattern": "^[\\S\\s]*$",
+            "x-note": "Enter multiple lines of plain text. You can use line breaks but no special formatting."
         },
         "multiLineTextEntryMarkdown": {
             "$comment": "UI - Multiline text entry with Markdown content.",
             "type": "string",
             "contentMediaType": "text/markdown",
-            "pattern": "^[\\S\\s]*$"
+            "pattern": "^[\\S\\s]*$",
+            "x-note": "Use Markdown formatting for rich text. Available formatting:\n- Headers: # for h1, ## for h2, etc.\n- Lists: * or - for bullets, 1. for numbered\n- Emphasis: *italic* or **bold**\n- Links: [text](url)\n- Code: `inline` or ```block```"
         },
         "dropDownSingleSelect": {
             "$comment": "UI - Drop Down Selection of a single entry from the defined enum.",
             "type": "string",
             "contentMediaType": "text/plain",
             "pattern": "^.*$",
-            "format": "dropDownSingleSelect"
+            "format": "dropDownSingleSelect",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
         },
         "multiSelect": {
             "$comment": "UI - Multiselect from the given items.",
             "type": "array",
             "uniqueItems": true,
-            "format": "multiSelect"
+            "format": "multiSelect",
+            "x-note": "Select multiple options from the dropdown menu. Multiple choices are allowed."
         },
         "singleLineTextEntryList": {
             "$comment": "UI - A Growable List of single line text (no markup or richtext).",
@@ -66,7 +74,8 @@
             "items": {
                 "$ref": "#/definitions/singleLineTextEntry",
                 "maxLength": 1024
-            }
+            },
+            "x-note": "Add multiple single-line text entries. Each entry should be unique and under 1024 characters."
         },
         "multiLineTextEntryListMarkdown": {
             "$comment": "UI - A Growable List of markdown formatted text fields.",
@@ -77,7 +86,8 @@
             "items": {
                 "$ref": "#/definitions/multiLineTextEntryMarkdown",
                 "maxLength": 10240
-            }
+            },
+            "x-note": "Add multiple markdown-formatted text entries. Each entry can include rich formatting and should be unique."
         },
         "singleLineHttpsURLEntryList": {
             "$comment": "UI - A Growable List of HTTPS URLs.",
@@ -88,68 +98,79 @@
             "items": {
                 "$ref": "#/definitions/singleLineHttpsURLEntry",
                 "maxLength": 1024
-            }
+            },
+            "x-note": "Enter multiple HTTPS URLs. Each URL should be unique and under 1024 characters."
         },
         "nestedQuestionsList": {
             "$comment": "UI - A Growable List of Questions.  The contents are an object, that can have any UI elements within.",
             "type": "array",
             "format": "nestedQuestionsList",
             "uniqueItems": true,
-            "default": []
+            "default": [],
+            "x-note": "Add multiple questions. Each question should be unique."
         },
         "nestedQuestions": {
             "$comment": "UI - The container for a nested question set.",
             "type": "object",
             "format": "nestedQuestions",
-            "additionalProperties": false
+            "additionalProperties": false,
+            "x-note": "Add multiple questions. Each question should be unique."
         },
         "singleGroupedTagSelector": {
             "$comment": "UI - A selector where a top level selection, gives a single choice from a list of tags.",
             "type": "object",
             "format": "singleGroupedTagSelector",
-            "additionalProperties": false
+            "additionalProperties": true,
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
         },
         "tagGroup": {
             "$comment": "UI - An individual group within a singleGroupedTagSelector.",
             "type": "string",
             "format": "tagGroup",
-            "pattern": "^.*$"
+            "pattern": "^.*$",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
         },
         "tagSelection": {
             "$comment": "UI - An individual tag within the group of a singleGroupedTagSelector.",
             "type": "string",
             "format": "tagSelection",
-            "pattern": "^.*$"
+            "pattern": "^.*$",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
         },
         "tokenValueCardanoADA": {
             "$comment": "UI - A Token Value denominated in Cardano ADA.",
             "type": "integer",
-            "format": "token:cardano:ada"
+            "format": "token:cardano:ada",
+            "x-note": "Enter the amount of Cardano ADA to be used in the proposal."
         },
         "durationInMonths": {
             "$comment": "UI - A Duration represented in total months.",
             "type": "integer",
-            "format": "datetime:duration:months"
+            "format": "datetime:duration:months",
+            "x-note": "Enter the duration of the proposal in months."
         },
         "yesNoChoice": {
             "$comment": "UI - A Boolean choice, represented as a Yes/No selection.  Yes = true.",
             "type": "boolean",
             "format": "yesNoChoice",
-            "default": false
+            "default": false,
+            "x-note": "Select Yes or No."
         },
         "agreementConfirmation": {
             "$comment": "UI - A Boolean choice, defaults to `false` but its invalid if its not set to `true`.",
             "type": "boolean",
             "format": "agreementConfirmation",
             "default": false,
-            "const": true
+            "const": true,
+            "x-note": "Select Yes or No."
         },
         "spdxLicenseOrURL": {
             "$comment": "UI - Drop Down Selection of any valid SPDX Identifier.  This is a complex type, it should let the user select one of the valid SPDX licenses, or enter a URL of the license if its proprietary. In the form its just a string.",
             "type": "string",
             "contentMediaType": "text/plain",
             "pattern": "^.*$",
-            "format": "spdxLicenseOrURL"
+            "format": "spdxLicenseOrURL",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
         }
     },
     "type": "object",
@@ -198,7 +219,7 @@
                             "$ref": "#/definitions/dropDownSingleSelect",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
-                            "x-mad-guidance": "<p>Please select from one of the following:</p><ol><li>Individual</li><li>Entity (Incorporated)</li><li>Entity (Not Incorporated) </li></ol>",
+                            "x-guidance": "<p>Please select from one of the following:</p><ol><li>Individual</li><li>Entity (Incorporated)</li><li>Entity (Not Incorporated) </li></ol>",
                             "enum": [
                                 "Individual",
                                 "Entity (Incorporated)",
@@ -218,10 +239,19 @@
                     "required": [
                         "applicant",
                         "type"
+                    ],
+                    "x-order": [
+                        "applicant",
+                        "type",
+                        "coproposers"
                     ]
                 }
             },
             "required": [
+                "title",
+                "proposer"
+            ],
+            "x-order": [
                 "title",
                 "proposer"
             ]
@@ -246,6 +276,9 @@
                     },
                     "required": [
                         "requestedFunds"
+                    ],
+                    "x-order": [
+                        "requestedFunds"
                     ]
                 },
                 "time": {
@@ -269,41 +302,38 @@
                     "title": "Translation Information",
                     "description": "Information about the proposal's language and translation status",
                     "properties": {
-                        "translated": {
+                        "isTranslated": {
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Auto-translated Status",
                             "description": "Indicate if your proposal has been auto-translated into English from another language",
                             "x-guidance": "<p>Tick YES if your proposal has been auto-translated into English from another language  so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections. Tick NO if your proposal has not been auto-translated into English from another language</p>"
                         },
-                        "original": {
+                        "originalLanguage": {
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Original Language",
                             "description": "If auto-translated, specify the original language of your proposal",
-                            "minLength": 2,
-                            "maxLength": 50,
-                            "examples": [
-                                "Spanish",
+                            "enum": [
+                                "Arabic",
+                                "Chinese",
+                                "French",
+                                "German",
+                                "Indonesian",
+                                "Italian",
                                 "Japanese",
-                                "French"
+                                "Korean",
+                                "Portuguese",
+                                "Russian",
+                                "Spanish",
+                                "Turkish",
+                                "Vietnamese",
+                                "Other"
                             ]
                         },
-                        "notes": {
-                            "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "Translation Notes",
-                            "description": "Additional notes about the translation or original language content",
-                            "maxLength": 500
+                        "originalDocumentLink": {
+                            "$ref": "#/definitions/singleLineHttpsURLEntry",
+                            "title": "Original Document Link",
+                            "description": "Provide a link to the original proposal document in its original language"
                         }
-                    },
-                    "required": [
-                        "isTranslated"
-                    ],
-                    "dependencies": {
-                        "originalLanguage": [
-                            "isTranslated"
-                        ],
-                        "translationNotes": [
-                            "isTranslated"
-                        ]
                     },
                     "if": {
                         "properties": {
@@ -314,9 +344,31 @@
                     },
                     "then": {
                         "required": [
-                            "originalLanguage"
-                        ]
-                    }
+                            "originalLanguage",
+                            "originalDocumentLink"
+                        ],
+                        "properties": {
+                            "originalLanguage": {
+                                "description": "Original language is required when the proposal is translated"
+                            },
+                            "originalDocumentLink": {
+                                "description": "Link to the original document is required when the proposal is translated"
+                            }
+                        }
+                    },
+                    "else": {
+                        "properties": {
+                            "originalLanguage": {
+                                "not": {}
+                            },
+                            "originalDocumentLink": {
+                                "not": {}
+                            }
+                        }
+                    },
+                    "required": [
+                        "isTranslated"
+                    ]
                 },
                 "problem": {
                     "$ref": "#/definitions/section",
@@ -391,7 +443,7 @@
                         "approach"
                     ]
                 },
-                "SupportingLinks": {
+                "supportingLinks": {
                     "$ref": "#/definitions/section",
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
@@ -474,7 +526,7 @@
                 "open_source": {
                     "$ref": "#/definitions/section",
                     "title": "Project Open Source",
-                    "description": "Will your project's output/be s fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
+                    "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
                     "x-guidance": "<p>Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software</p>",
                     "properties": {
                         "source_code": {
@@ -488,15 +540,30 @@
                             "title": "More Information",
                             "description": "Please provide here more information on the open source status of your project outputs",
                             "maxLength": 500,
-                            "x-guidance": "<p>If you did not answer PROPRIETARY to the above questions, the project should be open source-available throughout the entire lifecycle of the project with a declared open-source repository. Please indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs If only certain elements of your code will be open source please clarify which elements will be open source here. If you answered NO to the above question, please give further details as to why your projects outputs will not be open source METADATA</p>"
+                            "x-guidance": "<p>If you did not answer PROPRIETARY to the above questions, the project should be open source available throughout the entire lifecycle of the project with a declared open-source repository. Please indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs If only certain elements of your code will be open source please clarify which elements will be open source here. If you answered NO to the above question, please give further details as to why your projects outputs will not be open source METADATA</p>"
                         }
                     },
                     "required": [
                         "source_code",
                         "documentation"
+                    ],
+                    "x-order": [
+                        "source_code",
+                        "documentation",
+                        "note"
                     ]
                 }
-            }
+            },
+            "x-order": [
+                "budget",
+                "time",
+                "translation",
+                "problem",
+                "solution",
+                "supportingLinks",
+                "dependencies",
+                "open_source"
+            ]
         },
         "horizons": {
             "$ref": "#/definitions/segment",
@@ -752,9 +819,15 @@
                                 }
                             ]
                         }
-                    }
+                    },
+                    "x-order": [
+                        "theme"
+                    ]
                 }
-            }
+            },
+            "x-order": [
+                "theme"
+            ]
         },
         "details": {
             "$ref": "#/definitions/segment",
@@ -799,7 +872,12 @@
                         }
                     }
                 }
-            }
+            },
+            "x-order": [
+                "solution",
+                "impact",
+                "feasibility"
+            ]
         },
         "milestones": {
             "$ref": "#/definitions/segment",
@@ -807,16 +885,87 @@
             "properties": {
                 "milestones": {
                     "$ref": "#/definitions/section",
-                    "description": "<p>A clear set of milestones and acceptance criteria will demonstrate your capability to deliver the project as proposed. More guidance on submitting milestones as part of your project proposal can be found <a href=\"https://docs.projectcatalyst.io/current-fund/project-onboarding/funded-proposers-guides\">here</a>.</p><p><br></p><p><strong>Milestones guidance</strong></p><p><br></p><ul><li>For Grant Amounts of up to 75k ada, at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>3 milestones in total</strong>)</li><li>For Grant Amounts over 75k ada up to 150k ada, at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>4 milestones in total</strong>)</li><li>For Grant Amounts over 150k ada up to 300k ada, at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>5 milestones in total</strong>)</li><li>For Grant Amounts exceeding 300k ada, at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>6 milestones in total</strong>)</li></ul>",
+                    "title": "Project Milestones",
+                    "description": "<p>Each milestone must declare:</p><ul><li>A: Milestone outputs</li><li>B: Acceptance criteria</li><li>C: Evidence of completion</li></ul><p><strong>Requirements:</strong></p><ul><li>For Grant Amounts up to 75k ada: minimum 3 milestones (2 + final)</li><li>For Grant Amounts 75k-150k ada: minimum 4 milestones (3 + final)</li><li>The final milestone must include Project Close-out Report and Video</li></ul>",
                     "properties": {
-                        "declared": {
-                            "$ref": "#/definitions/multiLineTextEntryListMarkdown",
+                        "milestone_list": {
+                            "type": "array",
+                            "title": "Milestones",
+                            "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                            "x-guidance": "<p><strong>Milestone Requirements:</strong></p><ul><li>For Grant Amounts of up to 75k ada: at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>3 milestones in total</strong>)</li><li>For Grant Amounts over 75k ada up to 150k ada: at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>4 milestones in total</strong>)</li><li>For Grant Amounts over 150k ada up to 300k ada: at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>5 milestones in total</strong>)</li><li>For Grant Amounts exceeding 300k ada: at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>6 milestones in total</strong>)</li></ul>",
                             "minItems": 3,
-                            "maxItems": 6
+                            "maxItems": 6,
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "title",
+                                    "outputs",
+                                    "acceptance_criteria",
+                                    "evidence",
+                                    "delivery_month",
+                                    "cost"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "$ref": "#/definitions/singleLineTextEntry",
+                                        "title": "Milestone Title",
+                                        "description": "A clear, concise title for this milestone",
+                                        "maxLength": 100
+                                    },
+                                    "outputs": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Milestone Outputs",
+                                        "description": "What will be delivered in this milestone",
+                                        "maxLength": 1000
+                                    },
+                                    "acceptance_criteria": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Acceptance Criteria",
+                                        "description": "Specific conditions that must be met",
+                                        "maxLength": 1000
+                                    },
+                                    "evidence": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Evidence of Completion",
+                                        "description": "How you will demonstrate achievement",
+                                        "maxLength": 1000
+                                    },
+                                    "delivery_month": {
+                                        "$ref": "#/definitions/durationInMonths",
+                                        "title": "Delivery Month",
+                                        "description": "The month when this milestone will be delivered",
+                                        "minimum": 1,
+                                        "maximum": 12
+                                    },
+                                    "cost": {
+                                        "$ref": "#/definitions/tokenValueCardanoADA",
+                                        "title": "Cost in ADA",
+                                        "description": "The cost of this milestone in ADA"
+                                    },
+                                    "progress": {
+                                        "$ref": "#/definitions/dropDownSingleSelect",
+                                        "title": "Progress Status",
+                                        "description": "Current status of the milestone",
+                                        "enum": [
+                                            "Not Started",
+                                            "In Progress",
+                                            "Completed",
+                                            "Delayed"
+                                        ],
+                                        "default": "Not Started"
+                                    }
+                                }
+                            }
                         }
-                    }
+                    },
+                    "required": [
+                        "milestone_list"
+                    ]
                 }
-            }
+            },
+            "x-order": [
+                "milestones"
+            ]
         },
         "pitch": {
             "$ref": "#/definitions/segment",
@@ -829,7 +978,7 @@
                         "who": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "title": "Who is in the project team and what are their roles?",
-                            "description": "p>List your team, their Linkedin profiles (or similar) and state what aspect of the proposal’s work each team member will undertake.</p><p><br></p><p>If you are planning to recruit additional team members, please state what specific skills you will be looking for in the people you recruit, so readers can see that you understand what skills will be needed to complete the project.</p><p><br></p><p>You are expected to have already engaged the relevant members of the organizations referenced so you understand if they are willing and/or have capacity to support the project. If you have not taken any steps to engage with your team yet, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun. The Catalyst team cannot help with this, meaning you are expected to have understood the requirements and engaged the necessary people before submitting a proposal.</p><p><br></p><p>Have you engaged anyone on any of the technical group channels (eg Discord or Telegram), or do you have a direct line of communications with the people and resources required?</p><p><br></p><p>Important: Catalyst funding is not anonymous, and some level of ‘proof of life’ verifications will take place before initial funding is released. Also remember that your proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.</p><p><br></p><p>All Project Participants must disclose their role and scope of services across any submitted proposals, even if they are not in the lead or co-proposer role, such as an implementer, vendor, service provider, etc. Failure to disclose this information may lead to disqualification from the current grant round.</p>",
+                            "description": "<p>List your team, their Linkedin profiles (or similar) and state what aspect of the proposal’s work each team member will undertake.</p><p><br></p><p>If you are planning to recruit additional team members, please state what specific skills you will be looking for in the people you recruit, so readers can see that you understand what skills will be needed to complete the project.</p><p><br></p><p>You are expected to have already engaged the relevant members of the organizations referenced so you understand if they are willing and/or have capacity to support the project. If you have not taken any steps to engage with your team yet, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun. The Catalyst team cannot help with this, meaning you are expected to have understood the requirements and engaged the necessary people before submitting a proposal.</p><p><br></p><p>Have you engaged anyone on any of the technical group channels (eg Discord or Telegram), or do you have a direct line of communications with the people and resources required?</p><p><br></p><p>Important: Catalyst funding is not anonymous, and some level of ‘proof of life’ verifications will take place before initial funding is released. Also remember that your proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.</p><p><br></p><p>All Project Participants must disclose their role and scope of services across any submitted proposals, even if they are not in the lead or co-proposer role, such as an implementer, vendor, service provider, etc. Failure to disclose this information may lead to disqualification from the current grant round.</p>",
                             "minLength": 1,
                             "maxLength": 10240
                         }
@@ -861,7 +1010,12 @@
                         }
                     }
                 }
-            }
+            },
+            "x-order": [
+                "team",
+                "budget",
+                "value"
+            ]
         },
         "agreements": {
             "$ref": "#/definitions/segment",
@@ -911,6 +1065,6 @@
         "details",
         "milestones",
         "pitch",
-        "agreement"
+        "agreements"
     ]
 }

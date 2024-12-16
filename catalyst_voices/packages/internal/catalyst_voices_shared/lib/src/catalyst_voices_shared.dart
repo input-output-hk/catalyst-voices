@@ -1,6 +1,7 @@
 export 'common/build_config.dart';
 export 'common/build_environment.dart';
 export 'dependency/dependency_provider.dart';
+export 'extension/map_to_list_ext.dart';
 export 'formatter/cryptocurrency_formatter.dart';
 export 'formatter/wallet_address_formatter.dart';
 export 'logging/logging_service.dart';
