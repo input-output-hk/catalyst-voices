@@ -24,32 +24,37 @@ class _CampaignManagementState extends State<CampaignManagement> {
 
   @override
   Widget build(BuildContext context) {
-    final currentStatus = context.watch<CampaignBuilderCubit>().campaignStatus;
-    return Row(
-      children: [
-        VoicesOutlinedButton(
-          child: Text(context.l10n.campaignManagement),
-          onTap: () async {
-            final result =
-                await CampaignManagementDialog.show(context, currentStatus);
-            _handleDialogResult(result);
-          },
-        ),
-        _CampaignStatusIndicator(
-          campaignStatus: CampaignPublish.draft,
-          currentStatus: currentStatus,
-        ),
-        _CampaignStatusIndicator(
-          campaignStatus: CampaignPublish.published,
-          currentStatus: currentStatus,
-        ),
-      ],
+    return BlocSelector<CampaignBuilderCubit, CampaignBuilderState,
+        CampaignPublish?>(
+      selector: (state) => state.publish,
+      builder: (context, publish) {
+        return Row(
+          children: [
+            VoicesOutlinedButton(
+              child: Text(context.l10n.campaignManagement),
+              onTap: () async {
+                final result =
+                    await CampaignManagementDialog.show(context, publish);
+                _handleDialogResult(result);
+              },
+            ),
+            _CampaignStatusIndicator(
+              campaignStatus: CampaignPublish.draft,
+              currentStatus: publish,
+            ),
+            _CampaignStatusIndicator(
+              campaignStatus: CampaignPublish.published,
+              currentStatus: publish,
+            ),
+          ],
+        );
+      },
     );
   }
 
-  void _handleDialogResult(CampaignPublish? newStatus) {
-    if (newStatus == null) return;
-    context.read<CampaignBuilderCubit>().updateCampaignStatus(newStatus);
+  void _handleDialogResult(CampaignPublish? newPublish) {
+    if (newPublish == null) return;
+    context.read<CampaignBuilderCubit>().updateCampaignPublish(newPublish);
   }
 }
 

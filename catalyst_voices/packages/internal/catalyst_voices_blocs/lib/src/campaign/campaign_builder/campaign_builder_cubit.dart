@@ -5,23 +5,46 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'campaign_builder_state.dart';
 
 class CampaignBuilderCubit extends Cubit<CampaignBuilderState> {
-  CampaignBuilderCubit() : super(const LoadingCampaignBuilderState());
+  CampaignBuilderCubit() : super(const CampaignBuilderState(isLoading: true));
 
   void getCampaignStatus() {
-    emit(const LoadingCampaignBuilderState());
+    emit(state.copyWith(isLoading: true));
 
-    emit(const ChangedCampaignBuilderState(CampaignPublish.draft));
+    emit(
+      state.copyWith(
+        isLoading: false,
+        publish: const Optional(CampaignPublish.draft),
+      ),
+    );
   }
 
-  void updateCampaignStatus(CampaignPublish newStatus) {
-    emit(const LoadingCampaignBuilderState());
+  void updateCampaignPublish(CampaignPublish publish) {
+    emit(state.copyWith(isLoading: true));
+
     // TODO(ryszard-schossler): call backend to update campaign status
 
-    emit(ChangedCampaignBuilderState(newStatus));
+    emit(
+      state.copyWith(
+        isLoading: false,
+        publish: Optional(publish),
+      ),
+    );
   }
 
-  CampaignPublish? get campaignStatus => switch (state) {
-        LoadingCampaignBuilderState() => null,
-        ChangedCampaignBuilderState(:final status) => status,
-      };
+  void updateCampaignDates({
+    required DateTime? startDate,
+    required DateTime? endDate,
+  }) {
+    emit(state.copyWith(isLoading: true));
+
+    // TODO(ryszard-schossler): call backend to update campaign dates
+
+    emit(
+      state.copyWith(
+        isLoading: false,
+        startDate: Optional(startDate),
+        endDate: Optional(endDate),
+      ),
+    );
+  }
 }

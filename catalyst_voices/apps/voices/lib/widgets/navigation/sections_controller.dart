@@ -26,6 +26,10 @@ final class SectionsControllerState extends Equatable {
 
   bool get allSegmentsClosed => openedSections.isEmpty;
 
+  bool isEditing(SectionStepId stepId) {
+    return editStepsIds.contains(stepId);
+  }
+
   List<SectionsListViewItem> get listItems {
     final openedSections = {...this.openedSections};
 
