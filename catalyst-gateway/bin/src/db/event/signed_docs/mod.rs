@@ -53,7 +53,7 @@ pub(crate) struct SignedDoc {
 ///  - `doc_type` is a UUID v4
 #[allow(dead_code)]
 pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
-    match select_signed_docs(&doc.id, &Some(doc.ver)).await {
+    match select_signed_docs(&doc.id, &doc.ver).await {
         Ok(res_doc) => {
             anyhow::ensure!(
                 &res_doc == doc,
@@ -79,31 +79,13 @@ pub(crate) async fn insert_signed_docs(doc: &SignedDoc) -> anyhow::Result<()> {
 }
 
 /// Make a select query into the `event-db` by getting data from the `signed_docs` table.
-///
-/// * This returns a single document. All data from the document is returned, including
-///   the `payload` and `raw` fields.
-/// * `ver` should be able to be optional, in which case get the latest ver of the given
-///   `id`.
-///
-/// # Arguments:
-///  - `id` is a UUID v7
-///  - `ver` is a UUID v7
-#[allow(dead_code)]
-pub(crate) async fn select_signed_docs(
-    id: &uuid::Uuid, ver: &Option<uuid::Uuid>,
-) -> anyhow::Result<SignedDoc> {
+async fn select_signed_docs(id: &uuid::Uuid, ver: &uuid::Uuid) -> anyhow::Result<SignedDoc> {
     let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
         "id": id,
         "ver": ver,
     }))?;
     let res = EventDB::query_one(&query, &[]).await?;
-
-    let ver = if let Some(ver) = ver {
-        *ver
-    } else {
-        res.try_get("ver")?
-    };
 
     let doc_type = res.try_get("type")?;
     let author = res.try_get("author")?;
@@ -113,7 +95,7 @@ pub(crate) async fn select_signed_docs(
 
     Ok(SignedDoc {
         id: *id,
-        ver,
+        ver: *ver,
         doc_type,
         author,
         metadata,
@@ -124,9 +106,32 @@ pub(crate) async fn select_signed_docs(
 
 /// A `select_signed_docs` query filtering argument.
 #[allow(dead_code)]
-pub(crate) enum DocQueryFilter {
+pub(crate) enum DocsQueryFilter {
     /// All entries
     All,
+    /// Select docs with the specific `type` field
+    DocType(uuid::Uuid),
+    /// Select docs with the specific `id` field
+    DocId(uuid::Uuid),
+    /// Select docs with the specific `id` and `ver` field
+    DocVer(uuid::Uuid, uuid::Uuid),
+    /// Select docs with the specific `author` field
+    Author(String),
+}
+
+impl DocsQueryFilter {
+    /// Returns a string with the corresponding query docs filter statement
+    pub(crate) fn query_stmt(&self) -> String {
+        match self {
+            Self::All => "TRUE".to_string(),
+            Self::DocType(doc_type) => format!("signed_docs.type = '{doc_type}'"),
+            Self::DocId(id) => format!("signed_docs.id = '{id}'"),
+            Self::DocVer(id, ver) => {
+                format!("signed_docs.id = '{id}' AND signed_docs.ver = '{ver}'")
+            },
+            Self::Author(author) => format!("signed_docs.author = '{author}'"),
+        }
+    }
 }
 
 /// Make an advanced select query into the `event-db` by getting data from the
@@ -135,31 +140,37 @@ pub(crate) enum DocQueryFilter {
 /// # Arguments:
 ///  - `conditions` an SQL `WHERE` statements
 #[allow(dead_code)]
-pub(crate) async fn advanced_select_signed_docs(
-    conditions: &str, query_limits: &QueryLimits,
-) -> anyhow::Result<SignedDoc> {
+pub(crate) async fn filtered_select_signed_docs(
+    conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+) -> anyhow::Result<Vec<SignedDoc>> {
     let query_template = get_template(&ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
-        "conditions": conditions,
-        "query_limits": query_limits.query_limit_stmt(),
+        "conditions": conditions.query_stmt(),
+        "query_limits": query_limits.query_stmt(),
     }))?;
-    let res = EventDB::query_one(&query, &[]).await?;
+    let rows = EventDB::query(&query, &[]).await?;
 
-    let id = res.try_get("id")?;
-    let ver = res.try_get("ver")?;
-    let doc_type = res.try_get("type")?;
-    let author = res.try_get("author")?;
-    let metadata = res.try_get("metadata")?;
-    let payload = res.try_get("payload")?;
-    let raw = res.try_get("raw")?;
+    let docs = rows
+        .into_iter()
+        .map(|row| {
+            let id = row.try_get("id")?;
+            let ver = row.try_get("ver")?;
+            let doc_type = row.try_get("type")?;
+            let author = row.try_get("author")?;
+            let metadata = row.try_get("metadata")?;
+            let payload = row.try_get("payload")?;
+            let raw = row.try_get("raw")?;
+            Ok(SignedDoc {
+                id,
+                ver,
+                doc_type,
+                author,
+                metadata,
+                payload,
+                raw,
+            })
+        })
+        .collect::<anyhow::Result<_>>()?;
 
-    Ok(SignedDoc {
-        id,
-        ver,
-        doc_type,
-        author,
-        metadata,
-        payload,
-        raw,
-    })
+    Ok(docs)
 }

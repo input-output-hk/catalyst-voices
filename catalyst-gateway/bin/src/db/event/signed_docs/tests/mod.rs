@@ -8,11 +8,13 @@ use crate::db::event::establish_connection;
 async fn some_test() {
     establish_connection();
 
-    let docs = [
+    let doc_type = uuid::Uuid::new_v4();
+
+    let docs = vec![
         SignedDoc {
             id: uuid::Uuid::now_v7(),
             ver: uuid::Uuid::now_v7(),
-            doc_type: uuid::Uuid::new_v4(),
+            doc_type,
             author: "Alex".to_string(),
             metadata: Some(serde_json::Value::Null),
             payload: Some(serde_json::Value::Null),
@@ -21,7 +23,7 @@ async fn some_test() {
         SignedDoc {
             id: uuid::Uuid::now_v7(),
             ver: uuid::Uuid::now_v7(),
-            doc_type: uuid::Uuid::new_v4(),
+            doc_type,
             author: "Steven".to_string(),
             metadata: Some(serde_json::Value::Null),
             payload: Some(serde_json::Value::Null),
@@ -30,7 +32,7 @@ async fn some_test() {
         SignedDoc {
             id: uuid::Uuid::now_v7(),
             ver: uuid::Uuid::now_v7(),
-            doc_type: uuid::Uuid::new_v4(),
+            doc_type,
             author: "Sasha".to_string(),
             metadata: None,
             payload: None,
@@ -49,21 +51,41 @@ async fn some_test() {
         };
         assert!(insert_signed_docs(&another_doc).await.is_err());
 
-        let res_doc = select_signed_docs(&doc.id, &None).await.unwrap();
-        assert_eq!(doc, &res_doc);
-        let res_doc = select_signed_docs(&doc.id, &Some(doc.ver)).await.unwrap();
-        assert_eq!(doc, &res_doc);
+        let res_docs =
+            filtered_select_signed_docs(&DocsQueryFilter::DocId(doc.id), &QueryLimits::All)
+                .await
+                .unwrap();
+        assert_eq!(res_docs.len(), 1);
+        assert_eq!(doc, res_docs.first().unwrap());
 
-        let res_doc = advanced_select_signed_docs(
-            format!(
-                "signed_docs.id = '{}' AND signed_docs.ver = '{}'",
-                doc.id, doc.ver
-            )
-            .as_str(),
-            &QueryLimits::One,
+        let res_docs = filtered_select_signed_docs(
+            &DocsQueryFilter::DocVer(doc.id, doc.ver),
+            &QueryLimits::All,
         )
         .await
         .unwrap();
-        assert_eq!(doc, &res_doc);
+        assert_eq!(res_docs.len(), 1);
+        assert_eq!(doc, res_docs.first().unwrap());
+
+        let res_docs =
+            filtered_select_signed_docs(&DocsQueryFilter::DocType(doc.doc_type), &QueryLimits::All)
+                .await
+                .unwrap();
+        assert_eq!(res_docs.len(), 1);
+        assert_eq!(doc, res_docs.first().unwrap());
+
+        let res_docs = filtered_select_signed_docs(
+            &DocsQueryFilter::Author(doc.author.clone()),
+            &QueryLimits::All,
+        )
+        .await
+        .unwrap();
+        assert_eq!(res_docs.len(), 1);
+        assert_eq!(doc, res_docs.first().unwrap());
     }
+
+    let res_docs = filtered_select_signed_docs(&DocsQueryFilter::All, &QueryLimits::All)
+        .await
+        .unwrap();
+    assert_eq!(docs, res_docs.into_iter().rev().collect::<Vec<_>>());
 }

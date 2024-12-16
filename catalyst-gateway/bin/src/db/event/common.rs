@@ -4,6 +4,8 @@
 
 /// A query `LIMIT` and `OFFSET` limits.
 pub(crate) enum QueryLimits {
+    /// Return all entries without any `LIMIT` and `OFFSET` parametrs
+    All,
     /// Specifies `LIMIT` parameter equals to `1`
     One,
     /// Specifies `LIMIT` parameter
@@ -14,8 +16,9 @@ pub(crate) enum QueryLimits {
 
 impl QueryLimits {
     /// Returns a string with the corresponding query limit statement
-    pub(crate) fn query_limit_stmt(&self) -> String {
+    pub(crate) fn query_stmt(&self) -> String {
         match self {
+            Self::All => String::new(),
             Self::One => "LIMIT 1".to_string(),
             Self::Limit(limit) => format!("LIMIT {limit}"),
             Self::LimitAndOffset(limit, offset) => format!("LIMIT {limit} OFFSET {offset}"),

@@ -3,9 +3,7 @@ SELECT
   signed_docs.ver,
   signed_docs.type,
   signed_docs.author,
-  signed_docs.metadata,
-  signed_docs.payload,
-  signed_docs.raw
+  signed_docs.metadata
 FROM signed_docs
 WHERE
   {{ conditions }}
