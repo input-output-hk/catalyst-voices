@@ -19,7 +19,6 @@ final class SessionCubit extends Cubit<SessionState>
 
   final _logger = Logger('SessionCubit');
 
-  bool _isUnlocked = false;
   Account? _account;
   AdminToolsState _adminToolsState;
 
@@ -106,7 +105,6 @@ final class SessionCubit extends Cubit<SessionState>
   void _onActiveKeychainUnlockChanged(bool isUnlocked) {
     _logger.fine('Keychain unlock changed [$isUnlocked]');
 
-    _isUnlocked = isUnlocked;
     _updateState();
   }
 
@@ -136,8 +134,8 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   SessionState _createSessionState() {
-    final isUnlocked = _isUnlocked;
     final account = _account;
+    final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
 
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
