@@ -10,7 +10,7 @@ final class Account extends Equatable {
   final Set<AccountRole> roles;
   final WalletInfo walletInfo;
 
-  /// Whether this account is beaning used.
+  /// Whether this account is being used.
   final bool isActive;
 
   /// When account registration transaction is posted on chain account is
