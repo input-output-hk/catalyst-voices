@@ -121,7 +121,7 @@
             "$comment": "UI - A selector where a top level selection, gives a single choice from a list of tags.",
             "type": "object",
             "format": "singleGroupedTagSelector",
-            "additionalProperties": false,
+            "additionalProperties": true,
             "x-note": "Select one option from the dropdown menu. Only one choice is allowed."   
         },
         "tagGroup": {
