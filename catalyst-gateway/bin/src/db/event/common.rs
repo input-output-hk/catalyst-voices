@@ -4,7 +4,7 @@
 
 /// A query `LIMIT` and `OFFSET` limits.
 pub(crate) enum QueryLimits {
-    /// Return all entries without any `LIMIT` and `OFFSET` parametrs
+    /// Return all entries without any `LIMIT` and `OFFSET` parameters
     All,
     /// Specifies `LIMIT` parameter equals to `1`
     One,
