@@ -14,9 +14,9 @@ abstract interface class UserRepository {
     );
   }
 
-  Future<void> saveUser(User user);
-
   Future<User> getUser();
+
+  Future<void> saveUser(User user);
 }
 
 final class UserRepositoryImpl implements UserRepository {
