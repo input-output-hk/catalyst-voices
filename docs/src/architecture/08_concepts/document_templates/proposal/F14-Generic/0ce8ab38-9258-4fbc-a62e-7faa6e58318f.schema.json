@@ -329,7 +329,7 @@
                     },
                     "if": {
                         "properties": {
-                            "isTranslated": { "const": "Yes" }
+                            "isTranslated": { "const": true }
                         }
                     },
                     "then": {
