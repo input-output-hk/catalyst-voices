@@ -21,3 +21,6 @@ targets:
                 - SimpleProposal$Proposer
                 - CommunityChoiceProposal$ProposalCategory
                 - CommunityChoiceProposal$Proposer
+      json_serializable:
+        options:
+          explicit_to_json: true

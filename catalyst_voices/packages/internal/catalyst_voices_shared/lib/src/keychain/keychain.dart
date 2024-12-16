@@ -10,5 +10,5 @@ abstract interface class Keychain implements Lockable, ActiveAware {
 
   Future<void> setMasterKey(Bip32Ed25519XPrivateKey key);
 
-  Future<void> clear();
+  Future<void> erase();
 }

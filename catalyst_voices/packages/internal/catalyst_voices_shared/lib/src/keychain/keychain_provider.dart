@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class KeychainProvider {
   Future<Keychain> create(String id);

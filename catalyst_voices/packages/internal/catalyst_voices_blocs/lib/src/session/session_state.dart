@@ -54,6 +54,7 @@ final class GuestSessionState extends SessionState {
 
 /// The user has registered and unlocked the keychain.
 final class ActiveAccountSessionState extends SessionState {
+  // TODO(damian-molinski): Try limiting exposed Account to something smaller.
   final Account? account;
   @override
   final List<Space> spaces;

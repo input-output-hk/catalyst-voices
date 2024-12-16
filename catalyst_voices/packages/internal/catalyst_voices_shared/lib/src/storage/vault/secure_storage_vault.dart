@@ -108,6 +108,9 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
+  bool get lastIsUnlocked => _isUnlocked;
+
+  @override
   Future<bool> get isUnlocked => _getIsUnlockedAndSync();
 
   @override

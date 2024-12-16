@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 const _rootKey = 'rootKey';
@@ -59,6 +58,9 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   Future<void> setMasterKey(Bip32Ed25519XPrivateKey data) async {
     await writeString(data.toHex(), key: _rootKey);
   }
+
+  @override
+  Future<void> erase() => clear();
 
   @override
   String toString() => 'VaultKeychain[$id]';
