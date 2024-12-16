@@ -3,6 +3,7 @@ import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
@@ -11,12 +12,17 @@ import 'pageobject/spaces_drawer_page.dart';
 
 void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  late final GoRouter router;
+
+  setUpAll(() async {
+    router = buildAppRouter(initialLocation: const DiscoveryRoute().location);
+
+    await bootstrap(router: router);
+  });
 
   patrolWidgetTest('Spaces drawer guest menu renders correctly',
       (PatrolTester $) async {
-    final args =
-        await bootstrap(initialLocation: const DiscoveryRoute().location);
-    await $.pumpWidgetAndSettle(App(routerConfig: args.routerConfig));
+    await $.pumpWidgetAndSettle(App(routerConfig: router));
     await $(DashboardPage.guestShortcutBtn).tap();
     await $.pumpAndSettle();
     await Future<void>.delayed(const Duration(seconds: 5));
