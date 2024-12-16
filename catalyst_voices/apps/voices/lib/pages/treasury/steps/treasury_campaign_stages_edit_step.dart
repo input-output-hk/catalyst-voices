@@ -47,19 +47,16 @@ class _DateRange extends StatefulWidget {
 }
 
 class _DateRangeState extends State<_DateRange> {
-  final VoicesDateTimeFieldController _startDateController =
-      VoicesDateTimeFieldController();
-
-  final VoicesDateTimeFieldController _endDateController =
-      VoicesDateTimeFieldController();
+  late final VoicesDateTimeFieldController _startDateController;
+  late final VoicesDateTimeFieldController _endDateController;
 
   @override
   void initState() {
     super.initState();
 
     final cubit = context.read<CampaignBuilderCubit>();
-    _startDateController.value = cubit.state.startDate;
-    _endDateController.value = cubit.state.endDate;
+    _startDateController = VoicesDateTimeFieldController(cubit.state.startDate);
+    _endDateController = VoicesDateTimeFieldController(cubit.state.endDate);
   }
 
   @override
