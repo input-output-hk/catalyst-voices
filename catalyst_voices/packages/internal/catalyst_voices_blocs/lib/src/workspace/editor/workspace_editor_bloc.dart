@@ -1,29 +1,31 @@
-import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
-import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
+import 'package:catalyst_voices_blocs/src/workspace/editor/workspace_editor_event.dart';
+import 'package:catalyst_voices_blocs/src/workspace/editor/workspace_editor_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
+final class WorkspaceEditorBloc
+    extends Bloc<WorkspaceEditorEvent, WorkspaceEditorState> {
   final CampaignService _campaignService;
 
   final _answers = <SectionStepId, MarkdownData>{};
   final _guidances = <SectionStepId, List<Guidance>>{};
 
+  String? proposalId;
   SectionStepId? _activeStepId;
 
-  WorkspaceBloc(
+  WorkspaceEditorBloc(
     this._campaignService,
-  ) : super(const WorkspaceState()) {
-    on<LoadCurrentProposalEvent>(_loadCurrentProposal);
+  ) : super(const WorkspaceEditorState()) {
+    on<LoadProposalEvent>(_loadProposal);
     on<UpdateStepAnswerEvent>(_updateStepAnswer);
     on<ActiveStepChangedEvent>(_handleActiveStepEvent);
   }
 
-  Future<void> _loadCurrentProposal(
-    LoadCurrentProposalEvent event,
-    Emitter<WorkspaceState> emit,
+  Future<void> _loadProposal(
+    LoadProposalEvent event,
+    Emitter<WorkspaceEditorState> emit,
   ) async {
     _answers.clear();
     _guidances.clear();
@@ -67,7 +69,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
 
   void _updateStepAnswer(
     UpdateStepAnswerEvent event,
-    Emitter<WorkspaceState> emit,
+    Emitter<WorkspaceEditorState> emit,
   ) {
     final answer = event.data;
     if (answer != null) {
@@ -79,7 +81,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
 
   void _handleActiveStepEvent(
     ActiveStepChangedEvent event,
-    Emitter<WorkspaceState> emit,
+    Emitter<WorkspaceEditorState> emit,
   ) {
     _activeStepId = event.id;
 

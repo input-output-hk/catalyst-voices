@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/workspace/workspace_guidance_view.dart';
+import 'package:catalyst_voices/pages/workspace/editor/workspace_guidance_view.dart';
 import 'package:catalyst_voices/widgets/cards/comment_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -46,7 +46,8 @@ class _GuidanceSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, WorkspaceGuidance>(
+    return BlocSelector<WorkspaceEditorBloc, WorkspaceEditorState,
+        WorkspaceGuidance>(
       selector: (state) => state.guidance,
       builder: (context, state) {
         if (state.isNoneSelected) {

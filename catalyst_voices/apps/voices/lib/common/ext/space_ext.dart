@@ -11,7 +11,8 @@ extension SpaceExt on Space {
       case Space.discovery:
         const DiscoveryRoute().go(context);
       case Space.workspace:
-        const WorkspaceRoute().go(context);
+        // TODO(damian-molinski): Add manager which will keep track of this id.
+        const WorkspaceEditorRoute(proposalId: 'id').go(context);
       case Space.voting:
         const VotingRoute().go(context);
       case Space.fundedProjects:

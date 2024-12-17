@@ -3,7 +3,7 @@ import 'package:catalyst_voices/pages/funded_projects/funded_projects_page.dart'
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
 import 'package:catalyst_voices/pages/voting/voting_page.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_page.dart';
+import 'package:catalyst_voices/pages/workspace/workspace.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
@@ -16,15 +16,15 @@ import 'package:go_router/go_router.dart';
 
 part 'spaces_route.g.dart';
 
+const _prefix = Routes.currentMilestone;
+
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
-    TypedGoRoute<DiscoveryRoute>(path: '/${Routes.currentMilestone}/discovery'),
-    TypedGoRoute<WorkspaceRoute>(path: '/${Routes.currentMilestone}/workspace'),
-    TypedGoRoute<VotingRoute>(path: '/${Routes.currentMilestone}/voting'),
-    TypedGoRoute<FundedProjectsRoute>(
-      path: '/${Routes.currentMilestone}/funded_projects',
-    ),
-    TypedGoRoute<TreasuryRoute>(path: '/${Routes.currentMilestone}/treasury'),
+    TypedGoRoute<DiscoveryRoute>(path: '/$_prefix/discovery'),
+    TypedGoRoute<WorkspaceEditorRoute>(path: '/$_prefix/workspace/:proposalId'),
+    TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
+    TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
+    TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
   ],
 )
 final class SpacesShellRouteData extends ShellRouteData {
@@ -72,9 +72,13 @@ final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
   }
 }
 
-final class WorkspaceRoute extends GoRouteData
+final class WorkspaceEditorRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const WorkspaceRoute();
+  final String proposalId;
+
+  const WorkspaceEditorRoute({
+    required this.proposalId,
+  });
 
   @override
   List<RouteGuard> get routeGuards => [
@@ -84,7 +88,7 @@ final class WorkspaceRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const WorkspacePage();
+    return WorkspaceEditorPage(proposalId: proposalId);
   }
 }
 

@@ -53,8 +53,8 @@ class _AppState extends State<App> {
       BlocProvider<CampaignBuilderCubit>(
         create: (_) => Dependencies.instance.get<CampaignBuilderCubit>(),
       ),
-      BlocProvider<WorkspaceBloc>(
-        create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
+      BlocProvider<WorkspaceEditorBloc>(
+        create: (context) => Dependencies.instance.get<WorkspaceEditorBloc>(),
       ),
     ];
   }

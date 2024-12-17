@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/workspace/workspace_rich_text_step.dart';
+import 'package:catalyst_voices/pages/workspace/editor/workspace_rich_text_step.dart';
 import 'package:catalyst_voices/widgets/navigation/sections_list_view.dart';
 import 'package:catalyst_voices/widgets/navigation/sections_list_view_builder.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';

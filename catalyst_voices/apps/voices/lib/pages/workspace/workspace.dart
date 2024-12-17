@@ -1,1 +1,1 @@
-export 'workspace_page.dart';
+export 'editor/workspace_editor_page.dart';

@@ -80,8 +80,8 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
       )
-      ..registerFactory<WorkspaceBloc>(() {
-        return WorkspaceBloc(
+      ..registerFactory<WorkspaceEditorBloc>(() {
+        return WorkspaceEditorBloc(
           get<CampaignService>(),
         );
       });

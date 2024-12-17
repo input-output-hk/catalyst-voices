@@ -84,7 +84,7 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
       data: markdownString.data.isNotEmpty ? markdownString : null,
     );
 
-    context.read<WorkspaceBloc>().add(event);
+    context.read<WorkspaceEditorBloc>().add(event);
   }
 
   bool _canEditDocument(Document document) {
