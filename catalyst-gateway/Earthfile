@@ -128,7 +128,7 @@ check-builder-src-cache:
 test:
     FROM +builder-src
 
-    COPY docker-compose.yml .
+    COPY ./tests/docker/docker-compose.postgres.yml ./docker-compose.yml
 
     ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
