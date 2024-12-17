@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
+import '../utils/selector_utils.dart';
+
 class SpacesDrawerPage {
   static const closeBtn = Key('MenuCloseButton');
   static const guestMenuItems = Key('GuestMenuItems');
@@ -25,6 +27,7 @@ class SpacesDrawerPage {
     expect($(closeBtn), findsOneWidget);
     expect($(allSpacesBtn), findsOneWidget);
     expect($(chooserPrevBtn), findsOneWidget);
+    SelectorUtils.isDisabled($, $(chooserPrevBtn));
     expect($(chooserNextBtn), findsOneWidget);
     expect($(chooserItemContainer), findsExactly(5));
     expect(
