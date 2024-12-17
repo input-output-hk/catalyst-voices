@@ -88,7 +88,7 @@ final class _Bip32Ed25519XSigner implements CatalystCoseSigner {
   StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
 
   @override
-  Future<String?> get kid async => hex.encode(publicKey);
+  Future<Uint8List?> get kid async => publicKey;
 
   @override
   Future<Uint8List> sign(Uint8List data) async {
@@ -104,7 +104,7 @@ final class _Bip32Ed25519XVerifier implements CatalystCoseVerifier {
   const _Bip32Ed25519XVerifier(this.publicKey);
 
   @override
-  Future<String?> get kid async => hex.encode(publicKey);
+  Future<Uint8List?> get kid async => publicKey;
 
   @override
   Future<bool> verify(Uint8List data, Uint8List signature) async {

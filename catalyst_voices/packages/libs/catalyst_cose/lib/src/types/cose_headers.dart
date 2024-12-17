@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:catalyst_cose/src/cose_constants.dart';
 import 'package:catalyst_cose/src/types/string_or_int.dart';
 import 'package:catalyst_cose/src/types/uuid.dart';
@@ -18,7 +20,7 @@ final class CoseHeaders extends Equatable {
   ///
   /// Do not set the [kid] directly in the headers,
   /// it will be auto-populated with [CatalystCoseSigner.kid] value.
-  final String? kid;
+  final Uint8List? kid;
 
   /// See [CoseHeaderKeys.contentType].
   final StringOrInt? contentType;
@@ -122,7 +124,7 @@ final class CoseHeaders extends Equatable {
 
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
-      kid: CborUtils.deserializeString(map[CoseHeaderKeys.kid]),
+      kid: CborUtils.deserializeBytes(map[CoseHeaderKeys.kid]),
       contentType:
           CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
       contentEncoding:
@@ -144,7 +146,7 @@ final class CoseHeaders extends Equatable {
   CborValue toCbor() {
     final map = CborMap({
       if (alg != null) CoseHeaderKeys.alg: alg!.toCbor(),
-      if (kid != null) CoseHeaderKeys.kid: CborString(kid!),
+      if (kid != null) CoseHeaderKeys.kid: CborBytes(kid!),
       if (contentType != null)
         CoseHeaderKeys.contentType: contentType!.toCbor(),
       if (contentEncoding != null)
@@ -170,7 +172,7 @@ final class CoseHeaders extends Equatable {
   /// Returns a copy of the [CoseHeaders] with given [alg] and [kid].
   CoseHeaders copyWith({
     required StringOrInt? alg,
-    required String? kid,
+    required Uint8List? kid,
   }) {
     return CoseHeaders(
       alg: alg,

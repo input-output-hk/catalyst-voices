@@ -78,7 +78,7 @@ abstract interface class CatalystCoseSigner {
 
   /// Returns a key identifier that typically should refer to the public key
   /// of the private key used to sign the data.
-  Future<String?> get kid;
+  Future<Uint8List?> get kid;
 
   /// The [data] should be signed with a private key
   /// and the resulting signature returned as [Uint8List].
@@ -90,7 +90,7 @@ abstract interface class CatalystCoseSigner {
 abstract interface class CatalystCoseVerifier {
   /// Returns a key identifier that typically should refer to the public key
   /// of the private key used to sign the data.
-  Future<String?> get kid;
+  Future<Uint8List?> get kid;
 
   /// The [signature] should be verified against
   /// a known public/private key over the [data].

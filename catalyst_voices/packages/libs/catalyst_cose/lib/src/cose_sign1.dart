@@ -32,9 +32,7 @@ final class CoseSign1 extends Equatable {
 
   /// Deserializes the type from cbor.
   factory CoseSign1.fromCbor(CborValue value) {
-    if (value is! CborList ||
-        value.length != 4 ||
-        !value.tags.contains(CoseTags.coseSign1)) {
+    if (value is! CborList || value.length != 4) {
       throw FormatException('$value is not a valid COSE_SIGN1 structure');
     }
 

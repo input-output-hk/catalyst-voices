@@ -109,9 +109,9 @@ final class _SignerVerifier
   StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
 
   @override
-  Future<String?> get kid async {
+  Future<Uint8List?> get kid async {
     final pk = await _keyPair.extractPublicKey();
-    return hex.encode(pk.bytes);
+    return Uint8List.fromList(pk.bytes);
   }
 
   @override
