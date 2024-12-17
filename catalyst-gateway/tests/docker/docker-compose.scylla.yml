@@ -1,0 +1,14 @@
+services:
+  scylla-node:
+    container_name: scylla-node
+    image: scylladb/scylla:latest
+    restart: unless-stopped
+    command: --seeds=scylla-node --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+    ports:
+      - "9042:9042"
+    networks:
+      cluster:
+
+networks:
+  cluster:
+    driver: bridge
