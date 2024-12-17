@@ -1,4 +1,7 @@
+import 'package:catalyst_voices/pages/workspace/workspace_header.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WorkspacePage extends StatefulWidget {
   const WorkspacePage({super.key});
@@ -9,9 +12,21 @@ class WorkspacePage extends StatefulWidget {
 
 class _WorkspacePageState extends State<WorkspacePage> {
   @override
+  void initState() {
+    super.initState();
+
+    context.read<WorkspaceBloc>().add(const LoadProposalsEvent());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text('Workspace')),
+    return const Scaffold(
+      body: Column(
+        children: [
+          WorkspaceHeader(),
+          Spacer(),
+        ],
+      ),
     );
   }
 }

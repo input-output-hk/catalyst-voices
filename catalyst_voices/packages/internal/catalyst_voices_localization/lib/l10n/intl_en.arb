@@ -1152,5 +1152,31 @@
   },
   "campaignManagement": "Campaign Management",
   "published": "Published",
-  "status": "Status"
+  "status": "Status",
+  "myProposals": "My Proposals",
+  "workspaceDescription": "In this space you can manage your existing proposals, view previous and archived proposal as well as creating new proposals.",
+  "@workspaceDescription": {
+    "description": "Workspace page description"
+  },
+  "newDraftProposal": "New Draft Proposal",
+  "draftProposalsX": "Draft Proposals ({count})",
+  "@draftProposalsX": {
+    "description": "Workspace page tab",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "finalProposalsX": "Final Proposals ({count})",
+  "@finalProposalsX": {
+    "description": "Workspace page tab",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchProposals": "Search Proposals",
+  "search": "Search..."
 }

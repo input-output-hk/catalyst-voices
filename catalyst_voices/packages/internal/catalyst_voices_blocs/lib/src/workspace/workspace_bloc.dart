@@ -9,5 +9,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
 
   WorkspaceBloc(
     this._campaignService,
-  ) : super(const WorkspaceState());
+  ) : super(const WorkspaceState()) {
+    on<LoadProposalsEvent>(_loadProposals);
+  }
+
+  Future<void> _loadProposals(
+    LoadProposalsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    //
+  }
 }
