@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/workspace/editor/workspace_body.dart';
-import 'package:catalyst_voices/pages/workspace/editor/workspace_navigation_panel.dart';
-import 'package:catalyst_voices/pages/workspace/editor/workspace_setup_panel.dart';
+import 'package:catalyst_voices/pages/workspace/editor/proposal_body.dart';
+import 'package:catalyst_voices/pages/workspace/editor/proposal_editor_navigation_panel.dart';
+import 'package:catalyst_voices/pages/workspace/editor/proposal_editor_setup_panel.dart';
 import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
 import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -12,19 +12,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class WorkspaceEditorPage extends StatefulWidget {
+class ProposalEditorPage extends StatefulWidget {
   final String proposalId;
 
-  const WorkspaceEditorPage({
+  const ProposalEditorPage({
     super.key,
     required this.proposalId,
   });
 
   @override
-  State<WorkspaceEditorPage> createState() => _WorkspaceEditorPageState();
+  State<ProposalEditorPage> createState() => _ProposalEditorPageState();
 }
 
-class _WorkspaceEditorPageState extends State<WorkspaceEditorPage> {
+class _ProposalEditorPageState extends State<ProposalEditorPage> {
   late final SectionsController _sectionsController;
   late final ItemScrollController _bodyItemScrollController;
 
@@ -35,7 +35,7 @@ class _WorkspaceEditorPageState extends State<WorkspaceEditorPage> {
   void initState() {
     super.initState();
 
-    final bloc = context.read<WorkspaceEditorBloc>();
+    final bloc = context.read<ProposalEditorBloc>();
 
     _sectionsController = SectionsController();
     _bodyItemScrollController = ItemScrollController();
@@ -49,22 +49,16 @@ class _WorkspaceEditorPageState extends State<WorkspaceEditorPage> {
         .distinct(listEquals)
         .listen(_updateSections);
 
-    print('Initializing with proposalId[${widget.proposalId}]');
-
     bloc.add(LoadProposalEvent(id: widget.proposalId));
   }
 
   @override
-  void didUpdateWidget(covariant WorkspaceEditorPage oldWidget) {
+  void didUpdateWidget(covariant ProposalEditorPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId) {
-      print(
-        'Changing proposalId from[${oldWidget.proposalId}] '
-        'to [${widget.proposalId}]',
-      );
       final event = LoadProposalEvent(id: widget.proposalId);
-      context.read<WorkspaceEditorBloc>().add(event);
+      context.read<ProposalEditorBloc>().add(event);
     }
   }
 
@@ -82,11 +76,11 @@ class _WorkspaceEditorPageState extends State<WorkspaceEditorPage> {
     return SectionsControllerScope(
       controller: _sectionsController,
       child: SpaceScaffold(
-        left: const WorkspaceNavigationPanel(),
-        body: WorkspaceBody(
+        left: const ProposalEditorNavigationPanel(),
+        body: ProposalBody(
           itemScrollController: _bodyItemScrollController,
         ),
-        right: const WorkspaceSetupPanel(),
+        right: const ProposalEditorSetupPanel(),
       ),
     );
   }
@@ -108,7 +102,7 @@ class _WorkspaceEditorPageState extends State<WorkspaceEditorPage> {
       _activeStepId = activeStepId;
 
       final event = ActiveStepChangedEvent(activeStepId);
-      context.read<WorkspaceEditorBloc>().add(event);
+      context.read<ProposalEditorBloc>().add(event);
     }
   }
 }

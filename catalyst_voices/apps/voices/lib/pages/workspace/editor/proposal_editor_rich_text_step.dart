@@ -10,19 +10,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
-class WorkspaceRichTextStep extends StatefulWidget {
+class ProposalEditorRichTextStep extends StatefulWidget {
   final RichTextStep step;
 
-  const WorkspaceRichTextStep({
+  const ProposalEditorRichTextStep({
     super.key,
     required this.step,
   });
 
   @override
-  State<WorkspaceRichTextStep> createState() => _WorkspaceRichTextStepState();
+  State<ProposalEditorRichTextStep> createState() {
+    return _ProposalEditorRichTextStepState();
+  }
 }
 
-class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
+class _ProposalEditorRichTextStepState
+    extends State<ProposalEditorRichTextStep> {
   late final VoicesRichTextController _controller;
   late final VoicesRichTextEditModeController _editModeController;
 
@@ -84,7 +87,7 @@ class _WorkspaceRichTextStepState extends State<WorkspaceRichTextStep> {
       data: markdownString.data.isNotEmpty ? markdownString : null,
     );
 
-    context.read<WorkspaceEditorBloc>().add(event);
+    context.read<ProposalEditorBloc>().add(event);
   }
 
   bool _canEditDocument(Document document) {

@@ -56,8 +56,8 @@ class _AppState extends State<App> {
       BlocProvider<WorkspaceBloc>(
         create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
       ),
-      BlocProvider<WorkspaceEditorBloc>(
-        create: (context) => Dependencies.instance.get<WorkspaceEditorBloc>(),
+      BlocProvider<ProposalEditorBloc>(
+        create: (context) => Dependencies.instance.get<ProposalEditorBloc>(),
       ),
     ];
   }

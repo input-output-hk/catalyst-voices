@@ -22,7 +22,7 @@ const _prefix = Routes.currentMilestone;
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(path: '/$_prefix/discovery'),
     TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
-    TypedGoRoute<WorkspaceEditorRoute>(path: '/$_prefix/workspace/:proposalId'),
+    TypedGoRoute<ProposalEditorRoute>(path: '/$_prefix/workspace/:proposalId'),
     TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
     TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
     TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
@@ -89,11 +89,11 @@ final class WorkspaceRoute extends GoRouteData
   }
 }
 
-final class WorkspaceEditorRoute extends GoRouteData
+final class ProposalEditorRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
 
-  const WorkspaceEditorRoute({
+  const ProposalEditorRoute({
     required this.proposalId,
   });
 
@@ -105,7 +105,7 @@ final class WorkspaceEditorRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return WorkspaceEditorPage(proposalId: proposalId);
+    return ProposalEditorPage(proposalId: proposalId);
   }
 }
 

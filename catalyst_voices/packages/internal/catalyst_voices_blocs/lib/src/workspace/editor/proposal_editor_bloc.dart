@@ -1,12 +1,12 @@
-import 'package:catalyst_voices_blocs/src/workspace/editor/workspace_editor_event.dart';
-import 'package:catalyst_voices_blocs/src/workspace/editor/workspace_editor_state.dart';
+import 'package:catalyst_voices_blocs/src/workspace/editor/proposal_editor_event.dart';
+import 'package:catalyst_voices_blocs/src/workspace/editor/proposal_editor_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-final class WorkspaceEditorBloc
-    extends Bloc<WorkspaceEditorEvent, WorkspaceEditorState> {
+final class ProposalEditorBloc
+    extends Bloc<ProposalEditorEvent, ProposalEditorState> {
   final CampaignService _campaignService;
 
   final _answers = <SectionStepId, MarkdownData>{};
@@ -15,9 +15,9 @@ final class WorkspaceEditorBloc
   String? proposalId;
   SectionStepId? _activeStepId;
 
-  WorkspaceEditorBloc(
+  ProposalEditorBloc(
     this._campaignService,
-  ) : super(const WorkspaceEditorState()) {
+  ) : super(const ProposalEditorState()) {
     on<LoadProposalEvent>(_loadProposal);
     on<UpdateStepAnswerEvent>(_updateStepAnswer);
     on<ActiveStepChangedEvent>(_handleActiveStepEvent);
@@ -25,7 +25,7 @@ final class WorkspaceEditorBloc
 
   Future<void> _loadProposal(
     LoadProposalEvent event,
-    Emitter<WorkspaceEditorState> emit,
+    Emitter<ProposalEditorState> emit,
   ) async {
     _answers.clear();
     _guidances.clear();
@@ -35,7 +35,7 @@ final class WorkspaceEditorBloc
       emit(
         state.copyWith(
           sections: [],
-          guidance: const WorkspaceGuidance(isNoneSelected: true),
+          guidance: const ProposalGuidance(isNoneSelected: true),
         ),
       );
       return;
@@ -54,7 +54,7 @@ final class WorkspaceEditorBloc
 
     final activeStepId = _activeStepId;
     final guidances = _guidances[activeStepId] ?? <Guidance>[];
-    final guidance = WorkspaceGuidance(
+    final guidance = ProposalGuidance(
       isNoneSelected: activeStepId == null,
       guidances: guidances,
     );
@@ -69,7 +69,7 @@ final class WorkspaceEditorBloc
 
   void _updateStepAnswer(
     UpdateStepAnswerEvent event,
-    Emitter<WorkspaceEditorState> emit,
+    Emitter<ProposalEditorState> emit,
   ) {
     final answer = event.data;
     if (answer != null) {
@@ -81,13 +81,13 @@ final class WorkspaceEditorBloc
 
   void _handleActiveStepEvent(
     ActiveStepChangedEvent event,
-    Emitter<WorkspaceEditorState> emit,
+    Emitter<ProposalEditorState> emit,
   ) {
     _activeStepId = event.id;
 
     final activeStepId = _activeStepId;
     final guidances = _guidances[activeStepId] ?? <Guidance>[];
-    final guidance = WorkspaceGuidance(
+    final guidance = ProposalGuidance(
       isNoneSelected: activeStepId == null,
       guidances: guidances,
     );
