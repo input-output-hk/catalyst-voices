@@ -12,4 +12,9 @@ project: {
 			}
 		}
 	}
+	ci: {
+    targets: {
+      test: privileged: true
+    }
+  }
 }
