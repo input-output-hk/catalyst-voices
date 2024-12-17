@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/src/proposal_schema/proposal_definitions.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'proposal_definitions_dto.g.dart';
 
@@ -55,6 +56,14 @@ class ProposalDefinitionsDTO {
       _$ProposalDefinitionsDTOFromJson(json);
 
   Map<String, dynamic> toJson() => _$ProposalDefinitionsDTOToJson(this);
+
+  ProposalDefinitions toModel() {
+    return ProposalDefinitions(
+      segmentDefinition: segment.toModel(),
+      sectionDefinition: section.toModel(),
+      singleLineTextEntryDefinition: singleLineTextEntry.toModel(),
+    );
+  }
 }
 
 @JsonSerializable()
@@ -74,6 +83,12 @@ class SegmentDTO {
       _$SegmentDTOFromJson(json);
 
   Map<String, dynamic> toJson() => _$SegmentDTOToJson(this);
+
+  SegmentProposalDefinition toModel() => SegmentProposalDefinition(
+        type: DefinitionsObjectTypes.fromString(type),
+        note: note,
+        additionalProperties: additionalProperties,
+      );
 }
 
 @JsonSerializable()
@@ -93,6 +108,12 @@ class SectionDTO {
       _$SectionDTOFromJson(json);
 
   Map<String, dynamic> toJson() => _$SectionDTOToJson(this);
+
+  SectionProposalDefinition toModel() => SectionProposalDefinition(
+        type: DefinitionsObjectTypes.fromString(type),
+        note: note,
+        additionalProperties: additionalProperties,
+      );
 }
 
 @JsonSerializable()
@@ -114,6 +135,14 @@ class SingleLineTextEntryDTO {
       _$SingleLineTextEntryDTOFromJson(json);
 
   Map<String, dynamic> toJson() => _$SingleLineTextEntryDTOToJson(this);
+
+  SingleLineTextEntryDefinition toModel() => SingleLineTextEntryDefinition(
+        type: DefinitionsObjectTypes.fromString(type),
+        note: note,
+        contentMediaType:
+            DefinitionsContentMediaType.fromString(contentMediaType),
+        pattern: pattern,
+      );
 }
 
 @JsonSerializable()
@@ -276,7 +305,8 @@ class MultiLineTextEntryListMarkdownDTO {
   });
 
   factory MultiLineTextEntryListMarkdownDTO.fromJson(
-          Map<String, dynamic> json) =>
+    Map<String, dynamic> json,
+  ) =>
       _$MultiLineTextEntryListMarkdownDTOFromJson(json);
 
   Map<String, dynamic> toJson() =>

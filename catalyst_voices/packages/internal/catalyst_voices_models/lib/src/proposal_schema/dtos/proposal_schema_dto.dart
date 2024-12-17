@@ -1,4 +1,6 @@
-import 'package:catalyst_voices_models/src/proposal_template/dtos/proposal_definitions_dto.dart';
+import 'package:catalyst_voices_models/src/proposal_schema/dtos/proposal_definitions_dto.dart';
+import 'package:catalyst_voices_models/src/proposal_schema/proposal_definitions.dart';
+import 'package:catalyst_voices_models/src/proposal_schema/proposal_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -39,6 +41,19 @@ class ProposalSchemaDTO extends Equatable {
 
   Map<String, dynamic> toJson() => _$ProposalSchemaDTOToJson(this);
 
+  ProposalSchema toModel() {
+    return ProposalSchema(
+      schema: '',
+      title: '',
+      description: '',
+      definitions: definitions.toModel(),
+      type: DefinitionsObjectTypes.fromString(type),
+      additionalProperties: false,
+      properties: [],
+      order: [],
+    );
+  }
+
   @override
   List<Object?> get props => [
         schema,
@@ -70,7 +85,7 @@ class ProposalSchemaSegmentDTO extends Equatable {
   final String title;
   final String description;
   @JsonKey(toJson: _toJsonProperties)
-  final List<ProposalSectionTopicDto> properties;
+  final List<ProposalSectionDto> properties;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
@@ -94,6 +109,20 @@ class ProposalSchemaSegmentDTO extends Equatable {
 
   Map<String, dynamic> toJson() => _$ProposalSchemaSegmentDTOToJson(this);
 
+  ProposalSchemaSegment toModel(ProposalDefinitions definitions) {
+    final properties =
+        this.properties.map((e) => e.toModel(definitions)).toList();
+    return ProposalSchemaSegment(
+      ref: definitions.getDefinition(ref),
+      id: id,
+      title: title,
+      description: description,
+      properties: properties,
+      required: required,
+      order: order,
+    );
+  }
+
   @override
   List<Object?> get props => [
         ref,
@@ -106,7 +135,7 @@ class ProposalSchemaSegmentDTO extends Equatable {
       ];
 
   static Map<String, dynamic> _toJsonProperties(
-    List<ProposalSectionTopicDto> properties,
+    List<ProposalSectionDto> properties,
   ) {
     final map = <String, dynamic>{};
     for (final property in properties) {
@@ -117,13 +146,13 @@ class ProposalSchemaSegmentDTO extends Equatable {
 }
 
 @JsonSerializable()
-class ProposalSectionTopicDto extends Equatable {
+class ProposalSectionDto extends Equatable {
   @JsonKey(name: r'$ref')
   final String ref;
   final String id;
   final String title;
   final String description;
-  final List<dynamic> properties;
+  final List<ProposalSchemaElementDTO> properties;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
@@ -134,7 +163,7 @@ class ProposalSectionTopicDto extends Equatable {
   @JsonKey(name: 'open_source')
   final Map<String, dynamic> openSource; // Return to this
 
-  const ProposalSectionTopicDto({
+  const ProposalSectionDto({
     required this.ref,
     required this.id,
     this.title = '',
@@ -148,14 +177,28 @@ class ProposalSectionTopicDto extends Equatable {
     this.openSource = const <String, dynamic>{},
   });
 
-  factory ProposalSectionTopicDto.fromJson(Map<String, dynamic> json) {
+  factory ProposalSectionDto.fromJson(Map<String, dynamic> json) {
     final segmentsMap = json['properties'] as Map<String, dynamic>;
     json['properties'] = segmentsMap.convertMapToListWithIds();
 
-    return _$ProposalSectionTopicDtoFromJson(json);
+    return _$ProposalSectionDtoFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$ProposalSectionTopicDtoToJson(this);
+  Map<String, dynamic> toJson() => _$ProposalSectionDtoToJson(this);
+
+  ProposalSchemaSection toModel(ProposalDefinitions definitions) {
+    final properties =
+        this.properties.map((e) => e.toModel(definitions)).toList();
+    return ProposalSchemaSection(
+      ref: definitions.getDefinition(ref),
+      id: id,
+      title: title,
+      description: description,
+      properties: properties,
+      required: required,
+      order: order,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -174,13 +217,13 @@ class ProposalSectionTopicDto extends Equatable {
 
 @JsonSerializable()
 class ProposalSchemaElementDTO extends Equatable {
-  @JsonKey(name: r'$ref', includeToJson: false)
+  @JsonKey(name: r'$ref')
   final String ref;
   final String id;
   final String title;
   final String description;
-  final String? minLength;
-  final String? maxLength;
+  final int? minLength;
+  final int? maxLength;
   @JsonKey(name: 'default')
   final String defaultValue;
   @JsonKey(name: 'x-guidance')
@@ -216,6 +259,24 @@ class ProposalSchemaElementDTO extends Equatable {
       _$ProposalSchemaElementDTOFromJson(json);
 
   Map<String, dynamic> toJson() => _$ProposalSchemaElementDTOToJson(this);
+
+  ProposalSchemaElement toModel(ProposalDefinitions definitions) =>
+      ProposalSchemaElement(
+        ref: definitions.getDefinition(ref),
+        id: id,
+        title: title,
+        description: description,
+        minLength: minLength,
+        maxLength: maxLength,
+        defaultValue: defaultValue,
+        guidance: guidance,
+        enumValues: enumValues,
+        maxItems: maxItems,
+        minItems: minItems,
+        minimum: minimum,
+        maximum: maximum,
+        examples: examples,
+      );
 
   @override
   List<Object?> get props => [
