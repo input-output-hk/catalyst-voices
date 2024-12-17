@@ -11,10 +11,34 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     this._campaignService,
   ) : super(const WorkspaceState()) {
     on<LoadProposalsEvent>(_loadProposals);
+    on<TabChangedEvent>(_handleTabChange);
+    on<SearchQueryChangedEvent>(
+      _handleQueryChange,
+      // TODO(damian-molinski): implement debounce
+      transformer: null,
+    );
+  }
+
+  Future<String> createNewDraftProposal() async {
+    return 'dammmm';
   }
 
   Future<void> _loadProposals(
     LoadProposalsEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    //
+  }
+
+  Future<void> _handleTabChange(
+    TabChangedEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    //
+  }
+
+  Future<void> _handleQueryChange(
+    SearchQueryChangedEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
     //

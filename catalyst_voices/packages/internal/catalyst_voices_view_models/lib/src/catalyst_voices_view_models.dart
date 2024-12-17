@@ -16,3 +16,4 @@ export 'registration/registration.dart';
 export 'session/session_status.dart';
 export 'treasury/treasury_sections.dart';
 export 'workspace/workspace_sections.dart';
+export 'workspace/workspace_tab_type.dart';
