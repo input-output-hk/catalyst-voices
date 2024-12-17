@@ -31,7 +31,7 @@ cluster-test:
 # kubernetes-base : base container with tooling set up for local access
 kubernetes-base:
     FROM alpine:3.20.3
-    
+
     # Install kubectl
     RUN apk update && \
         apk upgrade && \
@@ -43,7 +43,7 @@ kubernetes-base:
     COPY --dir manifests manifests
 
 # test targets to deploy the local documentation
-deploy-docs:
+test-deploy-docs:
     FROM +kubernetes-base
 
     RUN kubectl create namespace cat-voices || true
@@ -62,7 +62,7 @@ show-info:
     FROM +kubernetes-base
     ARG local_file=""
 
-    # Get everything from all namespaces    
+    # Get everything from all namespaces
     RUN --no-cache kubectl -o wide get all --all-namespaces > cluster.info
 
     IF [ "$local_file" == "" ]
