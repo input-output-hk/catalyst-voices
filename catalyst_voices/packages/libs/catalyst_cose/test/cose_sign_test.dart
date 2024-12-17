@@ -9,40 +9,45 @@ import 'package:test/test.dart';
 void main() {
   group(CoseSign, () {
     const uuidV7 = '0193b535-7196-7cd1-84e6-ad9c316cf2d2';
-    late SimplePublicKey publicKey;
     late _SignerVerifier signerVerifier;
 
     setUp(() async {
       // Initialize the Ed25519 algorithm and generate a key pair
       final algorithm = Ed25519();
       final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
-      publicKey = await keyPair.extractPublicKey();
       signerVerifier = _SignerVerifier(algorithm, keyPair);
     });
 
     test('sign generates a valid COSE_SIGN structure', () async {
       final coseSign = await CoseSign.sign(
-        protectedHeaders: CoseHeaders.protected(
-          alg: const IntValue(CoseValues.eddsaAlg),
-          kid: hex.encode(publicKey.bytes),
-          contentType: const IntValue(CoseValues.jsonContentType),
-          contentEncoding: const StringValue(CoseValues.brotliContentEncoding),
-          type: const Uuid(uuidV7),
-          id: const Uuid(uuidV7),
-          ver: const Uuid(uuidV7),
-          ref: const SingleReferenceUuid(Uuid(uuidV7)),
-          template: const SingleReferenceUuid(Uuid(uuidV7)),
-          reply: const SingleReferenceUuid(Uuid(uuidV7)),
+        protectedHeaders: const CoseHeaders.protected(
+          contentType: IntValue(CoseValues.jsonContentType),
+          contentEncoding: StringValue(CoseValues.brotliContentEncoding),
+          type: Uuid(uuidV7),
+          id: Uuid(uuidV7),
+          ver: Uuid(uuidV7),
+          ref: SingleReferenceUuid(Uuid(uuidV7)),
+          template: SingleReferenceUuid(Uuid(uuidV7)),
+          reply: SingleReferenceUuid(Uuid(uuidV7)),
           section: 'section_name',
-          collabs: const ['test@domain.com'],
+          collabs: ['test@domain.com'],
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         signers: [signerVerifier],
         payload: utf8.encode('Test payload'),
       );
 
-      // test whether signature is valid
-      final isValid = await coseSign.verify(verifiers: [signerVerifier]);
+      for (final signature in coseSign.signatures) {
+        // verify whether alg & kid fields were added to protected headers
+        expect(signature.protectedHeaders.alg, isNotNull);
+        expect(signature.protectedHeaders.kid, isNotEmpty);
+      }
+
+      // test whether signatures are valid
+      final isValidAll = await coseSign.verifyAll(verifiers: [signerVerifier]);
+      expect(isValidAll, isTrue);
+
+      final isValid = await coseSign.verify(verifier: signerVerifier);
       expect(isValid, isTrue);
 
       // test whether serialization/deserialization works
@@ -65,8 +70,12 @@ void main() {
         ],
       );
 
-      // test whether signature is valid
-      final isValid = await coseSign.verify(verifiers: [signerVerifier]);
+      // test whether all signatures are invalid
+      final isValidAll = await coseSign.verifyAll(verifiers: [signerVerifier]);
+      expect(isValidAll, isFalse);
+
+      // test whether all signatures are invalid
+      final isValid = await coseSign.verify(verifier: signerVerifier);
       expect(isValid, isFalse);
     });
   });
@@ -78,6 +87,15 @@ final class _SignerVerifier
   final SimpleKeyPair _keyPair;
 
   const _SignerVerifier(this._algorithm, this._keyPair);
+
+  @override
+  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+
+  @override
+  Future<String?> get kid async {
+    final pk = await _keyPair.extractPublicKey();
+    return hex.encode(pk.bytes);
+  }
 
   @override
   Future<Uint8List> sign(Uint8List data) async {

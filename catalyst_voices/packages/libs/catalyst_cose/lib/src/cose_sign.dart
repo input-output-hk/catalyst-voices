@@ -72,21 +72,14 @@ final class CoseSign extends Equatable {
     final signatures = <CoseSignature>[];
     for (final signer in signers) {
       final signatureProtectedHeaders = CoseHeaders.protected(
-        alg: protectedHeaders.alg,
+        alg: signer.alg,
+        kid: await signer.kid,
       );
 
-      final sigStructure = _createCoseSignSigStructure(
-        bodyProtectedHeaders: protectedHeaders.toCbor(),
-        signatureProtectedHeaders: signatureProtectedHeaders.toCbor(),
-        payload: CborBytes(payload),
-      );
-
-      final toBeSigned = Uint8List.fromList(
-        cbor.encode(
-          CborBytes(
-            cbor.encode(sigStructure),
-          ),
-        ),
+      final toBeSigned = _createCoseSignSigStructureBytes(
+        bodyProtectedHeaders: protectedHeaders,
+        signatureProtectedHeaders: signatureProtectedHeaders,
+        payload: payload,
       );
 
       final signature = CoseSignature(
@@ -106,46 +99,36 @@ final class CoseSign extends Equatable {
     );
   }
 
+  /// Verifies whether the COSE_SIGN signature is valid.
+  ///
+  /// The signature is selected from the list of [signatures] based on the kid].
+  /// The [verifier] is responsible for providing the verification algorithm.
+  Future<bool> verify({
+    required CatalystCoseVerifier verifier,
+  }) async {
+    for (final signature in signatures) {
+      if (signature.protectedHeaders.kid == await verifier.kid) {
+        final toBeSigned = _createCoseSignSigStructureBytes(
+          bodyProtectedHeaders: protectedHeaders,
+          signatureProtectedHeaders: signature.protectedHeaders,
+          payload: payload,
+        );
+        return verifier.verify(toBeSigned, signature.signature);
+      }
+    }
+
+    // no eligible signature found that would match the kid
+    return false;
+  }
+
   /// Verifies whether the COSE_SIGN [signatures] are valid.
   ///
   /// The [verifiers] are responsible for providing the verification algorithm.
-  /// The count of [verifiers] must match the number of [signatures].
-  Future<bool> verify({
+  Future<bool> verifyAll({
     required List<CatalystCoseVerifier> verifiers,
   }) async {
-    if (verifiers.length != signatures.length) {
-      throw ArgumentError(
-        'Number of verifiers must match the number of signatures.',
-      );
-    }
-
-    for (var i = 0; i < verifiers.length; i++) {
-      final verifier = verifiers[i];
-      final signature = signatures[i];
-
-      final signatureProtectedHeaders = CoseHeaders.protected(
-        alg: protectedHeaders.alg,
-      );
-
-      final sigStructure = _createCoseSignSigStructure(
-        bodyProtectedHeaders: protectedHeaders.toCbor(),
-        signatureProtectedHeaders: signatureProtectedHeaders.toCbor(),
-        payload: CborBytes(payload),
-      );
-
-      final toBeSigned = Uint8List.fromList(
-        cbor.encode(
-          CborBytes(
-            cbor.encode(sigStructure),
-          ),
-        ),
-      );
-
-      final isVerified = await verifier.verify(
-        Uint8List.fromList(toBeSigned),
-        Uint8List.fromList(signature.signature),
-      );
-
+    for (final verifier in verifiers) {
+      final isVerified = await verify(verifier: verifier);
       if (!isVerified) {
         return false;
       }
@@ -176,6 +159,26 @@ final class CoseSign extends Equatable {
         payload,
         signatures,
       ];
+
+  static Uint8List _createCoseSignSigStructureBytes({
+    required CoseHeaders bodyProtectedHeaders,
+    required CoseHeaders signatureProtectedHeaders,
+    required Uint8List payload,
+  }) {
+    final sigStructure = _createCoseSignSigStructure(
+      bodyProtectedHeaders: bodyProtectedHeaders.toCbor(),
+      signatureProtectedHeaders: signatureProtectedHeaders.toCbor(),
+      payload: CborBytes(payload),
+    );
+
+    return Uint8List.fromList(
+      cbor.encode(
+        CborBytes(
+          cbor.encode(sigStructure),
+        ),
+      ),
+    );
+  }
 
   static CborList _createCoseSignSigStructure({
     required CborValue bodyProtectedHeaders,

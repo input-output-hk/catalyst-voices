@@ -9,9 +9,15 @@ import 'package:equatable/equatable.dart';
 /// can be used in protected/unprotected COSE headers.
 final class CoseHeaders extends Equatable {
   /// See [CoseHeaderKeys.alg].
+  ///
+  /// Do not set the [alg] directly in the headers,
+  /// it will be auto-populated with [CatalystCoseSigner.alg] value.
   final StringOrInt? alg;
 
   /// See [CoseHeaderKeys.kid].
+  ///
+  /// Do not set the [kid] directly in the headers,
+  /// it will be auto-populated with [CatalystCoseSigner.kid] value.
   final String? kid;
 
   /// See [CoseHeaderKeys.contentType].
@@ -159,6 +165,28 @@ final class CoseHeaders extends Equatable {
     } else {
       return map;
     }
+  }
+
+  /// Returns a copy of the [CoseHeaders] with given [alg] and [kid].
+  CoseHeaders copyWith({
+    required StringOrInt? alg,
+    required String? kid,
+  }) {
+    return CoseHeaders(
+      alg: alg,
+      kid: kid,
+      contentType: contentType,
+      contentEncoding: contentEncoding,
+      type: type,
+      id: id,
+      ver: ver,
+      ref: ref,
+      template: template,
+      reply: reply,
+      section: section,
+      collabs: collabs,
+      encodeAsBytes: encodeAsBytes,
+    );
   }
 
   @override

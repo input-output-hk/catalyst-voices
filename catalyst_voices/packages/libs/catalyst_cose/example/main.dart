@@ -16,14 +16,10 @@ Future<void> main() async {
 Future<void> _coseSign1() async {
   final algorithm = Ed25519();
   final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
-  final publicKey = await keyPair.extractPublicKey().then((e) => e.bytes);
   final signerVerifier = _SignerVerifier(algorithm, keyPair);
 
   final coseSign1 = await CoseSign1.sign(
-    protectedHeaders: CoseHeaders.protected(
-      alg: const IntValue(CoseValues.eddsaAlg),
-      kid: hex.encode(publicKey),
-    ),
+    protectedHeaders: const CoseHeaders.protected(),
     unprotectedHeaders: const CoseHeaders.unprotected(),
     signer: signerVerifier,
     payload: utf8.encode('This is the content.'),
@@ -47,20 +43,16 @@ Future<void> _coseSign1() async {
 Future<void> _coseSign() async {
   final algorithm = Ed25519();
   final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
-  final publicKey = await keyPair.extractPublicKey().then((e) => e.bytes);
   final signerVerifier = _SignerVerifier(algorithm, keyPair);
 
   final coseSign = await CoseSign.sign(
-    protectedHeaders: CoseHeaders.protected(
-      alg: const IntValue(CoseValues.eddsaAlg),
-      kid: hex.encode(publicKey),
-    ),
+    protectedHeaders: const CoseHeaders.protected(),
     unprotectedHeaders: const CoseHeaders.unprotected(),
     signers: [signerVerifier],
     payload: utf8.encode('This is the content.'),
   );
 
-  final verified = await coseSign.verify(
+  final verified = await coseSign.verifyAll(
     verifiers: [signerVerifier],
   );
 
@@ -81,6 +73,15 @@ final class _SignerVerifier
   final SimpleKeyPair _keyPair;
 
   const _SignerVerifier(this._algorithm, this._keyPair);
+
+  @override
+  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+
+  @override
+  Future<String?> get kid async {
+    final pk = await _keyPair.extractPublicKey();
+    return hex.encode(pk.bytes);
+  }
 
   @override
   Future<Uint8List> sign(Uint8List data) async {

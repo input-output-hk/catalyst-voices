@@ -67,6 +67,11 @@ final class CoseSign1 extends Equatable {
     required Uint8List payload,
     required CatalystCoseSigner signer,
   }) async {
+    protectedHeaders = protectedHeaders.copyWith(
+      alg: signer.alg,
+      kid: await signer.kid,
+    );
+
     final sigStructure = _createCoseSign1SigStructure(
       protectedHeader: protectedHeaders.toCbor(),
       payload: CborBytes(payload),
