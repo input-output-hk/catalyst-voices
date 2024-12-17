@@ -21,6 +21,10 @@ walletConfigs.forEach((walletConfig) => {
       walletConfig.extension.Name === "Lace",
       "https://github.com/input-output-hk/catalyst-voices/issues/1190"
     );
+    test.skip(
+      walletConfig.extension.Name === "Nufi",
+      "https://github.com/input-output-hk/catalyst-voices/issues/1190"
+    );
     test.beforeAll(async () => {
       browser = await restoreWallet(walletConfig);
       await enableWallet(walletConfig, browser);

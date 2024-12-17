@@ -5,6 +5,7 @@ export const onboardYoroiWallet = async (
   page: Page,
   walletConfig: WalletConfig
 ): Promise<void> => {
+  /* cspell: disable */
   await page.locator("#initialPage-tosAgreement-checkbox").check();
   await page.locator("#initialPage-continue-button").click();
   await page.locator("#mui-2").click();
@@ -32,6 +33,7 @@ export const onboardYoroiWallet = async (
   await page.locator("#primaryButton").click();
   await page.locator("#dialog-gotothewallet-button").click();
 };
+/* cspell: enable */
 
 export const signYoroiData = async (
   signTab: Page,
