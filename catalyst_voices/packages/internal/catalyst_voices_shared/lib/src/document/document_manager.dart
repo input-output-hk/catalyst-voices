@@ -35,7 +35,7 @@ abstract interface class DocumentManager {
 
   /// Signs the [document] with a single [privateKey].
   ///
-  /// The [publicKey] will be added as the metadata in the signed document
+  /// The [publicKey] will be added as metadata in the signed document
   /// so that it's easier to identify who signed it.
   Future<SignedDocument<T>> signDocument<T extends Document>(
     T document, {
