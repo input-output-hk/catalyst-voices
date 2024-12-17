@@ -36,7 +36,9 @@ test-kubernetes-base:
     RUN apk update && \
         apk upgrade && \
         apk add kubectl \
-                helm
+                helm \
+                vagrant
+
 
     #COPY shared/k3s.yaml $HOME/.kube/config
     COPY --dir shared shared
