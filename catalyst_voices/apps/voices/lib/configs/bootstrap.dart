@@ -74,6 +74,17 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   await _runApp(app);
 }
 
+GoRouter buildAppRouter({
+  String? initialLocation,
+}) {
+  return AppRouter.init(
+    initialLocation: initialLocation,
+    guards: const [
+      MilestoneGuard(),
+    ],
+  );
+}
+
 /// Initializes the application before it can be run. Should setup all
 /// the things which are necessary before the actual app is run,
 /// either via [runApp] or injected into a test environment during
@@ -81,7 +92,9 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
 ///
 /// Initialization logic that is relevant for [runApp] scenario
 /// only should be added to [_doBootstrapAndRun], not here.
-Future<BootstrapArgs> bootstrap({String? initialLocation}) async {
+Future<BootstrapArgs> bootstrap({
+  GoRouter? router,
+}) async {
   _loggingService
     ..level = kDebugMode ? Level.FINER : Level.OFF
     ..printLogs = kDebugMode;
@@ -94,12 +107,7 @@ Future<BootstrapArgs> bootstrap({String? initialLocation}) async {
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();
 
-  final router = AppRouter.init(
-    initialLocation: initialLocation,
-    guards: const [
-      MilestoneGuard(),
-    ],
-  );
+  router ??= buildAppRouter();
 
   Bloc.observer = AppBlocObserver();
 
