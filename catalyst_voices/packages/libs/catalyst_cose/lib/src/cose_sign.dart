@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:catalyst_cose/src/cose_constants.dart';
 import 'package:catalyst_cose/src/types/cose_headers.dart';
 import 'package:cbor/cbor.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// The COSE_SIGN structure implementation, supporting multiple signatures.
@@ -105,7 +106,8 @@ final class CoseSign extends Equatable {
     required CatalystCoseVerifier verifier,
   }) async {
     for (final signature in signatures) {
-      if (signature.protectedHeaders.kid == await verifier.kid) {
+      if (const DeepCollectionEquality()
+          .equals(signature.protectedHeaders.kid, await verifier.kid)) {
         final toBeSigned = _createCoseSignSigStructureBytes(
           bodyProtectedHeaders: protectedHeaders,
           signatureProtectedHeaders: signature.protectedHeaders,
