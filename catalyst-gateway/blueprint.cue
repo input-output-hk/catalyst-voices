@@ -1,6 +1,11 @@
 version: "1.0.0"
 project: {
 	name: "gateway"
+	ci: {
+		targets: {
+			test: privileged: true
+		}
+	}
 	deployment: {
 		on: {
 			always: {}
