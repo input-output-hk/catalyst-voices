@@ -144,15 +144,12 @@ test-postgres:
 test-scylla:
     FROM +builder-src
 
-    # COPY ./tests/docker/docker-compose.postgres.yml ./docker-compose.yml
+    COPY ./tests/docker/docker-compose.scylla.yml ./docker-compose.yml
 
-    # ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-
-    # WITH DOCKER \
-    #     --compose "./docker-compose.yml" \
-    #     --load ./event-db+build \
-    #     --pull alpine:3.20.3 \
-    #     --service event-db-is-running
-    #     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-    #         cargo nextest run --release --run-ignored=only signed_docs
-    # END
+    WITH DOCKER \
+        --compose "./docker-compose.yml" \
+        --pull alpine:3.20.3 \
+        --service scylla-node
+        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+            cargo nextest run --release --run-ignored=only scylla_session
+    END
