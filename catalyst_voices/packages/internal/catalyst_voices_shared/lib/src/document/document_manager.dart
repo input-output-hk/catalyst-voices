@@ -8,12 +8,12 @@ import 'package:equatable/equatable.dart';
 
 part 'document_manager_impl.dart';
 
-/// Parses the document from the bytes obtained from [Document.toBytes].
+/// Parses the document from the bytes obtained from [BinaryDocument.toBytes].
 ///
 /// Usually this would convert the [bytes] into a [String],
 /// decode a [String] into a json and then parse the data class
 /// from the json representation.
-typedef DocumentParser<T extends Document> = T Function(Uint8List bytes);
+typedef DocumentParser<T extends BinaryDocument> = T Function(Uint8List bytes);
 
 /// Manages the [SignedDocument]s.
 abstract interface class DocumentManager {
@@ -24,11 +24,11 @@ abstract interface class DocumentManager {
   /// Parses the document from the [bytes] representation.
   ///
   /// The [parser] must be able to parse the document
-  /// from the bytes produced by [Document.toBytes].
+  /// from the bytes produced by [BinaryDocument.toBytes].
   ///
   /// The implementation of this method must be able to understand the [bytes]
   /// that are obtained from the [SignedDocument.toBytes] method.
-  Future<SignedDocument<T>> parseDocument<T extends Document>(
+  Future<SignedDocument<T>> parseDocument<T extends BinaryDocument>(
     Uint8List bytes, {
     required DocumentParser<T> parser,
   });
@@ -37,7 +37,7 @@ abstract interface class DocumentManager {
   ///
   /// The [publicKey] will be added as metadata in the signed document
   /// so that it's easier to identify who signed it.
-  Future<SignedDocument<T>> signDocument<T extends Document>(
+  Future<SignedDocument<T>> signDocument<T extends BinaryDocument>(
     T document, {
     required Uint8List publicKey,
     required Uint8List privateKey,
@@ -49,7 +49,7 @@ abstract interface class DocumentManager {
 ///
 /// The [document] payload can be UTF-8 encoded bytes, a binary data
 /// or anything else that can be represented in binary format.
-abstract base class SignedDocument<T extends Document> extends Equatable {
+abstract base class SignedDocument<T extends BinaryDocument> extends Equatable {
   /// The default constructor for the [SignedDocument].
   const SignedDocument();
 
@@ -66,7 +66,7 @@ abstract base class SignedDocument<T extends Document> extends Equatable {
 
 /// Represents an abstract document that can be represented in binary format.
 // ignore: one_member_abstracts
-abstract interface class Document {
+abstract interface class BinaryDocument {
   /// Converts the document into a binary representation.
   ///
   /// See [DocumentParser].
@@ -76,7 +76,7 @@ abstract interface class Document {
   DocumentContentType get contentType;
 }
 
-/// Defines the content type of the [Document].
+/// Defines the content type of the [BinaryDocument].
 enum DocumentContentType {
   /// The document's content type is JSON.
   json,

@@ -6,7 +6,7 @@ final class _DocumentManagerImpl implements DocumentManager {
   const _DocumentManagerImpl();
 
   @override
-  Future<SignedDocument<T>> parseDocument<T extends Document>(
+  Future<SignedDocument<T>> parseDocument<T extends BinaryDocument>(
     Uint8List bytes, {
     required DocumentParser<T> parser,
   }) async {
@@ -17,7 +17,7 @@ final class _DocumentManagerImpl implements DocumentManager {
   }
 
   @override
-  Future<SignedDocument<T>> signDocument<T extends Document>(
+  Future<SignedDocument<T>> signDocument<T extends BinaryDocument>(
     T document, {
     required Uint8List publicKey,
     required Uint8List privateKey,
@@ -54,7 +54,8 @@ final class _DocumentManagerImpl implements DocumentManager {
   }
 }
 
-final class _CoseSignedDocument<T extends Document> extends SignedDocument<T> {
+final class _CoseSignedDocument<T extends BinaryDocument>
+    extends SignedDocument<T> {
   final CoseSign _coseSign;
 
   @override

@@ -56,7 +56,7 @@ void main() {
   });
 }
 
-final class _JsonDocument extends Equatable implements Document {
+final class _JsonDocument extends Equatable implements BinaryDocument {
   final String title;
 
   const _JsonDocument(this.title);

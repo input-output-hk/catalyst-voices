@@ -7,6 +7,7 @@ export 'crypto/crypto_service.dart';
 export 'crypto/key_derivation.dart';
 export 'crypto/local_crypto_service.dart';
 export 'dependency/dependency_provider.dart';
+export 'document/document_manager.dart';
 export 'formatter/cryptocurrency_formatter.dart';
 export 'formatter/wallet_address_formatter.dart';
 export 'keychain/keychain.dart';
