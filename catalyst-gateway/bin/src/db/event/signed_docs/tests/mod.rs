@@ -60,6 +60,14 @@ async fn some_test() {
         };
         assert!(insert_signed_docs(&another_doc).await.is_err());
 
+        let res_doc = select_signed_docs(&doc.body.id, &Some(doc.body.ver))
+            .await
+            .unwrap();
+        assert_eq!(doc, &res_doc);
+
+        let res_doc = select_signed_docs(&doc.body.id, &None).await.unwrap();
+        assert_eq!(doc, &res_doc);
+
         let res_docs = filtered_select_signed_docs(
             &DocsQueryFilter::DocId(doc.body.id),
             &QueryLimits::new_all(),

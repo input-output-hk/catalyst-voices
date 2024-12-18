@@ -15,10 +15,10 @@ pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplat
     source: include_str!("./sql/select_signed_documents.sql.jinja"),
 };
 
-/// Advanced select sql query jinja template
-pub(crate) const ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
-    name: "advanced_select_signed_documents.jinja.template",
-    source: include_str!("./sql/advanced_select_signed_documents.sql.jinja"),
+/// Filtered select sql query jinja template
+pub(crate) const FILTERED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
+    name: "filtered_select_signed_documents.jinja.template",
+    source: include_str!("./sql/filtered_select_signed_documents.sql.jinja"),
 };
 
 /// Signed doc body event db struct
@@ -60,7 +60,7 @@ pub(crate) struct FullSignedDoc {
 ///  - `doc_type` is a UUID v4
 #[allow(dead_code)]
 pub(crate) async fn insert_signed_docs(doc: &FullSignedDoc) -> anyhow::Result<()> {
-    match select_signed_docs(&doc.body.id, &doc.body.ver).await {
+    match select_signed_docs(&doc.body.id, &Some(doc.body.ver)).await {
         Ok(res_doc) => {
             anyhow::ensure!(
                 &res_doc == doc,
@@ -86,13 +86,30 @@ pub(crate) async fn insert_signed_docs(doc: &FullSignedDoc) -> anyhow::Result<()
 }
 
 /// Make a select query into the `event-db` by getting data from the `signed_docs` table.
-async fn select_signed_docs(id: &uuid::Uuid, ver: &uuid::Uuid) -> anyhow::Result<FullSignedDoc> {
+///
+/// * This returns a single document. All data from the document is returned, including
+///   the `payload` and `raw` fields.
+/// * `ver` should be able to be optional, in which case get the latest ver of the given
+///   `id`.
+///
+/// # Arguments:
+///  - `id` is a UUID v7
+///  - `ver` is a UUID v7
+pub(crate) async fn select_signed_docs(
+    id: &uuid::Uuid, ver: &Option<uuid::Uuid>,
+) -> anyhow::Result<FullSignedDoc> {
     let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
         "id": id,
         "ver": ver,
     }))?;
     let res = EventDB::query_one(&query, &[]).await?;
+
+    let ver = if let Some(ver) = ver {
+        *ver
+    } else {
+        res.try_get("ver")?
+    };
 
     let doc_type = res.try_get("type")?;
     let author = res.try_get("author")?;
@@ -103,7 +120,7 @@ async fn select_signed_docs(id: &uuid::Uuid, ver: &uuid::Uuid) -> anyhow::Result
     Ok(FullSignedDoc {
         body: SignedDocBody {
             id: *id,
-            ver: *ver,
+            ver,
             doc_type,
             author,
             metadata,
@@ -149,7 +166,7 @@ impl DocsQueryFilter {
 pub(crate) async fn filtered_select_signed_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
 ) -> anyhow::Result<Vec<SignedDocBody>> {
-    let query_template = get_template(&ADVANCED_SELECT_SIGNED_DOCS_TEMPLATE)?;
+    let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
         "conditions": conditions.query_stmt(),
         "query_limits": query_limits.query_stmt(),

@@ -1,4 +1,5 @@
 SELECT
+  {% if not ver %} signed_docs.ver, {% endif %}
   signed_docs.type,
   signed_docs.author,
   signed_docs.metadata,
@@ -7,6 +8,6 @@ SELECT
 FROM signed_docs
 WHERE
   signed_docs.id = '{{ id }}'
-  AND signed_docs.ver = '{{ ver }}'
+  {% if ver %} AND signed_docs.ver = '{{ ver }}' {% endif %}
 ORDER BY signed_docs.ver DESC
 LIMIT 1
