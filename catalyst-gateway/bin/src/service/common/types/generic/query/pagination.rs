@@ -55,8 +55,15 @@ pub(crate) struct Page(u64);
 
 impl Page {
     /// Creates a new `Page` instance.
-    pub(crate) fn new(page: u64) -> Self {
-        Self(page)
+    ///
+    /// # Errors:
+    ///  - Invalid `page` value, must be in range.
+    pub(crate) fn new(page: u64) -> anyhow::Result<Self> {
+        anyhow::ensure!(
+            is_valid_page(page),
+            "Invalid `page` value, must be in range {PAGE_MINIMUM}..{PAGE_MAXIMUM}"
+        );
+        Ok(Self(page))
     }
 }
 
@@ -189,11 +196,11 @@ impl Limit {
     /// Creates a new `Limit` instance.
     ///
     /// # Errors:
-    ///  - Invalid `limit` value, must be more than `0`
+    ///  - Invalid `limit` value, must be in range
     pub(crate) fn new(limit: u64) -> anyhow::Result<Self> {
         anyhow::ensure!(
-            limit != 0_u64,
-            "Invalid `limit` value, must be more than `0`"
+            is_valid_limit(limit),
+            "Invalid `limit` value, must be in range {LIMIT_MINIMUM}..{LIMIT_MAXIMUM}"
         );
         Ok(Self(limit))
     }
@@ -317,8 +324,15 @@ pub(crate) struct Remaining(u64);
 
 impl Remaining {
     /// Creates a new `Remaining` instance.
-    pub(crate) fn new(remaining: u64) -> Self {
-        Self(remaining)
+    ///
+    /// # Errors:
+    ///  - Invalid `remaining` value, must be in range
+    pub(crate) fn new(remaining: u64) -> anyhow::Result<Self> {
+        anyhow::ensure!(
+            is_valid_remaining(remaining),
+            "Invalid `remaining` value, must be in range {REMAINING_MINIMUM}..{REMAINING_MAXIMUM}"
+        );
+        Ok(Self(remaining))
     }
 }
 

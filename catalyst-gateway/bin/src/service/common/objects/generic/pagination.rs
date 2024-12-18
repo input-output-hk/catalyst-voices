@@ -39,13 +39,15 @@ impl CurrentPage {
     /// Create a new `CurrentPage` object.
     ///
     /// # Errors
-    ///  - Invalid `limit` value, must be more than `0`
+    ///  - Invalid `page` value, must be in range
+    ///  - Invalid `limit` value, must be in range
+    ///  - Invalid `remaining` value, must be in range
     #[allow(dead_code)]
     fn new(page: u64, limit: u64, remaining: u64) -> anyhow::Result<Self> {
         Ok(Self {
-            page: common::types::generic::query::pagination::Page::new(page),
+            page: common::types::generic::query::pagination::Page::new(page)?,
             limit: common::types::generic::query::pagination::Limit::new(limit)?,
-            remaining: common::types::generic::query::pagination::Remaining::new(remaining),
+            remaining: common::types::generic::query::pagination::Remaining::new(remaining)?,
         })
     }
 }
