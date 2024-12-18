@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 
 void main() {
   group(CoseSign, () {
+    const uuidV4 = 'e9aba14f-d05b-49b2-b5b5-100595853384';
     const uuidV7 = '0193b535-7196-7cd1-84e6-ad9c316cf2d2';
     late _SignerVerifier signerVerifier;
 
@@ -22,7 +23,7 @@ void main() {
         protectedHeaders: const CoseHeaders.protected(
           contentType: IntValue(CoseValues.jsonContentType),
           contentEncoding: StringValue(CoseValues.brotliContentEncoding),
-          type: Uuid(uuidV7),
+          type: Uuid(uuidV4),
           id: Uuid(uuidV7),
           ver: Uuid(uuidV7),
           ref: SingleReferenceUuid(Uuid(uuidV7)),

@@ -55,12 +55,11 @@ final class _DocumentManagerImpl implements DocumentManager {
 
 final class _CoseSignedDocument<T extends Document> extends SignedDocument<T> {
   final CoseSign _coseSign;
-  final T _document;
-
-  const _CoseSignedDocument(this._coseSign, this._document);
 
   @override
-  T get document => _document;
+  final T document;
+
+  const _CoseSignedDocument(this._coseSign, this.document);
 
   @override
   Future<bool> verifySignature(Uint8List publicKey) async {
@@ -76,7 +75,7 @@ final class _CoseSignedDocument<T extends Document> extends SignedDocument<T> {
   }
 
   @override
-  List<Object?> get props => [_coseSign, _document];
+  List<Object?> get props => [_coseSign, document];
 }
 
 final class _Bip32Ed25519XSigner implements CatalystCoseSigner {
@@ -84,6 +83,7 @@ final class _Bip32Ed25519XSigner implements CatalystCoseSigner {
   final Uint8List privateKey;
 
   const _Bip32Ed25519XSigner(this.publicKey, this.privateKey);
+
   @override
   StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
 
