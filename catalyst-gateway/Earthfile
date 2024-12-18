@@ -84,9 +84,16 @@ all-hosts-build:
 # package : Create a deployable container for catalyst-gateway
 package:
     FROM debian:12.7-slim
-    WORKDIR /cat-gateway
+
+    WORKDIR /app
+    RUN apt-get update && apt-get install -y curl python3 python3-pip
+    RUN pip3 install --break-system-packages cqlsh
+    RUN curl https://certs.secureserver.net/repository/sf-class2-root.crt -o /tmp/keyspaces.crt
+
     COPY +build/cat-gateway .
-    ENTRYPOINT [ "./cat-gateway", "run" ]
+    COPY entrypoint.sh .
+
+    ENTRYPOINT [ "/bin/bash", "entrypoint.sh" ]
 
 # Publish cat-gateway
 docker:
@@ -139,4 +146,4 @@ test:
         --service event-db-is-running
         RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
             cargo nextest run --release --run-ignored=only signed_docs
-    END 
+    END
