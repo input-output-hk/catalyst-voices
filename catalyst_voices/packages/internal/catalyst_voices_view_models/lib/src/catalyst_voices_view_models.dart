@@ -15,5 +15,6 @@ export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
 export 'session/session_status.dart';
 export 'treasury/treasury_sections.dart';
+export 'workspace/workspace_proposal_list_item.dart';
 export 'workspace/workspace_sections.dart';
 export 'workspace/workspace_tab_type.dart';
