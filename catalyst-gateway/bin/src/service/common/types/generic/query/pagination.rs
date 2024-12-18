@@ -53,6 +53,13 @@ static PAGE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Page(u64);
 
+impl Page {
+    /// Creates a new `Page` instance.
+    pub(crate) fn new(page: u64) -> Self {
+        Self(page)
+    }
+}
+
 impl Default for Page {
     fn default() -> Self {
         Self(PAGE_DEFAULT)
@@ -119,12 +126,6 @@ impl ToJSON for Page {
     }
 }
 
-impl From<u64> for Page {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
-
 impl From<Page> for u64 {
     fn from(value: Page) -> Self {
         value.0
@@ -183,6 +184,20 @@ static LIMIT_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 /// Limit of items to be returned in a page of data.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Limit(u64);
+
+impl Limit {
+    /// Creates a new `Limit` instance.
+    ///
+    /// # Errors:
+    ///  - Invalid `limit` value, must be more than `0`
+    pub(crate) fn new(limit: u64) -> anyhow::Result<Self> {
+        anyhow::ensure!(
+            limit != 0_u64,
+            "Invalid `limit` value, must be more than `0`"
+        );
+        Ok(Self(limit))
+    }
+}
 
 impl Default for Limit {
     fn default() -> Self {
@@ -250,12 +265,6 @@ impl ToJSON for Limit {
     }
 }
 
-impl From<u64> for Limit {
-    fn from(value: u64) -> Self {
-        Self(value)
-    }
-}
-
 impl From<Limit> for u64 {
     fn from(value: Limit) -> Self {
         value.0
@@ -305,6 +314,13 @@ static REMAINING_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 /// Limit of items to be returned in a page of data.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Remaining(u64);
+
+impl Remaining {
+    /// Creates a new `Remaining` instance.
+    pub(crate) fn new(remaining: u64) -> Self {
+        Self(remaining)
+    }
+}
 
 /// Is the `Page` valid?
 fn is_valid_remaining(value: u64) -> bool {
@@ -356,12 +372,6 @@ impl ParseFromJSON for Remaining {
 impl ToJSON for Remaining {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())
-    }
-}
-
-impl From<u64> for Remaining {
-    fn from(value: u64) -> Self {
-        Self(value)
     }
 }
 
