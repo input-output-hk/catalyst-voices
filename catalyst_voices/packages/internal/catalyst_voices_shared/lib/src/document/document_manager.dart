@@ -71,4 +71,13 @@ abstract interface class Document {
   ///
   /// See [DocumentParser].
   Uint8List toBytes();
+
+  /// Returns the document content type.
+  DocumentContentType get contentType;
+}
+
+/// Defines the content type of the [Document].
+enum DocumentContentType {
+  /// The document's content type is JSON.
+  json,
 }

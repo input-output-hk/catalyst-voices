@@ -82,6 +82,9 @@ final class _JsonDocument extends Equatable implements Document {
   }
 
   @override
+  DocumentContentType get contentType => DocumentContentType.json;
+
+  @override
   List<Object?> get props => [title];
 }
 

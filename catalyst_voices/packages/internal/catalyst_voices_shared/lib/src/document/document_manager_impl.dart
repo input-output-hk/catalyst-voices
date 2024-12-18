@@ -25,8 +25,9 @@ final class _DocumentManagerImpl implements DocumentManager {
     final compressedPayload = await _brotliCompressPayload(document.toBytes());
 
     final coseSign = await CoseSign.sign(
-      protectedHeaders: const CoseHeaders.protected(
+      protectedHeaders: CoseHeaders.protected(
         contentEncoding: _brotliEncoding,
+        contentType: document.contentType.asCose,
       ),
       unprotectedHeaders: const CoseHeaders.unprotected(),
       payload: compressedPayload,
@@ -76,6 +77,16 @@ final class _CoseSignedDocument<T extends Document> extends SignedDocument<T> {
 
   @override
   List<Object?> get props => [_coseSign, document];
+}
+
+extension _CoseDocumentContentType on DocumentContentType {
+  /// Maps the [DocumentContentType] into COSE representation.
+  StringOrInt get asCose {
+    switch (this) {
+      case DocumentContentType.json:
+        return const IntValue(CoseValues.jsonContentType);
+    }
+  }
 }
 
 final class _Bip32Ed25519XSigner implements CatalystCoseSigner {
