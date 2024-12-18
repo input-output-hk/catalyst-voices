@@ -7,6 +7,13 @@ import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
+/// A callback to get an optional value.
+/// Helps to distinguish whether a method argument
+/// has been passed as null or not passed at all.
+///
+/// See [CoseHeaders.copyWith].
+typedef OptionalValueGetter<T> = T? Function();
+
 /// A class that specifies headers that
 /// can be used in protected/unprotected COSE headers.
 final class CoseHeaders extends Equatable {
@@ -169,25 +176,37 @@ final class CoseHeaders extends Equatable {
     }
   }
 
-  /// Returns a copy of the [CoseHeaders] with given [alg] and [kid].
+  /// Returns a copy of the [CoseHeaders] with overwritten properties.
   CoseHeaders copyWith({
-    required StringOrInt? alg,
-    required Uint8List? kid,
+    OptionalValueGetter<StringOrInt?>? alg,
+    OptionalValueGetter<Uint8List?>? kid,
+    OptionalValueGetter<StringOrInt?>? contentType,
+    OptionalValueGetter<StringOrInt?>? contentEncoding,
+    OptionalValueGetter<Uuid?>? type,
+    OptionalValueGetter<Uuid?>? id,
+    OptionalValueGetter<Uuid?>? ver,
+    OptionalValueGetter<ReferenceUuid?>? ref,
+    OptionalValueGetter<ReferenceUuid?>? template,
+    OptionalValueGetter<ReferenceUuid?>? reply,
+    OptionalValueGetter<String?>? section,
+    OptionalValueGetter<List<String>?>? collabs,
+    bool? encodeAsBytes,
   }) {
     return CoseHeaders(
-      alg: alg,
-      kid: kid,
-      contentType: contentType,
-      contentEncoding: contentEncoding,
-      type: type,
-      id: id,
-      ver: ver,
-      ref: ref,
-      template: template,
-      reply: reply,
-      section: section,
-      collabs: collabs,
-      encodeAsBytes: encodeAsBytes,
+      alg: alg != null ? alg() : this.alg,
+      kid: kid != null ? kid() : this.kid,
+      contentType: contentType != null ? contentType() : this.contentType,
+      contentEncoding:
+          contentEncoding != null ? contentEncoding() : this.contentEncoding,
+      type: type != null ? type() : this.type,
+      id: id != null ? id() : this.id,
+      ver: ver != null ? ver() : this.ver,
+      ref: ref != null ? ref() : this.ref,
+      template: template != null ? template() : this.template,
+      reply: reply != null ? reply() : this.reply,
+      section: section != null ? section() : this.section,
+      collabs: collabs != null ? collabs() : this.collabs,
+      encodeAsBytes: encodeAsBytes ?? this.encodeAsBytes,
     );
   }
 
