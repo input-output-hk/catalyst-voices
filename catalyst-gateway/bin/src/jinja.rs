@@ -36,11 +36,6 @@ static JINJA_ENV: LazyLock<Environment> = LazyLock::new(|| {
     env
 });
 
-/// Initializes `JINJA_ENV`
-pub(crate) fn init_jinja() {
-    let _unused = &*JINJA_ENV;
-}
-
 /// Returns a template from the jinja environment, returns error if it does not exit.
 pub(crate) fn get_template(temp: &JinjaTemplateSource) -> anyhow::Result<Template<'static, '_>> {
     let template = JINJA_ENV.get_template(temp.name)?;
