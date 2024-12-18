@@ -14,7 +14,15 @@ walletConfigs.forEach((walletConfig) => {
       "https://github.com/input-output-hk/catalyst-voices/issues/753"
     );
     test.skip(
+      walletConfig.extension.Name === "Yoroi",
+      "https://github.com/input-output-hk/catalyst-voices/issues/753"
+    );
+    test.skip(
       walletConfig.extension.Name === "Lace",
+      "https://github.com/input-output-hk/catalyst-voices/issues/1190"
+    );
+    test.skip(
+      walletConfig.extension.Name === "Nufi",
       "https://github.com/input-output-hk/catalyst-voices/issues/1190"
     );
     test.beforeAll(async () => {
@@ -40,11 +48,7 @@ walletConfigs.forEach((walletConfig) => {
         walletConfig.extension.Name
       );
       const homePage = new HomePage(page);
-      const [walletPopup] = await Promise.all([
-        browser.waitForEvent("page"),
-        homePage.signDataButton.click(),
-      ]);
-      await signWalletPopup(walletPopup, walletConfig);
+      await signWalletPopup(browser, walletConfig, homePage.signDataButton);
       await homePage.assertModal(ModalName.SignData);
     });
 
@@ -56,11 +60,11 @@ walletConfigs.forEach((walletConfig) => {
         walletConfig.extension.Name
       );
       const homePage = new HomePage(page);
-      const [walletPopup] = await Promise.all([
-        browser.waitForEvent("page"),
-        homePage.signAndSubmitTxButton.click(),
-      ]);
-      await signWalletPopup(walletPopup, walletConfig);
+      await signWalletPopup(
+        browser,
+        walletConfig,
+        homePage.signAndSubmitTxButton
+      );
       await homePage.assertModal(ModalName.SignAndSubmitTx);
     });
 
@@ -74,11 +78,11 @@ walletConfigs.forEach((walletConfig) => {
           walletConfig.extension.Name
         );
         const homePage = new HomePage(page);
-        const [walletPopup] = await Promise.all([
-          browser.waitForEvent("page"),
-          homePage.signAndSubmitRBACTxButton.click(),
-        ]);
-        await signWalletPopup(walletPopup, walletConfig);
+        await signWalletPopup(
+          browser,
+          walletConfig,
+          homePage.signAndSubmitRBACTxButton
+        );
         await homePage.assertModal(ModalName.SignAndSubmitRBACTx);
       }
     );
@@ -94,13 +98,14 @@ walletConfigs.forEach((walletConfig) => {
           walletConfig.extension.Name
         );
         const homePage = new HomePage(page);
-        const [walletPopup] = await Promise.all([
-          browser.waitForEvent("page"),
-          homePage.signDataButton.click(),
-        ]);
         const walletConfigClone = structuredClone(walletConfig);
         walletConfigClone.password = "BadPassword";
-        await signWalletPopup(walletPopup, walletConfigClone, false);
+        await signWalletPopup(
+          browser,
+          walletConfigClone,
+          homePage.signDataButton,
+          false
+        );
         await homePage.assertModal(ModalName.SignDataUserDeclined);
       }
     );
@@ -116,13 +121,14 @@ walletConfigs.forEach((walletConfig) => {
           walletConfig.extension.Name
         );
         const homePage = new HomePage(page);
-        const [walletPopup] = await Promise.all([
-          browser.waitForEvent("page"),
-          homePage.signAndSubmitTxButton.click(),
-        ]);
         const walletConfigClone = structuredClone(walletConfig);
         walletConfigClone.password = "BadPassword";
-        await signWalletPopup(walletPopup, walletConfigClone, false);
+        await signWalletPopup(
+          browser,
+          walletConfigClone,
+          homePage.signAndSubmitTxButton,
+          false
+        );
         await homePage.assertModal(ModalName.SignTxUserDeclined);
       }
     );
@@ -138,13 +144,14 @@ walletConfigs.forEach((walletConfig) => {
           walletConfig.extension.Name
         );
         const homePage = new HomePage(page);
-        const [walletPopup] = await Promise.all([
-          browser.waitForEvent("page"),
-          homePage.signAndSubmitRBACTxButton.click(),
-        ]);
         const walletConfigClone = structuredClone(walletConfig);
         walletConfigClone.password = "BadPassword";
-        await signWalletPopup(walletPopup, walletConfigClone, false);
+        await signWalletPopup(
+          browser,
+          walletConfigClone,
+          homePage.signAndSubmitRBACTxButton,
+          false
+        );
         await homePage.assertModal(ModalName.SignRBACTxUserDeclined);
       }
     );
