@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/proposal_schema/definitions.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'definitions_dto.g.dart';
@@ -62,7 +62,23 @@ class DefinitionsDto {
         segment.toModel(),
         section.toModel(),
         singleLineTextEntry.toModel(),
+        multiLineTextEntry.toModel(),
+        multiLineTextEntryMarkdown.toModel(),
+        dropDownSingleSelect.toModel(),
+        multiSelect.toModel(),
+        singleLineTextEntryList.toModel(),
+        multiLineTextEntryListMarkdown.toModel(),
+        singleLineHttpsURLEntryList.toModel(),
+        nestedQuestionsList.toModel(),
+        nestedQuestions.toModel(),
+        singleGroupedTagSelector.toModel(),
+        tagGroup.toModel(),
+        tagSelection.toModel(),
+        tokenValueCardanoAda.toModel(),
         durationInMonths.toModel(),
+        yesNoChoice.toModel(),
+        agreementConfirmation.toModel(),
+        spdxLicenceOrUrl.toModel(),
       ];
 }
 
@@ -164,6 +180,15 @@ class SingleLineHttpsURLEntryDto {
       _$SingleLineHttpsURLEntryDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$SingleLineHttpsURLEntryDtoToJson(this);
+
+  SingleLineHttpsURLEntryDefinition toModel() {
+    return SingleLineHttpsURLEntryDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      format: DefinitionsFormat.fromString(format),
+      pattern: pattern,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -185,6 +210,16 @@ class MultiLineTextEntryDto {
       _$MultiLineTextEntryDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$MultiLineTextEntryDtoToJson(this);
+
+  MultiLineTextEntryDefinition toModel() {
+    return MultiLineTextEntryDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      contentMediaType:
+          DefinitionsContentMediaType.fromString(contentMediaType),
+      pattern: pattern,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -206,6 +241,16 @@ class MultiLineTextEntryMarkdownDto {
       _$MultiLineTextEntryMarkdownDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$MultiLineTextEntryMarkdownDtoToJson(this);
+
+  MultiLineTextEntryMarkdownDefinition toModel() {
+    return MultiLineTextEntryMarkdownDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      contentMediaType:
+          DefinitionsContentMediaType.fromString(contentMediaType),
+      pattern: pattern,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -229,6 +274,17 @@ class DropDownSingleSelectDto {
       _$DropDownSingleSelectDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$DropDownSingleSelectDtoToJson(this);
+
+  DropDownSingleSelectDefinition toModel() {
+    return DropDownSingleSelectDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      contentMediaType:
+          DefinitionsContentMediaType.fromString(contentMediaType),
+      pattern: pattern,
+      format: DefinitionsFormat.fromString(format),
+    );
+  }
 }
 
 @JsonSerializable()
@@ -250,6 +306,15 @@ class MultiSelectDto {
       _$MultiSelectDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$MultiSelectDtoToJson(this);
+
+  MultiSelectDefinition toModel() {
+    return MultiSelectDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      format: DefinitionsFormat.fromString(format),
+      uniqueItems: uniqueItems,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -258,7 +323,7 @@ class SingleLineTextEntryListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -276,6 +341,16 @@ class SingleLineTextEntryListDto {
       _$SingleLineTextEntryListDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$SingleLineTextEntryListDtoToJson(this);
+
+  SingleLineTextEntryListDefinition toModel() =>
+      SingleLineTextEntryListDefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+        uniqueItems: uniqueItems,
+        defaultValues: defaultValue,
+        items: items,
+      );
 }
 
 @JsonSerializable()
@@ -305,6 +380,16 @@ class MultiLineTextEntryListMarkdownDto {
 
   Map<String, dynamic> toJson() =>
       _$MultiLineTextEntryListMarkdownDtoToJson(this);
+
+  MultiLineTextEntryListMarkdownDefinition toModel() =>
+      MultiLineTextEntryListMarkdownDefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+        uniqueItems: uniqueItems,
+        defaultValue: defaultValue,
+        items: items,
+      );
 }
 
 @JsonSerializable()
@@ -331,6 +416,16 @@ class SingleLineHttpsURLEntryListDto {
       _$SingleLineHttpsURLEntryListDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$SingleLineHttpsURLEntryListDtoToJson(this);
+
+  SingleLineHttpsURLEntryListDefinition toModel() =>
+      SingleLineHttpsURLEntryListDefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+        uniqueItems: uniqueItems,
+        defaultValue: defaultValue,
+        items: items,
+      );
 }
 
 @JsonSerializable()
@@ -355,6 +450,14 @@ class NestedQuestionsListDto {
       _$NestedQuestionsListDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$NestedQuestionsListDtoToJson(this);
+
+  NestedQuestionsListDefinition toModel() => NestedQuestionsListDefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+        uniqueItems: uniqueItems,
+        defaultValue: defaultValue,
+      );
 }
 
 @JsonSerializable()
@@ -376,6 +479,15 @@ class NestedQuestionsDto {
       _$NestedQuestionsDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$NestedQuestionsDtoToJson(this);
+
+  NestedQuestionsDefinition toModel() {
+    return NestedQuestionsDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      format: DefinitionsFormat.fromString(format),
+      additionalProperties: additionalProperties,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -397,6 +509,15 @@ class SingleGroupedTagSelectorDto {
       _$SingleGroupedTagSelectorDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$SingleGroupedTagSelectorDtoToJson(this);
+
+  SingleGroupedTagSelectorDefinition toModel() {
+    return SingleGroupedTagSelectorDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      format: DefinitionsFormat.fromString(format),
+      additionalProperties: additionalProperties,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -418,18 +539,29 @@ class TagGroupDto {
       _$TagGroupDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$TagGroupDtoToJson(this);
+
+  TagGroupDefinition toModel() {
+    return TagGroupDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      format: DefinitionsFormat.fromString(format),
+      pattern: pattern,
+    );
+  }
 }
 
 @JsonSerializable()
 class TagSelectionDto {
   final String type;
   final String format;
+  final String pattern;
   @JsonKey(name: 'x-note')
   final String note;
 
   const TagSelectionDto({
     required this.type,
     required this.format,
+    required this.pattern,
     required this.note,
   });
 
@@ -437,6 +569,15 @@ class TagSelectionDto {
       _$TagSelectionDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$TagSelectionDtoToJson(this);
+
+  TagSelectionDefinition toModel() {
+    return TagSelectionDefinition(
+      type: DefinitionsObjectType.fromString(type),
+      note: note,
+      format: DefinitionsFormat.fromString(format),
+      pattern: pattern,
+    );
+  }
 }
 
 @JsonSerializable()
@@ -456,6 +597,12 @@ class TokenValueCardanoAdaDto {
       _$TokenValueCardanoAdaDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$TokenValueCardanoAdaDtoToJson(this);
+
+  TokenValueCardanoADADefinition toModel() => TokenValueCardanoADADefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+      );
 }
 
 @JsonSerializable()
@@ -505,6 +652,13 @@ class YesNoChoiceDto {
       _$YesNoChoiceDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$YesNoChoiceDtoToJson(this);
+
+  YesNoChoiceDefinition toModel() => YesNoChoiceDefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+        defaultValue: defaultValue,
+      );
 }
 
 @JsonSerializable()
@@ -530,6 +684,14 @@ class AgreementConfirmationDto {
       _$AgreementConfirmationDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$AgreementConfirmationDtoToJson(this);
+
+  AgreementConfirmationDefinition toModel() => AgreementConfirmationDefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+        defaultValue: defaultValue,
+        constValue: constValue,
+      );
 }
 
 @JsonSerializable()
@@ -553,4 +715,13 @@ class SPDXLicenceOrUrlDto {
       _$SPDXLicenceOrUrlDtoFromJson(json);
 
   Map<String, dynamic> toJson() => _$SPDXLicenceOrUrlDtoToJson(this);
+
+  SPDXLicenceOrUrlDefinition toModel() => SPDXLicenceOrUrlDefinition(
+        type: DefinitionsObjectType.fromString(type),
+        note: note,
+        format: DefinitionsFormat.fromString(format),
+        pattern: pattern,
+        contentMediaType:
+            DefinitionsContentMediaType.fromString(contentMediaType),
+      );
 }

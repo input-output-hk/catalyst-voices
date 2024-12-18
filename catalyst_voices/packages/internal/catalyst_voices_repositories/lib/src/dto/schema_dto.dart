@@ -17,12 +17,18 @@ class SchemaDto extends Equatable {
   final DefinitionsDto definitions;
   final String type;
   final bool additionalProperties;
-  @JsonKey(toJson: _toJsonProperties, fromJson: _fromJsonProperties)
-  final List<SchemaSegmentDto> properties;
+  @JsonKey(
+    toJson: _toJsonProperties,
+    fromJson: _fromJsonProperties,
+    name: 'properties',
+  )
+  final List<SchemaSegmentDto> segments;
   @JsonKey(name: 'x-order')
   final List<String> order;
   @JsonKey(includeToJson: false)
   final String propertiesSchema;
+
+  static late Map<String, int> orderMap;
 
   const SchemaDto({
     required this.schema,
@@ -32,7 +38,7 @@ class SchemaDto extends Equatable {
     required this.definitions,
     this.type = 'object',
     this.additionalProperties = false,
-    required this.properties,
+    required this.segments,
     required this.order,
     required this.propertiesSchema,
   });
@@ -48,15 +54,19 @@ class SchemaDto extends Equatable {
   Map<String, dynamic> toJson() => _$SchemaDtoToJson(this);
 
   Schema toModel() {
-    final properties =
-        this.properties.map((e) => e.toModel(definitions.definitions)).toList();
+    orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
+    final sortedProperties = List<SchemaSegmentDto>.from(this.segments)..sort();
+    final segments = sortedProperties
+        .where((e) => e.id.contains('segment'))
+        .map((e) => e.toModel(definitions.definitions))
+        .toList();
     return Schema(
       schema: schema,
       title: title,
       description: description,
       type: DefinitionsObjectType.fromString(type),
       additionalProperties: false,
-      segments: properties,
+      segments: segments,
       order: order,
       propertiesSchema: propertiesSchema,
     );
@@ -70,35 +80,40 @@ class SchemaDto extends Equatable {
         definitions,
         type,
         additionalProperties,
-        properties,
+        segments,
         order,
       ];
 
   static Map<String, dynamic> _toJsonProperties(
-    List<SchemaSegmentDto> properties,
+    List<SchemaSegmentDto> segments,
   ) {
     final map = <String, dynamic>{};
-    for (final property in properties) {
+    for (final property in segments) {
       map[property.id] = property.toJson();
     }
     return map;
   }
 
   static List<SchemaSegmentDto> _fromJsonProperties(Map<String, dynamic> json) {
-    final listOfProperties = json.convertMapToListWithIds();
-    return listOfProperties.map(SchemaSegmentDto.fromJson).toList();
+    final listOfSegments = json.convertMapToListWithIds();
+    return listOfSegments.map(SchemaSegmentDto.fromJson).toList();
   }
 }
 
 @JsonSerializable()
-class SchemaSegmentDto extends Equatable {
+class SchemaSegmentDto extends Equatable
+    implements Comparable<SchemaSegmentDto> {
   @JsonKey(name: r'$ref')
   final String ref;
   final String id;
   final String title;
   final String description;
-  @JsonKey(toJson: _toJsonProperties, fromJson: _fromJsonProperties)
-  final List<SchemaSectionDto> properties;
+  @JsonKey(
+    toJson: _toJsonProperties,
+    fromJson: _fromJsonProperties,
+    name: 'properties',
+  )
+  final List<SchemaSectionDto> sections;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
@@ -110,7 +125,7 @@ class SchemaSegmentDto extends Equatable {
     required this.id,
     this.title = '',
     this.description = '',
-    required this.properties,
+    required this.sections,
     this.required = const <String>[],
     this.order = const <String>[],
   });
@@ -122,7 +137,7 @@ class SchemaSegmentDto extends Equatable {
 
   SchemaSegment toModel(List<BaseDefinition> definitions) {
     orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
-    final sortedProperties = List<SchemaSectionDto>.from(properties)..sort();
+    final sortedProperties = List<SchemaSectionDto>.from(this.sections)..sort();
     final sections = sortedProperties
         .where((element) => element.ref.contains('section'))
         .map((e) => e.toModel(definitions, isRequired: required.contains(e.id)))
@@ -142,24 +157,31 @@ class SchemaSegmentDto extends Equatable {
         id,
         title,
         description,
-        properties,
+        sections,
         required,
         order,
       ];
 
   static Map<String, dynamic> _toJsonProperties(
-    List<SchemaSectionDto> properties,
+    List<SchemaSectionDto> sections,
   ) {
     final map = <String, dynamic>{};
-    for (final property in properties) {
+    for (final property in sections) {
       map[property.id] = property.toJson();
     }
     return map;
   }
 
   static List<SchemaSectionDto> _fromJsonProperties(Map<String, dynamic> json) {
-    final listOfProperties = json.convertMapToListWithIds();
-    return listOfProperties.map(SchemaSectionDto.fromJson).toList();
+    final listOfSections = json.convertMapToListWithIds();
+    return listOfSections.map(SchemaSectionDto.fromJson).toList();
+  }
+
+  @override
+  int compareTo(SchemaSegmentDto other) {
+    final thisIndex = SchemaDto.orderMap[id] ?? double.maxFinite.toInt();
+    final otherIndex = SchemaDto.orderMap[other.id] ?? double.maxFinite.toInt();
+    return thisIndex.compareTo(otherIndex);
   }
 }
 
@@ -171,8 +193,12 @@ class SchemaSectionDto extends Equatable
   final String id;
   final String title;
   final String description;
-  @JsonKey(toJson: _toJsonProperties, fromJson: _fromJsonProperties)
-  final List<SchemaElementDto> properties;
+  @JsonKey(
+    toJson: _toJsonProperties,
+    fromJson: _fromJsonProperties,
+    name: 'properties',
+  )
+  final List<SchemaElementDto> elements;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
@@ -190,7 +216,7 @@ class SchemaSectionDto extends Equatable
     required this.id,
     this.title = '',
     this.description = '',
-    required this.properties,
+    required this.elements,
     this.required = const <String>[],
     this.order = const <String>[],
     this.dependencies = const <String, dynamic>{},
@@ -209,9 +235,9 @@ class SchemaSectionDto extends Equatable
     required bool isRequired,
   }) {
     orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
-    final sortedProperties = List<SchemaElementDto>.from(properties)..sort();
-    final elements = sortedProperties
-        // .where((element) => element.ref.contains('section'))
+    final sortedElements = List<SchemaElementDto>.from(this.elements)..sort();
+    final elements = sortedElements
+        .where((element) => DefinitionsType.isKnownType(element.ref))
         .map((e) => e.toModel(definitions))
         .toList();
     return SchemaSection(
@@ -230,7 +256,7 @@ class SchemaSectionDto extends Equatable
         id,
         title,
         description,
-        properties,
+        elements,
         required,
         order,
         dependencies,
@@ -314,22 +340,24 @@ class SchemaElementDto extends Equatable
 
   Map<String, dynamic> toJson() => _$SchemaElementDtoToJson(this);
 
-  SchemaElement toModel(List<BaseDefinition> definitions) => SchemaElement(
-        ref: definitions.getDefinition(ref),
-        id: id,
-        title: title,
-        description: description,
-        minLength: minLength,
-        maxLength: maxLength,
-        defaultValue: defaultValue,
-        guidance: guidance,
-        enumValues: enumValues,
-        maxItems: maxItems,
-        minItems: minItems,
-        minimum: minimum,
-        maximum: maximum,
-        examples: examples,
-      );
+  SchemaElement toModel(List<BaseDefinition> definitions) {
+    return SchemaElement(
+      ref: definitions.getDefinition(ref),
+      id: id,
+      title: title,
+      description: description,
+      minLength: minLength,
+      maxLength: maxLength,
+      defaultValue: defaultValue,
+      guidance: guidance,
+      enumValues: enumValues,
+      maxItems: maxItems,
+      minItems: minItems,
+      minimum: minimum,
+      maximum: maximum,
+      examples: examples,
+    );
+  }
 
   @override
   List<Object?> get props => [
