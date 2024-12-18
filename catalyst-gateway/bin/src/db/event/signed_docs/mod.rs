@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod tests;
 
-use super::{common::QueryLimits, EventDB, NotFoundError};
+use super::{common::query_limits::QueryLimits, EventDB, NotFoundError};
 use crate::jinja::{get_template, JinjaTemplateSource};
 
 /// Insert sql query

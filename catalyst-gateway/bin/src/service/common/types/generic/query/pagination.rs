@@ -125,6 +125,12 @@ impl From<u64> for Page {
     }
 }
 
+impl From<Page> for u64 {
+    fn from(value: Page) -> Self {
+        value.0
+    }
+}
+
 impl Example for Page {
     fn example() -> Self {
         Self(PAGE_EXAMPLE)
@@ -250,6 +256,12 @@ impl From<u64> for Limit {
     }
 }
 
+impl From<Limit> for u64 {
+    fn from(value: Limit) -> Self {
+        value.0
+    }
+}
+
 impl Example for Limit {
     fn example() -> Self {
         Self(LIMIT_EXAMPLE)
@@ -350,6 +362,12 @@ impl ToJSON for Remaining {
 impl From<u64> for Remaining {
     fn from(value: u64) -> Self {
         Self(value)
+    }
+}
+
+impl From<Remaining> for u64 {
+    fn from(value: Remaining) -> Self {
+        value.0
     }
 }
 
