@@ -20,7 +20,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
   }
 
   Future<String> createNewDraftProposal() async {
-    return 'dammmm';
+    return 'new-draft-id';
   }
 
   Future<void> _loadProposals(
