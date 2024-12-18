@@ -70,9 +70,6 @@ class SchemaElement {
   final int? minItems;
   final int? minimum;
   final int? maximum;
-  // Sample JSON values associated with a particular schema,
-  // for the purpose of illustrating usage.
-  final List<String> examples;
 
   const SchemaElement({
     required this.ref,
@@ -88,6 +85,5 @@ class SchemaElement {
     this.minItems,
     this.minimum,
     this.maximum,
-    this.examples = const <String>[],
   });
 }

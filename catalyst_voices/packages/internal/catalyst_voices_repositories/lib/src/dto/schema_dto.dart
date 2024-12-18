@@ -314,8 +314,8 @@ class SchemaElementDto extends Equatable
   final int? minimum;
   @JsonKey(includeIfNull: false)
   final int? maximum;
-  final List<String> examples;
-  final Map<String, dynamic> items; // TODO(ryszard-shossler): return to this
+  // TODO(ryszard-schossler): return to this
+  final Map<String, dynamic> items;
 
   const SchemaElementDto({
     this.ref = '',
@@ -331,7 +331,6 @@ class SchemaElementDto extends Equatable
     required this.minItems,
     required this.minimum,
     required this.maximum,
-    this.examples = const <String>[],
     this.items = const <String, dynamic>{},
   });
 
@@ -355,7 +354,6 @@ class SchemaElementDto extends Equatable
       minItems: minItems,
       minimum: minimum,
       maximum: maximum,
-      examples: examples,
     );
   }
 
@@ -374,7 +372,6 @@ class SchemaElementDto extends Equatable
         minItems,
         minimum,
         maximum,
-        examples,
       ];
 
   @override

@@ -842,9 +842,7 @@
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "minLength": 1,
                             "maxLength": 10240,
-                            "examples": [
-                                "Our solution involves developing a decentralized education platform that will..."
-                            ]
+                            "x-guidance": "Our solution involves developing a decentralized education platform that will..."
                         }
                     }
                 },
