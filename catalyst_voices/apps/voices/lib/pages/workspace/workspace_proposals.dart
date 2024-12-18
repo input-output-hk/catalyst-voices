@@ -11,20 +11,23 @@ class WorkspaceProposals extends StatelessWidget {
   Widget build(BuildContext context) {
     return _Selector(
       builder: (context, state) {
-        return ListView.separated(
-          itemBuilder: (context, index) {
-            final item = state[index];
-            return _ProposalListTile(
-              key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
-              item: item,
-              onTap: () {
-                ProposalEditorRoute(proposalId: item.id).go(context);
-              },
-            );
-          },
-          separatorBuilder: (context, index) => const SizedBox(height: 8),
-          itemCount: state.length,
-          padding: const EdgeInsets.all(32),
+        return Offstage(
+          offstage: state.isEmpty,
+          child: ListView.separated(
+            itemBuilder: (context, index) {
+              final item = state[index];
+              return _ProposalListTile(
+                key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
+                item: item,
+                onTap: () {
+                  ProposalEditorRoute(proposalId: item.id).go(context);
+                },
+              );
+            },
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemCount: state.length,
+            padding: const EdgeInsets.all(32),
+          ),
         );
       },
     );
