@@ -34,6 +34,7 @@ class WorkspaceProposals extends StatelessWidget {
   }
 }
 
+// TODO(damian-molinski): Looks is not final
 class _ProposalListTile extends StatelessWidget {
   final WorkspaceProposalListItem item;
   final VoidCallback? onTap;

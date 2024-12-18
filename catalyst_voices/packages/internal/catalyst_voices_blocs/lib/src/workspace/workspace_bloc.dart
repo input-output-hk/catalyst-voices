@@ -11,6 +11,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
   // ignore: unused_field
   final CampaignService _campaignService;
 
+  // ignore: unused_field
+  final List<Proposal> _proposals = [];
+
   WorkspaceBloc(
     this._campaignService,
   ) : super(const WorkspaceState()) {
@@ -40,6 +43,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
         error: const Optional.empty(),
       ),
     );
+
+    // TODO(damian-molinski): implement fetching proposals
+    // TODO(damian-molinski): implement filtering of _proposals
 
     final isSuccess = await Future.delayed(
       const Duration(milliseconds: 300),
@@ -75,13 +81,19 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     TabChangedEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    //
+    // TODO(damian-molinski): implement filtering of _proposals
+
+    emit(state.copyWith(tab: event.tab));
   }
 
   Future<void> _handleQueryChange(
     SearchQueryChangedEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    //
+    // TODO(damian-molinski): implement filtering of _proposals
+
+    final query = event.query;
+
+    emit(state.copyWith(searchQuery: query));
   }
 }
