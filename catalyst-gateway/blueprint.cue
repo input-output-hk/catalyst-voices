@@ -14,7 +14,7 @@ project: {
 	}
 	ci: {
     targets: {
-      test-postgres: privileged: true
+      "test-postgres": privileged: true
     }
   }
 }
