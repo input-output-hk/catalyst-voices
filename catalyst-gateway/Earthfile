@@ -125,7 +125,7 @@ check-builder-src-cache:
         || (echo "ERROR: Source fingerprints do not match. Caching Error Detected!!" && exit 1) \
         && echo "Source fingerprints match. Caching OK."
 
-test:
+test-postgres:
     FROM +builder-src
 
     COPY docker-compose.yml .
@@ -139,4 +139,23 @@ test:
         --service event-db-is-running
         RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
             cargo nextest run --release --run-ignored=only signed_docs
-    END 
+    END
+
+test-scylla:
+    FROM +builder-src
+
+    # setup scylla
+    RUN curl -sSL https://repo.scylladb.com/scylla/repo.asc | apt-key add - && \
+        echo "deb [arch=$(dpkg --print-architecture)] https://repo.scylladb.com/deb/scylla/${SCYLLA_VERSION} $(lsb_release -c | awk '{print $2}') main" | tee /etc/apt/sources.list.d/scylla.list
+
+    RUN apt-get update && \
+        apt-get install -y scylla
+    
+    ENV HOST_IP
+    RUN export HOST_IP="$(ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}')"
+
+    RUN scylla --seeds=scylla-node --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+
+    # run the test
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        cargo nextest run --release --run-ignored=only scylla_session
