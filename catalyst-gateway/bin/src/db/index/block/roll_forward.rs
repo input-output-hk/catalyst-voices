@@ -207,7 +207,6 @@ async fn purge_stake_registration(
 }
 
 /// Purge data from `txi_by_hash`.
-#[allow(clippy::unused_async)]
 async fn purge_txi_by_hash(
     session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
 ) -> anyhow::Result<HashSet<Vec<u8>>> {
@@ -273,7 +272,6 @@ async fn purge_txo_assets(
 }
 
 /// Purge data from `unstaked_txo_ada`.
-#[allow(clippy::unused_async)]
 async fn purge_unstaked_txo_ada(
     session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
 ) -> anyhow::Result<()> {
