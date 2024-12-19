@@ -40,12 +40,12 @@ impl QueryLimits {
     }
 
     /// Create a `QueryLimits` object with the limit equals to `1`.
-    pub(crate) fn new_one() -> Self {
+    pub(crate) const fn one() -> Self {
         Self(QueryLimitsInner::Limit(1))
     }
 
     /// Create a `QueryLimits` object without the any limits.
-    pub(crate) fn new_all() -> Self {
+    pub(crate) const fn all() -> Self {
         Self(QueryLimitsInner::All)
     }
 
