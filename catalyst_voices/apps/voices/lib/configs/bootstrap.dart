@@ -87,15 +87,15 @@ GoRouter buildAppRouter({
 }
 
 @visibleForTesting
-Future<void> restartDependencies() async {
-  await Dependencies.instance.reset;
-}
-
-@visibleForTesting
 Future<void> registerDependencies() async {
   if (!Dependencies.instance.isInitialized) {
     await Dependencies.instance.init();
   }
+}
+
+@visibleForTesting
+Future<void> restartDependencies() async {
+  await Dependencies.instance.reset;
 }
 
 /// Initializes the application before it can be run. Should setup all
