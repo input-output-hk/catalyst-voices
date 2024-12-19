@@ -12,6 +12,7 @@ setup-code:
 generate-code: setup-code
     melos l10n
     melos build_runner
+    melos build_runner_repository
     just generate-gateway-services
 
 # Syntax sugar for linking packages and building generated code

@@ -32,9 +32,7 @@ final class CoseSign1 extends Equatable {
 
   /// Deserializes the type from cbor.
   factory CoseSign1.fromCbor(CborValue value) {
-    if (value is! CborList ||
-        value.length != 4 ||
-        !value.tags.contains(CoseTags.coseSign1)) {
+    if (value is! CborList || value.length != 4) {
       throw FormatException('$value is not a valid COSE_SIGN1 structure');
     }
 
@@ -67,6 +65,13 @@ final class CoseSign1 extends Equatable {
     required Uint8List payload,
     required CatalystCoseSigner signer,
   }) async {
+    final kid = await signer.kid;
+
+    protectedHeaders = protectedHeaders.copyWith(
+      alg: () => signer.alg,
+      kid: () => kid,
+    );
+
     final sigStructure = _createCoseSign1SigStructure(
       protectedHeader: protectedHeaders.toCbor(),
       payload: CborBytes(payload),

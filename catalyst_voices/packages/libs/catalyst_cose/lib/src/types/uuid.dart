@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart' as uuid;
 extension type const Uuid(String value) {
   /// Deserializes the type from cbor.
   factory Uuid.fromCbor(CborValue value) {
-    if (value is CborBytes && value.tags.contains(CborUtils.uuidTag)) {
+    if (value is CborBytes) {
       return Uuid(uuid.Uuid.unparse(value.bytes));
     } else {
       throw FormatException('The $value is not a valid uuid!');

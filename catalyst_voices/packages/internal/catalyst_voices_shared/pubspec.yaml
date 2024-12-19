@@ -9,12 +9,16 @@ environment:
 
 dependencies:
   catalyst_cardano_serialization: ^0.4.0
+  catalyst_compression: ^0.3.0
+  catalyst_cose: ^0.3.0
   catalyst_key_derivation: ^0.1.0
   catalyst_voices_models:
     path: ../catalyst_voices_models
+  cbor: ^6.2.0
   collection: ^1.18.0
   convert: ^3.1.1
   cryptography: ^2.7.0
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
   flutter_secure_storage: ^9.2.2
