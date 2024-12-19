@@ -15,7 +15,7 @@ repository.workspace =  true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "v0.0.9" }
+cardano-chain-follower = { git = "https://github.com/input-output-hk/catalyst-libs.git", tag="v0.0.10" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "v0.0.3" }
 rbac-registration = { version = "0.0.2", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "v0.0.8" }
 
