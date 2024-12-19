@@ -14,13 +14,30 @@ class SpacesDrawerPage {
   static const chooserPrevBtn = Key('DrawerChooserPreviousButton');
   static const chooserNextBtn = Key('DrawerChooserNextButton');
   static const chooserItemContainer = Key('DrawerChooserItem');
+  static const userDiscoveryDashboardTile = Key('DiscoveryDashboardTile');
+  static const userRolesTile = Key('RolesTile');
+  static const userFeedbackTile = Key('FeedbackTile');
+  static const userDocumentationTile = Key('DocumentationTile');
+  static const userDrawerMenuItem = Key('UserDrawerMenuItem');
 
   static Key chooserItem(Space space) {
     return Key('DrawerChooser$space');
   }
 
+  static Key userHeader(Space space) {
+    return Key('SpaceHeader.${space.name}');
+  }
+
   static Key chooserIcon(Space space) {
     return Key('DrawerChooser${space}AvatarKey');
+  }
+
+  static Key userMenuContainer(Space space) {
+    return Key('Drawer${space}MenuKey');
+  }
+
+  static Key userSectionHeader(Space space) {
+    return Key('Header.${space.name}');
   }
 
   static void guestLooksAsExpected(PatrolTester $) {
@@ -34,5 +51,100 @@ class SpacesDrawerPage {
       $(chooserIcon(Space.discovery)),
       findsOneWidget,
     );
+  }
+
+  static Future<void> userLooksAsExpected(PatrolTester $) async {
+    for (final space in Space.values) {
+      await $(SpacesDrawerPage.chooserItem(space)).tap();
+      switch (space) {
+        case Space.discovery:
+          userDiscoveryLooksAsExpected($);
+          break;
+        case Space.workspace:
+          userWorkspaceLooksAsExpected($);
+          break;
+        case Space.voting:
+          userVotingLooksAsExpected($);
+          break;
+        case Space.fundedProjects:
+          userFundedProjectsLooksAsExpected($);
+          break;
+        case Space.treasury:
+          userTreasuryLooksAsExpected($);
+          break;
+      }
+    }
+  }
+
+  static void userDiscoveryLooksAsExpected(PatrolTester $) {
+    expect(
+      $(userMenuContainer(Space.discovery)).$(userHeader(Space.discovery)),
+      findsOneWidget,
+    );
+    expect(
+      $(userMenuContainer(Space.discovery)).$(userDiscoveryDashboardTile),
+      findsOneWidget,
+    );
+    expect($(userMenuContainer(Space.discovery)).$(userRolesTile), findsOneWidget);
+    expect($(userMenuContainer(Space.discovery)).$(userFeedbackTile), findsOneWidget);
+    expect(
+      $(userMenuContainer(Space.discovery)).$(userDocumentationTile),
+      findsOneWidget,
+    );
+  }
+
+  static void userWorkspaceLooksAsExpected(PatrolTester $) {
+    expect(
+      $(userMenuContainer(Space.workspace)).$(userHeader(Space.workspace)),
+      findsOneWidget,
+    );
+    expect(
+      $(userMenuContainer(Space.workspace)).$(userSectionHeader(Space.workspace)),
+      findsOneWidget,
+    );
+    final children = find.descendant(
+      of: $(userMenuContainer(Space.workspace)),
+      matching: $(userDrawerMenuItem),
+    );
+    expect($(children), findsAtLeast(1));
+  }
+
+  static void userVotingLooksAsExpected(PatrolTester $) {
+    expect(
+      $(userMenuContainer(Space.voting)).$(userHeader(Space.voting)),
+      findsOneWidget,
+    );
+    expect(
+      $(userMenuContainer(Space.voting)).$(userSectionHeader(Space.voting)),
+      findsOneWidget,
+    );
+    final children = find.descendant(
+      of: $(userMenuContainer(Space.voting)),
+      matching: $(userDrawerMenuItem),
+    );
+    expect($(children), findsAtLeast(1));
+  }
+
+  static void userFundedProjectsLooksAsExpected(PatrolTester $) {
+    expect(
+      $(userMenuContainer(Space.fundedProjects)),
+      findsOneWidget,
+    );
+  }
+
+  static void userTreasuryLooksAsExpected(PatrolTester $) {
+    expect(
+      $(userMenuContainer(Space.treasury)).$(userHeader(Space.treasury)),
+      findsOneWidget,
+    );
+    expect(
+      $(userMenuContainer(Space.treasury)).$(userSectionHeader(Space.treasury)),
+      findsOneWidget,
+    );
+    final children = find.descendant(
+      of: $(userMenuContainer(Space.treasury)),
+      matching: $(userDrawerMenuItem),
+    );
+    expect($(children), findsAtLeast(1));
   }
 }

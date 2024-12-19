@@ -100,4 +100,15 @@ void main() async {
       SelectorUtils.isDisabled($, $(SpacesDrawerPage.chooserPrevBtn));
     },
   );
+
+  patrolWidgetTest(
+    'Spaces drawer - user - chooser - clicking on icons works correctly',
+        (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(DiscoveryPage.userShortcutBtn)
+          .tap(settleTimeout: const Duration(seconds: 10));
+      await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+      await SpacesDrawerPage.userLooksAsExpected($);
+    },
+  );
 }

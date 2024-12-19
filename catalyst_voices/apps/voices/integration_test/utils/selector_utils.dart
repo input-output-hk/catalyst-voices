@@ -5,7 +5,7 @@ class SelectorUtils {
   static void isDisabled(PatrolTester $, PatrolFinder widget,
       {bool? reverse = false,}) {
     final widgetProps = $.tester.widget(widget).toString().split('(').last;
-    var expectedState = reverse! ? 'enabled' : 'disabled';
+    final expectedState = reverse! ? 'enabled' : 'disabled';
     expect(
       widgetProps.contains('disabled'),
       !reverse,
