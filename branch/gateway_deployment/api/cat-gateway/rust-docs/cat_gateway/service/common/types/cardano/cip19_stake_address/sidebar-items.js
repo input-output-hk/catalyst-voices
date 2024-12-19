@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DECODED_ADDR_LEN","DESCRIPTION","ENCODED_ADDR_LEN","EXAMPLE","FORMAT","MAX_LENGTH","MIN_LENGTH","PATTERN","PROD_STAKE","TEST_STAKE","TITLE"],"fn":["is_valid"],"static":["EXTERNAL_DOCS","STAKE_SCHEMA"],"struct":["Cip19StakeAddress"]};

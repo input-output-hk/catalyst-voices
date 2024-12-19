@@ -1,0 +1,1079 @@
+Not in the F13 proposal, or the F14 base document?
+
+
+    "proposalDetails": {
+    "type": "object",
+    "title": "Proposal Details",
+    "description": "Detailed information about your proposal's solution, impact, and feasibility",
+    "properties": {
+        "solution": {
+            "type": "object",
+            "title": "Solution Description",
+            "description": "Detailed description of your proposed solution",
+            "x-guidance": "<p><b>YOUR PROJECT AND SOLUTION</b></p><p>How you write this section will depend on what type of proposal you are writing. You might want to include details on:</p><ul><li>How do you perceive the problem you are solving?</li><li>What are your reasons for approaching it in the way that you have?</li><li>Who will your project engage?</li><li>How will you demonstrate or prove your impact?</li></ul><p>Explain what is unique about your solution, who will benefit, and why this is important to Cardano. </p>",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "title": "Solution Description",
+                    "description": "Provide a comprehensive description of your proposed solution",
+                    "minLength": 100,
+                    "maxLength": 2000,
+                    "examples": [
+                        "Our solution involves developing a decentralized education platform that will..."
+                    ],
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "uniqueValue": {
+                    "type": "string",
+                    "title": "Unique Value Proposition",
+                    "description": "What makes your solution unique and innovative?",
+                    "minLength": 50,
+                    "maxLength": 500,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "targetAudience": {
+                    "type": "array",
+                    "title": "Target Audience",
+                    "description": "Who will benefit from your solution?",
+                    "items": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 100,
+                        "pattern": "^[\\S\\s]*$",
+                        "contentMediaType": "text/plain"
+                    },
+                    "minItems": 1,
+                    "maxItems": 5,
+                    "uniqueItems": true
+                },
+                "implementation": {
+                    "type": "string",
+                    "title": "Implementation Approach",
+                    "description": "How will you implement your solution?",
+                    "minLength": 100,
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                }
+            },
+            "required": [
+                "description",
+                "uniqueValue",
+                "targetAudience",
+                "implementation"
+            ]
+        },
+        "impact": {
+            "type": "object",
+            "title": "Project Impact",
+            "description": "Define and measure the impact of your project",
+            "x-guidance": "<p>Please include here a description of how you intend to measure impact (whether quantitative or qualitative) and how and with whom you will share your outputs:</p><ul><li>In what way will the success of your project bring value to the Cardano Community?</li><li>How will you measure this impact?</li><li>How will you share the outputs and opportunities that result from your project? </li></ul>",
+            "properties": {
+                "communityBenefit": {
+                    "type": "string",
+                    "title": "Community Benefit",
+                    "description": "How will the Cardano community benefit from your project?",
+                    "minLength": 100,
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "metrics": {
+                    "type": "array",
+                    "title": "Impact Metrics",
+                    "description": "Specific metrics to measure project success",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "title": "Metric Name",
+                                "minLength": 5,
+                                "maxLength": 100,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            },
+                            "description": {
+                                "type": "string",
+                                "title": "Metric Description",
+                                "minLength": 20,
+                                "maxLength": 300,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            },
+                            "target": {
+                                "type": "string",
+                                "title": "Target Value",
+                                "minLength": 1,
+                                "maxLength": 100,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            },
+                            "measurement": {
+                                "type": "string",
+                                "title": "Measurement Method",
+                                "minLength": 20,
+                                "maxLength": 300,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "description",
+                            "target",
+                            "measurement"
+                        ]
+                    },
+                    "minItems": 2,
+                    "maxItems": 5
+                },
+                "outputs": {
+                    "type": "array",
+                    "title": "Project Outputs",
+                    "description": "Tangible outputs and deliverables from the project",
+                    "items": {
+                        "type": "string",
+                        "minLength": 10,
+                        "maxLength": 200,
+                        "pattern": "^[\\S\\s]*$",
+                        "contentMediaType": "text/plain"
+                    },
+                    "minItems": 1,
+                    "maxItems": 10,
+                    "uniqueItems": true
+                }
+            },
+            "required": [
+                "communityBenefit",
+                "metrics",
+                "outputs"
+            ]
+        },
+        "capability": {
+            "type": "object",
+            "title": "Capability & Feasibility",
+            "description": "Demonstrate your ability to deliver the project successfully",
+            "x-guidance": "<p>Please describe your existing capabilities that demonstrate how and why you believe you're best suited to deliver this project? Please include the steps or processes that demonstrate that you can be trusted to manage funds properly. </p>",
+            "properties": {
+                "teamExperience": {
+                    "type": "string",
+                    "title": "Team Experience",
+                    "description": "Describe your team's relevant experience and capabilities",
+                    "minLength": 100,
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "feasibilityApproach": {
+                    "type": "string",
+                    "title": "Feasibility Approach",
+                    "description": "How will you validate the feasibility of your approach?",
+                    "minLength": 100,
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "fundManagement": {
+                    "type": "string",
+                    "title": "Fund Management",
+                    "description": "How will you ensure proper management and accountability of funds?",
+                    "minLength": 100,
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                }
+            },
+            "required": [
+                "teamExperience",
+                "feasibilityApproach",
+                "fundManagement"
+            ]
+        }
+    },
+    "required": [
+        "solution",
+        "impact",
+        "capability"
+    ]
+},
+"milestones": {
+    "type": "object",
+    "title": "Project Milestones",
+    "description": "Detailed project milestones and deliverables",
+    "x-guidance": "<p>A clear set of milestones and acceptance criteria will demonstrate your capability to deliver the project as proposed. More guidance on submitting milestones as part of your project proposal can be found here</p><p>For Grant Amounts of up to 75k ada, at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (3 milestones in total)</p><p>For Grant Amounts over 75k ada up to 150k ada, at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (4 milestones in total)</p><p>For Grant Amounts over 150k ada up to 300k ada, at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (5 milestones in total)</p><p>For Grant Amounts exceeding 300k ada, at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (6 milestones in total)</p> ",
+    "properties": {
+        "milestonesConfig": {
+            "type": "object",
+            "title": "Milestones Configuration",
+            "description": "Configuration for number of milestones",
+            "properties": {
+                "grantAmount": {
+                    "type": "number",
+                    "title": "Grant Amount in ADA",
+                    "description": "Total grant amount requested in ADA",
+                    "minimum": 0,
+                    "maximum": 1000000
+                },
+                "numberOfMilestones": {
+                    "type": "integer",
+                    "title": "Number of Milestones",
+                    "description": "Total number of milestones including the final milestone",
+                    "minimum": 2,
+                    "maximum": 6
+                }
+            },
+            "required": [
+                "grantAmount",
+                "numberOfMilestones"
+            ]
+        },
+        "milestonesList": {
+            "type": "array",
+            "title": "List of Milestones",
+            "description": "Detailed description of each project milestone",
+            "items": {
+                "type": "object",
+                "title": "Milestone",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "title": "Milestone Title",
+                        "description": "Short, descriptive title for the milestone",
+                        "minLength": 5,
+                        "maxLength": 100,
+                        "pattern": "^[\\S\\s]*$",
+                        "contentMediaType": "text/plain"
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Milestone Description",
+                        "description": "Detailed description of what this milestone entails",
+                        "minLength": 50,
+                        "maxLength": 1000,
+                        "pattern": "^[\\S\\s]*$",
+                        "contentMediaType": "text/plain"
+                    },
+                    "deliverables": {
+                        "type": "array",
+                        "title": "Deliverables",
+                        "description": "Specific outputs and deliverables for this milestone",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "title": "Deliverable Name",
+                                    "minLength": 5,
+                                    "maxLength": 100,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "title": "Deliverable Description",
+                                    "minLength": 20,
+                                    "maxLength": 500,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "Documentation",
+                                        "Software",
+                                        "Report",
+                                        "Presentation",
+                                        "Video",
+                                        "Other"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "description",
+                                "type"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 5
+                    },
+                    "acceptanceCriteria": {
+                        "type": "array",
+                        "title": "Acceptance Criteria",
+                        "description": "Specific criteria that must be met to consider this milestone complete",
+                        "items": {
+                            "type": "string",
+                            "minLength": 10,
+                            "maxLength": 200,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
+                        },
+                        "minItems": 1,
+                        "maxItems": 5
+                    },
+                    "evidenceOfCompletion": {
+                        "type": "array",
+                        "title": "Evidence of Completion",
+                        "description": "How will you demonstrate that this milestone is complete?",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "title": "Evidence Type",
+                                    "enum": [
+                                        "Code Repository",
+                                        "Documentation",
+                                        "Demo Video",
+                                        "Test Results",
+                                        "Metrics Report",
+                                        "User Feedback",
+                                        "Other"
+                                    ]
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "title": "Evidence Description",
+                                    "minLength": 20,
+                                    "maxLength": 300,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "description"
+                            ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 3
+                    },
+                    "timeline": {
+                        "type": "object",
+                        "title": "Timeline",
+                        "properties": {
+                            "startDate": {
+                                "type": "string",
+                                "title": "Start Date",
+                                "format": "date"
+                            },
+                            "endDate": {
+                                "type": "string",
+                                "title": "End Date",
+                                "format": "date"
+                            },
+                            "durationInWeeks": {
+                                "type": "integer",
+                                "title": "Duration in Weeks",
+                                "minimum": 1,
+                                "maximum": 52
+                            }
+                        },
+                        "required": [
+                            "startDate",
+                            "endDate",
+                            "durationInWeeks"
+                        ]
+                    },
+                    "budget": {
+                        "type": "object",
+                        "title": "Milestone Budget",
+                        "properties": {
+                            "amount": {
+                                "type": "number",
+                                "title": "Amount in ADA",
+                                "minimum": 0
+                            },
+                            "breakdown": {
+                                "type": "array",
+                                "title": "Budget Breakdown",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "category": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Development",
+                                                "Design",
+                                                "Marketing",
+                                                "Operations",
+                                                "Other"
+                                            ]
+                                        },
+                                        "amount": {
+                                            "type": "number",
+                                            "minimum": 0
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "minLength": 10,
+                                            "maxLength": 200,
+                                            "pattern": "^[\\S\\s]*$",
+                                            "contentMediaType": "text/plain"
+                                        }
+                                    },
+                                    "required": [
+                                        "category",
+                                        "amount",
+                                        "description"
+                                    ]
+                                },
+                                "minItems": 1
+                            }
+                        },
+                        "required": [
+                            "amount",
+                            "breakdown"
+                        ]
+                    }
+                },
+                "required": [
+                    "title",
+                    "description",
+                    "deliverables",
+                    "acceptanceCriteria",
+                    "evidenceOfCompletion",
+                    "timeline",
+                    "budget"
+                ]
+            },
+            "minItems": 3,
+            "maxItems": 10
+        }
+    },
+    "required": [
+        "milestonesConfig",
+        "milestonesList"
+    ]
+},
+"finalPitch": {
+    "type": "object",
+    "title": "Final Pitch",
+    "description": "Final project pitch including team, budget, and value proposition",
+    "properties": {
+        "team": {
+            "type": "object",
+            "title": "Team Information",
+            "description": "Details about the project team and their capabilities",
+            "properties": {
+                "members": {
+                    "type": "array",
+                    "title": "Team Members",
+                    "description": "List of team members and their roles",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "title": "Name",
+                                "description": "Full name of the team member",
+                                "minLength": 2,
+                                "maxLength": 100,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            },
+                            "role": {
+                                "type": "string",
+                                "title": "Role",
+                                "description": "Primary role in the project",
+                                "minLength": 5,
+                                "maxLength": 100,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            },
+                            "expertise": {
+                                "type": "array",
+                                "title": "Areas of Expertise",
+                                "items": {
+                                    "type": "string",
+                                    "minLength": 3,
+                                    "maxLength": 50,
+                                    "pattern": "^[\\S\\s]*$",
+                                    "contentMediaType": "text/plain"
+                                },
+                                "minItems": 1,
+                                "maxItems": 5,
+                                "uniqueItems": true
+                            },
+                            "experience": {
+                                "type": "string",
+                                "title": "Relevant Experience",
+                                "description": "Brief description of relevant experience",
+                                "minLength": 50,
+                                "maxLength": 500,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            },
+                            "links": {
+                                "type": "array",
+                                "title": "Professional Links",
+                                "description": "Links to professional profiles or past work",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "LinkedIn",
+                                                "GitHub",
+                                                "Portfolio",
+                                                "Twitter",
+                                                "Website",
+                                                "Other"
+                                            ]
+                                        },
+                                        "url": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "pattern": "^https://",
+                                            "pattern": "^https?://[\\w\\-]+(\\.[\\w\\-]+)+[/#?]?.*$",
+                                            "contentMediaType": "text/uri-list"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "maxLength": 100,
+                                            "pattern": "^[\\S\\s]*$",
+                                            "contentMediaType": "text/plain"
+                                        }
+                                    },
+                                    "required": [
+                                        "type",
+                                        "url"
+                                    ]
+                                },
+                                "maxItems": 5
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "role",
+                            "expertise",
+                            "experience"
+                        ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 10
+                }
+            },
+            "required": [
+                "members"
+            ]
+        },
+        "budget": {
+            "type": "object",
+            "title": "Budget Details",
+            "description": "Detailed budget breakdown and justification",
+            "properties": {
+                "totalBudget": {
+                    "type": "number",
+                    "title": "Total Budget (ADA)",
+                    "description": "Total amount requested in ADA",
+                    "minimum": 0,
+                    "maximum": 1000000
+                },
+                "categories": {
+                    "type": "array",
+                    "title": "Budget Categories",
+                    "description": "Breakdown of budget by category",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "category": {
+                                "type": "string",
+                                "enum": [
+                                    "Development",
+                                    "Design",
+                                    "Marketing",
+                                    "Operations",
+                                    "Research",
+                                    "Community Management",
+                                    "Legal",
+                                    "Other"
+                                ]
+                            },
+                            "amount": {
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "description": {
+                                "type": "string",
+                                "minLength": 20,
+                                "maxLength": 300,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            }
+                        },
+                        "required": [
+                            "category",
+                            "amount",
+                            "description"
+                        ]
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": [
+                "totalBudget",
+                "categories"
+            ]
+        },
+        "valueProposition": {
+            "type": "object",
+            "title": "Value Proposition",
+            "description": "Justification of the project's value for money",
+            "properties": {
+                "costBenefitAnalysis": {
+                    "type": "string",
+                    "title": "Cost-Benefit Analysis",
+                    "description": "Analysis of the project's costs versus its benefits to the Cardano ecosystem",
+                    "minLength": 100,
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "longTermValue": {
+                    "type": "string",
+                    "title": "Long-term Value",
+                    "description": "Description of the long-term value and sustainability of the project",
+                    "minLength": 100,
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "communityBenefits": {
+                    "type": "array",
+                    "title": "Community Benefits",
+                    "description": "Specific benefits to the Cardano community",
+                    "items": {
+                        "type": "string",
+                        "minLength": 20,
+                        "maxLength": 200,
+                        "pattern": "^[\\S\\s]*$",
+                        "contentMediaType": "text/plain"
+                    },
+                    "minItems": 2,
+                    "maxItems": 5
+                }
+            },
+            "required": [
+                "costBenefitAnalysis",
+                "longTermValue",
+                "communityBenefits"
+            ]
+        }
+    },
+    "required": [
+        "team",
+        "budget",
+        "valueProposition"
+    ]
+},
+"mandatoryAcknowledgments": {
+    "type": "object",
+    "title": "Mandatory Acknowledgments",
+    "description": "Required acknowledgments and agreements for proposal submission",
+    "properties": {
+        "fundRules": {
+            "type": "object",
+            "title": "Fund Rules Agreement",
+            "properties": {
+                "acknowledgment": {
+                    "type": "boolean",
+                    "title": "Fund Rules Acknowledgment",
+                    "description": "I confirm that I have read and agree to be bound by the Fund Rules",
+                    "const": true
+                },
+                "version": {
+                    "type": "string",
+                    "title": "Fund Rules Version",
+                    "description": "Version of the Fund Rules being acknowledged",
+                    "pattern": "^F[0-9]{1,3}$",
+                    "examples": [
+                        "F14",
+                        "F15"
+                    ]
+                },
+                "timestamp": {
+                    "type": "string",
+                    "title": "Acknowledgment Timestamp",
+                    "description": "When the rules were acknowledged",
+                    "format": "date-time",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                    "examples": [
+                        "2024-01-20T15:30:00Z"
+                    ]
+                }
+            },
+            "required": [
+                "acknowledgment",
+                "version",
+                "timestamp"
+            ]
+        },
+        "termsAndConditions": {
+            "type": "object",
+            "title": "Terms and Conditions Agreement",
+            "properties": {
+                "acknowledgment": {
+                    "type": "boolean",
+                    "title": "Terms and Conditions Acknowledgment",
+                    "description": "I confirm that I have read and agree to be bound by the Project Catalyst Terms and Conditions",
+                    "const": true
+                },
+                "version": {
+                    "type": "string",
+                    "title": "Terms Version",
+                    "description": "Version of the Terms and Conditions being acknowledged",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                    "examples": [
+                        "1.0.0",
+                        "2.1.3"
+                    ]
+                },
+                "documentUrl": {
+                    "type": "string",
+                    "title": "Terms Document URL",
+                    "description": "URL to the specific version of terms and conditions",
+                    "format": "uri",
+                    "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                    "contentMediaType": "text/html"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "title": "Acknowledgment Timestamp",
+                    "description": "When the terms were acknowledged",
+                    "format": "date-time",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                    "examples": [
+                        "2024-01-20T15:30:00Z"
+                    ]
+                }
+            },
+            "required": [
+                "acknowledgment",
+                "version",
+                "timestamp",
+                "documentUrl"
+            ]
+        },
+        "privacyPolicy": {
+            "type": "object",
+            "title": "Privacy Policy Agreement",
+            "properties": {
+                "acknowledgment": {
+                    "type": "boolean",
+                    "title": "Privacy Policy Acknowledgment",
+                    "description": "I acknowledge and agree that any data I share will be processed in accordance with the Catalyst FCS Privacy Policy",
+                    "const": true
+                },
+                "version": {
+                    "type": "string",
+                    "title": "Privacy Policy Version",
+                    "description": "Version of the Privacy Policy being acknowledged",
+                    "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                    "examples": [
+                        "1.0.0",
+                        "2.1.3"
+                    ]
+                },
+                "documentUrl": {
+                    "type": "string",
+                    "title": "Privacy Policy URL",
+                    "description": "URL to the specific version of privacy policy",
+                    "format": "uri",
+                    "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                    "contentMediaType": "text/html"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "title": "Acknowledgment Timestamp",
+                    "description": "When the privacy policy was acknowledged",
+                    "format": "date-time",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                    "examples": [
+                        "2024-01-20T15:30:00Z"
+                    ]
+                }
+            },
+            "required": [
+                "acknowledgment",
+                "version",
+                "timestamp",
+                "documentUrl"
+            ]
+        },
+        "intellectualProperty": {
+            "type": "object",
+            "title": "Intellectual Property Declaration",
+            "properties": {
+                "acknowledgment": {
+                    "type": "boolean",
+                    "title": "IP Rights Acknowledgment",
+                    "description": "I confirm that I have the necessary rights to all intellectual property included in this proposal",
+                    "const": true
+                },
+                "details": {
+                    "type": "string",
+                    "title": "IP Details",
+                    "description": "Additional details about intellectual property rights (if applicable)",
+                    "maxLength": 1000,
+                    "pattern": "^[\\S\\s]*$",
+                    "contentMediaType": "text/plain"
+                },
+                "attachments": {
+                    "type": "array",
+                    "title": "IP Documentation",
+                    "description": "Supporting documentation for IP rights (if applicable)",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "documentType": {
+                                "type": "string",
+                                "enum": [
+                                    "patent",
+                                    "trademark",
+                                    "copyright",
+                                    "license",
+                                    "other"
+                                ],
+                                "description": "Type of IP documentation"
+                            },
+                            "documentUrl": {
+                                "type": "string",
+                                "format": "uri",
+                                "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                                "contentMediaType": "application/pdf"
+                            },
+                            "description": {
+                                "type": "string",
+                                "maxLength": 500,
+                                "pattern": "^[\\S\\s]*$",
+                                "contentMediaType": "text/plain"
+                            }
+                        },
+                        "required": [
+                            "documentType",
+                            "documentUrl",
+                            "description"
+                        ]
+                    },
+                    "maxItems": 10
+                },
+                "timestamp": {
+                    "type": "string",
+                    "title": "Acknowledgment Timestamp",
+                    "description": "When the IP declaration was made",
+                    "format": "date-time",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                    "examples": [
+                        "2024-01-20T15:30:00Z"
+                    ]
+                }
+            },
+            "required": [
+                "acknowledgment",
+                "timestamp"
+            ]
+        },
+        "compliance": {
+            "type": "object",
+            "title": "Compliance Declaration",
+            "properties": {
+                "legalCompliance": {
+                    "type": "boolean",
+                    "title": "Legal Compliance",
+                    "description": "I confirm that my proposal complies with all applicable laws and regulations",
+                    "const": true
+                },
+                "noConflictOfInterest": {
+                    "type": "boolean",
+                    "title": "No Conflict of Interest",
+                    "description": "I confirm that there are no undisclosed conflicts of interest",
+                    "const": true
+                },
+                "accurateInformation": {
+                    "type": "boolean",
+                    "title": "Information Accuracy",
+                    "description": "I confirm that all information provided is accurate and complete",
+                    "const": true
+                },
+                "jurisdictions": {
+                    "type": "array",
+                    "title": "Applicable Jurisdictions",
+                    "description": "List of jurisdictions where compliance is declared",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}$",
+                        "description": "ISO 3166-1 alpha-2 country code"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
+                "timestamp": {
+                    "type": "string",
+                    "title": "Acknowledgment Timestamp",
+                    "description": "When the compliance declaration was made",
+                    "format": "date-time",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                    "examples": [
+                        "2024-01-20T15:30:00Z"
+                    ]
+                }
+            },
+            "required": [
+                "legalCompliance",
+                "noConflictOfInterest",
+                "accurateInformation",
+                "jurisdictions",
+                "timestamp"
+            ]
+        },
+        "additionalAcknowledgments": {
+            "type": "array",
+            "title": "Additional Acknowledgments",
+            "description": "Any additional acknowledgments required for specific proposal types",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "title": "Acknowledgment Type",
+                        "minLength": 5,
+                        "maxLength": 100,
+                        "pattern": "^[a-zA-Z][a-zA-Z0-9_\\-\\.]*$"
+                    },
+                    "acknowledgment": {
+                        "type": "boolean",
+                        "title": "Acknowledgment",
+                        "const": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "Detailed description of what is being acknowledged",
+                        "minLength": 10,
+                        "maxLength": 500,
+                        "pattern": "^[\\S\\s]*$",
+                        "contentMediaType": "text/plain"
+                    },
+                    "documentUrl": {
+                        "type": "string",
+                        "title": "Reference Document",
+                        "description": "URL to the document being acknowledged",
+                        "format": "uri",
+                        "pattern": "^https://[\\w\\-\\.]+\\.[a-zA-Z]{2,}/.*$",
+                        "contentMediaType": "text/html"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "title": "Acknowledgment Timestamp",
+                        "format": "date-time",
+                        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$",
+                        "examples": [
+                            "2024-01-20T15:30:00Z"
+                        ]
+                    }
+                },
+                "required": [
+                    "type",
+                    "acknowledgment",
+                    "description",
+                    "timestamp"
+                ]
+            }
+        }
+    },
+    "required": [
+        "fundRules",
+        "termsAndConditions",
+        "privacyPolicy",
+        "intellectualProperty",
+        "compliance"
+    ]
+}
+}
+}
+    "impact": {
+        "type": "object",
+        "title": "Project Impact",
+        "description": "Describe the expected impact of your project",
+        "properties": {
+            "timeframe": {
+                "type": "string",
+                "enum": [
+                    "Short-term (0-6 months)",
+                    "Medium-term (6-18 months)",
+                    "Long-term (18+ months)"
+                ],
+                "title": "Impact Timeframe",
+                "description": "Expected timeframe to see meaningful impact"
+            },
+            "scale": {
+                "type": "string",
+                "enum": [
+                    "Local",
+                    "Regional",
+                    "Global"
+                ],
+                "title": "Impact Scale",
+                "description": "Geographic scale of impact"
+            },
+            "metrics": {
+                "type": "array",
+                "title": "Impact Metrics",
+                "description": "Key metrics to measure project success",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "metric": {
+                            "type": "string",
+                            "title": "Metric Name",
+                            "description": "Name of the metric",
+                            "maxLength": 100,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
+                        },
+                        "target": {
+                            "type": "string",
+                            "title": "Target Value",
+                            "description": "Target value or goal for this metric",
+                            "maxLength": 100,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
+                        },
+                        "measurement": {
+                            "type": "string",
+                            "title": "Measurement Method",
+                            "description": "How this metric will be measured",
+                            "maxLength": 200,
+                            "pattern": "^[\\S\\s]*$",
+                            "contentMediaType": "text/plain"
+                        }
+                    },
+                    "required": [
+                        "metric",
+                        "target",
+                        "measurement"
+                    ]
+                },
+                "minItems": 1,
+                "maxItems": 5
+            }
+        },
+        "required": [
+            "timeframe",
+            "scale",
+            "metrics"
+        ]
+    }
+},
+"required": [
+    "primaryCategory",
+    "subCategory",
+    "tags",
+    "impact"
+]
+},

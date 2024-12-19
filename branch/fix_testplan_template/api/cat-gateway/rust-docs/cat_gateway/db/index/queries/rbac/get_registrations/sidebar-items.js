@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_REGISTRATIONS_BY_CHAIN_ROOT_CQL"],"mod":["result"],"struct":["GetRegistrationsByChainRootQuery","GetRegistrationsByChainRootQueryParams"]};

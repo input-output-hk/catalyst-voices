@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FILTERED_SELECT_SIGNED_DOCS_TEMPLATE","INSERT_SIGNED_DOCS","SELECT_SIGNED_DOCS_TEMPLATE"],"fn":["filtered_select_signed_docs","insert_signed_docs","select_signed_docs"],"mod":["full_signed_doc","query_filter","signed_doc_body"]};

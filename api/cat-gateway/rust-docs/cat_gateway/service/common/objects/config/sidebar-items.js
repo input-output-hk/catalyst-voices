@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["frontend_config"],"struct":["ConfigBadRequest"]};
