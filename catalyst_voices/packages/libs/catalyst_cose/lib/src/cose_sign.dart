@@ -68,6 +68,15 @@ final class CoseSign extends Equatable {
     required Uint8List payload,
     required List<CatalystCoseSigner> signers,
   }) async {
+    final algTheSame = signers.map((e) => e.alg).toSet().length == 1;
+    if (algTheSame) {
+      // if alg is the same put it on
+      // top-level headers as the default one
+      protectedHeaders = protectedHeaders.copyWith(
+        alg: () => signers.first.alg,
+      );
+    }
+
     final signatures = <CoseSignature>[];
     for (final signer in signers) {
       final signatureProtectedHeaders = CoseHeaders.protected(
