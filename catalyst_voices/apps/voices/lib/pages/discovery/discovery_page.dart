@@ -467,8 +467,10 @@ class _EmptyProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EmptyState(
-      description: context.l10n.discoverySpaceEmptyProposals,
+    return Center(
+      child: EmptyState(
+        description: context.l10n.discoverySpaceEmptyProposals,
+      ),
     );
   }
 }

@@ -52,7 +52,7 @@ class VoicesIndicator extends StatelessWidget {
             size: 20,
           ),
           const SizedBox(width: 10),
-          Expanded(
+          Flexible(
             child: DefaultTextStyle.merge(
               style: (theme.textTheme.titleSmall ?? const TextStyle()).copyWith(
                 height: 1,

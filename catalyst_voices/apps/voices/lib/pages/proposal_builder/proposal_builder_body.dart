@@ -1,14 +1,14 @@
-import 'package:catalyst_voices/pages/workspace/workspace_rich_text_step.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_rich_text_step.dart';
 import 'package:catalyst_voices/widgets/navigation/sections_list_view.dart';
 import 'package:catalyst_voices/widgets/navigation/sections_list_view_builder.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class WorkspaceBody extends StatelessWidget {
+class ProposalBuilderBody extends StatelessWidget {
   final ItemScrollController itemScrollController;
 
-  const WorkspaceBody({
+  const ProposalBuilderBody({
     super.key,
     required this.itemScrollController,
   });
@@ -23,7 +23,7 @@ class WorkspaceBody extends StatelessWidget {
           stepBuilder: (context, step) {
             switch (step) {
               case RichTextStep():
-                return WorkspaceRichTextStep(step: step);
+                return ProposalBuilderRichTextStep(step: step);
             }
           },
         );
