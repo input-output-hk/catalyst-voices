@@ -10,6 +10,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 final class Dependencies extends DependencyProvider {
   static final Dependencies instance = Dependencies._();
 
+  bool _isInitialized = false;
+
   Dependencies._();
 
   Future<void> init() async {
@@ -17,6 +19,17 @@ final class Dependencies extends DependencyProvider {
     _registerServices();
     _registerRepositories();
     _registerBlocsWithDependencies();
+
+    _isInitialized = true;
+  }
+
+  bool get isInitialized => _isInitialized;
+
+  @override
+  Future<void> get reset {
+    return super.reset.whenComplete(() {
+      _isInitialized = false;
+    });
   }
 
   void _registerBlocsWithDependencies() {

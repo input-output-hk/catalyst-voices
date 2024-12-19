@@ -8,6 +8,8 @@ export enum BrowserExtensionName {
   Lace = "Lace",
   Typhon = "Typhon",
   Eternl = "Eternl",
+  Yoroi = "Yoroi",
+  Nufi = "Nufi",
 }
 /* cspell: disable */
 export const browserExtensions: BrowserExtension[] = [
@@ -25,6 +27,16 @@ export const browserExtensions: BrowserExtension[] = [
     Name: BrowserExtensionName.Eternl,
     Id: "kmhcihpebfmpgmihbkipmjlmmioameka",
     HomeUrl: "index.html#/app/preprod/welcome",
+  },
+  {
+    Name: BrowserExtensionName.Yoroi,
+    Id: "poonlenmfdfbjfeeballhiibknlknepo",
+    HomeUrl: "main_window.html#",
+  },
+  {
+    Name: BrowserExtensionName.Nufi,
+    Id: "hbklpdnlgiadjhdadfnfmemmklbopbcm",
+    HomeUrl: "/index.html#",
   },
 ];
 /* cspell: enable */
