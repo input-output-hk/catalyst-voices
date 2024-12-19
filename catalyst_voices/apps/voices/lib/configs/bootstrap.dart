@@ -74,6 +74,7 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   await _runApp(app);
 }
 
+@visibleForTesting
 GoRouter buildAppRouter({
   String? initialLocation,
 }) {
@@ -83,6 +84,18 @@ GoRouter buildAppRouter({
       MilestoneGuard(),
     ],
   );
+}
+
+@visibleForTesting
+Future<void> restartDependencies() async {
+  await Dependencies.instance.reset;
+}
+
+@visibleForTesting
+Future<void> registerDependencies() async {
+  if (!Dependencies.instance.isInitialized) {
+    await Dependencies.instance.init();
+  }
 }
 
 /// Initializes the application before it can be run. Should setup all
@@ -102,7 +115,7 @@ Future<BootstrapArgs> bootstrap({
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
-  await Dependencies.instance.init();
+  await registerDependencies();
 
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();
