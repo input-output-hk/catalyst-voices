@@ -1,10 +1,12 @@
 //! Signed docs queries
 
+mod full_signed_doc;
+mod signed_doc_body;
 #[cfg(test)]
 mod tests;
-mod types;
 
-pub(crate) use types::{FullSignedDoc, SignedDocBody};
+pub(crate) use full_signed_doc::FullSignedDoc;
+pub(crate) use signed_doc_body::SignedDocBody;
 
 use super::{common::query_limits::QueryLimits, EventDB, NotFoundError};
 use crate::jinja::{get_template, JinjaTemplateSource};
@@ -49,7 +51,7 @@ pub(crate) async fn insert_signed_docs(doc: &FullSignedDoc) -> anyhow::Result<()
         Err(err) => return Err(err),
     }
 
-    EventDB::modify(INSERT_SIGNED_DOCS, &doc.db_fields()).await?;
+    EventDB::modify(INSERT_SIGNED_DOCS, &doc.postgres_db_fields()).await?;
     Ok(())
 }
 
