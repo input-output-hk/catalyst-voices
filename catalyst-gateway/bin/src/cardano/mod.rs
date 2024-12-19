@@ -449,19 +449,7 @@ impl SyncTask {
                 },
             }
 
-            // TODO: IF there is only 1 chain follower left in sync_tasks, then all
-            // immutable followers have finished.
-            // When this happens we need to purge the live index of any records that
-            // exist before the current immutable tip.
-            // Note: to prevent a data race when multiple nodes are syncing, we
-            // probably want to put a gap in this, so that there are X
-            // slots of overlap between the live chain and immutable
-            // chain.  This gap should be a parameter.
-
-            // WIP: How do we check that only one follower is left, and that the slot buffer
-            // (overlap) criteria is met?
-            let only_one_chain_follower_left = false;
-            if only_one_chain_follower_left {
+            if self.sync_tasks.len() == 1 {
                 if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 }

@@ -10,7 +10,6 @@ use crate::{
 };
 
 /// Purge Data from Live Index
-#[allow(unused_variables)]
 pub(crate) async fn purge_live_index(purge_slot: u64) -> anyhow::Result<()> {
     let persistent = false; // get volatile session
     let Some(session) = CassandraSession::get(persistent) else {
