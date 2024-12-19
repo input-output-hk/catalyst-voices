@@ -77,6 +77,13 @@ fuzzer-api:
 
 test-fuzzer-api:
     FROM debian:12.7-slim
+    ENV LOG_LEVEL=error
+    ENV DATA_REFRESH_TICK=5
+    ENV CHECK_CONFIG_TICK=5
+    ENV MACHINE_ID="UID"
+    ENV CHAIN_FOLLOWER_SYNC_TASKS="16"
+    ENV RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+    ENV CHAIN_NETWORK="Preprod"
 
     RUN apt-get update && apt install -y gnupg2 wget
     RUN mkdir -p /etc/apt/keyrings
@@ -87,4 +94,5 @@ test-fuzzer-api:
     COPY node1-scylla.yaml /etc/scylla/scylla.yaml
     #RUN scylla_setup -y
     #https://github.com/scylladb/scylladb/issues/3142
-    RUN scylla --options-file /etc/scylla/scylla.yaml --developer-mode 1
+    COPY ../../+build/cat-gateway .
+    RUN ( scylla --options-file /etc/scylla/scylla.yaml --developer-mode 1 & ) && ./cat-gateway run
