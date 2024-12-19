@@ -1,4 +1,4 @@
--- Index of Chain Root For TX ID. RBAC 509 registrations. 
+-- Index of Chain Root For TX ID (RBAC 509 registrations).
 CREATE TABLE IF NOT EXISTS chain_root_for_txn_id (
     -- Primary Key Data
     transaction_id      blob,   -- 32 Bytes of Transaction Hash.
