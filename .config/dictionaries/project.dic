@@ -75,6 +75,7 @@ delegators
 devnet
 DIND
 dockerhub
+domcontentloaded
 Dominik
 dotenv
 dotenvy
@@ -189,6 +190,7 @@ netifas
 netkey
 nextest
 Nodetool
+NuFi
 oapi
 OCSP
 Oleksandr

@@ -1,6 +1,5 @@
-import { Locator, Page } from '@playwright/test';
-import { BrowserExtensionName } from '../utils/extensions';
-
+import { Page } from "@playwright/test";
+import { BrowserExtensionName } from "../utils/extensions";
 
 export class WalletListPage {
   readonly page: Page;
@@ -9,10 +8,15 @@ export class WalletListPage {
     this.page = page;
   }
   async clickEnableWallet(walletName: BrowserExtensionName): Promise<void> {
-    const enableButton = (walletName: BrowserExtensionName) => this.page.locator(
-      `flt-semantics:has(flt-semantics-img[aria-label*="Name: ${walletName.toLowerCase()}"]) ` +
-      `flt-semantics[role="button"]:has-text("Enable wallet")`
-    );
-    await enableButton(walletName).click();
+    if (walletName === BrowserExtensionName.Nufi) {
+      const [walletPopup] = await Promise.all([
+        this.page.context().waitForEvent("page"),
+        await this.page.locator('//*[text()="Enable wallet"]').first().click(),
+      ]);
+      await walletPopup.locator("button:has-text('Connect')").click();
+    } else {
+      await this.page.locator('//*[text()="Enable wallet"]').first().click();
+    }
+    await this.page.waitForTimeout(2000);
   }
 }
