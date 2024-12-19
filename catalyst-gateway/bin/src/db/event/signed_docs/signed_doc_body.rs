@@ -14,3 +14,21 @@ pub(crate) struct SignedDocBody {
     /// `signed_doc` table `metadata` field
     pub(crate) metadata: Option<serde_json::Value>,
 }
+
+impl SignedDocBody {
+    /// Creates a  `SignedDocBody` from postgresql row object.
+    pub(crate) fn from_row(row: &tokio_postgres::Row) -> anyhow::Result<Self> {
+        let id = row.try_get("id")?;
+        let ver = row.try_get("ver")?;
+        let doc_type = row.try_get("type")?;
+        let author = row.try_get("author")?;
+        let metadata = row.try_get("metadata")?;
+        Ok(Self {
+            id,
+            ver,
+            doc_type,
+            author,
+            metadata,
+        })
+    }
+}

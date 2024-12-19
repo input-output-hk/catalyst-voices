@@ -82,31 +82,9 @@ pub(crate) async fn select_signed_docs(
         "id": id,
         "ver": ver,
     }))?;
-    let res = EventDB::query_one(&query, &[]).await?;
+    let row = EventDB::query_one(&query, &[]).await?;
 
-    let ver = if let Some(ver) = ver {
-        *ver
-    } else {
-        res.try_get("ver")?
-    };
-
-    let doc_type = res.try_get("type")?;
-    let author = res.try_get("author")?;
-    let metadata = res.try_get("metadata")?;
-    let payload = res.try_get("payload")?;
-    let raw = res.try_get("raw")?;
-
-    Ok(FullSignedDoc {
-        body: SignedDocBody {
-            id: *id,
-            ver,
-            doc_type,
-            author,
-            metadata,
-        },
-        payload,
-        raw,
-    })
+    FullSignedDoc::from_row(id, ver, &row)
 }
 
 /// A `select_signed_docs` query filtering argument.
@@ -153,21 +131,8 @@ pub(crate) async fn filtered_select_signed_docs(
     let rows = EventDB::query(&query, &[]).await?;
 
     let docs = rows
-        .into_iter()
-        .map(|row| {
-            let id = row.try_get("id")?;
-            let ver = row.try_get("ver")?;
-            let doc_type = row.try_get("type")?;
-            let author = row.try_get("author")?;
-            let metadata = row.try_get("metadata")?;
-            Ok(SignedDocBody {
-                id,
-                ver,
-                doc_type,
-                author,
-                metadata,
-            })
-        })
+        .iter()
+        .map(SignedDocBody::from_row)
         .collect::<anyhow::Result<_>>()?;
 
     Ok(docs)
