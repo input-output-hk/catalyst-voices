@@ -63,7 +63,7 @@ final class CoseValues {
   static const eddsaAlg = -8;
 
   /// The json content type value.
-  static const jsonContentType = 30;
+  static const jsonContentType = 50;
 
   /// The brotli compression content encoding.
   static const brotliContentEncoding = 'br';
