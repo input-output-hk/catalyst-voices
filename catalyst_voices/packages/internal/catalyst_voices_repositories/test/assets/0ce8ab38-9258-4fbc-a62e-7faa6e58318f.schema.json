@@ -186,6 +186,24 @@
             "title": "proposal setup",
             "description": "Proposal title",
             "properties": {
+                "title": {
+                    "$ref": "#/definitions/section",
+                    "title": "proposal setup",
+                    "description": "Proposal title",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/singleLineTextEntry",
+                            "title": "Proposal Title",
+                            "description": "<p><b>Proposal title</b></p><p>Please note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app. </p>",
+                            "minLength": 1,
+                            "maxLength": 60,
+                            "x-guidance": "<p>The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important.</p>"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ]
+                },
                 "proposer": {
                     "$ref": "#/definitions/section",
                     "properties": {
@@ -226,24 +244,6 @@
                         "applicant",
                         "type",
                         "coproposers"
-                    ]
-                },
-                "title": {
-                    "$ref": "#/definitions/section",
-                    "title": "proposal setup",
-                    "description": "Proposal title",
-                    "properties": {
-                        "title": {
-                            "$ref": "#/definitions/singleLineTextEntry",
-                            "title": "Proposal Title",
-                            "description": "<p><b>Proposal title</b></p><p>Please note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app. </p>",
-                            "minLength": 1,
-                            "maxLength": 60,
-                            "x-guidance": "<p>The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important.</p>"
-                        }
-                    },
-                    "required": [
-                        "title"
                     ]
                 }
             },
@@ -841,8 +841,7 @@
                         "solution": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "minLength": 1,
-                            "maxLength": 10240,
-                            "x-guidance": "Our solution involves developing a decentralized education platform that will..."
+                            "maxLength": 10240
                         }
                     }
                 },

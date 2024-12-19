@@ -67,16 +67,16 @@ enum DefinitionsFormat {
 }
 
 enum DefinitionsType {
-  section,
   segment,
+  section,
   singleLineTextEntry,
-  singleLineHttpsURLEntry,
   multiLineTextEntry,
   multiLineTextEntryMarkdown,
   dropDownSingleSelect,
   multiSelect,
   singleLineTextEntryList,
   multiLineTextEntryListMarkdown,
+  singleLineHttpsURLEntry,
   singleLineHttpsURLEntryList,
   nestedQuestionsList,
   nestedQuestions,
@@ -107,7 +107,7 @@ enum DefinitionsType {
         durationInMonths => DurationInMonthsDefinition,
         singleLineHttpsURLEntry => SingleLineHttpsURLEntryDefinition,
         multiLineTextEntry => MultiLineTextEntryDefinition,
-        multiLineTextEntryMarkdown => MultiLineTextEntryListMarkdownDefinition,
+        multiLineTextEntryMarkdown => MultiLineTextEntryMarkdownDefinition,
         dropDownSingleSelect => DropDownSingleSelectDefinition,
         multiSelect => MultiSelectDefinition,
         singleLineTextEntryList => SingleLineTextEntryListDefinition,

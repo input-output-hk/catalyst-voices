@@ -16,6 +16,7 @@ export 'proposal/proposal.dart';
 export 'proposal/proposal_section.dart';
 export 'proposal/proposal_template.dart';
 export 'proposal_schema/definitions.dart';
+export 'proposal_schema/proposal_builder.dart';
 export 'proposal_schema/schema.dart';
 export 'registration/registration.dart';
 export 'seed_phrase.dart';

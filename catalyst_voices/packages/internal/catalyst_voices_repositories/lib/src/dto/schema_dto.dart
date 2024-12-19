@@ -57,15 +57,13 @@ class SchemaDto extends Equatable {
     orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
     final sortedProperties = List<SchemaSegmentDto>.from(this.segments)..sort();
     final segments = sortedProperties
-        .where((e) => e.id.contains('segment'))
+        .where((e) => e.ref.contains('segment'))
         .map((e) => e.toModel(definitions.definitions))
         .toList();
     return Schema(
       schema: schema,
       title: title,
       description: description,
-      type: DefinitionsObjectType.fromString(type),
-      additionalProperties: false,
       segments: segments,
       order: order,
       propertiesSchema: propertiesSchema,
@@ -202,7 +200,6 @@ class SchemaSectionDto extends Equatable
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
-  final Map<String, dynamic> dependencies; // Return to this
   @JsonKey(name: 'if')
   final Map<String, dynamic> ifs;
   final Map<String, dynamic> then; // Return to this
@@ -219,7 +216,6 @@ class SchemaSectionDto extends Equatable
     required this.elements,
     this.required = const <String>[],
     this.order = const <String>[],
-    this.dependencies = const <String, dynamic>{},
     this.ifs = const <String, dynamic>{},
     this.then = const <String, dynamic>{},
     this.openSource = const <String, dynamic>{},
@@ -259,7 +255,6 @@ class SchemaSectionDto extends Equatable
         elements,
         required,
         order,
-        dependencies,
         ifs,
         then,
       ];

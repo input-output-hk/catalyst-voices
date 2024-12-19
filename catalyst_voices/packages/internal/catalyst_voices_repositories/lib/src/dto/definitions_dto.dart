@@ -68,6 +68,7 @@ class DefinitionsDto {
         multiSelect.toModel(),
         singleLineTextEntryList.toModel(),
         multiLineTextEntryListMarkdown.toModel(),
+        singleLineHttpsURLEntry.toModel(),
         singleLineHttpsURLEntryList.toModel(),
         nestedQuestionsList.toModel(),
         nestedQuestions.toModel(),

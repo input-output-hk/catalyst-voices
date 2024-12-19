@@ -4,8 +4,6 @@ class Schema {
   final String schema;
   final String title;
   final String description;
-  final DefinitionsObjectType type;
-  final bool additionalProperties;
   final List<SchemaSegment> segments;
   final List<String> order;
   final String propertiesSchema;
@@ -14,8 +12,6 @@ class Schema {
     required this.schema,
     required this.title,
     required this.description,
-    required this.type,
-    required this.additionalProperties,
     required this.segments,
     required this.order,
     required this.propertiesSchema,
