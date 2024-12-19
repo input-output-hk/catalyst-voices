@@ -2,11 +2,11 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-sealed class ProposalEditorEvent extends Equatable {
-  const ProposalEditorEvent();
+sealed class ProposalBuilderEvent extends Equatable {
+  const ProposalBuilderEvent();
 }
 
-final class LoadProposalEvent extends ProposalEditorEvent {
+final class LoadProposalEvent extends ProposalBuilderEvent {
   final String id;
 
   const LoadProposalEvent({
@@ -17,7 +17,7 @@ final class LoadProposalEvent extends ProposalEditorEvent {
   List<Object?> get props => [id];
 }
 
-final class UpdateStepAnswerEvent extends ProposalEditorEvent {
+final class UpdateStepAnswerEvent extends ProposalBuilderEvent {
   final SectionStepId id;
   final MarkdownData? data;
 
@@ -30,7 +30,7 @@ final class UpdateStepAnswerEvent extends ProposalEditorEvent {
   List<Object?> get props => [id, data];
 }
 
-final class ActiveStepChangedEvent extends ProposalEditorEvent {
+final class ActiveStepChangedEvent extends ProposalBuilderEvent {
   final SectionStepId? id;
 
   const ActiveStepChangedEvent(this.id);

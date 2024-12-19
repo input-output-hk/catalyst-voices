@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/workspace/editor/guidance_view.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_guidance_view.dart';
 import 'package:catalyst_voices/widgets/cards/comment_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -7,8 +7,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProposalEditorSetupPanel extends StatelessWidget {
-  const ProposalEditorSetupPanel({super.key});
+class ProposalBuilderSetupPanel extends StatelessWidget {
+  const ProposalBuilderSetupPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class _GuidanceSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalEditorBloc, ProposalEditorState,
+    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
         ProposalGuidance>(
       selector: (state) => state.guidance,
       builder: (context, state) {
@@ -55,7 +55,7 @@ class _GuidanceSelector extends StatelessWidget {
         } else if (state.showEmptyState) {
           return Text(context.l10n.noGuidanceForThisSection);
         } else {
-          return GuidanceView(state.guidances);
+          return ProposalBuilderGuidanceView(state.guidances);
         }
       },
     );

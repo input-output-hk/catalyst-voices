@@ -2,20 +2,20 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class ProposalEditorState extends Equatable {
+final class ProposalBuilderState extends Equatable {
   final List<Section> sections;
   final ProposalGuidance guidance;
 
-  const ProposalEditorState({
+  const ProposalBuilderState({
     this.sections = const [],
     this.guidance = const ProposalGuidance(),
   });
 
-  ProposalEditorState copyWith({
+  ProposalBuilderState copyWith({
     List<Section>? sections,
     ProposalGuidance? guidance,
   }) {
-    return ProposalEditorState(
+    return ProposalBuilderState(
       sections: sections ?? this.sections,
       guidance: guidance ?? this.guidance,
     );

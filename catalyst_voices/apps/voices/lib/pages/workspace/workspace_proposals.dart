@@ -20,7 +20,7 @@ class WorkspaceProposals extends StatelessWidget {
                 key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
                 item: item,
                 onTap: () {
-                  ProposalEditorRoute(proposalId: item.id).go(context);
+                  ProposalBuilderRoute(proposalId: item.id).go(context);
                 },
               );
             },

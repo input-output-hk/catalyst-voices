@@ -1,12 +1,12 @@
-import 'package:catalyst_voices_blocs/src/workspace/editor/proposal_editor_event.dart';
-import 'package:catalyst_voices_blocs/src/workspace/editor/proposal_editor_state.dart';
+import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
+import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-final class ProposalEditorBloc
-    extends Bloc<ProposalEditorEvent, ProposalEditorState> {
+final class ProposalBuilderBloc
+    extends Bloc<ProposalBuilderEvent, ProposalBuilderState> {
   final CampaignService _campaignService;
 
   final _answers = <SectionStepId, MarkdownData>{};
@@ -15,9 +15,9 @@ final class ProposalEditorBloc
   String? proposalId;
   SectionStepId? _activeStepId;
 
-  ProposalEditorBloc(
+  ProposalBuilderBloc(
     this._campaignService,
-  ) : super(const ProposalEditorState()) {
+  ) : super(const ProposalBuilderState()) {
     on<LoadProposalEvent>(_loadProposal);
     on<UpdateStepAnswerEvent>(_updateStepAnswer);
     on<ActiveStepChangedEvent>(_handleActiveStepEvent);
@@ -25,7 +25,7 @@ final class ProposalEditorBloc
 
   Future<void> _loadProposal(
     LoadProposalEvent event,
-    Emitter<ProposalEditorState> emit,
+    Emitter<ProposalBuilderState> emit,
   ) async {
     _answers.clear();
     _guidances.clear();
@@ -69,7 +69,7 @@ final class ProposalEditorBloc
 
   void _updateStepAnswer(
     UpdateStepAnswerEvent event,
-    Emitter<ProposalEditorState> emit,
+    Emitter<ProposalBuilderState> emit,
   ) {
     final answer = event.data;
     if (answer != null) {
@@ -81,7 +81,7 @@ final class ProposalEditorBloc
 
   void _handleActiveStepEvent(
     ActiveStepChangedEvent event,
-    Emitter<ProposalEditorState> emit,
+    Emitter<ProposalBuilderState> emit,
   ) {
     _activeStepId = event.id;
 

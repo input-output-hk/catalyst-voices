@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/workspace/editor/proposal_body.dart';
-import 'package:catalyst_voices/pages/workspace/editor/proposal_editor_navigation_panel.dart';
-import 'package:catalyst_voices/pages/workspace/editor/proposal_editor_setup_panel.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_body.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
 import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -12,19 +12,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class ProposalEditorPage extends StatefulWidget {
+class ProposalBuilderPage extends StatefulWidget {
   final String proposalId;
 
-  const ProposalEditorPage({
+  const ProposalBuilderPage({
     super.key,
     required this.proposalId,
   });
 
   @override
-  State<ProposalEditorPage> createState() => _ProposalEditorPageState();
+  State<ProposalBuilderPage> createState() => _ProposalBuilderPageState();
 }
 
-class _ProposalEditorPageState extends State<ProposalEditorPage> {
+class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
   late final SectionsController _sectionsController;
   late final ItemScrollController _bodyItemScrollController;
 
@@ -35,7 +35,7 @@ class _ProposalEditorPageState extends State<ProposalEditorPage> {
   void initState() {
     super.initState();
 
-    final bloc = context.read<ProposalEditorBloc>();
+    final bloc = context.read<ProposalBuilderBloc>();
 
     _sectionsController = SectionsController();
     _bodyItemScrollController = ItemScrollController();
@@ -53,12 +53,12 @@ class _ProposalEditorPageState extends State<ProposalEditorPage> {
   }
 
   @override
-  void didUpdateWidget(covariant ProposalEditorPage oldWidget) {
+  void didUpdateWidget(covariant ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId) {
       final event = LoadProposalEvent(id: widget.proposalId);
-      context.read<ProposalEditorBloc>().add(event);
+      context.read<ProposalBuilderBloc>().add(event);
     }
   }
 
@@ -76,11 +76,11 @@ class _ProposalEditorPageState extends State<ProposalEditorPage> {
     return SectionsControllerScope(
       controller: _sectionsController,
       child: SpaceScaffold(
-        left: const ProposalEditorNavigationPanel(),
-        body: ProposalBody(
+        left: const ProposalBuilderNavigationPanel(),
+        body: ProposalBuilderBody(
           itemScrollController: _bodyItemScrollController,
         ),
-        right: const ProposalEditorSetupPanel(),
+        right: const ProposalBuilderSetupPanel(),
       ),
     );
   }
@@ -102,7 +102,7 @@ class _ProposalEditorPageState extends State<ProposalEditorPage> {
       _activeStepId = activeStepId;
 
       final event = ActiveStepChangedEvent(activeStepId);
-      context.read<ProposalEditorBloc>().add(event);
+      context.read<ProposalBuilderBloc>().add(event);
     }
   }
 }

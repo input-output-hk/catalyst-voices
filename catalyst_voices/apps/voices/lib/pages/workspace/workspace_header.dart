@@ -125,7 +125,7 @@ class _DraftProposalButton extends StatelessWidget {
         final id = await context.read<WorkspaceBloc>().createNewDraftProposal();
 
         if (context.mounted) {
-          ProposalEditorRoute(proposalId: id).go(context);
+          ProposalBuilderRoute(proposalId: id).go(context);
         }
       },
       leading: VoicesAssets.icons.plus.buildIcon(),

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/funded_projects/funded_projects_page.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder.dart';
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
 import 'package:catalyst_voices/pages/voting/voting_page.dart';
@@ -22,7 +23,7 @@ const _prefix = Routes.currentMilestone;
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(path: '/$_prefix/discovery'),
     TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
-    TypedGoRoute<ProposalEditorRoute>(path: '/$_prefix/workspace/:proposalId'),
+    TypedGoRoute<ProposalBuilderRoute>(path: '/$_prefix/workspace/:proposalId'),
     TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
     TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
     TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
@@ -89,11 +90,11 @@ final class WorkspaceRoute extends GoRouteData
   }
 }
 
-final class ProposalEditorRoute extends GoRouteData
+final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
 
-  const ProposalEditorRoute({
+  const ProposalBuilderRoute({
     required this.proposalId,
   });
 
@@ -105,7 +106,7 @@ final class ProposalEditorRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalEditorPage(proposalId: proposalId);
+    return ProposalBuilderPage(proposalId: proposalId);
   }
 }
 
