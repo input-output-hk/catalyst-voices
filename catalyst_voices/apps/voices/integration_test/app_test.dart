@@ -17,12 +17,19 @@ void main() async {
   late final GoRouter router;
 
   setUpAll(() async {
-    router = buildAppRouter(initialLocation: const DiscoveryRoute().location);
+    router = buildAppRouter();
     await bootstrap(router: router);
   });
 
-  // needs to be skipped as once clicking on user type shortcut button, clicking on other user
-  // type does not work and you are stuck with first shortcut clicked app state
+  setUp(() async {
+    await registerDependencies();
+    router.go(const DiscoveryRoute().location);
+  });
+
+  tearDown(() async {
+    await restartDependencies();
+  });
+
   patrolWidgetTest(
     'Spaces drawer - visitor - no drawer button',
     (PatrolTester $) async {
@@ -31,7 +38,6 @@ void main() async {
           .tap(settleTimeout: const Duration(seconds: 10));
       expect($(AppBarPage.spacesDrawerButton).exists, false);
     },
-    // skip: true,
   );
 
   patrolWidgetTest(
@@ -41,7 +47,7 @@ void main() async {
       await $(DiscoveryPage.guestShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
-      SpacesDrawerPage.looksAsExpected($);
+      SpacesDrawerPage.guestLooksAsExpected($);
 
       // iterate thru spaces by clicking on spaces icons directly
       for (final space in Space.values) {
@@ -57,10 +63,7 @@ void main() async {
         expect($(children), findsAtLeast(1));
       }
       SelectorUtils.isDisabled($, $(SpacesDrawerPage.chooserNextBtn));
-
-      await $(SpacesDrawerPage.chooserItem(Space.discovery)).tap();
     },
-    // skip: true,
   );
 
   patrolWidgetTest(
@@ -70,7 +73,7 @@ void main() async {
       await $(DiscoveryPage.guestShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
-      SpacesDrawerPage.looksAsExpected($);
+      SpacesDrawerPage.guestLooksAsExpected($);
 
       // iterate thru spaces by clicking next
       for (var i = 0; i < Space.values.length; i++) {
@@ -95,9 +98,6 @@ void main() async {
         SelectorUtils.isEnabled($, $(SpacesDrawerPage.chooserNextBtn));
       }
       SelectorUtils.isDisabled($, $(SpacesDrawerPage.chooserPrevBtn));
-
-      await $(SpacesDrawerPage.chooserItem(Space.discovery)).tap();
     },
-    skip: true,
   );
 }

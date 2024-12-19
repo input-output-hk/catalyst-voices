@@ -23,7 +23,7 @@ class SpacesDrawerPage {
     return Key('DrawerChooser${space}AvatarKey');
   }
 
-  static void looksAsExpected(PatrolTester $) {
+  static void guestLooksAsExpected(PatrolTester $) {
     expect($(closeBtn), findsOneWidget);
     expect($(allSpacesBtn), findsOneWidget);
     expect($(chooserPrevBtn), findsOneWidget);
