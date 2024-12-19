@@ -21,6 +21,14 @@ services:
       timeout: 5s
       retries: 10
 
+# it is a helper service to wait until the event-db will be ready
+# mainly its a trick for Earthly how to wait until service will be fully functional
+  event-db-is-running:
+    image: alpine:3.20.3
+    depends_on:
+      event-db:
+        condition: service_healthy
+
   cat-gateway:
     image: cat-gateway:latest
     environment:

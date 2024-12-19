@@ -128,7 +128,7 @@ check-builder-src-cache:
 test-postgres:
     FROM +builder-src
 
-    COPY ./tests/docker/docker-compose.postgres.yml ./docker-compose.yml
+    COPY docker-compose.yml .
 
     ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
@@ -144,12 +144,18 @@ test-postgres:
 test-scylla:
     FROM +builder-src
 
-    COPY ./tests/docker/docker-compose.scylla.yml ./docker-compose.yml
+    # setup scylla
+    RUN curl -sSL https://repo.scylladb.com/scylla/repo.asc | apt-key add - && \
+        echo "deb [arch=$(dpkg --print-architecture)] https://repo.scylladb.com/deb/scylla/${SCYLLA_VERSION} $(lsb_release -c | awk '{print $2}') main" | tee /etc/apt/sources.list.d/scylla.list
 
-    WITH DOCKER \
-        --compose "./docker-compose.yml" \
-        --pull alpine:3.20.3 \
-        --service scylla-node
-        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-            cargo nextest run --release --run-ignored=only scylla_session
-    END
+    RUN apt-get update && \
+        apt-get install -y scylla
+    
+    ENV HOST_IP
+    RUN export HOST_IP="$(ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}')"
+
+    RUN scylla --seeds=scylla-node --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+
+    # run the test
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        cargo nextest run --release --run-ignored=only scylla_session
