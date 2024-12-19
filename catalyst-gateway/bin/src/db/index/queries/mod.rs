@@ -12,7 +12,8 @@ use std::{fmt::Debug, sync::Arc};
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use rbac::{
-    get_chain_root::GetChainRootQuery, get_registrations::GetRegistrationsByChainRootQuery,
+    get_chain_root, get_chain_root_from_stake_addr,
+    get_registrations::GetRegistrationsByChainRootQuery,
     get_role0_chain_root::GetRole0ChainRootQuery,
 };
 use registrations::{
@@ -96,6 +97,8 @@ pub(crate) enum PreparedSelectQuery {
     RegistrationsByChainRoot,
     /// Get chain root by role0 key
     ChainRootByRole0Key,
+    /// Get chain root by transaction id
+    ChainRootByTransactionId,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -157,6 +160,8 @@ pub(crate) struct PreparedQueries {
     registrations_by_chain_root_query: PreparedStatement,
     /// Get chain root by role0 key
     chain_root_by_role0_key_query: PreparedStatement,
+    /// Get chain root by transaction ID
+    chain_root_by_transaction_id_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -190,10 +195,12 @@ impl PreparedQueries {
         let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await;
-        let chain_root_by_stake_address = GetChainRootQuery::prepare(session.clone()).await;
+        let chain_root_by_stake_address =
+            get_chain_root_from_stake_addr::Query::prepare(session.clone()).await;
         let registrations_by_chain_root =
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
-        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session).await;
+        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
+        let chain_root_by_transaction_id = get_chain_root::Query::prepare(session).await;
 
         let (
             txo_insert_queries,
@@ -241,6 +248,7 @@ impl PreparedQueries {
             chain_root_by_stake_address_query: chain_root_by_stake_address?,
             registrations_by_chain_root_query: registrations_by_chain_root?,
             chain_root_by_role0_key_query: chain_root_by_role0_key?,
+            chain_root_by_transaction_id_query: chain_root_by_transaction_id?,
         })
     }
 
@@ -293,7 +301,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_upsert<P>(
         &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
     ) -> anyhow::Result<()>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match upsert_query {
             PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
         };
@@ -313,7 +323,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
@@ -331,6 +343,9 @@ impl PreparedQueries {
                 &self.registrations_by_chain_root_query
             },
             PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
+            PreparedSelectQuery::ChainRootByTransactionId => {
+                &self.chain_root_by_transaction_id_query
+            },
         };
 
         session
