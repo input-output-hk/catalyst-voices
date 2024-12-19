@@ -1,7 +1,12 @@
 //! Signed docs queries
 
+mod full_signed_doc;
+mod signed_doc_body;
 #[cfg(test)]
 mod tests;
+
+pub(crate) use full_signed_doc::FullSignedDoc;
+pub(crate) use signed_doc_body::SignedDocBody;
 
 use super::{common::query_limits::QueryLimits, EventDB, NotFoundError};
 use crate::jinja::{get_template, JinjaTemplateSource};
@@ -20,32 +25,6 @@ pub(crate) const FILTERED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = Jin
     name: "filtered_select_signed_documents.jinja.template",
     source: include_str!("./sql/filtered_select_signed_documents.sql.jinja"),
 };
-
-/// Signed doc body event db struct
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) struct SignedDocBody {
-    /// `signed_doc` table `id` field
-    id: uuid::Uuid,
-    /// `signed_doc` table `ver` field
-    ver: uuid::Uuid,
-    /// `signed_doc` table `type` field
-    doc_type: uuid::Uuid,
-    /// `signed_doc` table `author` field
-    author: String,
-    /// `signed_doc` table `metadata` field
-    metadata: Option<serde_json::Value>,
-}
-
-/// Full signed doc event db struct
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) struct FullSignedDoc {
-    /// Signed doc body
-    body: SignedDocBody,
-    /// `signed_doc` table `payload` field
-    payload: Option<serde_json::Value>,
-    /// `signed_doc` table `raw` field
-    raw: Vec<u8>,
-}
 
 /// Make an insert query into the `event-db` by adding data into the `signed_docs` table.
 ///
