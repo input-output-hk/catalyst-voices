@@ -7,26 +7,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef _StateData = ({bool show, LocalizedException? error});
 
-class WorkspaceError extends StatelessWidget {
-  const WorkspaceError({super.key});
+class WorkspaceErrorSelector extends StatelessWidget {
+  const WorkspaceErrorSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return _Selector(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, _StateData>(
+      selector: (state) => (show: state.showError, error: state.error),
       builder: (context, state) {
-        final message =
-            state.error?.message(context) ?? context.l10n.somethingWentWrong;
+        final errorMessage = state.error?.message(context);
 
         return Offstage(
           offstage: !state.show,
-          child: Center(
-            child: VoicesErrorIndicator(
-              message: message,
-              onRetry: () {
-                const event = LoadProposalsEvent();
-                context.read<WorkspaceBloc>().add(event);
-              },
-            ),
+          child: _WorkspaceError(
+            message: errorMessage ?? context.l10n.somethingWentWrong,
           ),
         );
       },
@@ -34,18 +28,23 @@ class WorkspaceError extends StatelessWidget {
   }
 }
 
-class _Selector extends StatelessWidget {
-  final BlocWidgetBuilder<_StateData> builder;
+class _WorkspaceError extends StatelessWidget {
+  final String message;
 
-  const _Selector({
-    required this.builder,
+  const _WorkspaceError({
+    required this.message,
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, _StateData>(
-      selector: (state) => (show: state.showError, error: state.error),
-      builder: builder,
+    return Center(
+      child: VoicesErrorIndicator(
+        message: message,
+        onRetry: () {
+          const event = LoadProposalsEvent();
+          context.read<WorkspaceBloc>().add(event);
+        },
+      ),
     );
   }
 }

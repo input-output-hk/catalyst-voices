@@ -4,32 +4,49 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class WorkspaceProposals extends StatelessWidget {
-  const WorkspaceProposals({super.key});
+typedef _ListItems = List<WorkspaceProposalListItem>;
+
+class WorkspaceProposalsSelector extends StatelessWidget {
+  const WorkspaceProposalsSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return _Selector(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, _ListItems>(
+      selector: (state) => state.proposals,
       builder: (context, state) {
         return Offstage(
           offstage: state.isEmpty,
-          child: ListView.separated(
-            itemBuilder: (context, index) {
-              final item = state[index];
-              return _ProposalListTile(
-                key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
-                item: item,
-                onTap: () {
-                  ProposalBuilderRoute(proposalId: item.id).go(context);
-                },
-              );
-            },
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
-            itemCount: state.length,
-            padding: const EdgeInsets.all(32),
-          ),
+          child: _WorkspaceProposals(items: state),
         );
       },
+    );
+  }
+}
+
+class _WorkspaceProposals extends StatelessWidget {
+  final List<WorkspaceProposalListItem> items;
+
+  const _WorkspaceProposals({
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      itemBuilder: (context, index) {
+        final item = items[index];
+
+        return _ProposalListTile(
+          key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
+          item: item,
+          onTap: () {
+            ProposalBuilderRoute(proposalId: item.id).go(context);
+          },
+        );
+      },
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemCount: items.length,
+      padding: const EdgeInsets.all(32),
     );
   }
 }
@@ -57,23 +74,6 @@ class _ProposalListTile extends StatelessWidget {
           child: Text(item.name),
         ),
       ),
-    );
-  }
-}
-
-class _Selector extends StatelessWidget {
-  final BlocWidgetBuilder<List<WorkspaceProposalListItem>> builder;
-
-  const _Selector({
-    required this.builder,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState,
-        List<WorkspaceProposalListItem>>(
-      selector: (state) => state.proposals,
-      builder: builder,
     );
   }
 }

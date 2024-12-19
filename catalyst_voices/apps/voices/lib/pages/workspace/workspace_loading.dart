@@ -3,24 +3,19 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class WorkspaceLoading extends StatelessWidget {
-  const WorkspaceLoading({super.key});
+class WorkspaceLoadingSelector extends StatelessWidget {
+  const WorkspaceLoadingSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return _Selector(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
+      selector: (state) => state.isLoading,
       builder: (context, state) {
         return Offstage(
           offstage: !state,
           child: TickerMode(
             enabled: state,
-            child: const Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: EdgeInsets.only(top: 32),
-                child: VoicesCircularProgressIndicator(),
-              ),
-            ),
+            child: const _WorkspaceLoading(),
           ),
         );
       },
@@ -28,18 +23,17 @@ class WorkspaceLoading extends StatelessWidget {
   }
 }
 
-class _Selector extends StatelessWidget {
-  final BlocWidgetBuilder<bool> builder;
-
-  const _Selector({
-    required this.builder,
-  });
+class _WorkspaceLoading extends StatelessWidget {
+  const _WorkspaceLoading();
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
-      selector: (state) => state.isLoading,
-      builder: builder,
+    return const Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: EdgeInsets.only(top: 32),
+        child: VoicesCircularProgressIndicator(),
+      ),
     );
   }
 }

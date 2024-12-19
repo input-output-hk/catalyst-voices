@@ -32,10 +32,10 @@ class _WorkspacePageState extends State<WorkspacePage> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                WorkspaceError(),
-                WorkspaceEmptyState(),
-                WorkspaceProposals(),
-                WorkspaceLoading(),
+                WorkspaceErrorSelector(),
+                WorkspaceEmptyStateSelector(),
+                WorkspaceProposalsSelector(),
+                WorkspaceLoadingSelector(),
               ],
             ),
           ),
