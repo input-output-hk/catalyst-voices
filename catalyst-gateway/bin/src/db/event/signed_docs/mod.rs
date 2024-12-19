@@ -1,12 +1,10 @@
 //! Signed docs queries
 
-mod full_signed_doc;
-mod signed_doc_body;
+mod types;
 #[cfg(test)]
 mod tests;
 
-pub(crate) use full_signed_doc::FullSignedDoc;
-pub(crate) use signed_doc_body::SignedDocBody;
+pub(crate) use types::{FullSignedDoc, SignedDocBody};
 
 use super::{common::query_limits::QueryLimits, EventDB, NotFoundError};
 use crate::jinja::{get_template, JinjaTemplateSource};
@@ -39,7 +37,7 @@ pub(crate) const FILTERED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = Jin
 ///  - `doc_type` is a UUID v4
 #[allow(dead_code)]
 pub(crate) async fn insert_signed_docs(doc: &FullSignedDoc) -> anyhow::Result<()> {
-    match select_signed_docs(&doc.body.id, &Some(doc.body.ver)).await {
+    match select_signed_docs(doc.id(), Some(doc.ver())).await {
         Ok(res_doc) => {
             anyhow::ensure!(
                 &res_doc == doc,
@@ -51,16 +49,7 @@ pub(crate) async fn insert_signed_docs(doc: &FullSignedDoc) -> anyhow::Result<()
         Err(err) => return Err(err),
     }
 
-    EventDB::modify(INSERT_SIGNED_DOCS, &[
-        &doc.body.id,
-        &doc.body.ver,
-        &doc.body.doc_type,
-        &doc.body.author,
-        &doc.body.metadata,
-        &doc.payload,
-        &doc.raw,
-    ])
-    .await?;
+    EventDB::modify(INSERT_SIGNED_DOCS, &doc.db_fields()).await?;
     Ok(())
 }
 
@@ -75,7 +64,7 @@ pub(crate) async fn insert_signed_docs(doc: &FullSignedDoc) -> anyhow::Result<()
 ///  - `id` is a UUID v7
 ///  - `ver` is a UUID v7
 pub(crate) async fn select_signed_docs(
-    id: &uuid::Uuid, ver: &Option<uuid::Uuid>,
+    id: &uuid::Uuid, ver: Option<&uuid::Uuid>,
 ) -> anyhow::Result<FullSignedDoc> {
     let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
     let query = query_template.render(serde_json::json!({
