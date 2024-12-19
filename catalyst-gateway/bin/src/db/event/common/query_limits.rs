@@ -18,6 +18,11 @@ enum QueryLimitsInner {
 }
 
 impl QueryLimits {
+    /// Create a `QueryLimits` object without the any limits.
+    pub(crate) const ALL: QueryLimits = Self(QueryLimitsInner::All);
+    /// Create a `QueryLimits` object with the limit equals to `1`.
+    pub(crate) const ONE: QueryLimits = Self(QueryLimitsInner::Limit(1));
+
     /// Create a `QueryLimits` object from the service `Limit` and `Page` values.
     ///
     /// # Errors
@@ -37,16 +42,6 @@ impl QueryLimits {
                 anyhow::bail!("Invalid arguments, `limit` must be provided when `page` is not None")
             },
         }
-    }
-
-    /// Create a `QueryLimits` object with the limit equals to `1`.
-    pub(crate) const fn one() -> Self {
-        Self(QueryLimitsInner::Limit(1))
-    }
-
-    /// Create a `QueryLimits` object without the any limits.
-    pub(crate) const fn all() -> Self {
-        Self(QueryLimitsInner::All)
     }
 
     /// Returns a string with the corresponding query limit statement
