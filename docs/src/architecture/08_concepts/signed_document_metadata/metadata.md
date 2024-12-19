@@ -110,8 +110,9 @@ However, `id` uniqueness is only guaranteed on first use.
 
 If the same `id` is used, by unauthorized publishers, the document is invalid.
 
-The `id` is a [ULID].
-It will be encoded using [ULID CBOR Encoding].
+The `id` is a [UUID].
+This identifier will be a [CBOR] Encoded [UUID Byte String].
+Only [UUID] V7 is supported and used.
 
 The first time a document is created, it will be assigned by the creator a new `id` which must
 be well constructed.
@@ -138,12 +139,13 @@ including all otherwise legitimate publications by the same author being marked 
 Every document in the system will be versioned.
 There can, and probably will, exist multiple versions of the same document.
 
-The `ver` is a [ULID].
-It will be encoded using [ULID CBOR Encoding].
+The `ver` is a [UUID].
+This identifier will be a [CBOR] Encoded [UUID Byte String].
+Only [UUID] V7 is supported and used.
 
 The initial `ver` assigned the first time a document is published will be identical to the [`id`](#document-id--id).
 Subsequent versions will retain the same [`id`](#document-id--id) and will create a new `ver`,
-following best practice for creating a new [ULID].
+following best practice for creating a new [UUID] v7.
 
 #### Document Reference : `ref`
 
@@ -154,13 +156,13 @@ following best practice for creating a new [ULID].
 This is a reference to another document.  
 The purpose of the `ref` will vary depending on the document [`type`](#document-type--type).
 
-The `ref` can be either a single [ULID] or a [CBOR] Array of Two [ULID].
+The `ref` can be either a single [UUID] or a [CBOR] Array of Two [UUID].
 
-If the `ref` is a single [ULID], it is a reference to the document of that [`id`](#document-id--id).
+If the `ref` is a single [UUID], it is a reference to the document of that [`id`](#document-id--id).
 If the `ref` is a [CBOR] array, it has the form `[<id>,<ver>]` where:
 
-* `<id>` = the [ULID] of the referenced documents [`id`](#document-id--id)
-* `<ver>` = the [ULID] of the referenced documents [`ver`](#document-version--ver).
+* `<id>` = the [UUID] of the referenced documents [`id`](#document-id--id)
+* `<ver>` = the [UUID] of the referenced documents [`ver`](#document-version--ver).
 
 #### Template Reference : `template`
 
@@ -289,8 +291,6 @@ This document is licensed under [CC-BY-4.0](https://creativecommons.org/licenses
 [JSON Schema]: https://json-schema.org/draft-07
 [Brotli]: https://datatracker.ietf.org/doc/html/rfc7932
 [JSON]: https://datatracker.ietf.org/doc/html/rfc7159
-[ULID]: https://github.com/ulid/spec
-[ULID CBOR Encoding]: https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/cbor_tags/ulid.md
 [CBOR]: https://datatracker.ietf.org/doc/html/rfc8610
 [UUID]: https://www.rfc-editor.org/rfc/rfc9562.html
 [JSON Path]: https://datatracker.ietf.org/doc/html/rfc9535
