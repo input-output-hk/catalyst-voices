@@ -18,6 +18,7 @@ final class ProblemPerspectiveStep extends RichTextStep {
     required super.sectionId,
     required super.data,
     super.charsLimit,
+    super.guidances,
   });
 
   @override
@@ -37,6 +38,7 @@ final class PerspectiveRationaleStep extends RichTextStep {
     required super.sectionId,
     required super.data,
     super.charsLimit,
+    super.guidances,
   });
 
   @override
@@ -56,6 +58,7 @@ final class ProjectEngagementStep extends RichTextStep {
     required super.sectionId,
     required super.data,
     super.charsLimit,
+    super.guidances,
   });
 
   @override

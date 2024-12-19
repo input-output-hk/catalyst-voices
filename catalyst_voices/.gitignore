@@ -1,6 +1,7 @@
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
 
+
 # Generated files from code generation tools
 *.g.dart
 *.freezed.dart
@@ -8,6 +9,7 @@
 *.swagger.dart
 *.openapi.dart
 *.gen.dart
+*.swagger.*.dart
 
 # Un-ignore generated files in public packages
 !**/packages/libs/**/*.g.dart
@@ -150,3 +152,5 @@ coverage/
 
 # Fastlane.swift runner binary
 **/fastlane/FastlaneRunner
+
+devtools_options.yaml

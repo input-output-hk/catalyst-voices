@@ -15,17 +15,23 @@ dependencies:
   catalyst_compression: ^0.3.0
   catalyst_compression_web: ^0.3.0
   catalyst_key_derivation: ^0.1.0
+  catalyst_voices_driver:
+    path: ../../../../internal/catalyst_voices_driver
   cbor: ^6.2.0
   convert: ^3.1.1
   cupertino_icons: ^1.0.6
-  equatable: ^2.0.5
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
+  flutter_driver:
+    sdk: flutter
+  js: ^0.6.7
+  test: ^1.25.7
+  web: ^1.1.0
+  webdriver: ^3.0.3
 
 dev_dependencies:
   catalyst_analysis: ^2.0.0
-  flutter_test:
-    sdk: flutter
 
 flutter:
   uses-material-design: true

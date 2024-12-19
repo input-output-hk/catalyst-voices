@@ -18,10 +18,11 @@ pub(crate) mod config;
 pub(crate) mod error;
 pub(crate) mod legacy;
 pub(crate) mod schema_check;
+pub(crate) mod signed_docs;
 
 /// Database version this crate matches.
 /// Must equal the last Migrations Version Number from `event-db/migrations`.
-pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 9;
+pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 2;
 
 /// Postgres Connection Manager DB Pool
 type SqlDbPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
@@ -212,7 +213,7 @@ impl EventDB {
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
-pub(crate) fn establish_connection() {
+pub fn establish_connection() {
     let (url, user, pass) = Settings::event_db_settings();
 
     // This was pre-validated and can't fail, but provide default in the impossible case it

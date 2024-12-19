@@ -34,7 +34,7 @@ dependencies:
     path: ../../packages/internal/catalyst_voices_view_models
   collection: ^1.18.0
   dotted_border: ^2.1.0
-  equatable: ^2.0.5
+  equatable: ^2.0.7
   file_picker: ^8.0.7
   flutter:
     sdk: flutter
@@ -75,6 +75,7 @@ dev_dependencies:
     sdk: flutter
   mockito: ^5.4.4
   mocktail: ^1.0.1
+  patrol_finders: ^2.5.1
   sentry_dart_plugin: ^2.1.0
 
 flutter:

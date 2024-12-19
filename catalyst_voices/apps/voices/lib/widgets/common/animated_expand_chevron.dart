@@ -12,7 +12,7 @@ class AnimatedExpandChevron extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedRotation(
-      turns: isExpanded ? 0 : 0.25,
+      turns: isExpanded ? 0.25 : 0,
       duration: const Duration(milliseconds: 250),
       child: VoicesAssets.icons.chevronRight.buildIcon(),
     );

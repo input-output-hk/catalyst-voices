@@ -18,6 +18,7 @@ final class ProblemStep extends RichTextStep {
     required super.sectionId,
     required super.data,
     super.charsLimit,
+    super.guidances,
   });
 
   @override
@@ -32,6 +33,7 @@ final class SolutionStep extends RichTextStep {
     required super.sectionId,
     required super.data,
     super.charsLimit,
+    super.guidances,
   });
 
   @override
@@ -46,6 +48,7 @@ final class PublicDescriptionStep extends RichTextStep {
     required super.sectionId,
     required super.data,
     super.charsLimit,
+    super.guidances,
   });
 
   @override

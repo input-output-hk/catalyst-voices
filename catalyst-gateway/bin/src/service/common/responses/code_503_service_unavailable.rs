@@ -3,9 +3,12 @@
 use poem_openapi::{types::Example, Object};
 use uuid::Uuid;
 
-#[derive(Debug, Object)]
-#[oai(example, skip_serializing_if_is_none)]
-/// Server Error response to a Bad request.
+#[derive(Object)]
+#[oai(example)]
+/// The service is not available, try again later.
+///
+/// *This is returned when the service either has not started,
+/// or has become unavailable.*
 pub(crate) struct ServiceUnavailable {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
     id: Uuid,

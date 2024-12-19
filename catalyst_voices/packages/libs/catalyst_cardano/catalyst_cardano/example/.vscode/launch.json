@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "example",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--web-header",
+                "Cross-Origin-Opener-Policy=same-origin",
+                "--web-header",
+                "Cross-Origin-Embedder-Policy=require-corp",
+            ],
+        },
+        {
+            "name": "example (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--web-header",
+                "Cross-Origin-Opener-Policy=same-origin",
+                "--web-header",
+                "Cross-Origin-Embedder-Policy=require-corp",
+            ],
+        },
+        {
+            "name": "example (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": [
+                "--web-header",
+                "Cross-Origin-Opener-Policy=same-origin",
+                "--web-header",
+                "Cross-Origin-Embedder-Policy=require-corp",
+            ],
+        }
+    ]
+}

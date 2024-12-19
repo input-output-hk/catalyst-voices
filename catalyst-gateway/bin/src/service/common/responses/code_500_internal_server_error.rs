@@ -8,9 +8,11 @@ use uuid::Uuid;
 /// probably want to place this in your crate root
 use crate::settings::Settings;
 
-#[derive(Debug, Object)]
+#[derive(Object)]
 #[oai(example, skip_serializing_if_is_none)]
-/// Server Error response to a Bad request.
+/// An internal server error occurred.
+///
+/// *The contents of this response should be reported to the projects issue tracker.*
 pub(crate) struct InternalServerError {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
     id: Uuid,
