@@ -45,9 +45,9 @@ impl CurrentPage {
     #[allow(dead_code)]
     fn new(page: u64, limit: u64, remaining: u64) -> anyhow::Result<Self> {
         Ok(Self {
-            page: common::types::generic::query::pagination::Page::new(page)?,
-            limit: common::types::generic::query::pagination::Limit::new(limit)?,
-            remaining: common::types::generic::query::pagination::Remaining::new(remaining)?,
+            page: page.try_into()?,
+            limit: limit.try_into()?,
+            remaining: remaining.try_into()?,
         })
     }
 }

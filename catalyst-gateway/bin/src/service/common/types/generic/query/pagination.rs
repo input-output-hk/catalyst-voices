@@ -53,20 +53,6 @@ static PAGE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Page(u64);
 
-impl Page {
-    /// Creates a new `Page` instance.
-    ///
-    /// # Errors:
-    ///  - Invalid `page` value, must be in range.
-    pub(crate) fn new(page: u64) -> anyhow::Result<Self> {
-        anyhow::ensure!(
-            is_valid_page(page),
-            "Invalid `page` value, must be in range {PAGE_MINIMUM}..{PAGE_MAXIMUM}"
-        );
-        Ok(Self(page))
-    }
-}
-
 impl Default for Page {
     fn default() -> Self {
         Self(PAGE_DEFAULT)
@@ -133,6 +119,18 @@ impl ToJSON for Page {
     }
 }
 
+impl TryFrom<u64> for Page {
+    type Error = anyhow::Error;
+
+    fn try_from(page: u64) -> Result<Self, Self::Error> {
+        anyhow::ensure!(
+            is_valid_page(page),
+            "Invalid `page` value, must be in range {PAGE_MINIMUM}..{PAGE_MAXIMUM}"
+        );
+        Ok(Self(page))
+    }
+}
+
 impl From<Page> for u64 {
     fn from(value: Page) -> Self {
         value.0
@@ -191,20 +189,6 @@ static LIMIT_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 /// Limit of items to be returned in a page of data.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Limit(u64);
-
-impl Limit {
-    /// Creates a new `Limit` instance.
-    ///
-    /// # Errors:
-    ///  - Invalid `limit` value, must be in range
-    pub(crate) fn new(limit: u64) -> anyhow::Result<Self> {
-        anyhow::ensure!(
-            is_valid_limit(limit),
-            "Invalid `limit` value, must be in range {LIMIT_MINIMUM}..{LIMIT_MAXIMUM}"
-        );
-        Ok(Self(limit))
-    }
-}
 
 impl Default for Limit {
     fn default() -> Self {
@@ -272,6 +256,18 @@ impl ToJSON for Limit {
     }
 }
 
+impl TryFrom<u64> for Limit {
+    type Error = anyhow::Error;
+
+    fn try_from(limit: u64) -> Result<Self, Self::Error> {
+        anyhow::ensure!(
+            is_valid_limit(limit),
+            "Invalid `limit` value, must be in range {LIMIT_MINIMUM}..{LIMIT_MAXIMUM}"
+        );
+        Ok(Self(limit))
+    }
+}
+
 impl From<Limit> for u64 {
     fn from(value: Limit) -> Self {
         value.0
@@ -321,20 +317,6 @@ static REMAINING_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 /// Limit of items to be returned in a page of data.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Remaining(u64);
-
-impl Remaining {
-    /// Creates a new `Remaining` instance.
-    ///
-    /// # Errors:
-    ///  - Invalid `remaining` value, must be in range
-    pub(crate) fn new(remaining: u64) -> anyhow::Result<Self> {
-        anyhow::ensure!(
-            is_valid_remaining(remaining),
-            "Invalid `remaining` value, must be in range {REMAINING_MINIMUM}..{REMAINING_MAXIMUM}"
-        );
-        Ok(Self(remaining))
-    }
-}
 
 /// Is the `Page` valid?
 fn is_valid_remaining(value: u64) -> bool {
@@ -386,6 +368,18 @@ impl ParseFromJSON for Remaining {
 impl ToJSON for Remaining {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())
+    }
+}
+
+impl TryFrom<u64> for Remaining {
+    type Error = anyhow::Error;
+
+    fn try_from(remaining: u64) -> Result<Self, Self::Error> {
+        anyhow::ensure!(
+            is_valid_remaining(remaining),
+            "Invalid `remaining` value, must be in range {REMAINING_MINIMUM}..{REMAINING_MAXIMUM}"
+        );
+        Ok(Self(remaining))
     }
 }
 
