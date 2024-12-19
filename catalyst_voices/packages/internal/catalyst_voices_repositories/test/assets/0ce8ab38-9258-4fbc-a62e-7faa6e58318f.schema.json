@@ -1,0 +1,1067 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
+    "title": "F14 Submission Form",
+    "description": "Schema for the F14 Catalyst Proposal Submission Form",
+    "definitions": {
+        "schemaReferenceNonUI": {
+            "$comment": "NOT UI: used to identify the kind of template document used.",
+            "type": "string",
+            "format": "path",
+            "readOnly": true
+        },
+        "segment": {
+            "$comment": "UI - Logical Document Section Break.",
+            "type": "object",
+            "additionalProperties": false,
+            "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
+        },
+        "section": {
+            "$comment": "UI - Logical Document Sub-Section Break.",
+            "type": "object",
+            "additionalProperties": false,
+            "x-note": "Subsections containing specific details about the proposal."
+        },
+        "singleLineTextEntry": {
+            "$comment": "UI - Single Line text entry without any markup or rich text capability.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^.*$",
+            "x-note": "Enter a single line of text. No formatting, line breaks, or special characters are allowed."
+        },
+        "singleLineHttpsURLEntry": {
+            "$comment": "UI - Single Line text entry for HTTPS Urls.",
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https:.*",
+            "x-note": "Enter a valid HTTPS URL. Must start with 'https://' and be a complete, working web address."
+        },
+        "multiLineTextEntry": {
+            "$comment": "UI - Multiline text entry without any markup or rich text capability.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^[\\S\\s]*$",
+            "x-note": "Enter multiple lines of plain text. You can use line breaks but no special formatting."
+        },
+        "multiLineTextEntryMarkdown": {
+            "$comment": "UI - Multiline text entry with Markdown content.",
+            "type": "string",
+            "contentMediaType": "text/markdown",
+            "pattern": "^[\\S\\s]*$",
+            "x-note": "Use Markdown formatting for rich text. Available formatting:\n- Headers: # for h1, ## for h2, etc.\n- Lists: * or - for bullets, 1. for numbered\n- Emphasis: *italic* or **bold**\n- Links: [text](url)\n- Code: `inline` or ```block```"
+        },
+        "dropDownSingleSelect": {
+            "$comment": "UI - Drop Down Selection of a single entry from the defined enum.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^.*$",
+            "format": "dropDownSingleSelect",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
+        },
+        "multiSelect": {
+            "$comment": "UI - Multiselect from the given items.",
+            "type": "array",
+            "uniqueItems": true,
+            "format": "multiSelect",
+            "x-note": "Select multiple options from the dropdown menu. Multiple choices are allowed."
+        },
+        "singleLineTextEntryList": {
+            "$comment": "UI - A Growable List of single line text (no markup or richtext).",
+            "type": "array",
+            "format": "singleLineTextEntryList",
+            "uniqueItems": true,
+            "default": [],
+            "items": {
+                "$ref": "#/definitions/singleLineTextEntry",
+                "maxLength": 1024
+            },
+            "x-note": "Add multiple single-line text entries. Each entry should be unique and under 1024 characters."
+        },
+        "multiLineTextEntryListMarkdown": {
+            "$comment": "UI - A Growable List of markdown formatted text fields.",
+            "type": "array",
+            "format": "multiLineTextEntryListMarkdown",
+            "uniqueItems": true,
+            "default": [],
+            "items": {
+                "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                "maxLength": 10240
+            },
+            "x-note": "Add multiple markdown-formatted text entries. Each entry can include rich formatting and should be unique."
+        },
+        "singleLineHttpsURLEntryList": {
+            "$comment": "UI - A Growable List of HTTPS URLs.",
+            "type": "array",
+            "format": "singleLineHttpsURLEntryList",
+            "uniqueItems": true,
+            "default": [],
+            "items": {
+                "$ref": "#/definitions/singleLineHttpsURLEntry",
+                "maxLength": 1024
+            },
+            "x-note": "Enter multiple HTTPS URLs. Each URL should be unique and under 1024 characters."
+        },
+        "nestedQuestionsList": {
+            "$comment": "UI - A Growable List of Questions.  The contents are an object, that can have any UI elements within.",
+            "type": "array",
+            "format": "nestedQuestionsList",
+            "uniqueItems": true,
+            "default": [],
+            "x-note": "Add multiple questions. Each question should be unique."
+        },
+        "nestedQuestions": {
+            "$comment": "UI - The container for a nested question set.",
+            "type": "object",
+            "format": "nestedQuestions",
+            "additionalProperties": false,
+            "x-note": "Add multiple questions. Each question should be unique."
+        },
+        "singleGroupedTagSelector": {
+            "$comment": "UI - A selector where a top level selection, gives a single choice from a list of tags.",
+            "type": "object",
+            "format": "singleGroupedTagSelector",
+            "additionalProperties": true,
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
+        },
+        "tagGroup": {
+            "$comment": "UI - An individual group within a singleGroupedTagSelector.",
+            "type": "string",
+            "format": "tagGroup",
+            "pattern": "^.*$",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
+        },
+        "tagSelection": {
+            "$comment": "UI - An individual tag within the group of a singleGroupedTagSelector.",
+            "type": "string",
+            "format": "tagSelection",
+            "pattern": "^.*$",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
+        },
+        "tokenValueCardanoADA": {
+            "$comment": "UI - A Token Value denominated in Cardano ADA.",
+            "type": "integer",
+            "format": "token:cardano:ada",
+            "x-note": "Enter the amount of Cardano ADA to be used in the proposal."
+        },
+        "durationInMonths": {
+            "$comment": "UI - A Duration represented in total months.",
+            "type": "integer",
+            "format": "datetime:duration:months",
+            "x-note": "Enter the duration of the proposal in months."
+        },
+        "yesNoChoice": {
+            "$comment": "UI - A Boolean choice, represented as a Yes/No selection.  Yes = true.",
+            "type": "boolean",
+            "format": "yesNoChoice",
+            "default": false,
+            "x-note": "Select Yes or No."
+        },
+        "agreementConfirmation": {
+            "$comment": "UI - A Boolean choice, defaults to `false` but its invalid if its not set to `true`.",
+            "type": "boolean",
+            "format": "agreementConfirmation",
+            "default": false,
+            "const": true,
+            "x-note": "Select Yes or No."
+        },
+        "spdxLicenseOrURL": {
+            "$comment": "UI - Drop Down Selection of any valid SPDX Identifier.  This is a complex type, it should let the user select one of the valid SPDX licenses, or enter a URL of the license if its proprietary. In the form its just a string.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^.*$",
+            "format": "spdxLicenseOrURL",
+            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "$ref": "#/definitions/schemaReferenceNonUI",
+            "default": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+            "const": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
+        },
+        "setup": {
+            "$ref": "#/definitions/segment",
+            "title": "proposal setup",
+            "description": "Proposal title",
+            "properties": {
+                "title": {
+                    "$ref": "#/definitions/section",
+                    "title": "proposal setup",
+                    "description": "Proposal title",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/singleLineTextEntry",
+                            "title": "Proposal Title",
+                            "description": "<p><b>Proposal title</b></p><p>Please note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app. </p>",
+                            "minLength": 1,
+                            "maxLength": 60,
+                            "x-guidance": "<p>The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important.</p>"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ]
+                },
+                "proposer": {
+                    "$ref": "#/definitions/section",
+                    "properties": {
+                        "applicant": {
+                            "$ref": "#/definitions/singleLineTextEntry",
+                            "title": "Name and surname of main applicant",
+                            "description": "Name and surname of main applicant",
+                            "x-guidance": "<p>Please provide the name and surname of the main applicant. The main applicant is considered as the individual responsible for the project and the person authorized to act on behalf of other applicants (where applicable).</p>",
+                            "minLength": 2,
+                            "maxLength": 100
+                        },
+                        "type": {
+                            "$ref": "#/definitions/dropDownSingleSelect",
+                            "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
+                            "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
+                            "x-guidance": "<p>Please select from one of the following:</p><ol><li>Individual</li><li>Entity (Incorporated)</li><li>Entity (Not Incorporated) </li></ol>",
+                            "enum": [
+                                "Individual",
+                                "Entity (Incorporated)",
+                                "Entity (Not Incorporated)"
+                            ],
+                            "default": "Individual"
+                        },
+                        "coproposers": {
+                            "$ref": "#/definitions/singleLineTextEntryList",
+                            "title": "Co-proposers and additional applicants",
+                            "description": "Co-proposers and additional applicants",
+                            "x-guidance": "<p>List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. <b>IMPORTANT</b> A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 14 rules for added detail.</p>",
+                            "maxItems": 5,
+                            "minItems": 0
+                        }
+                    },
+                    "required": [
+                        "applicant",
+                        "type"
+                    ],
+                    "x-order": [
+                        "applicant",
+                        "type",
+                        "coproposers"
+                    ]
+                }
+            },
+            "required": [
+                "title",
+                "proposer"
+            ],
+            "x-order": [
+                "title",
+                "proposer"
+            ]
+        },
+        "summary": {
+            "$ref": "#/definitions/segment",
+            "title": "Proposal Summary",
+            "description": "Key information about your proposal",
+            "properties": {
+                "budget": {
+                    "$ref": "#/definitions/section",
+                    "title": "Budget Information",
+                    "properties": {
+                        "requestedFunds": {
+                            "$ref": "#/definitions/tokenValueCardanoADA",
+                            "title": "Requested funds in ADA",
+                            "description": "The amount of funding requested for your proposal",
+                            "x-guidance": "<p>There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category:</p><p>Minimum Funding Amount per proposal:</p><p>Cardano Open: A15,000</p><p>Cardano Uses Cases: A15,000</p><p>Cardano Partners: A500,000 </p><p>Maximum Funding Amount per proposal:</p><p>Cardano Open:</p><ul><li>Developers (technical): A200,000</li><li>Ecosystem (non-technical): A100,000</li></ul><p>Cardano Uses Cases:</p><ul><li>Concept A150,000</li><li>Product: A500,000</li></ul><p>Cardano Partners:</p><ul><li>Enterprise R&D A2,000,000</li><li>Growth & Acceleration: A2,000,000 </li></ul>",
+                            "minimum": 15000,
+                            "maximum": 2000000
+                        }
+                    },
+                    "required": [
+                        "requestedFunds"
+                    ],
+                    "x-order": [
+                        "requestedFunds"
+                    ]
+                },
+                "time": {
+                    "$ref": "#/definitions/section",
+                    "properties": {
+                        "duration": {
+                            "$ref": "#/definitions/durationInMonths",
+                            "title": "Project Duration in Months",
+                            "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
+                            "x-guidance": "<p>Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out. </p> ",
+                            "minimum": 2,
+                            "maximum": 12
+                        }
+                    },
+                    "required": [
+                        "duration"
+                    ]
+                },
+                "translation": {
+                    "$ref": "#/definitions/section",
+                    "title": "Translation Information",
+                    "description": "Information about the proposal's language and translation status",
+                    "properties": {
+                        "isTranslated": {
+                            "$ref": "#/definitions/yesNoChoice",
+                            "title": "Auto-translated Status",
+                            "description": "Indicate if your proposal has been auto-translated into English from another language",
+                            "x-guidance": "<p>Tick YES if your proposal has been auto-translated into English from another language  so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections. Tick NO if your proposal has not been auto-translated into English from another language</p>"
+                        },
+                        "originalLanguage": {
+                            "$ref": "#/definitions/singleLineTextEntry",
+                            "title": "Original Language",
+                            "description": "If auto-translated, specify the original language of your proposal",
+                            "enum": [
+                                "Arabic",
+                                "Chinese",
+                                "French",
+                                "German",
+                                "Indonesian",
+                                "Italian",
+                                "Japanese",
+                                "Korean",
+                                "Portuguese",
+                                "Russian",
+                                "Spanish",
+                                "Turkish",
+                                "Vietnamese",
+                                "Other"
+                            ]
+                        },
+                        "originalDocumentLink": {
+                            "$ref": "#/definitions/singleLineHttpsURLEntry",
+                            "title": "Original Document Link",
+                            "description": "Provide a link to the original proposal document in its original language"
+                        }
+                    },
+                    "if": {
+                        "properties": {
+                            "isTranslated": {
+                                "const": true
+                            }
+                        }
+                    },
+                    "then": {
+                        "required": [
+                            "originalLanguage",
+                            "originalDocumentLink"
+                        ],
+                        "properties": {
+                            "originalLanguage": {
+                                "description": "Original language is required when the proposal is translated"
+                            },
+                            "originalDocumentLink": {
+                                "description": "Link to the original document is required when the proposal is translated"
+                            }
+                        }
+                    },
+                    "else": {
+                        "properties": {
+                            "originalLanguage": {
+                                "not": {}
+                            },
+                            "originalDocumentLink": {
+                                "not": {}
+                            }
+                        }
+                    },
+                    "required": [
+                        "isTranslated"
+                    ]
+                },
+                "problem": {
+                    "$ref": "#/definitions/section",
+                    "title": "Problem Statement",
+                    "description": "Define the problem your proposal aims to solve",
+                    "properties": {
+                        "statement": {
+                            "$ref": "#/definitions/multiLineTextEntry",
+                            "title": "Problem Description",
+                            "description": "Clearly define the problem you aim to solve. This will be visible in the Catalyst voting app.",
+                            "minLength": 10,
+                            "maxLength": 200,
+                            "x-guidance": "<p>Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail. </p> "
+                        },
+                        "impact": {
+                            "$ref": "#/definitions/multiSelect",
+                            "title": "Impact Areas",
+                            "description": "Select the areas that will be most impacted by solving this problem",
+                            "items": {
+                                "$ref": "#/definitions/singleLineTextEntry",
+                                "enum": [
+                                    "Technical Infrastructure",
+                                    "User Experience",
+                                    "Developer Tooling",
+                                    "Community Growth",
+                                    "Economic Sustainability",
+                                    "Interoperability",
+                                    "Security",
+                                    "Scalability",
+                                    "Education",
+                                    "Adoption"
+                                ]
+                            },
+                            "minItems": 1,
+                            "maxItems": 3
+                        }
+                    },
+                    "required": [
+                        "statement",
+                        "impact"
+                    ]
+                },
+                "solution": {
+                    "$ref": "#/definitions/section",
+                    "title": "Solution Overview",
+                    "description": "Describe your proposed solution to the problem",
+                    "properties": {
+                        "summary": {
+                            "$ref": "#/definitions/multiLineTextEntry",
+                            "title": "Solution Summary",
+                            "description": "Briefly describe your solution. Focus on what you will do or create to solve the problem.",
+                            "minLength": 10,
+                            "maxLength": 200,
+                            "x-guidance": "<p>Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how' This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail. </p> "
+                        },
+                        "approach": {
+                            "$ref": "#/definitions/multiLineTextEntry",
+                            "title": "Technical Approach",
+                            "description": "Outline the technical approach or methodology you will use",
+                            "maxLength": 500
+                        },
+                        "innovationAspects": {
+                            "$ref": "#/definitions/singleLineTextEntryList",
+                            "title": "Innovation Aspects",
+                            "description": "Key innovative aspects of your solution",
+                            "minItems": 1,
+                            "maxItems": 5
+                        }
+                    },
+                    "required": [
+                        "summary",
+                        "approach"
+                    ]
+                },
+                "supportingLinks": {
+                    "$ref": "#/definitions/section",
+                    "title": "Supporting Documentation",
+                    "description": "Additional resources and documentation for your proposal",
+                    "x-guidance": "<p>Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your proposal. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any of the questions in this form because you feel the answers can be found elsewhere. If any links are specified make sure these are added in good order (first link must be present before specifying second). Also ensure all links include https. Without these steps, the form will not be submittable and show errors </p>",
+                    "properties": {
+                        "mainRepository": {
+                            "$ref": "#/definitions/singleLineHttpsURLEntry",
+                            "title": "Main Code Repository",
+                            "description": "Primary repository where the project's code will be hosted"
+                        },
+                        "documentation": {
+                            "$ref": "#/definitions/singleLineHttpsURLEntry",
+                            "title": "Documentation URL",
+                            "description": "Main documentation site or resource for the project"
+                        },
+                        "other": {
+                            "$ref": "#/definitions/singleLineHttpsURLEntryList",
+                            "title": "Resource Links",
+                            "description": "Links to any other relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "minItems": 0,
+                            "maxItems": 5
+                        }
+                    }
+                },
+                "dependencies": {
+                    "$ref": "#/definitions/section",
+                    "title": "Project Dependencies",
+                    "description": "External dependencies and requirements for project success",
+                    "x-guidance": "<p>If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software. </p>",
+                    "properties": {
+                        "details": {
+                            "$ref": "#/definitions/nestedQuestionsList",
+                            "title": "Dependency Details",
+                            "description": "List and describe each dependency",
+                            "items": {
+                                "$ref": "#/definitions/nestedQuestions",
+                                "properties": {
+                                    "name": {
+                                        "$ref": "#/definitions/singleLineTextEntry",
+                                        "title": "Dependency Name",
+                                        "description": "Name of the organization, technology, or resource",
+                                        "maxLength": 100
+                                    },
+                                    "type": {
+                                        "$ref": "#/definitions/dropDownSingleSelect",
+                                        "title": "Dependency Type",
+                                        "description": "Type of dependency",
+                                        "enum": [
+                                            "Technical",
+                                            "Organizational",
+                                            "Legal",
+                                            "Financial",
+                                            "Other"
+                                        ]
+                                    },
+                                    "description": {
+                                        "$ref": "#/definitions/multiLineTextEntry",
+                                        "title": "Description",
+                                        "description": "Explain why this dependency is essential and how it affects your project",
+                                        "maxLength": 500
+                                    },
+                                    "mitigationPlan": {
+                                        "$ref": "#/definitions/multiLineTextEntry",
+                                        "title": "Mitigation Plan",
+                                        "description": "How will you handle potential issues with this dependency",
+                                        "maxLength": 300
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "type",
+                                    "description"
+                                ]
+                            },
+                            "minItems": 0,
+                            "maxItems": 10
+                        }
+                    }
+                },
+                "open_source": {
+                    "$ref": "#/definitions/section",
+                    "title": "Project Open Source",
+                    "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
+                    "x-guidance": "<p>Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software</p>",
+                    "properties": {
+                        "source_code": {
+                            "$ref": "#/definitions/spdxLicenseOrURL"
+                        },
+                        "documentation": {
+                            "$ref": "#/definitions/spdxLicenseOrURL"
+                        },
+                        "note": {
+                            "$ref": "#/definitions/multiLineTextEntry",
+                            "title": "More Information",
+                            "description": "Please provide here more information on the open source status of your project outputs",
+                            "maxLength": 500,
+                            "x-guidance": "<p>If you did not answer PROPRIETARY to the above questions, the project should be open source available throughout the entire lifecycle of the project with a declared open-source repository. Please indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs If only certain elements of your code will be open source please clarify which elements will be open source here. If you answered NO to the above question, please give further details as to why your projects outputs will not be open source METADATA</p>"
+                        }
+                    },
+                    "required": [
+                        "source_code",
+                        "documentation"
+                    ],
+                    "x-order": [
+                        "source_code",
+                        "documentation",
+                        "note"
+                    ]
+                }
+            },
+            "x-order": [
+                "budget",
+                "time",
+                "translation",
+                "problem",
+                "solution",
+                "supportingLinks",
+                "dependencies",
+                "open_source"
+            ]
+        },
+        "horizons": {
+            "$ref": "#/definitions/segment",
+            "title": "Horizons",
+            "properties": {
+                "theme": {
+                    "$ref": "#/definitions/section",
+                    "title": "Horizons",
+                    "description": "Long-term vision and categorization of your project",
+                    "properties": {
+                        "grouped_tag": {
+                            "$ref": "#/definitions/singleGroupedTagSelector",
+                            "oneOf": [
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Governance"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Governance",
+                                                "DAO"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Education"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Education",
+                                                "Learn to Earn",
+                                                "Training",
+                                                "Translation"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Community & Outreach"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Connected Community",
+                                                "Community",
+                                                "Community Outreach",
+                                                "Social Media"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Development & Tools"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Developer Tools",
+                                                "L2",
+                                                "Infrastructure",
+                                                "Analytics",
+                                                "AI",
+                                                "Research",
+                                                "UTXO",
+                                                "P2P"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Identity & Security"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Identity & Verification",
+                                                "Cybersecurity",
+                                                "Security",
+                                                "Authentication",
+                                                "Privacy"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "DeFi"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "DeFi",
+                                                "Payments",
+                                                "Stablecoin",
+                                                "Risk Management",
+                                                "Yield",
+                                                "Staking",
+                                                "Lending"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Real World Applications"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Wallet",
+                                                "Marketplace",
+                                                "Manufacturing",
+                                                "IoT",
+                                                "Financial Services",
+                                                "E-commerce",
+                                                "Business Services",
+                                                "Supply Chain",
+                                                "Real Estate",
+                                                "Healthcare",
+                                                "Tourism",
+                                                "Entertainments",
+                                                "RWA",
+                                                "Music",
+                                                "Tokenization"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Events & Marketing"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Events",
+                                                "Marketing",
+                                                "Hackathons",
+                                                "Accelerator",
+                                                "Incubator"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Interoperability"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Cross-chain",
+                                                "Interoperability",
+                                                "Off-chain",
+                                                "Legal",
+                                                "Policy Advocacy",
+                                                "Standards"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Sustainability"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Sustainability",
+                                                "Environment",
+                                                "Agriculture"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "Smart Contracts"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Smart Contract",
+                                                "Smart Contracts",
+                                                "Audit",
+                                                "Oracles"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "GameFi"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "Gaming",
+                                                "Gaming (GameFi)",
+                                                "Entertainment",
+                                                "Metaverse"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "properties": {
+                                        "group": {
+                                            "$ref": "#/definitions/tagGroup",
+                                            "const": "NFT"
+                                        },
+                                        "tag": {
+                                            "$ref": "#/definitions/tagSelection",
+                                            "enum": [
+                                                "NFT",
+                                                "CNFT",
+                                                "Collectibles",
+                                                "Digital Twin"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "x-order": [
+                        "theme"
+                    ]
+                }
+            },
+            "x-order": [
+                "theme"
+            ]
+        },
+        "details": {
+            "$ref": "#/definitions/segment",
+            "title": "Your Project and Solution",
+            "properties": {
+                "solution": {
+                    "$ref": "#/definitions/section",
+                    "title": "Solution",
+                    "description": "<p>How you write this section will depend on what type of proposal you are writing. You might want to include details on:</p><p><br></p><ul><li>How do you perceive the problem you are solving?</li><li>What are your reasons for approaching it in the way that you have?</li><li>Who will your project engage?</li><li>How will you demonstrate or prove your impact?</li></ul><p><br></p><p>Explain what is unique about your solution, who will benefit, and why this is important to Cardano.</p>",
+                    "properties": {
+                        "solution": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "minLength": 1,
+                            "maxLength": 10240
+                        }
+                    }
+                },
+                "impact": {
+                    "$ref": "#/definitions/section",
+                    "title": "Impact",
+                    "description": "<p>Please include here a description of how you intend to measure impact (whether quantitative or qualitative) and how and with whom you will share your outputs:</p><p><br></p><ul><li>In what way will the success of your project bring value to the Cardano Community?&nbsp;</li><li>How will you measure this impact?&nbsp;</li><li>How will you share the outputs and opportunities that result from your project?</li></ul>",
+                    "properties": {
+                        "impact": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "minLength": 1,
+                            "maxLength": 10240
+                        }
+                    }
+                },
+                "feasibility": {
+                    "$ref": "#/definitions/section",
+                    "title": "Capabilities & Feasibility",
+                    "description": "<p>Please describe your existing capabilities that demonstrate how and why you believe you’re best suited to deliver this project?</p><p>Please include the steps or processes that demonstrate that you can be trusted to manage funds properly.</p>",
+                    "properties": {
+                        "feasibility": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "minLength": 1,
+                            "maxLength": 10240
+                        }
+                    }
+                }
+            },
+            "x-order": [
+                "solution",
+                "impact",
+                "feasibility"
+            ]
+        },
+        "milestones": {
+            "$ref": "#/definitions/segment",
+            "title": "Milestones",
+            "properties": {
+                "milestones": {
+                    "$ref": "#/definitions/section",
+                    "title": "Project Milestones",
+                    "description": "<p>Each milestone must declare:</p><ul><li>A: Milestone outputs</li><li>B: Acceptance criteria</li><li>C: Evidence of completion</li></ul><p><strong>Requirements:</strong></p><ul><li>For Grant Amounts up to 75k ada: minimum 3 milestones (2 + final)</li><li>For Grant Amounts 75k-150k ada: minimum 4 milestones (3 + final)</li><li>The final milestone must include Project Close-out Report and Video</li></ul>",
+                    "properties": {
+                        "milestone_list": {
+                            "type": "array",
+                            "title": "Milestones",
+                            "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                            "x-guidance": "<p><strong>Milestone Requirements:</strong></p><ul><li>For Grant Amounts of up to 75k ada: at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>3 milestones in total</strong>)</li><li>For Grant Amounts over 75k ada up to 150k ada: at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>4 milestones in total</strong>)</li><li>For Grant Amounts over 150k ada up to 300k ada: at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>5 milestones in total</strong>)</li><li>For Grant Amounts exceeding 300k ada: at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (<strong>6 milestones in total</strong>)</li></ul>",
+                            "minItems": 3,
+                            "maxItems": 6,
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "title",
+                                    "outputs",
+                                    "acceptance_criteria",
+                                    "evidence",
+                                    "delivery_month",
+                                    "cost"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "$ref": "#/definitions/singleLineTextEntry",
+                                        "title": "Milestone Title",
+                                        "description": "A clear, concise title for this milestone",
+                                        "maxLength": 100
+                                    },
+                                    "outputs": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Milestone Outputs",
+                                        "description": "What will be delivered in this milestone",
+                                        "maxLength": 1000
+                                    },
+                                    "acceptance_criteria": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Acceptance Criteria",
+                                        "description": "Specific conditions that must be met",
+                                        "maxLength": 1000
+                                    },
+                                    "evidence": {
+                                        "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                                        "title": "Evidence of Completion",
+                                        "description": "How you will demonstrate achievement",
+                                        "maxLength": 1000
+                                    },
+                                    "delivery_month": {
+                                        "$ref": "#/definitions/durationInMonths",
+                                        "title": "Delivery Month",
+                                        "description": "The month when this milestone will be delivered",
+                                        "minimum": 1,
+                                        "maximum": 12
+                                    },
+                                    "cost": {
+                                        "$ref": "#/definitions/tokenValueCardanoADA",
+                                        "title": "Cost in ADA",
+                                        "description": "The cost of this milestone in ADA"
+                                    },
+                                    "progress": {
+                                        "$ref": "#/definitions/dropDownSingleSelect",
+                                        "title": "Progress Status",
+                                        "description": "Current status of the milestone",
+                                        "enum": [
+                                            "Not Started",
+                                            "In Progress",
+                                            "Completed",
+                                            "Delayed"
+                                        ],
+                                        "default": "Not Started"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "milestone_list"
+                    ]
+                }
+            },
+            "x-order": [
+                "milestones"
+            ]
+        },
+        "pitch": {
+            "$ref": "#/definitions/segment",
+            "title": "Final Pitch",
+            "properties": {
+                "team": {
+                    "$ref": "#/definitions/section",
+                    "title": "Team",
+                    "properties": {
+                        "who": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Who is in the project team and what are their roles?",
+                            "description": "<p>List your team, their Linkedin profiles (or similar) and state what aspect of the proposal’s work each team member will undertake.</p><p><br></p><p>If you are planning to recruit additional team members, please state what specific skills you will be looking for in the people you recruit, so readers can see that you understand what skills will be needed to complete the project.</p><p><br></p><p>You are expected to have already engaged the relevant members of the organizations referenced so you understand if they are willing and/or have capacity to support the project. If you have not taken any steps to engage with your team yet, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun. The Catalyst team cannot help with this, meaning you are expected to have understood the requirements and engaged the necessary people before submitting a proposal.</p><p><br></p><p>Have you engaged anyone on any of the technical group channels (eg Discord or Telegram), or do you have a direct line of communications with the people and resources required?</p><p><br></p><p>Important: Catalyst funding is not anonymous, and some level of ‘proof of life’ verifications will take place before initial funding is released. Also remember that your proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.</p><p><br></p><p>All Project Participants must disclose their role and scope of services across any submitted proposals, even if they are not in the lead or co-proposer role, such as an implementer, vendor, service provider, etc. Failure to disclose this information may lead to disqualification from the current grant round.</p>",
+                            "minLength": 1,
+                            "maxLength": 10240
+                        }
+                    }
+                },
+                "budget": {
+                    "$ref": "#/definitions/section",
+                    "title": "Budget & Costs",
+                    "properties": {
+                        "costs": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Please provide a cost breakdown of the proposed work and resources",
+                            "description": "<p>Make sure every element mentioned in your plan reflects its cost. It may be helpful to refer to your plan and timeline, list all the resources you will need at each stage, and what they cost.</p><p><br></p><p>Here, provide a clear description of any third party product or service you will be using. This could be hardware, software licenses, professional services (legal, accounting, code auditing, etc) but does not need to include the use of contracted programmers and developers.</p><p><br></p><p>The exact budget elements you include will depend on what type of work you are doing, and you might need to give less detail for a small, low-budget proposal. If the cost of the project will exceed the funding request, please provide information about alternative sources of funding.</p><p><br></p><p>Consider including budget elements for publicity / marketing / promotion / community engagement; project management; documentation; and reporting back to the community. Most proposals need these, but many proposers forget to include them.</p><p><br></p><p>It is the project team’s responsibility to properly manage the funds provided. Make sure to reference <a href=\"https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules\">Fund Rules</a> to understand eligibility around costs.</p>",
+                            "minLength": 1,
+                            "maxLength": 10240
+                        }
+                    }
+                },
+                "value": {
+                    "$ref": "#/definitions/section",
+                    "title": "Value for Money",
+                    "properties": {
+                        "note": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "How does the cost of the project represent value for money for the Cardano ecosystem?",
+                            "description": "<p>Use the response to provide the context about the costs you listed previously, particularly if they are high.</p><p><br></p><p>It may be helpful to include some brief information on how you have decided on the costs of the project.&nbsp;</p><p><br></p><p>For instance, can you justify with supporting evidence that costs are proportional to the average wage in your country, or typical freelance rates in your industry? Is there anything else that helps to support how the project represents value for money?</p>",
+                            "minLength": 1,
+                            "maxLength": 10240
+                        }
+                    }
+                }
+            },
+            "x-order": [
+                "team",
+                "budget",
+                "value"
+            ]
+        },
+        "agreements": {
+            "$ref": "#/definitions/segment",
+            "title": "Acknowledgements",
+            "properties": {
+                "mandatory": {
+                    "$ref": "#/definitions/section",
+                    "title": "Mandatory",
+                    "properties": {
+                        "fund_rules": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "title": "Fund Rules:",
+                            "description": "<p>By submitting a proposal to Project Catalyst Fund14, I confirm that I have read and agree to be bound by the<a href=\"https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules\"> Fund Rules</a>.</p>"
+                        },
+                        "terms_and_conditions": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "title": "Terms and Conditions:",
+                            "description": "<p>By submitting a proposal to Project Catalyst Fund14, I confirm that I have read and agree to be bound by the<a href=\"https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions\"> Project Catalyst Terms and Conditions</a>.</p>"
+                        },
+                        "privacy_policy": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "title": "Privacy Policy: ",
+                            "description": "<p>I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Fund14 will be collected, stored, used and processed in accordance with the Catalyst FC’s <a href=\"https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy\">Privacy Policy</a>.</p>"
+                        }
+                    },
+                    "required": [
+                        "fund_rules",
+                        "terms_and_conditions",
+                        "privacy_policy"
+                    ],
+                    "x-order": [
+                        "fund_rules",
+                        "terms_and_conditions",
+                        "privacy_policy"
+                    ]
+                }
+            },
+            "x-order": [
+                "mandatory"
+            ]
+        }
+    },
+    "x-order": [
+        "setup",
+        "summary",
+        "horizons",
+        "details",
+        "milestones",
+        "pitch",
+        "agreements"
+    ]
+}
