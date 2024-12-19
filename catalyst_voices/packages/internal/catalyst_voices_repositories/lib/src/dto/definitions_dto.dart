@@ -58,7 +58,7 @@ class DefinitionsDto {
 
   Map<String, dynamic> toJson() => _$DefinitionsDtoToJson(this);
 
-  List<BaseDefinition> get definitions => [
+  List<BaseDefinition> get definitionsModels => [
         segment.toModel(),
         section.toModel(),
         singleLineTextEntry.toModel(),

@@ -58,7 +58,7 @@ class SchemaDto extends Equatable {
     final sortedProperties = List<SchemaSegmentDto>.from(this.segments)..sort();
     final segments = sortedProperties
         .where((e) => e.ref.contains('segment'))
-        .map((e) => e.toModel(definitions.definitions))
+        .map((e) => e.toModel(definitions.definitionsModels))
         .toList();
     return Schema(
       schema: schema,
@@ -233,7 +233,7 @@ class SchemaSectionDto extends Equatable
     orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
     final sortedElements = List<SchemaElementDto>.from(this.elements)..sort();
     final elements = sortedElements
-        .where((element) => DefinitionsType.isKnownType(element.ref))
+        .where((element) => BaseDefinition.isKnownType(element.ref))
         .map((e) => e.toModel(definitions))
         .toList();
     return SchemaSection(

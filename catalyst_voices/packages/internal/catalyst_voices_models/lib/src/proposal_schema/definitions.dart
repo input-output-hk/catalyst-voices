@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 enum DefinitionsObjectType {
   string,
   object,
@@ -66,67 +68,67 @@ enum DefinitionsFormat {
   }
 }
 
-enum DefinitionsType {
-  segment,
-  section,
-  singleLineTextEntry,
-  multiLineTextEntry,
-  multiLineTextEntryMarkdown,
-  dropDownSingleSelect,
-  multiSelect,
-  singleLineTextEntryList,
-  multiLineTextEntryListMarkdown,
-  singleLineHttpsURLEntry,
-  singleLineHttpsURLEntryList,
-  nestedQuestionsList,
-  nestedQuestions,
-  singleGroupedTagSelector,
-  tagGroup,
-  tagSelection,
-  tokenValueCardanoADA,
-  durationInMonths,
-  yesNoChoice,
-  agreementConfirmation,
-  spdxLicenseOrURL;
+// enum DefinitionsType {
+//   segment,
+//   section,
+//   singleLineTextEntry,
+//   multiLineTextEntry,
+//   multiLineTextEntryMarkdown,
+//   dropDownSingleSelect,
+//   multiSelect,
+//   singleLineTextEntryList,
+//   multiLineTextEntryListMarkdown,
+//   singleLineHttpsURLEntry,
+//   singleLineHttpsURLEntryList,
+//   nestedQuestionsList,
+//   nestedQuestions,
+//   singleGroupedTagSelector,
+//   tagGroup,
+//   tagSelection,
+//   tokenValueCardanoADA,
+//   durationInMonths,
+//   yesNoChoice,
+//   agreementConfirmation,
+//   spdxLicenseOrURL;
 
-  const DefinitionsType();
+//   const DefinitionsType();
 
-  static DefinitionsType fromString(String value) {
-    return values.byName(value);
-  }
+//   static DefinitionsType fromString(String value) {
+//     return values.byName(value);
+//   }
 
-  static bool isKnownType(String refPath) {
-    final ref = refPath.split('/').last;
-    return values.asNameMap()[ref] != null;
-  }
+//   static bool isKnownType(String refPath) {
+//     final ref = refPath.split('/').last;
+//     return values.asNameMap()[ref] != null;
+//   }
 
-  Object get definitionType => switch (this) {
-        section => SectionDefinition,
-        segment => SegmentDefinition,
-        singleLineTextEntry => SingleLineTextEntryDefinition,
-        durationInMonths => DurationInMonthsDefinition,
-        singleLineHttpsURLEntry => SingleLineHttpsURLEntryDefinition,
-        multiLineTextEntry => MultiLineTextEntryDefinition,
-        multiLineTextEntryMarkdown => MultiLineTextEntryMarkdownDefinition,
-        dropDownSingleSelect => DropDownSingleSelectDefinition,
-        multiSelect => MultiSelectDefinition,
-        singleLineTextEntryList => SingleLineTextEntryListDefinition,
-        multiLineTextEntryListMarkdown =>
-          MultiLineTextEntryListMarkdownDefinition,
-        singleLineHttpsURLEntryList => SingleLineHttpsURLEntryListDefinition,
-        nestedQuestionsList => NestedQuestionsListDefinition,
-        nestedQuestions => NestedQuestionsDefinition,
-        singleGroupedTagSelector => SingleGroupedTagSelectorDefinition,
-        tagGroup => TagGroupDefinition,
-        tagSelection => TagSelectionDefinition,
-        tokenValueCardanoADA => TokenValueCardanoADADefinition,
-        yesNoChoice => YesNoChoiceDefinition,
-        agreementConfirmation => AgreementConfirmationDefinition,
-        spdxLicenseOrURL => SPDXLicenceOrUrlDefinition,
-      };
-}
+//   Object get definitionType => switch (this) {
+//         section => SectionDefinition,
+//         segment => SegmentDefinition,
+//         singleLineTextEntry => SingleLineTextEntryDefinition,
+//         durationInMonths => DurationInMonthsDefinition,
+//         singleLineHttpsURLEntry => SingleLineHttpsURLEntryDefinition,
+//         multiLineTextEntry => MultiLineTextEntryDefinition,
+//         multiLineTextEntryMarkdown => MultiLineTextEntryMarkdownDefinition,
+//         dropDownSingleSelect => DropDownSingleSelectDefinition,
+//         multiSelect => MultiSelectDefinition,
+//         singleLineTextEntryList => SingleLineTextEntryListDefinition,
+//         multiLineTextEntryListMarkdown =>
+//           MultiLineTextEntryListMarkdownDefinition,
+//         singleLineHttpsURLEntryList => SingleLineHttpsURLEntryListDefinition,
+//         nestedQuestionsList => NestedQuestionsListDefinition,
+//         nestedQuestions => NestedQuestionsDefinition,
+//         singleGroupedTagSelector => SingleGroupedTagSelectorDefinition,
+//         tagGroup => TagGroupDefinition,
+//         tagSelection => TagSelectionDefinition,
+//         tokenValueCardanoADA => TokenValueCardanoADADefinition,
+//         yesNoChoice => YesNoChoiceDefinition,
+//         agreementConfirmation => AgreementConfirmationDefinition,
+//         spdxLicenseOrURL => SPDXLicenceOrUrlDefinition,
+//       };
+// }
 
-abstract class BaseDefinition {
+sealed class BaseDefinition {
   final DefinitionsObjectType type;
   final String note;
 
@@ -134,13 +136,47 @@ abstract class BaseDefinition {
     required this.type,
     required this.note,
   });
+  @visibleForTesting
+  static final Map<String, Type> refPathToDefinitionType = {
+    'segment': SegmentDefinition,
+    'section': SectionDefinition,
+    'singleLineTextEntry': SingleLineTextEntryDefinition,
+    'singleLineHttpsURLEntry': SingleLineHttpsURLEntryDefinition,
+    'multiLineTextEntry': MultiLineTextEntryDefinition,
+    'multiLineTextEntryMarkdown': MultiLineTextEntryMarkdownDefinition,
+    'dropDownSingleSelect': DropDownSingleSelectDefinition,
+    'multiSelect': MultiSelectDefinition,
+    'singleLineTextEntryList': SingleLineTextEntryListDefinition,
+    'multiLineTextEntryListMarkdown': MultiLineTextEntryListMarkdownDefinition,
+    'singleLineHttpsURLEntryList': SingleLineHttpsURLEntryListDefinition,
+    'nestedQuestionsList': NestedQuestionsListDefinition,
+    'nestedQuestions': NestedQuestionsDefinition,
+    'singleGroupedTagSelector': SingleGroupedTagSelectorDefinition,
+    'tagGroup': TagGroupDefinition,
+    'tagSelection': TagSelectionDefinition,
+    'tokenValueCardanoADA': TokenValueCardanoADADefinition,
+    'durationInMonths': DurationInMonthsDefinition,
+    'yesNoChoice': YesNoChoiceDefinition,
+    'agreementConfirmation': AgreementConfirmationDefinition,
+    'spdxLicenseOrURL': SPDXLicenceOrUrlDefinition,
+  };
+
+  static Type typeFromRefPath(String refPath) {
+    final ref = refPath.split('/').last;
+    return refPathToDefinitionType[ref] ??
+        (throw ArgumentError('Unknown refPath: $refPath'));
+  }
+
+  static bool isKnownType(String refPath) {
+    final ref = refPath.split('/').last;
+    return refPathToDefinitionType[ref] != null;
+  }
 }
 
 extension BaseDefinitionListExt on List<BaseDefinition> {
   BaseDefinition getDefinition(String refPath) {
-    final ref = refPath.split('/').last;
-    final definitionType = DefinitionsType.fromString(ref);
-    final classType = definitionType.definitionType;
+    final definitionType = BaseDefinition.typeFromRefPath(refPath);
+    final classType = definitionType;
 
     return firstWhere((e) => e.runtimeType == classType);
   }

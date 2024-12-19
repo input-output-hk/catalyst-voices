@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/schema_dto.dart';
 import 'package:test/test.dart';
 
@@ -43,6 +44,15 @@ void main() {
           schemaDto.segments[i].order[j],
         );
       }
+    }
+  });
+
+  test('Check if every segment has a SegmentDefinition as ref', () {
+    final schemaDto = SchemaDto.fromJson(schemaJson);
+    final schema = schemaDto.toModel();
+
+    for (final segment in schema.segments) {
+      expect(segment.ref, isA<SegmentDefinition>());
     }
   });
 }
