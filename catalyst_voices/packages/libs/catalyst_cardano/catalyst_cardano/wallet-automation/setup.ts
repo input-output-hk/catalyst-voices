@@ -42,12 +42,11 @@ export const enableWallet = async (
   browser: BrowserContext
 ) => {
   const page = browser.pages()[0];
-  await page.reload();
   await page.goto("/");
   await page.waitForTimeout(4000);
   const [walletPopup] = await Promise.all([
     browser.waitForEvent("page"),
-    page.locator('//*[text()="Enable wallet"]').click(),
+    page.locator('//*[text()="Enable wallet"]').first().click(),
   ]);
   await walletPopup.waitForTimeout(2000);
   await allowExtension(walletPopup, walletConfig.extension.Name);
