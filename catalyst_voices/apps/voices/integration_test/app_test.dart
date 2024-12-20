@@ -8,7 +8,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import 'pageobject/appBar_page.dart';
-import 'pageobject/discovery_page.dart';
+import 'pageobject/overall_spaces_page.dart';
 import 'pageobject/spaces_drawer_page.dart';
 import 'utils/selector_utils.dart';
 
@@ -34,7 +34,7 @@ void main() async {
     'Spaces drawer - visitor - no drawer button',
     (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(DiscoveryPage.visitorShortcutBtn)
+      await $(OverallSpacesPage.visitorShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       expect($(AppBarPage.spacesDrawerButton).exists, false);
     },
@@ -44,7 +44,7 @@ void main() async {
     'Spaces drawer - guest - chooser - clicking on icons works correctly',
     (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(DiscoveryPage.guestShortcutBtn)
+      await $(OverallSpacesPage.guestShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
       SpacesDrawerPage.guestLooksAsExpected($);
@@ -70,10 +70,9 @@ void main() async {
     'Spaces drawer - guest - chooser - next,previous buttons work correctly',
     (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(DiscoveryPage.guestShortcutBtn)
+      await $(OverallSpacesPage.guestShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
-      SpacesDrawerPage.guestLooksAsExpected($);
 
       // iterate thru spaces by clicking next
       for (var i = 0; i < Space.values.length; i++) {
@@ -103,12 +102,36 @@ void main() async {
 
   patrolWidgetTest(
     'Spaces drawer - user - chooser - clicking on icons works correctly',
-        (PatrolTester $) async {
+    (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(DiscoveryPage.userShortcutBtn)
+      await $(OverallSpacesPage.userShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
       await SpacesDrawerPage.userLooksAsExpected($);
+    },
+  );
+
+  patrolWidgetTest(
+    'Spaces drawer - guest - chooser - all spaces button works',
+    (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(OverallSpacesPage.guestShortcutBtn)
+          .tap(settleTimeout: const Duration(seconds: 10));
+      await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+      await $(SpacesDrawerPage.allSpacesBtn).tap();
+      expect($(OverallSpacesPage.spacesListView), findsOneWidget);
+    },
+  );
+
+  patrolWidgetTest(
+    'Spaces drawer - user - chooser - all spaces button works',
+    (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(OverallSpacesPage.userShortcutBtn)
+          .tap(settleTimeout: const Duration(seconds: 10));
+      await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+      await $(SpacesDrawerPage.allSpacesBtn).tap();
+      expect($(OverallSpacesPage.spacesListView), findsOneWidget);
     },
   );
 }
