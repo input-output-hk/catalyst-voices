@@ -1,5 +1,17 @@
 //! `SignedDocBody` struct implementation.
 
+use super::DocsQueryFilter;
+use crate::{
+    db::event::{common::query_limits::QueryLimits, EventDB},
+    jinja::{get_template, JinjaTemplateSource},
+};
+
+/// Filtered select sql query jinja template
+pub(crate) const FILTERED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
+    name: "filtered_select_signed_documents.jinja.template",
+    source: include_str!("./sql/filtered_select_signed_documents.sql.jinja"),
+};
+
 /// Signed doc body event db struct
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct SignedDocBody {
@@ -57,8 +69,28 @@ impl SignedDocBody {
         }
     }
 
+    /// Loads a vector of `SignedDocBody` from the event db.
+    #[allow(dead_code)]
+    pub(crate) async fn load_from_db(
+        conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+    ) -> anyhow::Result<Vec<Self>> {
+        let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;
+        let query = query_template.render(serde_json::json!({
+            "conditions": conditions.query_stmt(),
+            "query_limits": query_limits.query_stmt(),
+        }))?;
+        let rows = EventDB::query(&query, &[]).await?;
+
+        let docs = rows
+            .iter()
+            .map(SignedDocBody::from_row)
+            .collect::<anyhow::Result<_>>()?;
+
+        Ok(docs)
+    }
+
     /// Creates a  `SignedDocBody` from postgresql row object.
-    pub(crate) fn from_row(row: &tokio_postgres::Row) -> anyhow::Result<Self> {
+    fn from_row(row: &tokio_postgres::Row) -> anyhow::Result<Self> {
         let id = row.try_get("id")?;
         let ver = row.try_get("ver")?;
         let doc_type = row.try_get("type")?;

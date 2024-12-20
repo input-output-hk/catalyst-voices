@@ -1,7 +1,7 @@
 //! Integration tests of the `signed docs` queries
 
 use super::*;
-use crate::db::event::establish_connection;
+use crate::db::event::{common::query_limits::QueryLimits, establish_connection};
 
 #[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
 #[tokio::test]
@@ -65,13 +65,13 @@ async fn some_test() {
         assert_eq!(doc, &res_doc);
 
         let res_docs =
-            filtered_select_signed_docs(&DocsQueryFilter::DocId(*doc.id()), &QueryLimits::ALL)
+            SignedDocBody::load_from_db(&DocsQueryFilter::DocId(*doc.id()), &QueryLimits::ALL)
                 .await
                 .unwrap();
         assert_eq!(res_docs.len(), 1);
         assert_eq!(doc.body(), res_docs.first().unwrap());
 
-        let res_docs = filtered_select_signed_docs(
+        let res_docs = SignedDocBody::load_from_db(
             &DocsQueryFilter::DocVer(*doc.id(), *doc.ver()),
             &QueryLimits::ALL,
         )
@@ -80,7 +80,7 @@ async fn some_test() {
         assert_eq!(res_docs.len(), 1);
         assert_eq!(doc.body(), res_docs.first().unwrap());
 
-        let res_docs = filtered_select_signed_docs(
+        let res_docs = SignedDocBody::load_from_db(
             &DocsQueryFilter::Author(doc.author().clone()),
             &QueryLimits::ALL,
         )
@@ -91,7 +91,7 @@ async fn some_test() {
     }
 
     let res_docs =
-        filtered_select_signed_docs(&DocsQueryFilter::DocType(doc_type), &QueryLimits::ALL)
+        SignedDocBody::load_from_db(&DocsQueryFilter::DocType(doc_type), &QueryLimits::ALL)
             .await
             .unwrap();
     assert_eq!(
@@ -99,7 +99,7 @@ async fn some_test() {
         res_docs.iter().rev().collect::<Vec<_>>()
     );
 
-    let res_docs = filtered_select_signed_docs(&DocsQueryFilter::All, &QueryLimits::ALL)
+    let res_docs = SignedDocBody::load_from_db(&DocsQueryFilter::All, &QueryLimits::ALL)
         .await
         .unwrap();
     assert_eq!(

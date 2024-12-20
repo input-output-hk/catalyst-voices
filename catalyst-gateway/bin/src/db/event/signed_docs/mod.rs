@@ -8,9 +8,9 @@ mod tests;
 
 pub(crate) use full_signed_doc::FullSignedDoc;
 pub(crate) use query_filter::DocsQueryFilter;
-pub(crate) use signed_doc_body::SignedDocBody;
+pub(crate) use signed_doc_body::{SignedDocBody, FILTERED_SELECT_SIGNED_DOCS_TEMPLATE};
 
-use super::{common::query_limits::QueryLimits, EventDB, NotFoundError};
+use super::{EventDB, NotFoundError};
 use crate::jinja::{get_template, JinjaTemplateSource};
 
 /// Insert sql query
@@ -20,12 +20,6 @@ const INSERT_SIGNED_DOCS: &str = include_str!("./sql/insert_signed_documents.sql
 pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
     name: "select_signed_documents.jinja.template",
     source: include_str!("./sql/select_signed_documents.sql.jinja"),
-};
-
-/// Filtered select sql query jinja template
-pub(crate) const FILTERED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
-    name: "filtered_select_signed_documents.jinja.template",
-    source: include_str!("./sql/filtered_select_signed_documents.sql.jinja"),
 };
 
 /// Make an insert query into the `event-db` by adding data into the `signed_docs` table.
@@ -78,25 +72,4 @@ pub(crate) async fn select_signed_docs(
     let row = EventDB::query_one(&query, &[]).await?;
 
     FullSignedDoc::from_row(id, ver, &row)
-}
-
-/// Make an filtered select query into the `event-db` by getting data from the
-/// `signed_docs` table.
-#[allow(dead_code)]
-pub(crate) async fn filtered_select_signed_docs(
-    conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-) -> anyhow::Result<Vec<SignedDocBody>> {
-    let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;
-    let query = query_template.render(serde_json::json!({
-        "conditions": conditions.query_stmt(),
-        "query_limits": query_limits.query_stmt(),
-    }))?;
-    let rows = EventDB::query(&query, &[]).await?;
-
-    let docs = rows
-        .iter()
-        .map(SignedDocBody::from_row)
-        .collect::<anyhow::Result<_>>()?;
-
-    Ok(docs)
 }
