@@ -145,17 +145,18 @@ test-scylla:
     FROM +builder-src
 
     # setup scylla
-    RUN curl -sSL https://repo.scylladb.com/scylla/repo.asc | apt-key add - && \
-        echo "deb [arch=$(dpkg --print-architecture)] https://repo.scylladb.com/deb/scylla/${SCYLLA_VERSION} $(lsb_release -c | awk '{print $2}') main" | tee /etc/apt/sources.list.d/scylla.list
-
     RUN apt-get update && \
-        apt-get install -y scylla
-    
-    ENV HOST_IP
-    RUN export HOST_IP="$(ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}')"
-
-    RUN scylla --seeds=scylla-node --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0 --broadcast-rpc-address ${HOST_IP}
+        apt-get install -y --no-install-recommends \
+        wget gnupg ca-certificates && \
+        mkdir -p /etc/apt/keyrings && \
+        gpg --homedir /tmp --no-default-keyring --keyring /etc/apt/keyrings/scylladb.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys a43e06657bac99e3 && \
+        wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-6.2.list && \
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+        scylla
 
     # run the test
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        scylla --options-file /etc/scylla/scylla.yaml --smp=2 --memory=4G --overprovisioned --developer-mode=1 & \
         cargo nextest run --release --run-ignored=only scylla_session
