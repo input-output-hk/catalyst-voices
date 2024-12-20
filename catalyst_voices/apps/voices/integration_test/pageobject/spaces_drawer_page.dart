@@ -86,9 +86,9 @@ class SpacesDrawerPage {
       findsOneWidget,
     );
     expect(
-        $(userMenuContainer(Space.discovery)).$(userRolesTile), findsOneWidget);
+        $(userMenuContainer(Space.discovery)).$(userRolesTile), findsOneWidget,);
     expect($(userMenuContainer(Space.discovery)).$(userFeedbackTile),
-        findsOneWidget);
+        findsOneWidget,);
     expect(
       $(userMenuContainer(Space.discovery)).$(userDocumentationTile),
       findsOneWidget,
