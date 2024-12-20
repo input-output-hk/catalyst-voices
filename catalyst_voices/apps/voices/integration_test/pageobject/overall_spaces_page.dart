@@ -12,6 +12,4 @@ class OverallSpacesPage {
   static Key spaceOverview(Space space) {
     return Key('SpaceOverview.${space.name}');
   }
-
-
 }

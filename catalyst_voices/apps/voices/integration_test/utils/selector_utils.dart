@@ -2,8 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 class SelectorUtils {
-  static void isDisabled(PatrolTester $, PatrolFinder widget,
-      {bool? reverse = false,}) {
+  static void isDisabled(
+    PatrolTester $,
+    PatrolFinder widget, {
+    bool? reverse = false,
+  }) {
     final widgetProps = $.tester.widget(widget).toString().split('(').last;
     final expectedState = reverse! ? 'enabled' : 'disabled';
     expect(
