@@ -119,9 +119,21 @@ impl ToJSON for Page {
     }
 }
 
-impl From<u64> for Page {
-    fn from(value: u64) -> Self {
-        Self(value)
+impl TryFrom<u64> for Page {
+    type Error = anyhow::Error;
+
+    fn try_from(page: u64) -> Result<Self, Self::Error> {
+        anyhow::ensure!(
+            is_valid_page(page),
+            "Invalid `page` value, must be in range {PAGE_MINIMUM}..{PAGE_MAXIMUM}"
+        );
+        Ok(Self(page))
+    }
+}
+
+impl From<Page> for u64 {
+    fn from(value: Page) -> Self {
+        value.0
     }
 }
 
@@ -244,9 +256,21 @@ impl ToJSON for Limit {
     }
 }
 
-impl From<u64> for Limit {
-    fn from(value: u64) -> Self {
-        Self(value)
+impl TryFrom<u64> for Limit {
+    type Error = anyhow::Error;
+
+    fn try_from(limit: u64) -> Result<Self, Self::Error> {
+        anyhow::ensure!(
+            is_valid_limit(limit),
+            "Invalid `limit` value, must be in range {LIMIT_MINIMUM}..{LIMIT_MAXIMUM}"
+        );
+        Ok(Self(limit))
+    }
+}
+
+impl From<Limit> for u64 {
+    fn from(value: Limit) -> Self {
+        value.0
     }
 }
 
@@ -347,9 +371,21 @@ impl ToJSON for Remaining {
     }
 }
 
-impl From<u64> for Remaining {
-    fn from(value: u64) -> Self {
-        Self(value)
+impl TryFrom<u64> for Remaining {
+    type Error = anyhow::Error;
+
+    fn try_from(remaining: u64) -> Result<Self, Self::Error> {
+        anyhow::ensure!(
+            is_valid_remaining(remaining),
+            "Invalid `remaining` value, must be in range {REMAINING_MINIMUM}..{REMAINING_MAXIMUM}"
+        );
+        Ok(Self(remaining))
+    }
+}
+
+impl From<Remaining> for u64 {
+    fn from(value: Remaining) -> Self {
+        value.0
     }
 }
 
