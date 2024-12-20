@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:catalyst_cose/src/types/string_or_int.dart';
 import 'package:catalyst_cose/src/types/uuid.dart';
 import 'package:cbor/cbor.dart';
@@ -34,6 +37,19 @@ final class CborUtils {
     }
 
     return ReferenceUuid.fromCbor(value);
+  }
+
+  /// Deserializes optional [Uint8List] type.
+  static Uint8List? deserializeBytes(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value is CborString) {
+      return utf8.encode(value.toString());
+    }
+
+    return Uint8List.fromList((value as CborBytes).bytes);
   }
 
   /// Deserializes optional [String] type.
