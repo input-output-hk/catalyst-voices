@@ -24,21 +24,21 @@ extension type const Uuid(String value) {
   }
 }
 
-/// A reference to an entity represented by the [uuid].
+/// A reference to an entity represented by the [id].
 /// Optionally the version of the entity may be specified by the [ver].
 ///
 /// What this uuid means depends where and how the class is used.
 /// In CDDL it is defined as (UUID / [UUID, UUID]).
 final class ReferenceUuid extends Equatable {
   /// The referenced entity uuid.
-  final Uuid uuid;
+  final Uuid id;
 
   /// The version of the referenced entity.
   final Uuid? ver;
 
   /// The default constructor for the [ReferenceUuid].
   const ReferenceUuid({
-    required this.uuid,
+    required this.id,
     this.ver,
   });
 
@@ -46,12 +46,12 @@ final class ReferenceUuid extends Equatable {
   factory ReferenceUuid.fromCbor(CborValue value) {
     if (value is CborList) {
       return ReferenceUuid(
-        uuid: Uuid.fromCbor(value[0]),
+        id: Uuid.fromCbor(value[0]),
         ver: Uuid.fromCbor(value[1]),
       );
     } else {
       return ReferenceUuid(
-        uuid: Uuid.fromCbor(value),
+        id: Uuid.fromCbor(value),
       );
     }
   }
@@ -61,14 +61,14 @@ final class ReferenceUuid extends Equatable {
     final ver = this.ver;
     if (ver != null) {
       return CborList([
-        uuid.toCbor(),
+        id.toCbor(),
         ver.toCbor(),
       ]);
     } else {
-      return uuid.toCbor();
+      return id.toCbor();
     }
   }
 
   @override
-  List<Object?> get props => [uuid, ver];
+  List<Object?> get props => [id, ver];
 }
