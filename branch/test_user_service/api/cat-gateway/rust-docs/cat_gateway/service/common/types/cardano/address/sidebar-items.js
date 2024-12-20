@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["STAKE_DESCRIPTION","STAKE_EXAMPLE","STAKE_TITLE"],"static":["EXTERNAL_DOCS","STAKE_SCHEMA"],"struct":["Cip19StakeAddress"]};

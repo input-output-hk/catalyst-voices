@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["INSERT_SIGNED_DOCS"],"fn":["insert_signed_docs"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["cip36","date_time_to_slot_number_get","rbac","registration_get","staking","sync_state_get","types"],"struct":["Api"],"type":["CardanoApi"]};
