@@ -47,21 +47,23 @@ async fn some_test() {
     ];
 
     for doc in &docs {
-        insert_signed_docs(doc).await.unwrap();
+        doc.upload_to_db().await.unwrap();
         // try to insert the same data again
-        insert_signed_docs(doc).await.unwrap();
+        doc.upload_to_db().await.unwrap();
         // try another doc with the same `id` and `ver` and with different other fields
         let another_doc = FullSignedDoc::new(
             SignedDocBody::new(*doc.id(), *doc.ver(), doc_type, "Neil".to_string(), None),
             None,
             vec![],
         );
-        assert!(insert_signed_docs(&another_doc).await.is_err());
+        assert!(another_doc.upload_to_db().await.is_err());
 
-        let res_doc = select_signed_docs(doc.id(), Some(doc.ver())).await.unwrap();
+        let res_doc = FullSignedDoc::load_from_db(doc.id(), Some(doc.ver()))
+            .await
+            .unwrap();
         assert_eq!(doc, &res_doc);
 
-        let res_doc = select_signed_docs(doc.id(), None).await.unwrap();
+        let res_doc = FullSignedDoc::load_from_db(doc.id(), None).await.unwrap();
         assert_eq!(doc, &res_doc);
 
         let res_docs =
