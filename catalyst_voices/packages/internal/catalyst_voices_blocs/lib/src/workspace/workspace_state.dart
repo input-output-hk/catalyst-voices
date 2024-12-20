@@ -3,45 +3,58 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class WorkspaceState extends Equatable {
-  final List<Section> sections;
-  final WorkspaceGuidance guidance;
+  final WorkspaceTabType tab;
+  final bool isLoading;
+  final int draftProposalCount;
+  final int finalProposalCount;
+  final String searchQuery;
+  final List<WorkspaceProposalListItem> proposals;
+  final LocalizedException? error;
 
   const WorkspaceState({
-    this.sections = const [],
-    this.guidance = const WorkspaceGuidance(),
+    this.tab = WorkspaceTabType.draftProposal,
+    this.isLoading = false,
+    this.draftProposalCount = 0,
+    this.finalProposalCount = 0,
+    this.searchQuery = '',
+    this.proposals = const [],
+    this.error,
   });
 
+  bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
+
+  bool get showEmptyState => !isLoading && proposals.isEmpty && error == null;
+
+  bool get showError => !isLoading && error != null;
+
   WorkspaceState copyWith({
-    List<Section>? sections,
-    WorkspaceGuidance? guidance,
+    WorkspaceTabType? tab,
+    bool? isLoading,
+    int? draftProposalCount,
+    int? finalProposalCount,
+    String? searchQuery,
+    List<WorkspaceProposalListItem>? proposals,
+    Optional<LocalizedException>? error,
   }) {
     return WorkspaceState(
-      sections: sections ?? this.sections,
-      guidance: guidance ?? this.guidance,
+      tab: tab ?? this.tab,
+      isLoading: isLoading ?? this.isLoading,
+      draftProposalCount: draftProposalCount ?? this.draftProposalCount,
+      finalProposalCount: finalProposalCount ?? this.finalProposalCount,
+      searchQuery: searchQuery ?? this.searchQuery,
+      proposals: proposals ?? this.proposals,
+      error: error.dataOr(this.error),
     );
   }
 
   @override
   List<Object?> get props => [
-        sections,
-        guidance,
-      ];
-}
-
-final class WorkspaceGuidance extends Equatable {
-  final bool isNoneSelected;
-  final List<Guidance> guidances;
-
-  const WorkspaceGuidance({
-    this.isNoneSelected = false,
-    this.guidances = const [],
-  });
-
-  bool get showEmptyState => !isNoneSelected && guidances.isEmpty;
-
-  @override
-  List<Object?> get props => [
-        isNoneSelected,
-        guidances,
+        tab,
+        isLoading,
+        draftProposalCount,
+        finalProposalCount,
+        searchQuery,
+        proposals,
+        error,
       ];
 }

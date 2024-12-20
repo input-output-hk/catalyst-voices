@@ -5,15 +5,19 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class GuidanceView extends StatefulWidget {
+class ProposalBuilderGuidanceView extends StatefulWidget {
   final List<Guidance> guidances;
-  const GuidanceView(this.guidances, {super.key});
+
+  const ProposalBuilderGuidanceView(this.guidances, {super.key});
 
   @override
-  State<GuidanceView> createState() => _GuidanceViewState();
+  State<ProposalBuilderGuidanceView> createState() {
+    return _ProposalBuilderGuidanceViewState();
+  }
 }
 
-class _GuidanceViewState extends State<GuidanceView> {
+class _ProposalBuilderGuidanceViewState
+    extends State<ProposalBuilderGuidanceView> {
   final List<Guidance> filteredGuidances = [];
 
   GuidanceType? selectedType;
@@ -27,7 +31,7 @@ class _GuidanceViewState extends State<GuidanceView> {
   }
 
   @override
-  void didUpdateWidget(GuidanceView oldWidget) {
+  void didUpdateWidget(ProposalBuilderGuidanceView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.guidances != widget.guidances) {
       filteredGuidances

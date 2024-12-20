@@ -2,8 +2,8 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class WorkspaceNavigationPanel extends StatelessWidget {
-  const WorkspaceNavigationPanel({super.key});
+class ProposalBuilderNavigationPanel extends StatelessWidget {
+  const ProposalBuilderNavigationPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
