@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
-import 'pageobject/appBar_page.dart';
+import 'pageobject/app_bar_page.dart';
 import 'pageobject/overall_spaces_page.dart';
 import 'pageobject/spaces_drawer_page.dart';
 import 'utils/selector_utils.dart';
