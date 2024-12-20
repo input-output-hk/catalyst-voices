@@ -1,9 +1,6 @@
 import 'package:catalyst_voices_models/src/proposal_schema/schema.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'proposal_builder.g.dart';
-
-@JsonSerializable()
 class ProposalBuilder {
   final String schema;
   final List<ProposalBuilderSegment> segments;
@@ -40,20 +37,8 @@ class ProposalBuilder {
           .toList(),
     );
   }
-
-  factory ProposalBuilder.fromJson(Map<String, dynamic> json) =>
-      _$ProposalBuilderFromJson(json);
-
-  Map<String, dynamic> toJson() {
-    final sections = <String, dynamic>{}..addAll({r'$schema': schema});
-    for (final section in segments) {
-      sections.addAll(section.toJson());
-    }
-    return sections;
-  }
 }
 
-@JsonSerializable()
 class ProposalBuilderSegment {
   final String id;
   final List<ProposalBuilderSection> sections;
@@ -62,19 +47,6 @@ class ProposalBuilderSegment {
     required this.id,
     required this.sections,
   });
-
-  factory ProposalBuilderSegment.fromJson(Map<String, dynamic> json) =>
-      _$ProposalBuilderSegmentFromJson(json);
-
-  Map<String, dynamic> toJson() {
-    final sections = <String, dynamic>{};
-    for (final section in this.sections) {
-      sections.addAll(section.toJson());
-    }
-    return {
-      id: sections,
-    };
-  }
 }
 
 @JsonSerializable()
@@ -86,22 +58,8 @@ class ProposalBuilderSection {
     required this.id,
     required this.elements,
   });
-
-  factory ProposalBuilderSection.fromJson(Map<String, dynamic> json) =>
-      _$ProposalBuilderSectionFromJson(json);
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    for (final element in elements) {
-      map.addAll(element.toJson());
-    }
-    return {
-      id: map,
-    };
-  }
 }
 
-@JsonSerializable()
 class ProposalBuilderElement {
   final String id;
   final dynamic value;
@@ -110,11 +68,4 @@ class ProposalBuilderElement {
     required this.id,
     required this.value,
   });
-
-  factory ProposalBuilderElement.fromJson(Map<String, dynamic> json) =>
-      _$ProposalBuilderElementFromJson(json);
-
-  Map<String, dynamic> toJson() => {
-        id: value,
-      };
 }
