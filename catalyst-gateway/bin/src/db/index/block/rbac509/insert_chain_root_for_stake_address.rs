@@ -9,6 +9,8 @@ use crate::{
     settings::cassandra_db::EnvVars,
 };
 
+use super::TransactionHash;
+
 /// Index RBAC Chain Root by Stake Address
 const INSERT_CHAIN_ROOT_FOR_STAKE_ADDRESS_QUERY: &str =
     include_str!("./cql/insert_chain_root_for_stake_address.cql");
@@ -24,6 +26,10 @@ pub(super) struct Params {
     txn: i16,
     /// Chain Root Hash. 32 bytes.
     chain_root: Vec<u8>,
+    /// Chain root slot number
+    chain_root_slot: num_bigint::BigInt,
+    /// Chain root transaction index
+    chain_root_txn: i16,
 }
 
 impl Debug for Params {
@@ -33,18 +39,25 @@ impl Debug for Params {
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .field("chain_root", &self.chain_root)
+            .field("chain_root_slot", &self.chain_root_slot)
+            .field("chain_root_txn", &self.chain_root_txn)
             .finish()
     }
 }
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(stake_addr: &[u8], chain_root: &[u8], slot_no: u64, txn: i16) -> Self {
+    pub(super) fn new(
+        stake_addr: TransactionHash, slot_no: u64, txn: i16, chain_root: TransactionHash,
+        chain_root_slot: u64, chain_root_txn: i16,
+    ) -> Self {
         Params {
             stake_addr: stake_addr.to_vec(),
             slot_no: num_bigint::BigInt::from(slot_no),
             txn,
             chain_root: chain_root.to_vec(),
+            chain_root_slot: num_bigint::BigInt::from(chain_root_slot),
+            chain_root_txn,
         }
     }
 

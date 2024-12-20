@@ -13,23 +13,27 @@ use crate::db::index::{
 };
 
 /// Get get chain root by stake address query string.
-const GET_CHAIN_ROOT: &str = include_str!("../cql/get_chain_root.cql");
+const GET_CHAIN_ROOT: &str = include_str!("../cql/get_chain_root_for_transaction_id.cql");
 
 /// Get chain root by stake address query params.
 #[derive(SerializeRow)]
-pub(crate) struct GetChainRootQueryParams {
-    /// Stake address to get the chain root for.
-    pub(crate) stake_address: Vec<u8>,
+pub(crate) struct QueryParams {
+    /// Transaction ID to look up.
+    pub(crate) transaction_id: Vec<u8>,
 }
 
 /// Get chain root by stake address query.
 #[derive(DeserializeRow)]
-pub(crate) struct GetChainRootQuery {
+pub(crate) struct Query {
     /// Chain root for the queries stake address.
     pub(crate) chain_root: Vec<u8>,
+    /// Slot Number the cert is in.
+    pub(crate) slot_no: num_bigint::BigInt,
+    /// Transaction Index.
+    pub(crate) txn: i16,
 }
 
-impl GetChainRootQuery {
+impl Query {
     /// Prepares a get chain root by stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         let get_chain_root_by_stake_address_query = PreparedQueries::prepare(
@@ -49,12 +53,12 @@ impl GetChainRootQuery {
 
     /// Executes a get chain root by stake address query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetChainRootQueryParams,
-    ) -> anyhow::Result<TypedRowStream<GetChainRootQuery>> {
+        session: &CassandraSession, params: QueryParams,
+    ) -> anyhow::Result<TypedRowStream<Query>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::ChainRootByStakeAddress, params)
             .await?
-            .rows_stream::<GetChainRootQuery>()?;
+            .rows_stream::<Query>()?;
 
         Ok(iter)
     }

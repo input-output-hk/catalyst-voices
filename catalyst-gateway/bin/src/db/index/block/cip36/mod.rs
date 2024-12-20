@@ -59,7 +59,6 @@ impl Cip36InsertQuery {
         &mut self, txn: usize, txn_index: i16, slot_no: u64, block: &MultiEraBlock,
     ) {
         if let Some(decoded_metadata) = block.txn_metadata(txn, Metadata::cip36::LABEL) {
-            #[allow(irrefutable_let_patterns)]
             if let Metadata::DecodedMetadataValues::Cip36(cip36) = &decoded_metadata.value {
                 // Check if we are indexing a valid or invalid registration.
                 // Note, we ONLY care about catalyst, we should only have 1 voting key, if not, call
