@@ -345,10 +345,8 @@ class SchemaElementDto extends Equatable
       defaultValue: defaultValue,
       guidance: guidance,
       enumValues: enumValues,
-      maxItems: maxItems,
-      minItems: minItems,
-      minimum: minimum,
-      maximum: maximum,
+      range: Range.createIntRange(min: minimum, max: maximum),
+      itemsRange: Range.createIntRange(min: minItems, max: maxItems),
     );
   }
 

@@ -18,6 +18,7 @@ export 'keychain/vault_keychain_provider.dart';
 export 'logging/logging_service.dart';
 export 'platform/catalyst_platform.dart';
 export 'platform_aware_builder/platform_aware_builder.dart';
+export 'range/range.dart';
 export 'responsive/responsive_builder.dart';
 export 'responsive/responsive_child.dart';
 export 'responsive/responsive_padding.dart';

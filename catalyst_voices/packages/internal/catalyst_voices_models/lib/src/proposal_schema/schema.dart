@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/proposal_schema/definitions.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 class Schema {
   final String schema;
@@ -62,10 +63,8 @@ class SchemaElement {
   final String? defaultValue;
   final String guidance;
   final List<String> enumValues;
-  final int? maxItems;
-  final int? minItems;
-  final int? minimum;
-  final int? maximum;
+  final Range<int>? range;
+  final Range<int>? itemsRange;
 
   const SchemaElement({
     required this.ref,
@@ -77,9 +76,7 @@ class SchemaElement {
     required this.defaultValue,
     required this.guidance,
     this.enumValues = const <String>[],
-    this.maxItems,
-    this.minItems,
-    this.minimum,
-    this.maximum,
+    required this.range,
+    required this.itemsRange,
   });
 }
