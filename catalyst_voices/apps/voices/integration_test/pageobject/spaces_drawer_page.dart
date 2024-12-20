@@ -85,8 +85,10 @@ class SpacesDrawerPage {
       $(userMenuContainer(Space.discovery)).$(userDiscoveryDashboardTile),
       findsOneWidget,
     );
-    expect($(userMenuContainer(Space.discovery)).$(userRolesTile), findsOneWidget);
-    expect($(userMenuContainer(Space.discovery)).$(userFeedbackTile), findsOneWidget);
+    expect(
+        $(userMenuContainer(Space.discovery)).$(userRolesTile), findsOneWidget);
+    expect($(userMenuContainer(Space.discovery)).$(userFeedbackTile),
+        findsOneWidget);
     expect(
       $(userMenuContainer(Space.discovery)).$(userDocumentationTile),
       findsOneWidget,
@@ -99,7 +101,8 @@ class SpacesDrawerPage {
       findsOneWidget,
     );
     expect(
-      $(userMenuContainer(Space.workspace)).$(userSectionHeader(Space.workspace)),
+      $(userMenuContainer(Space.workspace))
+          .$(userSectionHeader(Space.workspace)),
       findsOneWidget,
     );
     final children = find.descendant(
