@@ -2,7 +2,6 @@ library dashboard_page;
 
 import 'package:flutter/material.dart';
 
-class DashboardPage {
-  static const guestShortcutBtn = Key('GuestShortcut');
+class AppBarPage {
   static const spacesDrawerButton = Key('DrawerButton');
 }
