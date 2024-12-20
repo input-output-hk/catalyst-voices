@@ -12,7 +12,7 @@ package-schemathesis:
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
                     && st run --checks all $openapi_spec \
                     --workers=2 \
-                    --wait-for-schema=15 \
+                    --wait-for-schema=120 \
                     --max-response-time=5000 \
                     --hypothesis-max-examples=1000 \
                     --data-generation-method=all \
@@ -33,50 +33,42 @@ fuzzer-api:
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd curl
     COPY schemathesis-docker-compose.yml .
-    COPY node1-scylla.yaml .
-    COPY node2-scylla.yaml .
-    COPY node3-scylla.yaml .
-    COPY node4-scylla.yaml .
-    ENV HOST_IP
-    RUN export HOST_IP="$(ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}')"
+   # COPY node1-scylla.yaml .
+   # COPY node2-scylla.yaml .
+   # COPY node3-scylla.yaml .
+   # COPY node4-scylla.yaml .
+    #ENV HOST_IP
+    #RUN export HOST_IP="$(ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}')"
     LET OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
-    ENV LOG_LEVEL=error
-    ENV DATA_REFRESH_TICK=5
-    ENV CHECK_CONFIG_TICK=5
-    ENV MACHINE_ID="UID"
-    ENV CHAIN_FOLLOWER_SYNC_TASKS="16"
-    ENV RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-    ENV CHAIN_NETWORK="Preprod"
+    #ENV LOG_LEVEL=error
+    #ENV DATA_REFRESH_TICK=5
+    #ENV CHECK_CONFIG_TICK=5
+    #ENV MACHINE_ID="UID"
+    #ENV CHAIN_FOLLOWER_SYNC_TASKS="16"
+    #ENV RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+    #ENV CHAIN_NETWORK="Preprod"
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        #--load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
+        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
         #--load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package) \
+        --load cat-gateway:latest=(+package-cat-gateway-integration) \
         #--service event-db \
-        --service scylla-node1 \
-        --service scylla-node2 \
-        --service scylla-node3 \
-        --service scylla-node4 \
-        #--service cat-gateway \
+        #--service scylla-node1 \
+        #--service scylla-node2 \
+        #--service scylla-node3 \
+        #--service scylla-node4 \
+        --service cat-gateway \
         --allow-privileged
 
-        RUN docker run --net=default_cluster \
-            -e LOG_LEVEL \
-            -e DATA_REFRESH_TICK \
-            -e CHECK_CONFIG_TICK \
-            -e MACHINE_ID \
-            -e CHAIN_FOLLOWER_SYNC_TASKS \
-            -e RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
-            -e CHAIN_NETWORK="Preprod" \
-            cat-gateway:latest
+        RUN sleep 120 && wget http://127.0.0.1:3030/docs/cat-gateway.json && docker run schemathesis:latest --net=host
     END
    # WAIT
    #     SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
  #       SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
   #  END
 
-test-fuzzer-api:
-    FROM debian:12.7-slim
+package-cat-gateway-integration:
+    FROM python:3.14.0a3-slim-bookworm
     ENV LOG_LEVEL=error
     ENV DATA_REFRESH_TICK=5
     ENV CHECK_CONFIG_TICK=5
@@ -84,6 +76,8 @@ test-fuzzer-api:
     ENV CHAIN_FOLLOWER_SYNC_TASKS="16"
     ENV RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     ENV CHAIN_NETWORK="Preprod"
+    ENV CAT_ADDRESS=0.0.0.0:3030
+    ENV INTERNAL_API_KEY=123
 
     RUN apt-get update && apt install -y gnupg2 wget
     RUN mkdir -p /etc/apt/keyrings
@@ -95,4 +89,12 @@ test-fuzzer-api:
     #RUN scylla_setup -y
     #https://github.com/scylladb/scylladb/issues/3142
     COPY ../../+build/cat-gateway .
-    RUN ( scylla --options-file /etc/scylla/scylla.yaml --developer-mode 1 & ) && ./cat-gateway run
+
+    #RUN --no-cache wget -qO cargo_install https://sh.rustup.rs/ && chmod +x cargo_install && ./cargo_install -y && . "$HOME/.cargo/env" && cargo --version && pip install schemathesis==3.27.1
+    #RUN mkdir /results
+    #COPY ./hooks/hooks.py .
+    #RUN export SCHEMATHESIS_HOOKS=hooks
+
+    ENTRYPOINT ( scylla --options-file /etc/scylla/scylla.yaml --developer-mode 1 --default-log-level error & ) && \
+         ./cat-gateway run
+    SAVE IMAGE cat-gateway:latest
