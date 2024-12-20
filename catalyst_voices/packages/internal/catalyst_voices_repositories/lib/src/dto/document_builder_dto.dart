@@ -1,11 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_builder_dto.g.dart';
 
 @JsonSerializable()
-class DocumentBuilderDto {
+class DocumentBuilderDto extends Equatable {
   @JsonKey(name: r'$schema')
   final String schema;
   @JsonKey(fromJson: _fromJsonSegments, toJson: _toJsonSegments)
@@ -59,10 +60,13 @@ class DocumentBuilderDto {
     final listOfSegments = json.convertMapToListWithIds();
     return listOfSegments.map(DocumentBuilderSegmentDto.fromJson).toList();
   }
+
+  @override
+  List<Object?> get props => [schema, segments];
 }
 
 @JsonSerializable()
-class DocumentBuilderSegmentDto {
+class DocumentBuilderSegmentDto extends Equatable {
   final String id;
   @JsonKey(fromJson: _fromJsonSections, toJson: _toJsonSections)
   final List<DocumentBuilderSectionDto> sections;
@@ -118,15 +122,18 @@ class DocumentBuilderSegmentDto {
     final listOfSections = json.convertMapToListWithIds();
     return listOfSections.map(DocumentBuilderSectionDto.fromJson).toList();
   }
+
+  @override
+  List<Object?> get props => [id, sections];
 }
 
 @JsonSerializable()
-class DocumentBuilderSectionDto {
+class DocumentBuilderSectionDto extends Equatable {
   final String id;
   @JsonKey(fromJson: _fromJsonElements, toJson: _toJsonElements)
   final List<DocumentBuilderElementDto> elements;
 
-  DocumentBuilderSectionDto({
+  const DocumentBuilderSectionDto({
     required this.id,
     required this.elements,
   });
@@ -177,10 +184,13 @@ class DocumentBuilderSectionDto {
     final listOfElements = json.convertMapToListWithIdsAndValues();
     return listOfElements.map(DocumentBuilderElementDto.fromJson).toList();
   }
+
+  @override
+  List<Object?> get props => [id, elements];
 }
 
 @JsonSerializable()
-class DocumentBuilderElementDto {
+class DocumentBuilderElementDto extends Equatable {
   final String id;
   final dynamic value;
 
@@ -210,4 +220,7 @@ class DocumentBuilderElementDto {
       value: value,
     );
   }
+
+  @override
+  List<Object?> get props => [id, value];
 }

@@ -45,7 +45,7 @@ class DocumentSchemaDto extends Equatable {
 
   factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
     final segmentsMap = json['properties'] as Map<String, dynamic>;
-    json['propertiesDocumentSchema'] =
+    json['propertiesSchema'] =
         (segmentsMap[r'$schema'] as Map<String, dynamic>)['const'];
 
     return _$DocumentSchemaDtoFromJson(json);
@@ -352,13 +352,11 @@ class DocumentSchemaElementDto extends Equatable
       id: id,
       title: title,
       description: description,
-      minLength: minLength,
-      maxLength: maxLength,
       defaultValue: defaultValue,
       guidance: guidance,
       enumValues: enumValues,
-      range: Range.createIntRange(min: minimum, max: maximum),
-      itemsRange: Range.createIntRange(min: minItems, max: maxItems),
+      range: Range.optionalRangeOf(min: minimum, max: maximum),
+      itemsRange: Range.optionalRangeOf(min: minItems, max: maxItems),
     );
   }
 

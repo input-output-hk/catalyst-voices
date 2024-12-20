@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 enum DocumentDefinitionsObjectType {
@@ -30,45 +32,49 @@ enum DocumentDefinitionsContentMediaType {
   markdown('text/markdown'),
   unknown('unknown');
 
-  final String value;
+  final String schemaValue;
 
-  const DocumentDefinitionsContentMediaType(this.value);
+  const DocumentDefinitionsContentMediaType(this.schemaValue);
 
   static DocumentDefinitionsContentMediaType fromString(String value) {
-    return DocumentDefinitionsContentMediaType.values.asNameMap()[value] ??
+    return DocumentDefinitionsContentMediaType.values
+            .firstWhereOrNull((e) => e.schemaValue.toLowerCase() == value) ??
         DocumentDefinitionsContentMediaType.unknown;
   }
 }
 
 enum DocumentDefinitionsFormat {
-  path,
-  uri,
-  dropDownSingleSelect,
-  multiSelect,
-  singleLineTextEntryList,
-  singleLineTextEntryListMarkdown,
-  singleLineHttpsURLEntryList,
-  nestedQuestionsList,
-  nestedQuestions,
-  singleGroupedTagSelector,
-  tagGroup,
-  tagSelection,
-  tokenValueCardanoADA,
-  datetimeDurationMonths,
-  yesNoChoice,
-  agreementConfirmation,
-  spdxLicenseOrURL,
-  unknown;
+  path('path'),
+  uri('uri'),
+  dropDownSingleSelect('dropDownSingleSelect'),
+  multiSelect('multiSelect'),
+  singleLineTextEntryList('singleLineTextEntryList'),
+  singleLineTextEntryListMarkdown('singleLineTextEntryListMarkdown'),
+  singleLineHttpsURLEntryList('singleLineHttpsURLEntryList'),
+  nestedQuestionsList('nestedQuestionsList'),
+  nestedQuestions('nestedQuestions'),
+  singleGroupedTagSelector('singleGroupedTagSelector'),
+  tagGroup('tagGroup'),
+  tagSelection('tagSelection'),
+  tokenCardanoADA('token:cardano:ada'),
+  durationInMonths('datetime:duration:months'),
+  yesNoChoice('yesNoChoice'),
+  agreementConfirmation('agreementConfirmation'),
+  spdxLicenseOrURL('spdxLicenseOrURL'),
+  unknown('unknown');
 
-  const DocumentDefinitionsFormat();
+  final String value;
+
+  const DocumentDefinitionsFormat(this.value);
 
   static DocumentDefinitionsFormat fromString(String value) {
-    return DocumentDefinitionsFormat.values.asNameMap()[value] ??
+    return DocumentDefinitionsFormat.values
+            .firstWhereOrNull((e) => e.value.toLowerCase() == value) ??
         DocumentDefinitionsFormat.unknown;
   }
 }
 
-sealed class BaseDocumentDefinition {
+sealed class BaseDocumentDefinition extends Equatable {
   final DocumentDefinitionsObjectType type;
   final String note;
 
@@ -130,6 +136,13 @@ class SegmentDefinition extends BaseDocumentDefinition {
     required super.note,
     required this.additionalProperties,
   });
+
+  @override
+  List<Object?> get props => [
+        type,
+        note,
+        additionalProperties,
+      ];
 }
 
 class SectionDefinition extends BaseDocumentDefinition {
@@ -140,6 +153,13 @@ class SectionDefinition extends BaseDocumentDefinition {
     required super.note,
     required this.additionalProperties,
   });
+
+  @override
+  List<Object?> get props => [
+        additionalProperties,
+        type,
+        note,
+      ];
 }
 
 class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
@@ -152,6 +172,14 @@ class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
     required this.contentMediaType,
     required this.pattern,
   });
+
+  @override
+  List<Object?> get props => [
+        contentMediaType,
+        pattern,
+        type,
+        note,
+      ];
 }
 
 class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
@@ -164,6 +192,14 @@ class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
     required this.format,
     required this.pattern,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        pattern,
+        type,
+        note,
+      ];
 }
 
 class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
@@ -176,6 +212,14 @@ class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
     required this.contentMediaType,
     required this.pattern,
   });
+
+  @override
+  List<Object?> get props => [
+        contentMediaType,
+        pattern,
+        type,
+        note,
+      ];
 }
 
 class MultiLineTextEntryMarkdownDefinition extends BaseDocumentDefinition {
@@ -188,6 +232,14 @@ class MultiLineTextEntryMarkdownDefinition extends BaseDocumentDefinition {
     required this.contentMediaType,
     required this.pattern,
   });
+
+  @override
+  List<Object?> get props => [
+        contentMediaType,
+        pattern,
+        type,
+        note,
+      ];
 }
 
 class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
@@ -202,6 +254,15 @@ class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
     required this.contentMediaType,
     required this.pattern,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        contentMediaType,
+        pattern,
+        type,
+        note,
+      ];
 }
 
 class MultiSelectDefinition extends BaseDocumentDefinition {
@@ -214,6 +275,14 @@ class MultiSelectDefinition extends BaseDocumentDefinition {
     required this.format,
     required this.uniqueItems,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        uniqueItems,
+        type,
+        note,
+      ];
 }
 
 class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
@@ -230,6 +299,16 @@ class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
     required this.defaultValues,
     required this.items,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        uniqueItems,
+        type,
+        note,
+        defaultValues,
+        items,
+      ];
 }
 
 class MultiLineTextEntryListMarkdownDefinition extends BaseDocumentDefinition {
@@ -246,6 +325,16 @@ class MultiLineTextEntryListMarkdownDefinition extends BaseDocumentDefinition {
     required this.defaultValue,
     required this.items,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        uniqueItems,
+        type,
+        note,
+        defaultValue,
+        items,
+      ];
 }
 
 class SingleLineHttpsURLEntryListDefinition extends BaseDocumentDefinition {
@@ -262,6 +351,16 @@ class SingleLineHttpsURLEntryListDefinition extends BaseDocumentDefinition {
     required this.defaultValue,
     required this.items,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        uniqueItems,
+        type,
+        note,
+        defaultValue,
+        items,
+      ];
 }
 
 class NestedQuestionsListDefinition extends BaseDocumentDefinition {
@@ -276,6 +375,15 @@ class NestedQuestionsListDefinition extends BaseDocumentDefinition {
     required this.uniqueItems,
     required this.defaultValue,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        uniqueItems,
+        type,
+        note,
+        defaultValue,
+      ];
 }
 
 class NestedQuestionsDefinition extends BaseDocumentDefinition {
@@ -287,6 +395,14 @@ class NestedQuestionsDefinition extends BaseDocumentDefinition {
     required this.format,
     required this.additionalProperties,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        additionalProperties,
+        type,
+        note,
+      ];
 }
 
 class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
@@ -299,6 +415,14 @@ class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
     required this.format,
     required this.additionalProperties,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        additionalProperties,
+        type,
+        note,
+      ];
 }
 
 class TagGroupDefinition extends BaseDocumentDefinition {
@@ -311,6 +435,14 @@ class TagGroupDefinition extends BaseDocumentDefinition {
     required this.format,
     required this.pattern,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        pattern,
+        type,
+        note,
+      ];
 }
 
 class TagSelectionDefinition extends BaseDocumentDefinition {
@@ -323,6 +455,14 @@ class TagSelectionDefinition extends BaseDocumentDefinition {
     required this.format,
     required this.pattern,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        pattern,
+        type,
+        note,
+      ];
 }
 
 class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
@@ -333,6 +473,13 @@ class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
     required super.note,
     required this.format,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        type,
+        note,
+      ];
 }
 
 class DurationInMonthsDefinition extends BaseDocumentDefinition {
@@ -343,6 +490,13 @@ class DurationInMonthsDefinition extends BaseDocumentDefinition {
     required super.note,
     required this.format,
   });
+
+  @override
+  List<Object?> get props => [
+        type,
+        note,
+        format,
+      ];
 }
 
 class YesNoChoiceDefinition extends BaseDocumentDefinition {
@@ -355,6 +509,14 @@ class YesNoChoiceDefinition extends BaseDocumentDefinition {
     required this.format,
     required this.defaultValue,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        defaultValue,
+        type,
+        note,
+      ];
 }
 
 class AgreementConfirmationDefinition extends BaseDocumentDefinition {
@@ -369,6 +531,15 @@ class AgreementConfirmationDefinition extends BaseDocumentDefinition {
     required this.defaultValue,
     required this.constValue,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        defaultValue,
+        constValue,
+        type,
+        note,
+      ];
 }
 
 class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
@@ -383,4 +554,12 @@ class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
     required this.pattern,
     required this.contentMediaType,
   });
+
+  @override
+  List<Object?> get props => [
+        format,
+        pattern,
+        type,
+        note,
+      ];
 }

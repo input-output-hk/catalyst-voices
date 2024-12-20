@@ -34,4 +34,18 @@ void main() {
       }
     },
   );
+
+  test('Check if document definition media type is parse correctly', () {
+    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
+    final definitions = schemaDto.definitions.definitionsModels;
+
+    final singleLineTextEntry =
+        definitions.getDefinition('#/definitions/singleLineTextEntry')
+            as SingleLineTextEntryDefinition;
+
+    expect(
+      singleLineTextEntry.contentMediaType,
+      DocumentDefinitionsContentMediaType.textPlain,
+    );
+  });
 }

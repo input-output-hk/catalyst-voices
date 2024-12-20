@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/src/document_builder/document_schema.dart';
+import 'package:equatable/equatable.dart';
 
-class DocumentBuilder {
+class DocumentBuilder extends Equatable {
   final String schema;
   final List<DocumentBuilderSegment> segments;
 
@@ -36,9 +37,12 @@ class DocumentBuilder {
           .toList(),
     );
   }
+
+  @override
+  List<Object?> get props => [schema, segments];
 }
 
-class DocumentBuilderSegment {
+class DocumentBuilderSegment extends Equatable {
   final String id;
   final List<DocumentBuilderSection> sections;
 
@@ -46,9 +50,12 @@ class DocumentBuilderSegment {
     required this.id,
     required this.sections,
   });
+
+  @override
+  List<Object?> get props => [id, sections];
 }
 
-class DocumentBuilderSection {
+class DocumentBuilderSection extends Equatable {
   final String id;
   final List<DocumentBuilderElement> elements;
 
@@ -56,9 +63,12 @@ class DocumentBuilderSection {
     required this.id,
     required this.elements,
   });
+
+  @override
+  List<Object?> get props => [id, elements];
 }
 
-class DocumentBuilderElement {
+class DocumentBuilderElement extends Equatable {
   final String id;
   final dynamic value;
 
@@ -66,4 +76,7 @@ class DocumentBuilderElement {
     required this.id,
     required this.value,
   });
+
+  @override
+  List<Object?> get props => [id, value];
 }

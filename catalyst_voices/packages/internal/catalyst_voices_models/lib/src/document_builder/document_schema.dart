@@ -1,7 +1,8 @@
 import 'package:catalyst_voices_models/src/document_builder/document_definitions.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:equatable/equatable.dart';
 
-class DocumentSchema {
+class DocumentSchema extends Equatable {
   final String schema;
   final String title;
   final String description;
@@ -17,9 +18,19 @@ class DocumentSchema {
     required this.order,
     required this.propertiesSchema,
   });
+
+  @override
+  List<Object?> get props => [
+        schema,
+        title,
+        description,
+        segments,
+        order,
+        propertiesSchema,
+      ];
 }
 
-class DocumentSchemaSegment {
+class DocumentSchemaSegment extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
   final String title;
@@ -33,9 +44,17 @@ class DocumentSchemaSegment {
     required this.description,
     required this.sections,
   });
+
+  @override
+  List<Object?> get props => [
+        id,
+        title,
+        description,
+        sections,
+      ];
 }
 
-class DocumentSchemaSection {
+class DocumentSchemaSection extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
   final String title;
@@ -51,15 +70,24 @@ class DocumentSchemaSection {
     required this.elements,
     required this.isRequired,
   });
+
+  @override
+  List<Object?> get props => [
+        ref,
+        id,
+        title,
+        description,
+        elements,
+        isRequired,
+      ];
 }
 
-class DocumentSchemaElement {
+class DocumentSchemaElement extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
   final String title;
   final String description;
-  final int? minLength;
-  final int? maxLength;
+
   final String? defaultValue;
   final String guidance;
   final List<String> enumValues;
@@ -71,12 +99,23 @@ class DocumentSchemaElement {
     required this.id,
     required this.title,
     required this.description,
-    this.minLength,
-    this.maxLength,
     required this.defaultValue,
     required this.guidance,
     this.enumValues = const <String>[],
     required this.range,
     required this.itemsRange,
   });
+
+  @override
+  List<Object?> get props => [
+        ref,
+        id,
+        title,
+        description,
+        defaultValue,
+        guidance,
+        enumValues,
+        range,
+        itemsRange,
+      ];
 }
