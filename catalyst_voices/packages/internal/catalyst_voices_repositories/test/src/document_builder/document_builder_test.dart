@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/proposal_builder_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_builder_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_schema_dto.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/read_json.dart';
@@ -18,11 +18,11 @@ void main() {
   });
 
   test('Converts segments list into object for JSON', () {
-    final schemaDto = SchemaDto.fromJson(schemaJson);
+    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
     final schema = schemaDto.toModel();
 
-    final proposalBuilder = ProposalBuilder.build(schema);
-    final proposalBuilderDto = ProposalBuilderDto.fromModel(proposalBuilder);
+    final proposalBuilder = DocumentBuilder.build(schema);
+    final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
     final proposalBuilderJson = proposalBuilderDto.toJson();
 
     for (final segment in proposalBuilderDto.segments) {
@@ -31,15 +31,15 @@ void main() {
   });
 
   test('Converts object from JSON into List of segments', () {
-    final schemaDto = SchemaDto.fromJson(schemaJson);
+    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
     final schema = schemaDto.toModel();
 
-    final proposalBuilder = ProposalBuilder.build(schema);
-    final proposalBuilderDto = ProposalBuilderDto.fromModel(proposalBuilder);
+    final proposalBuilder = DocumentBuilder.build(schema);
+    final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
 
     final proposalBuilderJson = proposalBuilderDto.toJson();
     final proposalBuilderDtoFromJson =
-        ProposalBuilderDto.fromJson(proposalBuilderJson);
+        DocumentBuilderDto.fromJson(proposalBuilderJson);
 
     expect(
       proposalBuilderDtoFromJson.segments.length,

@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-enum DefinitionsObjectType {
+enum DocumentDefinitionsObjectType {
   string,
   object,
   integer,
@@ -8,11 +8,11 @@ enum DefinitionsObjectType {
   array,
   unknown;
 
-  const DefinitionsObjectType();
+  const DocumentDefinitionsObjectType();
 
-  static DefinitionsObjectType fromString(String value) {
-    return DefinitionsObjectType.values.asNameMap()[value] ??
-        DefinitionsObjectType.unknown;
+  static DocumentDefinitionsObjectType fromString(String value) {
+    return DocumentDefinitionsObjectType.values.asNameMap()[value] ??
+        DocumentDefinitionsObjectType.unknown;
   }
 
   dynamic get getDefaultValue => switch (this) {
@@ -25,22 +25,22 @@ enum DefinitionsObjectType {
       };
 }
 
-enum DefinitionsContentMediaType {
+enum DocumentDefinitionsContentMediaType {
   textPlain('text/plain'),
   markdown('text/markdown'),
   unknown('unknown');
 
   final String value;
 
-  const DefinitionsContentMediaType(this.value);
+  const DocumentDefinitionsContentMediaType(this.value);
 
-  static DefinitionsContentMediaType fromString(String value) {
-    return DefinitionsContentMediaType.values.asNameMap()[value] ??
-        DefinitionsContentMediaType.unknown;
+  static DocumentDefinitionsContentMediaType fromString(String value) {
+    return DocumentDefinitionsContentMediaType.values.asNameMap()[value] ??
+        DocumentDefinitionsContentMediaType.unknown;
   }
 }
 
-enum DefinitionsFormat {
+enum DocumentDefinitionsFormat {
   path,
   uri,
   dropDownSingleSelect,
@@ -60,79 +60,19 @@ enum DefinitionsFormat {
   spdxLicenseOrURL,
   unknown;
 
-  const DefinitionsFormat();
+  const DocumentDefinitionsFormat();
 
-  static DefinitionsFormat fromString(String value) {
-    return DefinitionsFormat.values.asNameMap()[value] ??
-        DefinitionsFormat.unknown;
+  static DocumentDefinitionsFormat fromString(String value) {
+    return DocumentDefinitionsFormat.values.asNameMap()[value] ??
+        DocumentDefinitionsFormat.unknown;
   }
 }
 
-// enum DefinitionsType {
-//   segment,
-//   section,
-//   singleLineTextEntry,
-//   multiLineTextEntry,
-//   multiLineTextEntryMarkdown,
-//   dropDownSingleSelect,
-//   multiSelect,
-//   singleLineTextEntryList,
-//   multiLineTextEntryListMarkdown,
-//   singleLineHttpsURLEntry,
-//   singleLineHttpsURLEntryList,
-//   nestedQuestionsList,
-//   nestedQuestions,
-//   singleGroupedTagSelector,
-//   tagGroup,
-//   tagSelection,
-//   tokenValueCardanoADA,
-//   durationInMonths,
-//   yesNoChoice,
-//   agreementConfirmation,
-//   spdxLicenseOrURL;
-
-//   const DefinitionsType();
-
-//   static DefinitionsType fromString(String value) {
-//     return values.byName(value);
-//   }
-
-//   static bool isKnownType(String refPath) {
-//     final ref = refPath.split('/').last;
-//     return values.asNameMap()[ref] != null;
-//   }
-
-//   Object get definitionType => switch (this) {
-//         section => SectionDefinition,
-//         segment => SegmentDefinition,
-//         singleLineTextEntry => SingleLineTextEntryDefinition,
-//         durationInMonths => DurationInMonthsDefinition,
-//         singleLineHttpsURLEntry => SingleLineHttpsURLEntryDefinition,
-//         multiLineTextEntry => MultiLineTextEntryDefinition,
-//         multiLineTextEntryMarkdown => MultiLineTextEntryMarkdownDefinition,
-//         dropDownSingleSelect => DropDownSingleSelectDefinition,
-//         multiSelect => MultiSelectDefinition,
-//         singleLineTextEntryList => SingleLineTextEntryListDefinition,
-//         multiLineTextEntryListMarkdown =>
-//           MultiLineTextEntryListMarkdownDefinition,
-//         singleLineHttpsURLEntryList => SingleLineHttpsURLEntryListDefinition,
-//         nestedQuestionsList => NestedQuestionsListDefinition,
-//         nestedQuestions => NestedQuestionsDefinition,
-//         singleGroupedTagSelector => SingleGroupedTagSelectorDefinition,
-//         tagGroup => TagGroupDefinition,
-//         tagSelection => TagSelectionDefinition,
-//         tokenValueCardanoADA => TokenValueCardanoADADefinition,
-//         yesNoChoice => YesNoChoiceDefinition,
-//         agreementConfirmation => AgreementConfirmationDefinition,
-//         spdxLicenseOrURL => SPDXLicenceOrUrlDefinition,
-//       };
-// }
-
-sealed class BaseDefinition {
-  final DefinitionsObjectType type;
+sealed class BaseDocumentDefinition {
+  final DocumentDefinitionsObjectType type;
   final String note;
 
-  const BaseDefinition({
+  const BaseDocumentDefinition({
     required this.type,
     required this.note,
   });
@@ -173,16 +113,16 @@ sealed class BaseDefinition {
   }
 }
 
-extension BaseDefinitionListExt on List<BaseDefinition> {
-  BaseDefinition getDefinition(String refPath) {
-    final definitionType = BaseDefinition.typeFromRefPath(refPath);
+extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
+  BaseDocumentDefinition getDefinition(String refPath) {
+    final definitionType = BaseDocumentDefinition.typeFromRefPath(refPath);
     final classType = definitionType;
 
     return firstWhere((e) => e.runtimeType == classType);
   }
 }
 
-class SegmentDefinition extends BaseDefinition {
+class SegmentDefinition extends BaseDocumentDefinition {
   final bool additionalProperties;
 
   const SegmentDefinition({
@@ -192,7 +132,7 @@ class SegmentDefinition extends BaseDefinition {
   });
 }
 
-class SectionDefinition extends BaseDefinition {
+class SectionDefinition extends BaseDocumentDefinition {
   final bool additionalProperties;
 
   const SectionDefinition({
@@ -202,8 +142,8 @@ class SectionDefinition extends BaseDefinition {
   });
 }
 
-class SingleLineTextEntryDefinition extends BaseDefinition {
-  final DefinitionsContentMediaType contentMediaType;
+class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
   const SingleLineTextEntryDefinition({
@@ -214,8 +154,8 @@ class SingleLineTextEntryDefinition extends BaseDefinition {
   });
 }
 
-class SingleLineHttpsURLEntryDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final String pattern;
 
   const SingleLineHttpsURLEntryDefinition({
@@ -226,8 +166,8 @@ class SingleLineHttpsURLEntryDefinition extends BaseDefinition {
   });
 }
 
-class MultiLineTextEntryDefinition extends BaseDefinition {
-  final DefinitionsContentMediaType contentMediaType;
+class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
   const MultiLineTextEntryDefinition({
@@ -238,8 +178,8 @@ class MultiLineTextEntryDefinition extends BaseDefinition {
   });
 }
 
-class MultiLineTextEntryMarkdownDefinition extends BaseDefinition {
-  final DefinitionsContentMediaType contentMediaType;
+class MultiLineTextEntryMarkdownDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
   const MultiLineTextEntryMarkdownDefinition({
@@ -250,9 +190,9 @@ class MultiLineTextEntryMarkdownDefinition extends BaseDefinition {
   });
 }
 
-class DropDownSingleSelectDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
-  final DefinitionsContentMediaType contentMediaType;
+class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
+  final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
   const DropDownSingleSelectDefinition({
@@ -264,8 +204,8 @@ class DropDownSingleSelectDefinition extends BaseDefinition {
   });
 }
 
-class MultiSelectDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class MultiSelectDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool uniqueItems;
 
   const MultiSelectDefinition({
@@ -276,8 +216,8 @@ class MultiSelectDefinition extends BaseDefinition {
   });
 }
 
-class SingleLineTextEntryListDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<String> defaultValues;
   final Map<String, dynamic> items;
@@ -292,8 +232,8 @@ class SingleLineTextEntryListDefinition extends BaseDefinition {
   });
 }
 
-class MultiLineTextEntryListMarkdownDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class MultiLineTextEntryListMarkdownDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
   final Map<String, dynamic> items;
@@ -308,8 +248,8 @@ class MultiLineTextEntryListMarkdownDefinition extends BaseDefinition {
   });
 }
 
-class SingleLineHttpsURLEntryListDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class SingleLineHttpsURLEntryListDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
   final Map<String, dynamic> items;
@@ -324,8 +264,8 @@ class SingleLineHttpsURLEntryListDefinition extends BaseDefinition {
   });
 }
 
-class NestedQuestionsListDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class NestedQuestionsListDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
 
@@ -338,8 +278,8 @@ class NestedQuestionsListDefinition extends BaseDefinition {
   });
 }
 
-class NestedQuestionsDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class NestedQuestionsDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool additionalProperties;
   const NestedQuestionsDefinition({
     required super.type,
@@ -349,8 +289,8 @@ class NestedQuestionsDefinition extends BaseDefinition {
   });
 }
 
-class SingleGroupedTagSelectorDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
   const SingleGroupedTagSelectorDefinition({
@@ -361,8 +301,8 @@ class SingleGroupedTagSelectorDefinition extends BaseDefinition {
   });
 }
 
-class TagGroupDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class TagGroupDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final String pattern;
 
   const TagGroupDefinition({
@@ -373,8 +313,8 @@ class TagGroupDefinition extends BaseDefinition {
   });
 }
 
-class TagSelectionDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class TagSelectionDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final String pattern;
 
   const TagSelectionDefinition({
@@ -385,8 +325,8 @@ class TagSelectionDefinition extends BaseDefinition {
   });
 }
 
-class TokenValueCardanoADADefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
 
   const TokenValueCardanoADADefinition({
     required super.type,
@@ -395,8 +335,8 @@ class TokenValueCardanoADADefinition extends BaseDefinition {
   });
 }
 
-class DurationInMonthsDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class DurationInMonthsDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
 
   const DurationInMonthsDefinition({
     required super.type,
@@ -405,8 +345,8 @@ class DurationInMonthsDefinition extends BaseDefinition {
   });
 }
 
-class YesNoChoiceDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class YesNoChoiceDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool defaultValue;
 
   const YesNoChoiceDefinition({
@@ -417,8 +357,8 @@ class YesNoChoiceDefinition extends BaseDefinition {
   });
 }
 
-class AgreementConfirmationDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class AgreementConfirmationDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final bool defaultValue;
   final bool constValue;
 
@@ -431,10 +371,10 @@ class AgreementConfirmationDefinition extends BaseDefinition {
   });
 }
 
-class SPDXLicenceOrUrlDefinition extends BaseDefinition {
-  final DefinitionsFormat format;
+class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
+  final DocumentDefinitionsFormat format;
   final String pattern;
-  final DefinitionsContentMediaType contentMediaType;
+  final DocumentDefinitionsContentMediaType contentMediaType;
 
   const SPDXLicenceOrUrlDefinition({
     required super.type,

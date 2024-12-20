@@ -2,29 +2,29 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'proposal_builder_dto.g.dart';
+part 'document_builder_dto.g.dart';
 
 @JsonSerializable()
-class ProposalBuilderDto {
+class DocumentBuilderDto {
   @JsonKey(name: r'$schema')
   final String schema;
   @JsonKey(fromJson: _fromJsonSegments, toJson: _toJsonSegments)
-  final List<ProposalBuilderSegmentDto> segments;
-  const ProposalBuilderDto({
+  final List<DocumentBuilderSegmentDto> segments;
+  const DocumentBuilderDto({
     required this.schema,
     required this.segments,
   });
 
-  factory ProposalBuilderDto.fromJson(Map<String, dynamic> json) {
+  factory DocumentBuilderDto.fromJson(Map<String, dynamic> json) {
     json['segments'] = Map<String, dynamic>.from(json)..remove(r'$schema');
-    return _$ProposalBuilderDtoFromJson(json);
+    return _$DocumentBuilderDtoFromJson(json);
   }
 
-  factory ProposalBuilderDto.fromModel(ProposalBuilder model) {
-    return ProposalBuilderDto(
+  factory DocumentBuilderDto.fromModel(DocumentBuilder model) {
+    return DocumentBuilderDto(
       schema: model.schema,
       segments:
-          model.segments.map(ProposalBuilderSegmentDto.fromModel).toList(),
+          model.segments.map(DocumentBuilderSegmentDto.fromModel).toList(),
     );
   }
 
@@ -36,15 +36,15 @@ class ProposalBuilderDto {
     return segments;
   }
 
-  ProposalBuilder toModel() {
-    return ProposalBuilder(
+  DocumentBuilder toModel() {
+    return DocumentBuilder(
       schema: schema,
       segments: segments.map((e) => e.toModel()).toList(),
     );
   }
 
   static Map<String, dynamic> _toJsonSegments(
-    List<ProposalBuilderSegmentDto> segments,
+    List<DocumentBuilderSegmentDto> segments,
   ) {
     final map = <String, dynamic>{};
     for (final segment in segments) {
@@ -53,35 +53,35 @@ class ProposalBuilderDto {
     return map;
   }
 
-  static List<ProposalBuilderSegmentDto> _fromJsonSegments(
+  static List<DocumentBuilderSegmentDto> _fromJsonSegments(
     Map<String, dynamic> json,
   ) {
     final listOfSegments = json.convertMapToListWithIds();
-    return listOfSegments.map(ProposalBuilderSegmentDto.fromJson).toList();
+    return listOfSegments.map(DocumentBuilderSegmentDto.fromJson).toList();
   }
 }
 
 @JsonSerializable()
-class ProposalBuilderSegmentDto {
+class DocumentBuilderSegmentDto {
   final String id;
   @JsonKey(fromJson: _fromJsonSections, toJson: _toJsonSections)
-  final List<ProposalBuilderSectionDto> sections;
+  final List<DocumentBuilderSectionDto> sections;
 
-  const ProposalBuilderSegmentDto({
+  const DocumentBuilderSegmentDto({
     required this.id,
     required this.sections,
   });
 
-  factory ProposalBuilderSegmentDto.fromJson(Map<String, dynamic> json) {
+  factory DocumentBuilderSegmentDto.fromJson(Map<String, dynamic> json) {
     json['sections'] = Map<String, dynamic>.from(json)..remove('id');
-    return _$ProposalBuilderSegmentDtoFromJson(json);
+    return _$DocumentBuilderSegmentDtoFromJson(json);
   }
 
-  factory ProposalBuilderSegmentDto.fromModel(ProposalBuilderSegment model) {
-    return ProposalBuilderSegmentDto(
+  factory DocumentBuilderSegmentDto.fromModel(DocumentBuilderSegment model) {
+    return DocumentBuilderSegmentDto(
       id: model.id,
       sections:
-          model.sections.map(ProposalBuilderSectionDto.fromModel).toList(),
+          model.sections.map(DocumentBuilderSectionDto.fromModel).toList(),
     );
   }
 
@@ -95,15 +95,15 @@ class ProposalBuilderSegmentDto {
     };
   }
 
-  ProposalBuilderSegment toModel() {
-    return ProposalBuilderSegment(
+  DocumentBuilderSegment toModel() {
+    return DocumentBuilderSegment(
       id: id,
       sections: sections.map((e) => e.toModel()).toList(),
     );
   }
 
   static Map<String, dynamic> _toJsonSections(
-    List<ProposalBuilderSectionDto> sections,
+    List<DocumentBuilderSectionDto> sections,
   ) {
     final map = <String, dynamic>{};
     for (final section in sections) {
@@ -112,35 +112,35 @@ class ProposalBuilderSegmentDto {
     return map;
   }
 
-  static List<ProposalBuilderSectionDto> _fromJsonSections(
+  static List<DocumentBuilderSectionDto> _fromJsonSections(
     Map<String, dynamic> json,
   ) {
     final listOfSections = json.convertMapToListWithIds();
-    return listOfSections.map(ProposalBuilderSectionDto.fromJson).toList();
+    return listOfSections.map(DocumentBuilderSectionDto.fromJson).toList();
   }
 }
 
 @JsonSerializable()
-class ProposalBuilderSectionDto {
+class DocumentBuilderSectionDto {
   final String id;
   @JsonKey(fromJson: _fromJsonElements, toJson: _toJsonElements)
-  final List<ProposalBuilderElementDto> elements;
+  final List<DocumentBuilderElementDto> elements;
 
-  ProposalBuilderSectionDto({
+  DocumentBuilderSectionDto({
     required this.id,
     required this.elements,
   });
 
-  factory ProposalBuilderSectionDto.fromJson(Map<String, dynamic> json) {
+  factory DocumentBuilderSectionDto.fromJson(Map<String, dynamic> json) {
     json['elements'] = Map<String, dynamic>.from(json)..remove('id');
-    return _$ProposalBuilderSectionDtoFromJson(json);
+    return _$DocumentBuilderSectionDtoFromJson(json);
   }
 
-  factory ProposalBuilderSectionDto.fromModel(ProposalBuilderSection model) {
-    return ProposalBuilderSectionDto(
+  factory DocumentBuilderSectionDto.fromModel(DocumentBuilderSection model) {
+    return DocumentBuilderSectionDto(
       id: model.id,
       elements:
-          model.elements.map(ProposalBuilderElementDto.fromModel).toList(),
+          model.elements.map(DocumentBuilderElementDto.fromModel).toList(),
     );
   }
 
@@ -154,15 +154,15 @@ class ProposalBuilderSectionDto {
     };
   }
 
-  ProposalBuilderSection toModel() {
-    return ProposalBuilderSection(
+  DocumentBuilderSection toModel() {
+    return DocumentBuilderSection(
       id: id,
       elements: elements.map((e) => e.toModel()).toList(),
     );
   }
 
   static Map<String, dynamic> _toJsonElements(
-    List<ProposalBuilderElementDto> elements,
+    List<DocumentBuilderElementDto> elements,
   ) {
     final map = <String, dynamic>{};
     for (final element in elements) {
@@ -171,30 +171,30 @@ class ProposalBuilderSectionDto {
     return map;
   }
 
-  static List<ProposalBuilderElementDto> _fromJsonElements(
+  static List<DocumentBuilderElementDto> _fromJsonElements(
     Map<String, dynamic> json,
   ) {
     final listOfElements = json.convertMapToListWithIdsAndValues();
-    return listOfElements.map(ProposalBuilderElementDto.fromJson).toList();
+    return listOfElements.map(DocumentBuilderElementDto.fromJson).toList();
   }
 }
 
 @JsonSerializable()
-class ProposalBuilderElementDto {
+class DocumentBuilderElementDto {
   final String id;
   final dynamic value;
 
-  const ProposalBuilderElementDto({
+  const DocumentBuilderElementDto({
     required this.id,
     required this.value,
   });
 
-  factory ProposalBuilderElementDto.fromJson(Map<String, dynamic> json) {
-    return _$ProposalBuilderElementDtoFromJson(json);
+  factory DocumentBuilderElementDto.fromJson(Map<String, dynamic> json) {
+    return _$DocumentBuilderElementDtoFromJson(json);
   }
 
-  factory ProposalBuilderElementDto.fromModel(ProposalBuilderElement model) {
-    return ProposalBuilderElementDto(
+  factory DocumentBuilderElementDto.fromModel(DocumentBuilderElement model) {
+    return DocumentBuilderElementDto(
       id: model.id,
       value: model.value,
     );
@@ -204,8 +204,8 @@ class ProposalBuilderElementDto {
         id: value,
       };
 
-  ProposalBuilderElement toModel() {
-    return ProposalBuilderElement(
+  DocumentBuilderElement toModel() {
+    return DocumentBuilderElement(
       id: id,
       value: value,
     );

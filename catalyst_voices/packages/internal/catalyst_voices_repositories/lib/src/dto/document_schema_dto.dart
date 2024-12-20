@@ -1,20 +1,20 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/definitions_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_definitions_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'schema_dto.g.dart';
+part 'document_schema_dto.g.dart';
 
 @JsonSerializable()
-class SchemaDto extends Equatable {
+class DocumentSchemaDto extends Equatable {
   @JsonKey(name: r'$schema')
   final String schema;
   @JsonKey(name: r'$id')
   final String id;
   final String title;
   final String description;
-  final DefinitionsDto definitions;
+  final DocumentDefinitionsDto definitions;
   final String type;
   final bool additionalProperties;
   @JsonKey(
@@ -22,7 +22,7 @@ class SchemaDto extends Equatable {
     fromJson: _fromJsonProperties,
     name: 'properties',
   )
-  final List<SchemaSegmentDto> segments;
+  final List<DocumentSchemaSegmentDto> segments;
   @JsonKey(name: 'x-order')
   final List<String> order;
   @JsonKey(includeToJson: false)
@@ -30,7 +30,7 @@ class SchemaDto extends Equatable {
 
   static late Map<String, int> orderMap;
 
-  const SchemaDto({
+  const DocumentSchemaDto({
     required this.schema,
     required this.id,
     required this.title,
@@ -43,24 +43,25 @@ class SchemaDto extends Equatable {
     required this.propertiesSchema,
   });
 
-  factory SchemaDto.fromJson(Map<String, dynamic> json) {
+  factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
     final segmentsMap = json['properties'] as Map<String, dynamic>;
-    json['propertiesSchema'] =
+    json['propertiesDocumentSchema'] =
         (segmentsMap[r'$schema'] as Map<String, dynamic>)['const'];
 
-    return _$SchemaDtoFromJson(json);
+    return _$DocumentSchemaDtoFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$SchemaDtoToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
 
-  Schema toModel() {
+  DocumentSchema toModel() {
     orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
-    final sortedProperties = List<SchemaSegmentDto>.from(this.segments)..sort();
+    final sortedProperties = List<DocumentSchemaSegmentDto>.from(this.segments)
+      ..sort();
     final segments = sortedProperties
         .where((e) => e.ref.contains('segment'))
         .map((e) => e.toModel(definitions.definitionsModels))
         .toList();
-    return Schema(
+    return DocumentSchema(
       schema: schema,
       title: title,
       description: description,
@@ -83,7 +84,7 @@ class SchemaDto extends Equatable {
       ];
 
   static Map<String, dynamic> _toJsonProperties(
-    List<SchemaSegmentDto> segments,
+    List<DocumentSchemaSegmentDto> segments,
   ) {
     final map = <String, dynamic>{};
     for (final property in segments) {
@@ -92,15 +93,17 @@ class SchemaDto extends Equatable {
     return map;
   }
 
-  static List<SchemaSegmentDto> _fromJsonProperties(Map<String, dynamic> json) {
+  static List<DocumentSchemaSegmentDto> _fromJsonProperties(
+    Map<String, dynamic> json,
+  ) {
     final listOfSegments = json.convertMapToListWithIds();
-    return listOfSegments.map(SchemaSegmentDto.fromJson).toList();
+    return listOfSegments.map(DocumentSchemaSegmentDto.fromJson).toList();
   }
 }
 
 @JsonSerializable()
-class SchemaSegmentDto extends Equatable
-    implements Comparable<SchemaSegmentDto> {
+class DocumentSchemaSegmentDto extends Equatable
+    implements Comparable<DocumentSchemaSegmentDto> {
   @JsonKey(name: r'$ref')
   final String ref;
   final String id;
@@ -111,14 +114,14 @@ class SchemaSegmentDto extends Equatable
     fromJson: _fromJsonProperties,
     name: 'properties',
   )
-  final List<SchemaSectionDto> sections;
+  final List<DocumentSchemaSectionDto> sections;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
 
   static late Map<String, int> orderMap;
 
-  const SchemaSegmentDto({
+  const DocumentSchemaSegmentDto({
     required this.ref,
     required this.id,
     this.title = '',
@@ -128,19 +131,20 @@ class SchemaSegmentDto extends Equatable
     this.order = const <String>[],
   });
 
-  factory SchemaSegmentDto.fromJson(Map<String, dynamic> json) =>
-      _$SchemaSegmentDtoFromJson(json);
+  factory DocumentSchemaSegmentDto.fromJson(Map<String, dynamic> json) =>
+      _$DocumentSchemaSegmentDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SchemaSegmentDtoToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentSchemaSegmentDtoToJson(this);
 
-  SchemaSegment toModel(List<BaseDefinition> definitions) {
+  DocumentSchemaSegment toModel(List<BaseDocumentDefinition> definitions) {
     orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
-    final sortedProperties = List<SchemaSectionDto>.from(this.sections)..sort();
+    final sortedProperties = List<DocumentSchemaSectionDto>.from(this.sections)
+      ..sort();
     final sections = sortedProperties
         .where((element) => element.ref.contains('section'))
         .map((e) => e.toModel(definitions, isRequired: required.contains(e.id)))
         .toList();
-    return SchemaSegment(
+    return DocumentSchemaSegment(
       ref: definitions.getDefinition(ref),
       id: id,
       title: title,
@@ -161,7 +165,7 @@ class SchemaSegmentDto extends Equatable
       ];
 
   static Map<String, dynamic> _toJsonProperties(
-    List<SchemaSectionDto> sections,
+    List<DocumentSchemaSectionDto> sections,
   ) {
     final map = <String, dynamic>{};
     for (final property in sections) {
@@ -170,22 +174,26 @@ class SchemaSegmentDto extends Equatable
     return map;
   }
 
-  static List<SchemaSectionDto> _fromJsonProperties(Map<String, dynamic> json) {
+  static List<DocumentSchemaSectionDto> _fromJsonProperties(
+    Map<String, dynamic> json,
+  ) {
     final listOfSections = json.convertMapToListWithIds();
-    return listOfSections.map(SchemaSectionDto.fromJson).toList();
+    return listOfSections.map(DocumentSchemaSectionDto.fromJson).toList();
   }
 
   @override
-  int compareTo(SchemaSegmentDto other) {
-    final thisIndex = SchemaDto.orderMap[id] ?? double.maxFinite.toInt();
-    final otherIndex = SchemaDto.orderMap[other.id] ?? double.maxFinite.toInt();
+  int compareTo(DocumentSchemaSegmentDto other) {
+    final thisIndex =
+        DocumentSchemaDto.orderMap[id] ?? double.maxFinite.toInt();
+    final otherIndex =
+        DocumentSchemaDto.orderMap[other.id] ?? double.maxFinite.toInt();
     return thisIndex.compareTo(otherIndex);
   }
 }
 
 @JsonSerializable()
-class SchemaSectionDto extends Equatable
-    implements Comparable<SchemaSectionDto> {
+class DocumentSchemaSectionDto extends Equatable
+    implements Comparable<DocumentSchemaSectionDto> {
   @JsonKey(name: r'$ref')
   final String ref;
   final String id;
@@ -196,7 +204,7 @@ class SchemaSectionDto extends Equatable
     fromJson: _fromJsonProperties,
     name: 'properties',
   )
-  final List<SchemaElementDto> elements;
+  final List<DocumentSchemaElementDto> elements;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
@@ -208,7 +216,7 @@ class SchemaSectionDto extends Equatable
 
   static late Map<String, int> orderMap;
 
-  const SchemaSectionDto({
+  const DocumentSchemaSectionDto({
     required this.ref,
     required this.id,
     this.title = '',
@@ -221,22 +229,23 @@ class SchemaSectionDto extends Equatable
     this.openSource = const <String, dynamic>{},
   });
 
-  factory SchemaSectionDto.fromJson(Map<String, dynamic> json) =>
-      _$SchemaSectionDtoFromJson(json);
+  factory DocumentSchemaSectionDto.fromJson(Map<String, dynamic> json) =>
+      _$DocumentSchemaSectionDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SchemaSectionDtoToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentSchemaSectionDtoToJson(this);
 
-  SchemaSection toModel(
-    List<BaseDefinition> definitions, {
+  DocumentSchemaSection toModel(
+    List<BaseDocumentDefinition> definitions, {
     required bool isRequired,
   }) {
     orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
-    final sortedElements = List<SchemaElementDto>.from(this.elements)..sort();
+    final sortedElements = List<DocumentSchemaElementDto>.from(this.elements)
+      ..sort();
     final elements = sortedElements
-        .where((element) => BaseDefinition.isKnownType(element.ref))
+        .where((element) => BaseDocumentDefinition.isKnownType(element.ref))
         .map((e) => e.toModel(definitions))
         .toList();
-    return SchemaSection(
+    return DocumentSchemaSection(
       ref: definitions.getDefinition(ref),
       id: id,
       title: title,
@@ -260,7 +269,7 @@ class SchemaSectionDto extends Equatable
       ];
 
   static Map<String, dynamic> _toJsonProperties(
-    List<SchemaElementDto> properties,
+    List<DocumentSchemaElementDto> properties,
   ) {
     final map = <String, dynamic>{};
     for (final property in properties) {
@@ -269,23 +278,26 @@ class SchemaSectionDto extends Equatable
     return map;
   }
 
-  static List<SchemaElementDto> _fromJsonProperties(Map<String, dynamic> json) {
+  static List<DocumentSchemaElementDto> _fromJsonProperties(
+    Map<String, dynamic> json,
+  ) {
     final listOfProperties = json.convertMapToListWithIds();
-    return listOfProperties.map(SchemaElementDto.fromJson).toList();
+    return listOfProperties.map(DocumentSchemaElementDto.fromJson).toList();
   }
 
   @override
-  int compareTo(SchemaSectionDto other) {
-    final thisIndex = SchemaSegmentDto.orderMap[id] ?? double.maxFinite.toInt();
+  int compareTo(DocumentSchemaSectionDto other) {
+    final thisIndex =
+        DocumentSchemaSegmentDto.orderMap[id] ?? double.maxFinite.toInt();
     final otherIndex =
-        SchemaSegmentDto.orderMap[other.id] ?? double.maxFinite.toInt();
+        DocumentSchemaSegmentDto.orderMap[other.id] ?? double.maxFinite.toInt();
     return thisIndex.compareTo(otherIndex);
   }
 }
 
 @JsonSerializable()
-class SchemaElementDto extends Equatable
-    implements Comparable<SchemaElementDto> {
+class DocumentSchemaElementDto extends Equatable
+    implements Comparable<DocumentSchemaElementDto> {
   @JsonKey(name: r'$ref')
   final String ref;
   final String id;
@@ -312,7 +324,7 @@ class SchemaElementDto extends Equatable
   // TODO(ryszard-schossler): return to this
   final Map<String, dynamic> items;
 
-  const SchemaElementDto({
+  const DocumentSchemaElementDto({
     this.ref = '',
     required this.id,
     this.title = '',
@@ -329,13 +341,13 @@ class SchemaElementDto extends Equatable
     this.items = const <String, dynamic>{},
   });
 
-  factory SchemaElementDto.fromJson(Map<String, dynamic> json) =>
-      _$SchemaElementDtoFromJson(json);
+  factory DocumentSchemaElementDto.fromJson(Map<String, dynamic> json) =>
+      _$DocumentSchemaElementDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SchemaElementDtoToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentSchemaElementDtoToJson(this);
 
-  SchemaElement toModel(List<BaseDefinition> definitions) {
-    return SchemaElement(
+  DocumentSchemaElement toModel(List<BaseDocumentDefinition> definitions) {
+    return DocumentSchemaElement(
       ref: definitions.getDefinition(ref),
       id: id,
       title: title,
@@ -368,10 +380,11 @@ class SchemaElementDto extends Equatable
       ];
 
   @override
-  int compareTo(SchemaElementDto other) {
-    final thisIndex = SchemaSectionDto.orderMap[id] ?? double.maxFinite.toInt();
+  int compareTo(DocumentSchemaElementDto other) {
+    final thisIndex =
+        DocumentSchemaSectionDto.orderMap[id] ?? double.maxFinite.toInt();
     final otherIndex =
-        SchemaSectionDto.orderMap[other.id] ?? double.maxFinite.toInt();
+        DocumentSchemaSectionDto.orderMap[other.id] ?? double.maxFinite.toInt();
     return thisIndex.compareTo(otherIndex);
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_schema_dto.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/read_json.dart';
@@ -17,7 +17,7 @@ void main() {
   });
 
   test('X-order of segments is kept in model class', () async {
-    final schemaDto = SchemaDto.fromJson(schemaJson);
+    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
 
     final schema = schemaDto.toModel();
 
@@ -30,7 +30,7 @@ void main() {
   });
 
   test('X-order of section is kept in model class', () {
-    final schemaDto = SchemaDto.fromJson(schemaJson);
+    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
     final schema = schemaDto.toModel();
 
     for (var i = 0; i < schema.segments.length; i++) {
@@ -48,7 +48,7 @@ void main() {
   });
 
   test('Check if every segment has a SegmentDefinition as ref', () {
-    final schemaDto = SchemaDto.fromJson(schemaJson);
+    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
     final schema = schemaDto.toModel();
 
     for (final segment in schema.segments) {

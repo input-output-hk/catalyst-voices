@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document_schema_dto.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/read_json.dart';
@@ -19,10 +19,11 @@ void main() {
     // ignore: lines_longer_than_80_chars
     'Check if all definition are in definition list inside DefinitionDto model',
     () async {
-      final schemaDto = SchemaDto.fromJson(schemaJson);
+      final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final definitions = schemaDto.definitions.definitionsModels;
 
-      for (final value in BaseDefinition.refPathToDefinitionType.values) {
+      for (final value
+          in BaseDocumentDefinition.refPathToDefinitionType.values) {
         final occurrences =
             definitions.where((element) => element.runtimeType == value).length;
         expect(

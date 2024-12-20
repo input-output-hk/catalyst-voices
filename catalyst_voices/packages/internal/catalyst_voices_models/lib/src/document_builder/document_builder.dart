@@ -1,29 +1,28 @@
-import 'package:catalyst_voices_models/src/proposal_schema/schema.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:catalyst_voices_models/src/document_builder/document_schema.dart';
 
-class ProposalBuilder {
+class DocumentBuilder {
   final String schema;
-  final List<ProposalBuilderSegment> segments;
+  final List<DocumentBuilderSegment> segments;
 
-  const ProposalBuilder({
+  const DocumentBuilder({
     required this.schema,
     required this.segments,
   });
 
-  factory ProposalBuilder.build(Schema proposalSchema) {
-    return ProposalBuilder(
+  factory DocumentBuilder.build(DocumentSchema proposalSchema) {
+    return DocumentBuilder(
       schema: proposalSchema.propertiesSchema,
       segments: proposalSchema.segments
           .map(
-            (element) => ProposalBuilderSegment(
+            (element) => DocumentBuilderSegment(
               id: element.id,
               sections: element.sections
                   .map(
-                    (element) => ProposalBuilderSection(
+                    (element) => DocumentBuilderSection(
                       id: element.id,
                       elements: element.elements
                           .map(
-                            (e) => ProposalBuilderElement(
+                            (e) => DocumentBuilderElement(
                               id: e.id,
                               value: e.ref.type.getDefaultValue,
                             ),
@@ -39,32 +38,31 @@ class ProposalBuilder {
   }
 }
 
-class ProposalBuilderSegment {
+class DocumentBuilderSegment {
   final String id;
-  final List<ProposalBuilderSection> sections;
+  final List<DocumentBuilderSection> sections;
 
-  const ProposalBuilderSegment({
+  const DocumentBuilderSegment({
     required this.id,
     required this.sections,
   });
 }
 
-@JsonSerializable()
-class ProposalBuilderSection {
+class DocumentBuilderSection {
   final String id;
-  final List<ProposalBuilderElement> elements;
+  final List<DocumentBuilderElement> elements;
 
-  const ProposalBuilderSection({
+  const DocumentBuilderSection({
     required this.id,
     required this.elements,
   });
 }
 
-class ProposalBuilderElement {
+class DocumentBuilderElement {
   final String id;
   final dynamic value;
 
-  const ProposalBuilderElement({
+  const DocumentBuilderElement({
     required this.id,
     required this.value,
   });

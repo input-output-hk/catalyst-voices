@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SchemaDefinition extends StatelessWidget {
-  final BaseDefinition definition;
+  final BaseDocumentDefinition definition;
   const SchemaDefinition({super.key, required this.definition});
 
   @override

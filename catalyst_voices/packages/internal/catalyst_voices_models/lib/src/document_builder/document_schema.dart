@@ -1,15 +1,15 @@
-import 'package:catalyst_voices_models/src/proposal_schema/definitions.dart';
+import 'package:catalyst_voices_models/src/document_builder/document_definitions.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-class Schema {
+class DocumentSchema {
   final String schema;
   final String title;
   final String description;
-  final List<SchemaSegment> segments;
+  final List<DocumentSchemaSegment> segments;
   final List<String> order;
   final String propertiesSchema;
 
-  const Schema({
+  const DocumentSchema({
     required this.schema,
     required this.title,
     required this.description,
@@ -19,14 +19,14 @@ class Schema {
   });
 }
 
-class SchemaSegment {
-  final BaseDefinition ref;
+class DocumentSchemaSegment {
+  final BaseDocumentDefinition ref;
   final String id;
   final String title;
   final String description;
-  final List<SchemaSection> sections;
+  final List<DocumentSchemaSection> sections;
 
-  const SchemaSegment({
+  const DocumentSchemaSegment({
     required this.ref,
     required this.id,
     required this.title,
@@ -35,15 +35,15 @@ class SchemaSegment {
   });
 }
 
-class SchemaSection {
-  final BaseDefinition ref;
+class DocumentSchemaSection {
+  final BaseDocumentDefinition ref;
   final String id;
   final String title;
   final String description;
-  final List<SchemaElement> elements;
+  final List<DocumentSchemaElement> elements;
   final bool isRequired;
 
-  const SchemaSection({
+  const DocumentSchemaSection({
     required this.ref,
     required this.id,
     required this.title,
@@ -53,8 +53,8 @@ class SchemaSection {
   });
 }
 
-class SchemaElement {
-  final BaseDefinition ref;
+class DocumentSchemaElement {
+  final BaseDocumentDefinition ref;
   final String id;
   final String title;
   final String description;
@@ -66,7 +66,7 @@ class SchemaElement {
   final Range<int>? range;
   final Range<int>? itemsRange;
 
-  const SchemaElement({
+  const DocumentSchemaElement({
     required this.ref,
     required this.id,
     required this.title,

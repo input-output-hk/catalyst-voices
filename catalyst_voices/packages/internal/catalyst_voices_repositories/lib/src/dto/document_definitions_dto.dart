@@ -1,10 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'definitions_dto.g.dart';
+part 'document_definitions_dto.g.dart';
 
 @JsonSerializable()
-class DefinitionsDto {
+class DocumentDefinitionsDto {
   final SegmentDto segment;
   final SectionDto section;
   final SingleLineTextEntryDto singleLineTextEntry;
@@ -29,7 +29,7 @@ class DefinitionsDto {
   @JsonKey(name: 'spdxLicenseOrURL')
   final SPDXLicenceOrUrlDto spdxLicenceOrUrl;
 
-  const DefinitionsDto({
+  const DocumentDefinitionsDto({
     required this.segment,
     required this.section,
     required this.singleLineTextEntry,
@@ -53,12 +53,12 @@ class DefinitionsDto {
     required this.spdxLicenceOrUrl,
   });
 
-  factory DefinitionsDto.fromJson(Map<String, dynamic> json) =>
-      _$DefinitionsDtoFromJson(json);
+  factory DocumentDefinitionsDto.fromJson(Map<String, dynamic> json) =>
+      _$DocumentDefinitionsDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DefinitionsDtoToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentDefinitionsDtoToJson(this);
 
-  List<BaseDefinition> get definitionsModels => [
+  List<BaseDocumentDefinition> get definitionsModels => [
         segment.toModel(),
         section.toModel(),
         singleLineTextEntry.toModel(),
@@ -102,7 +102,7 @@ class SegmentDto {
   Map<String, dynamic> toJson() => _$SegmentDtoToJson(this);
 
   SegmentDefinition toModel() => SegmentDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
         additionalProperties: additionalProperties,
       );
@@ -127,7 +127,7 @@ class SectionDto {
   Map<String, dynamic> toJson() => _$SectionDtoToJson(this);
 
   SectionDefinition toModel() => SectionDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
         additionalProperties: additionalProperties,
       );
@@ -154,10 +154,10 @@ class SingleLineTextEntryDto {
   Map<String, dynamic> toJson() => _$SingleLineTextEntryDtoToJson(this);
 
   SingleLineTextEntryDefinition toModel() => SingleLineTextEntryDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
         contentMediaType:
-            DefinitionsContentMediaType.fromString(contentMediaType),
+            DocumentDefinitionsContentMediaType.fromString(contentMediaType),
         pattern: pattern,
       );
 }
@@ -184,9 +184,9 @@ class SingleLineHttpsURLEntryDto {
 
   SingleLineHttpsURLEntryDefinition toModel() {
     return SingleLineHttpsURLEntryDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
       pattern: pattern,
     );
   }
@@ -214,10 +214,10 @@ class MultiLineTextEntryDto {
 
   MultiLineTextEntryDefinition toModel() {
     return MultiLineTextEntryDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
       contentMediaType:
-          DefinitionsContentMediaType.fromString(contentMediaType),
+          DocumentDefinitionsContentMediaType.fromString(contentMediaType),
       pattern: pattern,
     );
   }
@@ -245,10 +245,10 @@ class MultiLineTextEntryMarkdownDto {
 
   MultiLineTextEntryMarkdownDefinition toModel() {
     return MultiLineTextEntryMarkdownDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
       contentMediaType:
-          DefinitionsContentMediaType.fromString(contentMediaType),
+          DocumentDefinitionsContentMediaType.fromString(contentMediaType),
       pattern: pattern,
     );
   }
@@ -278,12 +278,12 @@ class DropDownSingleSelectDto {
 
   DropDownSingleSelectDefinition toModel() {
     return DropDownSingleSelectDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
       contentMediaType:
-          DefinitionsContentMediaType.fromString(contentMediaType),
+          DocumentDefinitionsContentMediaType.fromString(contentMediaType),
       pattern: pattern,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
     );
   }
 }
@@ -310,9 +310,9 @@ class MultiSelectDto {
 
   MultiSelectDefinition toModel() {
     return MultiSelectDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
       uniqueItems: uniqueItems,
     );
   }
@@ -345,9 +345,9 @@ class SingleLineTextEntryListDto {
 
   SingleLineTextEntryListDefinition toModel() =>
       SingleLineTextEntryListDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
         defaultValues: defaultValue,
         items: items,
@@ -384,9 +384,9 @@ class MultiLineTextEntryListMarkdownDto {
 
   MultiLineTextEntryListMarkdownDefinition toModel() =>
       MultiLineTextEntryListMarkdownDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
         defaultValue: defaultValue,
         items: items,
@@ -420,9 +420,9 @@ class SingleLineHttpsURLEntryListDto {
 
   SingleLineHttpsURLEntryListDefinition toModel() =>
       SingleLineHttpsURLEntryListDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
         defaultValue: defaultValue,
         items: items,
@@ -453,9 +453,9 @@ class NestedQuestionsListDto {
   Map<String, dynamic> toJson() => _$NestedQuestionsListDtoToJson(this);
 
   NestedQuestionsListDefinition toModel() => NestedQuestionsListDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
         defaultValue: defaultValue,
       );
@@ -483,9 +483,9 @@ class NestedQuestionsDto {
 
   NestedQuestionsDefinition toModel() {
     return NestedQuestionsDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
       additionalProperties: additionalProperties,
     );
   }
@@ -513,9 +513,9 @@ class SingleGroupedTagSelectorDto {
 
   SingleGroupedTagSelectorDefinition toModel() {
     return SingleGroupedTagSelectorDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
       additionalProperties: additionalProperties,
     );
   }
@@ -543,9 +543,9 @@ class TagGroupDto {
 
   TagGroupDefinition toModel() {
     return TagGroupDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
       pattern: pattern,
     );
   }
@@ -573,9 +573,9 @@ class TagSelectionDto {
 
   TagSelectionDefinition toModel() {
     return TagSelectionDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
       pattern: pattern,
     );
   }
@@ -600,9 +600,9 @@ class TokenValueCardanoAdaDto {
   Map<String, dynamic> toJson() => _$TokenValueCardanoAdaDtoToJson(this);
 
   TokenValueCardanoADADefinition toModel() => TokenValueCardanoADADefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
       );
 }
 
@@ -626,9 +626,9 @@ class DurationInMonthsDto {
 
   DurationInMonthsDefinition toModel() {
     return DurationInMonthsDefinition(
-      type: DefinitionsObjectType.fromString(type),
+      type: DocumentDefinitionsObjectType.fromString(type),
       note: note,
-      format: DefinitionsFormat.fromString(format),
+      format: DocumentDefinitionsFormat.fromString(format),
     );
   }
 }
@@ -655,9 +655,9 @@ class YesNoChoiceDto {
   Map<String, dynamic> toJson() => _$YesNoChoiceDtoToJson(this);
 
   YesNoChoiceDefinition toModel() => YesNoChoiceDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
         defaultValue: defaultValue,
       );
 }
@@ -687,9 +687,9 @@ class AgreementConfirmationDto {
   Map<String, dynamic> toJson() => _$AgreementConfirmationDtoToJson(this);
 
   AgreementConfirmationDefinition toModel() => AgreementConfirmationDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
         defaultValue: defaultValue,
         constValue: constValue,
       );
@@ -718,11 +718,11 @@ class SPDXLicenceOrUrlDto {
   Map<String, dynamic> toJson() => _$SPDXLicenceOrUrlDtoToJson(this);
 
   SPDXLicenceOrUrlDefinition toModel() => SPDXLicenceOrUrlDefinition(
-        type: DefinitionsObjectType.fromString(type),
+        type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
-        format: DefinitionsFormat.fromString(format),
+        format: DocumentDefinitionsFormat.fromString(format),
         pattern: pattern,
         contentMediaType:
-            DefinitionsContentMediaType.fromString(contentMediaType),
+            DocumentDefinitionsContentMediaType.fromString(contentMediaType),
       );
 }
