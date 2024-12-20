@@ -49,7 +49,7 @@ abstract interface class DocumentManager {
 ///
 /// The [document] payload can be UTF-8 encoded bytes, a binary data
 /// or anything else that can be represented in binary format.
-abstract base class SignedDocument<T extends BinaryDocument> extends Equatable {
+abstract interface class SignedDocument<T extends BinaryDocument> {
   /// The default constructor for the [SignedDocument].
   const SignedDocument();
 

@@ -55,7 +55,7 @@ final class _DocumentManagerImpl implements DocumentManager {
 }
 
 final class _CoseSignedDocument<T extends BinaryDocument>
-    extends SignedDocument<T> {
+    extends SignedDocument<T> with EquatableMixin {
   final CoseSign _coseSign;
 
   @override
