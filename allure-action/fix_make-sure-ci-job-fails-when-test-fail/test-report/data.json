@@ -1,0 +1,94 @@
+[
+  {
+    "runId": 11229098656,
+    "runUniqueId": "11229098656_1728365068406",
+    "testResult": "PASS",
+    "timestamp": 1728308911000,
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 281,
+        "unknown": 0,
+        "total": 281
+      },
+      "time": {
+        "start": 1728308911000,
+        "stop": 1728308969300,
+        "duration": 58300,
+        "minDuration": 1,
+        "maxDuration": 1220,
+        "sumDuration": 16838
+      }
+    }
+  },
+  {
+    "runId": 11216940874,
+    "runUniqueId": "11216940874_1728309021973",
+    "testResult": "PASS",
+    "timestamp": 1728308911000,
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 281,
+        "unknown": 0,
+        "total": 281
+      },
+      "time": {
+        "start": 1728308911000,
+        "stop": 1728308969300,
+        "duration": 58300,
+        "minDuration": 1,
+        "maxDuration": 1220,
+        "sumDuration": 16835
+      }
+    }
+  },
+  {
+    "runId": 11200934771,
+    "runUniqueId": "11200934771_1728209283126",
+    "testResult": "PASS",
+    "timestamp": 1728209180000,
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 281,
+        "unknown": 0,
+        "total": 281
+      },
+      "time": {
+        "start": 1728209180000,
+        "stop": 1728209240311,
+        "duration": 60311,
+        "minDuration": 1,
+        "maxDuration": 1238,
+        "sumDuration": 17739
+      }
+    }
+  },
+  {
+    "runId": 11183845864,
+    "runUniqueId": "11183845864_1728060927676",
+    "testResult": "PASS",
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 20,
+        "unknown": 0,
+        "total": 20
+      },
+      "time": {
+        "minDuration": 57,
+        "maxDuration": 219,
+        "sumDuration": 2302
+      }
+    }
+  }
+]

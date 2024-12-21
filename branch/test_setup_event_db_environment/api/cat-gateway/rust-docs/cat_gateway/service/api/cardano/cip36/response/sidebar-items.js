@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Cip36Registration"],"fn":["cip15_default","is_payable_default"],"struct":["Cip36Details","Cip36RegistrationList","Cip36RegistrationsForVotingPublicKey"],"type":["AllRegistration"]};

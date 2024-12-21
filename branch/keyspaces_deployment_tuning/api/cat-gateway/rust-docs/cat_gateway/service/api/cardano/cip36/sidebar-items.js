@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["endpoint","old_endpoint","response"],"struct":["Api"]};
