@@ -29,18 +29,21 @@ cluster-test:
     RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
 
 # kubernetes-base : base container with tooling set up for local access
-kubernetes-base:
+test-kubernetes-base:
     FROM alpine:3.20.3
-    
+
     # Install kubectl
     RUN apk update && \
         apk upgrade && \
         apk add kubectl \
-                helm
+                helm \
+                vagrant
 
-    COPY shared/k3s.yaml $HOME/.kube/config
 
+    #COPY shared/k3s.yaml $HOME/.kube/config
+    COPY --dir shared shared
     COPY --dir manifests manifests
+    RUN vagrant up
 
 # test targets to deploy the local documentation
 deploy-docs:
@@ -62,7 +65,7 @@ show-info:
     FROM +kubernetes-base
     ARG local_file=""
 
-    # Get everything from all namespaces    
+    # Get everything from all namespaces
     RUN --no-cache kubectl -o wide get all --all-namespaces > cluster.info
 
     IF [ "$local_file" == "" ]
