@@ -47,20 +47,12 @@ void main() async {
       await $(OverallSpacesPage.guestShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
-      SpacesDrawerPage.guestLooksAsExpected($);
+      SpacesDrawerPage.commonElementsLookAsExpected($);
 
       // iterate thru spaces by clicking on spaces icons directly
       for (final space in Space.values) {
         await $(SpacesDrawerPage.chooserItem(space)).tap();
-        expect(
-          $(SpacesDrawerPage.chooserIcon(space)),
-          findsOneWidget,
-        );
-        final children = find.descendant(
-          of: $(SpacesDrawerPage.guestMenuItems),
-          matching: find.byWidgetPredicate((widget) => true),
-        );
-        expect($(children), findsAtLeast(1));
+        await SpacesDrawerPage.guestLooksAsExpected($, space);
       }
       SelectorUtils.isDisabled($, $(SpacesDrawerPage.chooserNextBtn));
     },
@@ -75,25 +67,17 @@ void main() async {
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
 
       // iterate thru spaces by clicking next
-      for (var i = 0; i < Space.values.length; i++) {
+      for (final space in Space.values) {
+        await SpacesDrawerPage.guestLooksAsExpected($, space);
         await $(SpacesDrawerPage.chooserNextBtn).tap();
-        final children = find.descendant(
-          of: $(SpacesDrawerPage.guestMenuItems),
-          matching: find.byWidgetPredicate((widget) => true),
-        );
-        expect($(children), findsAtLeast(1));
         SelectorUtils.isEnabled($, $(SpacesDrawerPage.chooserPrevBtn));
       }
       SelectorUtils.isDisabled($, $(SpacesDrawerPage.chooserNextBtn));
 
       // iterate thru spaces by clicking previous
-      for (var i = 0; i < Space.values.length; i++) {
+      for (final space in Space.values.reversed) {
+        await SpacesDrawerPage.guestLooksAsExpected($, space);
         await $(SpacesDrawerPage.chooserPrevBtn).tap();
-        final children = find.descendant(
-          of: $(SpacesDrawerPage.guestMenuItems),
-          matching: find.byWidgetPredicate((widget) => true),
-        );
-        expect($(children), findsAtLeast(1));
         SelectorUtils.isEnabled($, $(SpacesDrawerPage.chooserNextBtn));
       }
       SelectorUtils.isDisabled($, $(SpacesDrawerPage.chooserPrevBtn));
@@ -107,7 +91,11 @@ void main() async {
       await $(OverallSpacesPage.userShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
-      await SpacesDrawerPage.userLooksAsExpected($);
+      SpacesDrawerPage.commonElementsLookAsExpected($);
+      for (final space in Space.values) {
+        await $(SpacesDrawerPage.chooserItem(space)).tap();
+        await SpacesDrawerPage.userLooksAsExpected($, space);
+      }
     },
   );
 
