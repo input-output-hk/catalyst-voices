@@ -1,50 +1,49 @@
-//! Get chain root by role0 key.
+//! Get chain root by stake address.
 use std::sync::{Arc, LazyLock};
 
 use anyhow::bail;
 use futures::StreamExt;
-use moka::{policy::EvictionPolicy, sync::Cache};
+use moka::policy::EvictionPolicy;
+use moka::sync::Cache;
+use pallas::ledger::addresses::StakeAddress;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
-use to_vec::ToVec;
 use tracing::error;
 
-use crate::{
-    db::index::{
-        block::rbac509::chain_root::{self, ChainRoot},
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
-    },
-    service::{common::auth::rbac::role0_kid::Role0Kid, utilities::convert::{big_uint_to_u64, from_saturating}},
+use crate::db::index::block::rbac509::chain_root::{self, ChainRoot};
+use crate::db::index::{
+    queries::{PreparedQueries, PreparedSelectQuery},
+    session::CassandraSession,
 };
+use crate::service::utilities::convert::{big_uint_to_u64, from_saturating};
 
-/// Cached Chain Root By Role 0 Kid.
-static CHAIN_ROOT_BY_ROLE0_KID_CACHE: LazyLock<Cache<Role0Kid, ChainRoot>> = LazyLock::new(|| {
-    Cache::builder()
-        // Set Eviction Policy to `LRU`
-        .eviction_policy(EvictionPolicy::lru())
-        // Set the initial capacity
-        .initial_capacity(chain_root::LRU_MAX_CAPACITY)
-        // Set the maximum number of LRU entries
-        .max_capacity(chain_root::LRU_MAX_CAPACITY as u64)
-        // Create the cache.
-        .build()
-});
+/// Cached Chain Root By Stake Address.
+static CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, ChainRoot>> =
+    LazyLock::new(|| {
+        Cache::builder()
+            // Set Eviction Policy to `LRU`
+            .eviction_policy(EvictionPolicy::lru())
+            // Set the initial capacity
+            .initial_capacity(chain_root::LRU_MAX_CAPACITY)
+            // Set the maximum number of LRU entries
+            .max_capacity(chain_root::LRU_MAX_CAPACITY as u64)
+            // Create the cache.
+            .build()
+    });
 
-/// Get chain root by role0 key query string.
-const GET_ROLE0_KEY_CHAIN_ROOT_CQL: &str =
-    include_str!("../cql/get_rbac_chain_root_for_role0_kid.cql");
+/// Get get chain root by stake address query string.
+const GET_CHAIN_ROOT: &str = include_str!("../cql/get_rbac_chain_root_for_stake_addr.cql");
 
-/// Get chain root by role0 key query params.
+/// Get chain root by stake address query params.
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
-    /// Role0 key to get the chain root for.
-    pub(crate) role0_kid: Vec<u8>,
+    /// Stake address to get the chain root for.
+    pub(crate) stake_address: Vec<u8>,
 }
 
-/// Get chain root by role0 key query.
+/// Get chain root by stake address query.
 #[derive(DeserializeRow)]
 pub(crate) struct Query {
     /// Slot Number the stake address was registered in.
@@ -60,31 +59,30 @@ pub(crate) struct Query {
 }
 
 impl Query {
-    /// Prepares a get chain root by role0 key query.
+    /// Prepares a get chain root by stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_chain_root_by_role0_key_query = PreparedQueries::prepare(
+        let get_chain_root_by_stake_address_query = PreparedQueries::prepare(
             session,
-            GET_ROLE0_KEY_CHAIN_ROOT_CQL,
+            GET_CHAIN_ROOT,
             scylla::statement::Consistency::All,
             true,
         )
         .await;
 
-        if let Err(ref error) = get_chain_root_by_role0_key_query {
-            error!(error=%error, "Failed to prepare get chain root by role0 key query");
+        if let Err(ref error) = get_chain_root_by_stake_address_query {
+            error!(error=%error, "Failed to prepare get chain root by stake address query");
         };
 
-        get_chain_root_by_role0_key_query
+        get_chain_root_by_stake_address_query
     }
 
-    /// Executes a get chain root role0 key query.
-    ///
-    /// Do not use directly, use an exposed method instead.
+    /// Executes a get chain root by stake address query.
+    /// Don't call directly, use one of the methods instead.
     async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::ChainRootByRole0Key, params)
+            .execute_iter(PreparedSelectQuery::ChainRootByStakeAddress, params)
             .await?
             .rows_stream::<Query>()?;
 
@@ -92,15 +90,15 @@ impl Query {
     }
 
     /// Get latest Chain Root for a given stake address, uncached.
-    ///
+    /// 
     /// Unless you really know you need an uncached result, use the cached version.
     pub(crate) async fn get_latest_uncached(
-        session: &CassandraSession, kid: Role0Kid,
+        session: &CassandraSession, stake_addr: &StakeAddress,
     ) -> anyhow::Result<Option<ChainRoot>> {
         let mut result = Self::execute(
             session,
             QueryParams {
-                role0_kid: kid.to_vec(),
+                stake_address: stake_addr.to_vec(),
             },
         )
         .await?;
@@ -123,19 +121,19 @@ impl Query {
 
     /// Get latest chain-root registration for a stake address.
     pub(crate) async fn get_latest(
-        session: &CassandraSession, kid: Role0Kid,
+        session: &CassandraSession, stake_addr: &StakeAddress,
     ) -> anyhow::Result<Option<ChainRoot>> {
-        match CHAIN_ROOT_BY_ROLE0_KID_CACHE.get(&kid) {
+        match CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.get(stake_addr) {
             Some(chain_root) => Ok(Some(chain_root)),
             None => {
                 // Look in DB for the stake registration
-                Self::get_latest_uncached(session, kid).await
+                Self::get_latest_uncached(session, stake_addr).await
             },
         }
     }
 }
 
 /// Update the cache when a rbac registration is indexed.
-pub(crate) fn cache_for_role0_kid(kid: Role0Kid, chain_root: &ChainRoot) {
-    CHAIN_ROOT_BY_ROLE0_KID_CACHE.insert(kid.clone(), chain_root.clone())
+pub(crate) fn cache_for_stake_addr(stake: &StakeAddress, chain_root: &ChainRoot) {
+    CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), chain_root.clone())
 }
