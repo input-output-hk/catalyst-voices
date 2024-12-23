@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
-import '../utils/selector_utils.dart';
-
 class SpacesDrawerPage {
   static const closeBtn = Key('MenuCloseButton');
   static const guestMenuItems = Key('GuestMenuItems');
@@ -40,39 +38,43 @@ class SpacesDrawerPage {
     return Key('Header.${space.name}');
   }
 
-  static void guestLooksAsExpected(PatrolTester $) {
+  static void commonElementsLookAsExpected(PatrolTester $) {
     expect($(closeBtn), findsOneWidget);
     expect($(allSpacesBtn), findsOneWidget);
     expect($(chooserPrevBtn), findsOneWidget);
-    SelectorUtils.isDisabled($, $(chooserPrevBtn));
     expect($(chooserNextBtn), findsOneWidget);
     expect($(chooserItemContainer), findsExactly(5));
-    expect(
-      $(chooserIcon(Space.discovery)),
-      findsOneWidget,
-    );
   }
 
-  static Future<void> userLooksAsExpected(PatrolTester $) async {
-    for (final space in Space.values) {
-      await $(SpacesDrawerPage.chooserItem(space)).tap();
-      switch (space) {
-        case Space.discovery:
-          userDiscoveryLooksAsExpected($);
-          break;
-        case Space.workspace:
-          userWorkspaceLooksAsExpected($);
-          break;
-        case Space.voting:
-          userVotingLooksAsExpected($);
-          break;
-        case Space.fundedProjects:
-          userFundedProjectsLooksAsExpected($);
-          break;
-        case Space.treasury:
-          userTreasuryLooksAsExpected($);
-          break;
-      }
+  static Future<void> guestLooksAsExpected(PatrolTester $, Space space) async {
+    expect(
+      $(SpacesDrawerPage.chooserIcon(space)),
+      findsOneWidget,
+    );
+    final children = find.descendant(
+      of: $(guestMenuItems),
+      matching: find.byWidgetPredicate((widget) => true),
+    );
+    expect($(children), findsAtLeast(1));
+  }
+
+  static Future<void> userLooksAsExpected(PatrolTester $, Space space) async {
+    switch (space) {
+      case Space.discovery:
+        userDiscoveryLooksAsExpected($);
+        break;
+      case Space.workspace:
+        userWorkspaceLooksAsExpected($);
+        break;
+      case Space.voting:
+        userVotingLooksAsExpected($);
+        break;
+      case Space.fundedProjects:
+        userFundedProjectsLooksAsExpected($);
+        break;
+      case Space.treasury:
+        userTreasuryLooksAsExpected($);
+        break;
     }
   }
 
