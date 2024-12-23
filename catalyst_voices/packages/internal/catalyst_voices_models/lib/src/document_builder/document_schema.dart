@@ -2,7 +2,12 @@ import 'package:catalyst_voices_models/src/document_builder/document_definitions
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-class DocumentSchema extends Equatable {
+/// A document schema that describes the structure of a document.
+///
+/// The document consists of top level [segments].
+/// [segments] contain [DocumentSchemaSegment.sections]
+/// and sections contain [DocumentSchemaElement]'s.
+final class DocumentSchema extends Equatable {
   final String schema;
   final String title;
   final String description;
@@ -30,7 +35,7 @@ class DocumentSchema extends Equatable {
       ];
 }
 
-class DocumentSchemaSegment extends Equatable {
+final class DocumentSchemaSegment extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
   final String title;
@@ -54,7 +59,7 @@ class DocumentSchemaSegment extends Equatable {
       ];
 }
 
-class DocumentSchemaSection extends Equatable {
+final class DocumentSchemaSection extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
   final String title;
@@ -82,7 +87,7 @@ class DocumentSchemaSection extends Equatable {
       ];
 }
 
-class DocumentSchemaElement extends Equatable {
+final class DocumentSchemaElement extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
   final String title;

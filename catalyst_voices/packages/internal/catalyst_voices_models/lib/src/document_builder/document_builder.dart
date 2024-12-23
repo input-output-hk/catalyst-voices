@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/src/document_builder/document_schema.dart';
 import 'package:equatable/equatable.dart';
 
-class DocumentBuilder extends Equatable {
+final class DocumentBuilder extends Equatable {
   final String schema;
   final List<DocumentBuilderSegment> segments;
 
@@ -13,28 +13,7 @@ class DocumentBuilder extends Equatable {
   factory DocumentBuilder.build(DocumentSchema schema) {
     return DocumentBuilder(
       schema: schema.propertiesSchema,
-      segments: schema.segments
-          .map(
-            (element) => DocumentBuilderSegment(
-              id: element.id,
-              sections: element.sections
-                  .map(
-                    (element) => DocumentBuilderSection(
-                      id: element.id,
-                      elements: element.elements
-                          .map(
-                            (e) => DocumentBuilderElement(
-                              id: e.id,
-                              value: e.ref.type.defaultValue,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  )
-                  .toList(),
-            ),
-          )
-          .toList(),
+      segments: schema.segments.map(DocumentBuilderSegment.build).toList(),
     );
   }
 
@@ -42,7 +21,7 @@ class DocumentBuilder extends Equatable {
   List<Object?> get props => [schema, segments];
 }
 
-class DocumentBuilderSegment extends Equatable {
+final class DocumentBuilderSegment extends Equatable {
   final String id;
   final List<DocumentBuilderSection> sections;
 
@@ -51,11 +30,18 @@ class DocumentBuilderSegment extends Equatable {
     required this.sections,
   });
 
+  factory DocumentBuilderSegment.build(DocumentSchemaSegment segment) {
+    return DocumentBuilderSegment(
+      id: segment.id,
+      sections: segment.sections.map(DocumentBuilderSection.build).toList(),
+    );
+  }
+
   @override
   List<Object?> get props => [id, sections];
 }
 
-class DocumentBuilderSection extends Equatable {
+final class DocumentBuilderSection extends Equatable {
   final String id;
   final List<DocumentBuilderElement> elements;
 
@@ -64,11 +50,18 @@ class DocumentBuilderSection extends Equatable {
     required this.elements,
   });
 
+  factory DocumentBuilderSection.build(DocumentSchemaSection section) {
+    return DocumentBuilderSection(
+      id: section.id,
+      elements: section.elements.map(DocumentBuilderElement.build).toList(),
+    );
+  }
+
   @override
   List<Object?> get props => [id, elements];
 }
 
-class DocumentBuilderElement extends Equatable {
+final class DocumentBuilderElement extends Equatable {
   final String id;
   final dynamic value;
 
@@ -76,6 +69,14 @@ class DocumentBuilderElement extends Equatable {
     required this.id,
     required this.value,
   });
+
+  factory DocumentBuilderElement.build(DocumentSchemaElement element) {
+    return DocumentBuilderElement(
+      id: element.id,
+      // TODO(dtscalac): provide value
+      value: element.ref.type.defaultValue,
+    );
+  }
 
   @override
   List<Object?> get props => [id, value];

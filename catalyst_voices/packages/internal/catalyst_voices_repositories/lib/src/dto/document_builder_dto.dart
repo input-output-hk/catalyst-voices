@@ -9,6 +9,7 @@ part 'document_builder_dto.g.dart';
 class DocumentBuilderDto extends Equatable {
   @JsonKey(name: r'$schema')
   final String schema;
+
   @JsonKey(fromJson: _fromJsonSegments, toJson: _toJsonSegments)
   final List<DocumentBuilderSegmentDto> segments;
 
@@ -31,11 +32,10 @@ class DocumentBuilderDto extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    final segments = <String, dynamic>{}..addAll({r'$schema': schema});
-    for (final segment in this.segments) {
-      segments.addAll(segment.toJson());
-    }
-    return segments;
+    return {
+      r'$schema': schema,
+      for (final segment in segments) ...segment.toJson(),
+    };
   }
 
   DocumentBuilder toModel() {
@@ -48,11 +48,9 @@ class DocumentBuilderDto extends Equatable {
   static Map<String, dynamic> _toJsonSegments(
     List<DocumentBuilderSegmentDto> segments,
   ) {
-    final map = <String, dynamic>{};
-    for (final segment in segments) {
-      map[segment.id] = segment.toJson();
-    }
-    return map;
+    return {
+      for (final segment in segments) segment.id: segment.toJson(),
+    };
   }
 
   static List<DocumentBuilderSegmentDto> _fromJsonSegments(
@@ -69,6 +67,7 @@ class DocumentBuilderDto extends Equatable {
 @JsonSerializable()
 class DocumentBuilderSegmentDto extends Equatable {
   final String id;
+
   @JsonKey(fromJson: _fromJsonSections, toJson: _toJsonSections)
   final List<DocumentBuilderSectionDto> sections;
 
@@ -91,12 +90,10 @@ class DocumentBuilderSegmentDto extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    final sections = <String, dynamic>{};
-    for (final section in this.sections) {
-      sections.addAll(section.toJson());
-    }
     return {
-      id: sections,
+      id: {
+        for (final section in sections) ...section.toJson(),
+      },
     };
   }
 
@@ -110,11 +107,9 @@ class DocumentBuilderSegmentDto extends Equatable {
   static Map<String, dynamic> _toJsonSections(
     List<DocumentBuilderSectionDto> sections,
   ) {
-    final map = <String, dynamic>{};
-    for (final section in sections) {
-      map[section.id] = section.toJson();
-    }
-    return map;
+    return {
+      for (final section in sections) section.id: section.toJson(),
+    };
   }
 
   static List<DocumentBuilderSectionDto> _fromJsonSections(
@@ -131,6 +126,7 @@ class DocumentBuilderSegmentDto extends Equatable {
 @JsonSerializable()
 class DocumentBuilderSectionDto extends Equatable {
   final String id;
+
   @JsonKey(fromJson: _fromJsonElements, toJson: _toJsonElements)
   final List<DocumentBuilderElementDto> elements;
 
@@ -153,12 +149,10 @@ class DocumentBuilderSectionDto extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    for (final element in elements) {
-      map.addAll(element.toJson());
-    }
     return {
-      id: map,
+      id: {
+        for (final element in elements) ...element.toJson(),
+      },
     };
   }
 
@@ -172,18 +166,16 @@ class DocumentBuilderSectionDto extends Equatable {
   static Map<String, dynamic> _toJsonElements(
     List<DocumentBuilderElementDto> elements,
   ) {
-    final map = <String, dynamic>{};
-    for (final element in elements) {
-      map[element.id] = element.value;
-    }
-    return map;
+    return {
+      for (final element in elements) element.id: element.value,
+    };
   }
 
   static List<DocumentBuilderElementDto> _fromJsonElements(
     Map<String, dynamic> json,
   ) {
-    final listOfElements = json.convertMapToListWithIdsAndValues();
-    return listOfElements.map(DocumentBuilderElementDto.fromJson).toList();
+    final elements = json.convertMapToListWithIdsAndValues();
+    return elements.map(DocumentBuilderElementDto.fromJson).toList();
   }
 
   @override
