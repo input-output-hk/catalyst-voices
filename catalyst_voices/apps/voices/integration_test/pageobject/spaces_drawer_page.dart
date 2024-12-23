@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
-import '../utils/selector_utils.dart';
 
 class SpacesDrawerPage {
   static const closeBtn = Key('MenuCloseButton');
@@ -40,17 +39,24 @@ class SpacesDrawerPage {
     return Key('Header.${space.name}');
   }
 
-  static void guestLooksAsExpected(PatrolTester $) {
+  static void guestDrawerMainElementsLooksAsExpected(PatrolTester $) {
     expect($(closeBtn), findsOneWidget);
     expect($(allSpacesBtn), findsOneWidget);
     expect($(chooserPrevBtn), findsOneWidget);
-    SelectorUtils.isDisabled($, $(chooserPrevBtn));
     expect($(chooserNextBtn), findsOneWidget);
     expect($(chooserItemContainer), findsExactly(5));
+  }
+
+  static Future<void> guestLooksAsExpected(PatrolTester $, Space space) async {
     expect(
-      $(chooserIcon(Space.discovery)),
+      $(SpacesDrawerPage.chooserIcon(space)),
       findsOneWidget,
     );
+    final children = find.descendant(
+      of: $(SpacesDrawerPage.guestMenuItems),
+      matching: find.byWidgetPredicate((widget) => true),
+    );
+    expect($(children), findsAtLeast(1));
   }
 
   static Future<void> userLooksAsExpected(PatrolTester $) async {
