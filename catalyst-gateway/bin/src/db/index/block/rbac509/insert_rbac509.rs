@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::Metadata::cip509::Cip509;
+use rbac_registration::cardano::cip509::Cip509;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
@@ -56,7 +56,7 @@ impl Params {
         Params {
             chain_root: chain_root.to_vec(),
             transaction_id: transaction_id.to_vec(),
-            purpose: cip509.purpose.to_vec(),
+            purpose: cip509.purpose.into(),
             slot_no: num_bigint::BigInt::from(slot_no),
             txn,
             prv_txn_id: if let Some(tx_id) = cip509.prv_tx_id {

@@ -31,6 +31,7 @@ class _SpacesListViewState extends State<SpacesListView> {
   @override
   Widget build(BuildContext context) {
     return VoicesScrollbar(
+      key: const Key('SpacesListView'),
       controller: _scrollController,
       alwaysVisible: true,
       padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -43,17 +44,24 @@ class _SpacesListViewState extends State<SpacesListView> {
             padding: const EdgeInsets.only(right: 16, bottom: 24),
             itemBuilder: (context, index) {
               final space = state[index];
+
               return switch (space) {
-                Space.discovery => DiscoveryOverview(key: ObjectKey(space)),
-                Space.workspace => WorkspaceOverview(key: ObjectKey(space)),
+                Space.discovery =>
+                  DiscoveryOverview(key: Key('SpaceOverview.${space.name}')),
+                Space.workspace =>
+                  WorkspaceOverview(key: Key('SpaceOverview.${space.name}')),
                 Space.voting => GreyOutContainer(
-                    child: VotingOverview(key: ObjectKey(space)),
+                    child: VotingOverview(
+                      key: Key('SpaceOverview.${space.name}'),
+                    ),
                   ),
                 Space.fundedProjects => GreyOutContainer(
-                    child: FundedProjectsOverview(key: ObjectKey(space)),
+                    child: FundedProjectsOverview(
+                      key: Key('SpaceOverview.${space.name}'),
+                    ),
                   ),
                 Space.treasury => TreasuryOverview(
-                    key: ObjectKey(space),
+                    key: Key('SpaceOverview.${space.name}'),
                   ),
               };
             },

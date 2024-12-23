@@ -19,6 +19,7 @@ class SpaceHeader extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
+      key: Key('SpaceHeader.${data.name}'),
       padding: const EdgeInsets.symmetric(vertical: 14)
           .add(const EdgeInsets.only(left: 16)),
       child: Row(

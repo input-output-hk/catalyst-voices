@@ -174,15 +174,15 @@ impl CatalystRBACTokenV1 {
 
     /// Check if the token is young enough.
     /// Old tokens are no longer valid.
-    pub(crate) fn young(&self, max_age: Duration, max_skew: Duration) -> bool {
+    pub(crate) fn is_young(&self, max_age: Duration, max_skew: Duration) -> bool {
         // We check that the token is not too old or too skewed.
         let now = SystemTime::now();
         let token_age = self.ulid.datetime();
 
         // The token is considered old if it was issued more than max_age ago.
-        // Or newer than an allowed clock skew value
+        // And newer than an allowed clock skew value
         // This is a safety measure to avoid replay attacks.
-        ((now - max_age) > token_age) && ((now + max_skew) < token_age)
+        ((now - max_age) < token_age) && ((now + max_skew) > token_age)
     }
 }
 
@@ -203,7 +203,7 @@ mod tests {
     use ed25519_dalek::SigningKey;
     use rand::rngs::OsRng;
 
-    use crate::service::common::auth::rbac::token::{CatalystRBACTokenV1, Kid};
+    use super::*;
 
     #[test]
     fn test_token_generation_and_decoding() {
@@ -234,5 +234,36 @@ mod tests {
         // Check its still signed properly against its own key, and not another.
         assert!(re_encoded_token.verify(&verifying_key).is_ok());
         assert!(re_encoded_token.verify(&verifying_key2).is_err());
+    }
+
+    #[test]
+    fn is_young() {
+        let mut random_seed = OsRng;
+        let key = SigningKey::generate(&mut random_seed);
+        let mut token = CatalystRBACTokenV1::new(&key);
+
+        // Update the token timestamp to be two seconds in the past.
+        let now = SystemTime::now();
+        token.ulid = Ulid::from_datetime(now - Duration::from_secs(2));
+
+        // Check that the token ISN'T young if max_age is one second.
+        let max_age = Duration::from_secs(1);
+        let max_skew = Duration::from_secs(1);
+        assert!(!token.is_young(max_age, max_skew));
+
+        // Check that the token IS young if max_age is three seconds.
+        let max_age = Duration::from_secs(3);
+        assert!(token.is_young(max_age, max_skew));
+
+        // Update the token timestamp to be two seconds in the future.
+        token.ulid = Ulid::from_datetime(now + Duration::from_secs(2));
+
+        // Check that the token IS too new if max_skew is one seconds.
+        let max_skew = Duration::from_secs(1);
+        assert!(!token.is_young(max_age, max_skew));
+
+        // Check that the token ISN'T too new if max_skew is three seconds.
+        let max_skew = Duration::from_secs(3);
+        assert!(token.is_young(max_age, max_skew));
     }
 }
