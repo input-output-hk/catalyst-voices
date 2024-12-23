@@ -39,7 +39,7 @@ class SpacesDrawerPage {
     return Key('Header.${space.name}');
   }
 
-  static void guestDrawerMainElementsLooksAsExpected(PatrolTester $) {
+  static void guestCommonElementsLookAsExpected(PatrolTester $) {
     expect($(closeBtn), findsOneWidget);
     expect($(allSpacesBtn), findsOneWidget);
     expect($(chooserPrevBtn), findsOneWidget);

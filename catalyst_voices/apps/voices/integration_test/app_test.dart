@@ -47,7 +47,7 @@ void main() async {
       await $(OverallSpacesPage.guestShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
-      SpacesDrawerPage.guestDrawerMainElementsLooksAsExpected($);
+      SpacesDrawerPage.guestCommonElementsLookAsExpected($);
 
       // iterate thru spaces by clicking on spaces icons directly
       for (final space in Space.values) {
@@ -91,6 +91,7 @@ void main() async {
       await $(OverallSpacesPage.userShortcutBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
       await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+      SpacesDrawerPage.guestCommonElementsLookAsExpected($);
       await SpacesDrawerPage.userLooksAsExpected($);
     },
   );
