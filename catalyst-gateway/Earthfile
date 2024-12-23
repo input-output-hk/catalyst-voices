@@ -151,7 +151,7 @@ test-scylla:
         scylla --options-file /etc/scylla/scylla.yaml --smp=2 --memory=4G --overprovisioned --developer-mode=1 & \
         cargo nextest run --release --run-ignored=only scylla_session
 
-# INSTALL_SCYLLA - Installs scylla for bookwarm-slim/debian
+# INSTALL_SCYLLA - Installs scylla for bookworm-slim/debian
 INSTALL_SCYLLA:
     FUNCTION
 
