@@ -168,7 +168,7 @@ impl CertInsertQuery {
                 // witnessed.
                 (cred.to_vec(), addr.clone(), false)
             },
-            pallas::ledger::primitives::conway::StakeCredential::Scripthash(script) => {
+            pallas::ledger::primitives::conway::StakeCredential::ScriptHash(script) => {
                 (script.to_vec(), default_addr, true)
             },
         };
@@ -251,8 +251,8 @@ impl CertInsertQuery {
 
     /// Index the certificates in a transaction.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64, txn: i16,
-        block: &MultiEraBlock,
+        &mut self, txs: &pallas::ledger::traverse::MultiEraTxWithRawAuxiliary<'_>, slot_no: u64,
+        txn: i16, block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         txs.certs().iter().for_each(|cert| {
