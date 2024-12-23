@@ -30,7 +30,7 @@ class InformationPanel extends StatelessWidget {
           body: body,
         ),
         const SizedBox(height: 12),
-        Expanded(child: Center(child: picture)),
+        Expanded(key: const Key('PictureContainer'), child: Center(child: picture)),
         const SizedBox(height: 12),
         _Footer(
           progress: progress,
@@ -64,16 +64,19 @@ class _Header extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
+          key: const Key('HeaderTitle'),
           title,
           style: theme.textTheme.titleLarge?.copyWith(color: textColor),
         ),
         if (subtitle != null)
           Text(
+            key: const Key('HeaderSubtitle'),
             subtitle,
             style: theme.textTheme.titleMedium?.copyWith(color: textColor),
           ),
         if (body != null)
           Text(
+            key: const Key('HeaderBody'),
             body,
             style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
           ),
