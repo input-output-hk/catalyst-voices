@@ -15,8 +15,9 @@ repository.workspace =  true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.5" }
+cardano-chain-follower = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", tag="v0.0.10" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "v0.0.3" }
+rbac-registration = { version = "0.0.2", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "v0.0.8" }
 
 pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
 pallas-traverse = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
@@ -42,6 +43,7 @@ tokio-postgres = { version = "0.7.12", features = [
     "with-chrono-0_4",
     "with-serde_json-1",
     "with-time-0_3",
+    "with-uuid-1"
 ] }
 tokio = { version = "1.41.0", features = ["rt", "macros", "rt-multi-thread"] }
 dotenvy = "0.15.7"
@@ -76,7 +78,7 @@ poem-openapi = { version = "5.1.2", features = [
     "url",
     "chrono",
 ] }
-uuid = { version = "1.11.0", features = ["v4", "serde"] }
+uuid = { version = "1.11.0", features = ["v4", "v7", "serde"] }
 ulid = { version = "1.1.3", features = ["serde", "uuid"] }
 blake2b_simd = "1.0.2"
 url = "2.5.3"
