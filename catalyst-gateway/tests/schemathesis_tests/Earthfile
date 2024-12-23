@@ -10,7 +10,7 @@ package-schemathesis:
     VOLUME /results
     ARG openapi_spec
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                    && st run --checks all $openapi_spec \
+                    && st run --checks all http://0.0.0.0:3030/docs/cat-gateway.json \
                     --workers=2 \
                     --wait-for-schema=120 \
                     --max-response-time=5000 \
@@ -33,34 +33,18 @@ fuzzer-api:
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd curl
     COPY schemathesis-docker-compose.yml .
-   # COPY node1-scylla.yaml .
-   # COPY node2-scylla.yaml .
-   # COPY node3-scylla.yaml .
-   # COPY node4-scylla.yaml .
-    #ENV HOST_IP
-    #RUN export HOST_IP="$(ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}')"
-    LET OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
-    #ENV LOG_LEVEL=error
-    #ENV DATA_REFRESH_TICK=5
-    #ENV CHECK_CONFIG_TICK=5
-    #ENV MACHINE_ID="UID"
-    #ENV CHAIN_FOLLOWER_SYNC_TASKS="16"
-    #ENV RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-    #ENV CHAIN_NETWORK="Preprod"
+    #LET OPENAPI_SPEC="http://cat-gateway:3030/docs/cat-gateway.json"
+
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
+        --load schemathesis:latest=(+package-schemathesis) \
         #--load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(+package-cat-gateway-integration) \
         #--service event-db \
-        #--service scylla-node1 \
-        #--service scylla-node2 \
-        #--service scylla-node3 \
-        #--service scylla-node4 \
         --service cat-gateway \
         --allow-privileged
 
-        RUN sleep 120 && wget http://127.0.0.1:3030/docs/cat-gateway.json && docker run schemathesis:latest --net=host
+        RUN sleep 120 && docker run --net=host schemathesis:latest
     END
    # WAIT
    #     SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
