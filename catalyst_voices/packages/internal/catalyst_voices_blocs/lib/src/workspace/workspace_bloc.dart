@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -6,110 +8,92 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
+  // ignore: unused_field
   final CampaignService _campaignService;
 
-  final _answers = <SectionStepId, MarkdownData>{};
-  final _guidances = <SectionStepId, List<Guidance>>{};
-
-  SectionStepId? _activeStepId;
+  // ignore: unused_field
+  final List<Proposal> _proposals = [];
 
   WorkspaceBloc(
     this._campaignService,
   ) : super(const WorkspaceState()) {
-    on<LoadCurrentProposalEvent>(_loadCurrentProposal);
-    on<UpdateStepAnswerEvent>(_updateStepAnswer);
-    on<ActiveStepChangedEvent>(_handleActiveStepEvent);
+    on<LoadProposalsEvent>(_loadProposals);
+    on<TabChangedEvent>(_handleTabChange);
+    on<SearchQueryChangedEvent>(
+      _handleQueryChange,
+      // TODO(damian-molinski): implement debounce
+      transformer: null,
+    );
   }
 
-  Future<void> _loadCurrentProposal(
-    LoadCurrentProposalEvent event,
+  Future<String> createNewDraftProposal() async {
+    return 'new-draft-id';
+  }
+
+  Future<void> _loadProposals(
+    LoadProposalsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    _answers.clear();
-    _guidances.clear();
-
-    final activeCampaign = await _campaignService.getActiveCampaign();
-    if (activeCampaign == null) {
-      emit(
-        state.copyWith(
-          sections: [],
-          guidance: const WorkspaceGuidance(isNoneSelected: true),
-        ),
-      );
-      return;
-    }
-
-    final template = activeCampaign.proposalTemplate;
-
-    final sections = template.sections.map(_mapProposalSection).toList();
-
-    for (final section in template.sections) {
-      for (final step in section.steps) {
-        final id = (sectionId: section.id, stepId: step.id);
-        _guidances[id] = step.guidances;
-      }
-    }
-
-    final activeStepId = _activeStepId;
-    final guidances = _guidances[activeStepId] ?? <Guidance>[];
-    final guidance = WorkspaceGuidance(
-      isNoneSelected: activeStepId == null,
-      guidances: guidances,
-    );
-
     emit(
       state.copyWith(
-        sections: sections,
-        guidance: guidance,
+        isLoading: true,
+        draftProposalCount: 0,
+        finalProposalCount: 0,
+        proposals: const [],
+        error: const Optional.empty(),
       ),
     );
-  }
 
-  void _updateStepAnswer(
-    UpdateStepAnswerEvent event,
-    Emitter<WorkspaceState> emit,
-  ) {
-    final answer = event.data;
-    if (answer != null) {
-      _answers[event.id] = answer;
-    } else {
-      _answers.remove(event.id);
-    }
-  }
+    // TODO(damian-molinski): implement fetching proposals
+    // TODO(damian-molinski): implement filtering of _proposals
 
-  void _handleActiveStepEvent(
-    ActiveStepChangedEvent event,
-    Emitter<WorkspaceState> emit,
-  ) {
-    _activeStepId = event.id;
+    final isSuccess = await Future.delayed(
+      const Duration(milliseconds: 300),
+      () => Random().nextBool(),
+    );
+    if (isClosed) return;
 
-    final activeStepId = _activeStepId;
-    final guidances = _guidances[activeStepId] ?? <Guidance>[];
-    final guidance = WorkspaceGuidance(
-      isNoneSelected: activeStepId == null,
-      guidances: guidances,
+    final proposals = isSuccess
+        ? List<WorkspaceProposalListItem>.generate(
+            20,
+            (index) => WorkspaceProposalListItem(
+              id: '$index',
+              name: 'Proposal [${index + 1}]',
+            ),
+          )
+        : const <WorkspaceProposalListItem>[];
+
+    final LocalizedException? error =
+        isSuccess ? null : const LocalizedUnknownException();
+
+    final newState = state.copyWith(
+      isLoading: false,
+      draftProposalCount: isSuccess ? 2 : 0,
+      finalProposalCount: isSuccess ? 1 : 0,
+      proposals: proposals,
+      error: Optional(error),
     );
 
-    emit(state.copyWith(guidance: guidance));
+    emit(newState);
   }
 
-  WorkspaceSection _mapProposalSection(ProposalSection section) {
-    return WorkspaceSection(
-      id: section.id,
-      name: section.name,
-      steps: section.steps.map(
-        (step) {
-          final id = (sectionId: section.id, stepId: step.id);
+  Future<void> _handleTabChange(
+    TabChangedEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    // TODO(damian-molinski): implement filtering of _proposals
 
-          return RichTextStep(
-            id: step.id,
-            sectionId: section.id,
-            name: step.name,
-            description: step.description,
-            initialData: _answers[id] ?? step.answer,
-          );
-        },
-      ).toList(),
-    );
+    emit(state.copyWith(tab: event.tab));
+  }
+
+  Future<void> _handleQueryChange(
+    SearchQueryChangedEvent event,
+    Emitter<WorkspaceState> emit,
+  ) async {
+    // TODO(damian-molinski): implement filtering of _proposals
+
+    final query = event.query;
+
+    emit(state.copyWith(searchQuery: query));
   }
 }

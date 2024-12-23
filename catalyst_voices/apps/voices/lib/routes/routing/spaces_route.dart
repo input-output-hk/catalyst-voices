@@ -1,9 +1,10 @@
 import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/funded_projects/funded_projects_page.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder.dart';
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
 import 'package:catalyst_voices/pages/voting/voting_page.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_page.dart';
+import 'package:catalyst_voices/pages/workspace/workspace.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
@@ -16,15 +17,16 @@ import 'package:go_router/go_router.dart';
 
 part 'spaces_route.g.dart';
 
+const _prefix = Routes.currentMilestone;
+
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
-    TypedGoRoute<DiscoveryRoute>(path: '/${Routes.currentMilestone}/discovery'),
-    TypedGoRoute<WorkspaceRoute>(path: '/${Routes.currentMilestone}/workspace'),
-    TypedGoRoute<VotingRoute>(path: '/${Routes.currentMilestone}/voting'),
-    TypedGoRoute<FundedProjectsRoute>(
-      path: '/${Routes.currentMilestone}/funded_projects',
-    ),
-    TypedGoRoute<TreasuryRoute>(path: '/${Routes.currentMilestone}/treasury'),
+    TypedGoRoute<DiscoveryRoute>(path: '/$_prefix/discovery'),
+    TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
+    TypedGoRoute<ProposalBuilderRoute>(path: '/$_prefix/workspace/:proposalId'),
+    TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
+    TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
+    TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
   ],
 )
 final class SpacesShellRouteData extends ShellRouteData {
@@ -85,6 +87,26 @@ final class WorkspaceRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const WorkspacePage();
+  }
+}
+
+final class ProposalBuilderRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  final String proposalId;
+
+  const ProposalBuilderRoute({
+    required this.proposalId,
+  });
+
+  @override
+  List<RouteGuard> get routeGuards => [
+        const SessionUnlockedGuard(),
+        const UserAccessGuard(),
+      ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProposalBuilderPage(proposalId: proposalId);
   }
 }
 

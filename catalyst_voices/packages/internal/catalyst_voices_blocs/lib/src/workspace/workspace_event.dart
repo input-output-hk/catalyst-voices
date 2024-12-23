@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -6,31 +5,34 @@ sealed class WorkspaceEvent extends Equatable {
   const WorkspaceEvent();
 }
 
-final class LoadCurrentProposalEvent extends WorkspaceEvent {
-  const LoadCurrentProposalEvent();
+final class LoadProposalsEvent extends WorkspaceEvent {
+  const LoadProposalsEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-final class UpdateStepAnswerEvent extends WorkspaceEvent {
-  final SectionStepId id;
-  final MarkdownData? data;
+final class TabChangedEvent extends WorkspaceEvent {
+  final WorkspaceTabType tab;
 
-  const UpdateStepAnswerEvent({
-    required this.id,
-    this.data,
+  const TabChangedEvent(this.tab);
+
+  @override
+  List<Object?> get props => [tab];
+}
+
+final class SearchQueryChangedEvent extends WorkspaceEvent {
+  final String query;
+  final bool isSubmitted;
+
+  const SearchQueryChangedEvent(
+    this.query, {
+    this.isSubmitted = false,
   });
 
   @override
-  List<Object?> get props => [id, data];
-}
-
-final class ActiveStepChangedEvent extends WorkspaceEvent {
-  final SectionStepId? id;
-
-  const ActiveStepChangedEvent(this.id);
-
-  @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [
+        query,
+        isSubmitted,
+      ];
 }
