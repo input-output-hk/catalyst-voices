@@ -12,11 +12,11 @@
 
 -- Signed Documents Storage Repository defintion.
 CREATE TABLE IF NOT EXISTS signed_docs (
-  id UUID NOT NULL, -- Actually a ULID
-  ver UUID NOT NULL, -- Actually a ULID
-  type UUID NOT NULL, -- Yes its a UUID this time
+  id UUID NOT NULL, -- UUID v7
+  ver UUID NOT NULL, -- UUID v7
+  type UUID NOT NULL, -- UUID v4
   author TEXT NOT NULL,
-  metadata JSONB NOT NULL,
+  metadata JSONB NULL,
   payload JSONB NULL,
   raw BYTEA NOT NULL,
 

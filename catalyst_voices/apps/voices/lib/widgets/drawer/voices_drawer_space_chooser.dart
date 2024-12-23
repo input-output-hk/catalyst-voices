@@ -32,6 +32,7 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
           onSelected: onChanged,
           itemBuilder: _itemBuilder,
           leading: VoicesIconButton(
+            key: const ValueKey('DrawerChooserAllSpacesButton'),
             onTap: onOverallTap,
             child: VoicesAssets.icons.allSpacesMenu.buildIcon(size: 20),
           ),

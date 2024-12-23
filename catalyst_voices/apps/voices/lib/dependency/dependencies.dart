@@ -14,6 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 final class Dependencies extends DependencyProvider {
   static final Dependencies instance = Dependencies._();
 
+  bool _isInitialized = false;
+
   Dependencies._();
 
   Future<void> init({
@@ -27,6 +29,17 @@ final class Dependencies extends DependencyProvider {
     _registerServices();
     _registerRepositories();
     _registerBlocsWithDependencies();
+
+    _isInitialized = true;
+  }
+
+  bool get isInitialized => _isInitialized;
+
+  @override
+  Future<void> get reset {
+    return super.reset.whenComplete(() {
+      _isInitialized = false;
+    });
   }
 
   void _registerBlocsWithDependencies() {
