@@ -17,7 +17,7 @@ enum DocumentDefinitionsObjectType {
         DocumentDefinitionsObjectType.unknown;
   }
 
-  dynamic get getDefaultValue => switch (this) {
+  dynamic get defaultValue => switch (this) {
         string => '',
         integer => 0,
         boolean => true,
@@ -82,6 +82,7 @@ sealed class BaseDocumentDefinition extends Equatable {
     required this.type,
     required this.note,
   });
+
   @visibleForTesting
   static final Map<String, Type> refPathToDefinitionType = {
     'segment': SegmentDefinition,
@@ -389,6 +390,7 @@ class NestedQuestionsListDefinition extends BaseDocumentDefinition {
 class NestedQuestionsDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
+
   const NestedQuestionsDefinition({
     required super.type,
     required super.note,

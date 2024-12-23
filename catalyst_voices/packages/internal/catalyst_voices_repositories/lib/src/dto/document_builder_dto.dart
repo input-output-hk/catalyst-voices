@@ -11,6 +11,7 @@ class DocumentBuilderDto extends Equatable {
   final String schema;
   @JsonKey(fromJson: _fromJsonSegments, toJson: _toJsonSegments)
   final List<DocumentBuilderSegmentDto> segments;
+
   const DocumentBuilderDto({
     required this.schema,
     required this.segments,

@@ -1,4 +1,4 @@
-extension MapToListExt on Map<String, dynamic> {
+extension DocumentMapToListExt on Map<String, dynamic> {
   List<Map<String, dynamic>> convertMapToListWithIds() {
     final list = <Map<String, dynamic>>[];
 

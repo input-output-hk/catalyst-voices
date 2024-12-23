@@ -10,10 +10,10 @@ class DocumentBuilder extends Equatable {
     required this.segments,
   });
 
-  factory DocumentBuilder.build(DocumentSchema proposalSchema) {
+  factory DocumentBuilder.build(DocumentSchema schema) {
     return DocumentBuilder(
-      schema: proposalSchema.propertiesSchema,
-      segments: proposalSchema.segments
+      schema: schema.propertiesSchema,
+      segments: schema.segments
           .map(
             (element) => DocumentBuilderSegment(
               id: element.id,
@@ -25,7 +25,7 @@ class DocumentBuilder extends Equatable {
                           .map(
                             (e) => DocumentBuilderElement(
                               id: e.id,
-                              value: e.ref.type.getDefaultValue,
+                              value: e.ref.type.defaultValue,
                             ),
                           )
                           .toList(),

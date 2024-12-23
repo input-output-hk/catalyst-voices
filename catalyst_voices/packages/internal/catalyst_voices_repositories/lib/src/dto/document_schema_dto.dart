@@ -7,9 +7,10 @@ import 'package:json_annotation/json_annotation.dart';
 part 'document_schema_dto.g.dart';
 
 @JsonSerializable()
-class DocumentSchemaDto extends Equatable {
+class DocumentSchemaDto extends Equatable implements Identifiable {
   @JsonKey(name: r'$schema')
   final String schema;
+  @override
   @JsonKey(name: r'$id')
   final String id;
   final String title;
@@ -28,8 +29,6 @@ class DocumentSchemaDto extends Equatable {
   @JsonKey(includeToJson: false)
   final String propertiesSchema;
 
-  static late Map<String, int> orderMap;
-
   const DocumentSchemaDto({
     required this.schema,
     required this.id,
@@ -42,7 +41,6 @@ class DocumentSchemaDto extends Equatable {
     required this.order,
     required this.propertiesSchema,
   });
-
   factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
     final segmentsMap = json['properties'] as Map<String, dynamic>;
     json['propertiesSchema'] =
@@ -54,9 +52,8 @@ class DocumentSchemaDto extends Equatable {
   Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
 
   DocumentSchema toModel() {
-    orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
     final sortedProperties = List<DocumentSchemaSegmentDto>.from(this.segments)
-      ..sort();
+      ..sortByOrder(order);
     final segments = sortedProperties
         .where((e) => e.ref.contains('segment'))
         .map((e) => e.toModel(definitions.definitionsModels))
@@ -102,10 +99,10 @@ class DocumentSchemaDto extends Equatable {
 }
 
 @JsonSerializable()
-class DocumentSchemaSegmentDto extends Equatable
-    implements Comparable<DocumentSchemaSegmentDto> {
+class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
   @JsonKey(name: r'$ref')
   final String ref;
+  @override
   final String id;
   final String title;
   final String description;
@@ -118,8 +115,6 @@ class DocumentSchemaSegmentDto extends Equatable
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
-
-  static late Map<String, int> orderMap;
 
   const DocumentSchemaSegmentDto({
     required this.ref,
@@ -137,9 +132,9 @@ class DocumentSchemaSegmentDto extends Equatable
   Map<String, dynamic> toJson() => _$DocumentSchemaSegmentDtoToJson(this);
 
   DocumentSchemaSegment toModel(List<BaseDocumentDefinition> definitions) {
-    orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
     final sortedProperties = List<DocumentSchemaSectionDto>.from(this.sections)
-      ..sort();
+      ..sortByOrder(order);
+
     final sections = sortedProperties
         .where((element) => element.ref.contains('section'))
         .map((e) => e.toModel(definitions, isRequired: required.contains(e.id)))
@@ -180,22 +175,13 @@ class DocumentSchemaSegmentDto extends Equatable
     final listOfSections = json.convertMapToListWithIds();
     return listOfSections.map(DocumentSchemaSectionDto.fromJson).toList();
   }
-
-  @override
-  int compareTo(DocumentSchemaSegmentDto other) {
-    final thisIndex =
-        DocumentSchemaDto.orderMap[id] ?? double.maxFinite.toInt();
-    final otherIndex =
-        DocumentSchemaDto.orderMap[other.id] ?? double.maxFinite.toInt();
-    return thisIndex.compareTo(otherIndex);
-  }
 }
 
 @JsonSerializable()
-class DocumentSchemaSectionDto extends Equatable
-    implements Comparable<DocumentSchemaSectionDto> {
+class DocumentSchemaSectionDto extends Equatable implements Identifiable {
   @JsonKey(name: r'$ref')
   final String ref;
+  @override
   final String id;
   final String title;
   final String description;
@@ -213,8 +199,6 @@ class DocumentSchemaSectionDto extends Equatable
   final Map<String, dynamic> then; // Return to this
   @JsonKey(name: 'open_source')
   final Map<String, dynamic> openSource; // Return to this
-
-  static late Map<String, int> orderMap;
 
   const DocumentSchemaSectionDto({
     required this.ref,
@@ -238,9 +222,8 @@ class DocumentSchemaSectionDto extends Equatable
     List<BaseDocumentDefinition> definitions, {
     required bool isRequired,
   }) {
-    orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
     final sortedElements = List<DocumentSchemaElementDto>.from(this.elements)
-      ..sort();
+      ..sortByOrder(order);
     final elements = sortedElements
         .where((element) => BaseDocumentDefinition.isKnownType(element.ref))
         .map((e) => e.toModel(definitions))
@@ -284,22 +267,13 @@ class DocumentSchemaSectionDto extends Equatable
     final listOfProperties = json.convertMapToListWithIds();
     return listOfProperties.map(DocumentSchemaElementDto.fromJson).toList();
   }
-
-  @override
-  int compareTo(DocumentSchemaSectionDto other) {
-    final thisIndex =
-        DocumentSchemaSegmentDto.orderMap[id] ?? double.maxFinite.toInt();
-    final otherIndex =
-        DocumentSchemaSegmentDto.orderMap[other.id] ?? double.maxFinite.toInt();
-    return thisIndex.compareTo(otherIndex);
-  }
 }
 
 @JsonSerializable()
-class DocumentSchemaElementDto extends Equatable
-    implements Comparable<DocumentSchemaElementDto> {
+class DocumentSchemaElementDto extends Equatable implements Identifiable {
   @JsonKey(name: r'$ref')
   final String ref;
+  @override
   final String id;
   final String title;
   final String description;
@@ -376,13 +350,4 @@ class DocumentSchemaElementDto extends Equatable
         minimum,
         maximum,
       ];
-
-  @override
-  int compareTo(DocumentSchemaElementDto other) {
-    final thisIndex =
-        DocumentSchemaSectionDto.orderMap[id] ?? double.maxFinite.toInt();
-    final otherIndex =
-        DocumentSchemaSectionDto.orderMap[other.id] ?? double.maxFinite.toInt();
-    return thisIndex.compareTo(otherIndex);
-  }
 }

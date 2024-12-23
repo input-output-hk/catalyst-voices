@@ -8,42 +8,44 @@ import 'package:test/test.dart';
 import '../../helpers/read_json.dart';
 
 void main() {
-  const schemaPath =
-      'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
+  group('DocumentBuilder', () {
+    const schemaPath =
+        'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
 
-  late Map<String, dynamic> schemaJson;
+    late Map<String, dynamic> schemaJson;
 
-  setUpAll(() {
-    schemaJson = json.decode(readJson(schemaPath)) as Map<String, dynamic>;
-  });
+    setUpAll(() {
+      schemaJson = json.decode(readJson(schemaPath)) as Map<String, dynamic>;
+    });
 
-  test('Converts segments list into object for JSON', () {
-    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-    final schema = schemaDto.toModel();
+    test('Converts segments list into object for JSON', () {
+      final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
+      final schema = schemaDto.toModel();
 
-    final proposalBuilder = DocumentBuilder.build(schema);
-    final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
-    final proposalBuilderJson = proposalBuilderDto.toJson();
+      final proposalBuilder = DocumentBuilder.build(schema);
+      final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
+      final proposalBuilderJson = proposalBuilderDto.toJson();
 
-    for (final segment in proposalBuilderDto.segments) {
-      expect(proposalBuilderJson[segment.id], isA<Map<String, dynamic>>());
-    }
-  });
+      for (final segment in proposalBuilderDto.segments) {
+        expect(proposalBuilderJson[segment.id], isA<Map<String, dynamic>>());
+      }
+    });
 
-  test('Converts object from JSON into List of segments', () {
-    final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-    final schema = schemaDto.toModel();
+    test('Converts object from JSON into List of segments', () {
+      final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
+      final schema = schemaDto.toModel();
 
-    final proposalBuilder = DocumentBuilder.build(schema);
-    final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
+      final proposalBuilder = DocumentBuilder.build(schema);
+      final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
 
-    final proposalBuilderJson = proposalBuilderDto.toJson();
-    final proposalBuilderDtoFromJson =
-        DocumentBuilderDto.fromJson(proposalBuilderJson);
+      final proposalBuilderJson = proposalBuilderDto.toJson();
+      final proposalBuilderDtoFromJson =
+          DocumentBuilderDto.fromJson(proposalBuilderJson);
 
-    expect(
-      proposalBuilderDtoFromJson.segments.length,
-      proposalBuilderDto.segments.length,
-    );
+      expect(
+        proposalBuilderDtoFromJson.segments.length,
+        proposalBuilderDto.segments.length,
+      );
+    });
   });
 }
