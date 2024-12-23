@@ -141,22 +141,29 @@ test-postgres:
             cargo nextest run --release --run-ignored=only signed_docs
     END
 
+# test-scylla - Runs the integration test for scylla.
 test-scylla:
     FROM +builder-src
 
-    # setup scylla
+    DO +INSTALL_SCYLLA --VERSION=6.2
+
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        scylla --options-file /etc/scylla/scylla.yaml --smp=2 --memory=4G --overprovisioned --developer-mode=1 & \
+        cargo nextest run --release --run-ignored=only scylla_session
+
+# INSTALL_SCYLLA - Installs scylla for bookwarm-slim/debian
+INSTALL_SCYLLA:
+    FUNCTION
+
+    ARG --required VERSION
+
     RUN apt-get update && \
         apt-get install -y --no-install-recommends \
         wget gnupg ca-certificates && \
         mkdir -p /etc/apt/keyrings && \
         gpg --homedir /tmp --no-default-keyring --keyring /etc/apt/keyrings/scylladb.gpg \
             --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys a43e06657bac99e3 && \
-        wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-6.2.list && \
+        wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-$VERSION.list && \
         apt-get update && \
         apt-get install -y --no-install-recommends \
         scylla
-
-    # run the test
-    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-        scylla --options-file /etc/scylla/scylla.yaml --smp=2 --memory=4G --overprovisioned --developer-mode=1 & \
-        cargo nextest run --release --run-ignored=only scylla_session
