@@ -84,6 +84,11 @@ final class Dependencies extends DependencyProvider {
         return WorkspaceBloc(
           get<CampaignService>(),
         );
+      })
+      ..registerFactory<ProposalBuilderBloc>(() {
+        return ProposalBuilderBloc(
+          get<CampaignService>(),
+        );
       });
   }
 
