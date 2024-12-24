@@ -113,11 +113,11 @@ class DocumentSegmentDto extends Equatable {
 
 class DocumentSectionDto extends Equatable {
   final DocumentSchemaSection schema;
-  final List<DocumentElementDto> elements;
+  final List<DocumentPropertyDto> properties;
 
   const DocumentSectionDto({
     required this.schema,
-    required this.elements,
+    required this.properties,
   });
 
   factory DocumentSectionDto.fromJsonSchema(
@@ -126,10 +126,10 @@ class DocumentSectionDto extends Equatable {
   }) {
     return DocumentSectionDto(
       schema: schema,
-      elements: schema.elements
+      properties: schema.properties
           .map(
-            (element) => DocumentElementDto.fromJsonSchema(
-              element,
+            (property) => DocumentPropertyDto.fromJsonSchema(
+              property,
               properties: properties,
             ),
           )
@@ -140,59 +140,59 @@ class DocumentSectionDto extends Equatable {
   factory DocumentSectionDto.fromModel(DocumentSection model) {
     return DocumentSectionDto(
       schema: model.schema,
-      elements: model.elements.map(DocumentElementDto.fromModel).toList(),
+      properties: model.properties.map(DocumentPropertyDto.fromModel).toList(),
     );
   }
 
   DocumentSection toModel() {
     return DocumentSection(
       schema: schema,
-      elements: elements.map((e) => e.toModel()).toList(),
+      properties: properties.map((e) => e.toModel()).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       schema.id: {
-        for (final element in elements) ...element.toJson(),
+        for (final property in properties) ...property.toJson(),
       },
     };
   }
 
   @override
-  List<Object?> get props => [schema, elements];
+  List<Object?> get props => [schema, properties];
 }
 
-class DocumentElementDto extends Equatable {
-  final DocumentSchemaElement schema;
+class DocumentPropertyDto extends Equatable {
+  final DocumentSchemaProperty schema;
   final dynamic value;
 
-  const DocumentElementDto({
+  const DocumentPropertyDto({
     required this.schema,
     required this.value,
   });
 
-  factory DocumentElementDto.fromJsonSchema(
-    DocumentSchemaElement schema, {
+  factory DocumentPropertyDto.fromJsonSchema(
+    DocumentSchemaProperty schema, {
     required DocumentPropertiesDto properties,
   }) {
-    return DocumentElementDto(
+    return DocumentPropertyDto(
       schema: schema,
       // TODO(dtscalac): validate that value is of correct type, ignore if not
       value: properties.getProperty(schema.nodeId),
     );
   }
 
-  factory DocumentElementDto.fromModel(DocumentElement model) {
-    return DocumentElementDto(
+  factory DocumentPropertyDto.fromModel(DocumentProperty model) {
+    return DocumentPropertyDto(
       schema: model.schema,
       // TODO(dtscalac): convert to json from model
       value: model.value,
     );
   }
 
-  DocumentElement toModel() {
-    return DocumentElement(
+  DocumentProperty toModel() {
+    return DocumentProperty(
       schema: schema,
       // TODO(dtscalac): convert from json to model
       value: value,

@@ -32,7 +32,7 @@ final class DocumentSegment extends Equatable {
   /// The schema of the document segment.
   final DocumentSchemaSegment schema;
 
-  /// The list of sections that group the [DocumentElement].
+  /// The list of sections that group the [DocumentProperty].
   final List<DocumentSection> sections;
 
   /// The default constructor for the [DocumentSegment].
@@ -57,43 +57,43 @@ final class DocumentSection extends Equatable {
   /// The schema of the document section.
   final DocumentSchemaSection schema;
 
-  /// The list of elements within this section.
-  final List<DocumentElement> elements;
+  /// The list of properties within this section.
+  final List<DocumentProperty> properties;
 
   /// The default constructor for the [DocumentSection].
   const DocumentSection({
     required this.schema,
-    required this.elements,
+    required this.properties,
   });
 
   /// Creates a [DocumentSection] from a [schema].
   factory DocumentSection.from(DocumentSchemaSection schema) {
     return DocumentSection(
       schema: schema,
-      elements: schema.elements.map(DocumentElement.fromSchema).toList(),
+      properties: schema.properties.map(DocumentProperty.fromSchema).toList(),
     );
   }
 
   @override
-  List<Object?> get props => [schema, elements];
+  List<Object?> get props => [schema, properties];
 }
 
-final class DocumentElement extends Equatable {
-  /// The schema of the document element.
-  final DocumentSchemaElement schema;
+final class DocumentProperty extends Equatable {
+  /// The schema of the document property.
+  final DocumentSchemaProperty schema;
 
-  /// The current value this element holds.
+  /// The current value this property holds.
   final Object? value;
 
-  /// The default constructor for the [DocumentElement].
-  const DocumentElement({
+  /// The default constructor for the [DocumentProperty].
+  const DocumentProperty({
     required this.schema,
     required this.value,
   });
 
   /// Creates a [DocumentSection] from an [schema].
-  factory DocumentElement.fromSchema(DocumentSchemaElement schema) {
-    return DocumentElement(
+  factory DocumentProperty.fromSchema(DocumentSchemaProperty schema) {
+    return DocumentProperty(
       schema: schema,
       value: null,
     );

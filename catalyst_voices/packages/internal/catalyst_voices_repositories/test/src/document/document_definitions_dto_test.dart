@@ -22,7 +22,7 @@ void main() {
       'Check if all definition are in definition list inside DefinitionDto model',
       () async {
         final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-        final definitions = schemaDto.definitions.definitionsModels;
+        final definitions = schemaDto.definitions.models;
 
         for (final value
             in BaseDocumentDefinition.refPathToDefinitionType.values) {
@@ -40,7 +40,7 @@ void main() {
 
     test('Check if document definition media type is parse correctly', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      final definitions = schemaDto.definitions.definitionsModels;
+      final definitions = schemaDto.definitions.models;
 
       final singleLineTextEntry =
           definitions.getDefinition('#/definitions/singleLineTextEntry')

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-/// The unique id of an object in a document for segments/sections/elements
+/// The unique id of an object in a document for segments/sections/properties
 /// in a format of paths from the top-level node down to the nested node.
 final class DocumentNodeId extends Equatable {
   /// The top-level node in the document.

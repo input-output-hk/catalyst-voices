@@ -7,7 +7,7 @@ import 'package:equatable/equatable.dart';
 ///
 /// The document consists of top level [segments].
 /// [segments] contain [DocumentSchemaSegment.sections]
-/// and sections contain [DocumentSchemaElement]'s.
+/// and sections contain [DocumentSchemaProperty]'s.
 final class DocumentSchema extends Equatable {
   final String schema;
   final String title;
@@ -72,7 +72,7 @@ final class DocumentSchemaSection extends Equatable {
   final String id;
   final String title;
   final String description;
-  final List<DocumentSchemaElement> elements;
+  final List<DocumentSchemaProperty> properties;
   final bool isRequired;
 
   const DocumentSchemaSection({
@@ -81,7 +81,7 @@ final class DocumentSchemaSection extends Equatable {
     required this.id,
     required this.title,
     required this.description,
-    required this.elements,
+    required this.properties,
     required this.isRequired,
   });
 
@@ -92,13 +92,13 @@ final class DocumentSchemaSection extends Equatable {
         id,
         title,
         description,
-        elements,
+        properties,
         isRequired,
       ];
 }
 
 /// A single property (field) in a document.
-final class DocumentSchemaElement extends Equatable {
+final class DocumentSchemaProperty extends Equatable {
   final BaseDocumentDefinition definition;
   final DocumentNodeId nodeId;
   final String id;
@@ -111,7 +111,7 @@ final class DocumentSchemaElement extends Equatable {
   final Range<int>? range;
   final Range<int>? itemsRange;
 
-  const DocumentSchemaElement({
+  const DocumentSchemaProperty({
     required this.definition,
     required this.nodeId,
     required this.id,

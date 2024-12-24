@@ -59,7 +59,7 @@ class DocumentDefinitionsDto extends Equatable {
 
   Map<String, dynamic> toJson() => _$DocumentDefinitionsDtoToJson(this);
 
-  List<BaseDocumentDefinition> get definitionsModels => [
+  List<BaseDocumentDefinition> get models => [
         segment.toModel(),
         section.toModel(),
         singleLineTextEntry.toModel(),

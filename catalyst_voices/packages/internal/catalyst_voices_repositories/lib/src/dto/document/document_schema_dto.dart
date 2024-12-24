@@ -57,7 +57,7 @@ class DocumentSchemaDto extends Equatable {
         .where((e) => e.ref.contains('segment'))
         .map(
           (e) => e.toModel(
-            definitions.definitionsModels,
+            definitions.models,
             parentNodeId: DocumentNodeId.root,
           ),
         )
@@ -143,7 +143,7 @@ class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
     final sortedSections = List.of(sections)..sortByOrder(order);
 
     final mappedSections = sortedSections
-        .where((element) => element.ref.contains('section'))
+        .where((section) => section.ref.contains('section'))
         .map(
           (e) => e.toModel(
             definitions,
@@ -155,7 +155,7 @@ class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
 
     return DocumentSchemaSegment(
       definition: definitions.getDefinition(ref),
-      nodeId: DocumentNodeId.root,
+      nodeId: nodeId,
       id: id,
       title: title,
       description: description,
@@ -205,7 +205,7 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
     fromJson: _fromJsonProperties,
     name: 'properties',
   )
-  final List<DocumentSchemaElementDto> elements;
+  final List<DocumentSchemaPropertyDto> properties;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
@@ -220,7 +220,7 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
     required this.id,
     this.title = '',
     this.description = '',
-    required this.elements,
+    required this.properties,
     this.required = const <String>[],
     this.order = const <String>[],
     this.ifs = const <String, dynamic>{},
@@ -240,10 +240,10 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
   }) {
     final nodeId = parentNodeId.child(id);
 
-    final sortedElements = List.of(elements)..sortByOrder(order);
+    final sortedProperties = List.of(properties)..sortByOrder(order);
 
-    final mappedElements = sortedElements
-        .where((element) => BaseDocumentDefinition.isKnownType(element.ref))
+    final mappedProperties = sortedProperties
+        .where((property) => BaseDocumentDefinition.isKnownType(property.ref))
         .map((e) => e.toModel(definitions, parentNodeId: nodeId))
         .toList();
 
@@ -253,7 +253,7 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
       id: id,
       title: title,
       description: description,
-      elements: mappedElements,
+      properties: mappedProperties,
       isRequired: isRequired,
     );
   }
@@ -264,7 +264,7 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
         id,
         title,
         description,
-        elements,
+        properties,
         required,
         order,
         ifs,
@@ -272,7 +272,7 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
       ];
 
   static Map<String, dynamic> _toJsonProperties(
-    List<DocumentSchemaElementDto> properties,
+    List<DocumentSchemaPropertyDto> properties,
   ) {
     final map = <String, dynamic>{};
     for (final property in properties) {
@@ -281,16 +281,16 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
     return map;
   }
 
-  static List<DocumentSchemaElementDto> _fromJsonProperties(
+  static List<DocumentSchemaPropertyDto> _fromJsonProperties(
     Map<String, dynamic> json,
   ) {
     final listOfProperties = json.convertMapToListWithIds();
-    return listOfProperties.map(DocumentSchemaElementDto.fromJson).toList();
+    return listOfProperties.map(DocumentSchemaPropertyDto.fromJson).toList();
   }
 }
 
 @JsonSerializable()
-class DocumentSchemaElementDto extends Equatable implements Identifiable {
+class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
   @JsonKey(name: r'$ref')
   final String ref;
   @override
@@ -318,7 +318,7 @@ class DocumentSchemaElementDto extends Equatable implements Identifiable {
   // TODO(ryszard-schossler): return to this
   final Map<String, dynamic> items;
 
-  const DocumentSchemaElementDto({
+  const DocumentSchemaPropertyDto({
     this.ref = '',
     required this.id,
     this.title = '',
@@ -335,16 +335,16 @@ class DocumentSchemaElementDto extends Equatable implements Identifiable {
     this.items = const <String, dynamic>{},
   });
 
-  factory DocumentSchemaElementDto.fromJson(Map<String, dynamic> json) =>
-      _$DocumentSchemaElementDtoFromJson(json);
+  factory DocumentSchemaPropertyDto.fromJson(Map<String, dynamic> json) =>
+      _$DocumentSchemaPropertyDtoFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DocumentSchemaElementDtoToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentSchemaPropertyDtoToJson(this);
 
-  DocumentSchemaElement toModel(
+  DocumentSchemaProperty toModel(
     List<BaseDocumentDefinition> definitions, {
     required DocumentNodeId parentNodeId,
   }) {
-    return DocumentSchemaElement(
+    return DocumentSchemaProperty(
       definition: definitions.getDefinition(ref),
       nodeId: parentNodeId.child(id),
       id: id,
