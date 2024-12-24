@@ -19,7 +19,7 @@ class DocumentBuilderDto extends Equatable {
   });
 
   factory DocumentBuilderDto.fromJson(Map<String, dynamic> json) {
-    json['segments'] = Map<String, dynamic>.from(json)..remove(r'$schema');
+    json['segments'] = Map.of(json)..remove(r'$schema');
     return _$DocumentBuilderDtoFromJson(json);
   }
 
@@ -77,7 +77,7 @@ class DocumentBuilderSegmentDto extends Equatable {
   });
 
   factory DocumentBuilderSegmentDto.fromJson(Map<String, dynamic> json) {
-    json['sections'] = Map<String, dynamic>.from(json)..remove('id');
+    json['sections'] = Map.of(json)..remove('id');
     return _$DocumentBuilderSegmentDtoFromJson(json);
   }
 
@@ -139,7 +139,7 @@ class DocumentBuilderSectionDto extends Equatable {
   });
 
   factory DocumentBuilderSectionDto.fromJson(Map<String, dynamic> json) {
-    json['elements'] = Map<String, dynamic>.from(json)..remove('id');
+    json['elements'] = Map.of(json)..remove('id');
     return _$DocumentBuilderSectionDtoFromJson(json);
   }
 
