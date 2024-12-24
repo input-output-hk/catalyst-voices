@@ -101,40 +101,28 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         break;
       case RegistrationState.checkYourKeychain:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.createKeychain:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.keychainCreated:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.keychainRestoreInfo:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.keychainRestoreInput:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.keychainRestoreStart:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.keychainRestoreSuccess:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.mnemonicInput:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.mnemonicVerified:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.mnemonicWritedown:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.passwordInfo:
-        // TODO: Handle this case.
         throw UnimplementedError();
       case RegistrationState.passwordInput:
-        // TODO: Handle this case.
         throw UnimplementedError();
     }
   }
