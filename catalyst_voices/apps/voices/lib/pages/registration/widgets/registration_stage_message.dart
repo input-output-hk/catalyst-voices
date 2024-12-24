@@ -25,11 +25,13 @@ class RegistrationStageMessage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DefaultTextStyle(
+          key: const Key('RegistrationDetailsTitle'),
           style: theme.textTheme.titleMedium!.copyWith(color: textColor),
           child: title,
         ),
         SizedBox(height: spacing),
         DefaultTextStyle(
+          key: const Key('RegistrationDetailsBody'),
           style: theme.textTheme.bodyMedium!.copyWith(color: textColor),
           child: subtitle,
         ),

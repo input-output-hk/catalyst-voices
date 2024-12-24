@@ -33,9 +33,18 @@ void main() async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
       await $(AppBarPage.getStartedBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
-      expect(await OnboardingPage.infoLearnMoreButtonText($), 'Learn More');
-      // await Future<void>.delayed(const Duration(seconds: 5));
+      expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
+      expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
     },
-    // skip: true,
+  );
+
+  patrolWidgetTest(
+    'Onboarding - visitor - get started screen looks as expected',
+        (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn)
+          .tap(settleTimeout: const Duration(seconds: 10));
+      await OnboardingPage.getStartedScreenLooksAsExpected($);
+    },
   );
 }
