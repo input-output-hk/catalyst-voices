@@ -7,6 +7,7 @@ export 'crypto/crypto_service.dart';
 export 'crypto/key_derivation.dart';
 export 'crypto/local_crypto_service.dart';
 export 'dependency/dependency_provider.dart';
+export 'document/document_manager.dart';
 export 'document/extension/document_list_sort_ext.dart';
 export 'document/extension/document_map_to_list_ext.dart';
 export 'document/identifiable.dart';

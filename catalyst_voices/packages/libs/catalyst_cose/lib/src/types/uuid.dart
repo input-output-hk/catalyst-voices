@@ -10,7 +10,7 @@ import 'package:uuid/uuid.dart' as uuid;
 extension type const Uuid(String value) {
   /// Deserializes the type from cbor.
   factory Uuid.fromCbor(CborValue value) {
-    if (value is CborBytes && value.tags.contains(CborUtils.uuidTag)) {
+    if (value is CborBytes) {
       return Uuid(uuid.Uuid.unparse(value.bytes));
     } else {
       throw FormatException('The $value is not a valid uuid!');
@@ -24,80 +24,51 @@ extension type const Uuid(String value) {
   }
 }
 
-/// Either a single [Uuid] or two [Uuid]'s.
+/// A reference to an entity represented by the [id].
+/// Optionally the version of the entity may be specified by the [ver].
 ///
 /// What this uuid means depends where and how the class is used.
 /// In CDDL it is defined as (UUID / [UUID, UUID]).
-sealed class ReferenceUuid extends Equatable {
+final class ReferenceUuid extends Equatable {
+  /// The referenced entity uuid.
+  final Uuid id;
+
+  /// The version of the referenced entity.
+  final Uuid? ver;
+
   /// The default constructor for the [ReferenceUuid].
-  const ReferenceUuid();
+  const ReferenceUuid({
+    required this.id,
+    this.ver,
+  });
 
   /// Deserializes the type from cbor.
   factory ReferenceUuid.fromCbor(CborValue value) {
     if (value is CborList) {
-      return DoubleReferenceUuid.fromCbor(value);
+      return ReferenceUuid(
+        id: Uuid.fromCbor(value[0]),
+        ver: Uuid.fromCbor(value[1]),
+      );
     } else {
-      return SingleReferenceUuid.fromCbor(value);
+      return ReferenceUuid(
+        id: Uuid.fromCbor(value),
+      );
     }
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor();
-}
-
-/// A single [Uuid] reference.
-final class SingleReferenceUuid extends ReferenceUuid {
-  /// A single reference uuid.
-  final Uuid uuid;
-
-  /// A default constructor for the [SingleReferenceUuid].
-  const SingleReferenceUuid(this.uuid);
-
-  /// Deserializes the type from cbor.
-  factory SingleReferenceUuid.fromCbor(CborValue value) {
-    return SingleReferenceUuid(Uuid.fromCbor(value));
-  }
-
-  @override
   CborValue toCbor() {
-    return uuid.toCbor();
-  }
-
-  @override
-  List<Object?> get props => [uuid];
-}
-
-/// A single [Uuid] reference.
-final class DoubleReferenceUuid extends ReferenceUuid {
-  /// The first referenced uuid.
-  final Uuid first;
-
-  /// The second reference uuid.
-  final Uuid second;
-
-  /// A default constructor for the [DoubleReferenceUuid].
-  const DoubleReferenceUuid(this.first, this.second);
-
-  /// Deserializes the type from cbor.
-  factory DoubleReferenceUuid.fromCbor(CborValue value) {
-    if (value is! CborList || value.length != 2) {
-      throw FormatException('Wrong format of the DoubleReferenceUuid: $value');
+    final ver = this.ver;
+    if (ver != null) {
+      return CborList([
+        id.toCbor(),
+        ver.toCbor(),
+      ]);
+    } else {
+      return id.toCbor();
     }
-
-    return DoubleReferenceUuid(
-      Uuid.fromCbor(value[0]),
-      Uuid.fromCbor(value[1]),
-    );
   }
 
   @override
-  CborValue toCbor() {
-    return CborList([
-      first.toCbor(),
-      second.toCbor(),
-    ]);
-  }
-
-  @override
-  List<Object?> get props => [first, second];
+  List<Object?> get props => [id, ver];
 }
