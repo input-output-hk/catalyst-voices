@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_models/src/document_builder/document.dart';
+import 'package:catalyst_voices_models/src/document_builder/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document_builder/document_schema.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,16 +12,26 @@ final class DocumentBuilder extends Equatable {
   final String schema;
   final List<DocumentBuilderSegment> segments;
 
+  /// The default constructor for the [DocumentBuilder].
   const DocumentBuilder({
     required this.schema,
     required this.segments,
   });
 
-  // TODO(dtscalac): accept current user responses
-  factory DocumentBuilder.from(DocumentSchema schema) {
+  /// Creates a [DocumentBuilder] from a [schema] and optionally
+  /// from a [document].
+  ///
+  /// If the [document] is given the
+  /// [DocumentBuilderElement] values will be filled.
+  factory DocumentBuilder.from(DocumentSchema schema, {Document? document}) {
     return DocumentBuilder(
       schema: schema.propertiesSchema,
-      segments: schema.segments.map(DocumentBuilderSegment.from).toList(),
+      segments: schema.segments
+          .map(
+            (segment) =>
+                DocumentBuilderSegment.from(segment, document: document),
+          )
+          .toList(),
     );
   }
 
@@ -36,15 +48,25 @@ final class DocumentBuilderSegment extends Equatable {
   /// The identifier of the object within a whole [DocumentBuilder].
   final DocumentNodeId nodeId;
 
+  /// The list of sections that group the [DocumentBuilderElement].
   final List<DocumentBuilderSection> sections;
 
+  /// The default constructor for the [DocumentBuilderSegment].
   const DocumentBuilderSegment({
     required this.id,
     required this.nodeId,
     required this.sections,
   });
 
-  factory DocumentBuilderSegment.from(DocumentSchemaSegment segment) {
+  /// Creates a [DocumentBuilderSegment] from a [segment] and optionally
+  /// from a [document].
+  ///
+  /// If the [document] is given the
+  /// [DocumentBuilderElement.value] values will be filled.
+  factory DocumentBuilderSegment.from(
+    DocumentSchemaSegment segment, {
+    Document? document,
+  }) {
     final nodeId = DocumentNodeId.root.child(segment.id);
 
     return DocumentBuilderSegment(
@@ -55,6 +77,7 @@ final class DocumentBuilderSegment extends Equatable {
             (segment) => DocumentBuilderSection.from(
               segment,
               parentNodeId: nodeId,
+              document: document,
             ),
           )
           .toList(),
@@ -77,15 +100,22 @@ final class DocumentBuilderSection extends Equatable {
   /// The list of elements within this section.
   final List<DocumentBuilderElement> elements;
 
+  /// The default constructor for the [DocumentBuilderSection].
   const DocumentBuilderSection({
     required this.id,
     required this.nodeId,
     required this.elements,
   });
 
+  /// Creates a [DocumentBuilderSection] from a [section] and optionally
+  /// from a [document].
+  ///
+  /// If the [document] is given the
+  /// [DocumentBuilderElement.value] will be filled.
   factory DocumentBuilderSection.from(
     DocumentSchemaSection section, {
     required DocumentNodeId parentNodeId,
+    Document? document,
   }) {
     final nodeId = parentNodeId.child(section.id);
 
@@ -97,6 +127,7 @@ final class DocumentBuilderSection extends Equatable {
             (section) => DocumentBuilderElement.from(
               section,
               parentNodeId: nodeId,
+              document: document,
             ),
           )
           .toList(),
@@ -119,53 +150,34 @@ final class DocumentBuilderElement extends Equatable {
   /// The current value this element holds.
   final Object? value;
 
+  /// The default constructor for the [DocumentBuilderElement].
   const DocumentBuilderElement({
     required this.id,
     required this.nodeId,
     required this.value,
   });
 
+  /// Creates a [DocumentBuilderSection] from an [element] and optionally
+  /// from a [document].
+  ///
+  /// If the [document] is given the
+  /// [DocumentBuilderElement.value] will be filled.
   factory DocumentBuilderElement.from(
     DocumentSchemaElement element, {
     required DocumentNodeId parentNodeId,
+    Document? document,
   }) {
+    final nodeId = parentNodeId.child(element.id);
+    // TODO(dtscalac): convert from raw property into
+    // enums/lists as needed by value
+    // TODO(dtscalac): validate that value is of correct type, ignore if not
     return DocumentBuilderElement(
       id: element.id,
-      nodeId: parentNodeId.child(element.id),
-      // TODO(dtscalac): provide value
-      value: null,
+      nodeId: nodeId,
+      value: document?.getProperty(nodeId),
     );
   }
 
   @override
   List<Object?> get props => [id, nodeId, value];
-}
-
-/// The unique id of an object in a document for segments/sections/elements
-/// in a format of paths from the top-level node down to the nested node.
-extension type const DocumentNodeId._(List<String> _paths) {
-  /// The top-level node in the document.
-  static const DocumentNodeId root = DocumentNodeId._([]);
-
-  /// Returns a parent node.
-  ///
-  /// For [root] node it returns [root] node as it doesn't have any parent.
-  DocumentNodeId parent() {
-    if (_paths.isEmpty) {
-      return this;
-    }
-
-    final paths = List.of(_paths)..removeLast();
-    return DocumentNodeId._(paths);
-  }
-
-  /// Returns a child node at given [path].
-  ///
-  /// The [path] is appended to the parent's [path].
-  DocumentNodeId child(String path) {
-    return DocumentNodeId._([
-      ..._paths,
-      path,
-    ]);
-  }
 }
