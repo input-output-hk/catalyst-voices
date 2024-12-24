@@ -40,7 +40,7 @@ void main() async {
 
   patrolWidgetTest(
     'Onboarding - visitor - get started screen looks as expected',
-        (PatrolTester $) async {
+    (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
       await $(AppBarPage.getStartedBtn)
           .tap(settleTimeout: const Duration(seconds: 10));
