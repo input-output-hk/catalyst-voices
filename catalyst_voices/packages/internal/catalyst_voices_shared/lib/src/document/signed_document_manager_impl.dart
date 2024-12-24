@@ -1,14 +1,14 @@
-part of 'document_manager.dart';
+part of 'signed_document_manager.dart';
 
 const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
 
-final class _DocumentManagerImpl implements DocumentManager {
-  const _DocumentManagerImpl();
+final class _SignedDocumentManagerImpl implements SignedDocumentManager {
+  const _SignedDocumentManagerImpl();
 
   @override
-  Future<SignedDocument<T>> parseDocument<T extends BinaryDocument>(
+  Future<SignedDocument<T>> parseDocument<T extends SignedDocumentPayload>(
     Uint8List bytes, {
-    required BinaryDocumentParser<T> parser,
+    required SignedDocumentPayloadParser<T> parser,
   }) async {
     final coseSign = CoseSign.fromCbor(cbor.decode(bytes));
     final payload = await _brotliDecompressPayload(coseSign);
@@ -17,7 +17,7 @@ final class _DocumentManagerImpl implements DocumentManager {
   }
 
   @override
-  Future<SignedDocument<T>> signDocument<T extends BinaryDocument>(
+  Future<SignedDocument<T>> signDocument<T extends SignedDocumentPayload>(
     T document, {
     required Uint8List publicKey,
     required Uint8List privateKey,
@@ -54,14 +54,14 @@ final class _DocumentManagerImpl implements DocumentManager {
   }
 }
 
-final class _CoseSignedDocument<T extends BinaryDocument>
+final class _CoseSignedDocument<T extends SignedDocumentPayload>
     extends SignedDocument<T> with EquatableMixin {
   final CoseSign _coseSign;
 
   @override
-  final T document;
+  final T payload;
 
-  const _CoseSignedDocument(this._coseSign, this.document);
+  const _CoseSignedDocument(this._coseSign, this.payload);
 
   @override
   Future<bool> verifySignature(Uint8List publicKey) async {
@@ -77,7 +77,7 @@ final class _CoseSignedDocument<T extends BinaryDocument>
   }
 
   @override
-  List<Object?> get props => [_coseSign, document];
+  List<Object?> get props => [_coseSign, payload];
 }
 
 extension _CoseDocumentContentType on DocumentContentType {
