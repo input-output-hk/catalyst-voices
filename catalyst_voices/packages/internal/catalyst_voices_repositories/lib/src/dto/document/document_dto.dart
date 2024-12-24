@@ -3,31 +3,38 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'document_builder_dto.g.dart';
+part 'document_dto.g.dart';
 
+// TODO(dtscalac): convert from raw property into
+// enums/lists as needed by value
+// TODO(dtscalac): validate that value is of correct type, ignore if not
+
+/// A data transfer object for the [Document].
+/// 
+/// Encodable as json but to decode it a [DocumentSchema]
+/// is needed which explains how to interpret the data.
 @JsonSerializable()
-class DocumentBuilderDto extends Equatable {
+class DocumentDto extends Equatable {
   @JsonKey(name: r'$schema')
   final String schema;
 
   @JsonKey(fromJson: _fromJsonSegments, toJson: _toJsonSegments)
-  final List<DocumentBuilderSegmentDto> segments;
+  final List<DocumentSegmentDto> segments;
 
-  const DocumentBuilderDto({
+  const DocumentDto({
     required this.schema,
     required this.segments,
   });
 
-  factory DocumentBuilderDto.fromJson(Map<String, dynamic> json) {
+  factory DocumentDto.fromJson(Map<String, dynamic> json) {
     json['segments'] = Map.of(json)..remove(r'$schema');
-    return _$DocumentBuilderDtoFromJson(json);
+    return _$DocumentDtoFromJson(json);
   }
 
-  factory DocumentBuilderDto.fromModel(DocumentBuilder model) {
-    return DocumentBuilderDto(
+  factory DocumentDto.fromModel(Document model) {
+    return DocumentDto(
       schema: model.schema,
-      segments:
-          model.segments.map(DocumentBuilderSegmentDto.fromModel).toList(),
+      segments: model.segments.map(DocumentSegmentDto.fromModel).toList(),
     );
   }
 
@@ -38,26 +45,26 @@ class DocumentBuilderDto extends Equatable {
     };
   }
 
-  DocumentBuilder toModel() {
-    return DocumentBuilder(
+  Document toModel(DocumentSchema documentSchema) {
+    return Document(
       schema: schema,
       segments: segments.map((e) => e.toModel()).toList(),
     );
   }
 
   static Map<String, dynamic> _toJsonSegments(
-    List<DocumentBuilderSegmentDto> segments,
+    List<DocumentSegmentDto> segments,
   ) {
     return {
       for (final segment in segments) segment.id: segment.toJson(),
     };
   }
 
-  static List<DocumentBuilderSegmentDto> _fromJsonSegments(
+  static List<DocumentSegmentDto> _fromJsonSegments(
     Map<String, dynamic> json,
   ) {
     final listOfSegments = json.convertMapToListWithIds();
-    return listOfSegments.map(DocumentBuilderSegmentDto.fromJson).toList();
+    return listOfSegments.map(DocumentSegmentDto.fromJson).toList();
   }
 
   @override
@@ -65,27 +72,26 @@ class DocumentBuilderDto extends Equatable {
 }
 
 @JsonSerializable()
-class DocumentBuilderSegmentDto extends Equatable {
+class DocumentSegmentDto extends Equatable {
   final String id;
 
   @JsonKey(fromJson: _fromJsonSections, toJson: _toJsonSections)
-  final List<DocumentBuilderSectionDto> sections;
+  final List<DocumentSectionDto> sections;
 
-  const DocumentBuilderSegmentDto({
+  const DocumentSegmentDto({
     required this.id,
     required this.sections,
   });
 
-  factory DocumentBuilderSegmentDto.fromJson(Map<String, dynamic> json) {
+  factory DocumentSegmentDto.fromJson(Map<String, dynamic> json) {
     json['sections'] = Map.of(json)..remove('id');
-    return _$DocumentBuilderSegmentDtoFromJson(json);
+    return _$DocumentSegmentDtoFromJson(json);
   }
 
-  factory DocumentBuilderSegmentDto.fromModel(DocumentBuilderSegment model) {
-    return DocumentBuilderSegmentDto(
+  factory DocumentSegmentDto.fromModel(DocumentSegment model) {
+    return DocumentSegmentDto(
       id: model.id,
-      sections:
-          model.sections.map(DocumentBuilderSectionDto.fromModel).toList(),
+      sections: model.sections.map(DocumentSectionDto.fromModel).toList(),
     );
   }
 
@@ -97,10 +103,10 @@ class DocumentBuilderSegmentDto extends Equatable {
     };
   }
 
-  DocumentBuilderSegment toModel() {
+  DocumentSegment toModel() {
     final nodeId = DocumentNodeId.root.child(id);
 
-    return DocumentBuilderSegment(
+    return DocumentSegment(
       id: id,
       nodeId: nodeId,
       sections: sections.map((e) => e.toModel(parentNodeId: nodeId)).toList(),
@@ -108,18 +114,18 @@ class DocumentBuilderSegmentDto extends Equatable {
   }
 
   static Map<String, dynamic> _toJsonSections(
-    List<DocumentBuilderSectionDto> sections,
+    List<DocumentSectionDto> sections,
   ) {
     return {
       for (final section in sections) section.id: section.toJson(),
     };
   }
 
-  static List<DocumentBuilderSectionDto> _fromJsonSections(
+  static List<DocumentSectionDto> _fromJsonSections(
     Map<String, dynamic> json,
   ) {
     final listOfSections = json.convertMapToListWithIds();
-    return listOfSections.map(DocumentBuilderSectionDto.fromJson).toList();
+    return listOfSections.map(DocumentSectionDto.fromJson).toList();
   }
 
   @override
@@ -127,27 +133,26 @@ class DocumentBuilderSegmentDto extends Equatable {
 }
 
 @JsonSerializable()
-class DocumentBuilderSectionDto extends Equatable {
+class DocumentSectionDto extends Equatable {
   final String id;
 
   @JsonKey(fromJson: _fromJsonElements, toJson: _toJsonElements)
-  final List<DocumentBuilderElementDto> elements;
+  final List<DocumentElementDto> elements;
 
-  const DocumentBuilderSectionDto({
+  const DocumentSectionDto({
     required this.id,
     required this.elements,
   });
 
-  factory DocumentBuilderSectionDto.fromJson(Map<String, dynamic> json) {
+  factory DocumentSectionDto.fromJson(Map<String, dynamic> json) {
     json['elements'] = Map.of(json)..remove('id');
-    return _$DocumentBuilderSectionDtoFromJson(json);
+    return _$DocumentSectionDtoFromJson(json);
   }
 
-  factory DocumentBuilderSectionDto.fromModel(DocumentBuilderSection model) {
-    return DocumentBuilderSectionDto(
+  factory DocumentSectionDto.fromModel(DocumentSection model) {
+    return DocumentSectionDto(
       id: model.id,
-      elements:
-          model.elements.map(DocumentBuilderElementDto.fromModel).toList(),
+      elements: model.elements.map(DocumentElementDto.fromModel).toList(),
     );
   }
 
@@ -159,9 +164,9 @@ class DocumentBuilderSectionDto extends Equatable {
     };
   }
 
-  DocumentBuilderSection toModel({required DocumentNodeId parentNodeId}) {
+  DocumentSection toModel({required DocumentNodeId parentNodeId}) {
     final nodeId = parentNodeId.child(id);
-    return DocumentBuilderSection(
+    return DocumentSection(
       id: id,
       nodeId: nodeId,
       elements: elements.map((e) => e.toModel(parentNodeId: nodeId)).toList(),
@@ -169,18 +174,18 @@ class DocumentBuilderSectionDto extends Equatable {
   }
 
   static Map<String, dynamic> _toJsonElements(
-    List<DocumentBuilderElementDto> elements,
+    List<DocumentElementDto> elements,
   ) {
     return {
       for (final element in elements) element.id: element.value,
     };
   }
 
-  static List<DocumentBuilderElementDto> _fromJsonElements(
+  static List<DocumentElementDto> _fromJsonElements(
     Map<String, dynamic> json,
   ) {
     final elements = json.convertMapToListWithIdsAndValues();
-    return elements.map(DocumentBuilderElementDto.fromJson).toList();
+    return elements.map(DocumentElementDto.fromJson).toList();
   }
 
   @override
@@ -188,21 +193,21 @@ class DocumentBuilderSectionDto extends Equatable {
 }
 
 @JsonSerializable()
-class DocumentBuilderElementDto extends Equatable {
+class DocumentElementDto extends Equatable {
   final String id;
   final dynamic value;
 
-  const DocumentBuilderElementDto({
+  const DocumentElementDto({
     required this.id,
     required this.value,
   });
 
-  factory DocumentBuilderElementDto.fromJson(Map<String, dynamic> json) {
-    return _$DocumentBuilderElementDtoFromJson(json);
+  factory DocumentElementDto.fromJson(Map<String, dynamic> json) {
+    return _$DocumentElementDtoFromJson(json);
   }
 
-  factory DocumentBuilderElementDto.fromModel(DocumentBuilderElement model) {
-    return DocumentBuilderElementDto(
+  factory DocumentElementDto.fromModel(DocumentElement model) {
+    return DocumentElementDto(
       id: model.id,
       value: model.value,
     );
@@ -212,8 +217,8 @@ class DocumentBuilderElementDto extends Equatable {
         id: value,
       };
 
-  DocumentBuilderElement toModel({required DocumentNodeId parentNodeId}) {
-    return DocumentBuilderElement(
+  DocumentElement toModel({required DocumentNodeId parentNodeId}) {
+    return DocumentElement(
       id: id,
       nodeId: parentNodeId.child(id),
       value: value,

@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_builder_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_schema_dto.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/read_json.dart';
 
 void main() {
-  group(DocumentBuilderDto, () {
+  group(DocumentDto, () {
     const schemaPath =
         'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
 
@@ -22,12 +22,12 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final documentBuilder = DocumentBuilder.from(schema);
-      final documentBuilderDto = DocumentBuilderDto.fromModel(documentBuilder);
-      final documentBuilderJson = documentBuilderDto.toJson();
+      final document = Document.from(schema);
+      final documentDto = DocumentDto.fromModel(document);
+      final documentJson = documentDto.toJson();
 
-      for (final segment in documentBuilderDto.segments) {
-        expect(documentBuilderJson[segment.id], isA<Map<String, dynamic>>());
+      for (final segment in documentDto.segments) {
+        expect(documentJson[segment.id], isA<Map<String, dynamic>>());
       }
     });
 
@@ -35,16 +35,15 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final documentBuilder = DocumentBuilder.from(schema);
-      final documentBuilderDto = DocumentBuilderDto.fromModel(documentBuilder);
+      final document = Document.from(schema);
+      final documentDto = DocumentDto.fromModel(document);
 
-      final documentBuilderJson = documentBuilderDto.toJson();
-      final documentBuilderDtoFromJson =
-          DocumentBuilderDto.fromJson(documentBuilderJson);
+      final documentJson = documentDto.toJson();
+      final documentDtoFromJson = DocumentDto.fromJson(documentJson);
 
       expect(
-        documentBuilderDtoFromJson.segments.length,
-        documentBuilderDto.segments.length,
+        documentDtoFromJson.segments.length,
+        documentDto.segments.length,
       );
     });
   });

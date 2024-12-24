@@ -1,10 +1,11 @@
-import 'package:catalyst_voices_models/src/document_builder/document_node_id.dart';
+import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:equatable/equatable.dart';
 
-final class Document extends Equatable {
+// TODO(dtscalac): move to dtos
+final class DocumentData extends Equatable {
   final Map<String, dynamic> properties;
 
-  const Document({required this.properties});
+  const DocumentData({required this.properties});
 
   /// Retrieves the value of a property located at the specified [nodeId].
   ///
