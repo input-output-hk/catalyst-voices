@@ -5,6 +5,7 @@ mod build_info;
 mod cardano;
 mod cli;
 mod db;
+mod jinja;
 mod logger;
 mod service;
 mod settings;
