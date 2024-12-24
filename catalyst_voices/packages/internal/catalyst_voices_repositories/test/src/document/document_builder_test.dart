@@ -22,12 +22,12 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final proposalBuilder = DocumentBuilder.from(schema);
-      final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
-      final proposalBuilderJson = proposalBuilderDto.toJson();
+      final documentBuilder = DocumentBuilder.from(schema);
+      final documentBuilderDto = DocumentBuilderDto.fromModel(documentBuilder);
+      final documentBuilderJson = documentBuilderDto.toJson();
 
-      for (final segment in proposalBuilderDto.segments) {
-        expect(proposalBuilderJson[segment.id], isA<Map<String, dynamic>>());
+      for (final segment in documentBuilderDto.segments) {
+        expect(documentBuilderJson[segment.id], isA<Map<String, dynamic>>());
       }
     });
 
@@ -35,16 +35,16 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final proposalBuilder = DocumentBuilder.from(schema);
-      final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
+      final documentBuilder = DocumentBuilder.from(schema);
+      final documentBuilderDto = DocumentBuilderDto.fromModel(documentBuilder);
 
-      final proposalBuilderJson = proposalBuilderDto.toJson();
-      final proposalBuilderDtoFromJson =
-          DocumentBuilderDto.fromJson(proposalBuilderJson);
+      final documentBuilderJson = documentBuilderDto.toJson();
+      final documentBuilderDtoFromJson =
+          DocumentBuilderDto.fromJson(documentBuilderJson);
 
       expect(
-        proposalBuilderDtoFromJson.segments.length,
-        proposalBuilderDto.segments.length,
+        documentBuilderDtoFromJson.segments.length,
+        documentBuilderDto.segments.length,
       );
     });
   });

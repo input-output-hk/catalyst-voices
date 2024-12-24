@@ -160,8 +160,7 @@ final class DocumentBuilderElement extends Equatable {
   /// Creates a [DocumentBuilderSection] from an [element] and optionally
   /// from a [document].
   ///
-  /// If the [document] is given the
-  /// [DocumentBuilderElement.value] will be filled.
+  /// If the [document] is given the [value] will be filled.
   factory DocumentBuilderElement.from(
     DocumentSchemaElement element, {
     required DocumentNodeId parentNodeId,
