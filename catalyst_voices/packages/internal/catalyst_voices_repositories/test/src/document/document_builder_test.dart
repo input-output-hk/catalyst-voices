@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document_builder_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_builder_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_schema_dto.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/read_json.dart';
 
 void main() {
-  group('DocumentBuilder', () {
+  group(DocumentBuilderDto, () {
     const schemaPath =
         'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
 
@@ -22,7 +22,7 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final proposalBuilder = DocumentBuilder.build(schema);
+      final proposalBuilder = DocumentBuilder.from(schema);
       final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
       final proposalBuilderJson = proposalBuilderDto.toJson();
 
@@ -35,7 +35,7 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final proposalBuilder = DocumentBuilder.build(schema);
+      final proposalBuilder = DocumentBuilder.from(schema);
       final proposalBuilderDto = DocumentBuilderDto.fromModel(proposalBuilder);
 
       final proposalBuilderJson = proposalBuilderDto.toJson();

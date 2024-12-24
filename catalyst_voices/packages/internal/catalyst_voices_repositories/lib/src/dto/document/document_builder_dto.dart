@@ -98,9 +98,12 @@ class DocumentBuilderSegmentDto extends Equatable {
   }
 
   DocumentBuilderSegment toModel() {
+    final nodeId = DocumentNodeId.root.child(id);
+
     return DocumentBuilderSegment(
       id: id,
-      sections: sections.map((e) => e.toModel()).toList(),
+      nodeId: nodeId,
+      sections: sections.map((e) => e.toModel(parentNodeId: nodeId)).toList(),
     );
   }
 
@@ -156,10 +159,12 @@ class DocumentBuilderSectionDto extends Equatable {
     };
   }
 
-  DocumentBuilderSection toModel() {
+  DocumentBuilderSection toModel({required DocumentNodeId parentNodeId}) {
+    final nodeId = parentNodeId.child(id);
     return DocumentBuilderSection(
       id: id,
-      elements: elements.map((e) => e.toModel()).toList(),
+      nodeId: nodeId,
+      elements: elements.map((e) => e.toModel(parentNodeId: nodeId)).toList(),
     );
   }
 
@@ -207,9 +212,10 @@ class DocumentBuilderElementDto extends Equatable {
         id: value,
       };
 
-  DocumentBuilderElement toModel() {
+  DocumentBuilderElement toModel({required DocumentNodeId parentNodeId}) {
     return DocumentBuilderElement(
       id: id,
+      nodeId: parentNodeId.child(id),
       value: value,
     );
   }

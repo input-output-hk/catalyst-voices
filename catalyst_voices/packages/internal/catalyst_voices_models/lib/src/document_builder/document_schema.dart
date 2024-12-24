@@ -35,6 +35,7 @@ final class DocumentSchema extends Equatable {
       ];
 }
 
+/// A top-level grouping object of the document.
 final class DocumentSchemaSegment extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
@@ -59,6 +60,7 @@ final class DocumentSchemaSegment extends Equatable {
       ];
 }
 
+/// A grouping object in a document on a section level.
 final class DocumentSchemaSection extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
@@ -87,11 +89,12 @@ final class DocumentSchemaSection extends Equatable {
       ];
 }
 
+/// A single property (field) in a document.
 final class DocumentSchemaElement extends Equatable {
   final BaseDocumentDefinition ref;
   final String id;
   final String title;
-  final String description;
+  final String? description;
 
   final String? defaultValue;
   final String guidance;

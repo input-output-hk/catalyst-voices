@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_schema_dto.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/read_json.dart';
 
 void main() {
-  group('DocumentDefinitions', () {
+  group('$DocumentSchemaDto definitions', () {
     const schemaPath =
         'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
 
@@ -16,6 +16,7 @@ void main() {
     setUpAll(() {
       schemaJson = json.decode(readJson(schemaPath)) as Map<String, dynamic>;
     });
+
     test(
       // ignore: lines_longer_than_80_chars
       'Check if all definition are in definition list inside DefinitionDto model',
