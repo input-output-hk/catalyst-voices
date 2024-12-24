@@ -28,8 +28,10 @@ final class DocumentBuilder extends Equatable {
       schema: schema.propertiesSchema,
       segments: schema.segments
           .map(
-            (segment) =>
-                DocumentBuilderSegment.from(segment, document: document),
+            (segment) => DocumentBuilderSegment.from(
+              segment,
+              document: document,
+            ),
           )
           .toList(),
     );
