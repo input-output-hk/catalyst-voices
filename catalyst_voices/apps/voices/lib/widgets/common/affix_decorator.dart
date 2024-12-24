@@ -63,7 +63,10 @@ class AffixDecorator extends StatelessWidget {
           ),
           SizedBox(width: gap),
         ],
-        Flexible(key: const Key('DecoratorData'),child: child,),
+        Flexible(
+          key: const Key('DecoratorData'),
+          child: child,
+        ),
         if (suffix != null) ...[
           SizedBox(width: gap),
           IconTheme(

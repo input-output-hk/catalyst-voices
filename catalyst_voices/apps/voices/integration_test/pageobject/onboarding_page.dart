@@ -76,8 +76,8 @@ class OnboardingPage {
   }
 
   static Future<PatrolFinder> detailsPartGetStartedRecoverBtn(
-      PatrolTester $,
-      ) async {
+    PatrolTester $,
+  ) async {
     return $(registrationDetailsPanel)
         .$(const Key('CreateAccountType.recover'));
   }
@@ -128,13 +128,16 @@ class OnboardingPage {
   }
 
   static Future<void> registrationDetailsPanelLooksAsExpected(
-      PatrolTester $, RegistrationState getStarted,) async {
+    PatrolTester $,
+    RegistrationState getStarted,
+  ) async {
     expect(
       detailsPartGetStartedTitle($),
       T.get('Welcome to Catalyst'),
     );
     expect(
-      detailsPartGetStartedBody($), isNotEmpty,
+      detailsPartGetStartedBody($),
+      isNotEmpty,
     );
     expect(
       detailsPartGetStartedQuestionText($),

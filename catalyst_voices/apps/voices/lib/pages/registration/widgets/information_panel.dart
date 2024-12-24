@@ -31,7 +31,9 @@ class InformationPanel extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Expanded(
-            key: const Key('PictureContainer'), child: Center(child: picture),),
+          key: const Key('PictureContainer'),
+          child: Center(child: picture),
+        ),
         const SizedBox(height: 12),
         _Footer(
           progress: progress,
