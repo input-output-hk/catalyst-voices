@@ -13,7 +13,9 @@ part 'document_manager_impl.dart';
 /// Usually this would convert the [bytes] into a [String],
 /// decode a [String] into a json and then parse the data class
 /// from the json representation.
-typedef DocumentParser<T extends BinaryDocument> = T Function(Uint8List bytes);
+typedef BinaryDocumentParser<T extends BinaryDocument> = T Function(
+  Uint8List bytes,
+);
 
 /// Manages the [SignedDocument]s.
 abstract interface class DocumentManager {
@@ -30,7 +32,7 @@ abstract interface class DocumentManager {
   /// that are obtained from the [SignedDocument.toBytes] method.
   Future<SignedDocument<T>> parseDocument<T extends BinaryDocument>(
     Uint8List bytes, {
-    required DocumentParser<T> parser,
+    required BinaryDocumentParser<T> parser,
   });
 
   /// Signs the [document] with a single [privateKey].
@@ -69,7 +71,7 @@ abstract interface class SignedDocument<T extends BinaryDocument> {
 abstract interface class BinaryDocument {
   /// Converts the document into a binary representation.
   ///
-  /// See [DocumentParser].
+  /// See [BinaryDocumentParser].
   Uint8List toBytes();
 
   /// Returns the document content type.

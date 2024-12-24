@@ -8,7 +8,7 @@ final class _DocumentManagerImpl implements DocumentManager {
   @override
   Future<SignedDocument<T>> parseDocument<T extends BinaryDocument>(
     Uint8List bytes, {
-    required DocumentParser<T> parser,
+    required BinaryDocumentParser<T> parser,
   }) async {
     final coseSign = CoseSign.fromCbor(cbor.decode(bytes));
     final payload = await _brotliDecompressPayload(coseSign);
