@@ -7,10 +7,9 @@ import 'package:json_annotation/json_annotation.dart';
 part 'document_schema_dto.g.dart';
 
 @JsonSerializable()
-class DocumentSchemaDto extends Equatable implements Identifiable {
+class DocumentSchemaDto extends Equatable {
   @JsonKey(name: r'$schema')
   final String schema;
-  @override
   @JsonKey(name: r'$id')
   final String id;
   final String title;
@@ -52,17 +51,18 @@ class DocumentSchemaDto extends Equatable implements Identifiable {
   Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
 
   DocumentSchema toModel() {
-    final sortedProperties = List<DocumentSchemaSegmentDto>.from(this.segments)
-      ..sortByOrder(order);
-    final segments = sortedProperties
+    final sortedSegments = List.of(segments)..sortByOrder(order);
+
+    final mappedSegments = sortedSegments
         .where((e) => e.ref.contains('segment'))
         .map((e) => e.toModel(definitions.definitionsModels))
         .toList();
+
     return DocumentSchema(
       schema: schema,
       title: title,
       description: description,
-      segments: segments,
+      segments: mappedSegments,
       order: order,
       propertiesSchema: propertiesSchema,
     );
@@ -132,19 +132,19 @@ class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
   Map<String, dynamic> toJson() => _$DocumentSchemaSegmentDtoToJson(this);
 
   DocumentSchemaSegment toModel(List<BaseDocumentDefinition> definitions) {
-    final sortedProperties = List<DocumentSchemaSectionDto>.from(this.sections)
-      ..sortByOrder(order);
+    final sortedSections = List.of(sections)..sortByOrder(order);
 
-    final sections = sortedProperties
+    final mappedSections = sortedSections
         .where((element) => element.ref.contains('section'))
         .map((e) => e.toModel(definitions, isRequired: required.contains(e.id)))
         .toList();
+
     return DocumentSchemaSegment(
       ref: definitions.getDefinition(ref),
       id: id,
       title: title,
       description: description,
-      sections: sections,
+      sections: mappedSections,
     );
   }
 
@@ -222,18 +222,19 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
     List<BaseDocumentDefinition> definitions, {
     required bool isRequired,
   }) {
-    final sortedElements = List<DocumentSchemaElementDto>.from(this.elements)
-      ..sortByOrder(order);
-    final elements = sortedElements
+    final sortedElements = List.of(elements)..sortByOrder(order);
+
+    final mappedElements = sortedElements
         .where((element) => BaseDocumentDefinition.isKnownType(element.ref))
         .map((e) => e.toModel(definitions))
         .toList();
+
     return DocumentSchemaSection(
       ref: definitions.getDefinition(ref),
       id: id,
       title: title,
       description: description,
-      elements: elements,
+      elements: mappedElements,
       isRequired: isRequired,
     );
   }
