@@ -22,12 +22,12 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final document = Document.from(schema);
+      final document = Document.fromSchema(schema);
       final documentDto = DocumentDto.fromModel(document);
       final documentJson = documentDto.toJson();
 
       for (final segment in documentDto.segments) {
-        expect(documentJson[segment.id], isA<Map<String, dynamic>>());
+        expect(documentJson[segment.schema.id], isA<Map<String, dynamic>>());
       }
     });
 
@@ -35,7 +35,7 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final document = Document.from(schema);
+      final document = Document.fromSchema(schema);
       final documentDto = DocumentDto.fromModel(document);
 
       final documentJson = documentDto.toJson();

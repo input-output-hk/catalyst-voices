@@ -55,7 +55,12 @@ class DocumentSchemaDto extends Equatable {
 
     final mappedSegments = sortedSegments
         .where((e) => e.ref.contains('segment'))
-        .map((e) => e.toModel(definitions.definitionsModels))
+        .map(
+          (e) => e.toModel(
+            definitions.definitionsModels,
+            parentNodeId: DocumentNodeId.root,
+          ),
+        )
         .toList();
 
     return DocumentSchema(
@@ -83,11 +88,9 @@ class DocumentSchemaDto extends Equatable {
   static Map<String, dynamic> _toJsonProperties(
     List<DocumentSchemaSegmentDto> segments,
   ) {
-    final map = <String, dynamic>{};
-    for (final property in segments) {
-      map[property.id] = property.toJson();
-    }
-    return map;
+    return {
+      for (final segment in segments) segment.id: segment.toJson(),
+    };
   }
 
   static List<DocumentSchemaSegmentDto> _fromJsonProperties(
@@ -131,16 +134,28 @@ class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
 
   Map<String, dynamic> toJson() => _$DocumentSchemaSegmentDtoToJson(this);
 
-  DocumentSchemaSegment toModel(List<BaseDocumentDefinition> definitions) {
+  DocumentSchemaSegment toModel(
+    List<BaseDocumentDefinition> definitions, {
+    required DocumentNodeId parentNodeId,
+  }) {
+    final nodeId = parentNodeId.child(id);
+
     final sortedSections = List.of(sections)..sortByOrder(order);
 
     final mappedSections = sortedSections
         .where((element) => element.ref.contains('section'))
-        .map((e) => e.toModel(definitions, isRequired: required.contains(e.id)))
+        .map(
+          (e) => e.toModel(
+            definitions,
+            parentNodeId: nodeId,
+            isRequired: required.contains(e.id),
+          ),
+        )
         .toList();
 
     return DocumentSchemaSegment(
-      ref: definitions.getDefinition(ref),
+      definition: definitions.getDefinition(ref),
+      nodeId: DocumentNodeId.root,
       id: id,
       title: title,
       description: description,
@@ -220,17 +235,21 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
 
   DocumentSchemaSection toModel(
     List<BaseDocumentDefinition> definitions, {
+    required DocumentNodeId parentNodeId,
     required bool isRequired,
   }) {
+    final nodeId = parentNodeId.child(id);
+
     final sortedElements = List.of(elements)..sortByOrder(order);
 
     final mappedElements = sortedElements
         .where((element) => BaseDocumentDefinition.isKnownType(element.ref))
-        .map((e) => e.toModel(definitions))
+        .map((e) => e.toModel(definitions, parentNodeId: nodeId))
         .toList();
 
     return DocumentSchemaSection(
-      ref: definitions.getDefinition(ref),
+      definition: definitions.getDefinition(ref),
+      nodeId: nodeId,
       id: id,
       title: title,
       description: description,
@@ -321,9 +340,13 @@ class DocumentSchemaElementDto extends Equatable implements Identifiable {
 
   Map<String, dynamic> toJson() => _$DocumentSchemaElementDtoToJson(this);
 
-  DocumentSchemaElement toModel(List<BaseDocumentDefinition> definitions) {
+  DocumentSchemaElement toModel(
+    List<BaseDocumentDefinition> definitions, {
+    required DocumentNodeId parentNodeId,
+  }) {
     return DocumentSchemaElement(
-      ref: definitions.getDefinition(ref),
+      definition: definitions.getDefinition(ref),
+      nodeId: parentNodeId.child(id),
       id: id,
       title: title,
       description: description,

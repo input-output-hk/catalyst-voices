@@ -5,11 +5,11 @@ import 'package:equatable/equatable.dart';
 final class DocumentPropertiesDto extends Equatable {
   final Map<String, dynamic> json;
 
-  const DocumentPropertiesDto.fromJson({required this.json});
+  const DocumentPropertiesDto.fromJson(this.json);
 
   /// Retrieves the value of a property located at the specified [nodeId].
   ///
-  /// This method traverses the nested structure of the [json] map using
+  /// This method traverses the nested structure of the [json] using
   /// the paths defined in the [nodeId]. If the specified path exists, the
   /// corresponding property value is returned. If the path is invalid or does
   /// not exist, the method returns `null`.
