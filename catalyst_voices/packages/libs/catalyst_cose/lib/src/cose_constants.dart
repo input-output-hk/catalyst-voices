@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_cose/src/types/string_or_int.dart';
 import 'package:cbor/cbor.dart';
 
 /// Holds commonly used tags in COSE.
@@ -62,7 +63,7 @@ final class CoseValues {
   static const eddsaAlg = -8;
 
   /// The json content type value.
-  static const jsonContentType = 30;
+  static const jsonContentType = 50;
 
   /// The brotli compression content encoding.
   static const brotliContentEncoding = 'br';
@@ -71,6 +72,14 @@ final class CoseValues {
 /// The interface for the data signer callback.
 // ignore: one_member_abstracts
 abstract interface class CatalystCoseSigner {
+  /// Returns the alg identifier that should refer
+  /// to the cryptographic algorithm used to [sign] the data.
+  StringOrInt? get alg;
+
+  /// Returns a key identifier that typically should refer to the public key
+  /// of the private key used to sign the data.
+  Future<Uint8List?> get kid;
+
   /// The [data] should be signed with a private key
   /// and the resulting signature returned as [Uint8List].
   Future<Uint8List> sign(Uint8List data);
@@ -79,6 +88,10 @@ abstract interface class CatalystCoseSigner {
 /// The interface for the signature verifier callback.
 // ignore: one_member_abstracts
 abstract interface class CatalystCoseVerifier {
+  /// Returns a key identifier that typically should refer to the public key
+  /// of the private key used to sign the data.
+  Future<Uint8List?> get kid;
+
   /// The [signature] should be verified against
   /// a known public/private key over the [data].
   Future<bool> verify(Uint8List data, Uint8List signature);
