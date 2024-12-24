@@ -50,19 +50,10 @@ final class DocumentSegment extends Equatable {
 
   /// Creates a [DocumentSegment] from a [segment].
   factory DocumentSegment.from(DocumentSchemaSegment segment) {
-    final nodeId = DocumentNodeId.root.child(segment.id);
-
     return DocumentSegment(
       id: segment.id,
-      nodeId: nodeId,
-      sections: segment.sections
-          .map(
-            (segment) => DocumentSection.from(
-              segment,
-              parentNodeId: nodeId,
-            ),
-          )
-          .toList(),
+      nodeId: segment.nodeId,
+      sections: segment.sections.map(DocumentSection.from).toList(),
     );
   }
 
@@ -90,23 +81,11 @@ final class DocumentSection extends Equatable {
   });
 
   /// Creates a [DocumentSection] from a [section].
-  factory DocumentSection.from(
-    DocumentSchemaSection section, {
-    required DocumentNodeId parentNodeId,
-  }) {
-    final nodeId = parentNodeId.child(section.id);
-
+  factory DocumentSection.from(DocumentSchemaSection section) {
     return DocumentSection(
       id: section.id,
-      nodeId: nodeId,
-      elements: section.elements
-          .map(
-            (section) => DocumentElement.from(
-              section,
-              parentNodeId: nodeId,
-            ),
-          )
-          .toList(),
+      nodeId: section.nodeId,
+      elements: section.elements.map(DocumentElement.from).toList(),
     );
   }
 
@@ -134,13 +113,10 @@ final class DocumentElement extends Equatable {
   });
 
   /// Creates a [DocumentSection] from an [element].
-  factory DocumentElement.from(
-    DocumentSchemaElement element, {
-    required DocumentNodeId parentNodeId,
-  }) {
+  factory DocumentElement.from(DocumentSchemaElement element) {
     return DocumentElement(
       id: element.id,
-      nodeId: parentNodeId.child(element.id),
+      nodeId: element.nodeId,
       value: null,
     );
   }

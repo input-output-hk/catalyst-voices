@@ -8,7 +8,6 @@ export 'campaign/campaign_publish.dart';
 export 'campaign/campaign_section.dart';
 export 'crypto/lock_factor.dart';
 export 'document/document.dart';
-export 'document/document_data.dart';
 export 'document/document_definitions.dart';
 export 'document/document_node_id.dart';
 export 'document/document_schema.dart';

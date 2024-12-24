@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/document/document_definitions.dart';
+import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -37,14 +38,16 @@ final class DocumentSchema extends Equatable {
 
 /// A top-level grouping object of the document.
 final class DocumentSchemaSegment extends Equatable {
-  final BaseDocumentDefinition ref;
+  final BaseDocumentDefinition definition;
+  final DocumentNodeId nodeId;
   final String id;
   final String title;
   final String description;
   final List<DocumentSchemaSection> sections;
 
   const DocumentSchemaSegment({
-    required this.ref,
+    required this.definition,
+    required this.nodeId,
     required this.id,
     required this.title,
     required this.description,
@@ -53,6 +56,8 @@ final class DocumentSchemaSegment extends Equatable {
 
   @override
   List<Object?> get props => [
+        definition,
+        nodeId,
         id,
         title,
         description,
@@ -62,7 +67,8 @@ final class DocumentSchemaSegment extends Equatable {
 
 /// A grouping object in a document on a section level.
 final class DocumentSchemaSection extends Equatable {
-  final BaseDocumentDefinition ref;
+  final BaseDocumentDefinition definition;
+  final DocumentNodeId nodeId;
   final String id;
   final String title;
   final String description;
@@ -70,7 +76,8 @@ final class DocumentSchemaSection extends Equatable {
   final bool isRequired;
 
   const DocumentSchemaSection({
-    required this.ref,
+    required this.definition,
+    required this.nodeId,
     required this.id,
     required this.title,
     required this.description,
@@ -80,7 +87,8 @@ final class DocumentSchemaSection extends Equatable {
 
   @override
   List<Object?> get props => [
-        ref,
+        definition,
+        nodeId,
         id,
         title,
         description,
@@ -91,7 +99,8 @@ final class DocumentSchemaSection extends Equatable {
 
 /// A single property (field) in a document.
 final class DocumentSchemaElement extends Equatable {
-  final BaseDocumentDefinition ref;
+  final BaseDocumentDefinition definition;
+  final DocumentNodeId nodeId;
   final String id;
   final String title;
   final String? description;
@@ -103,7 +112,8 @@ final class DocumentSchemaElement extends Equatable {
   final Range<int>? itemsRange;
 
   const DocumentSchemaElement({
-    required this.ref,
+    required this.definition,
+    required this.nodeId,
     required this.id,
     required this.title,
     required this.description,
@@ -116,7 +126,8 @@ final class DocumentSchemaElement extends Equatable {
 
   @override
   List<Object?> get props => [
-        ref,
+        definition,
+        nodeId,
         id,
         title,
         description,

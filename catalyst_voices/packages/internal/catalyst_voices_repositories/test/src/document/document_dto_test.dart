@@ -39,7 +39,8 @@ void main() {
       final documentDto = DocumentDto.fromModel(document);
 
       final documentJson = documentDto.toJson();
-      final documentDtoFromJson = DocumentDto.fromJson(documentJson);
+      final documentDtoFromJson =
+          DocumentDto.fromJsonSchema(documentJson, schema);
 
       expect(
         documentDtoFromJson.segments.length,

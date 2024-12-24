@@ -53,7 +53,7 @@ void main() {
       final schema = schemaDto.toModel();
 
       for (final segment in schema.segments) {
-        expect(segment.ref, isA<SegmentDefinition>());
+        expect(segment.definition, isA<SegmentDefinition>());
       }
     });
   });

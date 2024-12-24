@@ -1,20 +1,20 @@
-import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-// TODO(dtscalac): move to dtos
-final class DocumentData extends Equatable {
-  final Map<String, dynamic> properties;
+/// Utility structure for traversing a map using [DocumentNodeId]'s.
+final class DocumentPropertiesDto extends Equatable {
+  final Map<String, dynamic> json;
 
-  const DocumentData({required this.properties});
+  const DocumentPropertiesDto.fromJson({required this.json});
 
   /// Retrieves the value of a property located at the specified [nodeId].
   ///
-  /// This method traverses the nested structure of the [properties] map using
+  /// This method traverses the nested structure of the [json] map using
   /// the paths defined in the [nodeId]. If the specified path exists, the
   /// corresponding property value is returned. If the path is invalid or does
   /// not exist, the method returns `null`.
   Object? getProperty(DocumentNodeId nodeId) {
-    Object? object = properties;
+    Object? object = json;
     for (final path in nodeId.paths) {
       if (object is Map<String, dynamic>) {
         object = object[path];
@@ -28,5 +28,5 @@ final class DocumentData extends Equatable {
   }
 
   @override
-  List<Object?> get props => [properties];
+  List<Object?> get props => [json];
 }
