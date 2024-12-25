@@ -37,6 +37,21 @@ final class DocumentNodeId extends Equatable {
     ]);
   }
 
+  /// Returns true if this node is a child of [parent] node, false otherwise.
+  bool isChildOf(DocumentNodeId parent) {
+    if (parent.paths.length >= paths.length) {
+      return false;
+    }
+
+    for (var i = 0; i < parent.paths.length; i++) {
+      if (parent.paths[i] != paths[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   @override
   List<Object?> get props => paths;
 
