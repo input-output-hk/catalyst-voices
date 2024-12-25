@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/document/document_change.dart';
 import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_models/src/optional.dart';
 import 'package:equatable/equatable.dart';
@@ -26,22 +26,35 @@ final class Document extends Equatable {
     );
   }
 
-  /// Returns a new copy of the document
-  /// with updated property identified by the [nodeId].
-  Document editProperty(DocumentNodeId nodeId, Object? value) {
+  /// Applies [changes] in FIFO manner on a copy of the
+  /// document and returns the copy.
+  ///
+  /// The original document is not affected.
+  ///
+  /// For performance reasons it creates a single deep copy
+  /// of the document and applies all changes there iteratively.
+  Document applyChanges(List<DocumentChange> changes) {
+    final document = deepCopy();
+    for (final change in changes) {
+      document._applyChange(change);
+    }
+    return document;
+  }
+
+  /// Applies a [change] on this instance of the document
+  /// without creating a copy.
+  void _applyChange(DocumentChange change) {
     final segmentIndex =
-        segments.indexWhere((e) => nodeId.isChildOf(e.schema.nodeId));
+        segments.indexWhere((e) => change.nodeId.isChildOf(e.schema.nodeId));
 
     if (segmentIndex < 0) {
       throw ArgumentError(
-        'Cannot edit property $nodeId, it does not exist in this document',
+        'Cannot edit property ${change.nodeId}, '
+        'it does not exist in this document',
       );
     }
 
-    final editedSegments = List.of(segments);
-    final segment = editedSegments[segmentIndex];
-    editedSegments[segmentIndex] = segment.editProperty(nodeId, value);
-    return copyWith(segments: editedSegments);
+    segments[segmentIndex]._applyChange(change);
   }
 
   /// Returns a new copy with updated fields.
@@ -52,6 +65,17 @@ final class Document extends Equatable {
     return Document(
       schema: schema ?? this.schema,
       segments: segments ?? this.segments,
+    );
+  }
+
+  /// Returns a new deep copy of the document.
+  ///
+  /// [segments] are also recursively copied.
+  /// [schema] is not copied since it is immutable.
+  Document deepCopy() {
+    return Document(
+      schema: schema,
+      segments: segments.map((e) => e.deepCopy()).toList(),
     );
   }
 
@@ -80,22 +104,25 @@ final class DocumentSegment extends Equatable {
     );
   }
 
-  /// Returns a new copy of the segment
-  /// with updated property identified by the [nodeId].
-  DocumentSegment editProperty(DocumentNodeId nodeId, Object? value) {
+  /// Applies a [change] on a copy of this segment and returns the copy.
+  DocumentSegment applyChange(DocumentChange change) {
+    return deepCopy().._applyChange(change);
+  }
+
+  /// Applies a [change] on this instance of the segment
+  /// without creating a copy.
+  void _applyChange(DocumentChange change) {
     final sectionIndex =
-        sections.indexWhere((e) => nodeId.isChildOf(e.schema.nodeId));
+        sections.indexWhere((e) => change.nodeId.isChildOf(e.schema.nodeId));
 
     if (sectionIndex < 0) {
       throw ArgumentError(
-        'Cannot edit property $nodeId, it does not exist in this segment',
+        'Cannot edit property ${change.nodeId}, '
+        'it does not exist in this segment',
       );
     }
 
-    final editedSections = List.of(sections);
-    final section = editedSections[sectionIndex];
-    editedSections[sectionIndex] = section.editProperty(nodeId, value);
-    return copyWith(sections: editedSections);
+    sections[sectionIndex]._applyChange(change);
   }
 
   /// Returns a new copy with updated fields.
@@ -106,6 +133,17 @@ final class DocumentSegment extends Equatable {
     return DocumentSegment(
       schema: schema ?? this.schema,
       sections: sections ?? this.sections,
+    );
+  }
+
+  /// Returns a new deep copy of the segment.
+  ///
+  /// [schema] is not copied since it is immutable.
+  /// [sections] are also recursively copied.
+  DocumentSegment deepCopy() {
+    return DocumentSegment(
+      schema: schema,
+      sections: sections.map((e) => e.deepCopy()).toList(),
     );
   }
 
@@ -134,22 +172,26 @@ final class DocumentSection extends Equatable {
     );
   }
 
-  /// Returns a new copy of the section
-  /// with updated property identified by the [nodeId].
-  DocumentSection editProperty(DocumentNodeId nodeId, Object? value) {
+  /// Applies a [change] on a copy of this section and returns the copy.
+  DocumentSection applyChange(DocumentChange change) {
+    return deepCopy().._applyChange(change);
+  }
+
+  /// Applies a [change] on this instance of the section
+  /// without creating a copy.
+  void _applyChange(DocumentChange change) {
     final propertyIndex =
-        properties.indexWhere((e) => e.schema.nodeId == nodeId);
+        properties.indexWhere((e) => e.schema.nodeId == change.nodeId);
 
     if (propertyIndex < 0) {
       throw ArgumentError(
-        'Cannot edit property $nodeId, it does not exist in this section',
+        'Cannot edit property ${change.nodeId}, '
+        'it does not exist in this section',
       );
     }
 
-    final editedProperties = List.of(properties);
-    final property = editedProperties[propertyIndex];
-    editedProperties[propertyIndex] = property.copyWith(value: Optional(value));
-    return copyWith(properties: editedProperties);
+    properties[propertyIndex] =
+        properties[propertyIndex].copyWith(value: Optional(change.value));
   }
 
   /// Returns a new copy with updated fields.
@@ -160,6 +202,17 @@ final class DocumentSection extends Equatable {
     return DocumentSection(
       schema: schema ?? this.schema,
       properties: properties ?? this.properties,
+    );
+  }
+
+  /// Returns a new deep copy of the section.
+  ///
+  /// [schema] is not copied since it is immutable.
+  /// [properties] are also recursively copied.
+  DocumentSection deepCopy() {
+    return DocumentSection(
+      schema: schema,
+      properties: properties.map((e) => e.deepCopy()).toList(),
     );
   }
 
@@ -196,6 +249,17 @@ final class DocumentProperty extends Equatable {
     return DocumentProperty(
       schema: schema ?? this.schema,
       value: value.dataOr(this.value),
+    );
+  }
+
+  /// Returns a new deep copy of the property.
+  ///
+  /// [schema] is not copied since it is immutable.
+  /// [value] is not copied since it is immutable.
+  DocumentProperty deepCopy() {
+    return DocumentProperty(
+      schema: schema,
+      value: value,
     );
   }
 
