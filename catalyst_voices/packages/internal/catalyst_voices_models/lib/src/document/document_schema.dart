@@ -107,7 +107,7 @@ final class DocumentSchemaProperty extends Equatable {
 
   final String? defaultValue;
   final String guidance;
-  final List<String> enumValues;
+  final List<String>? enumValues;
   final Range<int>? range;
   final Range<int>? itemsRange;
 
@@ -119,7 +119,7 @@ final class DocumentSchemaProperty extends Equatable {
     required this.description,
     required this.defaultValue,
     required this.guidance,
-    this.enumValues = const <String>[],
+    required this.enumValues,
     required this.range,
     required this.itemsRange,
   });

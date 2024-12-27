@@ -213,9 +213,9 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
   final List<String> order;
   @JsonKey(name: 'if')
   final Map<String, dynamic> ifs;
-  final Map<String, dynamic> then; // TODO(dtscalac) Return to this
+  final Map<String, dynamic> then; // TODO(dtscalac): Return to this
   @JsonKey(name: 'open_source')
-  final Map<String, dynamic> openSource; // TODO(dtscalac) Return to this
+  final Map<String, dynamic> openSource; // TODO(dtscalac): Return to this
 
   const DocumentSchemaSectionDto({
     required this.ref,
@@ -307,8 +307,8 @@ class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
   final String defaultValue;
   @JsonKey(name: 'x-guidance')
   final String guidance;
-  @JsonKey(name: 'enum')
-  final List<String> enumValues;
+  @JsonKey(name: 'enum', includeIfNull: false)
+  final List<String>? enumValues;
   @JsonKey(includeIfNull: false)
   final int? maxItems;
   @JsonKey(includeIfNull: false)
@@ -317,24 +317,26 @@ class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
   final int? minimum;
   @JsonKey(includeIfNull: false)
   final int? maximum;
+
   // TODO(ryszard-schossler): return to this
-  final Map<String, dynamic> items;
+  @JsonKey(includeIfNull: false)
+  final Map<String, dynamic>? items;
 
   const DocumentSchemaPropertyDto({
     this.ref = '',
     required this.id,
     this.title = '',
     this.description = '',
-    required this.minLength,
-    required this.maxLength,
+    this.minLength,
+    this.maxLength,
     this.defaultValue = '',
     this.guidance = '',
-    this.enumValues = const <String>[],
-    required this.maxItems,
-    required this.minItems,
-    required this.minimum,
-    required this.maximum,
-    this.items = const <String, dynamic>{},
+    this.enumValues,
+    this.maxItems,
+    this.minItems,
+    this.minimum,
+    this.maximum,
+    this.items,
   });
 
   factory DocumentSchemaPropertyDto.fromJson(Map<String, dynamic> json) =>
