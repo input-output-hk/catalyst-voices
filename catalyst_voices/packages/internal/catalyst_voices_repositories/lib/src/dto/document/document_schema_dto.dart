@@ -304,7 +304,7 @@ class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
   @JsonKey(includeIfNull: false)
   final int? maxLength;
   @JsonKey(name: 'default')
-  final String defaultValue;
+  final Object? defaultValue;
   @JsonKey(name: 'x-guidance')
   final String guidance;
   @JsonKey(name: 'enum', includeIfNull: false)
@@ -329,7 +329,7 @@ class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
     this.description = '',
     this.minLength,
     this.maxLength,
-    this.defaultValue = '',
+    this.defaultValue,
     this.guidance = '',
     this.enumValues,
     this.maxItems,

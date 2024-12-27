@@ -105,7 +105,7 @@ final class DocumentSchemaProperty extends Equatable {
   final String title;
   final String? description;
 
-  final String? defaultValue;
+  final Object? defaultValue;
   final String guidance;
   final List<String>? enumValues;
   final Range<int>? range;
