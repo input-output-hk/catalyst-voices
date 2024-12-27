@@ -10,12 +10,12 @@ package-schemathesis:
     VOLUME /results
     ARG openapi_spec
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                    && st run --checks all http://0.0.0.0:3030/docs/cat-gateway.json \
-                    #--workers=2 \
+                    && st run --endpoint '^/api/v1/health/started' http://0.0.0.0:3030/docs/cat-gateway.json \
+                    --workers=2 \
                     --wait-for-schema=120 \
-                    #--max-response-time=5000 \
-                    #--hypothesis-max-examples=1000 \
-                    #--data-generation-method=all \
+                    --max-response-time=5000 \
+                    --hypothesis-max-examples=1000 \
+                    --data-generation-method=all \
                     --skip-deprecated-operations \
                     --force-schema-version=30 \
                     --show-trace \
@@ -37,9 +37,9 @@ test-fuzzer-api:
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis) \
-        #--load event-db:latest=(../../event-db+build) \
+        --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
-        #--service event-db \
+        --service event-db \
         --service cat-gateway \
         --allow-privileged
 
@@ -47,7 +47,7 @@ test-fuzzer-api:
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
-   # WAIT
-   #     SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
- #       SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
-  #  END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
+        SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+    END

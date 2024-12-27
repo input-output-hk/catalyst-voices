@@ -1,6 +1,23 @@
 VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.24 AS spectral-ci
 
+# INSTALL_SCYLLA - Installs scylla for bookworm-slim/debian
+INSTALL_SCYLLA:
+    FUNCTION
+
+    ARG --required VERSION
+
+    RUN apt-get update && \
+        apt-get install -y --no-install-recommends \
+        wget gnupg ca-certificates && \
+        mkdir -p /etc/apt/keyrings && \
+        gpg --homedir /tmp --no-default-keyring --keyring /etc/apt/keyrings/scylladb.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys a43e06657bac99e3 && \
+        wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-$VERSION.list && \
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+        scylla
+
 package-cat-gateway-integration:
     FROM python:3.14.0a3-slim-bookworm
     ENV LOG_LEVEL=error
@@ -12,18 +29,13 @@ package-cat-gateway-integration:
     ENV CHAIN_NETWORK="Preprod"
     ENV CAT_ADDRESS=0.0.0.0:3030
     ENV INTERNAL_API_KEY=123
+    ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
-    RUN apt-get update && apt install -y gnupg2 wget
-    RUN mkdir -p /etc/apt/keyrings
-    RUN gpg --homedir /tmp --no-default-keyring --keyring /etc/apt/keyrings/scylladb.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys a43e06657bac99e3
-    RUN wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-6.2.list
-    RUN apt-get update && apt-get install -y scylla
+    DO +INSTALL_SCYLLA --VERSION=6.2
 
     COPY node1-scylla.yaml /etc/scylla/scylla.yaml
-    #RUN scylla_setup -y
-    #https://github.com/scylladb/scylladb/issues/3142
     COPY ../+build/cat-gateway .
-
+    # https://github.com/scylladb/scylladb/issues/3142
     ENTRYPOINT ( scylla --options-file /etc/scylla/scylla.yaml --developer-mode 1 --default-log-level error & ) && \
          ./cat-gateway run
     SAVE IMAGE cat-gateway-integration:latest
