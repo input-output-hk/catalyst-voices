@@ -6,6 +6,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_dto.g.dart';
 
+// TODO(dtscalac): rewrite this
+
 @JsonSerializable()
 class DocumentSchemaDto extends Equatable {
   @JsonKey(name: r'$schema')
@@ -211,9 +213,9 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
   final List<String> order;
   @JsonKey(name: 'if')
   final Map<String, dynamic> ifs;
-  final Map<String, dynamic> then; // Return to this
+  final Map<String, dynamic> then; // TODO(dtscalac) Return to this
   @JsonKey(name: 'open_source')
-  final Map<String, dynamic> openSource; // Return to this
+  final Map<String, dynamic> openSource; // TODO(dtscalac) Return to this
 
   const DocumentSchemaSectionDto({
     required this.ref,

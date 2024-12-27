@@ -3,6 +3,8 @@ import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_models/src/optional.dart';
 import 'package:equatable/equatable.dart';
 
+// TODO(dtscalac): tests
+
 /// A class that understands the [DocumentSchema] and is able to collect
 /// all required inputs to build a valid document.
 ///
