@@ -13,12 +13,10 @@ import 'pageobject/spaces_drawer_page.dart';
 import 'utils/selector_utils.dart';
 
 void main() async {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   late final GoRouter router;
 
   setUpAll(() async {
     router = buildAppRouter();
-    await bootstrap(router: router);
   });
 
   setUp(() async {
