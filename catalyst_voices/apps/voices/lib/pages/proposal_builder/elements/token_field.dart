@@ -47,12 +47,32 @@ class TokenField extends StatelessWidget {
           max: max,
         ),
       ),
-      validator: _validate,
+      validator: (int? value, text) => _validate(context, value, text),
       onFieldSubmitted: onFieldSubmitted,
     );
   }
 
-  VoicesTextFieldValidationResult _validate(int? num, String text) {
+  VoicesTextFieldValidationResult _validate(
+    BuildContext context,
+    int? value,
+    String text,
+  ) {
+    // Value could not be parsed into int.
+    if (value == null && text.isNotEmpty) {
+      final message = context.l10n.errorValidationTokenNotParsed;
+      return VoicesTextFieldValidationResult.error(message);
+    }
+
+    // Initial, empty state
+    if (value == null) {
+      return const VoicesTextFieldValidationResult.none();
+    }
+
+    if (value < min || value > max) {
+      // Do not append any text
+      return const VoicesTextFieldValidationResult.error();
+    }
+
     return const VoicesTextFieldValidationResult.none();
   }
 }
@@ -70,15 +90,19 @@ class _Helper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(damian-molinski): Refactor text formatting with smarter syntax
     return Text.rich(
       TextSpan(
         children: [
-          TextSpan(text: '${context.l10n.requestedAmountShouldBeBetween} '),
+          TextSpan(text: context.l10n.requestedAmountShouldBeBetween),
+          const TextSpan(text: ' '),
           TextSpan(
             text: '$symbol$min',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          TextSpan(text: ' ${context.l10n.and} '),
+          const TextSpan(text: ' '),
+          TextSpan(text: context.l10n.and),
+          const TextSpan(text: ' '),
           TextSpan(
             text: '$symbol$max',
             style: const TextStyle(fontWeight: FontWeight.bold),

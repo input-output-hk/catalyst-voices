@@ -9,7 +9,7 @@ class VoicesNumFieldController<T extends num> extends ValueNotifier<T?> {
 }
 
 typedef VoicesNumFieldValidator<T extends num> = VoicesTextFieldValidationResult
-    Function(T? num, String text);
+    Function(T? value, String text);
 
 class VoicesNumField<T extends num> extends StatefulWidget {
   final Codec<T, String> codec;
@@ -21,6 +21,7 @@ class VoicesNumField<T extends num> extends StatefulWidget {
   final VoicesTextFieldDecoration? decoration;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final ValueChanged<T?>? onChanged;
   final VoicesNumFieldValidator<T>? validator;
 
   const VoicesNumField({
@@ -34,6 +35,7 @@ class VoicesNumField<T extends num> extends StatefulWidget {
     this.decoration,
     this.keyboardType,
     this.inputFormatters,
+    this.onChanged,
     this.validator,
   });
 
@@ -91,6 +93,7 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final onChanged = widget.onChanged;
     final validator = widget.validator;
     final onFieldSubmitted = widget.onFieldSubmitted;
 
@@ -105,6 +108,7 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
       inputFormatters: [
         ...?widget.inputFormatters,
       ],
+      onChanged: onChanged != null ? (value) => onChanged(_toNum(value)) : null,
       validator:
           validator != null ? (value) => validator(_toNum(value), value) : null,
       onFieldSubmitted: onFieldSubmitted != null

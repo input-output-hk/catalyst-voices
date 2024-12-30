@@ -13,13 +13,13 @@ class VoicesIntField extends VoicesNumField<int> {
     VoicesIntFieldController? super.controller,
     super.focusNode,
     super.decoration,
+    super.onChanged,
     super.validator,
     required super.onFieldSubmitted,
     List<TextInputFormatter>? inputFormatters,
   }) : super(
           codec: const IntCodec(),
           keyboardType: TextInputType.number,
-          maxLength: kIsWeb ? 16 : null,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             // Note. int.parse returns incorrect values for bigger Strings.
