@@ -304,6 +304,8 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Original Language",
                             "description": "If auto-translated, specify the original language of your proposal",
+                            "minLength": 2,
+                            "maxLength": 50,
                             "enum": [
                                 "Arabic",
                                 "Chinese",
@@ -413,14 +415,19 @@
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Technical Approach",
                             "description": "Outline the technical approach or methodology you will use",
-                            "maxLength": 500
+                            "maxLength": 500,
+                            "minLength": 10
                         },
                         "innovationAspects": {
                             "$ref": "#/definitions/singleLineTextEntryList",
                             "title": "Innovation Aspects",
                             "description": "Key innovative aspects of your solution",
                             "minItems": 1,
-                            "maxItems": 5
+                            "maxItems": 5,
+                            "items": {
+                                "maxLength": 200,
+                                "minLength": 10
+                            }
                         }
                     },
                     "required": [
