@@ -63,12 +63,7 @@ class TokenField extends StatelessWidget {
       return VoicesTextFieldValidationResult.error(message);
     }
 
-    // Initial, empty state
-    if (value == null) {
-      return const VoicesTextFieldValidationResult.none();
-    }
-
-    if (value < min || value > max) {
+    if (value != null && (value < min || value > max)) {
       // Do not append any text
       return const VoicesTextFieldValidationResult.error();
     }
