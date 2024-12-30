@@ -3,8 +3,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-// Note. Supports only ADA now but should be converted to money2 package
-// for different currencies support.
 class TokenField extends StatelessWidget {
   final VoicesIntFieldController? controller;
   final ValueChanged<int?>? onFieldSubmitted;
