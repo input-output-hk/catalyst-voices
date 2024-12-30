@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class TokenField extends StatelessWidget {
@@ -8,8 +9,7 @@ class TokenField extends StatelessWidget {
   final ValueChanged<int?>? onFieldSubmitted;
   final FocusNode? focusNode;
   final bool isRequired;
-  final int min;
-  final int max;
+  final Range<int> range;
   final Currency currency;
   final bool readOnly;
 
@@ -19,8 +19,7 @@ class TokenField extends StatelessWidget {
     required this.onFieldSubmitted,
     this.focusNode,
     this.isRequired = true,
-    required this.min,
-    required this.max,
+    required this.range,
     this.currency = const Currency.ada(),
     this.readOnly = false,
   }) : assert(
@@ -41,12 +40,11 @@ class TokenField extends StatelessWidget {
       decoration: VoicesTextFieldDecoration(
         labelText: label,
         prefixText: currency.symbol,
-        hintText: '$min',
+        hintText: '${range.min}',
         filled: true,
         helper: _Helper(
           symbol: currency.symbol,
-          min: min,
-          max: max,
+          range: range,
         ),
       ),
       validator: (int? value, text) => _validate(context, value, text),
@@ -66,7 +64,7 @@ class TokenField extends StatelessWidget {
       return VoicesTextFieldValidationResult.error(message);
     }
 
-    if (value != null && (value < min || value > max)) {
+    if (value != null && !range.contains(value)) {
       // Do not append any text
       return const VoicesTextFieldValidationResult.error();
     }
@@ -77,13 +75,11 @@ class TokenField extends StatelessWidget {
 
 class _Helper extends StatelessWidget {
   final String symbol;
-  final int min;
-  final int max;
+  final Range<int> range;
 
   const _Helper({
     required this.symbol,
-    required this.min,
-    required this.max,
+    required this.range,
   });
 
   @override
@@ -95,14 +91,14 @@ class _Helper extends StatelessWidget {
           TextSpan(text: context.l10n.requestedAmountShouldBeBetween),
           const TextSpan(text: ' '),
           TextSpan(
-            text: '$symbol$min',
+            text: '$symbol${range.min}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const TextSpan(text: ' '),
           TextSpan(text: context.l10n.and),
           const TextSpan(text: ' '),
           TextSpan(
-            text: '$symbol$max',
+            text: '$symbol${range.max}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ],
