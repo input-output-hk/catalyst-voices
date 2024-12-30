@@ -1,4 +1,6 @@
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_section_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_segment_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 

@@ -3,11 +3,6 @@ import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-// put conditionals under segments/sections/properties
-// add a flag whether they are currently enabled
-// resolve them when a document changes (if they have a conditional logic)
-// each property resolves separately
-
 /// A document schema that describes the structure of a document.
 ///
 /// The document consists of top level [segments].
