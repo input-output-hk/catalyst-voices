@@ -1,8 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:equatable/equatable.dart';
 
 /// Utility structure for traversing a json map using [DocumentNodeId]'s.
-final class DocumentPropertiesDto extends Equatable {
+final class DocumentPropertiesDto {
   final Map<String, dynamic> json;
 
   const DocumentPropertiesDto.fromJson(this.json);
@@ -26,7 +25,4 @@ final class DocumentPropertiesDto extends Equatable {
 
     return object;
   }
-
-  @override
-  List<Object?> get props => [json];
 }

@@ -4,7 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:test/test.dart';
 
-import '../../helpers/read_json.dart';
+import '../../../helpers/read_json.dart';
 
 void main() {
   group(DocumentSchemaDto, () {
