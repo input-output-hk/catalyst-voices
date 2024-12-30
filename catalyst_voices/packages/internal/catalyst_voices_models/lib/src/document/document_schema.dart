@@ -8,12 +8,12 @@ import 'package:equatable/equatable.dart';
 /// The document consists of top level [segments].
 /// [segments] contain [DocumentSchemaSegment.sections]
 /// and sections contain [DocumentSchemaProperty]'s.
-final class DocumentSchema extends Equatable {
+final class DocumentSchema extends Equatable implements DocumentNode {
   final String schema;
   final String title;
   final String description;
   final List<DocumentSchemaSegment> segments;
-  final List<String> order;
+  final List<DocumentNodeId> order;
   final String propertiesSchema;
 
   const DocumentSchema({
@@ -24,6 +24,14 @@ final class DocumentSchema extends Equatable {
     required this.order,
     required this.propertiesSchema,
   });
+
+  @override
+  DocumentNodeId get nodeId => DocumentNodeId.root;
+
+  /// Returns the [segments] sorted by the [order].
+  List<DocumentSchemaSegment> get sortedSegments {
+    return List.of(segments)..sortByOrder(order);
+  }
 
   @override
   List<Object?> get props => [
@@ -37,13 +45,15 @@ final class DocumentSchema extends Equatable {
 }
 
 /// A top-level grouping object of the document.
-final class DocumentSchemaSegment extends Equatable {
+final class DocumentSchemaSegment extends Equatable implements DocumentNode {
   final BaseDocumentDefinition definition;
+  @override
   final DocumentNodeId nodeId;
   final String id;
   final String title;
   final String description;
   final List<DocumentSchemaSection> sections;
+  final List<DocumentNodeId> order;
 
   const DocumentSchemaSegment({
     required this.definition,
@@ -52,7 +62,13 @@ final class DocumentSchemaSegment extends Equatable {
     required this.title,
     required this.description,
     required this.sections,
+    required this.order,
   });
+
+  /// Returns the [sections] sorted by the [order].
+  List<DocumentSchemaSection> get sortedSections {
+    return List.of(sections)..sortByOrder(order);
+  }
 
   @override
   List<Object?> get props => [
@@ -62,18 +78,21 @@ final class DocumentSchemaSegment extends Equatable {
         title,
         description,
         sections,
+        order,
       ];
 }
 
 /// A grouping object in a document on a section level.
-final class DocumentSchemaSection extends Equatable {
+final class DocumentSchemaSection extends Equatable implements DocumentNode {
   final BaseDocumentDefinition definition;
+  @override
   final DocumentNodeId nodeId;
   final String id;
   final String title;
   final String description;
   final List<DocumentSchemaProperty> properties;
   final bool isRequired;
+  final List<DocumentNodeId> order;
 
   const DocumentSchemaSection({
     required this.definition,
@@ -83,7 +102,13 @@ final class DocumentSchemaSection extends Equatable {
     required this.description,
     required this.properties,
     required this.isRequired,
+    required this.order,
   });
+
+  /// Returns the [properties] sorted by the [order].
+  List<DocumentSchemaProperty> get sortedProperties {
+    return List.of(properties)..sortByOrder(order);
+  }
 
   @override
   List<Object?> get props => [
@@ -94,19 +119,20 @@ final class DocumentSchemaSection extends Equatable {
         description,
         properties,
         isRequired,
+        order,
       ];
 }
 
 /// A single property (field) in a document.
-final class DocumentSchemaProperty extends Equatable {
+final class DocumentSchemaProperty extends Equatable implements DocumentNode {
   final BaseDocumentDefinition definition;
+  @override
   final DocumentNodeId nodeId;
   final String id;
   final String title;
   final String? description;
-
   final Object? defaultValue;
-  final String guidance;
+  final String? guidance;
   final List<String>? enumValues;
   final Range<int>? range;
   final Range<int>? itemsRange;

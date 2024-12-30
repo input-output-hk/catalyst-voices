@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:test/test.dart';
 
 import '../../helpers/read_json.dart';
@@ -22,11 +22,11 @@ void main() {
 
       final schema = schemaDto.toModel();
 
-      if (schemaDto.order.length != schema.segments.length) {
+      if (schemaDto.order?.length != schema.sortedSegments.length) {
         return;
       }
-      for (var i = 0; i < schema.segments.length; i++) {
-        expect(schema.segments[i].id, schemaDto.order[i]);
+      for (var i = 0; i < schema.sortedSegments.length; i++) {
+        expect(schema.sortedSegments[i].id, schemaDto.order?[i]);
       }
     });
 
@@ -34,15 +34,17 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      for (var i = 0; i < schema.segments.length; i++) {
-        if (schemaDto.segments[i].order.length !=
-            schema.segments[i].sections.length) {
+      for (var i = 0; i < schema.sortedSegments.length; i++) {
+        if (schemaDto.segments[i].order?.length !=
+            schema.sortedSegments[i].sortedSections.length) {
           continue;
         }
-        for (var j = 0; j < schema.segments[i].sections.length; j++) {
+        for (var j = 0;
+            j < schema.sortedSegments[i].sortedSections.length;
+            j++) {
           expect(
-            schema.segments[i].sections[j].id,
-            schemaDto.segments[i].order[j],
+            schema.sortedSegments[i].sortedSections[j].id,
+            schemaDto.segments[i].order?[j],
           );
         }
       }
@@ -52,7 +54,7 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      for (final segment in schema.segments) {
+      for (final segment in schema.sortedSegments) {
         expect(segment.definition, isA<SegmentDefinition>());
       }
     });
