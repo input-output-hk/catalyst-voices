@@ -153,6 +153,7 @@ class _CloseButtonPosition extends StatelessWidget {
     );
 
     return Align(
+      key: const Key('DialogCloseButton'),
       alignment: alignment,
       child: IconButtonTheme(
         data: const IconButtonThemeData(style: buttonStyle),

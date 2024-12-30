@@ -52,12 +52,14 @@ chrono
 ciphertext
 ciphertexts
 CIPs
+CNFT
 COCOAPODS
 codegen
 codepoints
 collabs
 commitlog
 concatcp
+coproposers
 COSE
 coti
 coverallsapp
@@ -77,6 +79,7 @@ delegators
 devnet
 DIND
 dockerhub
+domcontentloaded
 Dominik
 dotenv
 dotenvy
@@ -111,6 +114,7 @@ gethostname
 Gitbook
 gmtime
 gradlew
+Hackathons
 headful
 headlessui
 HIDPI
@@ -167,6 +171,7 @@ loguru
 lovelace
 lovelaces
 LTRB
+Lynxx
 mdlint
 metadatum
 metadatums
@@ -186,11 +191,13 @@ Multiplatform
 myproject
 Nami
 nanos
+nathanbogale
 NDEBUG
 netifas
 netkey
 nextest
 Nodetool
+NuFi
 oapi
 OCSP
 Oleksandr
@@ -199,6 +206,7 @@ oneshot
 openapi
 opentelemetry
 overprovisioned
+pageobject
 Pbkdf2
 pbxproj
 Pdart
@@ -218,6 +226,7 @@ projectcatalyst
 Prokhorenko
 proptest
 psql
+psycopg
 Ptarget
 pubkey
 PUBLICKEY
@@ -277,16 +286,19 @@ tablestats
 tacho
 testcov
 testdocs
+testid
 testplan
 testunit
 thiserror
 thollander
 Timelapse
 timelike
+tkach
 Toastify
 todos
 toggleable
 tojunit
+tomjs
 Traceback
 traefik
 trailings
@@ -321,6 +333,7 @@ Wireframes
 Wmissing
 Wnullable
 Woverlength
+Writedown
 xcassets
 xcconfig
 xcfilelist

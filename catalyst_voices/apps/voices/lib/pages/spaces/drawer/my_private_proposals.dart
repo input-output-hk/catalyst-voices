@@ -13,6 +13,7 @@ class MyPrivateProposals extends StatelessWidget {
       children: [
         SpaceHeader(Space.workspace),
         SectionHeader(
+          key: ValueKey('Header.workspace'),
           leading: SizedBox(width: 12),
           title: Text('My private proposals (3/5)'),
         ),
