@@ -516,14 +516,11 @@ class VoicesTextFieldValidationResult with EquatableMixin {
           'errorMessage can be only used for warning or error status',
         );
 
-<<<<<<< HEAD
   const VoicesTextFieldValidationResult.none()
       : this(
           status: VoicesTextFieldStatus.none,
         );
 
-=======
->>>>>>> main
   /// Returns a successful validation result.
   ///
   /// The method was designed to be used as
