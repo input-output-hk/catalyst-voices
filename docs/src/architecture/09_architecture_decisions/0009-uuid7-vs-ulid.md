@@ -79,4 +79,4 @@ We will:
 * [RFC 9562 - UUIDv7 Specification](https://datatracker.ietf.org/doc/rfc9562/)
 * [ULID Specification](https://github.com/ulid/spec)
 
-[RFC 9562]: https://datatracker.ietf.org/doc/rfc9562/ 
+[RFC 9562]: https://datatracker.ietf.org/doc/rfc9562/
