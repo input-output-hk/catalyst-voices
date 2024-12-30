@@ -2,7 +2,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_segment_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_dto.g.dart';
@@ -22,7 +21,7 @@ final class DocumentSchemaDto {
   @DocumentSchemaSegmentsDtoConverter()
   final List<DocumentSchemaSegmentDto> segments;
   @JsonKey(name: 'x-order')
-  final List<String> order;
+  final List<String>? order;
   @JsonKey(includeToJson: false)
   final String propertiesSchema;
 
@@ -49,13 +48,10 @@ final class DocumentSchemaDto {
   Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
 
   DocumentSchema toModel() {
-    final sortedSegments = List.of(segments)
-      ..sortByOrder(
-        order,
-        id: (e) => e.id,
-      );
+    const nodeId = DocumentNodeId.root;
+    final order = this.order ?? [];
 
-    final mappedSegments = sortedSegments
+    final mappedSegments = segments
         .where((e) => e.ref.contains('segment'))
         .map(
           (e) => e.toModel(
@@ -70,7 +66,7 @@ final class DocumentSchemaDto {
       title: title,
       description: description,
       segments: mappedSegments,
-      order: order,
+      order: order.map(nodeId.child).toList(),
       propertiesSchema: propertiesSchema,
     );
   }

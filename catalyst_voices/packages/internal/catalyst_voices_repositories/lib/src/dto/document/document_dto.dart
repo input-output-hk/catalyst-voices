@@ -23,7 +23,7 @@ class DocumentDto extends Equatable {
 
     return DocumentDto(
       schema: schema.schema,
-      segments: schema.segments
+      segments: schema.sortedSegments
           .map(
             (segment) => DocumentSegmentDto.fromJsonSchema(
               segment,
@@ -74,7 +74,7 @@ class DocumentSegmentDto extends Equatable {
   }) {
     return DocumentSegmentDto(
       schema: schema,
-      sections: schema.sections
+      sections: schema.sortedSections
           .map(
             (section) => DocumentSectionDto.fromJsonSchema(
               section,
@@ -126,7 +126,7 @@ class DocumentSectionDto extends Equatable {
   }) {
     return DocumentSectionDto(
       schema: schema,
-      properties: schema.properties
+      properties: schema.sortedProperties
           .map(
             (property) => DocumentPropertyDto.fromJsonSchema(
               property,

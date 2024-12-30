@@ -1,18 +1,14 @@
-/// Extracts an id from the [data].
-typedef DocumentListIdGetter<T> = String Function(T data);
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
-extension DocumentListSortExt<T> on List<T> {
-  void sortByOrder(
-    List<String> order, {
-    required DocumentListIdGetter<T> id,
-  }) {
+extension DocumentListSortExt<T extends DocumentNode> on List<T> {
+  void sortByOrder(List<DocumentNodeId> order) {
     final orderMap = {
       for (var i = 0; i < order.length; i++) order[i]: i,
     };
 
     sort((a, b) {
-      final aIndex = orderMap[id(a)] ?? double.maxFinite.toInt();
-      final bIndex = orderMap[id(b)] ?? double.maxFinite.toInt();
+      final aIndex = orderMap[a.nodeId] ?? double.maxFinite.toInt();
+      final bIndex = orderMap[b.nodeId] ?? double.maxFinite.toInt();
       return aIndex.compareTo(bIndex);
     });
   }

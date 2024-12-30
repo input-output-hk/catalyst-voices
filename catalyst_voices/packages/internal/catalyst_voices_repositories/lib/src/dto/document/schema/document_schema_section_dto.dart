@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_section_dto.g.dart';
@@ -52,17 +51,9 @@ final class DocumentSchemaSectionDto {
     required bool isRequired,
   }) {
     final nodeId = parentNodeId.child(id);
-    final sortedProperties = List.of(properties);
+    final order = this.order ?? [];
 
-    final order = this.order;
-    if (order != null) {
-      sortedProperties.sortByOrder(
-        order,
-        id: (e) => e.id,
-      );
-    }
-
-    final mappedProperties = sortedProperties
+    final mappedProperties = properties
         .where((property) => BaseDocumentDefinition.isKnownType(property.ref))
         .map((e) => e.toModel(definitions, parentNodeId: nodeId))
         .toList();
@@ -75,6 +66,7 @@ final class DocumentSchemaSectionDto {
       description: description ?? '',
       properties: mappedProperties,
       isRequired: isRequired,
+      order: order.map(nodeId.child).toList(),
     );
   }
 }

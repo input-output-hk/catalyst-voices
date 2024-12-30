@@ -58,3 +58,10 @@ final class DocumentNodeId extends Equatable {
   @override
   String toString() => paths.join('.');
 }
+
+/// The interface that every object in a document should implement,
+/// helps to navigate to a certain segment/section/property of the document.
+abstract interface class DocumentNode {
+  /// The node of the document where an object is located.
+  DocumentNodeId get nodeId;
+}

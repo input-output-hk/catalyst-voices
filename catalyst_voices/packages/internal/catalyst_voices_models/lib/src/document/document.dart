@@ -24,7 +24,7 @@ final class Document extends Equatable {
   factory Document.fromSchema(DocumentSchema schema) {
     return Document(
       schema: schema.propertiesSchema,
-      segments: schema.segments.map(DocumentSegment.fromSchema).toList(),
+      segments: schema.sortedSegments.map(DocumentSegment.fromSchema).toList(),
     );
   }
 
@@ -102,7 +102,7 @@ final class DocumentSegment extends Equatable {
   factory DocumentSegment.fromSchema(DocumentSchemaSegment schema) {
     return DocumentSegment(
       schema: schema,
-      sections: schema.sections.map(DocumentSection.from).toList(),
+      sections: schema.sortedSections.map(DocumentSection.from).toList(),
     );
   }
 
@@ -170,7 +170,8 @@ final class DocumentSection extends Equatable {
   factory DocumentSection.from(DocumentSchemaSection schema) {
     return DocumentSection(
       schema: schema,
-      properties: schema.properties.map(DocumentProperty.fromSchema).toList(),
+      properties:
+          schema.sortedProperties.map(DocumentProperty.fromSchema).toList(),
     );
   }
 
