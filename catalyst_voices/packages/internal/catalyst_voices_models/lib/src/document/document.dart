@@ -240,7 +240,7 @@ final class DocumentProperty extends Equatable {
   factory DocumentProperty.fromSchema(DocumentSchemaProperty schema) {
     return DocumentProperty(
       schema: schema,
-      value: null,
+      value: schema.defaultValue,
     );
   }
 
