@@ -6,7 +6,7 @@ use super::*;
 #[tokio::test]
 async fn test_schema() -> Result<(), String> {
     setup_test_database().await?;
-    let (_, _) = get_session()?;
+    let (..) = get_session()?;
 
     Ok(())
 }
