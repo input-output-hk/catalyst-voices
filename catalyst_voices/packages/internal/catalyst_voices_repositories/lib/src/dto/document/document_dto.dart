@@ -195,7 +195,7 @@ class DocumentPropertyDto extends Equatable {
     return DocumentProperty(
       schema: schema,
       // TODO(dtscalac): convert from json to model
-      value: value,
+      value: value ?? schema.defaultValue,
     );
   }
 
