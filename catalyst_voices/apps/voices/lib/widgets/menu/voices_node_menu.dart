@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 final class VoicesNodeMenuItem extends Equatable {
-  final int id;
+  final String id;
   final String label;
   final bool isEnabled;
 
@@ -28,8 +28,8 @@ class VoicesNodeMenu extends StatelessWidget {
   final String name;
   final Widget? icon;
   final VoidCallback? onHeaderTap;
-  final int? selectedItemId;
-  final ValueChanged<int> onItemTap;
+  final String? selectedItemId;
+  final ValueChanged<String> onItemTap;
   final List<VoicesNodeMenuItem> items;
   final bool isExpandable;
   final bool isExpanded;

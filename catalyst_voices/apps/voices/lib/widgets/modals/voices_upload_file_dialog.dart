@@ -14,13 +14,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 
+typedef OnVoicesFileUploaded = Future<void> Function(VoicesFile value);
+
 class VoicesUploadFileDialog extends StatefulWidget {
   final String title;
   final String itemNameToUpload;
   final String? info;
   final List<String>? allowedExtensions;
-  final Future<void> Function(VoicesFile value)? onUpload;
-  final VoidCallback? onCancel;
+  final OnVoicesFileUploaded? onUpload;
 
   const VoicesUploadFileDialog({
     super.key,
@@ -29,7 +30,6 @@ class VoicesUploadFileDialog extends StatefulWidget {
     this.info,
     this.allowedExtensions,
     this.onUpload,
-    this.onCancel,
   });
 
   static Future<VoicesFile?> show(
@@ -38,8 +38,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
     String? itemNameToUpload,
     String? info,
     List<String>? allowedExtensions,
-    Future<void> Function(VoicesFile value)? onUpload,
-    VoidCallback? onCancel,
+    OnVoicesFileUploaded? onUpload,
   }) {
     return VoicesDialog.show<VoicesFile?>(
       context: context,
@@ -50,7 +49,6 @@ class VoicesUploadFileDialog extends StatefulWidget {
           info: info,
           allowedExtensions: allowedExtensions,
           onUpload: onUpload,
-          onCancel: onCancel,
         );
       },
     );
@@ -68,7 +66,6 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
   Widget build(BuildContext context) {
     return VoicesSinglePaneDialog(
       constraints: const BoxConstraints(maxWidth: 600, maxHeight: 450),
-      onCancel: widget.onCancel,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -100,7 +97,6 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
                 });
                 await widget.onUpload?.call(file);
               },
-              onCancel: widget.onCancel,
             ),
           ],
         ),
@@ -111,13 +107,11 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
 
 class _Buttons extends StatefulWidget {
   final VoicesFile? selectedFile;
-  final Future<void> Function(VoicesFile value)? onUpload;
-  final VoidCallback? onCancel;
+  final OnVoicesFileUploaded? onUpload;
 
   const _Buttons({
     this.selectedFile,
     this.onUpload,
-    this.onCancel,
   });
 
   @override
@@ -134,7 +128,6 @@ class _ButtonsState extends State<_Buttons> {
         Expanded(
           child: VoicesOutlinedButton(
             onTap: () {
-              widget.onCancel?.call();
               Navigator.of(context).pop();
             },
             child: Text(context.l10n.cancelButtonText),

@@ -42,3 +42,5 @@ dev_dependencies:
     sdk: flutter
   mocktail: ^1.0.1
   plugin_platform_interface: ^2.1.8
+  shared_preferences: ^2.3.3
+  shared_preferences_platform_interface: ^2.4.1

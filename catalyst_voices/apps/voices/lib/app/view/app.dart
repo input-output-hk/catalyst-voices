@@ -38,14 +38,26 @@ class _AppState extends State<App> {
 
   List<BlocProvider> _multiBlocProviders() {
     return [
-      BlocProvider<AuthenticationBloc>(
-        create: (_) => Dependencies.instance.get<AuthenticationBloc>(),
-      ),
-      BlocProvider<LoginBloc>(
-        create: (_) => Dependencies.instance.get<LoginBloc>(),
+      BlocProvider<AdminToolsCubit>(
+        create: (_) => Dependencies.instance.get<AdminToolsCubit>(),
       ),
       BlocProvider<SessionCubit>(
-        create: (_) => Dependencies.instance.get(),
+        create: (_) => Dependencies.instance.get<SessionCubit>(),
+      ),
+      BlocProvider<ProposalsCubit>(
+        create: (_) => Dependencies.instance.get<ProposalsCubit>(),
+      ),
+      BlocProvider<CampaignInfoCubit>(
+        create: (_) => Dependencies.instance.get<CampaignInfoCubit>(),
+      ),
+      BlocProvider<CampaignBuilderCubit>(
+        create: (_) => Dependencies.instance.get<CampaignBuilderCubit>(),
+      ),
+      BlocProvider<WorkspaceBloc>(
+        create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
+      ),
+      BlocProvider<ProposalBuilderBloc>(
+        create: (context) => Dependencies.instance.get<ProposalBuilderBloc>(),
       ),
     ];
   }

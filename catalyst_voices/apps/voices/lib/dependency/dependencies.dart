@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final class Dependencies extends DependencyProvider {
   static final Dependencies instance = Dependencies._();
@@ -14,8 +18,14 @@ final class Dependencies extends DependencyProvider {
 
   Dependencies._();
 
-  Future<void> init() async {
+  Future<void> init({
+    required AppConfig config,
+  }) async {
     DependencyProvider.instance = this;
+
+    registerSingleton<AppConfig>(config);
+
+    _registerStorages();
     _registerServices();
     _registerRepositories();
     _registerBlocsWithDependencies();
@@ -34,15 +44,11 @@ final class Dependencies extends DependencyProvider {
 
   void _registerBlocsWithDependencies() {
     this
-      ..registerSingleton<AuthenticationBloc>(
-        AuthenticationBloc(
-          authenticationRepository: get(),
-        ),
+      ..registerLazySingleton<AdminToolsCubit>(
+        AdminToolsCubit.new,
       )
-      ..registerLazySingleton<LoginBloc>(
-        () => LoginBloc(
-          authenticationRepository: get(),
-        ),
+      ..registerLazySingleton<AdminTools>(
+        () => get<AdminToolsCubit>(),
       )
       ..registerLazySingleton<SessionCubit>(
         () {
@@ -50,6 +56,8 @@ final class Dependencies extends DependencyProvider {
             get<UserService>(),
             get<RegistrationService>(),
             get<RegistrationProgressNotifier>(),
+            get<AccessControl>(),
+            get<AdminTools>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -62,31 +70,70 @@ final class Dependencies extends DependencyProvider {
           registrationService: get<RegistrationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
         );
+      })
+      ..registerLazySingleton<ProposalsCubit>(
+        () => ProposalsCubit(
+          get<CampaignService>(),
+          get<ProposalService>(),
+          get<AdminTools>(),
+        ),
+      )
+      ..registerFactory<CampaignDetailsBloc>(() {
+        return CampaignDetailsBloc(
+          get<CampaignRepository>(),
+        );
+      })
+      ..registerLazySingleton<CampaignInfoCubit>(() {
+        return CampaignInfoCubit(
+          get<CampaignService>(),
+          get<AdminTools>(),
+        );
+      })
+      // TODO(ryszard-schossler): add repository for campaign management
+      ..registerLazySingleton<CampaignBuilderCubit>(
+        CampaignBuilderCubit.new,
+      )
+      ..registerFactory<WorkspaceBloc>(() {
+        return WorkspaceBloc(
+          get<CampaignService>(),
+        );
+      })
+      ..registerFactory<ProposalBuilderBloc>(() {
+        return ProposalBuilderBloc(
+          get<CampaignService>(),
+        );
       });
   }
 
   void _registerRepositories() {
     this
-      ..registerLazySingleton<CredentialsStorageRepository>(
-        () => CredentialsStorageRepository(storage: get()),
-      )
-      ..registerLazySingleton<AuthenticationRepository>(
-        () => AuthenticationRepository(credentialsStorageRepository: get()),
-      )
       ..registerLazySingleton<TransactionConfigRepository>(
         TransactionConfigRepository.new,
-      );
+      )
+      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
+      ..registerLazySingleton<UserRepository>(() {
+        return UserRepository(
+          get<UserStorage>(),
+          get<KeychainProvider>(),
+        );
+      });
   }
 
   void _registerServices() {
     registerLazySingleton<Storage>(() => const SecureStorage());
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
     registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
-    registerLazySingleton<KeychainProvider>(VaultKeychainProvider.new);
-    registerLazySingleton<DummyAuthStorage>(SecureDummyAuthStorage.new);
+    registerLazySingleton<KeychainProvider>(() {
+      return VaultKeychainProvider(
+        secureStorage: get<FlutterSecureStorage>(),
+        sharedPreferences: get<SharedPreferencesAsync>(),
+        cacheConfig: get<AppConfig>().cache,
+      );
+    });
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
-    registerLazySingleton<UserStorage>(SecureUserStorage.new);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,
     );
@@ -101,11 +148,32 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<UserService>(
       () {
         return UserService(
-          keychainProvider: get<KeychainProvider>(),
-          userStorage: get<UserStorage>(),
+          userRepository: get<UserRepository>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
     );
+    registerLazySingleton<AccessControl>(AccessControl.new);
+    registerLazySingleton<CampaignService>(() {
+      return CampaignService(
+        get<CampaignRepository>(),
+      );
+    });
+    registerLazySingleton<ProposalService>(() {
+      return ProposalService(
+        get<ProposalRepository>(),
+      );
+    });
+    registerLazySingleton<ConfigService>(() {
+      return ConfigService(
+        get<ConfigRepository>(),
+      );
+    });
+  }
+
+  void _registerStorages() {
+    registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
+    registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
+    registerLazySingleton<UserStorage>(SecureUserStorage.new);
   }
 }

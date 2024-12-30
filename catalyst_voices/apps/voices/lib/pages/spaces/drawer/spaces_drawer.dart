@@ -64,26 +64,29 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
   @override
   Widget build(BuildContext context) {
     return VoicesDrawer(
-      bottom: VoicesDrawerSpaceChooser(
-        key: const ValueKey('DrawerSpaceChooser'),
-        currentSpace: widget.space,
-        onChanged: (space) => space.go(context),
-        onOverallTap: () {
-          Scaffold.of(context).closeDrawer();
-          unawaited(const OverallSpacesRoute().push<void>(context));
-        },
-        builder: (context, value, child) {
-          final shortcutActivator = widget.spacesShortcutsActivators[value];
+      bottom: !widget.isUnlocked
+          ? null
+          : VoicesDrawerSpaceChooser(
+              key: const ValueKey('DrawerSpaceChooser'),
+              currentSpace: widget.space,
+              onChanged: (space) => space.go(context),
+              onOverallTap: () {
+                Scaffold.of(context).closeDrawer();
+                unawaited(const OverallSpacesRoute().push<void>(context));
+              },
+              builder: (context, value, child) {
+                final shortcutActivator =
+                    widget.spacesShortcutsActivators[value];
 
-          return VoicesPlainTooltip(
-            message: value.localizedName(context.l10n),
-            trailing: shortcutActivator != null
-                ? ShortcutActivatorView(activator: shortcutActivator)
-                : null,
-            child: child!,
-          );
-        },
-      ),
+                return VoicesPlainTooltip(
+                  message: value.localizedName(context.l10n),
+                  trailing: shortcutActivator != null
+                      ? ShortcutActivatorView(activator: shortcutActivator)
+                      : null,
+                  child: child!,
+                );
+              },
+            ),
       child: Column(
         children: [
           const SizedBox(height: 12),
