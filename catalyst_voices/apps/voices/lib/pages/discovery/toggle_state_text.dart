@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -55,35 +54,44 @@ class _ToggleStateTextState extends State<ToggleStateText> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Text.rich(
-      TextSpan(
-        children: [
-          const TextSpan(text: 'Toggle between'),
-          const TextSpan(text: ', '),
-          TextSpan(
-            text: 'No key (visitor)',
-            style: const TextStyle(decoration: TextDecoration.underline),
-            recognizer: _tapVisitor,
+    return Row(
+      children: [
+        GestureDetector(
+          key: const Key('VisitorShortcut'),
+          onTap: _tapVisitor.onTap,
+          child: const Text(
+            'No key (visitor)',
+            style: TextStyle(
+              decoration: TextDecoration.underline,
+              color: Colors.blue,
+            ),
           ),
-          const TextSpan(text: ', '),
-          TextSpan(
-            text: 'Key found(Guest/locked)',
-            style: const TextStyle(decoration: TextDecoration.underline),
-            recognizer: _tapGuest,
+        ),
+        const Text(', '),
+        GestureDetector(
+          key: const Key('GuestShortcut'),
+          onTap: _tapGuest.onTap,
+          child: const Text(
+            'Key found(Guest/locked)',
+            style: TextStyle(
+              decoration: TextDecoration.underline,
+              color: Colors.blue,
+            ),
           ),
-          const TextSpan(text: ', '),
-          TextSpan(
-            text: 'Key found (Active user/unlocked)',
-            style: const TextStyle(decoration: TextDecoration.underline),
-            recognizer: _tapActiveUser,
+        ),
+        const Text(', '),
+        GestureDetector(
+          key: const Key('UserShortcut'),
+          onTap: _tapActiveUser.onTap,
+          child: const Text(
+            'Key found (Active user/unlocked)',
+            style: TextStyle(
+              decoration: TextDecoration.underline,
+              color: Colors.blue,
+            ),
           ),
-        ],
-      ),
-      style: theme.textTheme.bodyLarge?.copyWith(
-        color: theme.colors.textOnPrimary,
-      ),
+        ),
+      ],
     );
   }
 }

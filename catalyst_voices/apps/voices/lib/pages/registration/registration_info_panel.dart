@@ -50,6 +50,7 @@ class RegistrationInfoPanel extends StatelessWidget {
         );
 
         return InformationPanel(
+          key: const Key('RegistrationInfoPanel'),
           title: headerStrings.title,
           subtitle: headerStrings.subtitle,
           body: headerStrings.body,
