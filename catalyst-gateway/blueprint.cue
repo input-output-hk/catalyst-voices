@@ -12,9 +12,4 @@ project: {
 			}
 		}
 	}
-	ci: {
-    targets: {
-      "test-postgres": privileged: true
-    }
-  }
 }
