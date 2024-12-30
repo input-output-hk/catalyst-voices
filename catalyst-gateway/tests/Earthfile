@@ -1,5 +1,7 @@
 VERSION 0.8
+
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.24 AS spectral-ci
+IMPORT .. AS gateway
 
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
@@ -14,7 +16,7 @@ test-lint-openapi:
     DO spectral-ci+LINT --dir=./doc
 
 test-postgres:
-    FROM +builder-src
+    FROM gateway+builder-src
 
     COPY ./docker/docker-compose.postgres.yml docker-compose.yml
 
@@ -31,7 +33,7 @@ test-postgres:
 
 # test-scylla - Runs the integration test for scylla.
 test-scylla:
-    FROM +builder-src
+    FROM gateway+builder-src
 
     DO +INSTALL_SCYLLA --VERSION=6.2
 
