@@ -3,6 +3,11 @@ import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
+// put conditionals under segments/sections/properties
+// add a flag whether they are currently enabled
+// resolve them when a document changes (if they have a conditional logic)
+// each property resolves separately
+
 /// A document schema that describes the structure of a document.
 ///
 /// The document consists of top level [segments].
@@ -106,7 +111,7 @@ final class DocumentSchemaProperty extends Equatable {
   final String? description;
 
   final Object? defaultValue;
-  final String guidance;
+  final String? guidance;
   final List<String>? enumValues;
   final Range<int>? range;
   final Range<int>? itemsRange;

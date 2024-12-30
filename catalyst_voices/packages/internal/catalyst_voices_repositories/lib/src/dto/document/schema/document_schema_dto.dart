@@ -1,12 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_definitions_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_dto.g.dart';
-
-// TODO(dtscalac): rewrite this
 
 @JsonSerializable()
 class DocumentSchemaDto extends Equatable {
@@ -19,11 +18,8 @@ class DocumentSchemaDto extends Equatable {
   final DocumentDefinitionsDto definitions;
   final String type;
   final bool additionalProperties;
-  @JsonKey(
-    toJson: _toJsonProperties,
-    fromJson: _fromJsonProperties,
-    name: 'properties',
-  )
+  @JsonKey(name: 'properties')
+  @DocumentSchemaSegmentsDtoConverter()
   final List<DocumentSchemaSegmentDto> segments;
   @JsonKey(name: 'x-order')
   final List<String> order;
@@ -53,7 +49,11 @@ class DocumentSchemaDto extends Equatable {
   Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
 
   DocumentSchema toModel() {
-    final sortedSegments = List.of(segments)..sortByOrder(order);
+    final sortedSegments = List.of(segments)
+      ..sortByOrder(
+        order,
+        id: (e) => e.id,
+      );
 
     final mappedSegments = sortedSegments
         .where((e) => e.ref.contains('segment'))
@@ -78,6 +78,7 @@ class DocumentSchemaDto extends Equatable {
   @override
   List<Object?> get props => [
         schema,
+        id,
         title,
         description,
         definitions,
@@ -85,45 +86,28 @@ class DocumentSchemaDto extends Equatable {
         additionalProperties,
         segments,
         order,
+        propertiesSchema,
       ];
-
-  static Map<String, dynamic> _toJsonProperties(
-    List<DocumentSchemaSegmentDto> segments,
-  ) {
-    return {
-      for (final segment in segments) segment.id: segment.toJson(),
-    };
-  }
-
-  static List<DocumentSchemaSegmentDto> _fromJsonProperties(
-    Map<String, dynamic> json,
-  ) {
-    final listOfSegments = json.convertMapToListWithIds();
-    return listOfSegments.map(DocumentSchemaSegmentDto.fromJson).toList();
-  }
 }
 
 @JsonSerializable()
-class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
+class DocumentSchemaSegmentDto extends Equatable {
+  @JsonKey(includeToJson: false)
+  final String id;
   @JsonKey(name: r'$ref')
   final String ref;
-  @override
-  final String id;
   final String title;
   final String description;
-  @JsonKey(
-    toJson: _toJsonProperties,
-    fromJson: _fromJsonProperties,
-    name: 'properties',
-  )
+  @JsonKey(name: 'properties')
+  @DocumentSchemaSectionsDtoConverter()
   final List<DocumentSchemaSectionDto> sections;
   final List<String> required;
   @JsonKey(name: 'x-order')
   final List<String> order;
 
   const DocumentSchemaSegmentDto({
-    required this.ref,
     required this.id,
+    required this.ref,
     this.title = '',
     this.description = '',
     required this.sections,
@@ -142,7 +126,11 @@ class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
   }) {
     final nodeId = parentNodeId.child(id);
 
-    final sortedSections = List.of(sections)..sortByOrder(order);
+    final sortedSections = List.of(sections)
+      ..sortByOrder(
+        order,
+        id: (e) => e.id,
+      );
 
     final mappedSections = sortedSections
         .where((section) => section.ref.contains('section'))
@@ -167,67 +155,49 @@ class DocumentSchemaSegmentDto extends Equatable implements Identifiable {
 
   @override
   List<Object?> get props => [
-        ref,
         id,
+        ref,
         title,
         description,
         sections,
         required,
         order,
       ];
-
-  static Map<String, dynamic> _toJsonProperties(
-    List<DocumentSchemaSectionDto> sections,
-  ) {
-    final map = <String, dynamic>{};
-    for (final property in sections) {
-      map[property.id] = property.toJson();
-    }
-    return map;
-  }
-
-  static List<DocumentSchemaSectionDto> _fromJsonProperties(
-    Map<String, dynamic> json,
-  ) {
-    final listOfSections = json.convertMapToListWithIds();
-    return listOfSections.map(DocumentSchemaSectionDto.fromJson).toList();
-  }
 }
 
 @JsonSerializable()
-class DocumentSchemaSectionDto extends Equatable implements Identifiable {
+class DocumentSchemaSectionDto extends Equatable {
+  @JsonKey(includeToJson: false)
+  final String id;
   @JsonKey(name: r'$ref')
   final String ref;
-  @override
-  final String id;
-  final String title;
-  final String description;
-  @JsonKey(
-    toJson: _toJsonProperties,
-    fromJson: _fromJsonProperties,
-    name: 'properties',
-  )
+  final String? title;
+  final String? description;
+  @DocumentSchemaPropertiesDtoConverter()
   final List<DocumentSchemaPropertyDto> properties;
-  final List<String> required;
+  final List<String>? required;
   @JsonKey(name: 'x-order')
-  final List<String> order;
+  final List<String>? order;
+
+  // conditional logic
   @JsonKey(name: 'if')
-  final Map<String, dynamic> ifs;
-  final Map<String, dynamic> then; // TODO(dtscalac): Return to this
-  @JsonKey(name: 'open_source')
-  final Map<String, dynamic> openSource; // TODO(dtscalac): Return to this
+  final DocumentSchemaIfConditionDto? ifs;
+  @JsonKey(name: 'then')
+  final DocumentSchemaSectionDto? then;
+  @JsonKey(name: 'else')
+  final DocumentSchemaSectionDto? elses;
 
   const DocumentSchemaSectionDto({
-    required this.ref,
     required this.id,
-    this.title = '',
-    this.description = '',
+    required this.ref,
+    this.title,
+    this.description,
     required this.properties,
-    this.required = const <String>[],
-    this.order = const <String>[],
-    this.ifs = const <String, dynamic>{},
-    this.then = const <String, dynamic>{},
-    this.openSource = const <String, dynamic>{},
+    this.required,
+    this.order,
+    this.ifs,
+    this.then,
+    this.elses,
   });
 
   factory DocumentSchemaSectionDto.fromJson(Map<String, dynamic> json) =>
@@ -241,8 +211,15 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
     required bool isRequired,
   }) {
     final nodeId = parentNodeId.child(id);
+    final sortedProperties = List.of(properties);
 
-    final sortedProperties = List.of(properties)..sortByOrder(order);
+    final order = this.order;
+    if (order != null) {
+      sortedProperties.sortByOrder(
+        order,
+        id: (e) => e.id,
+      );
+    }
 
     final mappedProperties = sortedProperties
         .where((property) => BaseDocumentDefinition.isKnownType(property.ref))
@@ -253,8 +230,8 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
       definition: definitions.getDefinition(ref),
       nodeId: nodeId,
       id: id,
-      title: title,
-      description: description,
+      title: title ?? '',
+      description: description ?? '',
       properties: mappedProperties,
       isRequired: isRequired,
     );
@@ -271,34 +248,18 @@ class DocumentSchemaSectionDto extends Equatable implements Identifiable {
         order,
         ifs,
         then,
+        elses,
       ];
-
-  static Map<String, dynamic> _toJsonProperties(
-    List<DocumentSchemaPropertyDto> properties,
-  ) {
-    final map = <String, dynamic>{};
-    for (final property in properties) {
-      map[property.id] = property.toJson();
-    }
-    return map;
-  }
-
-  static List<DocumentSchemaPropertyDto> _fromJsonProperties(
-    Map<String, dynamic> json,
-  ) {
-    final listOfProperties = json.convertMapToListWithIds();
-    return listOfProperties.map(DocumentSchemaPropertyDto.fromJson).toList();
-  }
 }
 
 @JsonSerializable()
-class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
+class DocumentSchemaPropertyDto extends Equatable {
   @JsonKey(name: r'$ref')
   final String ref;
-  @override
+  @JsonKey(includeToJson: false)
   final String id;
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
   @JsonKey(includeIfNull: false)
   final int? minLength;
   @JsonKey(includeIfNull: false)
@@ -306,7 +267,7 @@ class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
   @JsonKey(name: 'default')
   final Object? defaultValue;
   @JsonKey(name: 'x-guidance')
-  final String guidance;
+  final String? guidance;
   @JsonKey(name: 'enum', includeIfNull: false)
   final List<String>? enumValues;
   @JsonKey(includeIfNull: false)
@@ -352,7 +313,7 @@ class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
       definition: definitions.getDefinition(ref),
       nodeId: parentNodeId.child(id),
       id: id,
-      title: title,
+      title: title!,
       description: description,
       defaultValue: defaultValue,
       guidance: guidance,
@@ -378,4 +339,22 @@ class DocumentSchemaPropertyDto extends Equatable implements Identifiable {
         minimum,
         maximum,
       ];
+}
+
+@JsonSerializable()
+class DocumentSchemaIfConditionDto extends Equatable {
+  @JsonKey(name: 'properties')
+  final Map<String, dynamic>? properties;
+
+  const DocumentSchemaIfConditionDto({
+    required this.properties,
+  });
+
+  factory DocumentSchemaIfConditionDto.fromJson(Map<String, dynamic> json) =>
+      _$DocumentSchemaIfConditionDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DocumentSchemaIfConditionDtoToJson(this);
+
+  @override
+  List<Object?> get props => [properties];
 }
