@@ -6,6 +6,7 @@ use super::session::CassandraSession;
 
 mod scylla_schema;
 mod scylla_session;
+mod scyllla_queries;
 
 pub(super) async fn setup_test_database() -> Result<(), String> {
     CassandraSession::init();
