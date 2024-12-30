@@ -1178,5 +1178,19 @@
     }
   },
   "searchProposals": "Search Proposals",
-  "search": "Search…"
+  "search": "Search…",
+  "requestedFundsInCurrency": "Requested funds in {currency}",
+  "@requestedFundsInCurrency": {
+    "description": "Proposal builder input label text",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "requestedAmountShouldBeBetween": "Requested amount should be between",
+  "and": "and",
+  "@and": {
+    "description": "General text. May be used in context of A4000 and $5000"
+  }
 }
