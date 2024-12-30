@@ -13,11 +13,12 @@ deps:
 
 src:
     FROM +deps
-    COPY keys.txt .
+    COPY --dir pages ./pages
+    COPY --dir tests ./tests
+    COPY --dir utils ./utils
     COPY playwright.config.ts .
-    COPY global-setup.ts .
-    COPY wallet-tests.spec.ts .
-    COPY utils.ts .
+    COPY test-fixtures.ts .
+    COPY setup.ts .
 
 package-test:
     FROM +src
@@ -42,7 +43,9 @@ build-web:
 package-app:
     FROM nginx:alpine3.20-slim
     ARG tag='latest'
-    COPY +build-web/web /usr/share/nginx/html/
+    COPY +build-web/web /app
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
     SAVE IMAGE test-app:$tag
 
 nightly-test:
@@ -51,12 +54,10 @@ nightly-test:
     WITH DOCKER \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
-        --load test:latest=(+package-test) \
-        --service test-app \
-        --allow-privileged
+        --load test:latest=(+package-test)
 
-        RUN docker run --network=default_default --name=test test:latest && \
-            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml
+        RUN docker run --network=default_default --name=test test:latest ; \
+            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml ;
     END
     WAIT
         SAVE ARTIFACT cardano-wallet.junit-report.xml AS LOCAL cardano-wallet.junit-report.xml

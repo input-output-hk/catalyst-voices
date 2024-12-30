@@ -21,7 +21,7 @@ integration-test-web:
     # IF [ $browser = "edge" && $TARGETARCH = "amd64" ]]
     #    LET driver = "msedgedriver"
     # END
-    
+
     WORKDIR /frontend/apps/voices
 
     RUN ($driver --port=$driver_port > $driver.log &) && \

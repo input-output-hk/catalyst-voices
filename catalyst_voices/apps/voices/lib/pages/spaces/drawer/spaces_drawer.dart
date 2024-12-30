@@ -67,6 +67,7 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
       bottom: !widget.isUnlocked
           ? null
           : VoicesDrawerSpaceChooser(
+              key: const ValueKey('DrawerSpaceChooser'),
               currentSpace: widget.space,
               onChanged: (space) => space.go(context),
               onOverallTap: () {

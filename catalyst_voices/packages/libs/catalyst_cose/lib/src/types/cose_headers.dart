@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:catalyst_cose/src/cose_constants.dart';
 import 'package:catalyst_cose/src/types/string_or_int.dart';
 import 'package:catalyst_cose/src/types/uuid.dart';
@@ -5,14 +7,27 @@ import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
+/// A callback to get an optional value.
+/// Helps to distinguish whether a method argument
+/// has been passed as null or not passed at all.
+///
+/// See [CoseHeaders.copyWith].
+typedef OptionalValueGetter<T> = T? Function();
+
 /// A class that specifies headers that
 /// can be used in protected/unprotected COSE headers.
 final class CoseHeaders extends Equatable {
   /// See [CoseHeaderKeys.alg].
+  ///
+  /// Do not set the [alg] directly in the headers,
+  /// it will be auto-populated with [CatalystCoseSigner.alg] value.
   final StringOrInt? alg;
 
   /// See [CoseHeaderKeys.kid].
-  final String? kid;
+  ///
+  /// Do not set the [kid] directly in the headers,
+  /// it will be auto-populated with [CatalystCoseSigner.kid] value.
+  final Uint8List? kid;
 
   /// See [CoseHeaderKeys.contentType].
   final StringOrInt? contentType;
@@ -116,7 +131,7 @@ final class CoseHeaders extends Equatable {
 
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
-      kid: CborUtils.deserializeString(map[CoseHeaderKeys.kid]),
+      kid: CborUtils.deserializeBytes(map[CoseHeaderKeys.kid]),
       contentType:
           CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
       contentEncoding:
@@ -138,7 +153,7 @@ final class CoseHeaders extends Equatable {
   CborValue toCbor() {
     final map = CborMap({
       if (alg != null) CoseHeaderKeys.alg: alg!.toCbor(),
-      if (kid != null) CoseHeaderKeys.kid: CborString(kid!),
+      if (kid != null) CoseHeaderKeys.kid: CborBytes(kid!),
       if (contentType != null)
         CoseHeaderKeys.contentType: contentType!.toCbor(),
       if (contentEncoding != null)
@@ -159,6 +174,40 @@ final class CoseHeaders extends Equatable {
     } else {
       return map;
     }
+  }
+
+  /// Returns a copy of the [CoseHeaders] with overwritten properties.
+  CoseHeaders copyWith({
+    OptionalValueGetter<StringOrInt?>? alg,
+    OptionalValueGetter<Uint8List?>? kid,
+    OptionalValueGetter<StringOrInt?>? contentType,
+    OptionalValueGetter<StringOrInt?>? contentEncoding,
+    OptionalValueGetter<Uuid?>? type,
+    OptionalValueGetter<Uuid?>? id,
+    OptionalValueGetter<Uuid?>? ver,
+    OptionalValueGetter<ReferenceUuid?>? ref,
+    OptionalValueGetter<ReferenceUuid?>? template,
+    OptionalValueGetter<ReferenceUuid?>? reply,
+    OptionalValueGetter<String?>? section,
+    OptionalValueGetter<List<String>?>? collabs,
+    bool? encodeAsBytes,
+  }) {
+    return CoseHeaders(
+      alg: alg != null ? alg() : this.alg,
+      kid: kid != null ? kid() : this.kid,
+      contentType: contentType != null ? contentType() : this.contentType,
+      contentEncoding:
+          contentEncoding != null ? contentEncoding() : this.contentEncoding,
+      type: type != null ? type() : this.type,
+      id: id != null ? id() : this.id,
+      ver: ver != null ? ver() : this.ver,
+      ref: ref != null ? ref() : this.ref,
+      template: template != null ? template() : this.template,
+      reply: reply != null ? reply() : this.reply,
+      section: section != null ? section() : this.section,
+      collabs: collabs != null ? collabs() : this.collabs,
+      encodeAsBytes: encodeAsBytes ?? this.encodeAsBytes,
+    );
   }
 
   @override

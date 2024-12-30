@@ -1,10 +1,7 @@
-version: "3"
-
 services:
   event-db:
     image: event-db:latest
     environment:
-      # Required environment variables for migrations
       - DB_HOST=localhost
       - DB_PORT=5432
       - DB_NAME=CatalystEventDev
@@ -16,7 +13,6 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
-      - WITH_SEED_DATA=true
     ports:
       - 5432:5432
     healthcheck:
@@ -24,6 +20,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+# it is a helper service to wait until the event-db will be ready
+# mainly its a trick for Earthly how to wait until service will be fully functional
+  event-db-is-running:
+    image: alpine:3.20.3
+    depends_on:
+      event-db:
+        condition: service_healthy
 
   cat-gateway:
     image: cat-gateway:latest
