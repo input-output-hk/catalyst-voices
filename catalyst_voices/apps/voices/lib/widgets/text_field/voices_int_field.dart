@@ -17,6 +17,8 @@ class VoicesIntField extends VoicesNumField<int> {
     super.validator,
     required super.onFieldSubmitted,
     List<TextInputFormatter>? inputFormatters,
+    super.enabled,
+    super.readOnly,
   }) : super(
           codec: const IntCodec(),
           keyboardType: TextInputType.number,

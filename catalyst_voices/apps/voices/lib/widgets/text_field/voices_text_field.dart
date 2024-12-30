@@ -53,6 +53,9 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.enabled].
   final bool enabled;
 
+  /// [TextField.readOnly].
+  final bool readOnly;
+
   /// Whether the text field can be resized by the user
   /// in HTML's text area fashion.
   ///
@@ -93,6 +96,7 @@ class VoicesTextField extends StatefulWidget {
     this.maxLines = 1,
     this.minLines,
     this.enabled = true,
+    this.readOnly = false,
     this.validator,
     this.onChanged,
     this.resizable,
@@ -319,6 +323,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             maxLines: widget.maxLines,
             minLines: widget.minLines,
             maxLength: widget.maxLength,
+            readOnly: widget.readOnly,
             enabled: widget.enabled,
             onChanged: widget.onChanged,
           ),

@@ -23,6 +23,8 @@ class VoicesNumField<T extends num> extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<T?>? onChanged;
   final VoicesNumFieldValidator<T>? validator;
+  final bool enabled;
+  final bool readOnly;
 
   const VoicesNumField({
     super.key,
@@ -37,6 +39,8 @@ class VoicesNumField<T extends num> extends StatefulWidget {
     this.inputFormatters,
     this.onChanged,
     this.validator,
+    this.enabled = true,
+    this.readOnly = false,
   });
 
   @override
@@ -56,7 +60,10 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
   void initState() {
     super.initState();
 
-    _textEditingController = TextEditingController(text: null);
+    final num = _effectiveController.value;
+    final text = _toText(num);
+
+    _textEditingController = TextEditingController(text: text);
     _textEditingController.addListener(_handleTextChange);
 
     _effectiveController.addListener(_handleNumChange);
@@ -114,6 +121,8 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
       onFieldSubmitted: onFieldSubmitted != null
           ? (value) => onFieldSubmitted(_toNum(value))
           : null,
+      enabled: widget.enabled,
+      readOnly: widget.readOnly,
     );
   }
 

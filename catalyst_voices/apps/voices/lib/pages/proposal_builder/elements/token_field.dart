@@ -11,6 +11,7 @@ class TokenField extends StatelessWidget {
   final int min;
   final int max;
   final Currency currency;
+  final bool readOnly;
 
   const TokenField({
     super.key,
@@ -21,6 +22,7 @@ class TokenField extends StatelessWidget {
     required this.min,
     required this.max,
     this.currency = const Currency.ada(),
+    this.readOnly = false,
   }) : assert(
           currency == const Currency.ada(),
           'Only supports ADA at the moment',
@@ -49,6 +51,7 @@ class TokenField extends StatelessWidget {
       ),
       validator: (int? value, text) => _validate(context, value, text),
       onFieldSubmitted: onFieldSubmitted,
+      readOnly: readOnly,
     );
   }
 
