@@ -25,25 +25,27 @@ void main() async {
     await restartDependencies();
   });
 
-  patrolWidgetTest(
-    'Onboarding - visitor - get started button works',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(OverallSpacesPage.visitorShortcutBtn)
-          .tap(settleTimeout: const Duration(seconds: 10));
-      await $(AppBarPage.getStartedBtn).tap();
-      expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
-      expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
-    },
-  );
+  group('Onboarding -', () {
+    patrolWidgetTest(
+      'visitor - get started button works',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(OverallSpacesPage.visitorShortcutBtn)
+            .tap(settleTimeout: const Duration(seconds: 10));
+        await $(AppBarPage.getStartedBtn).tap();
+        expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
+        expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
+      },
+    );
 
-  patrolWidgetTest(
-    'Onboarding - visitor - get started screen looks as expected',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn)
-          .tap(settleTimeout: const Duration(seconds: 10));
-      await OnboardingPage.getStartedScreenLooksAsExpected($);
-    },
-  );
+    patrolWidgetTest(
+      'visitor - get started screen looks as expected',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: const Duration(seconds: 10));
+        await OnboardingPage.getStartedScreenLooksAsExpected($);
+      },
+    );
+  });
 }
