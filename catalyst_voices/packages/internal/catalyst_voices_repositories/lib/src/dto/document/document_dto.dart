@@ -1,12 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_properties_dto.dart';
-import 'package:equatable/equatable.dart';
 
 /// A data transfer object for the [Document].
 ///
 /// Encodable as json but to decode with [DocumentDto.fromJsonSchema]
 /// a [DocumentSchema] is needed which explains how to interpret the data.
-class DocumentDto extends Equatable {
+final class DocumentDto {
   final String schema;
   final List<DocumentSegmentDto> segments;
 
@@ -54,12 +53,9 @@ class DocumentDto extends Equatable {
       for (final segment in segments) ...segment.toJson(),
     };
   }
-
-  @override
-  List<Object?> get props => [schema, segments];
 }
 
-class DocumentSegmentDto extends Equatable {
+final class DocumentSegmentDto {
   final DocumentSchemaSegment schema;
   final List<DocumentSectionDto> sections;
 
@@ -106,12 +102,9 @@ class DocumentSegmentDto extends Equatable {
       },
     };
   }
-
-  @override
-  List<Object?> get props => [schema, sections];
 }
 
-class DocumentSectionDto extends Equatable {
+final class DocumentSectionDto {
   final DocumentSchemaSection schema;
   final List<DocumentPropertyDto> properties;
 
@@ -158,12 +151,9 @@ class DocumentSectionDto extends Equatable {
       },
     };
   }
-
-  @override
-  List<Object?> get props => [schema, properties];
 }
 
-class DocumentPropertyDto extends Equatable {
+final class DocumentPropertyDto {
   final DocumentSchemaProperty schema;
   final dynamic value;
 
@@ -195,14 +185,11 @@ class DocumentPropertyDto extends Equatable {
     return DocumentProperty(
       schema: schema,
       // TODO(dtscalac): convert from json to model
-      value: value ?? schema.defaultValue,
+      value: value,
     );
   }
 
   Map<String, dynamic> toJson() => {
         schema.id: value,
       };
-
-  @override
-  List<Object?> get props => [schema, value];
 }
