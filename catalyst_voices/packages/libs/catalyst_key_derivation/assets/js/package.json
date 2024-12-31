@@ -11,5 +11,8 @@
     "catalyst_key_derivation.js"
   ],
   "browser": "catalyst_key_derivation.js",
-  "homepage": "https://input-output-hk.github.io/catalyst-voices"
+  "homepage": "https://input-output-hk.github.io/catalyst-voices",
+  "dependencies": {
+    "catalyst_key_derivation": "file:"
+  }
 }
