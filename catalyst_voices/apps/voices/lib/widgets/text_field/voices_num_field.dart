@@ -23,6 +23,7 @@ class VoicesNumField<T extends num> extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<T?>? onChanged;
   final VoicesNumFieldValidator<T>? validator;
+  final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
   final bool enabled;
   final bool readOnly;
 
@@ -39,6 +40,7 @@ class VoicesNumField<T extends num> extends StatefulWidget {
     this.inputFormatters,
     this.onChanged,
     this.validator,
+    this.onStatusChanged,
     this.enabled = true,
     this.readOnly = false,
   });
@@ -118,6 +120,7 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
       onChanged: onChanged != null ? (value) => onChanged(_toNum(value)) : null,
       validator:
           validator != null ? (value) => validator(_toNum(value), value) : null,
+      onStatusChanged: widget.onStatusChanged,
       onFieldSubmitted: onFieldSubmitted != null
           ? (value) => onFieldSubmitted(_toNum(value))
           : null,

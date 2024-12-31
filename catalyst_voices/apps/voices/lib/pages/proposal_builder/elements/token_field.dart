@@ -7,9 +7,10 @@ import 'package:flutter/material.dart';
 class TokenField extends StatelessWidget {
   final VoicesIntFieldController? controller;
   final ValueChanged<int?>? onFieldSubmitted;
+  final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
+  final String? labelText;
   final FocusNode? focusNode;
-  final bool isRequired;
-  final Range<int> range;
+  final Range<int>? range;
   final Currency currency;
   final bool readOnly;
 
@@ -17,9 +18,10 @@ class TokenField extends StatelessWidget {
     super.key,
     this.controller,
     required this.onFieldSubmitted,
+    this.onStatusChanged,
+    this.labelText,
     this.focusNode,
-    this.isRequired = true,
-    required this.range,
+    this.range,
     this.currency = const Currency.ada(),
     this.readOnly = false,
   }) : assert(
@@ -29,25 +31,25 @@ class TokenField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var label = context.l10n.requestedFundsInCurrency(currency.name);
-    if (isRequired) {
-      label = '*$label';
-    }
+    final range = this.range;
 
     return VoicesIntField(
       controller: controller,
       focusNode: focusNode,
       decoration: VoicesTextFieldDecoration(
-        labelText: label,
+        labelText: labelText,
         prefixText: currency.symbol,
-        hintText: '${range.min}',
+        hintText: range != null ? '${range.min}' : null,
         filled: true,
-        helper: _Helper(
-          symbol: currency.symbol,
-          range: range,
-        ),
+        helper: range != null
+            ? _Helper(
+                symbol: currency.symbol,
+                range: range,
+              )
+            : null,
       ),
       validator: (int? value, text) => _validate(context, value, text),
+      onStatusChanged: onStatusChanged,
       onFieldSubmitted: onFieldSubmitted,
       readOnly: readOnly,
     );
@@ -64,7 +66,7 @@ class TokenField extends StatelessWidget {
       return VoicesTextFieldValidationResult.error(message);
     }
 
-    if (value != null && !range.contains(value)) {
+    if (value != null && !(range?.contains(value) ?? true)) {
       // Do not append any text
       return const VoicesTextFieldValidationResult.error();
     }

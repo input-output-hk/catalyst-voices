@@ -80,6 +80,8 @@ class VoicesTextField extends StatefulWidget {
   /// [AutovalidateMode]
   final AutovalidateMode? autovalidateMode;
 
+  final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
+
   const VoicesTextField({
     super.key,
     this.controller,
@@ -107,6 +109,7 @@ class VoicesTextField extends StatefulWidget {
     this.onSaved,
     this.inputFormatters,
     this.autovalidateMode,
+    this.onStatusChanged,
   });
 
   @override
@@ -462,20 +465,14 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final errorText = widget.decoration?.errorText;
     if (errorText != null) {
       _onValidationResultChanged(
-        VoicesTextFieldValidationResult(
-          status: VoicesTextFieldStatus.error,
-          errorMessage: errorText,
-        ),
+        VoicesTextFieldValidationResult.error(errorText),
       );
       return;
     }
 
     final result = widget.validator?.call(value);
     _onValidationResultChanged(
-      result ??
-          const VoicesTextFieldValidationResult(
-            status: VoicesTextFieldStatus.none,
-          ),
+      result ?? const VoicesTextFieldValidationResult.none(),
     );
   }
 
@@ -483,6 +480,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     if (_validation != validation) {
       setState(() {
         _validation = validation;
+        widget.onStatusChanged?.call(validation.status);
       });
     }
   }
