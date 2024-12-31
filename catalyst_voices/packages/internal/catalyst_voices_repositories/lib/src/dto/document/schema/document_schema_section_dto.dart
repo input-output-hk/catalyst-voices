@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
+import 'package:catalyst_voices_repositories/src/utils/document_schema_dto_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_section_dto.g.dart';
