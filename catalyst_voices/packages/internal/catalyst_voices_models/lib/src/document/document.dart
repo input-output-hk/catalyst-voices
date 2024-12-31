@@ -247,7 +247,7 @@ final class DocumentProperty extends Equatable {
   /// Returns a new copy with updated fields.
   DocumentProperty copyWith({
     DocumentSchemaProperty? schema,
-    Optional<Object?>? value,
+    Optional<Object>? value,
   }) {
     return DocumentProperty(
       schema: schema ?? this.schema,

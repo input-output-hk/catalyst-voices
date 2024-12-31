@@ -51,11 +51,18 @@ final class DocumentSchemaSectionDto {
     required bool isRequired,
   }) {
     final nodeId = parentNodeId.child(id);
-    final order = this.order ?? [];
+    final order = this.order ?? const [];
+    final required = this.required ?? const [];
 
     final mappedProperties = properties
         .where((property) => BaseDocumentDefinition.isKnownType(property.ref))
-        .map((e) => e.toModel(definitions, parentNodeId: nodeId))
+        .map(
+          (e) => e.toModel(
+            definitions,
+            parentNodeId: nodeId,
+            isRequired: required.contains(e.id),
+          ),
+        )
         .toList();
 
     return DocumentSchemaSection(

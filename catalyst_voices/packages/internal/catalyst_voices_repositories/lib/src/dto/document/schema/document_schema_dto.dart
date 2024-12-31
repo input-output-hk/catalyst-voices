@@ -49,7 +49,7 @@ final class DocumentSchemaDto {
 
   DocumentSchema toModel() {
     const nodeId = DocumentNodeId.root;
-    final order = this.order ?? [];
+    final order = this.order ?? const [];
 
     final mappedSegments = segments
         .where((e) => e.ref.contains('segment'))

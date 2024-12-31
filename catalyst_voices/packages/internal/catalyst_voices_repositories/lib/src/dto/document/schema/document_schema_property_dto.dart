@@ -60,6 +60,7 @@ final class DocumentSchemaPropertyDto {
   DocumentSchemaProperty toModel(
     List<BaseDocumentDefinition> definitions, {
     required DocumentNodeId parentNodeId,
+    required bool isRequired,
   }) {
     return DocumentSchemaProperty(
       definition: definitions.getDefinition(ref),
@@ -72,6 +73,7 @@ final class DocumentSchemaPropertyDto {
       enumValues: enumValues,
       range: Range.optionalRangeOf(min: minimum, max: maximum),
       itemsRange: Range.optionalRangeOf(min: minItems, max: maxItems),
+      isRequired: isRequired,
     );
   }
 }

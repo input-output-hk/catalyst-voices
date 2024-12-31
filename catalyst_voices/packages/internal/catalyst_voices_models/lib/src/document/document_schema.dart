@@ -136,6 +136,7 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
   final List<String>? enumValues;
   final Range<int>? range;
   final Range<int>? itemsRange;
+  final bool isRequired;
 
   const DocumentSchemaProperty({
     required this.definition,
@@ -148,6 +149,7 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
     required this.enumValues,
     required this.range,
     required this.itemsRange,
+    required this.isRequired,
   });
 
   @override
@@ -162,5 +164,6 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
         enumValues,
         range,
         itemsRange,
+        isRequired,
       ];
 }
