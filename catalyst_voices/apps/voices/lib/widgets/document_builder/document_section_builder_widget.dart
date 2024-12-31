@@ -82,7 +82,8 @@ class _DocumentSectionBuilderWidgetState
 
   void _onChanged(DocumentChange change) {
     setState(() {
-      _editedSection = _editedSection.applyChange(change);
+      final builder = _editedSection.toBuilder()..addChange(change);
+      _editedSection = builder.build();
       _pendingChanges.add(change);
     });
   }
