@@ -11,8 +11,7 @@ use crate::{
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_assets_by_stake_addr() -> Result<(), String> {
-    setup_test_database().await?;
-    let (session, _) = get_session()?;
+    let (session, _) = get_shared_session().await?;
 
     let stake_addr1: StakeAddress = Cip19StakeAddress::try_from(
         "stake_test1ursne3ndzr4kz8gmhmstu5026erayrnqyj46nqkkfcn0ufss2t7vt",
