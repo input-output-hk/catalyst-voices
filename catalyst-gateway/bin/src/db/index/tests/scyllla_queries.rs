@@ -13,6 +13,7 @@ use crate::{
 async fn test_get_assets_by_stake_addr() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
+    // cspell: disable
     let stake_addr1: StakeAddress = Cip19StakeAddress::try_from(
         "stake_test1ursne3ndzr4kz8gmhmstu5026erayrnqyj46nqkkfcn0ufss2t7vt",
     )
@@ -20,6 +21,7 @@ async fn test_get_assets_by_stake_addr() -> Result<(), String> {
     .try_into()
     .map_err(|_| String::from("Failed converting cip19 stake address into hash"))?;
     let stake_addr1 = stake_addr1.payload().as_hash().to_vec();
+    // cspell: enable
 
     GetAssetsByStakeAddressQuery::execute(
         &session,

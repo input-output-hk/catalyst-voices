@@ -12,7 +12,7 @@ mod scyllla_queries;
 
 pub(super) static SHARED_SESSION: OnceCell<Result<(), String>> = OnceCell::const_new();
 
-pub(super) async fn setup_test_database() -> Result<(), String> {
+async fn setup_test_database() -> Result<(), String> {
     CassandraSession::init();
 
     CassandraSession::wait_is_ready(core::time::Duration::from_secs(1)).await;
