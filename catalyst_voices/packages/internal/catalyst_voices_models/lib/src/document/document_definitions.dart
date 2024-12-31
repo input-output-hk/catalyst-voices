@@ -238,13 +238,13 @@ final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -270,13 +270,13 @@ final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -303,13 +303,13 @@ final class MultiLineTextEntryMarkdownDefinition
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -338,13 +338,13 @@ final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -370,13 +370,13 @@ final class MultiSelectDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -408,13 +408,13 @@ final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -447,13 +447,13 @@ final class MultiLineTextEntryListMarkdownDefinition
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -486,13 +486,13 @@ final class SingleLineHttpsURLEntryListDefinition
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -521,13 +521,13 @@ final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -553,13 +553,13 @@ final class NestedQuestionsDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -585,13 +585,13 @@ final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -617,13 +617,13 @@ final class TagGroupDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -649,13 +649,13 @@ final class TagSelectionDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -678,13 +678,13 @@ final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -707,13 +707,13 @@ final class DurationInMonthsDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -739,13 +739,13 @@ final class YesNoChoiceDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
@@ -807,13 +807,13 @@ final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO: implement castProperty
+    // TODO(ryszard-schossler): implement castProperty
     throw UnimplementedError();
   }
 
   @override
   Object? castValue(Object? value) {
-    // TODO: implement castValue
+    // TODO(ryszard-schossler): implement castValue
     throw UnimplementedError();
   }
 }
