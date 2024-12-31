@@ -511,11 +511,13 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium,
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         ),
-        const Spacer(),
+        const SizedBox(width: 16),
         VoicesTextButton(
           onTap: onToggleEditMode,
           child: Text(

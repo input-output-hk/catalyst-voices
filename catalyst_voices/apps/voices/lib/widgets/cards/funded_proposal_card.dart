@@ -1,10 +1,8 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a proposal in funded state on a card.
@@ -45,7 +43,7 @@ class FundedProposalCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _FundCategory(
-                  fund: proposal.fund,
+                  fund: proposal.campaignName,
                   category: proposal.category,
                 ),
                 const SizedBox(height: 4),
@@ -184,7 +182,7 @@ class _FundedDate extends StatelessWidget {
 }
 
 class _FundsAndComments extends StatelessWidget {
-  final Coin funds;
+  final String funds;
   final int commentsCount;
 
   const _FundsAndComments({
@@ -206,7 +204,7 @@ class _FundsAndComments extends StatelessWidget {
           Column(
             children: [
               Text(
-                CryptocurrencyFormatter.formatAmount(funds),
+                funds,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Text(

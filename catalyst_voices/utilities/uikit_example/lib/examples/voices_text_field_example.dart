@@ -85,7 +85,9 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: VoicesTextFieldValidationResult.success(),
+                validator: (value) {
+                  return const VoicesTextFieldValidationResult.success();
+                },
                 onFieldSubmitted: (value) {},
               ),
             ),
@@ -99,8 +101,11 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator:
-                    VoicesTextFieldValidationResult.warning('Warning message'),
+                validator: (value) {
+                  return const VoicesTextFieldValidationResult.warning(
+                    'Warning message',
+                  );
+                },
                 onFieldSubmitted: (value) {},
               ),
             ),
@@ -114,8 +119,11 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator:
-                    VoicesTextFieldValidationResult.error('Error message'),
+                validator: (value) {
+                  return const VoicesTextFieldValidationResult.error(
+                    'Error message',
+                  );
+                },
                 onFieldSubmitted: (value) {},
               ),
             ),
@@ -129,7 +137,9 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: VoicesTextFieldValidationResult.success(),
+                validator: (value) {
+                  return const VoicesTextFieldValidationResult.success();
+                },
                 enabled: false,
                 onFieldSubmitted: (value) {},
               ),
@@ -144,8 +154,11 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator:
-                    VoicesTextFieldValidationResult.warning('Warning message'),
+                validator: (value) {
+                  return const VoicesTextFieldValidationResult.warning(
+                    'Warning message',
+                  );
+                },
                 enabled: false,
                 onFieldSubmitted: (value) {},
               ),
@@ -160,8 +173,11 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator:
-                    VoicesTextFieldValidationResult.error('Error message'),
+                validator: (value) {
+                  return const VoicesTextFieldValidationResult.error(
+                    'Error message',
+                  );
+                },
                 enabled: false,
                 onFieldSubmitted: (value) {},
               ),

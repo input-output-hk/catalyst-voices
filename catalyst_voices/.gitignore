@@ -1,5 +1,6 @@
 ### Dart ###
 # See https://www.dartlang.org/guides/libraries/private-files
+devtools_options.yaml
 
 
 # Generated files from code generation tools
