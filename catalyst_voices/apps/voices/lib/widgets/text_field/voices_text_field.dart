@@ -119,6 +119,18 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   VoicesTextFieldValidationResult _validation =
       const VoicesTextFieldValidationResult.none();
 
+  bool get _isResizable {
+    final resizable = widget.resizable ??
+        (CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop);
+
+    // expands property is not supported if any of these are specified,
+    // both must be null
+    final hasNoLineConstraints =
+        widget.maxLines == null && widget.minLines == null;
+
+    return resizable && hasNoLineConstraints;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -170,122 +182,9 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final colors = theme.colors;
-    final colorScheme = theme.colorScheme;
 
     final labelText = widget.decoration?.labelText ?? '';
     final resizable = _isResizable;
-
-    InputDecoration buildDecoration() {
-      return InputDecoration(
-        filled: widget.decoration?.filled,
-        fillColor: widget.decoration?.fillColor,
-        // Note. prefixText is not visible when field is not focused without
-        // this.
-        // Should be removed once this is resolved
-        // https://github.com/flutter/flutter/issues/64552#issuecomment-2074034179
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
-        border: widget.decoration?.border ??
-            _getBorder(
-              orDefault: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.outlineVariant,
-                ),
-              ),
-            ),
-        enabledBorder: widget.decoration?.enabledBorder ??
-            _getBorder(
-              orDefault: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.outlineVariant,
-                ),
-              ),
-            ),
-        disabledBorder: widget.decoration?.disabledBorder ??
-            OutlineInputBorder(
-              borderSide: BorderSide(
-                color: colorScheme.outline,
-              ),
-            ),
-        errorBorder: widget.decoration?.errorBorder ??
-            OutlineInputBorder(
-              borderSide: BorderSide(
-                width: 2,
-                color: _getStatusColor(
-                  orDefault: colorScheme.error,
-                ),
-              ),
-            ),
-        focusedBorder: widget.decoration?.focusedBorder ??
-            _getBorder(
-              orDefault: OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2,
-                  color: colorScheme.primary,
-                ),
-              ),
-            ),
-        focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
-            _getBorder(
-              orDefault: OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2,
-                  color: colorScheme.error,
-                ),
-              ),
-            ),
-        helper: widget.decoration?.helper != null
-            ? DefaultTextStyle(
-                style: widget.enabled
-                    ? textTheme.bodySmall!
-                    : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
-                child: widget.decoration!.helper!,
-              )
-            : null,
-        helperText: widget.decoration?.helperText,
-        helperStyle: widget.enabled
-            ? textTheme.bodySmall
-            : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
-        hintText: widget.decoration?.hintText,
-        hintStyle: _getHintStyle(
-          textTheme,
-          theme,
-          orDefault: textTheme.bodyLarge!.copyWith(color: colors.textDisabled),
-        ),
-        errorText: widget.decoration?.errorText ?? _validation.errorMessage,
-        errorMaxLines: widget.decoration?.errorMaxLines,
-        errorStyle: _getErrorStyle(textTheme, theme),
-        prefixIcon: _wrapIconIfExists(
-          widget.decoration?.prefixIcon,
-          const EdgeInsetsDirectional.only(start: 8, end: 4),
-        ),
-        prefixText: widget.decoration?.prefixText,
-        prefixStyle: WidgetStateTextStyle.resolveWith((states) {
-          var textStyle = textTheme.bodyLarge ?? const TextStyle();
-
-          if (!states.contains(WidgetState.focused) &&
-              _obtainController().text.isEmpty) {
-            textStyle = textStyle.copyWith(color: colors.textDisabled);
-          }
-
-          return textStyle;
-        }),
-
-        suffixIcon: _wrapIconIfExists(
-          widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
-          const EdgeInsetsDirectional.only(start: 4, end: 8),
-        ),
-        suffixText: widget.decoration?.suffixText,
-        counterText: widget.decoration?.counterText,
-        counterStyle: widget.enabled
-            ? textTheme.bodySmall
-            : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
-      );
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,7 +213,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             onSaved: widget.onSaved,
             inputFormatters: widget.inputFormatters,
             autovalidateMode: widget.autovalidateMode,
-            decoration: buildDecoration(),
+            decoration: _buildDecoration(context),
             keyboardType: widget.keyboardType,
             textInputAction: widget.textInputAction,
             textCapitalization: widget.textCapitalization,
@@ -332,16 +231,120 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     );
   }
 
-  bool get _isResizable {
-    final resizable = widget.resizable ??
-        (CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop);
+  InputDecoration _buildDecoration(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colors = theme.colors;
+    final colorScheme = theme.colorScheme;
 
-    // expands property is not supported if any of these are specified,
-    // both must be null
-    final hasNoLineConstraints =
-        widget.maxLines == null && widget.minLines == null;
+    return InputDecoration(
+      filled: widget.decoration?.filled,
+      fillColor: widget.decoration?.fillColor,
+      // Note. prefixText is not visible when field is not focused without
+      // this.
+      // Should be removed once this is resolved
+      // https://github.com/flutter/flutter/issues/64552#issuecomment-2074034179
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
+      border: widget.decoration?.border ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+      enabledBorder: widget.decoration?.enabledBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+      disabledBorder: widget.decoration?.disabledBorder ??
+          OutlineInputBorder(
+            borderSide: BorderSide(
+              color: colorScheme.outline,
+            ),
+          ),
+      errorBorder: widget.decoration?.errorBorder ??
+          OutlineInputBorder(
+            borderSide: BorderSide(
+              width: 2,
+              color: _getStatusColor(
+                orDefault: colorScheme.error,
+              ),
+            ),
+          ),
+      focusedBorder: widget.decoration?.focusedBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                width: 2,
+                color: colorScheme.primary,
+              ),
+            ),
+          ),
+      focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                width: 2,
+                color: colorScheme.error,
+              ),
+            ),
+          ),
+      helper: widget.decoration?.helper != null
+          ? DefaultTextStyle(
+              style: widget.enabled
+                  ? textTheme.bodySmall!
+                  : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+              child: widget.decoration!.helper!,
+            )
+          : null,
+      helperText: widget.decoration?.helperText,
+      helperStyle: widget.enabled
+          ? textTheme.bodySmall
+          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+      hintText: widget.decoration?.hintText,
+      hintStyle: _getHintStyle(
+        textTheme,
+        theme,
+        orDefault: textTheme.bodyLarge!.copyWith(color: colors.textDisabled),
+      ),
+      errorText: widget.decoration?.errorText ?? _validation.errorMessage,
+      errorMaxLines: widget.decoration?.errorMaxLines,
+      errorStyle: _getErrorStyle(textTheme, theme),
+      prefixIcon: _wrapIconIfExists(
+        widget.decoration?.prefixIcon,
+        const EdgeInsetsDirectional.only(start: 8, end: 4),
+      ),
+      prefixText: widget.decoration?.prefixText,
+      prefixStyle: WidgetStateTextStyle.resolveWith((states) {
+        var textStyle = textTheme.bodyLarge ?? const TextStyle();
 
-    return resizable && hasNoLineConstraints;
+        if (!states.contains(WidgetState.focused) &&
+            _obtainController().text.isEmpty) {
+          textStyle = textStyle.copyWith(color: colors.textDisabled);
+        }
+
+        return textStyle;
+      }),
+
+      suffixIcon: _wrapIconIfExists(
+        widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+        const EdgeInsetsDirectional.only(start: 4, end: 8),
+      ),
+      suffixText: widget.decoration?.suffixText,
+      counterText: widget.decoration?.counterText,
+      counterStyle: widget.enabled
+          ? textTheme.bodySmall
+          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+    );
   }
 
   InputBorder _getBorder({required InputBorder orDefault}) {
