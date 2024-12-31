@@ -7,6 +7,9 @@ import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/guards/milestone_guard.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -74,6 +77,30 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   await _runApp(app);
 }
 
+@visibleForTesting
+GoRouter buildAppRouter({
+  String? initialLocation,
+}) {
+  return AppRouter.init(
+    initialLocation: initialLocation,
+    guards: const [
+      MilestoneGuard(),
+    ],
+  );
+}
+
+@visibleForTesting
+Future<void> registerDependencies({required AppConfig config}) async {
+  if (!Dependencies.instance.isInitialized) {
+    await Dependencies.instance.init(config: config);
+  }
+}
+
+@visibleForTesting
+Future<void> restartDependencies() async {
+  await Dependencies.instance.reset;
+}
+
 /// Initializes the application before it can be run. Should setup all
 /// the things which are necessary before the actual app is run,
 /// either via [runApp] or injected into a test environment during
@@ -81,7 +108,9 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
 ///
 /// Initialization logic that is relevant for [runApp] scenario
 /// only should be added to [_doBootstrapAndRun], not here.
-Future<BootstrapArgs> bootstrap() async {
+Future<BootstrapArgs> bootstrap({
+  GoRouter? router,
+}) async {
   _loggingService
     ..level = kDebugMode ? Level.FINER : Level.OFF
     ..printLogs = kDebugMode;
@@ -89,16 +118,17 @@ Future<BootstrapArgs> bootstrap() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
-  await Dependencies.instance.init();
+  final configService = ConfigService(ConfigRepository());
+  final config = await configService
+      .getAppConfig()
+      .onError((error, stackTrace) => const AppConfig());
+
+  await registerDependencies(config: config);
 
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();
 
-  final router = AppRouter.init(
-    guards: const [
-      MilestoneGuard(),
-    ],
-  );
+  router ??= buildAppRouter();
 
   Bloc.observer = AppBlocObserver();
 

@@ -22,6 +22,7 @@ auditability
 Autolayout
 autorecalculates
 autoresizing
+autovalidate
 backendpython
 backgrounding
 bech
@@ -59,6 +60,7 @@ collabs
 commitlog
 concatcp
 coproposers
+COSE
 coti
 coverallsapp
 CQLSH
@@ -77,6 +79,7 @@ delegators
 devnet
 DIND
 dockerhub
+domcontentloaded
 Dominik
 dotenv
 dotenvy
@@ -168,6 +171,7 @@ loguru
 lovelace
 lovelaces
 LTRB
+Lynxx
 mdlint
 metadatum
 metadatums
@@ -187,11 +191,13 @@ Multiplatform
 myproject
 Nami
 nanos
+nathanbogale
 NDEBUG
 netifas
 netkey
 nextest
 Nodetool
+NuFi
 oapi
 OCSP
 Oleksandr
@@ -200,6 +206,7 @@ oneshot
 openapi
 opentelemetry
 overprovisioned
+pageobject
 Pbkdf2
 pbxproj
 Pdart
@@ -219,6 +226,7 @@ projectcatalyst
 Prokhorenko
 proptest
 psql
+psycopg
 Ptarget
 pubkey
 PUBLICKEY
@@ -283,7 +291,9 @@ testplan
 testunit
 thiserror
 thollander
+Timelapse
 timelike
+tkach
 Toastify
 todos
 toggleable
@@ -292,6 +302,7 @@ tomjs
 Traceback
 traefik
 trailings
+tstr
 TXNZD
 txos
 Typer
@@ -299,6 +310,7 @@ unawaited
 unchunk
 Unlogged
 unmanaged
+Unmarks
 Unstaked
 upskilling
 UTXO
@@ -321,6 +333,7 @@ Wireframes
 Wmissing
 Wnullable
 Woverlength
+Writedown
 xcassets
 xcconfig
 xcfilelist

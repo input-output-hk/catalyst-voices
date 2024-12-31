@@ -17,10 +17,13 @@ dependencies:
     path: ../catalyst_voices_localization
   catalyst_voices_models:
     path: ../catalyst_voices_models
+  catalyst_voices_shared:
+    path: ../catalyst_voices_shared
   equatable: ^2.0.7
   flutter:
     sdk: flutter
   formz: ^0.7.0
+  intl: ^0.19.0
 
 dev_dependencies:
   catalyst_analysis: ^2.0.0

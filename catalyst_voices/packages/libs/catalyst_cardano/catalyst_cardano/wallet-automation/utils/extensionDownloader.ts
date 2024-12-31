@@ -44,12 +44,41 @@ export class ExtensionDownloader {
     }
 
     // Download the extension
-    const crxPath = await this.downloadExtension(extensionName);
-
+    if (extensionName === BrowserExtensionName.Nufi) {
+      const zipPath = await this.downloadNufiExtension();
+      await this.extractExtension(zipPath, extensionPath);
+    } else {
+      const crxPath = await this.downloadExtension(extensionName);
+      await this.extractExtension(crxPath, extensionPath);
+    }
     // Extract the extension
-    await this.extractExtension(crxPath, extensionPath);
 
     return extensionPath;
+  }
+
+  private async downloadNufiExtension(): Promise<string> {
+    const url =
+      "https://assets.nu.fi/extension/testnet/nufi-cwe-testnet-latest.zip";
+    const filePath = path.join(
+      this.extensionsDir,
+      "nufi-cwe-testnet-latest.zip"
+    );
+
+    // Ensure the download directory exists
+    await fsPromises.mkdir(this.extensionsDir, { recursive: true });
+
+    // Fetch the extension
+    const res = await nodeFetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to download extension: ${res.statusText}`);
+    }
+
+    // Stream the response directly to a file
+    const fileStream = fs.createWriteStream(filePath);
+    await pipeline(res.body, fileStream);
+
+    console.log(`Extension has been downloaded to: ${filePath}`);
+    return filePath;
   }
 
   private async extractExtension(
