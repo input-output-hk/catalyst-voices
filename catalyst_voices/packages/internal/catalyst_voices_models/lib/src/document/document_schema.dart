@@ -124,14 +124,15 @@ final class DocumentSchemaSection extends Equatable implements DocumentNode {
 }
 
 /// A single property (field) in a document.
-final class DocumentSchemaProperty extends Equatable implements DocumentNode {
-  final BaseDocumentDefinition definition;
+final class DocumentSchemaProperty<T extends Object> extends Equatable
+    implements DocumentNode {
+  final BaseDocumentDefinition<T> definition;
   @override
   final DocumentNodeId nodeId;
   final String id;
   final String title;
   final String? description;
-  final Object? defaultValue;
+  final T? defaultValue;
   final String? guidance;
   final List<String>? enumValues;
   final Range<int>? range;

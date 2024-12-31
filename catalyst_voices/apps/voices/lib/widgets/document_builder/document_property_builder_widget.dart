@@ -19,7 +19,8 @@ class DocumentPropertyBuilderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (property.schema.definition) {
+    final definition = property.schema.definition;
+    return switch (definition) {
       SingleLineTextEntryDefinition() => throw UnimplementedError(),
       SingleLineHttpsURLEntryDefinition() => throw UnimplementedError(),
       MultiLineTextEntryDefinition() => throw UnimplementedError(),
@@ -38,8 +39,12 @@ class DocumentPropertyBuilderWidget extends StatelessWidget {
       DurationInMonthsDefinition() => throw UnimplementedError(),
       YesNoChoiceDefinition() => throw UnimplementedError(),
       AgreementConfirmationDefinition() => DocumentCheckboxBuilderWidget(
-          property: property,
-          onChanged: (val) {},
+          definition: definition,
+          value: definition.castProperty(property).value,
+          nodeId: property.schema.nodeId,
+          title: property.schema.title,
+          description: property.schema.description ?? '',
+          onChanged: onChanged,
         ),
       SPDXLicenceOrUrlDefinition() => throw UnimplementedError(),
 

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -72,7 +73,7 @@ enum DocumentDefinitionsFormat {
   }
 }
 
-sealed class BaseDocumentDefinition extends Equatable {
+sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
   final DocumentDefinitionsObjectType type;
   final String note;
 
@@ -116,6 +117,10 @@ sealed class BaseDocumentDefinition extends Equatable {
     final ref = refPath.split('/').last;
     return refPathToDefinitionType[ref] != null;
   }
+
+  T? castValue(Object? value);
+
+  DocumentProperty<T> castProperty(DocumentProperty<T> property);
 }
 
 extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
@@ -142,6 +147,16 @@ final class SegmentDefinition extends BaseDocumentDefinition {
         note,
         additionalProperties,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    return property;
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    return value;
+  }
 }
 
 final class SectionDefinition extends BaseDocumentDefinition {
@@ -159,9 +174,20 @@ final class SectionDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    return property;
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    return value;
+  }
 }
 
-final class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
+final class SingleLineTextEntryDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -179,6 +205,16 @@ final class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
+  }
+
+  @override
+  String? castValue(Object? value) {
+    return value as String?;
+  }
 }
 
 final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
@@ -199,6 +235,18 @@ final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
@@ -219,6 +267,18 @@ final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class MultiLineTextEntryMarkdownDefinition
@@ -240,6 +300,18 @@ final class MultiLineTextEntryMarkdownDefinition
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
@@ -263,6 +335,18 @@ final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class MultiSelectDefinition extends BaseDocumentDefinition {
@@ -283,6 +367,18 @@ final class MultiSelectDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
@@ -309,6 +405,18 @@ final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
         defaultValues,
         items,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class MultiLineTextEntryListMarkdownDefinition
@@ -336,6 +444,18 @@ final class MultiLineTextEntryListMarkdownDefinition
         defaultValue,
         items,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class SingleLineHttpsURLEntryListDefinition
@@ -363,6 +483,18 @@ final class SingleLineHttpsURLEntryListDefinition
         defaultValue,
         items,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
@@ -386,6 +518,18 @@ final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
         note,
         defaultValue,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class NestedQuestionsDefinition extends BaseDocumentDefinition {
@@ -406,6 +550,18 @@ final class NestedQuestionsDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
@@ -426,6 +582,18 @@ final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class TagGroupDefinition extends BaseDocumentDefinition {
@@ -446,6 +614,18 @@ final class TagGroupDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class TagSelectionDefinition extends BaseDocumentDefinition {
@@ -466,6 +646,18 @@ final class TagSelectionDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
@@ -483,6 +675,18 @@ final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class DurationInMonthsDefinition extends BaseDocumentDefinition {
@@ -500,6 +704,18 @@ final class DurationInMonthsDefinition extends BaseDocumentDefinition {
         note,
         format,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
 final class YesNoChoiceDefinition extends BaseDocumentDefinition {
@@ -520,9 +736,22 @@ final class YesNoChoiceDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }
 
-final class AgreementConfirmationDefinition extends BaseDocumentDefinition {
+final class AgreementConfirmationDefinition
+    extends BaseDocumentDefinition<bool> {
   final DocumentDefinitionsFormat format;
   final bool defaultValue;
   final bool constValue;
@@ -543,6 +772,16 @@ final class AgreementConfirmationDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<bool> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<bool>;
+  }
+
+  @override
+  bool? castValue(Object? value) {
+    return value as bool?;
+  }
 }
 
 final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
@@ -565,4 +804,16 @@ final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    // TODO: implement castProperty
+    throw UnimplementedError();
+  }
+
+  @override
+  Object? castValue(Object? value) {
+    // TODO: implement castValue
+    throw UnimplementedError();
+  }
 }

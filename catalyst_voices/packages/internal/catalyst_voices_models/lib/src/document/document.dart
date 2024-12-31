@@ -223,12 +223,12 @@ final class DocumentSection extends Equatable {
   List<Object?> get props => [schema, properties];
 }
 
-final class DocumentProperty extends Equatable {
+final class DocumentProperty<T extends Object> extends Equatable {
   /// The schema of the document property.
-  final DocumentSchemaProperty schema;
+  final DocumentSchemaProperty<T> schema;
 
   /// The current value this property holds.
-  final Object? value;
+  final T? value;
 
   /// The default constructor for the [DocumentProperty].
   const DocumentProperty({
@@ -237,10 +237,10 @@ final class DocumentProperty extends Equatable {
   });
 
   /// Creates a [DocumentSection] from an [schema].
-  factory DocumentProperty.fromSchema(DocumentSchemaProperty schema) {
+  factory DocumentProperty.fromSchema(DocumentSchemaProperty<T> schema) {
     return DocumentProperty(
       schema: schema,
-      value: schema.defaultValue,
+      value: schema.definition.castValue(schema.defaultValue),
     );
   }
 

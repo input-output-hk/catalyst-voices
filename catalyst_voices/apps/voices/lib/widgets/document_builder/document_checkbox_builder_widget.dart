@@ -7,12 +7,20 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class DocumentCheckboxBuilderWidget extends StatefulWidget {
-  final DocumentProperty property;
+  final bool? value;
+  final AgreementConfirmationDefinition definition;
+  final DocumentNodeId nodeId;
+  final String description;
+  final String title;
   final ValueChanged<DocumentChange> onChanged;
 
   const DocumentCheckboxBuilderWidget({
     super.key,
-    required this.property,
+    required this.value,
+    required this.definition,
+    required this.nodeId,
+    required this.description,
+    required this.title,
     required this.onChanged,
   });
 
@@ -24,21 +32,18 @@ class DocumentCheckboxBuilderWidget extends StatefulWidget {
 class _DocumentCheckboxBuilderWidgetState
     extends State<DocumentCheckboxBuilderWidget> {
   bool editMode = false;
-  late bool value;
   late bool initialValue;
-  DocumentNodeId get nodeId => widget.property.schema.nodeId;
-  String get description => widget.property.schema.description ?? '';
-  AgreementConfirmationDefinition get definition =>
-      widget.property.schema.definition as AgreementConfirmationDefinition;
+  late bool currentEditValue;
+  DocumentNodeId get nodeId => widget.nodeId;
+  String get description => widget.description;
+  bool get defaultValue => widget.definition.defaultValue;
 
   @override
   void initState() {
     super.initState();
 
-    value = bool.tryParse(widget.property.value.toString()) ??
-        bool.tryParse(widget.property.schema.defaultValue.toString()) ??
-        false;
-    initialValue = value;
+    initialValue = widget.value ?? defaultValue;
+    currentEditValue = initialValue;
   }
 
   @override
@@ -50,24 +55,24 @@ class _DocumentCheckboxBuilderWidgetState
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DocumentPropertyTopbar(
               isEditMode: editMode,
               onToggleEditMode: _toggleEditMode,
-              title: widget.property.schema.title,
+              title: widget.title,
             ),
             const SizedBox(height: 22),
-            Offstage(
-              offstage: description.isEmpty,
-              child: Text(
+            if (description.isNotEmpty) ...[
+              Text(
                 description,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
-            ),
-            const SizedBox(height: 22),
+              const SizedBox(height: 22),
+            ],
             VoicesCheckbox(
-              value: value,
+              value: currentEditValue,
               onChanged: _changeValue,
               isDisabled: !editMode,
               label: Text(
@@ -82,20 +87,7 @@ class _DocumentCheckboxBuilderWidgetState
             Offstage(
               offstage: !editMode,
               child: DocumentPropertyFooter(
-                onSave: !_isValidValue
-                    ? null
-                    : () {
-                        widget.onChanged(
-                          DocumentChange(
-                            nodeId: nodeId,
-                            value: value,
-                          ),
-                        );
-                        setState(() {
-                          editMode = false;
-                          initialValue = value;
-                        });
-                      },
+                onSave: !_isValidValue ? null : _save,
               ),
             ),
           ],
@@ -104,9 +96,11 @@ class _DocumentCheckboxBuilderWidgetState
     );
   }
 
+  bool get _isValidValue => currentEditValue == widget.definition.constValue;
+
   void _toggleEditMode() {
     if (editMode) {
-      value = initialValue;
+      currentEditValue = initialValue;
     }
     setState(() {
       editMode = !editMode;
@@ -115,9 +109,20 @@ class _DocumentCheckboxBuilderWidgetState
 
   void _changeValue(bool value) {
     setState(() {
-      this.value = value;
+      currentEditValue = value;
     });
   }
 
-  bool get _isValidValue => value == definition.constValue;
+  void _save() {
+    widget.onChanged(
+      DocumentChange(
+        nodeId: nodeId,
+        value: currentEditValue,
+      ),
+    );
+    setState(() {
+      editMode = false;
+      initialValue = currentEditValue;
+    });
+  }
 }
