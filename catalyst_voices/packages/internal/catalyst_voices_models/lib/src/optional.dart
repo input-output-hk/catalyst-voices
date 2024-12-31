@@ -23,7 +23,7 @@ import 'package:equatable/equatable.dart';
 ///   }
 /// }
 ///```
-final class Optional<T extends Object?> extends Equatable {
+final class Optional<T> extends Equatable {
   final T? data;
 
   const Optional(this.data);
@@ -38,7 +38,7 @@ final class Optional<T extends Object?> extends Equatable {
   List<Object?> get props => [data];
 }
 
-extension NullableOptionalExt<T extends Object?> on Optional<T>? {
+extension NullableOptionalExt<T> on Optional<T>? {
   /// Returns [data] from [Optional] if not null.
   /// [fallback] is returned otherwise.
   ///

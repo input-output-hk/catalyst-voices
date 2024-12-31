@@ -12,7 +12,6 @@ export 'document/document_change.dart';
 export 'document/document_definitions.dart';
 export 'document/document_node_id.dart';
 export 'document/document_schema.dart';
-export 'document_builder/document_builder.dart';
 export 'errors/errors.dart';
 export 'file/voices_file.dart';
 export 'markdown_data.dart';
