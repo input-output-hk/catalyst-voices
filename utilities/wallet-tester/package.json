@@ -22,7 +22,6 @@
     "ace-builds": "^1.32.7",
     "cborg": "^4.1.1",
     "dayjs": "^1.11.10",
-    "hermes-wallet-connector": "file:",
     "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-ace": "^10.1.0",
