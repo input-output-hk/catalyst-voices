@@ -5,9 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Note. This widget will be removed so its not localized
 class CurrentUserStatusText extends StatelessWidget {
-  const CurrentUserStatusText({
-    super.key,
-  });
+  const CurrentUserStatusText({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +13,9 @@ class CurrentUserStatusText extends StatelessWidget {
     final sessionBloc = context.watch<SessionCubit>();
 
     final stateDesc = switch (sessionBloc.state) {
-      VisitorSessionState() => 'visitor',
-      GuestSessionState() => 'guest',
-      ActiveAccountSessionState() => 'user',
+      VisitorSessionState() => 'Visitor / no key',
+      GuestSessionState() => 'Guest / locked',
+      ActiveAccountSessionState() => 'Actor / unlocked',
     };
 
     return Text(

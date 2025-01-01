@@ -9,9 +9,9 @@ class TreasuryOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SpaceOverviewContainer(
-      child: Column(
-        children: [
+    return SpaceOverviewContainer(
+      child: ListView(
+        children: const [
           SpaceOverviewHeader(Space.treasury),
           SectionHeader(title: Text('Individual private campaigns')),
           VoicesNavTile(

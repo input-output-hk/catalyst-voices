@@ -89,6 +89,7 @@ command:
       asn1lib: ^1.5.3
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
+      chopper: ^8.0.3
       collection: ^1.18.0
       cryptography: ^2.7.0
       dotted_border: ^2.1.0
@@ -111,6 +112,8 @@ command:
       formz: ^0.7.0
       intl: ^0.19.0
       logging: ^1.2.0
+      markdown: ^7.2.2
+      markdown_quill: ^4.2.0
       meta: ^1.10.0
       result_type: ^0.2.0
       password_strength: ^0.2.0
@@ -121,10 +124,11 @@ command:
       convert: ^3.1.1
       path: ^1.9.0
       pinenacl: ^0.6.0
-      ulid: ^2.0.0
       uuid: ^4.5.1
       sentry_flutter: ^8.8.0
       scrollable_positioned_list: ^0.3.8
+      shared_preferences: ^2.3.3
+      shared_preferences_platform_interface: ^2.4.1
       # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
       # but here we import it explicitly to make sure the latest version is used which addresses
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
@@ -134,6 +138,7 @@ command:
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
+      chopper_generator: ^8.0.3
       mocktail: ^1.0.1
 
 scripts:
@@ -147,12 +152,22 @@ scripts:
     run: |
       melos exec -c 1 \
       --depends-on="build_runner" \
-      --ignore="catalyst_voices_services" -- \
+      --ignore="catalyst_voices_repositories" -- \
           dart run build_runner build --delete-conflicting-outputs
     description: |
       Run `build_runner` in every package which contains the build_runner dependency.
-      The catalyst_voices_services is skipped because to run a build_runner there you
+      The catalyst_voices_repositories is skipped because to run a build_runner there you
       must generate first swagger docs (see related Earthfile).
+
+  build_runner_repository:
+    run: |
+      melos exec -c 1 \
+      --depends-on="build_runner" \
+      --scope="catalyst_voices_repositories" -- \
+          dart run build_runner build --delete-conflicting-outputs \
+              --build-filter="lib/src/dto/*"
+    description: |
+      Run `build_runner` in catalyst_voices_repositories package only in selected folders
 
   metrics:
     run: |
@@ -164,16 +179,16 @@ scripts:
 
   format-apply:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix"
+      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix"
     description: Run `dart format` for all packages.
 
   format-check:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
+      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
+      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
     description: Run `dart format` checks for all packages.
 
   license-check:

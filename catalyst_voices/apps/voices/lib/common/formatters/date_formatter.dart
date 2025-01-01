@@ -27,4 +27,72 @@ abstract class DateFormatter {
 
     return DateFormat.yMMMMd().format(dateTime);
   }
+
+  static String formatInDays(
+    VoicesLocalizations l10n,
+    DateTime dateTime, {
+    DateTime? from,
+  }) {
+    from ??= DateTimeExt.now();
+
+    final days = dateTime.isAfter(from) ? dateTime.difference(from).inDays : 0;
+
+    return l10n.inXDays(days);
+  }
+
+  static (String date, String time) formatDateTimeParts(
+    DateTime date,
+  ) {
+    final dayMonthFormatter = DateFormat('d MMMM').format(date);
+    final timeFormatter = DateFormat('HH:mm').format(date);
+
+    return (dayMonthFormatter, timeFormatter);
+  }
+
+  static String formatShortMonth(
+    VoicesLocalizations l10n,
+    DateTime dateTime,
+  ) {
+    return DateFormat.MMM().format(dateTime);
+  }
+
+  /// Formats full date and time.
+  /// If [timeOnNewline] is true then the time will be placed on a new line.
+  ///
+  /// Example:
+  /// - Thu, 6 June 2024 10:00 am
+  static String formatFullDateTime(
+    DateTime dateTime, {
+    bool timeOnNewline = false,
+  }) {
+    final format =
+        timeOnNewline ? 'EEE, d MMMM yyyy\nh:mm a' : 'EEE, d MMMM yyyy h:mm a';
+    return DateFormat(format).format(dateTime);
+  }
+
+  /// Formats the timezone info extracted from the [dateTime].
+  ///
+  /// Example:
+  /// - GMT+01:00 Central European Standard Time
+  static String formatTimezone(DateTime dateTime) {
+    final offset = _formatTimezoneOffset(dateTime.timeZoneOffset);
+    final timezone = dateTime.timeZoneName;
+    return 'GMT$offset $timezone';
+  }
+
+  static String _formatTimezoneOffset(Duration offset) {
+    if (offset.isNegative) {
+      return '-${_formatDurationHHmm(offset)}';
+    } else {
+      return '+${_formatDurationHHmm(offset)}';
+    }
+  }
+
+  static String _formatDurationHHmm(Duration offset) {
+    final nf = NumberFormat('00');
+    final hours = offset.inHours;
+    final minutes = offset.inMinutes - hours * Duration.minutesPerHour;
+
+    return '${nf.format(hours)}:${nf.format(minutes)}';
+  }
 }
