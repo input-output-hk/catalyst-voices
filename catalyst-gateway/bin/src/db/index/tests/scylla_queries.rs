@@ -11,6 +11,7 @@ use crate::db::index::queries::{
         get_assets_by_stake_address::*, get_txi_by_txn_hash::*, get_txo_by_stake_address::*,
         update_txo_spent::*,
     },
+    sync_status::update::*,
 };
 
 const FAILED_EXECUTING_QUERY_MSG: &str = "Failed executing query";
@@ -125,6 +126,15 @@ async fn test_get_stake_addr_w_vote_key() -> Result<(), String> {
     Ok(())
 }
 
+// Note: `get_sync_status` query is not available.
+// #[ignore = "An integration test which requires a running Scylla node instance, disabled
+// from `testunit` CI run"] #[tokio::test]
+// async fn test_get_sync_status() -> Result<(), String> {
+//     let (session, _) = get_shared_session().await?;
+
+//     Ok(())
+// }
+
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_txi_by_txn_hashes() -> Result<(), String> {
@@ -145,6 +155,21 @@ async fn test_get_txo_by_stake_address() -> Result<(), String> {
     GetTxoByStakeAddressQuery::execute(
         &session,
         GetTxoByStakeAddressQueryParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
+    )
+    .await
+    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    Ok(())
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn test_insert_sync_status() -> Result<(), String> {
+    let (session, _) = get_shared_session().await?;
+
+    SyncStatusInsertQuery::execute(
+        &session,
+        row::SyncStatusQueryParams::new(u64::MAX, u64::MAX),
     )
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;

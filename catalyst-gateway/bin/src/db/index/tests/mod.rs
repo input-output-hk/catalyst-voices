@@ -8,7 +8,6 @@ use tokio::sync::OnceCell;
 use super::session::CassandraSession;
 
 mod scylla_queries;
-mod scylla_schema;
 mod scylla_session;
 
 static SHARED_SESSION: OnceCell<Result<(), String>> = OnceCell::const_new();
