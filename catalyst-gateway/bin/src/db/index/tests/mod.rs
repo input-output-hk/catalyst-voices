@@ -1,4 +1,5 @@
 //! Integration tests of the `IndexDB` queries
+//! This module contains utility functions used with different testing modules.
 
 use std::sync::Arc;
 
@@ -10,7 +11,7 @@ mod scylla_queries;
 mod scylla_schema;
 mod scylla_session;
 
-pub(super) static SHARED_SESSION: OnceCell<Result<(), String>> = OnceCell::const_new();
+static SHARED_SESSION: OnceCell<Result<(), String>> = OnceCell::const_new();
 
 async fn setup_test_database() -> Result<(), String> {
     CassandraSession::init();
