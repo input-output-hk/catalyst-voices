@@ -1,6 +1,8 @@
 //! Integration tests of the `IndexDB` queries testing on its session.
 //! This is mainly to test whether the defined queries work with the database or not.
 
+use futures::StreamExt;
+
 use super::*;
 use crate::db::index::queries::{
     rbac::{get_chain_root::*, get_registrations::*, get_role0_chain_root::*},
@@ -15,18 +17,24 @@ use crate::db::index::queries::{
 };
 
 const FAILED_EXECUTING_QUERY_MSG: &str = "Failed executing query";
+const FAILED_READING_ROW_MSG: &str = "Failed executing query";
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_assets_by_stake_addr() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetAssetsByStakeAddressQuery::execute(
+    let mut iter = GetAssetsByStakeAddressQuery::execute(
         &session,
         GetAssetsByStakeAddressParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -36,11 +44,16 @@ async fn test_get_assets_by_stake_addr() -> Result<(), String> {
 async fn test_get_chain_root() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetChainRootQuery::execute(&session, GetChainRootQueryParams {
+    let mut iter = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
         stake_address: vec![],
     })
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -50,12 +63,17 @@ async fn test_get_chain_root() -> Result<(), String> {
 async fn test_get_invalid_registration_w_stake_addr() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetInvalidRegistrationQuery::execute(
+    let mut iter = GetInvalidRegistrationQuery::execute(
         &session,
         GetInvalidRegistrationParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -65,11 +83,17 @@ async fn test_get_invalid_registration_w_stake_addr() -> Result<(), String> {
 async fn test_get_registrations_by_chain_root() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetRegistrationsByChainRootQuery::execute(&session, GetRegistrationsByChainRootQueryParams {
-        chain_root: vec![],
-    })
+    let mut iter = GetRegistrationsByChainRootQuery::execute(
+        &session,
+        GetRegistrationsByChainRootQueryParams { chain_root: vec![] },
+    )
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -79,11 +103,16 @@ async fn test_get_registrations_by_chain_root() -> Result<(), String> {
 async fn test_get_registrations_w_stake_addr() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetRegistrationQuery::execute(&session, GetRegistrationParams {
+    let mut iter = GetRegistrationQuery::execute(&session, GetRegistrationParams {
         stake_address: vec![],
     })
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -93,9 +122,16 @@ async fn test_get_registrations_w_stake_addr() -> Result<(), String> {
 async fn test_get_role0_key_chain_root() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams { role0_key: vec![] })
-        .await
-        .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    let mut iter = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
+        role0_key: vec![],
+    })
+    .await
+    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -105,9 +141,14 @@ async fn test_get_role0_key_chain_root() -> Result<(), String> {
 async fn test_get_stake_addr_w_stake_key_hash() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
+    let mut iter = GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
         .await
         .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -117,11 +158,16 @@ async fn test_get_stake_addr_w_stake_key_hash() -> Result<(), String> {
 async fn test_get_stake_addr_w_vote_key() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
+    let mut iter = GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
         vote_key: vec![],
     })
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -140,9 +186,15 @@ async fn test_get_stake_addr_w_vote_key() -> Result<(), String> {
 async fn test_get_txi_by_txn_hashes() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetTxiByTxnHashesQuery::execute(&session, GetTxiByTxnHashesQueryParams::new(vec![]))
-        .await
-        .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    let mut iter =
+        GetTxiByTxnHashesQuery::execute(&session, GetTxiByTxnHashesQueryParams::new(vec![]))
+            .await
+            .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
@@ -152,12 +204,17 @@ async fn test_get_txi_by_txn_hashes() -> Result<(), String> {
 async fn test_get_txo_by_stake_address() -> Result<(), String> {
     let (session, _) = get_shared_session().await?;
 
-    GetTxoByStakeAddressQuery::execute(
+    let mut iter = GetTxoByStakeAddressQuery::execute(
         &session,
         GetTxoByStakeAddressQueryParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
     .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+
+    while let Some(row_res) = iter.next().await {
+        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        drop(row);
+    }
 
     Ok(())
 }
