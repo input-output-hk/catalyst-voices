@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:test/test.dart';
 
-import '../../helpers/read_json.dart';
+import '../../../helpers/read_json.dart';
 
 void main() {
-  group('DocumentSchema', () {
+  group(DocumentSchemaDto, () {
     const schemaPath =
         'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
 
@@ -22,11 +22,11 @@ void main() {
 
       final schema = schemaDto.toModel();
 
-      if (schemaDto.order.length != schema.segments.length) {
+      if (schemaDto.order?.length != schema.segments.length) {
         return;
       }
       for (var i = 0; i < schema.segments.length; i++) {
-        expect(schema.segments[i].id, schemaDto.order[i]);
+        expect(schema.segments[i].id, schemaDto.order?[i]);
       }
     });
 
@@ -35,14 +35,14 @@ void main() {
       final schema = schemaDto.toModel();
 
       for (var i = 0; i < schema.segments.length; i++) {
-        if (schemaDto.segments[i].order.length !=
+        if (schemaDto.segments[i].order?.length !=
             schema.segments[i].sections.length) {
           continue;
         }
         for (var j = 0; j < schema.segments[i].sections.length; j++) {
           expect(
             schema.segments[i].sections[j].id,
-            schemaDto.segments[i].order[j],
+            schemaDto.segments[i].order?[j],
           );
         }
       }
@@ -53,7 +53,7 @@ void main() {
       final schema = schemaDto.toModel();
 
       for (final segment in schema.segments) {
-        expect(segment.ref, isA<SegmentDefinition>());
+        expect(segment.definition, isA<SegmentDefinition>());
       }
     });
   });
