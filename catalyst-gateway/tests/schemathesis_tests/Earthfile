@@ -10,7 +10,7 @@ package-schemathesis:
     VOLUME /results
     ARG openapi_spec
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                    && st run --endpoint '^/api/v1/health/started' http://0.0.0.0:3030/docs/cat-gateway.json \
+                    && st run --endpoint '^/api/v1/health/started' $openapi_spec \
                     --workers=2 \
                     --wait-for-schema=120 \
                     --max-response-time=5000 \
@@ -30,13 +30,12 @@ package-schemathesis:
 test-fuzzer-api:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
-    RUN apk add yq zstd curl
     COPY schemathesis-docker-compose.yml .
-    #LET OPENAPI_SPEC="http://0.0.0.0:3030/docs/cat-gateway.json"
+    LET OPENAPI_SPEC="http://0.0.0.0:3030/docs/cat-gateway.json"
 
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis) \
+        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
