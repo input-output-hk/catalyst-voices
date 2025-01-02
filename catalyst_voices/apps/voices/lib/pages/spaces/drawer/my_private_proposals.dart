@@ -8,33 +8,16 @@ class MyPrivateProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SpaceHeader(Space.workspace),
-        const SectionHeader(
+        SpaceHeader(Space.workspace),
+        SectionHeader(
           key: ValueKey('Header.workspace'),
           leading: SizedBox(width: 12),
           title: Text('My private proposals (3/5)'),
         ),
-        VoicesNavTile(
-          name: 'My first proposal',
-          status: ProposalStatus.draft,
-          trailing: const MoreOptionsButton(),
-          onTap: () => Scaffold.of(context).closeDrawer(),
-        ),
-        VoicesNavTile(
-          name: 'My second proposal',
-          status: ProposalStatus.inProgress,
-          trailing: const MoreOptionsButton(),
-          onTap: () => Scaffold.of(context).closeDrawer(),
-        ),
-        VoicesNavTile(
-          name: 'My third proposal',
-          status: ProposalStatus.inProgress,
-          trailing: const MoreOptionsButton(),
-          onTap: () => Scaffold.of(context).closeDrawer(),
-        ),
+        // TODO(damian-molinski): watch workspace bloc
       ],
     );
   }

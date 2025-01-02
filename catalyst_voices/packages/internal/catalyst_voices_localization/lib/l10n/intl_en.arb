@@ -48,18 +48,6 @@
   "@passwordErrorText": {
     "description": "Text shown in  password field when input is invalid"
   },
-  "loginTitleText": "Login",
-  "@loginTitleText": {
-    "description": "Text shown in the login screen title"
-  },
-  "loginButtonText": "Login",
-  "@loginButtonText": {
-    "description": "Text shown in the login screen for the login button"
-  },
-  "loginScreenErrorMessage": "Wrong credentials",
-  "@loginScreenErrorMessage": {
-    "description": "Text shown in the login screen when the user enters wrong credentials"
-  },
   "homeScreenText": "Catalyst Voices",
   "@homeScreenText": {
     "description": "Text shown in the home screen"
@@ -151,28 +139,28 @@
   "@proposalStatusReady": {
     "description": "Indicates to user that status is in ready mode"
   },
-  "proposalStatusDraft": "Draft",
-  "@proposalStatusDraft": {
+  "draft": "Draft",
+  "@draft": {
     "description": "Indicates to user that status is in draft mode"
   },
-  "proposalStatusInProgress": "In progress",
-  "@proposalStatusInProgress": {
+  "inProgress": "In progress",
+  "@inProgress": {
     "description": "Indicates to user that status is in progress"
   },
-  "proposalStatusPrivate": "Private",
-  "@proposalStatusPrivate": {
+  "private": "Private",
+  "@private": {
     "description": "Indicates to user that status is in private mode"
   },
-  "proposalStatusLive": "LIVE",
-  "@proposalStatusLive": {
+  "live": "Live",
+  "@live": {
     "description": "Indicates to user that status is in live mode"
   },
-  "proposalStatusCompleted": "Completed",
-  "@proposalStatusCompleted": {
+  "completed": "Completed",
+  "@completed": {
     "description": "Indicates to user that status is completed"
   },
-  "proposalStatusOpen": "Open",
-  "@proposalStatusOpen": {
+  "open": "Open",
+  "@open": {
     "description": "Indicates to user that status is in open mode"
   },
   "fundedProposal": "Funded proposal",
@@ -275,13 +263,53 @@
   "@treasuryCampaignBuilderSegments": {
     "description": "Tab name in campaign builder panel"
   },
-  "treasuryCampaignSetup": "Setup Campaign",
-  "@treasuryCampaignSetup": {
+  "treasuryCreateCampaign": "Create Campaign",
+  "@treasuryCreateCampaign": {
     "description": "Segment name"
   },
-  "treasuryCampaignTitle": "Campaign title",
-  "@treasuryCampaignTitle": {
-    "description": "Campaign title"
+  "setupCampaignDetails": "Setup Campaign Details",
+  "@setupCampaignDetails": {
+    "description": "Segment step for entering campaign details."
+  },
+  "setupCampaignStages": "Setup Campaign Stages",
+  "@setupCampaignStages": {
+    "description": "Segment step for entering campaign start and end dates."
+  },
+  "setupCampaignStagesTimezone": "You are setting date and times using this Timezone:",
+  "@setupCampaignStagesTimezone": {
+    "description": "The description of a timezone in which the user sets campaign stages."
+  },
+  "startAndEndDates": "Start & End Dates",
+  "@startAndEndDates": {
+    "description": "Refers to a date & time range (start & end)."
+  },
+  "campaignStart": "Campaign Start",
+  "@campaignStart": {
+    "description": "Label for the campaign start date."
+  },
+  "campaignEnd": "Campaign End",
+  "@campaignEnd": {
+    "description": "Label for the campaign end date."
+  },
+  "campaignDates": "Campaign Dates",
+  "@campaignDates": {
+    "description": "Label for the campaign start & end date."
+  },
+  "noDateTimeSelected": "No date & time selected",
+  "@noDateTimeSelected": {
+    "description": "Placeholder when date & time not selected."
+  },
+  "setupBaseProposalTemplate": "Setup Base Proposal Template",
+  "@setupBaseProposalTemplate": {
+    "description": "Segment step for entering a proposal template for a campaign."
+  },
+  "setupBaseQuestions": "Setup Base Questions",
+  "@setupBaseQuestions": {
+    "description": "Segment description for entering a proposal template for a campaign."
+  },
+  "setupCategories": "Setup Categories",
+  "@setupCategories": {
+    "description": "Segment step for entering campaign categories."
   },
   "stepEdit": "Edit",
   "@stepEdit": {
@@ -391,6 +419,10 @@
   "visitor": "Visitor",
   "@visitor": {
     "description": "Refers to user that created keychain but is locked"
+  },
+  "actor": "Actor",
+  "@actor": {
+    "description": "Refers to user that created keychain and is unlocked."
   },
   "noConnectionBannerRefreshButtonText": "Refresh",
   "@noConnectionBannerRefreshButtonText": {
@@ -656,6 +688,10 @@
   "accountCreationSplashNextButton": "Create your Keychain now",
   "accountInstructionsTitle": "Great! Your Catalyst Keychain \u2028has been created.",
   "accountInstructionsMessage": "On the next screen, you're going to see 12 words. \u2028This is called your \"seed phrase\".   \u2028\u2028It's like a super secure password that only you know, \u2028that allows you to prove ownership of your keychain.  \u2028\u2028You'll use it to login and recover your account on \u2028different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.",
+  "previous": "Previous",
+  "@previous": {
+    "description": "(Action) switch to the previous item."
+  },
   "next": "Next",
   "@next": {
     "description": "For example in button that goes to next stage of registration"
@@ -958,6 +994,18 @@
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
   },
+  "format": "Format",
+  "@format": {
+    "description": "A label for the format field in the date picker."
+  },
+  "datePickerDateRangeError": "Please select a date within the range of today and one year from today.",
+  "@datePickerDateRangeError": {
+    "description": "Error message for the date picker when the selected date is outside the range of today and one year from today."
+  },
+  "datePickerDaysInMonthError": "Entered day exceeds the maximum days for this month.",
+  "@datePickerDaysInMonthError": {
+    "description": "Error message for the date picker when the selected day is greater than the maximum days for the selected month."
+  },
   "saveBeforeEditingErrorText": "Please save before editing something else",
   "mandatoryGuidanceType": "Mandatory",
   "@mandatoryGuidanceType": {
@@ -986,5 +1034,149 @@
   "noGuidanceForThisSection": "There is no guidance for this section",
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
-  }
+  },
+  "noProposalStateDescription": "Discovery space will show draft proposals you can comment on, currently there are no draft proposals.",
+  "@noProposalStateDescription": {
+    "description": "Description shown when there are no proposals in the proposals tab"
+  },
+  "noProposalStateTitle": "No draft proposals yet",
+  "@noProposalStateTitle": {
+    "description": "Title shown when there are no proposals in the proposals tab"
+  },
+  "campaignIsLive": "Campaign Is Live (Published)",
+  "@campaignIsLive": {
+    "description": "Title of the campaign is live (published) space"
+  },
+  "campaignStartingSoon": "Campaign Starting Soon (Ready to deploy)",
+  "@campaignStartingSoon": {
+    "description": "Title of the campaign starting soon space"
+  },
+  "campaignConcluded": "Campaign Concluded, Result are in!",
+  "@campaignConcluded": {
+    "description": "Title of the campaign concluded space"
+  },
+  "campaignBeginsOn": "Campaign begins on {date} at {time}",
+  "@campaignBeginsOn": {
+    "description": "Title of the campaign concluded space",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "campaignEndsOn": "Campaign ends on {date} at {time}",
+  "@campaignEndsOn": {
+    "description": "Title of the campaign concluded space",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "viewProposals": "View proposals",
+  "@viewProposals": {
+    "description": "Title of the view proposals space"
+  },
+  "viewVotingResults": "View Voting Results",
+  "@viewVotingResults": {
+    "description": "Title of the view voting results space"
+  },
+  "campaignDetails": "Campaign Details",
+  "description": "Description",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "categories": "Categories",
+  "fundingCategories": "Funding categories",
+  "proposals": "Proposals",
+  "totalSubmitted": "Total submitted",
+  "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
+  "@inXDays": {
+    "placeholders": {
+      "x": {
+        "type": "int"
+      }
+    }
+  },
+  "campaignCategories": "Campaign Categories",
+  "cardanoUseCases": "Cardano Use Cases",
+  "discoverySpaceTitle": "Boost Social Entrepreneurship",
+  "@discoverySpaceTitle": {
+    "description": "Title for the discovery space for actor (unlocked) user."
+  },
+  "discoverySpaceDescription": "Project Catalyst is built on the ingenuity of our global network. Ideas can come from anyone, from any background, anywhere in the world. Proposers pitch their ideas to the community by submitting proposals onto the Catalyst collaboration platform.",
+  "@discoverySpaceDescription": {
+    "description": "Description for the discovery space for actor (unlocked) user."
+  },
+  "discoverySpaceEmptyProposals": "Once this campaign launches draft proposals will be shared here.",
+  "@discoverySpaceEmptyProposals": {
+    "description": "Description for empty state on discovery space when there are no draft proposals."
+  },
+  "campaign": "Campaign",
+  "campaignPreviewTitle": "Campaign Preview",
+  "@campaignPreviewTitle": {
+    "description": "Title for the campaign preview dialog (admin mode)."
+  },
+  "campaignPreviewEvents": "Events",
+  "@campaignPreviewEvents": {
+    "description": "Tab label in campaign preview dialog for campaign events."
+  },
+  "campaignPreviewViews": "Views",
+  "@campaignPreviewViews": {
+    "description": "Tab label in campaign preview dialog for campaign views."
+  },
+  "campaignPreviewEventBefore": "Before Campaign",
+  "@campaignPreviewEventBefore": {
+    "description": "A name of the state of a campaign before it starts."
+  },
+  "campaignPreviewEventDuring": "During Campaign",
+  "@campaignPreviewEventDuring": {
+    "description": "A name of the state of a campaign when it is active."
+  },
+  "campaignPreviewEventAfter": "After Campaign",
+  "@campaignPreviewEventAfter": {
+    "description": "A name of the state of a campaign when it is active."
+  },
+  "userAuthenticationState": "User Authentication State",
+  "@userAuthenticationState": {
+    "description": "The state of the user (keychain), actor, guest, visitor, etc."
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Activated state"
+  },
+  "campaignManagement": "Campaign Management",
+  "published": "Published",
+  "status": "Status",
+  "myProposals": "My Proposals",
+  "workspaceDescription": "In this space you can manage your existing proposals, view previous and archived proposal as well as creating new proposals.",
+  "@workspaceDescription": {
+    "description": "Workspace page description"
+  },
+  "newDraftProposal": "New Draft Proposal",
+  "draftProposalsX": "Draft Proposals ({count})",
+  "@draftProposalsX": {
+    "description": "Workspace page tab",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "finalProposalsX": "Final Proposals ({count})",
+  "@finalProposalsX": {
+    "description": "Workspace page tab",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchProposals": "Search Proposals",
+  "search": "Search…"
 }

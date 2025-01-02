@@ -31,9 +31,9 @@ class SectionsMenuListener extends StatelessWidget {
 
 class SectionsMenu extends StatelessWidget {
   final List<Section> sections;
-  final Set<int> openedSections;
+  final Set<String> openedSections;
   final SectionStepId? selectedStep;
-  final ValueChanged<int> onSectionTap;
+  final ValueChanged<String> onSectionTap;
   final ValueChanged<SectionStepId> onStepSelected;
 
   const SectionsMenu({
