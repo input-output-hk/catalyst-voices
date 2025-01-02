@@ -28,11 +28,6 @@ final class DocumentSchema extends Equatable implements DocumentNode {
   @override
   DocumentNodeId get nodeId => DocumentNodeId.root;
 
-  /// Returns the [segments] sorted by the [order].
-  List<DocumentSchemaSegment> get sortedSegments {
-    return List.of(segments)..sortByOrder(order);
-  }
-
   @override
   List<Object?> get props => [
         schema,
@@ -64,11 +59,6 @@ final class DocumentSchemaSegment extends Equatable implements DocumentNode {
     required this.sections,
     required this.order,
   });
-
-  /// Returns the [sections] sorted by the [order].
-  List<DocumentSchemaSection> get sortedSections {
-    return List.of(sections)..sortByOrder(order);
-  }
 
   @override
   List<Object?> get props => [
@@ -105,11 +95,6 @@ final class DocumentSchemaSection extends Equatable implements DocumentNode {
     required this.order,
   });
 
-  /// Returns the [properties] sorted by the [order].
-  List<DocumentSchemaProperty> get sortedProperties {
-    return List.of(properties)..sortByOrder(order);
-  }
-
   @override
   List<Object?> get props => [
         definition,
@@ -137,6 +122,7 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
   final List<String>? enumValues;
   final Range<int>? range;
   final Range<int>? itemsRange;
+  final bool isRequired;
 
   const DocumentSchemaProperty({
     required this.definition,
@@ -149,6 +135,7 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     required this.enumValues,
     required this.range,
     required this.itemsRange,
+    required this.isRequired,
   });
 
   @override
@@ -163,5 +150,6 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
         enumValues,
         range,
         itemsRange,
+        isRequired,
       ];
 }

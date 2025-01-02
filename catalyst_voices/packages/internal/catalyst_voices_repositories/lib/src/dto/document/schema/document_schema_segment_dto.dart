@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_section_dto.dart';
+import 'package:catalyst_voices_repositories/src/utils/document_schema_dto_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_segment_dto.g.dart';
@@ -16,7 +16,7 @@ final class DocumentSchemaSegmentDto {
   @JsonKey(name: 'properties')
   @DocumentSchemaSectionsDtoConverter()
   final List<DocumentSchemaSectionDto> sections;
-  final List<String> required;
+  final List<String>? required;
   @JsonKey(name: 'x-order')
   final List<String>? order;
 
@@ -26,8 +26,8 @@ final class DocumentSchemaSegmentDto {
     this.title = '',
     this.description = '',
     required this.sections,
-    this.required = const <String>[],
-    this.order = const <String>[],
+    this.required,
+    this.order,
   });
 
   factory DocumentSchemaSegmentDto.fromJson(Map<String, dynamic> json) =>
@@ -40,7 +40,8 @@ final class DocumentSchemaSegmentDto {
     required DocumentNodeId parentNodeId,
   }) {
     final nodeId = parentNodeId.child(id);
-    final order = this.order ?? [];
+    final order = this.order ?? const [];
+    final required = this.required ?? const [];
 
     final mappedSections = sections
         .where((section) => section.ref.contains('section'))
