@@ -114,13 +114,14 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
   @override
   final DocumentNodeId nodeId;
   final String id;
-  final String title;
+  final String? title;
   final String? description;
   final Object? defaultValue;
   final String? guidance;
   final List<String>? enumValues;
   final Range<int>? range;
   final Range<int>? itemsRange;
+  final List<DocumentSchemaLogicalGroup>? oneOf;
   final bool isRequired;
 
   const DocumentSchemaProperty({
@@ -134,6 +135,7 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
     required this.enumValues,
     required this.range,
     required this.itemsRange,
+    required this.oneOf,
     required this.isRequired,
   });
 
@@ -149,6 +151,42 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
         enumValues,
         range,
         itemsRange,
+        oneOf,
         isRequired,
+      ];
+}
+
+final class DocumentSchemaLogicalGroup extends Equatable {
+  final List<DocumentSchemaLogicalCondition> conditions;
+
+  const DocumentSchemaLogicalGroup({
+    required this.conditions,
+  });
+
+  @override
+  List<Object?> get props => [
+        conditions,
+      ];
+}
+
+final class DocumentSchemaLogicalCondition extends Equatable {
+  final BaseDocumentDefinition definition;
+  final String id;
+  final Object? value;
+  final List<String>? enumValues;
+
+  const DocumentSchemaLogicalCondition({
+    required this.definition,
+    required this.id,
+    required this.value,
+    required this.enumValues,
+  });
+
+  @override
+  List<Object?> get props => [
+        definition,
+        id,
+        value,
+        enumValues,
       ];
 }
