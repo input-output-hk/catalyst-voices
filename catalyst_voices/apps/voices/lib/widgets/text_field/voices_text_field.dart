@@ -228,7 +228,6 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             readOnly: widget.readOnly,
             enabled: widget.enabled,
             onChanged: widget.onChanged,
-            ignorePointers: widget.readOnly,
           ),
         ),
       ],
