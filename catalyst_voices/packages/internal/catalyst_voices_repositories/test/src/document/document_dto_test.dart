@@ -26,7 +26,7 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final document = Document.fromSchema(schema);
+      final document = DocumentBuilder.fromSchema(schema).build();
       final documentDto = DocumentDto.fromModel(document);
       final documentJson = documentDto.toJson();
 
@@ -39,7 +39,7 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final document = Document.fromSchema(schema);
+      final document = DocumentBuilder.fromSchema(schema).build();
       final documentDto = DocumentDto.fromModel(document);
 
       final documentJson = documentDto.toJson();

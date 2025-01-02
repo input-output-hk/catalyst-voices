@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_segment_dto.dart';
+import 'package:catalyst_voices_repositories/src/utils/document_schema_dto_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_dto.g.dart';
@@ -49,7 +49,7 @@ final class DocumentSchemaDto {
 
   DocumentSchema toModel() {
     const nodeId = DocumentNodeId.root;
-    final order = this.order ?? [];
+    final order = this.order ?? const [];
 
     final mappedSegments = segments
         .where((e) => e.ref.contains('segment'))

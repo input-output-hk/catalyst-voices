@@ -6,7 +6,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_propertie
 /// Encodable as json but to decode with [DocumentDto.fromJsonSchema]
 /// a [DocumentSchema] is needed which explains how to interpret the data.
 final class DocumentDto {
-  final String schema;
+  final DocumentSchema schema;
   final List<DocumentSegmentDto> segments;
 
   const DocumentDto({
@@ -21,8 +21,8 @@ final class DocumentDto {
     final properties = DocumentPropertiesDto.fromJson(json);
 
     return DocumentDto(
-      schema: schema.schema,
-      segments: schema.sortedSegments
+      schema: schema,
+      segments: schema.segments
           .map(
             (segment) => DocumentSegmentDto.fromJsonSchema(
               segment,
@@ -41,10 +41,13 @@ final class DocumentDto {
   }
 
   Document toModel() {
-    return Document(
+    // building a document via builder to sort segments/sections/properties
+    return DocumentBuilder(
       schema: schema,
-      segments: segments.map((e) => e.toModel()).toList(),
-    );
+      segments: segments
+          .map((e) => DocumentSegmentBuilder.fromSegment(e.toModel()))
+          .toList(),
+    ).build();
   }
 
   Map<String, dynamic> toJson() {
@@ -70,7 +73,7 @@ final class DocumentSegmentDto {
   }) {
     return DocumentSegmentDto(
       schema: schema,
-      sections: schema.sortedSections
+      sections: schema.sections
           .map(
             (section) => DocumentSectionDto.fromJsonSchema(
               section,
@@ -119,7 +122,7 @@ final class DocumentSectionDto {
   }) {
     return DocumentSectionDto(
       schema: schema,
-      properties: schema.sortedProperties
+      properties: schema.properties
           .map(
             (property) => DocumentPropertyDto.fromJsonSchema(
               property,
