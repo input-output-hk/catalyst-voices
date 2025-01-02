@@ -3,7 +3,7 @@ project: {
 	name: "gateway-schema-tests"
 	ci: {
     targets: {
-      test-fuzzer-api: privileged: true
+      "test-fuzzer-api": privileged: true
     }
   }
 }
