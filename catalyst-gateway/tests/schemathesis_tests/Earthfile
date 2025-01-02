@@ -9,8 +9,7 @@ package-schemathesis:
     COPY ./hooks/hooks.py .
     VOLUME /results
     ARG openapi_spec
-    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                    && st run --endpoint '^/api/v1/health/started' $openapi_spec \
+    ENTRYPOINT st run --endpoint '^/api/v1/health/started' --checks all $openapi_spec \
                     --workers=2 \
                     --wait-for-schema=120 \
                     --max-response-time=5000 \
