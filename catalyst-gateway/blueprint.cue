@@ -136,7 +136,10 @@ project: {
 					resources: {
 						requests: {
 							cpu:    "1"
-							memory: "2Gi"
+							memory: "16Gi"
+						}
+						limits: {
+							memory: "20Gi"
 						}
 					}
 
