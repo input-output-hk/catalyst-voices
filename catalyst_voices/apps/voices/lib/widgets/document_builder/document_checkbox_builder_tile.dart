@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_footer.dart';
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_topbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -5,6 +6,8 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DocumentCheckboxBuilderTile extends StatefulWidget {
   final bool? value;
@@ -69,9 +72,16 @@ class _DocumentCheckboxBuilderWidgetState
               ),
               const SizedBox(height: 22),
               if (description.isNotEmpty) ...[
-                Text(
-                  description,
-                  style: Theme.of(context).textTheme.titleSmall,
+                MarkdownBody(
+                  data: description,
+                  selectable: true,
+                  onTapLink: (text, href, title) async {
+                    if (href == null) return;
+                    final url = href.getUri();
+                    if (!await launchUrl(url)) {
+                      throw Exception('Could not launch $url');
+                    }
+                  },
                 ),
                 const SizedBox(height: 22),
               ],
