@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## 2025-01-02
+## 2025-01-02v1
 
 ### Changes
 
@@ -16,10 +16,10 @@ Packages with breaking changes:
 Packages with other changes:
 
 * [Change Log](#change-log)
-  * [2025-01-02](#2025-01-02)
+  * [2025-01-02v1](#2025-01-02v1)
     * [Changes](#changes)
       * [`catalyst_key_derivation` - `v0.1.1`](#catalyst_key_derivation---v011)
-  * [2025-01-02](#2025-01-02-1)
+  * [2025-01-02](#2025-01-02)
     * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0`](#catalyst_cardano---v040)
       * [`catalyst_cardano_platform_interface` - `v0.4.0`](#catalyst_cardano_platform_interface---v040)
@@ -33,7 +33,8 @@ Packages with other changes:
 
 Packages with dependency updates only:
 
-> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+> Packages listed below depend on other packages in this workspace that have had changes.
+> Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
 
 * `catalyst_cardano_serialization` - `v0.5.0+1`
 * `catalyst_cardano` - `v0.4.0+1`
@@ -56,7 +57,6 @@ Packages with dependency updates only:
 * **FEAT**: rust key derivation ([#1063](https://github.com/input-output-hk/catalyst-voices/issues/1063)).
 ([0712347b](https://github.com/input-output-hk/catalyst-voices/commit/0712347b1e6e85d67b43d1733650d62d1c9d7c94))
 
-
 ## 2025-01-02
 
 ### Changes
@@ -70,10 +70,10 @@ Packages with breaking changes:
 Packages with other changes:
 
 * [Change Log](#change-log)
-  * [2025-01-02](#2025-01-02)
+  * [2025-01-02v1](#2025-01-02v1)
     * [Changes](#changes)
       * [`catalyst_key_derivation` - `v0.1.1`](#catalyst_key_derivation---v011)
-  * [2025-01-02](#2025-01-02-1)
+  * [2025-01-02](#2025-01-02)
     * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0`](#catalyst_cardano---v040)
       * [`catalyst_cardano_platform_interface` - `v0.4.0`](#catalyst_cardano_platform_interface---v040)
@@ -84,7 +84,7 @@ Packages with other changes:
       * [`catalyst_compression_web` - `v0.4.0`](#catalyst_compression_web---v040)
       * [`catalyst_cose` - `v0.4.0`](#catalyst_cose---v040)
       * [`catalyst_analysis` - `v2.0.1`](#catalyst_analysis---v201)
-
+  
 ---
 
 #### `catalyst_cardano` - `v0.4.0`
