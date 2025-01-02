@@ -1,12 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_logical_property_dto.dart';
-import 'package:catalyst_voices_repositories/src/utils/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_property_dto.g.dart';
 
-// @DocumentSchemaLogicalPropertiesDtoConverter()
 @JsonSerializable(includeIfNull: false)
 final class DocumentSchemaPropertyDto {
   @JsonKey(name: r'$ref')
