@@ -14,7 +14,7 @@ final class DocumentBuilder implements DocumentNode {
   DocumentSchema _schema;
   List<DocumentSegmentBuilder> _segments;
 
-  /// The default constructor for the [Document].
+  /// The default constructor for the [DocumentBuilder].
   DocumentBuilder({
     required DocumentSchema schema,
     required List<DocumentSegmentBuilder> segments,
