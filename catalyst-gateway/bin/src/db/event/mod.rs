@@ -110,8 +110,7 @@ impl EventDB {
         }
         let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
         let conn = pool.get().await?;
-        let params = params.iter().map(|s| -> &dyn ToSql { *s });
-        let rows = conn.query_raw(stmt, params).await?;
+        let rows = conn.query_raw(stmt, params.iter().copied()).await?;
         Ok(rows.map_err(Into::into))
     }
 
