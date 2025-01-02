@@ -47,33 +47,33 @@ async fn some_test() {
     ];
 
     for doc in &docs {
-        doc.upload_to_db().await.unwrap();
+        doc.store().await.unwrap();
         // try to insert the same data again
-        doc.upload_to_db().await.unwrap();
+        doc.store().await.unwrap();
         // try another doc with the same `id` and `ver` and with different other fields
         let another_doc = FullSignedDoc::new(
             SignedDocBody::new(*doc.id(), *doc.ver(), doc_type, "Neil".to_string(), None),
             None,
             vec![],
         );
-        assert!(another_doc.upload_to_db().await.is_err());
+        assert!(another_doc.store().await.is_err());
 
-        let res_doc = FullSignedDoc::load_from_db(doc.id(), Some(doc.ver()))
+        let res_doc = FullSignedDoc::retrieve(doc.id(), Some(doc.ver()))
             .await
             .unwrap();
         assert_eq!(doc, &res_doc);
 
-        let res_doc = FullSignedDoc::load_from_db(doc.id(), None).await.unwrap();
+        let res_doc = FullSignedDoc::retrieve(doc.id(), None).await.unwrap();
         assert_eq!(doc, &res_doc);
 
         let res_docs =
-            SignedDocBody::load_from_db(&DocsQueryFilter::DocId(*doc.id()), &QueryLimits::ALL)
+            SignedDocBody::retrieve(&DocsQueryFilter::DocId(*doc.id()), &QueryLimits::ALL)
                 .await
                 .unwrap();
         assert_eq!(res_docs.len(), 1);
         assert_eq!(doc.body(), res_docs.first().unwrap());
 
-        let res_docs = SignedDocBody::load_from_db(
+        let res_docs = SignedDocBody::retrieve(
             &DocsQueryFilter::DocVer(*doc.id(), *doc.ver()),
             &QueryLimits::ALL,
         )
@@ -82,7 +82,7 @@ async fn some_test() {
         assert_eq!(res_docs.len(), 1);
         assert_eq!(doc.body(), res_docs.first().unwrap());
 
-        let res_docs = SignedDocBody::load_from_db(
+        let res_docs = SignedDocBody::retrieve(
             &DocsQueryFilter::Author(doc.author().clone()),
             &QueryLimits::ALL,
         )
@@ -92,16 +92,15 @@ async fn some_test() {
         assert_eq!(doc.body(), res_docs.first().unwrap());
     }
 
-    let res_docs =
-        SignedDocBody::load_from_db(&DocsQueryFilter::DocType(doc_type), &QueryLimits::ALL)
-            .await
-            .unwrap();
+    let res_docs = SignedDocBody::retrieve(&DocsQueryFilter::DocType(doc_type), &QueryLimits::ALL)
+        .await
+        .unwrap();
     assert_eq!(
         docs.iter().map(FullSignedDoc::body).collect::<Vec<_>>(),
         res_docs.iter().rev().collect::<Vec<_>>()
     );
 
-    let res_docs = SignedDocBody::load_from_db(&DocsQueryFilter::All, &QueryLimits::ALL)
+    let res_docs = SignedDocBody::retrieve(&DocsQueryFilter::All, &QueryLimits::ALL)
         .await
         .unwrap();
     assert_eq!(

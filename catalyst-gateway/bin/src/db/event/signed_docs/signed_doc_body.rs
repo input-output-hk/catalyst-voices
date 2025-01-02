@@ -71,7 +71,7 @@ impl SignedDocBody {
 
     /// Loads a vector of `SignedDocBody` from the event db.
     #[allow(dead_code)]
-    pub(crate) async fn load_from_db(
+    pub(crate) async fn retrieve(
         conditions: &DocsQueryFilter, query_limits: &QueryLimits,
     ) -> anyhow::Result<Vec<Self>> {
         let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;

@@ -73,8 +73,8 @@ impl FullSignedDoc {
     ///  - `ver` is a UUID v7
     ///  - `doc_type` is a UUID v4
     #[allow(dead_code)]
-    pub(crate) async fn upload_to_db(&self) -> anyhow::Result<()> {
-        match Self::load_from_db(self.id(), Some(self.ver())).await {
+    pub(crate) async fn store(&self) -> anyhow::Result<()> {
+        match Self::retrieve(self.id(), Some(self.ver())).await {
             Ok(res_doc) => {
                 anyhow::ensure!(
                     &res_doc == self,
@@ -104,7 +104,7 @@ impl FullSignedDoc {
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
     #[allow(dead_code)]
-    pub(crate) async fn load_from_db(
+    pub(crate) async fn retrieve(
         id: &uuid::Uuid, ver: Option<&uuid::Uuid>,
     ) -> anyhow::Result<Self> {
         let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
