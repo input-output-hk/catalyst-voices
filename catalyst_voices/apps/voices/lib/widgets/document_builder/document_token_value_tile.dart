@@ -93,6 +93,7 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
               currency: widget.currency,
               showHelper: _isEditMode,
               readOnly: !_isEditMode,
+              ignorePointers: !_isEditMode,
             ),
             if (_isEditMode) ...[
               const SizedBox(height: 12),

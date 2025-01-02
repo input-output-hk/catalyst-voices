@@ -26,6 +26,7 @@ class VoicesNumField<T extends num> extends StatefulWidget {
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
   final bool enabled;
   final bool readOnly;
+  final bool? ignorePointers;
 
   const VoicesNumField({
     super.key,
@@ -43,6 +44,7 @@ class VoicesNumField<T extends num> extends StatefulWidget {
     this.onStatusChanged,
     this.enabled = true,
     this.readOnly = false,
+    this.ignorePointers,
   });
 
   @override
@@ -126,6 +128,7 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
           : null,
       enabled: widget.enabled,
       readOnly: widget.readOnly,
+      ignorePointers: widget.ignorePointers,
     );
   }
 

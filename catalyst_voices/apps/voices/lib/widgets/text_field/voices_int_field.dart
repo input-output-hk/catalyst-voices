@@ -20,6 +20,7 @@ class VoicesIntField extends VoicesNumField<int> {
     List<TextInputFormatter>? inputFormatters,
     super.enabled,
     super.readOnly,
+    super.ignorePointers,
   }) : super(
           codec: const IntCodec(),
           keyboardType: TextInputType.number,

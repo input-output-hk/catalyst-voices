@@ -14,6 +14,7 @@ class TokenField extends StatelessWidget {
   final Currency currency;
   final bool showHelper;
   final bool readOnly;
+  final bool? ignorePointers;
 
   const TokenField({
     super.key,
@@ -26,6 +27,7 @@ class TokenField extends StatelessWidget {
     this.currency = const Currency.ada(),
     this.showHelper = true,
     this.readOnly = false,
+    this.ignorePointers,
   }) : assert(
           currency == const Currency.ada(),
           'Only supports ADA at the moment',
@@ -54,6 +56,7 @@ class TokenField extends StatelessWidget {
       onStatusChanged: onStatusChanged,
       onFieldSubmitted: onFieldSubmitted,
       readOnly: readOnly,
+      ignorePointers: ignorePointers,
     );
   }
 
