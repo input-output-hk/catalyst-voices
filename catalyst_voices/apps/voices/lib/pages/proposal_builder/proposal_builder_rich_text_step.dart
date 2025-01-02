@@ -8,7 +8,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class ProposalBuilderRichTextStep extends StatefulWidget {
   final RichTextStep step;
@@ -36,7 +36,8 @@ class _ProposalBuilderRichTextStepState
     final markdownString = widget.step.initialData ?? const MarkdownData('');
     final delta = markdown.encode(markdownString);
 
-    final document = delta.isNotEmpty ? Document.fromDelta(delta) : Document();
+    final document =
+        delta.isNotEmpty ? quill.Document.fromDelta(delta) : quill.Document();
     final selectionOffset = document.length == 0 ? 0 : document.length - 1;
 
     _controller = VoicesRichTextController(
@@ -76,7 +77,7 @@ class _ProposalBuilderRichTextStepState
     );
   }
 
-  void _saveDocument(Document document) {
+  void _saveDocument(quill.Document document) {
     final delta = document.toDelta();
     final markdownString = markdown.decode(delta);
 
@@ -90,7 +91,7 @@ class _ProposalBuilderRichTextStepState
     context.read<ProposalBuilderBloc>().add(event);
   }
 
-  bool _canEditDocument(Document document) {
+  bool _canEditDocument(quill.Document document) {
     final sectionsController = SectionsControllerScope.of(context);
 
     final ids = sectionsController.value.editStepsIds;

@@ -1,11 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_definitions_dto.g.dart';
 
 @JsonSerializable()
-class DocumentDefinitionsDto extends Equatable {
+final class DocumentDefinitionsDto {
   final SegmentDto segment;
   final SectionDto section;
   final SingleLineTextEntryDto singleLineTextEntry;
@@ -59,7 +58,7 @@ class DocumentDefinitionsDto extends Equatable {
 
   Map<String, dynamic> toJson() => _$DocumentDefinitionsDtoToJson(this);
 
-  List<BaseDocumentDefinition> get definitionsModels => [
+  List<BaseDocumentDefinition> get models => [
         segment.toModel(),
         section.toModel(),
         singleLineTextEntry.toModel(),
@@ -82,35 +81,10 @@ class DocumentDefinitionsDto extends Equatable {
         agreementConfirmation.toModel(),
         spdxLicenceOrUrl.toModel(),
       ];
-
-  @override
-  List<Object?> get props => [
-        section,
-        segment,
-        singleLineTextEntry,
-        singleLineHttpsURLEntry,
-        multiLineTextEntry,
-        multiLineTextEntryMarkdown,
-        dropDownSingleSelect,
-        multiSelect,
-        singleLineTextEntryList,
-        multiLineTextEntryListMarkdown,
-        singleLineHttpsURLEntryList,
-        nestedQuestionsList,
-        nestedQuestions,
-        singleGroupedTagSelector,
-        tagGroup,
-        tagSelection,
-        tokenValueCardanoAda,
-        durationInMonths,
-        yesNoChoice,
-        agreementConfirmation,
-        spdxLicenceOrUrl,
-      ];
 }
 
 @JsonSerializable()
-class SegmentDto extends Equatable {
+final class SegmentDto {
   final String type;
   final bool additionalProperties;
   @JsonKey(name: 'x-note')
@@ -132,17 +106,10 @@ class SegmentDto extends Equatable {
         note: note,
         additionalProperties: additionalProperties,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        additionalProperties,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class SectionDto extends Equatable {
+final class SectionDto {
   final String type;
   final bool additionalProperties;
   @JsonKey(name: 'x-note')
@@ -164,17 +131,10 @@ class SectionDto extends Equatable {
         note: note,
         additionalProperties: additionalProperties,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        additionalProperties,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class SingleLineTextEntryDto extends Equatable {
+class SingleLineTextEntryDto {
   final String type;
   final String contentMediaType;
   final String pattern;
@@ -200,18 +160,10 @@ class SingleLineTextEntryDto extends Equatable {
             DocumentDefinitionsContentMediaType.fromString(contentMediaType),
         pattern: pattern,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        contentMediaType,
-        pattern,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class SingleLineHttpsURLEntryDto extends Equatable {
+final class SingleLineHttpsURLEntryDto {
   final String type;
   final String format;
   final String pattern;
@@ -238,18 +190,10 @@ class SingleLineHttpsURLEntryDto extends Equatable {
       pattern: pattern,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        pattern,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class MultiLineTextEntryDto extends Equatable {
+final class MultiLineTextEntryDto {
   final String type;
   final String contentMediaType;
   final String pattern;
@@ -277,18 +221,10 @@ class MultiLineTextEntryDto extends Equatable {
       pattern: pattern,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        contentMediaType,
-        pattern,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class MultiLineTextEntryMarkdownDto extends Equatable {
+final class MultiLineTextEntryMarkdownDto {
   final String type;
   final String contentMediaType;
   final String pattern;
@@ -316,18 +252,10 @@ class MultiLineTextEntryMarkdownDto extends Equatable {
       pattern: pattern,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        contentMediaType,
-        pattern,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class DropDownSingleSelectDto extends Equatable {
+final class DropDownSingleSelectDto {
   final String type;
   final String contentMediaType;
   final String pattern;
@@ -358,19 +286,10 @@ class DropDownSingleSelectDto extends Equatable {
       format: DocumentDefinitionsFormat.fromString(format),
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        contentMediaType,
-        pattern,
-        format,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class MultiSelectDto extends Equatable {
+final class MultiSelectDto {
   final String type;
   final bool uniqueItems;
   final String format;
@@ -397,18 +316,10 @@ class MultiSelectDto extends Equatable {
       uniqueItems: uniqueItems,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        uniqueItems,
-        note,
-        format,
-      ];
 }
 
 @JsonSerializable()
-class SingleLineTextEntryListDto extends Equatable {
+final class SingleLineTextEntryListDto {
   final String type;
   final String format;
   final bool uniqueItems;
@@ -441,20 +352,10 @@ class SingleLineTextEntryListDto extends Equatable {
         defaultValues: defaultValue,
         items: items,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        note,
-        format,
-        uniqueItems,
-        defaultValue,
-        items,
-      ];
 }
 
 @JsonSerializable()
-class MultiLineTextEntryListMarkdownDto extends Equatable {
+final class MultiLineTextEntryListMarkdownDto {
   final String type;
   final String format;
   final bool uniqueItems;
@@ -490,20 +391,10 @@ class MultiLineTextEntryListMarkdownDto extends Equatable {
         defaultValue: defaultValue,
         items: items,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        note,
-        format,
-        uniqueItems,
-        defaultValue,
-        items,
-      ];
 }
 
 @JsonSerializable()
-class SingleLineHttpsURLEntryListDto extends Equatable {
+final class SingleLineHttpsURLEntryListDto {
   final String type;
   final String format;
   final bool uniqueItems;
@@ -536,20 +427,10 @@ class SingleLineHttpsURLEntryListDto extends Equatable {
         defaultValue: defaultValue,
         items: items,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        note,
-        format,
-        uniqueItems,
-        defaultValue,
-        items,
-      ];
 }
 
 @JsonSerializable()
-class NestedQuestionsListDto extends Equatable {
+final class NestedQuestionsListDto {
   final String type;
   final String format;
   final bool uniqueItems;
@@ -578,19 +459,10 @@ class NestedQuestionsListDto extends Equatable {
         uniqueItems: uniqueItems,
         defaultValue: defaultValue,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        note,
-        format,
-        uniqueItems,
-        defaultValue,
-      ];
 }
 
 @JsonSerializable()
-class NestedQuestionsDto extends Equatable {
+final class NestedQuestionsDto {
   final String type;
   final String format;
   final bool additionalProperties;
@@ -617,18 +489,10 @@ class NestedQuestionsDto extends Equatable {
       additionalProperties: additionalProperties,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        note,
-        additionalProperties,
-      ];
 }
 
 @JsonSerializable()
-class SingleGroupedTagSelectorDto extends Equatable {
+final class SingleGroupedTagSelectorDto {
   final String type;
   final String format;
   final bool additionalProperties;
@@ -655,18 +519,10 @@ class SingleGroupedTagSelectorDto extends Equatable {
       additionalProperties: additionalProperties,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        note,
-        additionalProperties,
-      ];
 }
 
 @JsonSerializable()
-class TagGroupDto extends Equatable {
+final class TagGroupDto {
   final String type;
   final String format;
   final String pattern;
@@ -693,18 +549,10 @@ class TagGroupDto extends Equatable {
       pattern: pattern,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        pattern,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class TagSelectionDto extends Equatable {
+final class TagSelectionDto {
   final String type;
   final String format;
   final String pattern;
@@ -731,18 +579,10 @@ class TagSelectionDto extends Equatable {
       pattern: pattern,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        pattern,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class TokenValueCardanoAdaDto extends Equatable {
+final class TokenValueCardanoAdaDto {
   final String type;
   final String format;
   @JsonKey(name: 'x-note')
@@ -764,17 +604,10 @@ class TokenValueCardanoAdaDto extends Equatable {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        note,
-        format,
-      ];
 }
 
 @JsonSerializable()
-class DurationInMonthsDto extends Equatable {
+final class DurationInMonthsDto {
   final String type;
   final String format;
   @JsonKey(name: 'x-note')
@@ -798,17 +631,10 @@ class DurationInMonthsDto extends Equatable {
       format: DocumentDefinitionsFormat.fromString(format),
     );
   }
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        note,
-      ];
 }
 
 @JsonSerializable()
-class YesNoChoiceDto extends Equatable {
+final class YesNoChoiceDto {
   final String type;
   final String format;
   @JsonKey(name: 'default')
@@ -834,18 +660,10 @@ class YesNoChoiceDto extends Equatable {
         format: DocumentDefinitionsFormat.fromString(format),
         defaultValue: defaultValue,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        note,
-        defaultValue,
-      ];
 }
 
 @JsonSerializable()
-class AgreementConfirmationDto extends Equatable {
+final class AgreementConfirmationDto {
   final String type;
   final String format;
   @JsonKey(name: 'default')
@@ -875,19 +693,10 @@ class AgreementConfirmationDto extends Equatable {
         defaultValue: defaultValue,
         constValue: constValue,
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        note,
-        defaultValue,
-        constValue,
-      ];
 }
 
 @JsonSerializable()
-class SPDXLicenceOrUrlDto extends Equatable {
+final class SPDXLicenceOrUrlDto {
   final String type;
   final String contentMediaType;
   final String pattern;
@@ -916,13 +725,4 @@ class SPDXLicenceOrUrlDto extends Equatable {
         contentMediaType:
             DocumentDefinitionsContentMediaType.fromString(contentMediaType),
       );
-
-  @override
-  List<Object?> get props => [
-        type,
-        format,
-        note,
-        pattern,
-        contentMediaType,
-      ];
 }
