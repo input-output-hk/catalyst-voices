@@ -42,14 +42,14 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
   late final VoicesIntFieldController _controller;
   late final FocusNode _focusNode;
 
-  bool _editMode = false;
+  bool _isEditMode = false;
   bool _isValid = false;
   int? _value;
 
   @override
   void initState() {
     _controller = VoicesIntFieldController(widget.initialValue);
-    _focusNode = FocusNode(canRequestFocus: _editMode);
+    _focusNode = FocusNode(canRequestFocus: _isEditMode);
     _value = widget.initialValue;
 
     super.initState();
@@ -58,6 +58,7 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -77,7 +78,7 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DocumentPropertyTopBar(
-              isEditMode: _editMode,
+              isEditMode: _isEditMode,
               onToggleEditMode: _toggleEditMode,
               title: widget.description,
             ),
@@ -90,10 +91,10 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
               labelText: tokenFieldLabel,
               range: widget.range,
               currency: widget.currency,
-              showHelper: _editMode,
-              readOnly: !_editMode,
+              showHelper: _isEditMode,
+              readOnly: !_isEditMode,
             ),
-            if (_editMode) ...[
+            if (_isEditMode) ...[
               const SizedBox(height: 12),
               DocumentPropertyFooter(
                 onSave: _isValid ? _saveChanges : null,
@@ -127,7 +128,7 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
   void _saveChanges() {
     setState(() {
       _value = _controller.value;
-      _editMode = false;
+      _isEditMode = false;
       _focusNode.canRequestFocus = false;
 
       final change = DocumentChange(nodeId: widget.id, value: _value);
@@ -137,7 +138,7 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
 
   void _toggleEditMode() {
     setState(() {
-      final mode = !_editMode;
+      final mode = !_isEditMode;
 
       if (mode) {
         // save last value
@@ -155,7 +156,7 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
           ..unfocus();
       }
 
-      _editMode = mode;
+      _isEditMode = mode;
     });
   }
 }
