@@ -217,7 +217,8 @@ final class SingleLineTextEntryDefinition
   }
 }
 
-final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
+final class SingleLineHttpsURLEntryDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -237,19 +238,18 @@ final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  String? castValue(Object? value) {
+    return value as String?;
   }
 }
 
-final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
+final class MultiLineTextEntryDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -269,20 +269,18 @@ final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  String? castValue(Object? value) {
+    return value as String?;
   }
 }
 
 final class MultiLineTextEntryMarkdownDefinition
-    extends BaseDocumentDefinition {
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -302,19 +300,18 @@ final class MultiLineTextEntryMarkdownDefinition
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  String? castValue(Object? value) {
+    return value as String?;
   }
 }
 
-final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
+final class DropDownSingleSelectDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
@@ -337,19 +334,18 @@ final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  String? castValue(Object? value) {
+    return value as String?;
   }
 }
 
-final class MultiSelectDefinition extends BaseDocumentDefinition {
+final class MultiSelectDefinition
+    extends BaseDocumentDefinition<List<dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
 
@@ -369,22 +365,23 @@ final class MultiSelectDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<List<dynamic>> castProperty(
+    DocumentProperty<Object> property,
+  ) {
+    return property as DocumentProperty<List<dynamic>>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  List<dynamic>? castValue(Object? value) {
+    return value as List<dynamic>?;
   }
 }
 
-final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
+final class SingleLineTextEntryListDefinition
+    extends BaseDocumentDefinition<List<dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<String> defaultValues;
+  final List<dynamic> defaultValues;
   final Map<String, dynamic> items;
 
   const SingleLineTextEntryListDefinition({
@@ -407,20 +404,20 @@ final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<List<dynamic>> castProperty(
+    DocumentProperty<Object> property,
+  ) {
+    return property as DocumentProperty<List<dynamic>>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  List<dynamic>? castValue(Object? value) {
+    return value as List<dynamic>?;
   }
 }
 
 final class MultiLineTextEntryListMarkdownDefinition
-    extends BaseDocumentDefinition {
+    extends BaseDocumentDefinition<List<dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
@@ -446,20 +443,20 @@ final class MultiLineTextEntryListMarkdownDefinition
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<List<dynamic>> castProperty(
+    DocumentProperty<Object> property,
+  ) {
+    return property as DocumentProperty<List<dynamic>>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  List<dynamic>? castValue(Object? value) {
+    return value as List<dynamic>?;
   }
 }
 
 final class SingleLineHttpsURLEntryListDefinition
-    extends BaseDocumentDefinition {
+    extends BaseDocumentDefinition<List<dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
@@ -485,19 +482,20 @@ final class SingleLineHttpsURLEntryListDefinition
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<List<dynamic>> castProperty(
+    DocumentProperty<Object> property,
+  ) {
+    return property as DocumentProperty<List<dynamic>>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  List<dynamic>? castValue(Object? value) {
+    return value as List<dynamic>?;
   }
 }
 
-final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
+final class NestedQuestionsListDefinition
+    extends BaseDocumentDefinition<List<dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
@@ -520,19 +518,21 @@ final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<List<dynamic>> castProperty(
+    DocumentProperty<Object> property,
+  ) {
+    return property as DocumentProperty<List<dynamic>>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  List<dynamic>? castValue(Object? value) {
+    return value as List<dynamic>?;
   }
 }
 
-final class NestedQuestionsDefinition extends BaseDocumentDefinition {
+// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
+final class NestedQuestionsDefinition
+    extends BaseDocumentDefinition<List<dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
@@ -552,19 +552,21 @@ final class NestedQuestionsDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<List<dynamic>> castProperty(
+    DocumentProperty<Object> property,
+  ) {
+    return property as DocumentProperty<List<dynamic>>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  List<dynamic>? castValue(Object? value) {
+    return value as List<dynamic>?;
   }
 }
 
-final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
+// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
+final class SingleGroupedTagSelectorDefinition
+    extends BaseDocumentDefinition<Map<String, dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
@@ -584,19 +586,19 @@ final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<Map<String, dynamic>> castProperty(
+    DocumentProperty<Object> property,
+  ) {
+    return property as DocumentProperty<Map<String, dynamic>>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  Map<String, dynamic>? castValue(Object? value) {
+    return value as Map<String, dynamic>?;
   }
 }
 
-final class TagGroupDefinition extends BaseDocumentDefinition {
+final class TagGroupDefinition extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -616,19 +618,17 @@ final class TagGroupDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  String? castValue(Object? value) {
+    return value as String?;
   }
 }
 
-final class TagSelectionDefinition extends BaseDocumentDefinition {
+final class TagSelectionDefinition extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -648,19 +648,17 @@ final class TagSelectionDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  String? castValue(Object? value) {
+    return value as String?;
   }
 }
 
-final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
+final class TokenValueCardanoADADefinition extends BaseDocumentDefinition<int> {
   final DocumentDefinitionsFormat format;
 
   const TokenValueCardanoADADefinition({
@@ -677,19 +675,17 @@ final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<int> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<int>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  int? castValue(Object? value) {
+    return value as int?;
   }
 }
 
-final class DurationInMonthsDefinition extends BaseDocumentDefinition {
+final class DurationInMonthsDefinition extends BaseDocumentDefinition<int> {
   final DocumentDefinitionsFormat format;
 
   const DurationInMonthsDefinition({
@@ -706,19 +702,17 @@ final class DurationInMonthsDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<int> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<int>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  int? castValue(Object? value) {
+    return value as int?;
   }
 }
 
-final class YesNoChoiceDefinition extends BaseDocumentDefinition {
+final class YesNoChoiceDefinition extends BaseDocumentDefinition<bool> {
   final DocumentDefinitionsFormat format;
   final bool defaultValue;
 
@@ -738,15 +732,13 @@ final class YesNoChoiceDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<bool> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<bool>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  bool? castValue(Object? value) {
+    return value as bool?;
   }
 }
 
@@ -784,7 +776,7 @@ final class AgreementConfirmationDefinition
   }
 }
 
-final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
+final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
   final DocumentDefinitionsContentMediaType contentMediaType;
@@ -806,14 +798,12 @@ final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
       ];
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    // TODO(ryszard-schossler): implement castProperty
-    throw UnimplementedError();
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
   }
 
   @override
-  Object? castValue(Object? value) {
-    // TODO(ryszard-schossler): implement castValue
-    throw UnimplementedError();
+  String? castValue(Object? value) {
+    return value as String?;
   }
 }

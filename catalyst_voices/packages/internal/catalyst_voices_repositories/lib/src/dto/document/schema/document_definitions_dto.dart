@@ -324,7 +324,7 @@ final class SingleLineTextEntryListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<String> defaultValue;
+  final List<dynamic> defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -399,7 +399,7 @@ final class SingleLineHttpsURLEntryListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -435,7 +435,7 @@ final class NestedQuestionsListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
   @JsonKey(name: 'x-note')
   final String note;
 
