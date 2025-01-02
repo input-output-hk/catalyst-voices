@@ -2,6 +2,8 @@
 
 #![allow(dead_code)]
 
+use std::fmt::Display;
+
 use crate::service::common::types::generic::query::pagination::{Limit, Page};
 
 /// A query limits struct.
@@ -15,6 +17,18 @@ enum QueryLimitsInner {
     Limit(u64),
     /// Specifies `LIMIT` and `OFFSET` parameters
     LimitAndOffset(u64, u64),
+}
+
+impl Display for QueryLimits {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.0 {
+            QueryLimitsInner::All => write!(f, ""),
+            QueryLimitsInner::Limit(limit) => write!(f, "LIMIT {limit}"),
+            QueryLimitsInner::LimitAndOffset(limit, offset) => {
+                write!(f, "LIMIT {limit} OFFSET {offset}")
+            },
+        }
+    }
 }
 
 impl QueryLimits {
@@ -40,17 +54,6 @@ impl QueryLimits {
             (None, None) => Ok(Self(QueryLimitsInner::All)),
             (None, Some(_)) => {
                 anyhow::bail!("Invalid arguments, `limit` must be provided when `page` is not None")
-            },
-        }
-    }
-
-    /// Returns a string with the corresponding query limit statement
-    pub(crate) fn query_stmt(&self) -> String {
-        match self.0 {
-            QueryLimitsInner::All => String::new(),
-            QueryLimitsInner::Limit(limit) => format!("LIMIT {limit}"),
-            QueryLimitsInner::LimitAndOffset(limit, offset) => {
-                format!("LIMIT {limit} OFFSET {offset}")
             },
         }
     }

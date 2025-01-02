@@ -1,5 +1,7 @@
 //! `DocsQueryFilter` struct implementation.
 
+use std::fmt::Display;
+
 /// A `select_signed_docs` query filtering argument.
 #[allow(dead_code)]
 pub(crate) enum DocsQueryFilter {
@@ -15,17 +17,16 @@ pub(crate) enum DocsQueryFilter {
     Author(String),
 }
 
-impl DocsQueryFilter {
-    /// Returns a string with the corresponding query docs filter statement
-    pub(crate) fn query_stmt(&self) -> String {
+impl Display for DocsQueryFilter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::All => "TRUE".to_string(),
-            Self::DocType(doc_type) => format!("signed_docs.type = '{doc_type}'"),
-            Self::DocId(id) => format!("signed_docs.id = '{id}'"),
+            Self::All => write!(f, "TRUE"),
+            Self::DocType(doc_type) => write!(f, "signed_docs.type = '{doc_type}'"),
+            Self::DocId(id) => write!(f, "signed_docs.id = '{id}'"),
             Self::DocVer(id, ver) => {
-                format!("signed_docs.id = '{id}' AND signed_docs.ver = '{ver}'")
+                write!(f, "signed_docs.id = '{id}' AND signed_docs.ver = '{ver}'")
             },
-            Self::Author(author) => format!("signed_docs.author = '{author}'"),
+            Self::Author(author) => write!(f, "signed_docs.author = '{author}'"),
         }
     }
 }

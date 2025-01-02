@@ -76,8 +76,8 @@ impl SignedDocBody {
     ) -> anyhow::Result<Vec<Self>> {
         let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;
         let query = query_template.render(serde_json::json!({
-            "conditions": conditions.query_stmt(),
-            "query_limits": query_limits.query_stmt(),
+            "conditions": conditions.to_string(),
+            "query_limits": query_limits.to_string(),
         }))?;
         let rows = EventDB::query(&query, &[]).await?;
 
