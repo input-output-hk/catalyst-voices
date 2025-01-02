@@ -1,6 +1,6 @@
-import 'package:catalyst_voices/pages/proposal_builder/elements/token_field.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_property_footer.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_property_topbar.dart';
+import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
