@@ -2,12 +2,12 @@ import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class DocumentPropertyTopbar extends StatelessWidget {
+class DocumentPropertyTopBar extends StatelessWidget {
   final String title;
   final bool isEditMode;
   final VoidCallback? onToggleEditMode;
 
-  const DocumentPropertyTopbar({
+  const DocumentPropertyTopBar({
     super.key,
     required this.title,
     required this.isEditMode,

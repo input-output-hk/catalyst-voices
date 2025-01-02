@@ -59,9 +59,9 @@ class _ProposalBuilderRichTextStepState
     return SectionStepStateBuilder(
       id: widget.step.sectionStepId,
       builder: (context, value, child) {
-        return WorkspaceTileContainer(
+        return SelectableTile(
           isSelected: value.isSelected,
-          content: child!,
+          child: child!,
         );
       },
       child: VoicesRichText(

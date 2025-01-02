@@ -1,42 +1,44 @@
-import 'package:catalyst_voices/widgets/document_builder/document_property_footer.dart';
-import 'package:catalyst_voices/widgets/document_builder/document_property_topbar.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_footer.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_top_bar.dart';
 import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices/widgets/tiles/selectable_tile.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class DocumentTokenValueWidget extends StatefulWidget {
+class DocumentTokenValueTile extends StatefulWidget {
   final String title;
   final String description;
   final int? initialValue;
   final Currency currency;
   final Range<int>? range;
+  final bool isSelected;
   final bool isRequired;
 
   // TODO(damian-molinski): Change to DocumentChange
   final ValueChanged<int?> onChanged;
 
-  const DocumentTokenValueWidget({
-    required super.key,
+  const DocumentTokenValueTile({
+    super.key,
     required this.title,
     required this.description,
     this.initialValue,
     required this.currency,
     this.range,
+    this.isSelected = false,
     this.isRequired = true,
     required this.onChanged,
   });
 
   @override
-  State<DocumentTokenValueWidget> createState() {
-    return _DocumentTokenValueWidgetState();
+  State<DocumentTokenValueTile> createState() {
+    return _DocumentTokenValueTileState();
   }
 }
 
-class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
+class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
   late final VoicesIntFieldController _controller;
   late final FocusNode _focusNode;
 
@@ -61,24 +63,20 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colors;
-
     var tokenFieldLabel = widget.title;
     if (widget.isRequired) {
       tokenFieldLabel = '*$tokenFieldLabel';
     }
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.elevationsOnSurfaceNeutralLv1White,
-      ),
+    return SelectableTile(
+      isSelected: widget.isSelected,
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DocumentPropertyTopbar(
+            DocumentPropertyTopBar(
               isEditMode: _editMode,
               onToggleEditMode: _toggleEditMode,
               title: widget.description,
@@ -92,14 +90,15 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
               labelText: tokenFieldLabel,
               range: widget.range,
               currency: widget.currency,
+              showHelper: _editMode,
               readOnly: !_editMode,
             ),
-            Offstage(
-              offstage: !_editMode,
-              child: DocumentPropertyFooter(
+            if (_editMode) ...[
+              const SizedBox(height: 12),
+              DocumentPropertyFooter(
                 onSave: _isValid ? _saveChanges : null,
               ),
-            ),
+            ],
           ],
         ),
       ),

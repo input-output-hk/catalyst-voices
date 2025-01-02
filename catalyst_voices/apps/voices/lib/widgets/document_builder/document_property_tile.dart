@@ -1,9 +1,9 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class DocumentPropertyWidget extends StatelessWidget {
+class DocumentPropertyTile extends StatelessWidget {
   final BaseDocumentDefinition definition;
-  const DocumentPropertyWidget({super.key, required this.definition});
+  const DocumentPropertyTile({super.key, required this.definition});
 
   @override
   Widget build(BuildContext context) {

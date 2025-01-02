@@ -12,6 +12,7 @@ class TokenField extends StatelessWidget {
   final FocusNode? focusNode;
   final Range<int>? range;
   final Currency currency;
+  final bool showHelper;
   final bool readOnly;
 
   const TokenField({
@@ -23,6 +24,7 @@ class TokenField extends StatelessWidget {
     this.focusNode,
     this.range,
     this.currency = const Currency.ada(),
+    this.showHelper = true,
     this.readOnly = false,
   }) : assert(
           currency == const Currency.ada(),
@@ -41,7 +43,7 @@ class TokenField extends StatelessWidget {
         prefixText: currency.symbol,
         hintText: range != null ? '${range.min}' : null,
         filled: true,
-        helper: range != null
+        helper: range != null && showHelper
             ? _Helper(
                 symbol: currency.symbol,
                 range: range,
