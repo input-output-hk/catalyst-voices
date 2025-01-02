@@ -10,8 +10,6 @@ enum DocumentDefinitionsObjectType {
   array,
   unknown;
 
-  const DocumentDefinitionsObjectType();
-
   static DocumentDefinitionsObjectType fromString(String value) {
     return DocumentDefinitionsObjectType.values.asNameMap()[value] ??
         DocumentDefinitionsObjectType.unknown;
@@ -129,7 +127,7 @@ extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
   }
 }
 
-class SegmentDefinition extends BaseDocumentDefinition {
+final class SegmentDefinition extends BaseDocumentDefinition {
   final bool additionalProperties;
 
   const SegmentDefinition({
@@ -146,7 +144,7 @@ class SegmentDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class SectionDefinition extends BaseDocumentDefinition {
+final class SectionDefinition extends BaseDocumentDefinition {
   final bool additionalProperties;
 
   const SectionDefinition({
@@ -163,7 +161,7 @@ class SectionDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
+final class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -183,7 +181,7 @@ class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
+final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -203,7 +201,7 @@ class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
+final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -223,7 +221,8 @@ class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class MultiLineTextEntryMarkdownDefinition extends BaseDocumentDefinition {
+final class MultiLineTextEntryMarkdownDefinition
+    extends BaseDocumentDefinition {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -243,7 +242,7 @@ class MultiLineTextEntryMarkdownDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
+final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
@@ -266,7 +265,7 @@ class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class MultiSelectDefinition extends BaseDocumentDefinition {
+final class MultiSelectDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
 
@@ -286,7 +285,7 @@ class MultiSelectDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
+final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<String> defaultValues;
@@ -312,7 +311,8 @@ class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class MultiLineTextEntryListMarkdownDefinition extends BaseDocumentDefinition {
+final class MultiLineTextEntryListMarkdownDefinition
+    extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
@@ -338,7 +338,8 @@ class MultiLineTextEntryListMarkdownDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class SingleLineHttpsURLEntryListDefinition extends BaseDocumentDefinition {
+final class SingleLineHttpsURLEntryListDefinition
+    extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
@@ -364,7 +365,7 @@ class SingleLineHttpsURLEntryListDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class NestedQuestionsListDefinition extends BaseDocumentDefinition {
+final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<dynamic> defaultValue;
@@ -387,7 +388,7 @@ class NestedQuestionsListDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class NestedQuestionsDefinition extends BaseDocumentDefinition {
+final class NestedQuestionsDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
@@ -407,7 +408,7 @@ class NestedQuestionsDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
+final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
@@ -427,7 +428,7 @@ class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class TagGroupDefinition extends BaseDocumentDefinition {
+final class TagGroupDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -447,7 +448,7 @@ class TagGroupDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class TagSelectionDefinition extends BaseDocumentDefinition {
+final class TagSelectionDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -467,7 +468,7 @@ class TagSelectionDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
+final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
 
   const TokenValueCardanoADADefinition({
@@ -484,7 +485,7 @@ class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
       ];
 }
 
-class DurationInMonthsDefinition extends BaseDocumentDefinition {
+final class DurationInMonthsDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
 
   const DurationInMonthsDefinition({
@@ -501,7 +502,7 @@ class DurationInMonthsDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class YesNoChoiceDefinition extends BaseDocumentDefinition {
+final class YesNoChoiceDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool defaultValue;
 
@@ -521,7 +522,7 @@ class YesNoChoiceDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class AgreementConfirmationDefinition extends BaseDocumentDefinition {
+final class AgreementConfirmationDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final bool defaultValue;
   final bool constValue;
@@ -544,7 +545,7 @@ class AgreementConfirmationDefinition extends BaseDocumentDefinition {
       ];
 }
 
-class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
+final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
   final DocumentDefinitionsFormat format;
   final String pattern;
   final DocumentDefinitionsContentMediaType contentMediaType;
