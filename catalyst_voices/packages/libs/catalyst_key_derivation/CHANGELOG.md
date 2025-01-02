@@ -1,3 +1,7 @@
+## 0.1.1+1
+
+ - **DOCS**: update pub.dev topics for catalyst_key_derivation package. ([a6d9bcfa](https://github.com/input-output-hk/catalyst-voices/commit/a6d9bcfa451cbb8d0ded9659e63fbfa290416480))
+
 ## 0.1.1
 
  - **REFACTOR**(cat-voices): self contained frontend dir ([#1082](https://github.com/input-output-hk/catalyst-voices/issues/1082)). ([62e5f437](https://github.com/input-output-hk/catalyst-voices/commit/62e5f43778fab323d7c1e4ebab4b5e89c1ba0cb5))

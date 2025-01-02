@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-02
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`catalyst_key_derivation` - `v0.1.1+1`](#catalyst_key_derivation---v0111)
+ - [`catalyst_cardano_serialization` - `v0.5.0+2`](#catalyst_cardano_serialization---v0502)
+ - [`catalyst_cardano` - `v0.4.0+2`](#catalyst_cardano---v0402)
+ - [`catalyst_cardano_platform_interface` - `v0.4.0+2`](#catalyst_cardano_platform_interface---v0402)
+ - [`catalyst_cardano_web` - `v0.4.0+2`](#catalyst_cardano_web---v0402)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `catalyst_cardano_serialization` - `v0.5.0+2`
+ - `catalyst_cardano` - `v0.4.0+2`
+ - `catalyst_cardano_platform_interface` - `v0.4.0+2`
+ - `catalyst_cardano_web` - `v0.4.0+2`
+
+---
+
+#### `catalyst_key_derivation` - `v0.1.1+1`
+
+ - **DOCS**: update pub.dev topics for catalyst_key_derivation package. ([a6d9bcfa](https://github.com/input-output-hk/catalyst-voices/commit/a6d9bcfa451cbb8d0ded9659e63fbfa290416480))
+
+
 ## 2025-01-02v1
 
 ### Changes
