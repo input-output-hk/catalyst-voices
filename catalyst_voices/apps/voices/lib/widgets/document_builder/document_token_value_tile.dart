@@ -48,11 +48,11 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
 
   @override
   void initState() {
+    super.initState();
+
     _controller = VoicesIntFieldController(widget.initialValue);
     _focusNode = FocusNode(canRequestFocus: _isEditMode);
     _value = widget.initialValue;
-
-    super.initState();
   }
 
   @override
