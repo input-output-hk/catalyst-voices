@@ -64,7 +64,10 @@ integration-test-web:
             exit 1
     END
 
-test-web-all:
+# TODO(dtscalac): disabled integration tests due to them being flaky,
+# reenable when enable-threads.js workaround is removed
+# and https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407 closed
+disabled-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome \
             --browser=firefox
