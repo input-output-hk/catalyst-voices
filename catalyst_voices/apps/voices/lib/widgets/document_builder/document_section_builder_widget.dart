@@ -29,6 +29,7 @@ class DocumentSectionBuilderWidget extends StatefulWidget {
 class _DocumentSectionBuilderWidgetState
     extends State<DocumentSectionBuilderWidget> {
   late DocumentSection _editedSection;
+  late DocumentSectionBuilder _builder;
   final _pendingChanges = <DocumentChange>[];
 
   @override
@@ -36,6 +37,7 @@ class _DocumentSectionBuilderWidgetState
     super.initState();
 
     _editedSection = widget.section;
+    _builder = _editedSection.toBuilder();
   }
 
   @override
@@ -44,6 +46,7 @@ class _DocumentSectionBuilderWidgetState
 
     if (oldWidget.section != widget.section) {
       _editedSection = widget.section;
+      _builder = _editedSection.toBuilder();
       _pendingChanges.clear();
     }
   }
@@ -82,8 +85,8 @@ class _DocumentSectionBuilderWidgetState
 
   void _onChanged(DocumentChange change) {
     setState(() {
-      final builder = _editedSection.toBuilder()..addChange(change);
-      _editedSection = builder.build();
+      _builder.addChange(change);
+      _editedSection = _builder.build();
       _pendingChanges.add(change);
     });
   }
