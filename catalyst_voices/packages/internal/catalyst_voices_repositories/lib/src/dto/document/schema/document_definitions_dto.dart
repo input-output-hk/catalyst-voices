@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_definitions_dto.g.dart';
@@ -324,7 +325,8 @@ final class SingleLineTextEntryListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  @ListStringConverter()
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -360,7 +362,8 @@ final class MultiLineTextEntryListMarkdownDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  @ListStringConverter()
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -399,6 +402,7 @@ final class SingleLineHttpsURLEntryListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
+  @ListStringConverter()
   final List<String> defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
@@ -435,6 +439,7 @@ final class NestedQuestionsListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
+  @ListStringConverter()
   final List<String> defaultValue;
   @JsonKey(name: 'x-note')
   final String note;

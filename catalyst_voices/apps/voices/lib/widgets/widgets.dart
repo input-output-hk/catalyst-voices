@@ -27,7 +27,7 @@ export 'containers/sidebar_scaffold.dart';
 export 'containers/space_scaffold.dart';
 export 'containers/space_side_panel.dart';
 export 'containers/workspace_text_tile_container.dart';
-export 'containers/workspace_tile_container.dart';
+export 'containers/selectable_tile.dart';
 export 'drawer/voices_drawer.dart';
 export 'drawer/voices_drawer_space_chooser.dart';
 export 'footers/links_page_footer.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/widgets/document_builder/document_property_footer.dart';
-import 'package:catalyst_voices/widgets/document_builder/document_property_topbar.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_footer.dart';
+import 'package:catalyst_voices/widgets/document_builder/common/document_property_topbar.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';

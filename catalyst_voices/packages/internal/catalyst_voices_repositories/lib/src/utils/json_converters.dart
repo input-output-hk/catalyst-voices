@@ -31,3 +31,17 @@ final class ShelleyAddressConverter
   @override
   String toJson(ShelleyAddress object) => object.toBech32();
 }
+
+final class ListStringConverter
+    implements JsonConverter<List<String>, List<dynamic>> {
+  const ListStringConverter();
+
+  @override
+  List<String> fromJson(List<dynamic> json) {
+    return json.map((e) => e as String).toList();
+  }
+
+  @override
+  List<dynamic> toJson(List<String> object) =>
+      object.map((e) => e as dynamic).toList();
+}

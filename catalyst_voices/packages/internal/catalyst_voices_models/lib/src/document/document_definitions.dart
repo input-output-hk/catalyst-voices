@@ -378,10 +378,10 @@ final class MultiSelectDefinition
 }
 
 final class SingleLineTextEntryListDefinition
-    extends BaseDocumentDefinition<List<dynamic>> {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<dynamic> defaultValues;
+  final List<String> defaultValues;
   final Map<String, dynamic> items;
 
   const SingleLineTextEntryListDefinition({
@@ -404,23 +404,24 @@ final class SingleLineTextEntryListDefinition
       ];
 
   @override
-  DocumentProperty<List<dynamic>> castProperty(
+  DocumentProperty<List<String>> castProperty(
     DocumentProperty<Object> property,
   ) {
-    return property as DocumentProperty<List<dynamic>>;
+    return property as DocumentProperty<List<String>>;
   }
 
   @override
-  List<dynamic>? castValue(Object? value) {
-    return value as List<dynamic>?;
+  List<String>? castValue(Object? value) {
+    // return value as List<String>?;
+    return null;
   }
 }
 
 final class MultiLineTextEntryListMarkdownDefinition
-    extends BaseDocumentDefinition<List<dynamic>> {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
 
   const MultiLineTextEntryListMarkdownDefinition({
@@ -443,23 +444,23 @@ final class MultiLineTextEntryListMarkdownDefinition
       ];
 
   @override
-  DocumentProperty<List<dynamic>> castProperty(
+  DocumentProperty<List<String>> castProperty(
     DocumentProperty<Object> property,
   ) {
-    return property as DocumentProperty<List<dynamic>>;
+    return property as DocumentProperty<List<String>>;
   }
 
   @override
-  List<dynamic>? castValue(Object? value) {
-    return value as List<dynamic>?;
+  List<String>? castValue(Object? value) {
+    return value as List<String>?;
   }
 }
 
 final class SingleLineHttpsURLEntryListDefinition
-    extends BaseDocumentDefinition<List<dynamic>> {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
 
   const SingleLineHttpsURLEntryListDefinition({
@@ -482,23 +483,23 @@ final class SingleLineHttpsURLEntryListDefinition
       ];
 
   @override
-  DocumentProperty<List<dynamic>> castProperty(
+  DocumentProperty<List<String>> castProperty(
     DocumentProperty<Object> property,
   ) {
-    return property as DocumentProperty<List<dynamic>>;
+    return property as DocumentProperty<List<String>>;
   }
 
   @override
-  List<dynamic>? castValue(Object? value) {
-    return value as List<dynamic>?;
+  List<String>? castValue(Object? value) {
+    return value as List<String>?;
   }
 }
 
 final class NestedQuestionsListDefinition
-    extends BaseDocumentDefinition<List<dynamic>> {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
 
   const NestedQuestionsListDefinition({
     required super.type,
@@ -518,21 +519,21 @@ final class NestedQuestionsListDefinition
       ];
 
   @override
-  DocumentProperty<List<dynamic>> castProperty(
+  DocumentProperty<List<String>> castProperty(
     DocumentProperty<Object> property,
   ) {
-    return property as DocumentProperty<List<dynamic>>;
+    return property as DocumentProperty<List<String>>;
   }
 
   @override
-  List<dynamic>? castValue(Object? value) {
-    return value as List<dynamic>?;
+  List<String>? castValue(Object? value) {
+    return value as List<String>?;
   }
 }
 
 // TODO(ryszard-schossler): Verify BaseDocumentDefinition type
 final class NestedQuestionsDefinition
-    extends BaseDocumentDefinition<List<dynamic>> {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
@@ -552,15 +553,15 @@ final class NestedQuestionsDefinition
       ];
 
   @override
-  DocumentProperty<List<dynamic>> castProperty(
+  DocumentProperty<List<String>> castProperty(
     DocumentProperty<Object> property,
   ) {
-    return property as DocumentProperty<List<dynamic>>;
+    return property as DocumentProperty<List<String>>;
   }
 
   @override
-  List<dynamic>? castValue(Object? value) {
-    return value as List<dynamic>?;
+  List<String>? castValue(Object? value) {
+    return value as List<String>?;
   }
 }
 
