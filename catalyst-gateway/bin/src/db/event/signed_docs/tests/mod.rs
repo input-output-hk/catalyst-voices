@@ -9,7 +9,7 @@ use crate::db::event::{common::query_limits::QueryLimits, establish_connection};
 
 #[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn some_test() {
+async fn queries_test() {
     establish_connection();
 
     let doc_type = uuid::Uuid::new_v4();
@@ -107,7 +107,7 @@ async fn some_test() {
     )
     .await
     .unwrap());
-    for exp_doc in &docs {
+    for exp_doc in docs.iter().rev() {
         let res_doc = res_docs.try_next().await.unwrap().unwrap();
         assert_eq!(exp_doc.body(), &res_doc);
     }
@@ -117,7 +117,7 @@ async fn some_test() {
             .await
             .unwrap()
     );
-    for exp_doc in &docs {
+    for exp_doc in docs.iter().rev() {
         let res_doc = res_docs.try_next().await.unwrap().unwrap();
         assert_eq!(exp_doc.body(), &res_doc);
     }
