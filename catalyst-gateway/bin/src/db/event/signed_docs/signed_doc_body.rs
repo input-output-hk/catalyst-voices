@@ -1,5 +1,7 @@
 //! `SignedDocBody` struct implementation.
 
+use futures::{Stream, StreamExt};
+
 use super::DocsQueryFilter;
 use crate::{
     db::event::{common::query_limits::QueryLimits, EventDB},
@@ -69,23 +71,18 @@ impl SignedDocBody {
         }
     }
 
-    /// Loads a vector of `SignedDocBody` from the event db.
+    /// Loads a async stream of `SignedDocBody` from the event db.
     #[allow(dead_code)]
     pub(crate) async fn retrieve(
         conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-    ) -> anyhow::Result<Vec<Self>> {
+    ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
         let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;
         let query = query_template.render(serde_json::json!({
             "conditions": conditions.to_string(),
             "query_limits": query_limits.to_string(),
         }))?;
-        let rows = EventDB::query(&query, &[]).await?;
-
-        let docs = rows
-            .iter()
-            .map(SignedDocBody::from_row)
-            .collect::<anyhow::Result<_>>()?;
-
+        let rows = EventDB::query_stream(&query, &[]).await?;
+        let docs = rows.map(|res_row| res_row.and_then(|row| SignedDocBody::from_row(&row)));
         Ok(docs)
     }
 
