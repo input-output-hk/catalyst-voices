@@ -7,6 +7,9 @@ import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/guards/milestone_guard.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -87,9 +90,9 @@ GoRouter buildAppRouter({
 }
 
 @visibleForTesting
-Future<void> registerDependencies() async {
+Future<void> registerDependencies({required AppConfig config}) async {
   if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init();
+    await Dependencies.instance.init(config: config);
   }
 }
 
@@ -115,7 +118,12 @@ Future<BootstrapArgs> bootstrap({
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
-  await registerDependencies();
+  final configService = ConfigService(ConfigRepository());
+  final config = await configService
+      .getAppConfig()
+      .onError((error, stackTrace) => const AppConfig());
+
+  await registerDependencies(config: config);
 
   // Key derivation needs to be initialized before it can be used
   await CatalystKeyDerivation.init();

@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 extension GuidanceExt on GuidanceType {
   String localizedType(VoicesLocalizations localizations) => switch (this) {

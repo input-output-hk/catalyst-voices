@@ -22,6 +22,7 @@ auditability
 Autolayout
 autorecalculates
 autoresizing
+autovalidate
 backendpython
 backgrounding
 bech
@@ -51,12 +52,15 @@ chrono
 ciphertext
 ciphertexts
 CIPs
+CNFT
 COCOAPODS
 codegen
 codepoints
 collabs
 commitlog
 concatcp
+coproposers
+COSE
 coti
 coverallsapp
 CQLSH
@@ -110,6 +114,7 @@ gethostname
 Gitbook
 gmtime
 gradlew
+Hackathons
 headful
 headlessui
 HIDPI
@@ -166,6 +171,7 @@ loguru
 lovelace
 lovelaces
 LTRB
+Lynxx
 mdlint
 metadatum
 metadatums
@@ -186,6 +192,7 @@ Multiplatform
 myproject
 Nami
 nanos
+nathanbogale
 NDEBUG
 netifas
 netkey
@@ -285,7 +292,9 @@ testplan
 testunit
 thiserror
 thollander
+Timelapse
 timelike
+tkach
 Toastify
 todos
 toggleable
@@ -294,6 +303,7 @@ tomjs
 Traceback
 traefik
 trailings
+tstr
 TXNZD
 txos
 Typer
@@ -301,6 +311,7 @@ unawaited
 unchunk
 Unlogged
 unmanaged
+Unmarks
 Unstaked
 upskilling
 UTXO
@@ -323,6 +334,7 @@ Wireframes
 Wmissing
 Wnullable
 Woverlength
+Writedown
 xcassets
 xcconfig
 xcfilelist

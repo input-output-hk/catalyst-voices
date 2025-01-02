@@ -28,6 +28,7 @@ class GetStartedPanel extends StatelessWidget {
         ),
         const SizedBox(height: 32),
         Text(
+          key: const Key('GetStartedQuestion'),
           context.l10n.accountCreationGetStatedWhatNext,
           style: theme.textTheme.titleSmall?.copyWith(
             color: theme.colors.textOnPrimaryLevel0,
@@ -40,7 +41,7 @@ class GetStartedPanel extends StatelessWidget {
             children: CreateAccountType.values
                 .map<Widget>((type) {
                   return RegistrationTile(
-                    key: ValueKey(type),
+                    key: Key(type.toString()),
                     icon: type._icon,
                     title: type._getTitle(context.l10n),
                     subtitle: type._getSubtitle(context.l10n),

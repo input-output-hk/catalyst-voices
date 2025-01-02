@@ -166,6 +166,7 @@ class VoicesLearnMoreButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesTextButton(
+      key: const Key('LearnMoreButton'),
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
       onTap: onTap,
       child: Text(context.l10n.learnMore),

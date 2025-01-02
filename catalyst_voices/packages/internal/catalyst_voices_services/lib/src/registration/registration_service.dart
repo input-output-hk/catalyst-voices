@@ -6,7 +6,7 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:logging/logging.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid/uuid.dart';
 
 // TODO(damian-molinski): remove once recover account is implemented
@@ -51,13 +51,6 @@ abstract interface class RegistrationService {
   /// Loads account related to this [seedPhrase]. Throws exception if non found.
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
-  });
-
-  /// Creates [Keychain] for given [account] with [lockFactor].
-  Future<Keychain> createKeychainFor({
-    required Account account,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
   });
 
   /// Builds an unsigned registration transaction from given parameters.
@@ -148,13 +141,16 @@ final class RegistrationServiceImpl implements RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    // TODO(dtscalac): support more roles when backend is ready
+    // TODO(dtscalac): derive a key from the seed phrase and fetch
+    // from the backend info about the registration (roles, wallet, etc).
     final roles = {AccountRole.root};
+
     final keychainId = const Uuid().v4();
+    final keychain = await _keychainProvider.create(keychainId);
 
     // Note. with rootKey query backend for account details.
     return Account(
-      keychainId: keychainId,
+      keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),
@@ -162,23 +158,6 @@ final class RegistrationServiceImpl implements RegistrationService {
         address: _testNetAddress,
       ),
     );
-  }
-
-  @override
-  Future<Keychain> createKeychainFor({
-    required Account account,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  }) async {
-    final keychainId = account.keychainId;
-    final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
-
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
-
-    return keychain;
   }
 
   @override
@@ -200,15 +179,10 @@ final class RegistrationServiceImpl implements RegistrationService {
         ),
       );
 
-      final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
-        masterKey: masterKey,
-        // TODO(dtscalac): support more roles when backend is ready
-        role: AccountRole.root,
-      );
-
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: config,
-        keyPair: keyPair,
+        keyDerivation: _keyDerivation,
+        masterKey: masterKey,
         networkId: networkId,
         roles: roles,
         changeAddress: changeAddress,
@@ -257,7 +231,7 @@ final class RegistrationServiceImpl implements RegistrationService {
       final address = await enabledWallet.getChangeAddress();
 
       return Account(
-        keychainId: keychainId,
+        keychain: keychain,
         roles: roles,
         walletInfo: WalletInfo(
           metadata: WalletMetadata.fromCardanoWallet(wallet),
@@ -278,7 +252,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required SeedPhrase seedPhrase,
     required LockFactor lockFactor,
   }) async {
-    final roles = {AccountRole.root};
+    final roles = {AccountRole.voter, AccountRole.proposer};
     final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
 
     final keychain = await _keychainProvider.create(keychainId);
@@ -287,7 +261,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.setMasterKey(masterKey);
 
     return Account(
-      keychainId: keychainId,
+      keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),

@@ -2,17 +2,23 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
-part 'capability_and_feasibility.dart';
-part 'proposal_impact.dart';
-part 'proposal_setup.dart';
-part 'proposal_solution.dart';
-part 'proposal_summary.dart';
+final class WorkspaceSection extends BaseSection<WorkspaceSectionStep> {
+  final String name;
 
-sealed class WorkspaceSection extends BaseSection<WorkspaceSectionStep> {
   const WorkspaceSection({
     required super.id,
+    required this.name,
     required super.steps,
   });
+
+  @override
+  String localizedName(BuildContext context) => name;
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        name,
+      ];
 }
 
 sealed class WorkspaceSectionStep extends BaseSectionStep {
@@ -21,22 +27,34 @@ sealed class WorkspaceSectionStep extends BaseSectionStep {
     required super.sectionId,
     super.isEnabled,
     super.isEditable,
-    super.guidances,
   });
 }
 
-abstract base class RichTextStep extends WorkspaceSectionStep {
-  final DocumentJson data;
+final class RichTextStep extends WorkspaceSectionStep {
+  final String name;
+  final String? description;
+  final MarkdownData? initialData;
   final int? charsLimit;
 
   const RichTextStep({
     required super.id,
     required super.sectionId,
-    required this.data,
+    required this.name,
+    this.description,
+    this.initialData,
     this.charsLimit,
     super.isEditable,
-    super.guidances,
   });
 
-  String localizedDesc(BuildContext context) => localizedName(context);
+  @override
+  String localizedName(BuildContext context) => name;
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        name,
+        description,
+        initialData,
+        charsLimit,
+      ];
 }
