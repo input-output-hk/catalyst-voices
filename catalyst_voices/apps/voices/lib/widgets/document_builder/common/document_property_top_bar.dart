@@ -3,13 +3,13 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class DocumentPropertyTopBar extends StatelessWidget {
-  final String title;
+  final String? title;
   final bool isEditMode;
   final VoidCallback? onToggleEditMode;
 
   const DocumentPropertyTopBar({
     super.key,
-    required this.title,
+    this.title,
     required this.isEditMode,
     this.onToggleEditMode,
   });
@@ -20,7 +20,7 @@ class DocumentPropertyTopBar extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            title,
+            title ?? '',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),

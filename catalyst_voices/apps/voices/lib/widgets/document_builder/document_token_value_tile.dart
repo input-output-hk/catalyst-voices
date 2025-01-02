@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 class DocumentTokenValueTile extends StatefulWidget {
   final DocumentNodeId id;
   final String title;
-  final String description;
+  final String? description;
   final int? initialValue;
   final Currency currency;
   final Range<int>? range;
@@ -23,7 +23,7 @@ class DocumentTokenValueTile extends StatefulWidget {
     super.key,
     required this.id,
     required this.title,
-    required this.description,
+    this.description,
     this.initialValue,
     required this.currency,
     this.range,
