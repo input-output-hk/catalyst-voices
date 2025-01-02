@@ -9,6 +9,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class DocumentTokenValueTile extends StatefulWidget {
+  final DocumentNodeId id;
   final String title;
   final String description;
   final int? initialValue;
@@ -16,12 +17,11 @@ class DocumentTokenValueTile extends StatefulWidget {
   final Range<int>? range;
   final bool isSelected;
   final bool isRequired;
-
-  // TODO(damian-molinski): Change to DocumentChange
-  final ValueChanged<int?> onChanged;
+  final ValueChanged<DocumentChange> onChanged;
 
   const DocumentTokenValueTile({
     super.key,
+    required this.id,
     required this.title,
     required this.description,
     this.initialValue,
@@ -130,7 +130,8 @@ class _DocumentTokenValueTileState extends State<DocumentTokenValueTile> {
       _editMode = false;
       _focusNode.canRequestFocus = false;
 
-      widget.onChanged(_value);
+      final change = DocumentChange(nodeId: widget.id, value: _value);
+      widget.onChanged(change);
     });
   }
 

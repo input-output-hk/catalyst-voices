@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/document_builder/document_property_builder.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_property_builder_widget.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
