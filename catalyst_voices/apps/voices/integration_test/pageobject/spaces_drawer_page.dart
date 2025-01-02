@@ -17,25 +17,14 @@ class SpacesDrawerPage {
   static const userFeedbackTile = Key('FeedbackTile');
   static const userDocumentationTile = Key('DocumentationTile');
   static const userDrawerMenuItem = Key('UserDrawerMenuItem');
-
-  static Key chooserItem(Space space) {
-    return Key('DrawerChooser$space');
-  }
-
-  static Key userHeader(Space space) {
-    return Key('SpaceHeader.${space.name}');
-  }
+  static const tooltipElement = Key('Tooltip');
 
   static Key chooserIcon(Space space) {
     return Key('DrawerChooser${space}AvatarKey');
   }
 
-  static Key userMenuContainer(Space space) {
-    return Key('Drawer${space}MenuKey');
-  }
-
-  static Key userSectionHeader(Space space) {
-    return Key('Header.${space.name}');
+  static Key chooserItem(Space space) {
+    return Key('DrawerChooser$space');
   }
 
   static void commonElementsLookAsExpected(PatrolTester $) {
@@ -56,26 +45,6 @@ class SpacesDrawerPage {
       matching: find.byWidgetPredicate((widget) => true),
     );
     expect($(children), findsAtLeast(1));
-  }
-
-  static Future<void> userLooksAsExpected(PatrolTester $, Space space) async {
-    switch (space) {
-      case Space.discovery:
-        userDiscoveryLooksAsExpected($);
-        break;
-      case Space.workspace:
-        userWorkspaceLooksAsExpected($);
-        break;
-      case Space.voting:
-        userVotingLooksAsExpected($);
-        break;
-      case Space.fundedProjects:
-        userFundedProjectsLooksAsExpected($);
-        break;
-      case Space.treasury:
-        userTreasuryLooksAsExpected($);
-        break;
-    }
   }
 
   static void userDiscoveryLooksAsExpected(PatrolTester $) {
@@ -101,18 +70,56 @@ class SpacesDrawerPage {
     );
   }
 
-  static void userWorkspaceLooksAsExpected(PatrolTester $) {
+  static void userFundedProjectsLooksAsExpected(PatrolTester $) {
     expect(
-      $(userMenuContainer(Space.workspace)).$(userHeader(Space.workspace)),
+      $(userMenuContainer(Space.fundedProjects)),
+      findsOneWidget,
+    );
+  }
+
+  static Key userHeader(Space space) {
+    return Key('SpaceHeader.${space.name}');
+  }
+
+  static Future<void> userLooksAsExpected(PatrolTester $, Space space) async {
+    switch (space) {
+      case Space.discovery:
+        userDiscoveryLooksAsExpected($);
+        break;
+      case Space.workspace:
+        userWorkspaceLooksAsExpected($);
+        break;
+      case Space.voting:
+        userVotingLooksAsExpected($);
+        break;
+      case Space.fundedProjects:
+        userFundedProjectsLooksAsExpected($);
+        break;
+      case Space.treasury:
+        userTreasuryLooksAsExpected($);
+        break;
+    }
+  }
+
+  static Key userMenuContainer(Space space) {
+    return Key('Drawer${space}MenuKey');
+  }
+
+  static Key userSectionHeader(Space space) {
+    return Key('Header.${space.name}');
+  }
+
+  static void userTreasuryLooksAsExpected(PatrolTester $) {
+    expect(
+      $(userMenuContainer(Space.treasury)).$(userHeader(Space.treasury)),
       findsOneWidget,
     );
     expect(
-      $(userMenuContainer(Space.workspace))
-          .$(userSectionHeader(Space.workspace)),
+      $(userMenuContainer(Space.treasury)).$(userSectionHeader(Space.treasury)),
       findsOneWidget,
     );
     final children = find.descendant(
-      of: $(userMenuContainer(Space.workspace)),
+      of: $(userMenuContainer(Space.treasury)),
       matching: $(userDrawerMenuItem),
     );
     expect($(children), findsAtLeast(1));
@@ -134,24 +141,18 @@ class SpacesDrawerPage {
     expect($(children), findsAtLeast(1));
   }
 
-  static void userFundedProjectsLooksAsExpected(PatrolTester $) {
+  static void userWorkspaceLooksAsExpected(PatrolTester $) {
     expect(
-      $(userMenuContainer(Space.fundedProjects)),
-      findsOneWidget,
-    );
-  }
-
-  static void userTreasuryLooksAsExpected(PatrolTester $) {
-    expect(
-      $(userMenuContainer(Space.treasury)).$(userHeader(Space.treasury)),
+      $(userMenuContainer(Space.workspace)).$(userHeader(Space.workspace)),
       findsOneWidget,
     );
     expect(
-      $(userMenuContainer(Space.treasury)).$(userSectionHeader(Space.treasury)),
+      $(userMenuContainer(Space.workspace))
+          .$(userSectionHeader(Space.workspace)),
       findsOneWidget,
     );
     final children = find.descendant(
-      of: $(userMenuContainer(Space.treasury)),
+      of: $(userMenuContainer(Space.workspace)),
       matching: $(userDrawerMenuItem),
     );
     expect($(children), findsAtLeast(1));
