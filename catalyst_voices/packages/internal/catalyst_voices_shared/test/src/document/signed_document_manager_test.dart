@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
-import 'package:catalyst_voices_shared/src/document/document_manager.dart';
+import 'package:catalyst_voices_shared/src/document/signed_document_manager.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -13,8 +13,8 @@ final _publicKey = Uint8List.fromList(List.filled(32, 1));
 final _signature = Uint8List.fromList(List.filled(32, 2));
 
 void main() {
-  group(DocumentManager, () {
-    const documentManager = DocumentManager();
+  group(SignedDocumentManager, () {
+    const documentManager = SignedDocumentManager();
 
     setUpAll(() {
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
@@ -40,7 +40,7 @@ void main() {
         privateKey: _privateKey,
       );
 
-      expect(signedDocument.document, equals(document));
+      expect(signedDocument.payload, equals(document));
 
       final isVerified = await signedDocument.verifySignature(_publicKey);
       expect(isVerified, isTrue);
@@ -56,7 +56,7 @@ void main() {
   });
 }
 
-final class _JsonDocument extends Equatable implements BinaryDocument {
+final class _JsonDocument extends Equatable implements SignedDocumentPayload {
   final String title;
 
   const _JsonDocument(this.title);
