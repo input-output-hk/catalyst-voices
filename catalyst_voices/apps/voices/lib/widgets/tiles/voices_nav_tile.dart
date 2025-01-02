@@ -42,6 +42,7 @@ class VoicesNavTile extends StatelessWidget {
     );
 
     return IconTheme(
+      key: const ValueKey('UserDrawerMenuItem'),
       data: iconTheme,
       child: IconButtonTheme(
         data: const IconButtonThemeData(style: iconButtonStyle),

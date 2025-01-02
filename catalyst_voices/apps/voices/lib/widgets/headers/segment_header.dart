@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class SegmentHeader extends StatelessWidget {
   final String name;
   final Widget? leading;
+  final EdgeInsets padding;
   final List<Widget> actions;
   final bool isSelected;
   final VoidCallback? onTap;
@@ -12,6 +13,7 @@ class SegmentHeader extends StatelessWidget {
     super.key,
     required this.name,
     this.leading,
+    this.padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
     this.actions = const [],
     this.isSelected = false,
     this.onTap,
@@ -57,7 +59,7 @@ class SegmentHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 color: backgroundColor.resolve(_states),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: padding,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
