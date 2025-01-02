@@ -17,7 +17,7 @@ use crate::db::index::queries::{
 };
 
 const FAILED_EXECUTING_QUERY_MSG: &str = "Failed executing query";
-const FAILED_READING_ROW_MSG: &str = "Failed executing query";
+const FAILED_READING_ROW_MSG: &str = "Failed reading row";
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
