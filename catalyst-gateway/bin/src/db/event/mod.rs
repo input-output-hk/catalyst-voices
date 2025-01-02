@@ -10,7 +10,7 @@ use std::{
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use error::NotFoundError;
-use futures::{Stream, TryStreamExt};
+use futures::{Stream, StreamExt, TryStreamExt};
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
@@ -100,7 +100,7 @@ impl EventDB {
     ///
     /// # Returns
     ///
-    /// `anyhow::Result<impl TryStreamExt<Item = Result<Row, tokio_postgres::Error>>>`
+    /// `anyhow::Result<impl Stream<Item = anyhow::Result<Row>>>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_stream(
         stmt: &str, params: &[&(dyn ToSql + Sync)],
@@ -111,7 +111,7 @@ impl EventDB {
         let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
         let conn = pool.get().await?;
         let rows = conn.query_raw(stmt, params.iter().copied()).await?;
-        Ok(rows.map_err(Into::into))
+        Ok(rows.map_err(Into::into).boxed())
     }
 
     /// Query the database for a single row.
