@@ -139,6 +139,7 @@ project: {
 							memory: "16Gi"
 						}
 						limits: {
+							cpu:    "8"
 							memory: "20Gi"
 						}
 					}
