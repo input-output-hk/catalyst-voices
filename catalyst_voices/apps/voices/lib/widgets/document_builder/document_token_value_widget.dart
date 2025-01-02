@@ -86,6 +86,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
             const SizedBox(height: 22),
             TokenField(
               controller: _controller,
+              focusNode: _focusNode,
               onFieldSubmitted: _handleSubmitted,
               onStatusChanged: _handleStatusChange,
               labelText: tokenFieldLabel,
@@ -142,17 +143,19 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
         // save last value
         _value = _controller.value;
 
-        _focusNode.canRequestFocus = true;
+        _focusNode
+          ..canRequestFocus = true
+          ..requestFocus();
       } else {
         // restore previous value
         _controller.value = _value;
 
-        _focusNode.canRequestFocus = false;
+        _focusNode
+          ..canRequestFocus = false
+          ..unfocus();
       }
 
       _editMode = mode;
-
-      _focusNode.requestFocus();
     });
   }
 }
