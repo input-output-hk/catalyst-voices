@@ -21,14 +21,14 @@ use crate::db::index::queries::{
 async fn test_get_assets_by_stake_addr() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetAssetsByStakeAddressQuery::execute(
+    let mut row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
         GetAssetsByStakeAddressParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -39,13 +39,13 @@ async fn test_get_assets_by_stake_addr() {
 async fn test_get_chain_root() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
+    let mut row_stream = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
         stake_address: vec![],
     })
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -56,14 +56,14 @@ async fn test_get_chain_root() {
 async fn test_get_invalid_registration_w_stake_addr() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetInvalidRegistrationQuery::execute(
+    let mut row_stream = GetInvalidRegistrationQuery::execute(
         &session,
         GetInvalidRegistrationParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -74,14 +74,14 @@ async fn test_get_invalid_registration_w_stake_addr() {
 async fn test_get_registrations_by_chain_root() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetRegistrationsByChainRootQuery::execute(
+    let mut row_stream = GetRegistrationsByChainRootQuery::execute(
         &session,
         GetRegistrationsByChainRootQueryParams { chain_root: vec![] },
     )
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -92,13 +92,13 @@ async fn test_get_registrations_by_chain_root() {
 async fn test_get_registrations_w_stake_addr() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetRegistrationQuery::execute(&session, GetRegistrationParams {
+    let mut row_stream = GetRegistrationQuery::execute(&session, GetRegistrationParams {
         stake_address: vec![],
     })
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -109,13 +109,13 @@ async fn test_get_registrations_w_stake_addr() {
 async fn test_get_role0_key_chain_root() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
+    let mut row_stream = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
         role0_key: vec![],
     })
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -126,11 +126,11 @@ async fn test_get_role0_key_chain_root() {
 async fn test_get_stake_addr_w_stake_key_hash() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
+    let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
         .await
         .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -141,13 +141,13 @@ async fn test_get_stake_addr_w_stake_key_hash() {
 async fn test_get_stake_addr_w_vote_key() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
+    let mut row_stream = GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
         vote_key: vec![],
     })
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -168,12 +168,12 @@ async fn test_get_stake_addr_w_vote_key() {
 async fn test_get_txi_by_txn_hashes() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter =
+    let mut row_stream =
         GetTxiByTxnHashesQuery::execute(&session, GetTxiByTxnHashesQueryParams::new(vec![]))
             .await
             .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
@@ -184,14 +184,14 @@ async fn test_get_txi_by_txn_hashes() {
 async fn test_get_txo_by_stake_address() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut iter = GetTxoByStakeAddressQuery::execute(
+    let mut row_stream = GetTxoByStakeAddressQuery::execute(
         &session,
         GetTxoByStakeAddressQueryParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
     .unwrap();
 
-    while let Some(row_res) = iter.next().await {
+    while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
         drop(row);
     }
