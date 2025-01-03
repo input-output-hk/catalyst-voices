@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_properties_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_converter_ext.dart';
 
 /// A data transfer object for the [Document].
 ///
@@ -156,9 +157,9 @@ final class DocumentSectionDto {
   }
 }
 
-final class DocumentPropertyDto {
+final class DocumentPropertyDto<T extends Object> {
   final DocumentSchemaProperty schema;
-  final dynamic value;
+  final T? value;
 
   const DocumentPropertyDto({
     required this.schema,
@@ -166,20 +167,19 @@ final class DocumentPropertyDto {
   });
 
   factory DocumentPropertyDto.fromJsonSchema(
-    DocumentSchemaProperty schema, {
+    DocumentSchemaProperty<T> schema, {
     required DocumentPropertiesDto properties,
   }) {
     return DocumentPropertyDto(
       schema: schema,
-      // TODO(dtscalac): validate that value is of correct type, ignore if not
-      value: properties.getProperty(schema.nodeId),
+      value: schema.definition.converter
+          .fromJson(properties.getProperty(schema.nodeId)),
     );
   }
 
-  factory DocumentPropertyDto.fromModel(DocumentProperty model) {
+  factory DocumentPropertyDto.fromModel(DocumentProperty<T> model) {
     return DocumentPropertyDto(
       schema: model.schema,
-      // TODO(dtscalac): convert to json from model
       value: model.value,
     );
   }
@@ -187,12 +187,11 @@ final class DocumentPropertyDto {
   DocumentProperty toModel() {
     return DocumentProperty(
       schema: schema,
-      // TODO(dtscalac): convert from json to model
       value: value,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        schema.id: value,
+        schema.id: schema.definition.converter.toJson(value),
       };
 }

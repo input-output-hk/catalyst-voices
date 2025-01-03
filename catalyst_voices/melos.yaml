@@ -105,6 +105,7 @@ command:
       flutter_dropzone_platform_interface: 2.0.6
       flutter_dropzone_web: 4.0.2
       flutter_localized_locales: ^2.0.5
+      flutter_markdown: ^0.7.4+3
       flutter_quill: ^10.8.2
       flutter_quill_extensions: ^10.8.2
       flutter_rust_bridge: ^2.5.1

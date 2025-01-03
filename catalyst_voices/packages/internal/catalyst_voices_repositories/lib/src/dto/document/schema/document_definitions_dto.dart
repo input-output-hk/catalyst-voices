@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_definitions_dto.g.dart';
@@ -28,6 +29,7 @@ final class DocumentDefinitionsDto {
   final AgreementConfirmationDto agreementConfirmation;
   @JsonKey(name: 'spdxLicenseOrURL')
   final SPDXLicenceOrUrlDto spdxLicenceOrUrl;
+  final LanguageCodeDto languageCode;
 
   const DocumentDefinitionsDto({
     required this.segment,
@@ -51,6 +53,7 @@ final class DocumentDefinitionsDto {
     required this.yesNoChoice,
     required this.agreementConfirmation,
     required this.spdxLicenceOrUrl,
+    required this.languageCode,
   });
 
   factory DocumentDefinitionsDto.fromJson(Map<String, dynamic> json) =>
@@ -80,6 +83,7 @@ final class DocumentDefinitionsDto {
         yesNoChoice.toModel(),
         agreementConfirmation.toModel(),
         spdxLicenceOrUrl.toModel(),
+        languageCode.toModel(),
       ];
 }
 
@@ -324,7 +328,8 @@ final class SingleLineTextEntryListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<String> defaultValue;
+  @ListStringConverter()
+  final List<String>? defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -349,7 +354,7 @@ final class SingleLineTextEntryListDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValues: defaultValue,
+        defaultValues: defaultValue ?? <String>[],
         items: items,
       );
 }
@@ -360,7 +365,8 @@ final class MultiLineTextEntryListMarkdownDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  @ListStringConverter()
+  final List<String>? defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -388,7 +394,7 @@ final class MultiLineTextEntryListMarkdownDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? <String>[],
         items: items,
       );
 }
@@ -399,7 +405,8 @@ final class SingleLineHttpsURLEntryListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  @ListStringConverter()
+  final List<String>? defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -424,7 +431,7 @@ final class SingleLineHttpsURLEntryListDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? <String>[],
         items: items,
       );
 }
@@ -435,7 +442,8 @@ final class NestedQuestionsListDto {
   final String format;
   final bool uniqueItems;
   @JsonKey(name: 'default')
-  final List<dynamic> defaultValue;
+  @ListStringConverter()
+  final List<String>? defaultValue;
   @JsonKey(name: 'x-note')
   final String note;
 
@@ -457,7 +465,7 @@ final class NestedQuestionsListDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? <String>[],
       );
 }
 
@@ -638,7 +646,7 @@ final class YesNoChoiceDto {
   final String type;
   final String format;
   @JsonKey(name: 'default')
-  final bool defaultValue;
+  final bool? defaultValue;
   @JsonKey(name: 'x-note')
   final String note;
 
@@ -658,7 +666,7 @@ final class YesNoChoiceDto {
         type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? false,
       );
 }
 
@@ -667,9 +675,9 @@ final class AgreementConfirmationDto {
   final String type;
   final String format;
   @JsonKey(name: 'default')
-  final bool defaultValue;
+  final bool? defaultValue;
   @JsonKey(name: 'const')
-  final bool constValue;
+  final bool? constValue;
   @JsonKey(name: 'x-note')
   final String note;
 
@@ -690,8 +698,8 @@ final class AgreementConfirmationDto {
         type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
-        defaultValue: defaultValue,
-        constValue: constValue,
+        defaultValue: defaultValue ?? false,
+        constValue: constValue ?? true,
       );
 }
 
@@ -724,5 +732,40 @@ final class SPDXLicenceOrUrlDto {
         pattern: pattern,
         contentMediaType:
             DocumentDefinitionsContentMediaType.fromString(contentMediaType),
+      );
+}
+
+@JsonSerializable()
+final class LanguageCodeDto {
+  final String type;
+  final String? title;
+  final String? description;
+  @JsonKey(name: 'enum')
+  @ListStringConverter()
+  final List<String>? enumValues;
+  @JsonKey(name: 'default')
+  final String? defaultValue;
+  @JsonKey(name: 'x-note')
+  final String note;
+
+  const LanguageCodeDto({
+    required this.type,
+    required this.title,
+    required this.description,
+    required this.enumValues,
+    required this.defaultValue,
+    required this.note,
+  });
+
+  factory LanguageCodeDto.fromJson(Map<String, dynamic> json) =>
+      _$LanguageCodeDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LanguageCodeDtoToJson(this);
+
+  LanguageCodeDefinition toModel() => LanguageCodeDefinition(
+        type: DocumentDefinitionsObjectType.fromString(type),
+        note: note,
+        defaultValue: defaultValue ?? 'en',
+        enumValues: enumValues ?? <String>[],
       );
 }
