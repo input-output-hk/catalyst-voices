@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["cat_gateway",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"cat_gateway/logger/enum.LogLevel.html\" title=\"enum cat_gateway::logger::LogLevel\">LogLevel</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"cat_gateway/service/api/health/inspection_get/enum.DeepQueryInspectionFlag.html\" title=\"enum cat_gateway::service::api::health::inspection_get::DeepQueryInspectionFlag\">DeepQueryInspectionFlag</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"cat_gateway/service/api/health/inspection_get/enum.LogLevel.html\" title=\"enum cat_gateway::service::api::health::inspection_get::LogLevel\">LogLevel</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"cat_gateway/service/api/auth/token/struct.Kid.html\" title=\"struct cat_gateway::service::api::auth::token::Kid\">Kid</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"struct\" href=\"cat_gateway/service/api/auth/token/struct.UlidBytes.html\" title=\"struct cat_gateway::service::api::auth::token::UlidBytes\">UlidBytes</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1596]}

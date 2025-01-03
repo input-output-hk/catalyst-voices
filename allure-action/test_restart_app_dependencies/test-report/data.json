@@ -1,0 +1,50 @@
+[
+  {
+    "runId": 12410573393,
+    "runUniqueId": "12410573393_1734604385783",
+    "testResult": "PASS",
+    "timestamp": 1734603821000,
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 334,
+        "unknown": 0,
+        "total": 334
+      },
+      "time": {
+        "start": 1734603821000,
+        "stop": 1734603906323,
+        "duration": 85323,
+        "minDuration": 1,
+        "maxDuration": 1091,
+        "sumDuration": 24783
+      }
+    }
+  },
+  {
+    "runId": 12409124905,
+    "runUniqueId": "12409124905_1734598953280",
+    "testResult": "PASS",
+    "timestamp": 1734598310000,
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 334,
+        "unknown": 0,
+        "total": 334
+      },
+      "time": {
+        "start": 1734598310000,
+        "stop": 1734598386301,
+        "duration": 76301,
+        "minDuration": 0,
+        "maxDuration": 677,
+        "sumDuration": 20405
+      }
+    }
+  }
+]

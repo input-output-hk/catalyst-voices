@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CompressionChoice","TlsChoice"],"fn":["make_execution_profile","make_session","retry_init"],"static":["PERSISTENT_SESSION","VOLATILE_SESSION"],"struct":["CassandraSession"]};

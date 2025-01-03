@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["FILTERED_SELECT_SIGNED_DOCS_TEMPLATE"],"struct":["SignedDocBody"]};

@@ -1,0 +1,31 @@
+block = [
+    block_header,
+    block_data: ~encoded-cbor, ; deterministically encoded CBOR
+    validator_signature,
+]
+
+block_header = [
+    chain_id: ULID,
+    height: int,
+    timestamp: ~#6.1(uint .ge 1722470400), ; Epoch-based date/time
+    prev_block_id: hash_bytes, ; hash of the previous block
+    ?ledger_type: UUID,
+    ?purpose_id: ULID / UUID,
+    ?validator,
+    ~metadata,
+]
+
+UUID = #6.37(bytes) ; UUID type
+ULID = #6.32780(bytes) ; ULID type
+
+hash_bytes = (
+  #6.32781(bytes) \ ; Blake3 hash
+  #6.32782(bytes) \ ; Blake2b hash
+  #6.32783(bytes) ; Blake2s hash
+)
+kid = hash_bytes ; hash of the x509/c509 certificate
+
+validator = (kid / [2* kid])
+metadata = [ *Any ]
+
+validator_signature = (bytes / [2* bytes])
