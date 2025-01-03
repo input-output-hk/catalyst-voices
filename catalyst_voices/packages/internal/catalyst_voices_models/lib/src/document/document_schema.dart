@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 
 /// A document schema that describes the structure of a document.
 ///
@@ -137,6 +138,22 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
     required this.itemsRange,
     required this.oneOf,
     required this.isRequired,
+  });
+
+  @visibleForTesting
+  const DocumentSchemaProperty.optional({
+    required this.definition,
+    required this.nodeId,
+    required this.id,
+    this.title,
+    this.description,
+    this.defaultValue,
+    this.guidance,
+    this.enumValues,
+    this.range,
+    this.itemsRange,
+    this.oneOf,
+    this.isRequired = false,
   });
 
   @override
