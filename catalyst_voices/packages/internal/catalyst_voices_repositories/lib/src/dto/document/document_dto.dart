@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_properties_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
 
 /// A data transfer object for the [Document].
 ///
@@ -171,7 +172,8 @@ final class DocumentPropertyDto<T extends Object> {
   }) {
     return DocumentPropertyDto(
       schema: schema,
-      value: schema.definition.castValue(properties.getProperty(schema.nodeId)),
+      value: schema.definition.converter
+          .fromJson(properties.getProperty(schema.nodeId)),
     );
   }
 

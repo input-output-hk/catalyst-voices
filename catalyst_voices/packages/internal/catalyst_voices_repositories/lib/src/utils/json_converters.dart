@@ -45,3 +45,17 @@ final class ListStringConverter
   List<dynamic> toJson(List<String> object) =>
       object.map((e) => e as dynamic).toList();
 }
+
+/// A converter that only casts json to a target type.
+///
+/// Can be used for simple types like [String], [int], etc,
+/// which have a direct representation in json.
+final class NoopConverter<T> implements JsonConverter<T?, Object?> {
+  const NoopConverter();
+
+  @override
+  T? fromJson(Object? json) => json as T?;
+
+  @override
+  Object? toJson(T? object) => object as Object?;
+}

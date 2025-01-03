@@ -48,6 +48,7 @@ class DocumentPropertyBuilderWidget extends StatelessWidget {
           onChanged: onChanged,
         ),
       SPDXLicenceOrUrlDefinition() => throw UnimplementedError(),
+      LanguageCodeDefinition() => throw UnimplementedError(),
 
       // unsupported
       SegmentDefinition() || SectionDefinition() => throw UnsupportedError(

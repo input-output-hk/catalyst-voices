@@ -15,15 +15,6 @@ enum DocumentDefinitionsObjectType {
     return DocumentDefinitionsObjectType.values.asNameMap()[value] ??
         DocumentDefinitionsObjectType.unknown;
   }
-
-  dynamic get defaultValue => switch (this) {
-        string => '',
-        integer => 0,
-        boolean => true,
-        array => <String>[],
-        object => <String, dynamic>{},
-        unknown => 'unknown',
-      };
 }
 
 enum DocumentDefinitionsContentMediaType {
@@ -105,6 +96,7 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
     'yesNoChoice': YesNoChoiceDefinition,
     'agreementConfirmation': AgreementConfirmationDefinition,
     'spdxLicenseOrURL': SPDXLicenceOrUrlDefinition,
+    'languageCode': LanguageCodeDefinition,
   };
 
   static Type typeFromRefPath(String refPath) {
@@ -807,4 +799,28 @@ final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition<String> {
   String? castValue(Object? value) {
     return value as String?;
   }
+}
+
+final class LanguageCodeDefinition extends BaseDocumentDefinition<String> {
+  final String defaultValue;
+  final List<String> enumValues;
+  const LanguageCodeDefinition({
+    required super.type,
+    required super.note,
+    required this.defaultValue,
+    required this.enumValues,
+  });
+
+  @override
+  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<String>;
+  }
+
+  @override
+  String? castValue(Object? value) {
+    return value as String?;
+  }
+
+  @override
+  List<Object?> get props => [];
 }

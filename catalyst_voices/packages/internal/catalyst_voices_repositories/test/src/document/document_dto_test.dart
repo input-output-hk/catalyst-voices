@@ -64,7 +64,7 @@ void main() {
       final agreementSections = documentDto.segments[agreementSegment].sections;
       expect(
         agreementSections.first.properties.first.value,
-        isA<bool?>(),
+        isA<bool>(),
       );
       expect(agreementSections.first.properties.first.value, true);
     });

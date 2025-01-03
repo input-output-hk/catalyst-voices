@@ -29,6 +29,7 @@ final class DocumentDefinitionsDto {
   final AgreementConfirmationDto agreementConfirmation;
   @JsonKey(name: 'spdxLicenseOrURL')
   final SPDXLicenceOrUrlDto spdxLicenceOrUrl;
+  final LanguageCodeDto languageCode;
 
   const DocumentDefinitionsDto({
     required this.segment,
@@ -52,6 +53,7 @@ final class DocumentDefinitionsDto {
     required this.yesNoChoice,
     required this.agreementConfirmation,
     required this.spdxLicenceOrUrl,
+    required this.languageCode,
   });
 
   factory DocumentDefinitionsDto.fromJson(Map<String, dynamic> json) =>
@@ -81,6 +83,7 @@ final class DocumentDefinitionsDto {
         yesNoChoice.toModel(),
         agreementConfirmation.toModel(),
         spdxLicenceOrUrl.toModel(),
+        languageCode.toModel(),
       ];
 }
 
@@ -326,7 +329,7 @@ final class SingleLineTextEntryListDto {
   final bool uniqueItems;
   @JsonKey(name: 'default')
   @ListStringConverter()
-  final List<String> defaultValue;
+  final List<String>? defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -351,7 +354,7 @@ final class SingleLineTextEntryListDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValues: defaultValue,
+        defaultValues: defaultValue ?? <String>[],
         items: items,
       );
 }
@@ -363,7 +366,7 @@ final class MultiLineTextEntryListMarkdownDto {
   final bool uniqueItems;
   @JsonKey(name: 'default')
   @ListStringConverter()
-  final List<String> defaultValue;
+  final List<String>? defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -391,7 +394,7 @@ final class MultiLineTextEntryListMarkdownDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? <String>[],
         items: items,
       );
 }
@@ -403,7 +406,7 @@ final class SingleLineHttpsURLEntryListDto {
   final bool uniqueItems;
   @JsonKey(name: 'default')
   @ListStringConverter()
-  final List<String> defaultValue;
+  final List<String>? defaultValue;
   final Map<String, dynamic> items;
   @JsonKey(name: 'x-note')
   final String note;
@@ -428,7 +431,7 @@ final class SingleLineHttpsURLEntryListDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? <String>[],
         items: items,
       );
 }
@@ -440,7 +443,7 @@ final class NestedQuestionsListDto {
   final bool uniqueItems;
   @JsonKey(name: 'default')
   @ListStringConverter()
-  final List<String> defaultValue;
+  final List<String>? defaultValue;
   @JsonKey(name: 'x-note')
   final String note;
 
@@ -462,7 +465,7 @@ final class NestedQuestionsListDto {
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
         uniqueItems: uniqueItems,
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? <String>[],
       );
 }
 
@@ -643,7 +646,7 @@ final class YesNoChoiceDto {
   final String type;
   final String format;
   @JsonKey(name: 'default')
-  final bool defaultValue;
+  final bool? defaultValue;
   @JsonKey(name: 'x-note')
   final String note;
 
@@ -663,7 +666,7 @@ final class YesNoChoiceDto {
         type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
-        defaultValue: defaultValue,
+        defaultValue: defaultValue ?? false,
       );
 }
 
@@ -672,9 +675,9 @@ final class AgreementConfirmationDto {
   final String type;
   final String format;
   @JsonKey(name: 'default')
-  final bool defaultValue;
+  final bool? defaultValue;
   @JsonKey(name: 'const')
-  final bool constValue;
+  final bool? constValue;
   @JsonKey(name: 'x-note')
   final String note;
 
@@ -695,8 +698,8 @@ final class AgreementConfirmationDto {
         type: DocumentDefinitionsObjectType.fromString(type),
         note: note,
         format: DocumentDefinitionsFormat.fromString(format),
-        defaultValue: defaultValue,
-        constValue: constValue,
+        defaultValue: defaultValue ?? false,
+        constValue: constValue ?? true,
       );
 }
 
@@ -730,4 +733,72 @@ final class SPDXLicenceOrUrlDto {
         contentMediaType:
             DocumentDefinitionsContentMediaType.fromString(contentMediaType),
       );
+}
+
+@JsonSerializable()
+final class LanguageCodeDto {
+  final String type;
+  final String? title;
+  final String? description;
+  @JsonKey(name: 'enum')
+  @ListStringConverter()
+  final List<String>? enumValues;
+  @JsonKey(name: 'default')
+  final String? defaultValue;
+  @JsonKey(name: 'x-note')
+  final String note;
+
+  const LanguageCodeDto({
+    required this.type,
+    required this.title,
+    required this.description,
+    required this.enumValues,
+    required this.defaultValue,
+    required this.note,
+  });
+
+  factory LanguageCodeDto.fromJson(Map<String, dynamic> json) =>
+      _$LanguageCodeDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LanguageCodeDtoToJson(this);
+
+  LanguageCodeDefinition toModel() => LanguageCodeDefinition(
+        type: DocumentDefinitionsObjectType.fromString(type),
+        note: note,
+        defaultValue: defaultValue ?? 'en',
+        enumValues: enumValues ?? <String>[],
+      );
+}
+
+extension DocumentDefinitionConverterExt<T extends Object>
+    on BaseDocumentDefinition<T> {
+  JsonConverter<T?, Object?> get converter {
+    switch (this) {
+      case SingleLineTextEntryDefinition():
+      case SingleLineHttpsURLEntryDefinition():
+      case MultiLineTextEntryDefinition():
+      case MultiLineTextEntryMarkdownDefinition():
+      case DropDownSingleSelectDefinition():
+      case MultiSelectDefinition():
+      case MultiLineTextEntryListMarkdownDefinition():
+      case SingleLineHttpsURLEntryListDefinition():
+      case NestedQuestionsListDefinition():
+      case NestedQuestionsDefinition():
+      case SingleGroupedTagSelectorDefinition():
+      case TagGroupDefinition():
+      case TagSelectionDefinition():
+      case TokenValueCardanoADADefinition():
+      case DurationInMonthsDefinition():
+      case YesNoChoiceDefinition():
+      case AgreementConfirmationDefinition():
+      case SPDXLicenceOrUrlDefinition():
+      case LanguageCodeDefinition():
+        return NoopConverter<T>();
+      case SingleLineTextEntryListDefinition():
+        return const ListStringConverter() as JsonConverter<T?, Object?>;
+      case SegmentDefinition():
+      case SectionDefinition():
+        throw UnsupportedError("These definitions don't support values");
+    }
+  }
 }
