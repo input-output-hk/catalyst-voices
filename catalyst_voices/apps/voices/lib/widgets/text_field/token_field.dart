@@ -9,6 +9,7 @@ class TokenField extends StatelessWidget {
   final ValueChanged<int?>? onFieldSubmitted;
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
   final String? labelText;
+  final String? errorText;
   final FocusNode? focusNode;
   final Range<int>? range;
   final Currency currency;
@@ -22,6 +23,7 @@ class TokenField extends StatelessWidget {
     required this.onFieldSubmitted,
     this.onStatusChanged,
     this.labelText,
+    this.errorText,
     this.focusNode,
     this.range,
     this.currency = const Currency.ada(),
@@ -42,6 +44,7 @@ class TokenField extends StatelessWidget {
       focusNode: focusNode,
       decoration: VoicesTextFieldDecoration(
         labelText: labelText,
+        errorText: errorText,
         prefixText: currency.symbol,
         hintText: range != null ? '${range.min}' : null,
         filled: true,
