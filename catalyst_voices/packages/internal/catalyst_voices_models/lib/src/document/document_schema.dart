@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 
 /// A document schema that describes the structure of a document.
 ///
@@ -121,6 +122,7 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
   final List<String>? enumValues;
   final Range<int>? range;
   final Range<int>? itemsRange;
+  final List<DocumentSchemaLogicalGroup>? oneOf;
   final bool isRequired;
 
   const DocumentSchemaProperty({
@@ -134,7 +136,24 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
     required this.enumValues,
     required this.range,
     required this.itemsRange,
+    required this.oneOf,
     required this.isRequired,
+  });
+
+  @visibleForTesting
+  const DocumentSchemaProperty.optional({
+    required this.definition,
+    required this.nodeId,
+    required this.id,
+    this.title,
+    this.description,
+    this.defaultValue,
+    this.guidance,
+    this.enumValues,
+    this.range,
+    this.itemsRange,
+    this.oneOf,
+    this.isRequired = false,
   });
 
   @override
@@ -149,6 +168,42 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
         enumValues,
         range,
         itemsRange,
+        oneOf,
         isRequired,
+      ];
+}
+
+final class DocumentSchemaLogicalGroup extends Equatable {
+  final List<DocumentSchemaLogicalCondition> conditions;
+
+  const DocumentSchemaLogicalGroup({
+    required this.conditions,
+  });
+
+  @override
+  List<Object?> get props => [
+        conditions,
+      ];
+}
+
+final class DocumentSchemaLogicalCondition extends Equatable {
+  final BaseDocumentDefinition definition;
+  final String id;
+  final Object? value;
+  final List<String>? enumValues;
+
+  const DocumentSchemaLogicalCondition({
+    required this.definition,
+    required this.id,
+    required this.value,
+    required this.enumValues,
+  });
+
+  @override
+  List<Object?> get props => [
+        definition,
+        id,
+        value,
+        enumValues,
       ];
 }
