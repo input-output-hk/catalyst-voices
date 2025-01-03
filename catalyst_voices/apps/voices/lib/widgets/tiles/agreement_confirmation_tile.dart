@@ -34,11 +34,12 @@ class AgreementConfirmationTile extends StatefulWidget {
 
 class _DocumentCheckboxBuilderWidgetState
     extends State<AgreementConfirmationTile> {
-  late bool initialValue;
-  late bool currentEditValue;
-  DocumentNodeId get nodeId => widget.nodeId;
-  String get description => widget.description;
-  bool get defaultValue => widget.definition.defaultValue;
+  late bool _initialValue;
+  late bool _currentEditValue;
+
+  DocumentNodeId get _nodeId => widget.nodeId;
+  String get _description => widget.description;
+  bool get _defaultValue => widget.definition.defaultValue;
 
   @override
   void initState() {
@@ -52,7 +53,7 @@ class _DocumentCheckboxBuilderWidgetState
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.isEditMode != widget.isEditMode && !widget.isEditMode) {
-      currentEditValue = initialValue;
+      _currentEditValue = _initialValue;
     }
 
     if (oldWidget.value != widget.value) {
@@ -72,9 +73,9 @@ class _DocumentCheckboxBuilderWidgetState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (description.isNotEmpty) ...[
+            if (_description.isNotEmpty) ...[
               MarkdownBody(
-                data: description,
+                data: _description,
                 selectable: true,
                 onTapLink: (text, href, title) async {
                   if (href == null) return;
@@ -87,7 +88,7 @@ class _DocumentCheckboxBuilderWidgetState
               const SizedBox(height: 22),
             ],
             VoicesCheckbox(
-              value: currentEditValue,
+              value: _currentEditValue,
               onChanged: _changeValue,
               isDisabled: !widget.isEditMode,
               label: Text(
@@ -106,21 +107,21 @@ class _DocumentCheckboxBuilderWidgetState
   }
 
   void _changeValue(bool value) {
-    initialValue = currentEditValue;
+    _initialValue = _currentEditValue;
     setState(() {
-      currentEditValue = value;
+      _currentEditValue = value;
     });
 
     widget.onChanged(
       DocumentChange(
-        nodeId: nodeId,
-        value: currentEditValue,
+        nodeId: _nodeId,
+        value: _currentEditValue,
       ),
     );
   }
 
   void _setInitialValues() {
-    initialValue = widget.value ?? defaultValue;
-    currentEditValue = initialValue;
+    _initialValue = widget.value ?? _defaultValue;
+    _currentEditValue = _initialValue;
   }
 }
