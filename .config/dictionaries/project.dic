@@ -146,6 +146,7 @@ keychains
 Keyhash
 keyserver
 keyspace
+keyspaces
 KUBECONFIG
 kubernetescrd
 kubetail
@@ -299,6 +300,7 @@ Toastify
 todos
 toggleable
 tojunit
+tolerations
 tomjs
 Traceback
 traefik
