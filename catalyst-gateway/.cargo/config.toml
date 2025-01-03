@@ -27,11 +27,7 @@ rustflags = [
 
 [build]
 rustflags = []
-rustdocflags = [
-    "--enable-index-page",
-    "-Z",
-    "unstable-options",
-]
+rustdocflags = []
 
 [profile.dev]
 opt-level = 1
