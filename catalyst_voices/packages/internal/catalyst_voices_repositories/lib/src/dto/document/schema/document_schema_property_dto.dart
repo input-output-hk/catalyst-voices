@@ -10,7 +10,7 @@ final class DocumentSchemaPropertyDto {
   final String ref;
   @JsonKey(includeToJson: false)
   final String id;
-  final String? title;
+  final String title;
   final String? description;
   @JsonKey(includeIfNull: false)
   final int? minLength;
@@ -38,12 +38,12 @@ final class DocumentSchemaPropertyDto {
   const DocumentSchemaPropertyDto({
     this.ref = '',
     required this.id,
-    this.title = '',
-    this.description = '',
+    required this.title,
+    this.description,
     this.minLength,
     this.maxLength,
     this.defaultValue,
-    this.guidance = '',
+    this.guidance,
     this.enumValues,
     this.maxItems,
     this.minItems,
@@ -66,7 +66,7 @@ final class DocumentSchemaPropertyDto {
       definition: definitions.getDefinition(ref),
       nodeId: parentNodeId.child(id),
       id: id,
-      title: title!,
+      title: title,
       description: description,
       defaultValue: defaultValue,
       guidance: guidance,
