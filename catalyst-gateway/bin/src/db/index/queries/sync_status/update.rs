@@ -20,7 +20,7 @@ use crate::{
 const INSERT_SYNC_STATUS_QUERY: &str = include_str!("../cql/insert_sync_status.cql");
 
 /// Sync Status Row Record Module
-pub(super) mod row {
+pub(crate) mod row {
     use scylla::{frame::value::CqlTimestamp, DeserializeRow, SerializeRow};
 
     /// Sync Status Record Row (used for both Insert and Query response)
