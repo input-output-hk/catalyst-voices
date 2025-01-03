@@ -11,7 +11,7 @@ final class DocumentSchemaSectionDto {
   final String id;
   @JsonKey(name: r'$ref')
   final String ref;
-  final String title;
+  final String? title;
   final String? description;
   @DocumentSchemaPropertiesDtoConverter()
   final List<DocumentSchemaPropertyDto> properties;
