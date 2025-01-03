@@ -4,8 +4,6 @@ use super::*;
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_session() -> Result<(), String> {
-    get_shared_session().await?;
-
-    Ok(())
+async fn test_session() {
+    get_shared_session().await.unwrap();
 }

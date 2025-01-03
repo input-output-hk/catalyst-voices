@@ -16,232 +16,206 @@ use crate::db::index::queries::{
     sync_status::update::*,
 };
 
-const FAILED_EXECUTING_QUERY_MSG: &str = "Failed executing query";
-const FAILED_READING_ROW_MSG: &str = "Failed reading row";
-
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_assets_by_stake_addr() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_assets_by_stake_addr() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetAssetsByStakeAddressQuery::execute(
         &session,
         GetAssetsByStakeAddressParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_chain_root() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_chain_root() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
         stake_address: vec![],
     })
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_invalid_registration_w_stake_addr() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_invalid_registration_w_stake_addr() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetInvalidRegistrationQuery::execute(
         &session,
         GetInvalidRegistrationParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_registrations_by_chain_root() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_registrations_by_chain_root() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetRegistrationsByChainRootQuery::execute(
         &session,
         GetRegistrationsByChainRootQueryParams { chain_root: vec![] },
     )
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_registrations_w_stake_addr() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_registrations_w_stake_addr() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetRegistrationQuery::execute(&session, GetRegistrationParams {
         stake_address: vec![],
     })
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_role0_key_chain_root() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_role0_key_chain_root() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
         role0_key: vec![],
     })
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_stake_addr_w_stake_key_hash() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_stake_addr_w_stake_key_hash() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
         .await
-        .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+        .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_stake_addr_w_vote_key() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_stake_addr_w_vote_key() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
         vote_key: vec![],
     })
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 // Note: `get_sync_status` query is not available.
 // #[ignore = "An integration test which requires a running Scylla node instance, disabled
 // from `testunit` CI run"] #[tokio::test]
-// async fn test_get_sync_status() -> Result<(), String> {
-//     let (session, _) = get_shared_session().await?;
+// async fn test_get_sync_status() {
+//     let (session, _) =
+// get_shared_session().await.unwrap();
 
 //     Ok(())
 // }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_txi_by_txn_hashes() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_txi_by_txn_hashes() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter =
         GetTxiByTxnHashesQuery::execute(&session, GetTxiByTxnHashesQueryParams::new(vec![]))
             .await
-            .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+            .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_txo_by_stake_address() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_get_txo_by_stake_address() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     let mut iter = GetTxoByStakeAddressQuery::execute(
         &session,
         GetTxoByStakeAddressQueryParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
     )
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
+    .unwrap();
 
     while let Some(row_res) = iter.next().await {
-        let row = row_res.map_err(|_| String::from(FAILED_READING_ROW_MSG));
+        let row = row_res.unwrap();
         drop(row);
     }
-
-    Ok(())
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_insert_sync_status() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_insert_sync_status() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     SyncStatusInsertQuery::execute(
         &session,
         row::SyncStatusQueryParams::new(u64::MAX, u64::MAX),
     )
     .await
-    .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
-
-    Ok(())
+    .unwrap();
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_update_txo_spent() -> Result<(), String> {
-    let (session, _) = get_shared_session().await?;
+async fn test_update_txo_spent() {
+    let (session, _) = get_shared_session().await.unwrap();
 
     UpdateTxoSpentQuery::execute(&session, vec![])
         .await
-        .map_err(|_| String::from(FAILED_EXECUTING_QUERY_MSG))?;
-
-    Ok(())
+        .unwrap();
 }
