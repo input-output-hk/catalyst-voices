@@ -37,12 +37,17 @@ impl Example for CurrentPage {
 
 impl CurrentPage {
     /// Create a new `CurrentPage` object.
+    ///
+    /// # Errors
+    ///  - Invalid `page` value, must be in range
+    ///  - Invalid `limit` value, must be in range
+    ///  - Invalid `remaining` value, must be in range
     #[allow(dead_code)]
-    fn new(page: u64, limit: u64, remaining: u64) -> Self {
-        Self {
-            page: page.into(),
-            limit: limit.into(),
-            remaining: remaining.into(),
-        }
+    fn new(page: u64, limit: u64, remaining: u64) -> anyhow::Result<Self> {
+        Ok(Self {
+            page: page.try_into()?,
+            limit: limit.try_into()?,
+            remaining: remaining.try_into()?,
+        })
     }
 }

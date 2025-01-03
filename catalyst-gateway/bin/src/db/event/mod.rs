@@ -9,11 +9,14 @@ use std::{
 
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
+use error::NotFoundError;
+use futures::{Stream, StreamExt, TryStreamExt};
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
 use crate::settings::Settings;
 
+pub(crate) mod common;
 pub(crate) mod config;
 pub(crate) mod error;
 pub(crate) mod legacy;
@@ -71,11 +74,11 @@ impl EventDB {
     ///
     /// # Returns
     ///
-    /// `Result<Vec<Row>, anyhow::Error>`
+    /// `anyhow::Result<Vec<Row>>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query(
         stmt: &str, params: &[&(dyn ToSql + Sync)],
-    ) -> Result<Vec<Row>, anyhow::Error> {
+    ) -> anyhow::Result<Vec<Row>> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
         }
@@ -83,6 +86,32 @@ impl EventDB {
         let conn = pool.get().await?;
         let rows = conn.query(stmt, params).await?;
         Ok(rows)
+    }
+
+    /// Query the database and return a async stream of rows.
+    ///
+    /// If deep query inspection is enabled, this will log the query plan inside a
+    /// rolled-back transaction, before running the query.
+    ///
+    /// # Arguments
+    ///
+    /// * `stmt` - `&str` SQL statement.
+    /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
+    ///
+    /// # Returns
+    ///
+    /// `anyhow::Result<impl Stream<Item = anyhow::Result<Row>>>`
+    #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
+    pub(crate) async fn query_stream(
+        stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Row>>> {
+        if Self::is_deep_query_enabled() {
+            Self::explain_analyze_rollback(stmt, params).await?;
+        }
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let conn = pool.get().await?;
+        let rows = conn.query_raw(stmt, params.iter().copied()).await?;
+        Ok(rows.map_err(Into::into).boxed())
     }
 
     /// Query the database for a single row.
@@ -98,13 +127,13 @@ impl EventDB {
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_one(
         stmt: &str, params: &[&(dyn ToSql + Sync)],
-    ) -> Result<Row, anyhow::Error> {
+    ) -> anyhow::Result<Row> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
         }
         let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
         let conn = pool.get().await?;
-        let row = conn.query_one(stmt, params).await?;
+        let row = conn.query_opt(stmt, params).await?.ok_or(NotFoundError)?;
         Ok(row)
     }
 
