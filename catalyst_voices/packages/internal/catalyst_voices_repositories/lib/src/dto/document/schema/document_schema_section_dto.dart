@@ -11,7 +11,7 @@ final class DocumentSchemaSectionDto {
   final String id;
   @JsonKey(name: r'$ref')
   final String ref;
-  final String title;
+  final String? title;
   final String? description;
   @DocumentSchemaPropertiesDtoConverter()
   final List<DocumentSchemaPropertyDto> properties;
@@ -22,7 +22,7 @@ final class DocumentSchemaSectionDto {
   const DocumentSchemaSectionDto({
     required this.id,
     required this.ref,
-    required this.title,
+    this.title,
     this.description,
     required this.properties,
     this.required,
