@@ -5,7 +5,7 @@ mod api;
 
 mod docs;
 // These modules are utility or common types/functions
-mod common;
+pub(crate) mod common;
 mod poem_service;
 pub(crate) mod utilities;
 
