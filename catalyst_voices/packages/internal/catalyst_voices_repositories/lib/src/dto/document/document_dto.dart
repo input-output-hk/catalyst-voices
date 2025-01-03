@@ -192,6 +192,6 @@ final class DocumentPropertyDto<T extends Object> {
   }
 
   Map<String, dynamic> toJson() => {
-        schema.id: value,
+        schema.id: schema.definition.converter.toJson(value),
       };
 }

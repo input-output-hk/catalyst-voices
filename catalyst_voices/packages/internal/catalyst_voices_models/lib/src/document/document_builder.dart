@@ -214,8 +214,7 @@ final class DocumentPropertyBuilder<T extends Object> implements DocumentNode {
   factory DocumentPropertyBuilder.fromSchema(DocumentSchemaProperty<T> schema) {
     return DocumentPropertyBuilder(
       schema: schema,
-      value: 
-      schema.defaultValue,
+      value: schema.defaultValue,
     );
   }
 
