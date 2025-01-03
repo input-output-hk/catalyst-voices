@@ -126,9 +126,10 @@ async fn test_get_role0_key_chain_root() {
 async fn test_get_stake_addr_w_stake_key_hash() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
-        .await
-        .unwrap();
+    let mut row_stream =
+        GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
+            .await
+            .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
@@ -141,11 +142,12 @@ async fn test_get_stake_addr_w_stake_key_hash() {
 async fn test_get_stake_addr_w_vote_key() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut row_stream = GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
-        vote_key: vec![],
-    })
-    .await
-    .unwrap();
+    let mut row_stream =
+        GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
+            vote_key: vec![],
+        })
+        .await
+        .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();
