@@ -39,7 +39,8 @@ test-scylla:
 
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         scylla --options-file /etc/scylla/scylla.yaml --smp=2 --memory=4G --overprovisioned --developer-mode=1 & \
-        cargo nextest run --release --run-ignored=only scylla_session scylla_queries
+        cargo nextest run --release --run-ignored=only scylla_session scylla_queries \
+        --config slow-timeout.period=30 --config slow-timeout.terminate-after=2
 
 # INSTALL_SCYLLA - Installs scylla for bookworm-slim/debian
 INSTALL_SCYLLA:
