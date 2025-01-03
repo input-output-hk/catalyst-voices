@@ -2,7 +2,7 @@ name: UIKit Flutter Example Firebase Hosting Deploy
 
 on:
   push:
-    #branches: "main"
+    branches: "main"
 
 permissions:
   contents: write
