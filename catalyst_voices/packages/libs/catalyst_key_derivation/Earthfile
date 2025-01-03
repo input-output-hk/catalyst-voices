@@ -66,7 +66,8 @@ integration-test-web:
 
 # TODO(dtscalac): disabled integration tests due to them being flaky,
 # reenable when enable-threads.js workaround is removed
-# and https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407 closed
+# and the fix for flutter drive from https://github.com/flutter/flutter/issues/159037
+# is released in flutter stable channel
 disabled-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome \
