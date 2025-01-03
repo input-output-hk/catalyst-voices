@@ -73,6 +73,7 @@ impl EventDB {
 impl EventDB {
     /// Get voter query
     #[allow(dead_code)]
+    #[allow(clippy::ref_option)]
     pub(crate) async fn get_voter(
         event: &Option<EventId>, voting_key: String, with_delegations: bool,
     ) -> anyhow::Result<Voter> {
@@ -156,6 +157,7 @@ impl EventDB {
 
     /// Get delegator query
     #[allow(dead_code)]
+    #[allow(clippy::ref_option)]
     pub(crate) async fn get_delegator(
         event: &Option<EventId>, stake_public_key: String,
     ) -> anyhow::Result<Delegator> {
