@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/document_builder/document_checkbox_builder_tile.dart';
+import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_tile.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -38,11 +38,11 @@ class DocumentPropertyBuilderWidget extends StatelessWidget {
       TokenValueCardanoADADefinition() => throw UnimplementedError(),
       DurationInMonthsDefinition() => throw UnimplementedError(),
       YesNoChoiceDefinition() => throw UnimplementedError(),
-      AgreementConfirmationDefinition() => DocumentCheckboxBuilderTile(
+      AgreementConfirmationDefinition() => AgreementConfirmationTile(
           definition: definition,
           value: definition.castProperty(property).value,
           nodeId: property.schema.nodeId,
-          title: property.schema.title,
+          title: property.schema.title ?? '',
           description: property.schema.description ?? '',
           isSelected: true,
           onChanged: onChanged,

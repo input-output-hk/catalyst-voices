@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_properties_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_converter_ext.dart';
 
 /// A data transfer object for the [Document].
 ///

@@ -39,7 +39,7 @@ final class ListStringConverter
   @override
   List<String>? fromJson(List<dynamic>? json) {
     if (json == null) return null;
-    
+
     return json.cast();
   }
 

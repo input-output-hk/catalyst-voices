@@ -110,17 +110,26 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
     return refPathToDefinitionType[ref] != null;
   }
 
-  T? castValue(Object? value);
+  /// Casts a dynamic value from external JSON to type [T].
+  ///
+  /// Since JSON data types are dynamic, this method uses known
+  /// definition types to cast values to [T] for easier usage in UI widgets.
+  ///
+  /// Returns the value as type [T] if successful, or `null` otherwise.
+  T? castValue(Object? value) {
+    return value as T?;
+  }
 
-  DocumentProperty<T> castProperty(DocumentProperty<T> property);
-}
-
-extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
-  BaseDocumentDefinition getDefinition(String refPath) {
-    final definitionType = BaseDocumentDefinition.typeFromRefPath(refPath);
-    final classType = definitionType;
-
-    return firstWhere((e) => e.runtimeType == classType);
+  /// Casts a [DocumentProperty<Object>] to [DocumentProperty<T>].
+  ///
+  /// This method sets a specific type [T] for a [DocumentProperty],
+  /// which holds a user-provided answer in the frontend.
+  ///
+  /// [property] is the [DocumentProperty<Object>] to be cast.
+  ///
+  /// Returns a [DocumentProperty] with its value cast to type [T].
+  DocumentProperty<T> castProperty(DocumentProperty<Object> property) {
+    return property as DocumentProperty<T>;
   }
 }
 
@@ -134,21 +143,21 @@ final class SegmentDefinition extends BaseDocumentDefinition {
   });
 
   @override
+  Object? castValue(Object? value) {
+    throw UnsupportedError('Segment cannot have a value');
+  }
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    throw UnsupportedError('Segment cannot have a property');
+  }
+
+  @override
   List<Object?> get props => [
         type,
         note,
         additionalProperties,
       ];
-
-  @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    return property;
-  }
-
-  @override
-  Object? castValue(Object? value) {
-    return value;
-  }
 }
 
 final class SectionDefinition extends BaseDocumentDefinition {
@@ -161,21 +170,21 @@ final class SectionDefinition extends BaseDocumentDefinition {
   });
 
   @override
+  Object? castValue(Object? value) {
+    throw UnsupportedError('Section cannot have a value');
+  }
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    throw UnsupportedError('Section cannot have a property');
+  }
+
+  @override
   List<Object?> get props => [
         additionalProperties,
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    return property;
-  }
-
-  @override
-  Object? castValue(Object? value) {
-    return value;
-  }
 }
 
 final class SingleLineTextEntryDefinition
@@ -197,16 +206,6 @@ final class SingleLineTextEntryDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class SingleLineHttpsURLEntryDefinition
@@ -228,16 +227,6 @@ final class SingleLineHttpsURLEntryDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class MultiLineTextEntryDefinition
@@ -259,16 +248,6 @@ final class MultiLineTextEntryDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class MultiLineTextEntryMarkdownDefinition
@@ -290,16 +269,6 @@ final class MultiLineTextEntryMarkdownDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class DropDownSingleSelectDefinition
@@ -324,16 +293,6 @@ final class DropDownSingleSelectDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class MultiSelectDefinition
@@ -355,18 +314,6 @@ final class MultiSelectDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<List<dynamic>> castProperty(
-    DocumentProperty<Object> property,
-  ) {
-    return property as DocumentProperty<List<dynamic>>;
-  }
-
-  @override
-  List<dynamic>? castValue(Object? value) {
-    return value as List<dynamic>?;
-  }
 }
 
 final class SingleLineTextEntryListDefinition
@@ -394,19 +341,6 @@ final class SingleLineTextEntryListDefinition
         defaultValues,
         items,
       ];
-
-  @override
-  DocumentProperty<List<String>> castProperty(
-    DocumentProperty<Object> property,
-  ) {
-    return property as DocumentProperty<List<String>>;
-  }
-
-  @override
-  List<String>? castValue(Object? value) {
-    // return value as List<String>?;
-    return null;
-  }
 }
 
 final class MultiLineTextEntryListMarkdownDefinition
@@ -434,18 +368,6 @@ final class MultiLineTextEntryListMarkdownDefinition
         defaultValue,
         items,
       ];
-
-  @override
-  DocumentProperty<List<String>> castProperty(
-    DocumentProperty<Object> property,
-  ) {
-    return property as DocumentProperty<List<String>>;
-  }
-
-  @override
-  List<String>? castValue(Object? value) {
-    return value as List<String>?;
-  }
 }
 
 final class SingleLineHttpsURLEntryListDefinition
@@ -473,18 +395,6 @@ final class SingleLineHttpsURLEntryListDefinition
         defaultValue,
         items,
       ];
-
-  @override
-  DocumentProperty<List<String>> castProperty(
-    DocumentProperty<Object> property,
-  ) {
-    return property as DocumentProperty<List<String>>;
-  }
-
-  @override
-  List<String>? castValue(Object? value) {
-    return value as List<String>?;
-  }
 }
 
 final class NestedQuestionsListDefinition
@@ -509,18 +419,6 @@ final class NestedQuestionsListDefinition
         note,
         defaultValue,
       ];
-
-  @override
-  DocumentProperty<List<String>> castProperty(
-    DocumentProperty<Object> property,
-  ) {
-    return property as DocumentProperty<List<String>>;
-  }
-
-  @override
-  List<String>? castValue(Object? value) {
-    return value as List<String>?;
-  }
 }
 
 // TODO(ryszard-schossler): Verify BaseDocumentDefinition type
@@ -543,18 +441,6 @@ final class NestedQuestionsDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<List<String>> castProperty(
-    DocumentProperty<Object> property,
-  ) {
-    return property as DocumentProperty<List<String>>;
-  }
-
-  @override
-  List<String>? castValue(Object? value) {
-    return value as List<String>?;
-  }
 }
 
 // TODO(ryszard-schossler): Verify BaseDocumentDefinition type
@@ -577,18 +463,6 @@ final class SingleGroupedTagSelectorDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<Map<String, dynamic>> castProperty(
-    DocumentProperty<Object> property,
-  ) {
-    return property as DocumentProperty<Map<String, dynamic>>;
-  }
-
-  @override
-  Map<String, dynamic>? castValue(Object? value) {
-    return value as Map<String, dynamic>?;
-  }
 }
 
 final class TagGroupDefinition extends BaseDocumentDefinition<String> {
@@ -609,16 +483,6 @@ final class TagGroupDefinition extends BaseDocumentDefinition<String> {
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class TagSelectionDefinition extends BaseDocumentDefinition<String> {
@@ -639,16 +503,6 @@ final class TagSelectionDefinition extends BaseDocumentDefinition<String> {
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class TokenValueCardanoADADefinition extends BaseDocumentDefinition<int> {
@@ -666,16 +520,6 @@ final class TokenValueCardanoADADefinition extends BaseDocumentDefinition<int> {
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<int> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<int>;
-  }
-
-  @override
-  int? castValue(Object? value) {
-    return value as int?;
-  }
 }
 
 final class DurationInMonthsDefinition extends BaseDocumentDefinition<int> {
@@ -693,16 +537,6 @@ final class DurationInMonthsDefinition extends BaseDocumentDefinition<int> {
         note,
         format,
       ];
-
-  @override
-  DocumentProperty<int> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<int>;
-  }
-
-  @override
-  int? castValue(Object? value) {
-    return value as int?;
-  }
 }
 
 final class YesNoChoiceDefinition extends BaseDocumentDefinition<bool> {
@@ -723,16 +557,6 @@ final class YesNoChoiceDefinition extends BaseDocumentDefinition<bool> {
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<bool> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<bool>;
-  }
-
-  @override
-  bool? castValue(Object? value) {
-    return value as bool?;
-  }
 }
 
 final class AgreementConfirmationDefinition
@@ -757,16 +581,6 @@ final class AgreementConfirmationDefinition
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<bool> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<bool>;
-  }
-
-  @override
-  bool? castValue(Object? value) {
-    return value as bool?;
-  }
 }
 
 final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition<String> {
@@ -789,21 +603,12 @@ final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition<String> {
         type,
         note,
       ];
-
-  @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
-
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
 }
 
 final class LanguageCodeDefinition extends BaseDocumentDefinition<String> {
   final String defaultValue;
   final List<String> enumValues;
+
   const LanguageCodeDefinition({
     required super.type,
     required super.note,
@@ -812,15 +617,19 @@ final class LanguageCodeDefinition extends BaseDocumentDefinition<String> {
   });
 
   @override
-  DocumentProperty<String> castProperty(DocumentProperty<Object> property) {
-    return property as DocumentProperty<String>;
-  }
+  List<Object?> get props => [
+        defaultValue,
+        enumValues,
+        note,
+        type,
+      ];
+}
 
-  @override
-  String? castValue(Object? value) {
-    return value as String?;
-  }
+extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
+  BaseDocumentDefinition getDefinition(String refPath) {
+    final definitionType = BaseDocumentDefinition.typeFromRefPath(refPath);
+    final classType = definitionType;
 
-  @override
-  List<Object?> get props => [];
+    return firstWhere((e) => e.runtimeType == classType);
+  }
 }

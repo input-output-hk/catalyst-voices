@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DocumentCheckboxBuilderTile extends StatefulWidget {
+class AgreementConfirmationTile extends StatefulWidget {
   final bool? value;
   final AgreementConfirmationDefinition definition;
   final DocumentNodeId nodeId;
@@ -18,7 +18,7 @@ class DocumentCheckboxBuilderTile extends StatefulWidget {
   final bool isSelected;
   final ValueChanged<DocumentChange> onChanged;
 
-  const DocumentCheckboxBuilderTile({
+  const AgreementConfirmationTile({
     super.key,
     required this.value,
     required this.definition,
@@ -30,12 +30,12 @@ class DocumentCheckboxBuilderTile extends StatefulWidget {
   });
 
   @override
-  State<DocumentCheckboxBuilderTile> createState() =>
+  State<AgreementConfirmationTile> createState() =>
       _DocumentCheckboxBuilderWidgetState();
 }
 
 class _DocumentCheckboxBuilderWidgetState
-    extends State<DocumentCheckboxBuilderTile> {
+    extends State<AgreementConfirmationTile> {
   bool editMode = false;
   late bool initialValue;
   late bool currentEditValue;
@@ -47,8 +47,16 @@ class _DocumentCheckboxBuilderWidgetState
   void initState() {
     super.initState();
 
-    initialValue = widget.value ?? defaultValue;
-    currentEditValue = initialValue;
+    _setInitialValues();
+  }
+
+  @override
+  void didUpdateWidget(covariant AgreementConfirmationTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.value != widget.value) {
+      _setInitialValues();
+    }
   }
 
   @override
@@ -139,5 +147,10 @@ class _DocumentCheckboxBuilderWidgetState
       editMode = false;
       initialValue = currentEditValue;
     });
+  }
+
+  void _setInitialValues() {
+    initialValue = widget.value ?? defaultValue;
+    currentEditValue = initialValue;
   }
 }
