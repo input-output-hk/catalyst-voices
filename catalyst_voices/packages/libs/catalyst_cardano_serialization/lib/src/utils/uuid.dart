@@ -60,3 +60,17 @@ extension type UuidV4._(List<int> bytes) {
     return Uint8List.fromList(byteList);
   }
 }
+
+/// Utils around UUID v7.
+abstract class UuidV7 {
+  /// Extracts the timestamp from the Uuid V7 string.
+  static DateTime parseTimestamp(String uuid) {
+    final uuidParts = uuid.split('-');
+    // First 48 bits of UUIDv7
+    final uuidTimestampHex = uuidParts[0] + uuidParts[1].substring(0, 4);
+
+    // Convert timestampHex to milliseconds since Unix epoch
+    final timestamp = int.parse(uuidTimestampHex, radix: 16);
+    return DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);
+  }
+}

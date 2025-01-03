@@ -8,17 +8,32 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
-  catalyst_cardano_serialization: ^0.4.0
+  catalyst_cardano_serialization: ^0.5.0+2
+  catalyst_compression: ^0.4.0
+  catalyst_cose: ^0.4.0
+  catalyst_key_derivation: ^0.1.1+1
+  catalyst_voices_models:
+    path: ../catalyst_voices_models
+  cbor: ^6.2.0
   collection: ^1.18.0
+  convert: ^3.1.1
+  cryptography: ^2.7.0
+  equatable: ^2.0.7
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^9.2.2
   get_it: ^7.6.7
   intl: ^0.19.0
+  json_annotation: ^4.9.0
   logging: ^1.2.0
+  shared_preferences: ^2.3.3
+  uuid: ^4.5.1
   web: ^1.1.0
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.0
+  catalyst_analysis: ^2.0.1
   flutter_test:
     sdk: flutter
+  mocktail: ^1.0.1
+  shared_preferences_platform_interface: ^2.4.1
   test: ^1.24.9

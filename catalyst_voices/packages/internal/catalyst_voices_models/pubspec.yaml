@@ -8,15 +8,20 @@ environment:
 
 dependencies:
   bip39: ^1.0.6
-  catalyst_cardano: ^0.3.0
-  catalyst_cardano_serialization: ^0.4.0
-  catalyst_cardano_web: ^0.3.0
+  catalyst_cardano: ^0.4.0+2
+  catalyst_cardano_serialization: ^0.5.0+2
+  catalyst_cardano_web: ^0.4.0+2
+  catalyst_voices_shared:
+    path: ../catalyst_voices_shared
   collection: ^1.18.0
   convert: ^3.1.1
   equatable: ^2.0.7
+  json_annotation: ^4.9.0
   meta: ^1.10.0
   password_strength: ^0.2.0
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.0
+  build_runner: ^2.4.12
+  catalyst_analysis: ^2.0.1
+  json_serializable: ^6.9.0
   test: ^1.24.9

@@ -16,6 +16,7 @@ class RegistrationDetailsPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<RegistrationCubit, RegistrationState, RegistrationStep>(
+      key: const Key('RegistrationDetailsPanel'),
       selector: (state) => state.step,
       builder: (context, state) {
         return switch (state) {

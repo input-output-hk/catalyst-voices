@@ -1,167 +1,46 @@
-import 'package:catalyst_voices/pages/workspace/rich_text/answer.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/bonus_mark_up.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/delivery_and_accountability.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/feasibility_checks.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/problem_statement.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/public_description.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/solution_statement.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/title.dart';
-import 'package:catalyst_voices/pages/workspace/rich_text/value_for_money.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_body.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_navigation_panel.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_setup_panel.dart';
-import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
-import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_empty_state.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_error.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_header.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_loading.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_proposals.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-final sections = [
-  const ProposalSetup(
-    id: 0,
-    steps: [
-      TitleStep(
-        id: 0,
-        sectionId: 0,
-        data: DocumentJson(title),
-        guidances: mockGuidance,
-      ),
-    ],
-  ),
-  ProposalSummary(
-    id: 1,
-    steps: [
-      ProblemStep(
-        id: 0,
-        sectionId: 1,
-        data: const DocumentJson(problemStatement),
-        charsLimit: 200,
-        guidances: [
-          mockGuidance[0],
-        ],
-      ),
-      const SolutionStep(
-        id: 1,
-        sectionId: 1,
-        data: DocumentJson(solutionStatement),
-        charsLimit: 200,
-        guidances: mockGuidance,
-      ),
-      const PublicDescriptionStep(
-        id: 2,
-        sectionId: 1,
-        data: DocumentJson(publicDescription),
-        charsLimit: 3000,
-        guidances: mockGuidance,
-      ),
-    ],
-  ),
-  const ProposalSolution(
-    id: 2,
-    steps: [
-      ProblemPerspectiveStep(
-        id: 0,
-        sectionId: 2,
-        data: DocumentJson(answer),
-        charsLimit: 200,
-      ),
-      PerspectiveRationaleStep(
-        id: 1,
-        sectionId: 2,
-        data: DocumentJson(answer),
-        charsLimit: 200,
-      ),
-      ProjectEngagementStep(
-        id: 2,
-        sectionId: 2,
-        data: DocumentJson(answer),
-        charsLimit: 200,
-      ),
-    ],
-  ),
-  const ProposalImpact(
-    id: 3,
-    steps: [
-      BonusMarkUpStep(
-        id: 0,
-        sectionId: 3,
-        data: DocumentJson(bonusMarkUp),
-        charsLimit: 900,
-      ),
-      ValueForMoneyStep(
-        id: 1,
-        sectionId: 3,
-        data: DocumentJson(valueForMoney),
-        charsLimit: 2600,
-      ),
-    ],
-  ),
-  const CompatibilityAndFeasibility(
-    id: 4,
-    steps: [
-      DeliveryAndAccountabilityStep(
-        id: 0,
-        sectionId: 4,
-        data: DocumentJson(deliveryAndAccountability),
-      ),
-      FeasibilityChecksStep(
-        id: 1,
-        sectionId: 4,
-        data: DocumentJson(feasibilityChecks),
-      ),
-    ],
-  ),
-];
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WorkspacePage extends StatefulWidget {
-  const WorkspacePage({
-    super.key,
-  });
+  const WorkspacePage({super.key});
 
   @override
   State<WorkspacePage> createState() => _WorkspacePageState();
 }
 
 class _WorkspacePageState extends State<WorkspacePage> {
-  late final SectionsController _sectionsController;
-  late final ItemScrollController _bodyItemScrollController;
-
   @override
   void initState() {
     super.initState();
 
-    _sectionsController = SectionsController();
-    _bodyItemScrollController = ItemScrollController();
-
-    _sectionsController.attachItemsScrollController(_bodyItemScrollController);
-
-    _populateSections();
-  }
-
-  @override
-  void dispose() {
-    _sectionsController.dispose();
-    super.dispose();
+    context.read<WorkspaceBloc>().add(const LoadProposalsEvent());
   }
 
   @override
   Widget build(BuildContext context) {
-    return SectionsControllerScope(
-      controller: _sectionsController,
-      child: SpaceScaffold(
-        left: const WorkspaceNavigationPanel(),
-        body: WorkspaceBody(
-          itemScrollController: _bodyItemScrollController,
-        ),
-        right: const WorkspaceSetupPanel(),
+    return const Scaffold(
+      body: Column(
+        children: [
+          WorkspaceHeader(),
+          Expanded(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                WorkspaceErrorSelector(),
+                WorkspaceEmptyStateSelector(),
+                WorkspaceProposalsSelector(),
+                WorkspaceLoadingSelector(),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
-  }
-
-  void _populateSections() {
-    _sectionsController.value = SectionsControllerState.initial(
-      sections: sections,
     );
   }
 }

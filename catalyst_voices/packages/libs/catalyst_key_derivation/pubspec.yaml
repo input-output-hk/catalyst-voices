@@ -1,10 +1,9 @@
 name: catalyst_key_derivation
 description: A Flutter plugin exposing CIP-1852 Cardano HD Key Derivation
-repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_key_derivation/catalyst_key_derivation
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_key_derivation
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
-topics: [cryptography, encryption, codec]
-version: 0.1.0
-publish_to: none
+topics: [cryptography, encryption]
+version: 0.1.1+1
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -12,16 +11,17 @@ environment:
 
 dependencies:
   cbor: ^6.2.0
+  collection: ^1.18.0
   convert: ^3.1.1
   cryptography: ^2.7.0
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  flutter_rust_bridge: 2.5.1
+  flutter_rust_bridge: ^2.5.1
   plugin_platform_interface: ^2.1.7
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.0
+  catalyst_analysis: ^2.0.1
   ffi: ^2.1.0
   ffigen: ^11.0.0
   flutter_test:

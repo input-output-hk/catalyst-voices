@@ -15,6 +15,7 @@ class DrawerToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIconButton(
+      key: const Key('DrawerButton'),
       onTap: () => Scaffold.maybeOf(context)?.openDrawer(),
       child: VoicesAssets.icons.menu.buildIcon(),
     );
@@ -165,6 +166,7 @@ class VoicesLearnMoreButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesTextButton(
+      key: const Key('LearnMoreButton'),
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
       onTap: onTap,
       child: Text(context.l10n.learnMore),

@@ -13,12 +13,13 @@ abstract final class AppRouter {
   );
 
   static GoRouter init({
+    String? initialLocation,
     List<RouteGuard> guards = const [],
     Listenable? refreshListenable,
   }) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: Routes.initialLocation,
+      initialLocation: initialLocation ?? Routes.initialLocation,
       redirect: (context, state) async => _guard(context, state, guards),
       observers: [
         SentryNavigatorObserver(),

@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
+import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -9,9 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SpacesShellPage extends StatefulWidget {
-  final Space space;
-  final Widget child;
-
   static final Map<Space, ShortcutActivator> _spacesShortcutsActivators = {
     Space.discovery: LogicalKeySet(
       LogicalKeyboardKey.control,
@@ -35,6 +36,9 @@ class SpacesShellPage extends StatefulWidget {
     ),
   };
 
+  final Space space;
+  final Widget child;
+
   const SpacesShellPage({
     super.key,
     required this.space,
@@ -46,37 +50,167 @@ class SpacesShellPage extends StatefulWidget {
 }
 
 class _SpacesShellPageState extends State<SpacesShellPage> {
+  final GlobalKey _adminToolsKey = GlobalKey(debugLabel: 'admin_tools');
+  final StreamController<Space> _selectedSpaceSC = StreamController.broadcast();
+  OverlayEntry? _adminToolsOverlay;
+
+  @override
+  void didUpdateWidget(SpacesShellPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.space != widget.space) {
+      _selectedSpaceSC.add(widget.space);
+    }
+  }
+
+  @override
+  void dispose() {
+    _removeAdminToolsOverlay();
+    unawaited(_selectedSpaceSC.close());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final sessionBloc = context.watch<SessionCubit>();
-    final isVisitor = sessionBloc.state is VisitorSessionState;
-    final isUnlocked = sessionBloc.state is ActiveAccountSessionState;
-
-    return CallbackShortcuts(
-      bindings: <ShortcutActivator, VoidCallback>{
-        for (final entry in SpacesShellPage._spacesShortcutsActivators.entries)
-          entry.value: () => entry.key.go(context),
+    return BlocListener<AdminToolsCubit, AdminToolsState>(
+      listenWhen: (previous, current) => previous.enabled != current.enabled,
+      listener: (context, state) {
+        if (state.enabled) {
+          _insertAdminToolsOverlay();
+        } else {
+          _removeAdminToolsOverlay();
+        }
       },
-      child: Scaffold(
-        appBar: VoicesAppBar(
-          leading: isVisitor ? null : const DrawerToggleButton(),
-          automaticallyImplyLeading: false,
-          actions: const [
-            SpacesThemeModeSwitch(),
-            SessionActionHeader(),
-            SessionStateHeader(),
-          ],
-        ),
-        drawer: isVisitor
-            ? null
-            : SpacesDrawer(
-                space: widget.space,
-                spacesShortcutsActivators:
-                    SpacesShellPage._spacesShortcutsActivators,
-                isUnlocked: isUnlocked,
+      child: _Shortcuts(
+        onToggleAdminTools: _toggleAdminTools,
+        child: BlocSelector<SessionCubit, SessionState,
+            ({bool isUnlocked, bool isVisitor})>(
+          selector: (state) => (
+            isUnlocked: state is ActiveAccountSessionState,
+            isVisitor: state is VisitorSessionState
+          ),
+          builder: (context, state) {
+            return Scaffold(
+              appBar: VoicesAppBar(
+                leading: state.isVisitor ? null : const DrawerToggleButton(),
+                automaticallyImplyLeading: false,
+                actions: _getActions(widget.space),
               ),
-        body: widget.child,
+              drawer: state.isVisitor
+                  ? null
+                  : SpacesDrawer(
+                      space: widget.space,
+                      spacesShortcutsActivators:
+                          SpacesShellPage._spacesShortcutsActivators,
+                      isUnlocked: state.isUnlocked,
+                    ),
+              body: widget.child,
+            );
+          },
+        ),
       ),
+    );
+  }
+
+  List<Widget> _getActions(Space space) {
+    if (space == Space.treasury) {
+      return [
+        const CampaignManagement(),
+        const SpacesThemeModeSwitch(),
+      ];
+    } else {
+      return [
+        const SpacesThemeModeSwitch(),
+        const SessionActionHeader(),
+        const SessionStateHeader(),
+      ];
+    }
+  }
+
+  void _toggleAdminTools() {
+    final cubit = context.read<AdminToolsCubit>();
+    if (cubit.state.enabled) {
+      cubit.disable();
+    } else {
+      cubit.enable();
+    }
+  }
+
+  void _insertAdminToolsOverlay() {
+    if (_adminToolsOverlay != null) {
+      // already shown
+      return;
+    }
+
+    final overlayEntry = _createAdminToolsOverlay();
+    Overlay.of(context, rootOverlay: true).insert(overlayEntry);
+    _adminToolsOverlay = overlayEntry;
+  }
+
+  void _removeAdminToolsOverlay() {
+    _adminToolsOverlay?.remove();
+    _adminToolsOverlay = null;
+  }
+
+  OverlayEntry _createAdminToolsOverlay() {
+    return OverlayEntry(
+      builder: (BuildContext context) {
+        return StreamBuilder<Space>(
+          // Passing it as a stream, not as a value because when the page
+          // rebuilds the overlay entry is not rebuilt.
+          stream: _watchSpace,
+          builder: (context, snapshot) {
+            final space = snapshot.data;
+            if (space == null) {
+              return const Offstage();
+            }
+
+            return DraggableCampaignAdminToolsDialog(
+              dialogKey: _adminToolsKey,
+              selectedSpace: space,
+              onSpaceSelected: (space) => space.go(context),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Stream<Space> get _watchSpace async* {
+    yield widget.space;
+    yield* _selectedSpaceSC.stream;
+  }
+}
+
+class _Shortcuts extends StatelessWidget {
+  final VoidCallback onToggleAdminTools;
+  final Widget child;
+
+  const _Shortcuts({
+    required this.onToggleAdminTools,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<SessionCubit, SessionState,
+        Map<Space, ShortcutActivator>>(
+      selector: (state) {
+        return switch (state) {
+          ActiveAccountSessionState(:final spacesShortcuts) => spacesShortcuts,
+          _ => {},
+        };
+      },
+      builder: (context, shortcuts) {
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            for (final entry in shortcuts.entries)
+              entry.value: () => entry.key.go(context),
+            CampaignAdminToolsDialog.shortcut: onToggleAdminTools,
+          },
+          child: child,
+        );
+      },
     );
   }
 }

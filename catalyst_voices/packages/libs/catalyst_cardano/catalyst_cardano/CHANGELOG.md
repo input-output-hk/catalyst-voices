@@ -1,3 +1,19 @@
+## 0.4.0+2
+
+ - Update a dependency to the latest release.
+
+## 0.4.0+1
+
+ - Update a dependency to the latest release.
+
+## 0.4.0
+
+ - **REFACTOR**(cat-voices): self contained frontend dir ([#1082](https://github.com/input-output-hk/catalyst-voices/issues/1082)). ([62e5f437](https://github.com/input-output-hk/catalyst-voices/commit/62e5f43778fab323d7c1e4ebab4b5e89c1ba0cb5))
+ - **FIX**(cat-voices): equatable lint issue fix ([#1280](https://github.com/input-output-hk/catalyst-voices/issues/1280)). ([e551c617](https://github.com/input-output-hk/catalyst-voices/commit/e551c61702ab4a229c88119a43611a42516b2665))
+ - **FEAT**(cat-voices): Integration tests using flutter_driver ([#1304](https://github.com/input-output-hk/catalyst-voices/issues/1304)). ([34de044c](https://github.com/input-output-hk/catalyst-voices/commit/34de044c9b5f22f2c0fb7406a25699c5bd12b9f5))
+ - **FEAT**: rust key derivation ([#1063](https://github.com/input-output-hk/catalyst-voices/issues/1063)). ([0712347b](https://github.com/input-output-hk/catalyst-voices/commit/0712347b1e6e85d67b43d1733650d62d1c9d7c94))
+ - **FEAT**(general): Bump cat-ci to `v3.2.23` ([#1125](https://github.com/input-output-hk/catalyst-voices/issues/1125)). ([d967d275](https://github.com/input-output-hk/catalyst-voices/commit/d967d2750f6b9b1fb3b80366380572e7528268d4))
+
 ## 0.3.0
 
 > Note: This release has breaking changes.
