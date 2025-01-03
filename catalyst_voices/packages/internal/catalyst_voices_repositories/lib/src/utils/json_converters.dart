@@ -33,18 +33,18 @@ final class ShelleyAddressConverter
 }
 
 final class ListStringConverter
-    implements JsonConverter<List<String>, List<dynamic>> {
+    implements JsonConverter<List<String>?, List<dynamic>?> {
   const ListStringConverter();
 
   @override
-  List<String> fromJson(List<dynamic>? json) {
-    if (json == null) return <String>[];
-    return json.map((e) => e as String).toList();
+  List<String>? fromJson(List<dynamic>? json) {
+    if (json == null) return null;
+    
+    return json.cast();
   }
 
   @override
-  List<dynamic> toJson(List<String> object) =>
-      object.map((e) => e as dynamic).toList();
+  List<dynamic>? toJson(List<String>? object) => object;
 }
 
 /// A converter that only casts json to a target type.
