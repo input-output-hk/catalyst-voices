@@ -1,6 +1,7 @@
 //! Insert Unstaked TXOs into the DB.
 use std::sync::Arc;
 
+use pallas_crypto::hash::Hash;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -33,7 +34,7 @@ pub(super) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        txn_hash: &[u8], txo: i16, slot_no: u64, txn: i16, address: &str, value: u64,
+        txn_hash: Hash<32>, txo: i16, slot_no: u64, txn: i16, address: &str, value: u64,
     ) -> Self {
         Self {
             txn_hash: txn_hash.to_vec(),
