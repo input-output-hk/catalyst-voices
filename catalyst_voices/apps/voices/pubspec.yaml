@@ -10,10 +10,10 @@ environment:
 dependencies:
   animated_text_kit: ^4.2.2
   animations: ^2.0.11
-  catalyst_cardano: ^0.3.0
-  catalyst_cardano_serialization: ^0.4.0
-  catalyst_cardano_web: ^0.3.0
-  catalyst_key_derivation: ^0.1.0
+  catalyst_cardano: ^0.4.0+2
+  catalyst_cardano_serialization: ^0.5.0+2
+  catalyst_cardano_web: ^0.4.0+2
+  catalyst_key_derivation: ^0.1.1+1
   catalyst_voices_assets:
     path: ../../packages/internal/catalyst_voices_assets
   catalyst_voices_blocs:
@@ -73,7 +73,7 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.4.12
   build_verify: ^3.1.0
-  catalyst_analysis: ^2.0.0
+  catalyst_analysis: ^2.0.1
   flutter_test:
     sdk: flutter
   go_router_builder: ^2.4.1
