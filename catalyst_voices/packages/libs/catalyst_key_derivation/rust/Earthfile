@@ -22,4 +22,10 @@ build:
 
     COPY flutter-rust-bridge+code-generator/frb_generated.rs ./src/frb_generated.rs
     DO rust-ci+EXECUTE \
-        --cmd="/scripts/std_build.py" \
+        --cmd="/scripts/std_build.py"
+
+# sync-cfg: Synchronize local config with CI version.
+# Must be run by the developer manually.
+sync-cfg:
+    FROM +builder
+    DO rust-ci+SYNC_STD_CFG
