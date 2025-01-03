@@ -37,7 +37,8 @@ final class ListStringConverter
   const ListStringConverter();
 
   @override
-  List<String> fromJson(List<dynamic> json) {
+  List<String> fromJson(List<dynamic>? json) {
+    if (json == null) return <String>[];
     return json.map((e) => e as String).toList();
   }
 
