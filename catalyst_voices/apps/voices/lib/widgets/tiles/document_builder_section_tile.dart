@@ -46,6 +46,10 @@ class _DocumentBuilderSectionTileState
 
     _editedSection = widget.section;
     _builder = _editedSection.toBuilder();
+
+    // TODO(damian-molinski): validation
+    _isValid =
+        _editedSection.properties.every((element) => element.value != null);
   }
 
   @override
@@ -56,6 +60,10 @@ class _DocumentBuilderSectionTileState
       _editedSection = widget.section;
       _builder = _editedSection.toBuilder();
       _pendingChanges.clear();
+
+      // TODO(damian-molinski): validation
+      _isValid =
+          _editedSection.properties.every((element) => element.value != null);
     }
   }
 
@@ -103,12 +111,14 @@ class _DocumentBuilderSectionTileState
     // ignore: unnecessary_lambdas
     setState(() {
       _pendingChanges.clear();
+      _isEditMode = false;
     });
   }
 
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
+      _pendingChanges.clear();
     });
   }
 
@@ -119,7 +129,8 @@ class _DocumentBuilderSectionTileState
       _pendingChanges.add(change);
 
       // TODO(damian-molinski): validation
-      _isValid = false;
+      _isValid =
+          _editedSection.properties.every((element) => element.value != null);
     });
   }
 }
@@ -155,7 +166,6 @@ class _Header extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
-        const SizedBox(width: 16),
       ],
     );
   }
@@ -223,6 +233,7 @@ class _PropertyBuilder extends StatelessWidget {
           label: property.schema.title ?? '',
           value: property.value is int ? property.value! as int : null,
           currency: const Currency.ada(),
+          range: property.schema.range,
           isEditMode: isEditMode,
           isRequired: property.schema.isRequired,
           onChanged: onChanged,
