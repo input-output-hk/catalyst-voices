@@ -13,38 +13,25 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
-env:
-  AWS_REGION: eu-central-1
-  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
-  EARTHLY_TARGET: docker
-  ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
-
 jobs:
   deploy-uikit-example:
     name: Deploy UIKit example on Firebase Hosting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.5.0
         with:
-          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-          aws_region: ${{ env.AWS_REGION }}
-          earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
-
+          version: 0.8.0
+      - name: Setup CI
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.5.0
       - name: Build Flutter Web
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.5.0
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst_voices/utilities/uikit_example
-          flags: --allow-privileged
-          targets: local-build-web
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
-
+          command: run
+          args: ./catalyst_voices/utilities/uikit_example+local-build-web
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: "${{ secrets.UIKIT_FIREBASE_SERVICE_ACCOUNT }}"
