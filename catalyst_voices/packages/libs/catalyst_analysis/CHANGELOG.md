@@ -1,3 +1,7 @@
+## 2.0.1
+
+ - **REFACTOR**(cat-voices): self contained frontend dir ([#1082](https://github.com/input-output-hk/catalyst-voices/issues/1082)). ([62e5f437](https://github.com/input-output-hk/catalyst-voices/commit/62e5f43778fab323d7c1e4ebab4b5e89c1ba0cb5))
+
 ## 2.0.0
 
 > Note: This release has breaking changes.
