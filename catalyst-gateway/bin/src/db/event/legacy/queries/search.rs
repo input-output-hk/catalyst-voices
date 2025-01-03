@@ -138,7 +138,7 @@ impl EventDB {
             let ends = row
                 .try_get::<&'static str, Option<NaiveDateTime>>("end_time")?
                 .map(|val| val.and_local_timezone(Utc).unwrap());
-            let is_final = ends.map_or(false, |ends| Utc::now() > ends);
+            let is_final = ends.is_some_and(|ends| Utc::now() > ends);
             events.push(EventSummary {
                 id: EventId(row.try_get("row_id")?),
                 name: row.try_get("name")?,
