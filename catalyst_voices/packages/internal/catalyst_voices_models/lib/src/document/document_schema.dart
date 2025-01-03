@@ -46,7 +46,7 @@ final class DocumentSchemaSegment extends Equatable implements DocumentNode {
   final DocumentNodeId nodeId;
   final String id;
   final String title;
-  final String description;
+  final String? description;
   final List<DocumentSchemaSection> sections;
   final List<DocumentNodeId> order;
 
@@ -79,7 +79,7 @@ final class DocumentSchemaSection extends Equatable implements DocumentNode {
   final DocumentNodeId nodeId;
   final String id;
   final String title;
-  final String description;
+  final String? description;
   final List<DocumentSchemaProperty> properties;
   final bool isRequired;
   final List<DocumentNodeId> order;
