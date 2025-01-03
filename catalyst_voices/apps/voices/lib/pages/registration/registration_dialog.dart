@@ -77,6 +77,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
           selector: (state) => state.step is! AccountCompletedStep,
           builder: (context, showCloseButton) {
             return VoicesTwoPaneDialog(
+              key: const Key('RegistrationDialog'),
               left: const RegistrationInfoPanel(),
               right: const RegistrationDetailsPanel(),
               showCloseButton: showCloseButton,
