@@ -1,6 +1,7 @@
 export 'cache/cache.dart';
 export 'cache/local_tll_cache.dart';
 export 'cache/ttl_cache.dart';
+export 'codecs/codecs.dart';
 export 'common/build_config.dart';
 export 'common/build_environment.dart';
 export 'crypto/crypto_service.dart';

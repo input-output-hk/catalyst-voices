@@ -13,6 +13,8 @@ class Range<T extends num> extends Equatable {
     return Range(min: min, max: max);
   }
 
+  bool contains(T value) => value >= min && value <= max;
+
   @override
   List<Object?> get props => [min, max];
 }

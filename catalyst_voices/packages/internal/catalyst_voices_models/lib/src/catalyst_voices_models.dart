@@ -16,6 +16,7 @@ export 'document/document_schema.dart';
 export 'errors/errors.dart';
 export 'file/voices_file.dart';
 export 'markdown_data.dart';
+export 'money/money.dart';
 export 'optional.dart';
 export 'proposal/guidance.dart';
 export 'proposal/proposal.dart';
