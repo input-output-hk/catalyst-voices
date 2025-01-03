@@ -2,14 +2,14 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 /// Opinionated container usually used inside space main body.
-class WorkspaceTileContainer extends StatelessWidget {
+class SelectableTile extends StatelessWidget {
   final bool isSelected;
-  final Widget content;
+  final Widget child;
 
-  const WorkspaceTileContainer({
+  const SelectableTile({
     super.key,
     this.isSelected = false,
-    required this.content,
+    required this.child,
   });
 
   @override
@@ -41,7 +41,7 @@ class WorkspaceTileContainer extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: _borderRadius(isSelected),
-        child: content,
+        child: child,
       ),
     );
   }
