@@ -22,7 +22,7 @@ final class DocumentSchemaSectionDto {
   const DocumentSchemaSectionDto({
     required this.id,
     required this.ref,
-    required this.title,
+    this.title,
     this.description,
     required this.properties,
     this.required,
