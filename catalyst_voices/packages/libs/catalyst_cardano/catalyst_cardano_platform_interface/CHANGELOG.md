@@ -1,3 +1,16 @@
+## 0.4.0+2
+
+ - Update a dependency to the latest release.
+
+## 0.4.0+1
+
+ - Update a dependency to the latest release.
+
+## 0.4.0
+
+ - **REFACTOR**(cat-voices): self contained frontend dir ([#1082](https://github.com/input-output-hk/catalyst-voices/issues/1082)). ([62e5f437](https://github.com/input-output-hk/catalyst-voices/commit/62e5f43778fab323d7c1e4ebab4b5e89c1ba0cb5))
+ - **FIX**(cat-voices): equatable lint issue fix ([#1280](https://github.com/input-output-hk/catalyst-voices/issues/1280)). ([e551c617](https://github.com/input-output-hk/catalyst-voices/commit/e551c61702ab4a229c88119a43611a42516b2665))
+
 ## 0.3.0
 
 > Note: This release has breaking changes.

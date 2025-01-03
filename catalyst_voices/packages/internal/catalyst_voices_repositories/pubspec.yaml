@@ -8,7 +8,7 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
-  catalyst_cardano_serialization: ^0.4.0
+  catalyst_cardano_serialization: ^0.5.0+2
   catalyst_voices_models:
     path: ../catalyst_voices_models
   catalyst_voices_shared:
@@ -24,7 +24,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.12
-  catalyst_analysis: ^2.0.0
+  catalyst_analysis: ^2.0.1
   chopper_generator: ^8.0.3
   json_serializable: ^6.7.1
   mockito: ^5.4.4

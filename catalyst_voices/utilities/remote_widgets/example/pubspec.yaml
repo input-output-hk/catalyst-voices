@@ -15,7 +15,7 @@ dependencies:
   rfw: ^1.0.26
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.0
+  catalyst_analysis: ^2.0.1
 
 flutter:
   uses-material-design: true
