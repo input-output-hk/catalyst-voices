@@ -114,7 +114,7 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
   @override
   final DocumentNodeId nodeId;
   final String id;
-  final String title;
+  final String? title;
   final String? description;
   final Object? defaultValue;
   final String? guidance;
