@@ -10,7 +10,7 @@ final class DocumentSchemaPropertyDto {
   final String ref;
   @JsonKey(includeToJson: false)
   final String id;
-  final String title;
+  final String? title;
   final String? description;
   @JsonKey(includeIfNull: false)
   final int? minLength;
@@ -38,7 +38,7 @@ final class DocumentSchemaPropertyDto {
   const DocumentSchemaPropertyDto({
     this.ref = '',
     required this.id,
-    required this.title,
+    this.title,
     this.description,
     this.minLength,
     this.maxLength,
