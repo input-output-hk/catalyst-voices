@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/widgets/document_builder/common/document_property_footer.dart';
-import 'package:catalyst_voices/widgets/document_builder/common/document_property_topbar.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -163,7 +163,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 24, top: 20, bottom: 20),
-          child: DocumentPropertyTopbar(
+          child: _TopBar(
             title: widget.title,
             isEditMode: _effectiveEditModeController.value,
             onToggleEditMode: _toggleEditMode,
@@ -194,7 +194,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
         const SizedBox(height: 16),
         Offstage(
           offstage: !_effectiveEditModeController.value,
-          child: DocumentPropertyFooter(
+          child: _Footer(
             onSave: _saveDocument,
           ),
         ),
@@ -349,6 +349,30 @@ class _Editor extends StatelessWidget {
   }
 }
 
+class _Footer extends StatelessWidget {
+  final VoidCallback? onSave;
+
+  const _Footer({
+    this.onSave,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
+      alignment: Alignment.centerRight,
+      color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
+      child: VoicesFilledButton(
+        onTap: onSave,
+        child: Text(context.l10n.saveButtonText.toUpperCase()),
+      ),
+    );
+  }
+}
+
 class _Toolbar extends StatelessWidget {
   final QuillController controller;
 
@@ -468,6 +492,43 @@ class _ToolbarIconButton extends StatelessWidget {
     return IconButton(
       onPressed: onPressed,
       icon: icon.buildIcon(),
+    );
+  }
+}
+
+class _TopBar extends StatelessWidget {
+  final String title;
+  final bool isEditMode;
+  final VoidCallback? onToggleEditMode;
+
+  const _TopBar({
+    required this.title,
+    required this.isEditMode,
+    this.onToggleEditMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
+        const SizedBox(width: 16),
+        VoicesTextButton(
+          onTap: onToggleEditMode,
+          child: Text(
+            isEditMode
+                ? context.l10n.cancelButtonText
+                : context.l10n.editButtonText,
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
+        ),
+        const SizedBox(width: 16),
+      ],
     );
   }
 }

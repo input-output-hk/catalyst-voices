@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/tiles/agreement_confirmation_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -195,7 +196,8 @@ class _PropertyBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (property.schema.definition) {
+    final definition = property.schema.definition;
+    switch (definition) {
       case SegmentDefinition():
       case SectionDefinition():
         throw UnsupportedError(
@@ -219,9 +221,19 @@ class _PropertyBuilder extends StatelessWidget {
       case TokenValueCardanoADADefinition():
       case DurationInMonthsDefinition():
       case YesNoChoiceDefinition():
-      case AgreementConfirmationDefinition():
       case SPDXLicenceOrUrlDefinition():
+      case LanguageCodeDefinition():
         throw UnimplementedError();
+      case AgreementConfirmationDefinition():
+        return AgreementConfirmationTile(
+          value: definition.castProperty(property).value,
+          definition: definition,
+          nodeId: property.schema.nodeId,
+          description: property.schema.description ?? '',
+          title: property.schema.title ?? '',
+          isEditMode: isEditMode,
+          onChanged: onPropertyChanged,
+        );
     }
   }
 }
