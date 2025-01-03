@@ -22,9 +22,9 @@ class TreasuryCampaignStagesViewStep extends StatelessWidget {
     return SectionStepStateBuilder(
       id: step.sectionStepId,
       builder: (context, value, child) {
-        return WorkspaceTileContainer(
+        return SelectableTile(
           isSelected: value.isSelected,
-          content: Column(
+          child: Column(
             children: [
               TreasuryCampaignStepHeader(step: step),
               const SizedBox(height: 12),
