@@ -1,6 +1,5 @@
 //! CIP36 Registration Endpoints
 
-use ed25519_dalek::VerifyingKey;
 use poem::http::{HeaderMap, StatusCode};
 use poem_openapi::{param::Query, OpenApi};
 
@@ -15,6 +14,7 @@ use crate::service::common::{
 
 pub(crate) mod endpoint;
 pub(crate) mod old_endpoint;
+
 pub(crate) mod response;
 
 /// Cardano Staking API Endpoints
@@ -94,9 +94,9 @@ impl Api {
         _auth: NoneOrRBAC,
     ) -> old_endpoint::SingleRegistrationResponse {
         let hex_key = stake_pub_key.0;
-        let pub_key: VerifyingKey = hex_key.into();
 
-        old_endpoint::get_latest_registration_from_stake_addr(&pub_key, true).await
+        old_endpoint::get_latest_registration_from_stake_addr(hex_key.as_bytes().to_vec(), true)
+            .await
     }
 
     /// Get latest CIP36 registrations from a stake key hash.
@@ -114,7 +114,7 @@ impl Api {
         stake_key_hash: Query<String>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
-    ) -> old_endpoint::SingleRegistrationResponse {
+    ) -> response::AllRegistration {
         old_endpoint::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
     }
 

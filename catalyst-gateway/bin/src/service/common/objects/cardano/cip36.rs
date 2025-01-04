@@ -23,6 +23,7 @@ impl Cip36ReportingList {
     }
 
     /// Add a new `Cip36Reporting` to the list.
+    #[allow(dead_code)]
     pub(crate) fn add(&mut self, cip36: Cip36Reporting) {
         self.cip36.push(cip36);
     }
@@ -50,6 +51,7 @@ pub(crate) struct Cip36Reporting {
 
 impl Cip36Reporting {
     /// Create a new instance of `Cip36Reporting`.
+    #[allow(dead_code)]
     pub(crate) fn new(cip36: Vec<Cip36Info>, invalids: Vec<InvalidRegistrationsReport>) -> Self {
         Self { cip36, invalids }
     }

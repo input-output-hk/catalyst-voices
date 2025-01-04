@@ -8,9 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    service::common::types::cardano::slot_no::SlotNo,
 };
 
 /// Get invalid registrations from stake addr query.
@@ -28,12 +31,10 @@ pub(crate) struct GetInvalidRegistrationParams {
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(
-        stake_address: Vec<u8>, slot_no: num_bigint::BigInt,
-    ) -> GetInvalidRegistrationParams {
+    pub(crate) fn new(stake_address: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
         Self {
             stake_address,
-            slot_no,
+            slot_no: slot_no.into_big_int(),
         }
     }
 }
