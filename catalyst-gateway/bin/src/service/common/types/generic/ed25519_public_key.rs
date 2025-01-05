@@ -133,3 +133,16 @@ impl From<Ed25519HexEncodedPublicKey> for ed25519_dalek::VerifyingKey {
             .expect("This can only fail if the type was invalidly constructed.")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Ed25519HexEncodedPublicKey;
+
+    #[test]
+    fn hex_to_pub_key() {
+        assert!(Ed25519HexEncodedPublicKey::try_from(
+            "0x76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de".to_string(),
+        )
+        .is_ok());
+    }
+}

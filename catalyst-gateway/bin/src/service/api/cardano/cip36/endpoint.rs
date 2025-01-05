@@ -6,7 +6,7 @@ use tracing::{error, info};
 use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
 use super::{
     cardano::{self},
-    filter::get_latest_registration_from_stake_key_hash,
+    filter::{get_latest_registration_from_stake_key_hash, get_registration_from_stake_addr},
     response, NoneOrRBAC, SlotNo,
 };
 use crate::{
@@ -18,7 +18,6 @@ use crate::{
 };
 
 /// Process the endpoint operation
-#[allow(clippy::unused_async)]
 pub(crate) async fn cip36_registrations(
     lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
@@ -27,20 +26,11 @@ pub(crate) async fn cip36_registrations(
 ) -> response::AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
-        let _err = anyhow::anyhow!("Failed to acquire db session");
-        // return SingleRegistrationResponse::service_unavailable(&err,
-        // RetryAfterOption::Default);
         return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-            "Invalid Stake Address or Voter Key",
+            "Connection issue",
             StatusCode::UNPROCESSABLE_ENTITY,
         )]);
     };
-
-    if let Some(_slot) = asat {
-    } else {
-        // If _asat is None, then get the latest slot number from the chain follower and
-        // use that.
-    }
 
     if let Some(stake_or_voter) = lookup {
         match StakeAddressOrPublicKey::from(stake_or_voter) {
@@ -49,42 +39,27 @@ pub(crate) async fn cip36_registrations(
                 let stake_hash: HexEncodedHash28 = match cip19_stake_address.try_into() {
                     Ok(stake_hash) => stake_hash,
                     Err(err) => {
-                        error!("stake addr to stake hash {:?}", err);
                         return response::AllRegistration::unprocessable_content(vec![
                             poem::Error::from_string(
-                                "Invalid Stake Address or Voter Key",
+                                format!("Stake addr to stake hash {err:?}"),
                                 StatusCode::UNPROCESSABLE_ENTITY,
                             ),
                         ]);
                     },
                 };
 
-                // Get stake public key from stake hash
-                match get_latest_registration_from_stake_key_hash(stake_hash.to_string(), session)
-                    .await
-                {
-                    common::responses::WithErrorResponses::With(resp) => resp,
-                    common::responses::WithErrorResponses::Error(_error_responses) => {
-                        return response::AllRegistration::unprocessable_content(vec![
-                            poem::Error::from_string(
-                                "Invalid Stake Address or Voter Key",
-                                StatusCode::UNPROCESSABLE_ENTITY,
-                            ),
-                        ]);
-                    },
-                }
+                return get_latest_registration_from_stake_key_hash(stake_hash, session).await;
             },
-            StakeAddressOrPublicKey::PublicKey(_ed25519_hex_encoded_public_key) => {
-                info!("stake public key conor");
-                return response::AllRegistration::unprocessable_content(vec![
-                    poem::Error::from_string(
-                        "Invalid Stake Address or Voter Key",
-                        StatusCode::UNPROCESSABLE_ENTITY,
-                    ),
-                ]);
+            StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
+                return get_registration_from_stake_addr(
+                    ed25519_hex_encoded_public_key,
+                    asat,
+                    session,
+                )
+                .await;
             },
             StakeAddressOrPublicKey::All => {
-                info!("stake address conor all");
+                info!("ALL");
                 return response::AllRegistration::unprocessable_content(vec![
                     poem::Error::from_string(
                         "Invalid Stake Address or Voter Key",

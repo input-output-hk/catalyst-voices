@@ -1,6 +1,6 @@
 //! CIP36 Registration Endpoints
 
-use poem::http::{HeaderMap, StatusCode};
+use poem::http::HeaderMap;
 use poem_openapi::{param::Query, OpenApi};
 
 use self::cardano::slot_no::SlotNo;
@@ -57,16 +57,16 @@ impl Api {
         // Special validation for the `lookup` parameter.
         // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
         // is invalid.
-        if let Some(lookup) = lookup.0.clone() {
-            if lookup.is_all(headers).is_err() {
-                return response::AllRegistration::unprocessable_content(vec![
-                    poem::Error::from_string(
-                        "Invalid Stake Address or Voter Key",
-                        StatusCode::UNPROCESSABLE_ENTITY,
-                    ),
-                ]);
-            }
-        }
+        // if let Some(lookup) = lookup.0.clone() {
+        // if lookup.is_all(headers).is_err() {
+        // return response::AllRegistration::unprocessable_content(vec![
+        // poem::Error::from_string(
+        // "Invalid Stake Address or Voter Key",
+        // StatusCode::UNPROCESSABLE_ENTITY,
+        // ),
+        // ]);
+        // }
+        // }
 
         endpoint::cip36_registrations(
             lookup.0,
