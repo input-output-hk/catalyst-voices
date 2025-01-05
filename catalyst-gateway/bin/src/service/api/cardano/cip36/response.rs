@@ -39,7 +39,7 @@ pub(crate) struct Cip36RegistrationList {
     #[oai(skip_serializing_if_is_empty, validator(max_items = "10"))]
     pub invalid: Vec<Cip36Details>,
     /// Current Page
-    pub page: common::objects::generic::pagination::CurrentPage,
+    pub page: Option<common::objects::generic::pagination::CurrentPage>,
 }
 
 impl Example for Cip36RegistrationList {
@@ -48,7 +48,7 @@ impl Example for Cip36RegistrationList {
             slot: (common::types::cardano::slot_no::EXAMPLE + 635).into(),
             voting_key: vec![Cip36RegistrationsForVotingPublicKey::example()],
             invalid: vec![Cip36Details::invalid_example()],
-            page: common::objects::generic::pagination::CurrentPage::example(),
+            page: Some(common::objects::generic::pagination::CurrentPage::example()),
         }
     }
 }

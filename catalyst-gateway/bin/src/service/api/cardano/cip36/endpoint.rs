@@ -6,10 +6,16 @@ use tracing::{error, info};
 use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
 use super::{
     cardano::{self},
-    old_endpoint::get_latest_registration_from_stake_key_hash,
+    filter::get_latest_registration_from_stake_key_hash,
     response, NoneOrRBAC, SlotNo,
 };
-use crate::service::common::{self};
+use crate::{
+    db::index::session::CassandraSession,
+    service::{
+        api::cardano::cip36::response::AllRegistration,
+        common::{self},
+    },
+};
 
 /// Process the endpoint operation
 #[allow(clippy::unused_async)]
@@ -19,6 +25,17 @@ pub(crate) async fn cip36_registrations(
     _limit: common::types::generic::query::pagination::Limit, _auth: NoneOrRBAC,
     _headers: &HeaderMap,
 ) -> response::AllRegistration {
+    let Some(session) = CassandraSession::get(true) else {
+        error!("Failed to acquire db session");
+        let _err = anyhow::anyhow!("Failed to acquire db session");
+        // return SingleRegistrationResponse::service_unavailable(&err,
+        // RetryAfterOption::Default);
+        return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+            "Invalid Stake Address or Voter Key",
+            StatusCode::UNPROCESSABLE_ENTITY,
+        )]);
+    };
+
     if let Some(_slot) = asat {
     } else {
         // If _asat is None, then get the latest slot number from the chain follower and
@@ -43,7 +60,7 @@ pub(crate) async fn cip36_registrations(
                 };
 
                 // Get stake public key from stake hash
-                match get_latest_registration_from_stake_key_hash(stake_hash.to_string(), true)
+                match get_latest_registration_from_stake_key_hash(stake_hash.to_string(), session)
                     .await
                 {
                     common::responses::WithErrorResponses::With(resp) => resp,

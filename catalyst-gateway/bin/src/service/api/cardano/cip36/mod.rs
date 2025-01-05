@@ -13,7 +13,8 @@ use crate::service::common::{
 };
 
 pub(crate) mod endpoint;
-pub(crate) mod old_endpoint;
+#[allow(dead_code)]
+pub(crate) mod filter;
 
 pub(crate) mod response;
 
@@ -76,65 +77,5 @@ impl Api {
             headers,
         )
         .await
-    }
-
-    /// Get latest CIP36 registrations from stake address.
-    ///
-    /// This endpoint gets the latest registration given a stake address.
-    #[oai(
-        path = "/draft/cardano/cip36/latest_registration/stake_addr",
-        method = "get",
-        operation_id = "latestRegistrationGivenStakeAddr"
-    )]
-    async fn latest_registration_cip36_given_stake_addr(
-        &self,
-        /// Stake Public Key to find the latest registration for.
-        stake_pub_key: Query<Ed25519HexEncodedPublicKey>, // Validation provided by type.
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> old_endpoint::SingleRegistrationResponse {
-        let hex_key = stake_pub_key.0;
-
-        old_endpoint::get_latest_registration_from_stake_addr(hex_key.as_bytes().to_vec(), true)
-            .await
-    }
-
-    /// Get latest CIP36 registrations from a stake key hash.
-    ///
-    /// This endpoint gets the latest registration given a stake key hash.
-    #[oai(
-        path = "/draft/cardano/cip36/latest_registration/stake_key_hash",
-        method = "get",
-        operation_id = "latestRegistrationGivenStakeHash"
-    )]
-    async fn latest_registration_cip36_given_stake_key_hash(
-        &self,
-        /// Stake Key Hash to find the latest registration for.
-        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
-        stake_key_hash: Query<String>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> response::AllRegistration {
-        old_endpoint::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
-    }
-
-    /// Get latest CIP36 registrations from voting key.
-    ///
-    /// This endpoint returns the list of stake address registrations currently associated
-    /// with a given voting key.
-    #[oai(
-        path = "/draft/cardano/cip36/latest_registration/vote_key",
-        method = "get",
-        operation_id = "latestRegistrationGivenVoteKey"
-    )]
-    async fn latest_registration_cip36_given_vote_key(
-        &self,
-        /// Voting Key to find CIP36 registrations for.
-        #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]"))]
-        vote_key: Query<String>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> old_endpoint::MultipleRegistrationResponse {
-        old_endpoint::get_associated_vote_key_registrations(vote_key.0, true).await
     }
 }
