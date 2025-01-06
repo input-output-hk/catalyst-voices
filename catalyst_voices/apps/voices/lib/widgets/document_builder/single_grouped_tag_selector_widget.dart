@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/string_ext.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_segmented_button.dart';
+import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -62,7 +62,7 @@ class _SingleGroupedTagSelectorWidgetState
         isRequired: widget.isRequired,
       );
     } else {
-      return _TagChip(_selection);
+      return _GroupedTagChip(_selection);
     }
   }
 
@@ -137,7 +137,7 @@ class _TagSelector extends StatelessWidget {
         const SizedBox(height: 12),
         _TagChipGroup(
           tags: tags,
-          selected: selectedTag,
+          selectedTag: selectedTag,
           onChanged: (tag) {
             final group = selectedGroup!.group;
 
@@ -198,63 +198,117 @@ class _TagGroupsDropdown extends StatelessWidget {
 
 class _TagChipGroup extends StatelessWidget {
   final List<String> tags;
-  final String? selected;
+  final String? selectedTag;
   final ValueChanged<String?> onChanged;
 
   const _TagChipGroup({
     required this.tags,
-    this.selected,
+    this.selectedTag,
     required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    final selected = this.selected;
+    final selectedTag = this.selectedTag;
 
-    return VoicesSegmentedButton<String>(
-      segments: tags
-          .map((tag) => ButtonSegment(value: tag, label: Text(tag)))
-          .toList(),
-      selected: {
-        if (selected != null) selected,
-      },
-      onChanged: (value) {
-        onChanged(value.firstOrNull);
-      },
-      multiSelectionEnabled: false,
-      emptySelectionAllowed: true,
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: tags.map((tag) {
+        final isSelected = tag == selectedTag;
+        return _TagChip(
+          key: ObjectKey(tag),
+          name: tag,
+          isSelected: isSelected,
+          isEnabled: true,
+          onTap: () => isSelected ? onChanged(null) : onChanged(tag),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _GroupedTagChip extends StatelessWidget {
+  final GroupedTagsSelection data;
+
+  const _GroupedTagChip(
+    this.data,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final isValid = data.isValid;
+
+    return _TagChip(
+      key: const ValueKey('SelectedGroupedTagChipKey'),
+      name: isValid ? '$data' : context.l10n.noTagSelected,
+      isSelected: isValid,
+      isEnabled: isValid,
     );
   }
 }
 
 class _TagChip extends StatelessWidget {
-  final GroupedTagsSelection selection;
+  final String name;
+  final bool isSelected;
+  final bool isEnabled;
+  final VoidCallback? onTap;
 
-  const _TagChip(this.selection);
+  Set<WidgetState> get states => {
+        if (isSelected) WidgetState.selected,
+        if (!isEnabled) WidgetState.disabled,
+      };
+
+  const _TagChip({
+    super.key,
+    required this.name,
+    this.isSelected = false,
+    this.isEnabled = true,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colors;
-    final textTheme = theme.textTheme;
 
-    final isValid = selection.isValid;
+    final backgroundColor = WidgetStateProperty.resolveWith<Color?>((states) {
+      if (states.contains(WidgetState.disabled)) {
+        return colors.onSurfaceNeutralOpaqueLv2;
+      }
 
-    final backgroundColor =
-        isValid ? colors.onPrimaryContainer : colors.onSurfaceNeutralOpaqueLv2;
-    final foregroundColor =
-        isValid ? colors.textOnPrimary : colors.textDisabled;
+      if (states.contains(WidgetState.selected)) {
+        return colors.onPrimaryContainer;
+      }
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: backgroundColor,
+      return null;
+    });
+
+    final foregroundColor = WidgetStateProperty.resolveWith<Color?>((states) {
+      if (states.contains(WidgetState.disabled)) {
+        return colors.textDisabled;
+      }
+
+      if (states.contains(WidgetState.selected)) {
+        return colors.textOnPrimaryWhite;
+      }
+
+      return null;
+    });
+
+    return VoicesChip.rectangular(
+      content: Text(
+        name,
+        style: TextStyle(color: foregroundColor.resolve(states)),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-      child: Text(
-        isValid ? '$selection' : context.l10n.noTagSelected,
-        style: textTheme.labelLarge?.copyWith(color: foregroundColor),
-      ),
+      trailing: onTap != null && isSelected
+          ? Icon(
+              Icons.clear,
+              color: foregroundColor.resolve(states),
+            )
+          : null,
+      backgroundColor: backgroundColor.resolve(states),
+      onTap: onTap,
     );
   }
 }
