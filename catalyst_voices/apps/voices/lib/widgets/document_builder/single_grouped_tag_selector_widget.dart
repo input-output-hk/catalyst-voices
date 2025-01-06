@@ -124,10 +124,8 @@ class _TagSelector extends StatelessWidget {
           starred: isRequired,
         ),
         const SizedBox(height: 4),
-        VoicesDropdown<GroupedTags>(
-          items: groupedTags
-              .map((e) => DropdownMenuEntry(value: e, label: e.group))
-              .toList(),
+        _TagGroupsDropdown(
+          groupedTags: groupedTags,
           onChanged: onGroupChanged,
           value: selectedGroup,
         ),
@@ -137,23 +135,16 @@ class _TagSelector extends StatelessWidget {
           starred: isRequired,
         ),
         const SizedBox(height: 12),
-        VoicesSegmentedButton<String>(
-          segments: tags
-              .map((tag) => ButtonSegment(value: tag, label: Text(tag)))
-              .toList(),
-          selected: {
-            if (selectedTag != null) selectedTag,
-          },
-          onChanged: (value) {
+        _TagChipGroup(
+          tags: tags,
+          selected: selectedTag,
+          onChanged: (tag) {
             final group = selectedGroup!.group;
-            final tag = value.firstOrNull;
 
             final selection = GroupedTagsSelection(group: group, tag: tag);
 
             onSelectionChanged(selection);
           },
-          multiSelectionEnabled: false,
-          emptySelectionAllowed: true,
         ),
       ],
     );
@@ -178,6 +169,60 @@ class _TagSelectorLabel extends StatelessWidget {
     return Text(
       data.starred(isEnabled: starred),
       style: textTheme.titleSmall?.copyWith(color: colors.textOnPrimaryLevel0),
+    );
+  }
+}
+
+class _TagGroupsDropdown extends StatelessWidget {
+  final List<GroupedTags> groupedTags;
+  final ValueChanged<GroupedTags?> onChanged;
+  final GroupedTags? value;
+
+  const _TagGroupsDropdown({
+    required this.groupedTags,
+    required this.onChanged,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesDropdown<GroupedTags>(
+      items: groupedTags
+          .map((e) => DropdownMenuEntry(value: e, label: e.group))
+          .toList(),
+      onChanged: onChanged,
+      value: value,
+    );
+  }
+}
+
+class _TagChipGroup extends StatelessWidget {
+  final List<String> tags;
+  final String? selected;
+  final ValueChanged<String?> onChanged;
+
+  const _TagChipGroup({
+    required this.tags,
+    this.selected,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = this.selected;
+
+    return VoicesSegmentedButton<String>(
+      segments: tags
+          .map((tag) => ButtonSegment(value: tag, label: Text(tag)))
+          .toList(),
+      selected: {
+        if (selected != null) selected,
+      },
+      onChanged: (value) {
+        onChanged(value.firstOrNull);
+      },
+      multiSelectionEnabled: false,
+      emptySelectionAllowed: true,
     );
   }
 }
