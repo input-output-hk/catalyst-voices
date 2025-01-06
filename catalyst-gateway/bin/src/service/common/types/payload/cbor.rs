@@ -3,13 +3,16 @@ use std::ops::{Deref, DerefMut};
 use bytes::Bytes;
 use poem::{Body, FromRequest, IntoResponse, Request, RequestBody, Response, Result};
 use poem_openapi::{
-    impl_apirequest_for_payload, payload::{ParsePayload, Payload}, registry::{MetaMediaType, MetaResponse, MetaResponses, MetaSchema, MetaSchemaRef, Registry}, ApiResponse
+    impl_apirequest_for_payload,
+    payload::{ParsePayload, Payload},
+    registry::{MetaMediaType, MetaResponse, MetaResponses, MetaSchema, MetaSchemaRef, Registry},
+    ApiResponse,
 };
 
-//use crate::{
+// use crate::{
 //    payload::{ParsePayload, Payload},
-//    registry::{MetaMediaType, MetaResponse, MetaResponses, MetaSchema, MetaSchemaRef, Registry},
-//    ApiResponse,
+//    registry::{MetaMediaType, MetaResponse, MetaResponses, MetaSchema, MetaSchemaRef,
+// Registry},    ApiResponse,
 //};
 
 /// A cbor binary payload.
