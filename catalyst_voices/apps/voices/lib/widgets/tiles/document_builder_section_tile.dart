@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -214,6 +215,20 @@ class _PropertyBuilder extends StatelessWidget {
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
       case SingleGroupedTagSelectorDefinition():
+        final value = property.value;
+
+        final selection = value is GroupedTagsSelection
+            ? value
+            : const GroupedTagsSelection();
+
+        return SingleGroupedTagSelectorWidget(
+          id: property.schema.nodeId,
+          selection: selection,
+          groupedTags: property.groupedTags(),
+          isEditMode: isEditMode,
+          onChanged: onPropertyChanged,
+          isRequired: property.schema.isRequired,
+        );
       case TagGroupDefinition():
       case TagSelectionDefinition():
       case TokenValueCardanoADADefinition():

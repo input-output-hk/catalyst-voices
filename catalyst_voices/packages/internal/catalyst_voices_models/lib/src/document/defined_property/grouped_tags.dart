@@ -23,6 +23,19 @@ final class GroupedTagsSelection extends Equatable {
     );
   }
 
+  bool selects(GroupedTags groupedTag) {
+    final group = this.group;
+    final tag = this.tag;
+
+    final groupMatches = group == groupedTag.group;
+    final tagFoundOrNull = tag == null || groupedTag.tags.contains(tag);
+
+    return groupMatches && tagFoundOrNull;
+  }
+
+  @override
+  String toString() => '$group: $tag';
+
   @override
   List<Object?> get props => [
         group,
@@ -86,6 +99,9 @@ final class GroupedTags extends Equatable {
       },
     ).toList();
   }
+
+  @override
+  String toString() => '$group: $tags';
 
   @override
   List<Object?> get props => [
