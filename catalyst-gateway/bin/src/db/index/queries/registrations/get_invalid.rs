@@ -34,7 +34,7 @@ impl GetInvalidRegistrationParams {
     pub(crate) fn new(stake_address: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
         Self {
             stake_address,
-            slot_no: slot_no.into_big_int(),
+            slot_no: slot_no.into(),
         }
     }
 }

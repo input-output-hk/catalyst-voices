@@ -247,7 +247,7 @@ async fn get_all_registrations_from_stake_pub_key(
     Ok(registrations)
 }
 
-/// Sort latest registrations for a given stake address sorting by slot no
+/// Sort latest registrations for a given stake address, sort by slot no.
 fn sort_latest_registration(mut registrations: Vec<Cip36Details>) -> anyhow::Result<Cip36Details> {
     registrations.sort_by_key(|registration| Reverse(registration.slot_no.clone()));
     registrations.into_iter().next().ok_or(anyhow::anyhow!(

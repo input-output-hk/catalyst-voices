@@ -95,6 +95,12 @@ impl ParseFromJSON for SlotNo {
     }
 }
 
+impl From<SlotNo> for BigInt {
+    fn from(val: SlotNo) -> Self {
+        BigInt::from(val.0)
+    }
+}
+
 impl ToJSON for SlotNo {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())
@@ -123,11 +129,6 @@ impl SlotNo {
     /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
     pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
         value.map(std::convert::Into::into)
-    }
-
-    /// big int
-    pub(crate) fn into_big_int(self) -> BigInt {
-        BigInt::from(self.0)
     }
 }
 

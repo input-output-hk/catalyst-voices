@@ -8,7 +8,6 @@ use crate::service::common;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)] // TODO: Remove once endpoint fully implemented
 pub(crate) enum Cip36Registration {
     /// All CIP36 registrations associated with the same Voting Key.
     #[oai(status = 200)]
