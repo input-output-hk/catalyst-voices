@@ -7,17 +7,21 @@ import 'package:json_annotation/json_annotation.dart';
 
 final class DocumentSchemaSegmentsDtoConverter
     implements
-        JsonConverter<List<DocumentSchemaSegmentDto>, Map<String, dynamic>> {
+        JsonConverter<List<DocumentSchemaSegmentDto>, Map<String, dynamic>?> {
   const DocumentSchemaSegmentsDtoConverter();
 
   @override
-  List<DocumentSchemaSegmentDto> fromJson(Map<String, dynamic> json) {
+  List<DocumentSchemaSegmentDto> fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return [];
+    }
+
     final properties = json.convertMapToListWithIds();
     return properties.map(DocumentSchemaSegmentDto.fromJson).toList();
   }
 
   @override
-  Map<String, dynamic> toJson(List<DocumentSchemaSegmentDto> segments) {
+  Map<String, dynamic>? toJson(List<DocumentSchemaSegmentDto> segments) {
     return {
       for (final segment in segments) segment.id: segment.toJson(),
     };
@@ -26,17 +30,21 @@ final class DocumentSchemaSegmentsDtoConverter
 
 final class DocumentSchemaSectionsDtoConverter
     implements
-        JsonConverter<List<DocumentSchemaSectionDto>, Map<String, dynamic>> {
+        JsonConverter<List<DocumentSchemaSectionDto>, Map<String, dynamic>?> {
   const DocumentSchemaSectionsDtoConverter();
 
   @override
-  List<DocumentSchemaSectionDto> fromJson(Map<String, dynamic> json) {
+  List<DocumentSchemaSectionDto> fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return [];
+    }
+
     final properties = json.convertMapToListWithIds();
     return properties.map(DocumentSchemaSectionDto.fromJson).toList();
   }
 
   @override
-  Map<String, dynamic> toJson(List<DocumentSchemaSectionDto> sections) {
+  Map<String, dynamic>? toJson(List<DocumentSchemaSectionDto> sections) {
     return {
       for (final section in sections) section.id: section.toJson(),
     };
@@ -45,17 +53,21 @@ final class DocumentSchemaSectionsDtoConverter
 
 final class DocumentSchemaPropertiesDtoConverter
     implements
-        JsonConverter<List<DocumentSchemaPropertyDto>, Map<String, dynamic>> {
+        JsonConverter<List<DocumentSchemaPropertyDto>, Map<String, dynamic>?> {
   const DocumentSchemaPropertiesDtoConverter();
 
   @override
-  List<DocumentSchemaPropertyDto> fromJson(Map<String, dynamic> json) {
+  List<DocumentSchemaPropertyDto> fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return [];
+    }
+
     final properties = json.convertMapToListWithIds();
     return properties.map(DocumentSchemaPropertyDto.fromJson).toList();
   }
 
   @override
-  Map<String, dynamic> toJson(List<DocumentSchemaPropertyDto> properties) {
+  Map<String, dynamic>? toJson(List<DocumentSchemaPropertyDto> properties) {
     return {
       for (final property in properties) property.id: property.toJson(),
     };
