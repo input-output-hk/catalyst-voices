@@ -11,4 +11,5 @@
 pub(crate) mod cardano;
 pub(crate) mod generic;
 pub(crate) mod headers;
+pub(crate) mod payload;
 pub(crate) mod string_types;

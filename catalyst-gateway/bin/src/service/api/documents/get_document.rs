@@ -1,8 +1,8 @@
 //! Implementation of the GET `/sync_state` endpoint
 
-use poem_openapi::{payload::Binary, ApiResponse};
+use poem_openapi::ApiResponse;
 
-use crate::service::common::responses::WithErrorResponses;
+use crate::service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor};
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -10,7 +10,7 @@ use crate::service::common::responses::WithErrorResponses;
 pub(crate) enum Responses {
     /// The Document that was requested.
     #[oai(status = 200)]
-    Ok(Binary<Vec<u8>>),
+    Ok(Cbor<Vec<u8>>),
     /// The document could not be found.
     #[oai(status = 404)]
     NotFound,
