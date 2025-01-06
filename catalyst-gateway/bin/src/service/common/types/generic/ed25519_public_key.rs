@@ -134,6 +134,14 @@ impl From<Ed25519HexEncodedPublicKey> for ed25519_dalek::VerifyingKey {
     }
 }
 
+impl TryInto<Vec<u8>> for Ed25519HexEncodedPublicKey {
+    type Error = anyhow::Error;
+
+    fn try_into(self) -> Result<Vec<u8>, Self::Error> {
+        Ok(hex::decode(self.0.trim_start_matches("0x"))?)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Ed25519HexEncodedPublicKey;

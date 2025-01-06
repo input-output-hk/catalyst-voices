@@ -4,7 +4,7 @@ use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
 use poem::http::StatusCode;
-use tracing::{error, info};
+use tracing::error;
 
 use super::{
     cardano::{
@@ -20,7 +20,7 @@ use super::{
 };
 use crate::db::index::{
     queries::registrations::{
-        get_from_stake_addr::GetRegistrationQuery,
+        get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
         get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
         get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
     },
@@ -33,7 +33,7 @@ pub async fn get_registration_from_stake_addr(
 ) -> AllRegistration {
     let registrations = match get_all_registrations_from_stake_pub_key(
         session.clone(),
-        stake_pub_key.as_bytes().to_vec(),
+        stake_pub_key.clone(),
     )
     .await
     {
@@ -69,8 +69,6 @@ pub async fn get_registration_from_stake_addr(
             },
         }
     } else {
-        info!("conor {:?}", hex::encode(stake_pub_key.as_bytes()));
-
         match sort_latest_registration(registrations) {
             Ok(registration) => registration,
             Err(err) => {
@@ -145,17 +143,18 @@ async fn latest_registration_from_stake_addr(
     stake_pub_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>,
 ) -> anyhow::Result<Cip36Details> {
     sort_latest_registration(
-        get_all_registrations_from_stake_pub_key(session, stake_pub_key.as_bytes().to_vec())
-            .await?,
+        get_all_registrations_from_stake_pub_key(session, stake_pub_key).await?,
     )
 }
 
 /// Get all cip36 registrations for a given stake address.
 async fn get_all_registrations_from_stake_pub_key(
-    session: Arc<CassandraSession>, stake_pub_key: Vec<u8>,
+    session: Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter =
-        GetRegistrationQuery::execute(&session, stake_pub_key.into()).await?;
+    let mut registrations_iter = GetRegistrationQuery::execute(&session, GetRegistrationParams {
+        stake_address: stake_pub_key.try_into()?,
+    })
+    .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
         let row = row?;
