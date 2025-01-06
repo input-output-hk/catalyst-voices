@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -186,13 +185,34 @@ class _TagGroupsDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDropdown<GroupedTags>(
+    return DropdownButtonFormField<GroupedTags>(
       items: groupedTags
-          .map((e) => DropdownMenuEntry(value: e, label: e.group))
+          .map((e) => DropdownMenuItem(value: e, child: Text(e.group)))
           .toList(),
-      onChanged: onChanged,
       value: value,
+      onChanged: onChanged,
+      // dropdownColor: Colors.amber,
+      // icon: VoicesAssets.icons.chevronDown.buildIcon(),
+      // decoration: InputDecoration(
+      //   filled: true,
+      //   fillColor: Colors.red,
+      //   border: OutlineInputBorder(
+      //     borderSide: BorderSide(
+      //       color: Colors.teal,
+      //       width: 10,
+      //     ),
+      //   ),
+      // ),
+      // borderRadius: BorderRadius.circular(0),
+      // padding: EdgeInsets.only(left: 8),
     );
+    // return VoicesDropdown<GroupedTags>(
+    //   items: groupedTags
+    //       .map((e) => DropdownMenuEntry(value: e, label: e.group))
+    //       .toList(),
+    //   onChanged: onChanged,
+    //   value: value,
+    // );
   }
 }
 
