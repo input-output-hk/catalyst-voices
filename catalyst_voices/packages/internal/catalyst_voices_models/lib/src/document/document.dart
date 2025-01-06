@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_models/src/document/document_builder.dart';
-import 'package:catalyst_voices_models/src/document/document_schema.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 // TODO(dtscalac): tests
@@ -89,6 +88,16 @@ final class DocumentProperty extends Equatable {
   /// Creates a new [DocumentPropertyBuilder] from this property.
   DocumentPropertyBuilder toBuilder() {
     return DocumentPropertyBuilder.fromProperty(this);
+  }
+
+  List<GroupedTags> groupedTags() {
+    assert(
+      schema.definition is SingleGroupedTagSelectorDefinition,
+      'Grouped tags are available only for SingleGroupedTagSelector',
+    );
+
+    final oneOf = schema.oneOf ?? const [];
+    return GroupedTags.fromLogicalGroups(oneOf);
   }
 
   @override
