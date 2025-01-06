@@ -28,7 +28,7 @@ use crate::service::common::{
 };
 
 /// A Query Parameter that can take a CIP-19 stake address, or a public key.
-/// Defining these are mutually exclusive, ao a single parameter is required to be used.
+/// Defining these are mutually exclusive, as a single parameter is required to be used.
 #[derive(Clone)]
 pub(crate) enum StakeAddressOrPublicKey {
     /// A CIP-19 stake address

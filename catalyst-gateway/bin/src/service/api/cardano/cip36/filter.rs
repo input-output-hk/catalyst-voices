@@ -103,12 +103,8 @@ pub async fn get_registration_from_stake_addr(
 
     // include any erroneous registrations which occur AFTER the slot# of the last valid
     // registration
-    let invalids_report = match get_invalid_registrations(
-        stake_pub_key.as_bytes(),
-        slot_no.clone(),
-        session,
-    )
-    .await
+    let invalids_report = match get_invalid_registrations(stake_pub_key, slot_no.clone(), session)
+        .await
     {
         Ok(invalids) => invalids,
         Err(err) => {
@@ -208,11 +204,11 @@ fn get_registration_given_slot_no(
 
 /// Get invalid registrations for stake addr after given slot no
 async fn get_invalid_registrations(
-    stake_pub_key: &[u8], slot_no: SlotNo, session: Arc<CassandraSession>,
+    stake_pub_key: Ed25519HexEncodedPublicKey, slot_no: SlotNo, session: Arc<CassandraSession>,
 ) -> anyhow::Result<Vec<Cip36Details>> {
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
         &session,
-        GetInvalidRegistrationParams::new(stake_pub_key.to_owned(), slot_no.clone()),
+        GetInvalidRegistrationParams::new(stake_pub_key.try_into()?, slot_no.clone()),
     )
     .await?;
     let mut invalid_registrations = Vec::new();
@@ -333,10 +329,17 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             },
         };
 
+        let Ok(stake_pub_key) = Ed25519HexEncodedPublicKey::try_from(row.stake_address) else {
+            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                "Failed to convert raw stake pub key to pub key type".to_string(),
+                StatusCode::UNPROCESSABLE_ENTITY,
+            )]);
+        };
+
         // include any erroneous registrations which occur AFTER the slot# of the last valid
         // registration
         let invalids_report = match get_invalid_registrations(
-            &row.stake_address,
+            stake_pub_key,
             registration.slot_no.clone(),
             session,
         )

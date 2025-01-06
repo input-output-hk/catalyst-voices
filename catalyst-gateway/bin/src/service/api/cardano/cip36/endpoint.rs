@@ -35,7 +35,9 @@ pub(crate) async fn cip36_registrations(
     if let Some(stake_or_voter) = lookup {
         match StakeAddressOrPublicKey::from(stake_or_voter) {
             StakeAddressOrPublicKey::Address(cip19_stake_address) => {
-                // Convert stake address into stake key hash
+                // Typically, a stake address will start with 'stake1',
+                // for example: stake1ux7k5ztvhwj7ykv5v7vwjjzdfckjk0v74z9p9m5w0t5534clf62eq
+                // We need to convert this to a stake hash as per our data model.
                 let stake_hash: HexEncodedHash28 = match cip19_stake_address.try_into() {
                     Ok(stake_hash) => stake_hash,
                     Err(err) => {
