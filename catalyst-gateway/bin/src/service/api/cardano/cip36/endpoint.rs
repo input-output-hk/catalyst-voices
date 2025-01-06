@@ -6,7 +6,7 @@ use tracing::{error, info};
 use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
 use super::{
     cardano::{self},
-    filter::{get_latest_registration_from_stake_key_hash, get_registration_from_stake_addr},
+    filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key},
     response, NoneOrRBAC, SlotNo,
 };
 use crate::{
@@ -51,13 +51,13 @@ pub(crate) async fn cip36_registrations(
                     },
                 };
 
-                return get_latest_registration_from_stake_key_hash(stake_hash, session).await;
+                return get_registration_given_stake_key_hash(stake_hash, session, asat).await;
             },
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
-                return get_registration_from_stake_addr(
+                return get_registration_given_vote_key(
                     ed25519_hex_encoded_public_key,
-                    asat,
                     session,
+                    asat,
                 )
                 .await;
             },

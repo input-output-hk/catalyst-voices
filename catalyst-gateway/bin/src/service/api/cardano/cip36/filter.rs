@@ -22,16 +22,82 @@ use crate::db::index::{
     queries::registrations::{
         get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
         get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
+        get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
         get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
     },
     session::CassandraSession,
 };
 
+/// Get registration given a stake key hash, time specific based on asat param,
+/// or latest registration returned if no asat given.
+pub(crate) async fn get_registration_given_stake_key_hash(
+    stake_hash: HexEncodedHash28, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+) -> AllRegistration {
+    // Get stake addr associated with given stake hash.
+    let mut stake_addr_iter = match GetStakeAddrQuery::execute(
+        &session,
+        GetStakeAddrParams::new(stake_hash.into()),
+    )
+    .await
+    {
+        Ok(stake_addr) => stake_addr,
+        Err(err) => {
+            error!(
+                id="get_latest_registration_from_stake_key_hash_query_stake_addr",
+                error=?err,
+                "Failed to query stake addr from stake hash"
+            );
+
+            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                format!("Failed to query stake addr from stake hash {err:?}"),
+                StatusCode::UNPROCESSABLE_ENTITY,
+            )]);
+        },
+    };
+
+    if let Some(row_stake_addr) = stake_addr_iter.next().await {
+        let row = match row_stake_addr {
+            Ok(r) => r,
+            Err(err) => {
+                error!(
+                    id="get_latest_registration_from_stake_key_hash_latest_registration",
+                    error=?err,
+                    "Failed to get latest registration"
+                );
+
+                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                    format!("Failed to get latest registration {err:?}"),
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                )]);
+            },
+        };
+
+        // Stake hash successfully converted into associated stake pub key which we use to lookup
+        // registrations.
+        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_address.clone()) {
+            Ok(key) => key,
+            Err(err) => {
+                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                    format!("Failed to type stake address {err:?}"),
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                )]);
+            },
+        };
+
+        return get_registration_from_stake_addr(stake_pub_key, asat, session, None).await;
+    }
+    AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+        "Stake hash does not exist",
+        StatusCode::UNPROCESSABLE_ENTITY,
+    )])
+}
+
 /// Get registration from stake addr
 pub async fn get_registration_from_stake_addr(
-    stake_pub_key: Ed25519HexEncodedPublicKey, asat: Option<SlotNo>, session: Arc<CassandraSession>,
+    stake_pub_key: Ed25519HexEncodedPublicKey, asat: Option<SlotNo>,
+    session: Arc<CassandraSession>, vote_key: Option<Ed25519HexEncodedPublicKey>,
 ) -> AllRegistration {
-    let registrations = match get_all_registrations_from_stake_pub_key(
+    let mut registrations = match get_all_registrations_from_stake_pub_key(
         session.clone(),
         stake_pub_key.clone(),
     )
@@ -51,6 +117,12 @@ pub async fn get_registration_from_stake_addr(
             )]);
         },
     };
+
+    // check registrations (stake addrs) are still actively associated with the voting key,
+    // and have not been registered to another voting key.
+    if let Some(vote_key) = vote_key {
+        registrations = check_stake_addr_voting_key_association(registrations, &vote_key);
+    }
 
     let registration = if let Some(slot_no) = asat {
         match get_registration_given_slot_no(registrations, &slot_no) {
@@ -132,15 +204,6 @@ pub async fn get_registration_from_stake_addr(
             page: None,
         },
     )))
-}
-
-/// Get registration given stake address, latest or based on optional slot no
-async fn latest_registration_from_stake_addr(
-    stake_pub_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>,
-) -> anyhow::Result<Cip36Details> {
-    sort_latest_registration(
-        get_all_registrations_from_stake_pub_key(session, stake_pub_key).await?,
-    )
 }
 
 /// Get all cip36 registrations for a given stake address.
@@ -235,50 +298,37 @@ async fn get_invalid_registrations(
     Ok(invalid_registrations)
 }
 
-/// Stake addresses need to be individually checked to make sure they are still actively
-/// associated with the voting key, and have not been registered to another voting key.
-fn check_stake_addr_voting_key_association(
-    registrations: Vec<Cip36Details>, associated_voting_key: &str,
-) -> anyhow::Result<Vec<Cip36Details>> {
-    let Ok(associated_key) = Ed25519HexEncodedPublicKey::try_from(associated_voting_key) else {
-        return Err(anyhow::anyhow!(
-            "Can't sort latest registrations by slot no"
-        ));
+/// Get registration given a stake key hash, time specific based on asat param,
+/// or latest registration returned if no asat given.
+pub(crate) async fn get_registration_given_vote_key(
+    vote_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+) -> AllRegistration {
+    let vote_key: Vec<u8> = match vote_key.try_into() {
+        Ok(vote_key) => vote_key,
+        Err(err) => {
+            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                format!("Failed to convert vote key to bytes {err:?}"),
+                StatusCode::UNPROCESSABLE_ENTITY,
+            )]);
+        },
     };
 
-    Ok(registrations
-        .into_iter()
-        .filter(|r| {
-            r.vote_pub_key
-                .clone()
-                .unwrap_or(Ed25519HexEncodedPublicKey::examples(0))
-                == associated_key
-        })
-        .collect())
-}
-
-/// Get latest registration given a stake key hash.
-#[allow(clippy::too_many_lines)]
-pub(crate) async fn get_latest_registration_from_stake_key_hash(
-    stake_hash: HexEncodedHash28, session: Arc<CassandraSession>,
-) -> AllRegistration {
-    // Get stake addr associated with give stake hash
-    let mut stake_addr_iter = match GetStakeAddrQuery::execute(
+    // Get stake addr associated voting key.
+    let mut stake_addr_iter = match GetStakeAddrFromVoteKeyQuery::execute(
         &session,
-        GetStakeAddrParams::new(stake_hash.into()),
+        GetStakeAddrFromVoteKeyParams::new(vote_key),
     )
     .await
     {
-        Ok(latest) => latest,
+        Ok(stake_addr) => stake_addr,
         Err(err) => {
             error!(
-                id="get_latest_registration_from_stake_key_hash_query_stake_addr",
+                id="get_associated_vote_key_registrations_query_stake_addr_from_vote_key",
                 error=?err,
-                "Failed to query stake addr from stake hash"
+                "Failed to query stake addr from vote key"
             );
-
             return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                format!("Failed to query stake addr from stake hash {err:?}"),
+                format!("Failed to query stake addr from vote key {err:?}"),
                 StatusCode::UNPROCESSABLE_ENTITY,
             )]);
         },
@@ -289,18 +339,19 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(r) => r,
             Err(err) => {
                 error!(
-                    id="get_latest_registration_from_stake_key_hash_latest_registration",
+                    id="get_associated_vote_key_registrations_latest_registration",
                     error=?err,
                     "Failed to get latest registration"
                 );
-
                 return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to get latest registration {err:?}"),
+                    format!("Failed to query stake addr from vote key {err:?}"),
                     StatusCode::UNPROCESSABLE_ENTITY,
                 )]);
             },
         };
 
+        // Stake hash successfully converted into associated stake pub key which we use to lookup
+        // registrations.
         let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_address.clone()) {
             Ok(key) => key,
             Err(err) => {
@@ -311,77 +362,27 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             },
         };
 
-        let registration = match latest_registration_from_stake_addr(stake_pub_key, session.clone())
-            .await
-        {
-            Ok(registration) => registration,
-            Err(err) => {
-                error!(
-                    id="get_latest_registration_from_stake_key_hash_registration_for_stake_addr",
-                    error=?err,
-                    "Failed to obtain registration for given stake addr",
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to obtain registration for given stake addr {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
-            },
-        };
-
-        let Ok(stake_pub_key) = Ed25519HexEncodedPublicKey::try_from(row.stake_address) else {
-            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                "Failed to convert raw stake pub key to pub key type".to_string(),
-                StatusCode::UNPROCESSABLE_ENTITY,
-            )]);
-        };
-
-        // include any erroneous registrations which occur AFTER the slot# of the last valid
-        // registration
-        let invalids_report = match get_invalid_registrations(
-            stake_pub_key,
-            registration.slot_no.clone(),
-            session,
-        )
-        .await
-        {
-            Ok(invalids) => invalids,
-            Err(err) => {
-                error!(
-                    id="get_latest_registration_from_stake_key_hash_invalid_registrations_for_stake_addr",
-                    error=?err,
-                    "Failed to obtain invalid registrations for given stake addr",
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to obtain invalid registrations for given stake addr {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
-            },
-        };
-
-        let Some(vote_pub_key) = registration.clone().vote_pub_key else {
-            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                "Vote pub key does not exist".to_string(),
-                StatusCode::UNPROCESSABLE_ENTITY,
-            )]);
-        };
-
-        return AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
-            Cip36RegistrationList {
-                slot: registration.clone().slot_no,
-                voting_key: vec![Cip36RegistrationsForVotingPublicKey {
-                    vote_pub_key,
-                    registrations: vec![registration.clone()],
-                }],
-                invalid: invalids_report,
-                page: None,
-            },
-        )));
+        return get_registration_from_stake_addr(stake_pub_key, asat, session, None).await;
     }
 
     AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-        "Stake hash does not exist",
+        "Vote key does not exist",
         StatusCode::UNPROCESSABLE_ENTITY,
     )])
+}
+
+/// Stake addresses need to be individually checked to make sure they are still actively
+/// associated with the voting key, and have not been registered to another voting key.
+fn check_stake_addr_voting_key_association(
+    registrations: Vec<Cip36Details>, associated_voting_key: &Ed25519HexEncodedPublicKey,
+) -> Vec<Cip36Details> {
+    registrations
+        .into_iter()
+        .filter(|r| {
+            r.vote_pub_key
+                .clone()
+                .unwrap_or(Ed25519HexEncodedPublicKey::examples(0))
+                == *associated_voting_key
+        })
+        .collect()
 }

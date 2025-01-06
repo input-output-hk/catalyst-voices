@@ -13,7 +13,7 @@ use crate::service::common::{
 };
 
 pub(crate) mod endpoint;
-#[allow(dead_code)]
+
 pub(crate) mod filter;
 
 pub(crate) mod response;
