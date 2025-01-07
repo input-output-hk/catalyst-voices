@@ -92,7 +92,12 @@ impl EnvVars {
             default_dl_chunk_size,
             1,
             MAX_DL_CHUNK_SIZE,
-        ) * ONE_MEGABYTE;
+        )
+        .checked_mul(ONE_MEGABYTE)
+        .unwrap_or_else(|| {
+            info!("Too big 'CHAIN_FOLLOWER_DL_CHUNK_SIZE' value, default value {default_dl_chunk_size} is used");
+            default_dl_chunk_size
+        });
         dl_config = dl_config.with_chunk_size(chunk_size);
 
         let queue_ahead = StringEnvVar::new_as(
