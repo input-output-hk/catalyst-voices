@@ -57,9 +57,8 @@ class _DocumentBuilderSectionTileState
     if (oldWidget.section != widget.section) {
       _editedSection = widget.section;
       _builder = _editedSection.toBuilder();
-      _pendingChanges.clear();
-
       _isValid = _editedSection.validate().isValid;
+      _pendingChanges.clear();
     }
   }
 
@@ -122,8 +121,8 @@ class _DocumentBuilderSectionTileState
     setState(() {
       _builder.addChange(change);
       _editedSection = _builder.build();
-      _pendingChanges.add(change);
       _isValid = _editedSection.validate().isValid;
+      _pendingChanges.add(change);
     });
   }
 }
