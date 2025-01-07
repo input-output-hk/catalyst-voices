@@ -103,6 +103,7 @@ class _DocumentBuilderSectionTileState
     // ignore: unnecessary_lambdas
     setState(() {
       _pendingChanges.clear();
+      _isEditMode = false;
     });
   }
 
@@ -119,7 +120,11 @@ class _DocumentBuilderSectionTileState
       _pendingChanges.add(change);
 
       // TODO(damian-molinski): validation
-      _isValid = false;
+      if (change.value is GroupedTagsSelection) {
+        _isValid = (change.value! as GroupedTagsSelection).isValid;
+      } else {
+        _isValid = false;
+      }
     });
   }
 }
