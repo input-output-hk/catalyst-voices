@@ -21,7 +21,7 @@ final class SectionDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentValidationResult validateProperty(DocumentProperty<Object> property) {
-    return DocumentValidator.validateBasic(property);
+    throw UnsupportedError('Section cannot have a property');
   }
 
   @override

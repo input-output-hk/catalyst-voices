@@ -21,7 +21,7 @@ final class SegmentDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentValidationResult validateProperty(DocumentProperty<Object> property) {
-    return DocumentValidator.validateBasic(property);
+    throw UnsupportedError('Segment cannot have a property');
   }
 
   @override
