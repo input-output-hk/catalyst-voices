@@ -1,4 +1,4 @@
-part of 'document_definitions.dart';
+part of '../document_definitions.dart';
 
 final class TagGroupDefinition extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;

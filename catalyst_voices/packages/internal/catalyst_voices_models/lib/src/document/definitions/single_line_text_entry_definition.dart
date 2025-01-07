@@ -1,4 +1,4 @@
-part of 'document_definitions.dart';
+part of '../document_definitions.dart';
 
 final class SingleLineTextEntryDefinition
     extends BaseDocumentDefinition<String> {

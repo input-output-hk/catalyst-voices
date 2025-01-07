@@ -11,7 +11,7 @@ export 'document/defined_property/grouped_tags.dart';
 export 'document/document.dart';
 export 'document/document_builder.dart';
 export 'document/document_change.dart';
-export 'document/definitions/document_definitions.dart';
+export 'document/document_definitions.dart';
 export 'document/document_node_id.dart';
 export 'document/document_schema.dart';
 export 'document/document_validator.dart';

@@ -1,4 +1,4 @@
-part of 'document_definitions.dart';
+part of '../document_definitions.dart';
 
 final class DurationInMonthsDefinition extends BaseDocumentDefinition<int> {
   final DocumentDefinitionsFormat format;

@@ -1,4 +1,4 @@
-part of 'document_definitions.dart';
+part of '../document_definitions.dart';
 
 // TODO(ryszard-schossler): Verify BaseDocumentDefinition type
 final class NestedQuestionsDefinition
