@@ -1185,5 +1185,11 @@
   "@and": {
     "description": "General text. May be used in context of A4000 and $5000"
   },
-  "errorValidationTokenNotParsed": "Invalid input. Could not parse parse."
+  "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
+  "noTagSelected": "No Tag Selected",
+  "@noTagSelected": {
+    "description": "For example in context of document builder"
+  },
+  "singleGroupedTagSelectorTitle": "Please choose the most relevant category group and tag related to the outcomes of your proposal",
+  "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag"
 }

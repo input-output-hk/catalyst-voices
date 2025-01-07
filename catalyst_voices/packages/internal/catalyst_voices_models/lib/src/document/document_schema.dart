@@ -1,7 +1,8 @@
-import 'package:catalyst_voices_models/src/document/document_definitions.dart';
+import 'package:catalyst_voices_models/src/document/definitions/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 /// A document schema that describes the structure of a document.
 ///
@@ -130,6 +131,9 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
   /// Minimum-maximum (both inclusive) count of items.
   final Range<int>? itemsRange;
 
+  /// Allowed combination of values this property can take.
+  final List<DocumentSchemaLogicalGroup>? oneOf;
+
   /// Whether the property is required.
   final bool isRequired;
 
@@ -145,7 +149,25 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     required this.numRange,
     required this.strRange,
     required this.itemsRange,
+    required this.oneOf,
     required this.isRequired,
+  });
+
+  @visibleForTesting
+  const DocumentSchemaProperty.optional({
+    required this.definition,
+    required this.nodeId,
+    required this.id,
+    this.title,
+    this.description,
+    this.defaultValue,
+    this.guidance,
+    this.enumValues,
+    this.numRange,
+    this.strRange,
+    this.itemsRange,
+    this.oneOf,
+    this.isRequired = false,
   });
 
   @override
@@ -161,6 +183,42 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
         numRange,
         strRange,
         itemsRange,
+        oneOf,
         isRequired,
+      ];
+}
+
+final class DocumentSchemaLogicalGroup extends Equatable {
+  final List<DocumentSchemaLogicalCondition> conditions;
+
+  const DocumentSchemaLogicalGroup({
+    required this.conditions,
+  });
+
+  @override
+  List<Object?> get props => [
+        conditions,
+      ];
+}
+
+final class DocumentSchemaLogicalCondition extends Equatable {
+  final BaseDocumentDefinition definition;
+  final String id;
+  final Object? value;
+  final List<String>? enumValues;
+
+  const DocumentSchemaLogicalCondition({
+    required this.definition,
+    required this.id,
+    required this.value,
+    required this.enumValues,
+  });
+
+  @override
+  List<Object?> get props => [
+        definition,
+        id,
+        value,
+        enumValues,
       ];
 }

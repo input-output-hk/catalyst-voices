@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -199,6 +200,7 @@ class _PropertyBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final definition = property.schema.definition;
+
     switch (definition) {
       case SegmentDefinition():
       case SectionDefinition():
@@ -217,21 +219,31 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
-      case SingleGroupedTagSelectorDefinition():
       case TagGroupDefinition():
       case TagSelectionDefinition():
       case DurationInMonthsDefinition():
       case YesNoChoiceDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
-        throw UnimplementedError();
+        throw UnimplementedError('${definition.type} not implemented');
+      case SingleGroupedTagSelectorDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleGroupedTagSelectorWidget(
+          id: castProperty.schema.nodeId,
+          selection: castProperty.value ?? const GroupedTagsSelection(),
+          groupedTags: definition.groupedTags(castProperty.schema),
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+          isRequired: castProperty.schema.isRequired,
+        );
       case AgreementConfirmationDefinition():
+        final castProperty = definition.castProperty(property);
         return AgreementConfirmationWidget(
-          value: definition.castProperty(property).value,
+          value: castProperty.value,
           definition: definition,
-          nodeId: property.schema.nodeId,
-          description: property.schema.description ?? '',
-          title: property.schema.title ?? '',
+          nodeId: castProperty.schema.nodeId,
+          description: castProperty.schema.description ?? '',
+          title: castProperty.schema.title ?? '',
           isEditMode: isEditMode,
           onChanged: onChanged,
         );

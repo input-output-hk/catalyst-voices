@@ -1,9 +1,32 @@
+library catalysts_voices_models;
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
-part 'document_definitions_list.dart';
+part 'language_code_definition.dart';
+part 'drop_down_single_select_definition.dart';
+part 'multi_line_text_entry_definition.dart';
+part 'multi_line_text_entry_list_markdown_definition.dart';
+part 'multi_line_text_entry_markdown_definition.dart';
+part 'multi_select_definition.dart';
+part 'section_definition.dart';
+part 'segment_definition.dart';
+part 'single_line_https_url_entry_definition.dart';
+part 'single_line_https_url_entry_list_definition.dart';
+part 'single_line_text_entry_definition.dart';
+part 'single_line_text_entry_list_definition.dart';
+part 'nested_questions_list_definition.dart';
+part 'nested_questions_definition.dart';
+part 'single_grouped_tag_selector_definition.dart';
+part 'tag_group_definition.dart';
+part 'tag_selection_definition.dart';
+part 'token_value_cardano_ada_definition.dart';
+part 'duration_in_months_definition.dart';
+part 'yes_no_choice_definition.dart';
+part 'agreement_confirmation_definition.dart';
+part 'spdx_license_or_url_definition.dart';
 
 enum DocumentDefinitionsObjectType {
   string,

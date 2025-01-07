@@ -1,10 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_logical_property_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_property_dto.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 final class DocumentSchemaPropertyDto {
   @JsonKey(name: r'$ref')
   final String ref;
@@ -16,24 +17,20 @@ final class DocumentSchemaPropertyDto {
   final Object? defaultValue;
   @JsonKey(name: 'x-guidance')
   final String? guidance;
-  @JsonKey(name: 'enum', includeIfNull: false)
+  @JsonKey(name: 'enum')
   final List<String>? enumValues;
-  @JsonKey(includeIfNull: false)
   final int? minimum;
-  @JsonKey(includeIfNull: false)
   final int? maximum;
-  @JsonKey(includeIfNull: false)
   final int? minLength;
-  @JsonKey(includeIfNull: false)
   final int? maxLength;
-  @JsonKey(includeIfNull: false)
   final int? minItems;
-  @JsonKey(includeIfNull: false)
   final int? maxItems;
 
   // TODO(ryszard-schossler): return to this
-  @JsonKey(includeIfNull: false)
   final Map<String, dynamic>? items;
+
+  /// Logical boolean algebra conditions.
+  final List<DocumentSchemaLogicalGroupDto>? oneOf;
 
   const DocumentSchemaPropertyDto({
     this.ref = '',
@@ -50,6 +47,7 @@ final class DocumentSchemaPropertyDto {
     this.maxItems,
     this.minItems,
     this.items,
+    this.oneOf,
   });
 
   factory DocumentSchemaPropertyDto.fromJson(Map<String, dynamic> json) =>
@@ -74,6 +72,7 @@ final class DocumentSchemaPropertyDto {
       numRange: Range.optionalRangeOf(min: minimum, max: maximum),
       strRange: Range.optionalRangeOf(min: minLength, max: maxLength),
       itemsRange: Range.optionalRangeOf(min: minItems, max: maxItems),
+      oneOf: oneOf?.map((e) => e.toModel(definitions)).toList(),
       isRequired: isRequired,
     );
   }
