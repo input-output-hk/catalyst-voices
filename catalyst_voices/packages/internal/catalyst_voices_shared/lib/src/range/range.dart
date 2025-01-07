@@ -10,7 +10,7 @@ class Range<T extends num> extends Equatable {
   const Range({required this.min, required this.max});
 
   /// Creates an [int] [Range] which assumes if
-  /// min or max are null then they are unconstrained.
+  /// [min] or [max] are null then they are unconstrained.
   static Range<int>? optionalIntRangeOf({int? min, int? max}) {
     if (min != null && max != null) {
       return Range(min: min, max: max);
