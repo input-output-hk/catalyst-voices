@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.2.27 AS docs-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:fix/pin-poetry-version AS docs-ci
 
 
 # update-docs-dev-script: get the latest docs dev script from CI.

@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.27 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v3.2.27 AS flutter_rust_bridge
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix/pin-poetry-version AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:fix/pin-poetry-version AS flutter_rust_bridge
 
 builder:
     FROM flutter_rust_bridge+builder
@@ -9,7 +9,7 @@ builder:
 
 # Generated necessary files for running Flutter web locally and save it locally.
 code-generator:
-    ARG local = false 
+    ARG local = false
     FROM +builder
     DO flutter_rust_bridge+CODE_GENERATOR_WEB
 
@@ -17,7 +17,7 @@ code-generator:
         SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
         SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
         SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
-    ELSE 
+    ELSE
         SAVE ARTIFACT ./assets/js assets_js
         SAVE ARTIFACT ./rust/src/frb_generated.rs frb_generated.rs
         SAVE ARTIFACT ./lib/src src
@@ -56,7 +56,7 @@ integration-test-web:
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
-    
+
     IF [ -f fail ]
         RUN --no-cache echo ""$browser" integration test failed" && \
             echo "Printing "$driver" logs..." && \

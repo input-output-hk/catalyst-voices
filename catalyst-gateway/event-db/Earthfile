@@ -3,8 +3,8 @@
 # the database and its associated software.
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.27 AS postgresql-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.27 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/pin-poetry-version AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:fix/pin-poetry-version AS python-ci
 
 # cspell: words
 
