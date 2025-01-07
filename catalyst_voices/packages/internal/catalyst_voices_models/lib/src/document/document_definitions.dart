@@ -129,6 +129,12 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
   ///
   /// Returns a [DocumentProperty] with its value cast to type [T].
   DocumentProperty<T> castProperty(DocumentProperty<Object> property) {
+    if (property.schema.definition != this) {
+      throw ArgumentError(
+        'The ${property.schema.nodeId} cannot be cast '
+        'by $this document definition',
+      );
+    }
     return property as DocumentProperty<T>;
   }
 }
