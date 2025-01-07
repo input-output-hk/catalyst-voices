@@ -462,6 +462,15 @@ final class SingleGroupedTagSelectorDefinition
     required this.additionalProperties,
   });
 
+  @visibleForTesting
+  const SingleGroupedTagSelectorDefinition.dummy()
+      : this(
+          type: DocumentDefinitionsObjectType.object,
+          note: '',
+          format: DocumentDefinitionsFormat.singleGroupedTagSelector,
+          additionalProperties: true,
+        );
+
   @override
   List<Object?> get props => [
         format,
@@ -482,6 +491,15 @@ final class TagGroupDefinition extends BaseDocumentDefinition<String> {
     required this.pattern,
   });
 
+  @visibleForTesting
+  const TagGroupDefinition.dummy()
+      : this(
+          type: DocumentDefinitionsObjectType.string,
+          note: '',
+          format: DocumentDefinitionsFormat.tagGroup,
+          pattern: '',
+        );
+
   @override
   List<Object?> get props => [
         format,
@@ -501,6 +519,15 @@ final class TagSelectionDefinition extends BaseDocumentDefinition<String> {
     required this.format,
     required this.pattern,
   });
+
+  @visibleForTesting
+  const TagSelectionDefinition.dummy()
+      : this(
+          type: DocumentDefinitionsObjectType.string,
+          note: '',
+          format: DocumentDefinitionsFormat.tagSelection,
+          pattern: '',
+        );
 
   @override
   List<Object?> get props => [
