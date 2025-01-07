@@ -1,6 +1,7 @@
 export 'cache/cache.dart';
 export 'cache/local_tll_cache.dart';
 export 'cache/ttl_cache.dart';
+export 'codecs/codecs.dart';
 export 'common/build_config.dart';
 export 'common/build_environment.dart';
 export 'crypto/crypto_service.dart';
@@ -34,5 +35,6 @@ export 'utils/active_aware.dart';
 export 'utils/date_time_ext.dart';
 export 'utils/future_ext.dart';
 export 'utils/iterable_ext.dart';
+export 'utils/launch_url_mixin.dart';
 export 'utils/lockable.dart';
 export 'utils/typedefs.dart';
