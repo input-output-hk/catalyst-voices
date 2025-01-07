@@ -106,7 +106,9 @@ class _Footer extends StatelessWidget {
         Visibility.maintain(
           visible: progress != null,
           child: AnimatedVoicesLinearProgressIndicator(
-              key: const Key('ProgressBar'), value: progress ?? 0,),
+            key: const Key('ProgressBar'),
+            value: progress ?? 0,
+          ),
         ),
         const SizedBox(height: 10),
         VoicesLearnMoreButton(onTap: () {}),

@@ -27,7 +27,9 @@ void main() async {
     await restartDependencies();
   });
 
-  group('Onboarding -', () {
+  group(
+    'Onboarding -',
+    () {
       patrolWidgetTest(
         'visitor - get started button works',
         (PatrolTester $) async {
@@ -110,7 +112,7 @@ void main() async {
 
       patrolWidgetTest(
         'visitor - create keychain created screen back button works',
-            (PatrolTester $) async {
+        (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
