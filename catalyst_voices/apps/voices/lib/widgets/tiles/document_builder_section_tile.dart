@@ -242,9 +242,9 @@ class _PropertyBuilder extends StatelessWidget {
           description: property.schema.description ?? '',
           title: property.schema.title ?? '',
           isEditMode: isEditMode,
-          onChanged: onPropertyChanged,
+          onChanged: onChanged,
         );
-       case TokenValueCardanoADADefinition():
+      case TokenValueCardanoADADefinition():
         return DocumentTokenValueWidget(
           id: property.schema.nodeId,
           label: property.schema.title ?? '',
