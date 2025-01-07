@@ -12,10 +12,6 @@ final class DocumentSchemaPropertyDto {
   final String id;
   final String? title;
   final String? description;
-  @JsonKey(includeIfNull: false)
-  final int? minLength;
-  @JsonKey(includeIfNull: false)
-  final int? maxLength;
   @JsonKey(name: 'default')
   final Object? defaultValue;
   @JsonKey(name: 'x-guidance')
@@ -23,13 +19,17 @@ final class DocumentSchemaPropertyDto {
   @JsonKey(name: 'enum', includeIfNull: false)
   final List<String>? enumValues;
   @JsonKey(includeIfNull: false)
-  final int? maxItems;
-  @JsonKey(includeIfNull: false)
-  final int? minItems;
-  @JsonKey(includeIfNull: false)
   final int? minimum;
   @JsonKey(includeIfNull: false)
   final int? maximum;
+  @JsonKey(includeIfNull: false)
+  final int? minLength;
+  @JsonKey(includeIfNull: false)
+  final int? maxLength;
+  @JsonKey(includeIfNull: false)
+  final int? minItems;
+  @JsonKey(includeIfNull: false)
+  final int? maxItems;
 
   // TODO(ryszard-schossler): return to this
   @JsonKey(includeIfNull: false)
@@ -40,15 +40,15 @@ final class DocumentSchemaPropertyDto {
     required this.id,
     this.title,
     this.description,
-    this.minLength,
-    this.maxLength,
     this.defaultValue,
     this.guidance,
     this.enumValues,
-    this.maxItems,
-    this.minItems,
     this.minimum,
     this.maximum,
+    this.minLength,
+    this.maxLength,
+    this.maxItems,
+    this.minItems,
     this.items,
   });
 
@@ -71,8 +71,9 @@ final class DocumentSchemaPropertyDto {
       defaultValue: defaultValue,
       guidance: guidance,
       enumValues: enumValues,
-      range: Range.optionalRangeOf(min: minimum, max: maximum),
-      itemsRange: Range.optionalRangeOf(min: minItems, max: maxItems),
+      numRange: Range.optionalIntRangeOf(min: minimum, max: maximum),
+      strRange: Range.optionalIntRangeOf(min: minLength, max: maxLength),
+      itemsRange: Range.optionalIntRangeOf(min: minItems, max: maxItems),
       isRequired: isRequired,
     );
   }

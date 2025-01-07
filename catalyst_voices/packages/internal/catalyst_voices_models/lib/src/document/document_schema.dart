@@ -120,8 +120,17 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
   final T? defaultValue;
   final String? guidance;
   final List<String>? enumValues;
-  final Range<int>? range;
+
+  /// Minimum-maximum (both inclusive) numerical range.
+  final Range<int>? numRange;
+
+  /// Minimum-maximum (both inclusive) length of a string.
+  final Range<int>? strRange;
+
+  /// Minimum-maximum (both inclusive) count of items.
   final Range<int>? itemsRange;
+
+  /// Whether the property is required.
   final bool isRequired;
 
   const DocumentSchemaProperty({
@@ -133,7 +142,8 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     required this.defaultValue,
     required this.guidance,
     required this.enumValues,
-    required this.range,
+    required this.numRange,
+    required this.strRange,
     required this.itemsRange,
     required this.isRequired,
   });
@@ -148,7 +158,8 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
         defaultValue,
         guidance,
         enumValues,
-        range,
+        numRange,
+        strRange,
         itemsRange,
         isRequired,
       ];
