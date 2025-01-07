@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -119,7 +120,7 @@ class _DocumentBuilderSectionTileState
       _pendingChanges.add(change);
 
       // TODO(damian-molinski): validation
-      _isValid = false;
+      _isValid = true;
     });
   }
 }
@@ -208,7 +209,6 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleLineHttpsURLEntryDefinition():
       case MultiLineTextEntryDefinition():
       case MultiLineTextEntryMarkdownDefinition():
-      case DropDownSingleSelectDefinition():
       case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
@@ -224,6 +224,18 @@ class _PropertyBuilder extends StatelessWidget {
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
         throw UnimplementedError();
+      case DropDownSingleSelectDefinition():
+        return SingleDropdownSelectionWidget(
+          value: definition.castProperty(property).value,
+          defaultValue:
+              definition.castValue(property.schema.defaultValue) ?? '',
+          items: property.schema.enumValues ?? [],
+          definition: definition,
+          nodeId: property.schema.nodeId,
+          title: property.schema.title ?? '',
+          isEditMode: isEditMode,
+          onChanged: onPropertyChanged,
+        );
       case AgreementConfirmationDefinition():
         return AgreementConfirmationWidget(
           value: definition.castProperty(property).value,

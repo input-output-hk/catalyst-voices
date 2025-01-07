@@ -18,7 +18,7 @@ class VoicesDropdown<T> extends StatelessWidget {
     final ctx = Theme.of(context);
     return DropdownMenu<T?>(
       dropdownMenuEntries: [
-        VoicesDropdownMenuEntry<T?>(
+        if (true) VoicesDropdownMenuEntry<T?>(
           value: null,
           label: context.l10n.all,
           context: context,
