@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -14,15 +15,6 @@ enum DocumentDefinitionsObjectType {
     return DocumentDefinitionsObjectType.values.asNameMap()[value] ??
         DocumentDefinitionsObjectType.unknown;
   }
-
-  dynamic get defaultValue => switch (this) {
-        string => '',
-        integer => 0,
-        boolean => true,
-        array => <String>[],
-        object => <String, dynamic>{},
-        unknown => 'unknown',
-      };
 }
 
 enum DocumentDefinitionsContentMediaType {
@@ -72,7 +64,7 @@ enum DocumentDefinitionsFormat {
   }
 }
 
-sealed class BaseDocumentDefinition extends Equatable {
+sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
   final DocumentDefinitionsObjectType type;
   final String note;
 
@@ -104,6 +96,7 @@ sealed class BaseDocumentDefinition extends Equatable {
     'yesNoChoice': YesNoChoiceDefinition,
     'agreementConfirmation': AgreementConfirmationDefinition,
     'spdxLicenseOrURL': SPDXLicenceOrUrlDefinition,
+    'languageCode': LanguageCodeDefinition,
   };
 
   static Type typeFromRefPath(String refPath) {
@@ -116,14 +109,33 @@ sealed class BaseDocumentDefinition extends Equatable {
     final ref = refPath.split('/').last;
     return refPathToDefinitionType[ref] != null;
   }
-}
 
-extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
-  BaseDocumentDefinition getDefinition(String refPath) {
-    final definitionType = BaseDocumentDefinition.typeFromRefPath(refPath);
-    final classType = definitionType;
+  /// Casts a dynamic value from external JSON to type [T].
+  ///
+  /// Since JSON data types are dynamic, this method uses known
+  /// definition types to cast values to [T] for easier usage in UI widgets.
+  ///
+  /// Returns the value as type [T] if successful, or `null` otherwise.
+  T? castValue(Object? value) {
+    return value as T?;
+  }
 
-    return firstWhere((e) => e.runtimeType == classType);
+  /// Casts a [DocumentProperty<Object>] to [DocumentProperty<T>].
+  ///
+  /// This method sets a specific type [T] for a [DocumentProperty],
+  /// which holds a user-provided answer in the frontend.
+  ///
+  /// [property] is the [DocumentProperty<Object>] to be cast.
+  ///
+  /// Returns a [DocumentProperty] with its value cast to type [T].
+  DocumentProperty<T> castProperty(DocumentProperty<Object> property) {
+    if (property.schema.definition != this) {
+      throw ArgumentError(
+        'The ${property.schema.nodeId} cannot be cast '
+        'by $this document definition',
+      );
+    }
+    return property as DocumentProperty<T>;
   }
 }
 
@@ -135,6 +147,16 @@ final class SegmentDefinition extends BaseDocumentDefinition {
     required super.note,
     required this.additionalProperties,
   });
+
+  @override
+  Object? castValue(Object? value) {
+    throw UnsupportedError('Segment cannot have a value');
+  }
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    throw UnsupportedError('Segment cannot have a property');
+  }
 
   @override
   List<Object?> get props => [
@@ -154,6 +176,16 @@ final class SectionDefinition extends BaseDocumentDefinition {
   });
 
   @override
+  Object? castValue(Object? value) {
+    throw UnsupportedError('Section cannot have a value');
+  }
+
+  @override
+  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+    throw UnsupportedError('Section cannot have a property');
+  }
+
+  @override
   List<Object?> get props => [
         additionalProperties,
         type,
@@ -161,7 +193,8 @@ final class SectionDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
+final class SingleLineTextEntryDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -181,7 +214,8 @@ final class SingleLineTextEntryDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
+final class SingleLineHttpsURLEntryDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -201,7 +235,8 @@ final class SingleLineHttpsURLEntryDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
+final class MultiLineTextEntryDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -222,7 +257,7 @@ final class MultiLineTextEntryDefinition extends BaseDocumentDefinition {
 }
 
 final class MultiLineTextEntryMarkdownDefinition
-    extends BaseDocumentDefinition {
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
 
@@ -242,7 +277,8 @@ final class MultiLineTextEntryMarkdownDefinition
       ];
 }
 
-final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
+final class DropDownSingleSelectDefinition
+    extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final DocumentDefinitionsContentMediaType contentMediaType;
   final String pattern;
@@ -265,7 +301,8 @@ final class DropDownSingleSelectDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class MultiSelectDefinition extends BaseDocumentDefinition {
+final class MultiSelectDefinition
+    extends BaseDocumentDefinition<List<dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
 
@@ -285,7 +322,8 @@ final class MultiSelectDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
+final class SingleLineTextEntryListDefinition
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<String> defaultValues;
@@ -312,10 +350,10 @@ final class SingleLineTextEntryListDefinition extends BaseDocumentDefinition {
 }
 
 final class MultiLineTextEntryListMarkdownDefinition
-    extends BaseDocumentDefinition {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
 
   const MultiLineTextEntryListMarkdownDefinition({
@@ -339,10 +377,10 @@ final class MultiLineTextEntryListMarkdownDefinition
 }
 
 final class SingleLineHttpsURLEntryListDefinition
-    extends BaseDocumentDefinition {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
   final Map<String, dynamic> items;
 
   const SingleLineHttpsURLEntryListDefinition({
@@ -365,10 +403,11 @@ final class SingleLineHttpsURLEntryListDefinition
       ];
 }
 
-final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
+final class NestedQuestionsListDefinition
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
-  final List<dynamic> defaultValue;
+  final List<String> defaultValue;
 
   const NestedQuestionsListDefinition({
     required super.type,
@@ -388,7 +427,9 @@ final class NestedQuestionsListDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class NestedQuestionsDefinition extends BaseDocumentDefinition {
+// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
+final class NestedQuestionsDefinition
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
@@ -408,7 +449,9 @@ final class NestedQuestionsDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
+// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
+final class SingleGroupedTagSelectorDefinition
+    extends BaseDocumentDefinition<Map<String, dynamic>> {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
@@ -428,7 +471,7 @@ final class SingleGroupedTagSelectorDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class TagGroupDefinition extends BaseDocumentDefinition {
+final class TagGroupDefinition extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -448,7 +491,7 @@ final class TagGroupDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class TagSelectionDefinition extends BaseDocumentDefinition {
+final class TagSelectionDefinition extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
 
@@ -468,7 +511,7 @@ final class TagSelectionDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
+final class TokenValueCardanoADADefinition extends BaseDocumentDefinition<int> {
   final DocumentDefinitionsFormat format;
 
   const TokenValueCardanoADADefinition({
@@ -485,7 +528,7 @@ final class TokenValueCardanoADADefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class DurationInMonthsDefinition extends BaseDocumentDefinition {
+final class DurationInMonthsDefinition extends BaseDocumentDefinition<int> {
   final DocumentDefinitionsFormat format;
 
   const DurationInMonthsDefinition({
@@ -502,7 +545,7 @@ final class DurationInMonthsDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class YesNoChoiceDefinition extends BaseDocumentDefinition {
+final class YesNoChoiceDefinition extends BaseDocumentDefinition<bool> {
   final DocumentDefinitionsFormat format;
   final bool defaultValue;
 
@@ -522,7 +565,8 @@ final class YesNoChoiceDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class AgreementConfirmationDefinition extends BaseDocumentDefinition {
+final class AgreementConfirmationDefinition
+    extends BaseDocumentDefinition<bool> {
   final DocumentDefinitionsFormat format;
   final bool defaultValue;
   final bool constValue;
@@ -545,7 +589,7 @@ final class AgreementConfirmationDefinition extends BaseDocumentDefinition {
       ];
 }
 
-final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
+final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition<String> {
   final DocumentDefinitionsFormat format;
   final String pattern;
   final DocumentDefinitionsContentMediaType contentMediaType;
@@ -565,4 +609,33 @@ final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition {
         type,
         note,
       ];
+}
+
+final class LanguageCodeDefinition extends BaseDocumentDefinition<String> {
+  final String defaultValue;
+  final List<String> enumValues;
+
+  const LanguageCodeDefinition({
+    required super.type,
+    required super.note,
+    required this.defaultValue,
+    required this.enumValues,
+  });
+
+  @override
+  List<Object?> get props => [
+        defaultValue,
+        enumValues,
+        note,
+        type,
+      ];
+}
+
+extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
+  BaseDocumentDefinition getDefinition(String refPath) {
+    final definitionType = BaseDocumentDefinition.typeFromRefPath(refPath);
+    final classType = definitionType;
+
+    return firstWhere((e) => e.runtimeType == classType);
+  }
 }
