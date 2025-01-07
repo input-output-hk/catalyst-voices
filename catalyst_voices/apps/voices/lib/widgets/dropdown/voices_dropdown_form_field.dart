@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 class VoicesDropdownFormField<T> extends StatelessWidget {
@@ -23,6 +24,7 @@ class VoicesDropdownFormField<T> extends StatelessWidget {
       onChanged: onChanged,
       icon: VoicesAssets.icons.chevronDown.buildIcon(),
       style: theme.textTheme.bodyLarge,
+      dropdownColor: theme.colors.onSurfaceNeutralOpaqueLv1,
     );
   }
 }
