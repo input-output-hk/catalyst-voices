@@ -22,7 +22,7 @@
         },
         "translation": {
             "isTranslated": true,
-            "originalLanguage": "German",
+            "originalLanguage": "de",
             "originalDocumentLink": "https://example.com/original-doc"
         },
         "problem": {
@@ -50,14 +50,12 @@
             ]
         },
         "dependencies": {
-            "details": [
-                {
-                    "name": "External API Service",
-                    "type": "Technical",
-                    "description": "Integration with third-party API service",
-                    "mitigationPlan": "Build fallback mechanisms and maintain alternative providers"
-                }
-            ]
+            "details": [{
+                "name": "External API Service",
+                "type": "Technical",
+                "description": "Integration with third-party API service",
+                "mitigationPlan": "Build fallback mechanisms and maintain alternative providers"
+            }]
         },
         "open_source": {
             "source_code": "MIT",
@@ -86,8 +84,7 @@
     },
     "milestones": {
         "milestones": {
-            "milestone_list": [
-                {
+            "milestone_list": [{
                     "title": "Initial Setup and Planning",
                     "outputs": "Project infrastructure setup and detailed planning documents",
                     "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
