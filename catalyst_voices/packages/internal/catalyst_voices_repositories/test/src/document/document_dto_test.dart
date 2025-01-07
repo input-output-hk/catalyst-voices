@@ -22,11 +22,55 @@ void main() {
           json.decode(readJson(documentPath)) as Map<String, dynamic>;
     });
 
+    test(
+      'Roundtrip from json string to dto and reverse '
+      'should result in the same document',
+      () {
+        final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
+
+        // original
+        final originalJsonString = json.encode(documentJson);
+
+        // serialized and deserialized
+        final documentDto = DocumentDto.fromJsonSchema(documentJson, schema);
+        final documentDtoJson = documentDto.toJson();
+        final serializedJsonString = json.encode(documentDtoJson);
+
+        // verify they are the same
+        expect(serializedJsonString, equals(originalJsonString));
+      },
+      // TODO(dtscalac): fix parsing the document and enable this test
+      skip: true,
+    );
+
+    test(
+        'Roundtrip from json to model and reverse '
+        'should result in the same document', () {
+      final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
+
+      // original
+      final originalDocDto = DocumentDto.fromJsonSchema(documentJson, schema);
+      final originalDoc = originalDocDto.toModel();
+
+      // serialized and deserialized
+      final serializedDocJson = DocumentDto.fromModel(originalDoc).toJson();
+      final deserializedDocDto =
+          DocumentDto.fromJsonSchema(serializedDocJson, schema);
+      final deserializedDoc = deserializedDocDto.toModel();
+
+      // verify they are the same
+      expect(deserializedDoc, equals(originalDoc));
+    });
+
     test('Converts segments list into object for JSON', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final document = DocumentBuilder.fromSchema(schema).build();
+      final document = DocumentBuilder.fromSchema(
+        schemaUrl: schemaPath,
+        schema: schema,
+      ).build();
+
       final documentDto = DocumentDto.fromModel(document);
       final documentJson = documentDto.toJson();
 
@@ -39,7 +83,11 @@ void main() {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
-      final document = DocumentBuilder.fromSchema(schema).build();
+      final document = DocumentBuilder.fromSchema(
+        schemaUrl: schemaPath,
+        schema: schema,
+      ).build();
+
       final documentDto = DocumentDto.fromModel(document);
 
       final documentJson = documentDto.toJson();

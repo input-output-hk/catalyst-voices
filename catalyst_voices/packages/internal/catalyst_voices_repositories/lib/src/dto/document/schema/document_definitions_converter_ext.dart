@@ -14,6 +14,7 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case DropDownSingleSelectDefinition():
       case MultiSelectDefinition():
       case NestedQuestionsDefinition():
+      case NestedQuestionsListDefinition():
       case TagGroupDefinition():
       case TagSelectionDefinition():
       case TokenValueCardanoADADefinition():
@@ -31,7 +32,6 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
       case SingleLineHttpsURLEntryListDefinition():
-      case NestedQuestionsListDefinition():
         return const ListStringConverter() as JsonConverter<T?, Object?>;
     }
   }

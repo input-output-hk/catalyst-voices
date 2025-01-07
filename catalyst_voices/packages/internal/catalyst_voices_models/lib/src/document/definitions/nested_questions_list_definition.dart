@@ -1,7 +1,8 @@
 part of '../document_definitions.dart';
 
+// TODO(dtscalac): parse the Map<String, dynamic> into a question properties
 final class NestedQuestionsListDefinition
-    extends BaseDocumentDefinition<List<String>> {
+    extends BaseDocumentDefinition<List<Map<String, dynamic>>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
   final List<String> defaultValue;
@@ -16,7 +17,7 @@ final class NestedQuestionsListDefinition
 
   @override
   DocumentValidationResult validateProperty(
-    DocumentProperty<List<String>> property,
+    DocumentProperty<List<Map<String, dynamic>>> property,
   ) {
     return DocumentValidator.validateList(property);
   }
