@@ -87,7 +87,7 @@ class _DocumentBuilderSectionTileState
             for (final property in widget.section.properties) ...[
               const SizedBox(height: 8),
               _PropertyBuilder(
-                key: ObjectKey(property.schema.nodeId),
+                key: ValueKey(property.schema.nodeId),
                 property: property,
                 isEditMode: _isEditMode,
                 onChanged: _handlePropertyChange,
