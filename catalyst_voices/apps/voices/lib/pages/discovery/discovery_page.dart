@@ -11,7 +11,6 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,83 +32,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final section = DocumentSection(
-      schema: const DocumentSchemaSection(
-        definition: SectionDefinition(
-          type: DocumentDefinitionsObjectType.object,
-          note: '',
-          additionalProperties: true,
-        ),
-        nodeId: DocumentNodeId.root,
-        id: 'theme',
-        title: 'Horizons',
-        description: 'Long-term vision and categorization of your project',
-        properties: [],
-        isRequired: true,
-        order: [],
-      ),
-      properties: [
-        DocumentProperty(
-          schema: DocumentSchemaProperty.optional(
-            definition: SingleGroupedTagSelectorDefinition.dummy(),
-            nodeId: DocumentNodeId.root.child('grouped_tag'),
-            id: 'bundget',
-            oneOf: const [
-              DocumentSchemaLogicalGroup(
-                conditions: [
-                  DocumentSchemaLogicalCondition(
-                    definition: TagGroupDefinition.dummy(),
-                    id: 'group',
-                    value: 'Governance',
-                    enumValues: null,
-                  ),
-                  DocumentSchemaLogicalCondition(
-                    definition: TagSelectionDefinition.dummy(),
-                    id: 'group',
-                    value: null,
-                    enumValues: [
-                      'Governance',
-                      'DAO',
-                    ],
-                  ),
-                ],
-              ),
-              DocumentSchemaLogicalGroup(
-                conditions: [
-                  DocumentSchemaLogicalCondition(
-                    definition: TagGroupDefinition.dummy(),
-                    id: 'group',
-                    value: 'Education',
-                    enumValues: null,
-                  ),
-                  DocumentSchemaLogicalCondition(
-                    definition: TagSelectionDefinition.dummy(),
-                    id: 'group',
-                    value: null,
-                    enumValues: [
-                      'Education',
-                      'Learn to Earn',
-                      'Training',
-                      'Translation',
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          value: null,
-        ),
-      ],
-    );
-    return Scaffold(
-      body: Center(
-        child: DocumentBuilderSectionTile(
-          key: const ValueKey('theme'),
-          section: section,
-          onChanged: (value) {},
-        ),
-      ),
-    );
     return const CustomScrollView(
       slivers: [
         _Body(),
