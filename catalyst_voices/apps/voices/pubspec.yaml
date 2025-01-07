@@ -63,6 +63,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   sentry_flutter: ^8.8.0
   shared_preferences: ^2.3.3
+  url_launcher: ^6.2.2
   url_strategy: ^0.3.0
   # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
   # but here we import it explicitly to make sure the latest version is used which addresses
