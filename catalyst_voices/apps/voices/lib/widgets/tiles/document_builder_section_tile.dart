@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/tiles/agreement_confirmation_tile.dart';
+import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -225,7 +225,7 @@ class _PropertyBuilder extends StatelessWidget {
       case LanguageCodeDefinition():
         throw UnimplementedError();
       case AgreementConfirmationDefinition():
-        return AgreementConfirmationTile(
+        return AgreementConfirmationWidget(
           value: definition.castProperty(property).value,
           definition: definition,
           nodeId: property.schema.nodeId,
