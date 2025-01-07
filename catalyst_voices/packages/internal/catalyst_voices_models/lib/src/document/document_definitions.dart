@@ -5,28 +5,28 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
-part 'definitions/language_code_definition.dart';
+part 'definitions/agreement_confirmation_definition.dart';
 part 'definitions/drop_down_single_select_definition.dart';
+part 'definitions/duration_in_months_definition.dart';
+part 'definitions/language_code_definition.dart';
 part 'definitions/multi_line_text_entry_definition.dart';
 part 'definitions/multi_line_text_entry_list_markdown_definition.dart';
 part 'definitions/multi_line_text_entry_markdown_definition.dart';
 part 'definitions/multi_select_definition.dart';
+part 'definitions/nested_questions_definition.dart';
+part 'definitions/nested_questions_list_definition.dart';
 part 'definitions/section_definition.dart';
 part 'definitions/segment_definition.dart';
+part 'definitions/single_grouped_tag_selector_definition.dart';
 part 'definitions/single_line_https_url_entry_definition.dart';
 part 'definitions/single_line_https_url_entry_list_definition.dart';
 part 'definitions/single_line_text_entry_definition.dart';
 part 'definitions/single_line_text_entry_list_definition.dart';
-part 'definitions/nested_questions_list_definition.dart';
-part 'definitions/nested_questions_definition.dart';
-part 'definitions/single_grouped_tag_selector_definition.dart';
+part 'definitions/spdx_license_or_url_definition.dart';
 part 'definitions/tag_group_definition.dart';
 part 'definitions/tag_selection_definition.dart';
 part 'definitions/token_value_cardano_ada_definition.dart';
-part 'definitions/duration_in_months_definition.dart';
 part 'definitions/yes_no_choice_definition.dart';
-part 'definitions/agreement_confirmation_definition.dart';
-part 'definitions/spdx_license_or_url_definition.dart';
 
 enum DocumentDefinitionsObjectType {
   string,

@@ -11,8 +11,6 @@ final class GroupedTagsSelection extends Equatable {
     this.tag,
   });
 
-  // TODO(dtscalac): remove this, should be validated in definition
-  @deprecated
   bool get isValid => group != null && tag != null;
 
   GroupedTagsSelection copyWith({

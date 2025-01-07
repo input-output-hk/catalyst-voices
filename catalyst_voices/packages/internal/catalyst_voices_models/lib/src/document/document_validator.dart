@@ -5,6 +5,10 @@ import 'package:equatable/equatable.dart';
 
 /// Validates [DocumentProperty].
 final class DocumentValidator {
+  /// Validates the [property] against all common rules that
+  /// apply to all properties.
+  ///
+  /// There are no specific checks for different types like [String] or [int].
   static DocumentValidationResult validateBasic(
     DocumentProperty<Object> property,
   ) {

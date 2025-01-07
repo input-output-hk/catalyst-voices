@@ -25,10 +25,28 @@ final class SingleGroupedTagSelectorDefinition
   DocumentValidationResult validateProperty(
     DocumentProperty<GroupedTagsSelection> property,
   ) {
-    // TODO(dtscalac): validation
-    // bool get isValid => group != null && tag != null;
+    final result = DocumentValidator.validateBasic(property);
+    if (result.isInvalid) {
+      return result;
+    }
 
-    return DocumentValidator.validateBasic(property);
+    final value = property.value;
+    if (value == null) {
+      // whether the property is required or not is validated by the
+      // validateBasic since it passed the validation the property
+      // is not required
+      return const SuccessfulDocumentValidation();
+    }
+
+    // TODO(dtscalac): validate whether group & tag are oneOf
+    // specified by the schema
+    if (value.isValid) {
+      return const SuccessfulDocumentValidation();
+    } else {
+      return MissingRequiredDocumentValue(
+        invalidNodeId: property.schema.nodeId,
+      );
+    }
   }
 
   List<GroupedTags> groupedTags(
