@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/src/document/document_builder.dart';
 import 'package:catalyst_voices_models/src/document/document_schema.dart';
+import 'package:catalyst_voices_models/src/document/document_validator.dart';
 import 'package:equatable/equatable.dart';
 
 // TODO(dtscalac): tests
@@ -85,6 +86,11 @@ final class DocumentProperty<T extends Object> extends Equatable {
     required this.schema,
     required this.value,
   });
+
+  /// Validates whether the property [value] is valid against the [schema].
+  DocumentValidationResult validate() {
+    return schema.definition.validateProperty(this);
+  }
 
   /// Creates a new [DocumentPropertyBuilder] from this property.
   DocumentPropertyBuilder toBuilder() {
