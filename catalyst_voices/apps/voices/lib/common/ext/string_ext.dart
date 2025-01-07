@@ -6,6 +6,21 @@ extension StringExt on String {
       return '';
     }
   }
+
+  String starred({
+    bool leading = true,
+    bool isEnabled = true,
+  }) {
+    if (!isEnabled) {
+      return this;
+    }
+
+    return leading ? withPrefix('*') : withSuffix('*');
+  }
+
+  String withPrefix(String value) => '$value$this';
+
+  String withSuffix(String value) => '$this$value';
 }
 
 extension UrlParser on String {
