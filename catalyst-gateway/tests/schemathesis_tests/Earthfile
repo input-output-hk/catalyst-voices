@@ -9,7 +9,9 @@ package-schemathesis:
     COPY ./hooks/hooks.py .
     VOLUME /results
     ARG openapi_spec
-    ENTRYPOINT st run --endpoint '^/api/v1/health/started' $openapi_spec \
+    # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
+    ARG seed
+    ENTRYPOINT st run --endpoint '^/api/v1/health/started' --checks all $openapi_spec \
                     --workers=2 \
                     --wait-for-schema=120 \
                     --max-response-time=5000 \
@@ -20,7 +22,8 @@ package-schemathesis:
                     --show-trace \
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
-                    --cassette-path=/results/cassette.yaml
+                    --cassette-path=/results/cassette.yaml \
+                    $seed
 
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
@@ -31,10 +34,11 @@ test-fuzzer-api:
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
     LET OPENAPI_SPEC="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG seed
 
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
+        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC --seed=$seed) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
