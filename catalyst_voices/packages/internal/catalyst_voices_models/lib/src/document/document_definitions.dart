@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_models/src/document/document_validator.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -144,10 +143,6 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
   /// Validates the [property] against document rules.
   DocumentValidationResult validateProperty(DocumentProperty<T> property);
 }
-
-
-
-
 
 extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {
   BaseDocumentDefinition getDefinition(String refPath) {

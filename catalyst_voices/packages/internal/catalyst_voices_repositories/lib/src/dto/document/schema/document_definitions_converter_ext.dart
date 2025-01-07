@@ -12,9 +12,6 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case MultiLineTextEntryMarkdownDefinition():
       case DropDownSingleSelectDefinition():
       case MultiSelectDefinition():
-      case MultiLineTextEntryListMarkdownDefinition():
-      case SingleLineHttpsURLEntryListDefinition():
-      case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
       case SingleGroupedTagSelectorDefinition():
       case TagGroupDefinition():
@@ -27,6 +24,9 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case LanguageCodeDefinition():
         return NoopConverter<T>();
       case SingleLineTextEntryListDefinition():
+      case MultiLineTextEntryListMarkdownDefinition():
+      case SingleLineHttpsURLEntryListDefinition():
+      case NestedQuestionsListDefinition():
         return const ListStringConverter() as JsonConverter<T?, Object?>;
       case SegmentDefinition():
       case SectionDefinition():
