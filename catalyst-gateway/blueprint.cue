@@ -25,7 +25,6 @@ project: {
 
 					containerPort: 8080
 					strategy:      "Recreate"
-
           ingressHost: "gateway.dev.project-catalyst.io"
 
 					persistentVolumeClaims: [
