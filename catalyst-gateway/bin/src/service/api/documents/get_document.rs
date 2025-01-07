@@ -1,5 +1,6 @@
-//! Implementation of the GET `/sync_state` endpoint
+//! Implementation of the GET `/document` endpoint
 
+use poem::Body;
 use poem_openapi::ApiResponse;
 
 use crate::service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor};
@@ -10,7 +11,7 @@ use crate::service::common::{responses::WithErrorResponses, types::payload::cbor
 pub(crate) enum Responses {
     /// The Document that was requested.
     #[oai(status = 200)]
-    Ok(Cbor<Vec<u8>>),
+    Ok(Cbor<Body>),
     /// The document could not be found.
     #[oai(status = 404)]
     NotFound,

@@ -1,17 +1,26 @@
 //! Signed Documents API endpoints
 
 use anyhow::anyhow;
+use poem::{error::ReadBodyError, Body};
 use poem_openapi::{
     param::{Path, Query},
+    payload::Json,
     OpenApi,
 };
+use put_document::MAXIMUM_DOCUMENT_SIZE;
 
 use crate::service::{
-    common::{auth::none_or_rbac::NoneOrRBAC, tags::ApiTags, types::generic::uuidv7::UUIDv7},
+    common::{
+        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
+        objects::document::bad_put_request::PutDocumentBadRequest,
+        tags::ApiTags,
+        types::{generic::uuidv7::UUIDv7, payload::cbor::Cbor},
+    },
     utilities::middleware::schema_validation::schema_version_validation,
 };
 
 mod get_document;
+mod put_document;
 
 /// Cardano Follower API Endpoints
 pub(crate) struct DocumentApi;
@@ -46,5 +55,33 @@ impl DocumentApi {
             return get_document::AllResponses::internal_error(&err);
         };
         get_document::endpoint(doc_id, ver_id).await
+    }
+
+    /// Put A Signed Document.
+    ///
+    /// This endpoint returns OK if the document is valid, able to be put by the
+    /// submitter, and if it already exists, is identical to the existing document.
+    #[oai(
+        path = "/draft/document",
+        method = "put",
+        operation_id = "putDocument",
+        transform = "schema_version_validation"
+    )]
+    async fn put_document(
+        &self, /// The document to PUT
+        document: Cbor<Body>,
+        /// Authorization required.
+        _auth: CatalystRBACSecurityScheme,
+    ) -> put_document::AllResponses {
+        match document.0.into_bytes_limit(MAXIMUM_DOCUMENT_SIZE).await {
+            Ok(document) => put_document::endpoint(document).await,
+            Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
+            Err(_err) => {
+                put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                    "Failed to read document from the request",
+                )))
+                .into()
+            },
+        }
     }
 }
