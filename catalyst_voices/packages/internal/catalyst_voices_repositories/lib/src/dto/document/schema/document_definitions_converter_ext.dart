@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/defined_property_dto/grouped_tags_dto.dart';
 import 'package:catalyst_voices_repositories/src/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -13,7 +14,6 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case DropDownSingleSelectDefinition():
       case MultiSelectDefinition():
       case NestedQuestionsDefinition():
-      case SingleGroupedTagSelectorDefinition():
       case TagGroupDefinition():
       case TagSelectionDefinition():
       case TokenValueCardanoADADefinition():
@@ -22,15 +22,16 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case AgreementConfirmationDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
+      case SegmentDefinition():
+      case SectionDefinition():
         return NoopConverter<T>();
+      case SingleGroupedTagSelectorDefinition():
+        return GroupedTagsSelectionConverter as JsonConverter<T?, Object?>;
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
         return const ListStringConverter() as JsonConverter<T?, Object?>;
-      case SegmentDefinition():
-      case SectionDefinition():
-        throw UnsupportedError("These definitions don't support values");
     }
   }
 }
