@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -46,6 +47,10 @@ class _DocumentBuilderSectionTileState
 
     _editedSection = widget.section;
     _builder = _editedSection.toBuilder();
+
+    // TODO(damian-molinski): validation
+    _isValid =
+        _editedSection.properties.every((element) => element.value != null);
   }
 
   @override
@@ -56,6 +61,10 @@ class _DocumentBuilderSectionTileState
       _editedSection = widget.section;
       _builder = _editedSection.toBuilder();
       _pendingChanges.clear();
+
+      // TODO(damian-molinski): validation
+      _isValid =
+          _editedSection.properties.every((element) => element.value != null);
     }
   }
 
@@ -81,7 +90,7 @@ class _DocumentBuilderSectionTileState
                 key: ObjectKey(property.schema.nodeId),
                 property: property,
                 isEditMode: _isEditMode,
-                onPropertyChanged: _handlePropertyChange,
+                onChanged: _handlePropertyChange,
               ),
             ],
             if (_isEditMode) ...[
@@ -103,12 +112,14 @@ class _DocumentBuilderSectionTileState
     // ignore: unnecessary_lambdas
     setState(() {
       _pendingChanges.clear();
+      _isEditMode = false;
     });
   }
 
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
+      _pendingChanges.clear();
     });
   }
 
@@ -119,7 +130,8 @@ class _DocumentBuilderSectionTileState
       _pendingChanges.add(change);
 
       // TODO(damian-molinski): validation
-      _isValid = false;
+      _isValid =
+          _editedSection.properties.every((element) => element.value != null);
     });
   }
 }
@@ -155,7 +167,6 @@ class _Header extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
-        const SizedBox(width: 16),
       ],
     );
   }
@@ -185,13 +196,13 @@ class _Footer extends StatelessWidget {
 class _PropertyBuilder extends StatelessWidget {
   final DocumentProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onPropertyChanged;
+  final ValueChanged<DocumentChange> onChanged;
 
   const _PropertyBuilder({
     required super.key,
     required this.property,
     required this.isEditMode,
-    required this.onPropertyChanged,
+    required this.onChanged,
   });
 
   @override
@@ -218,7 +229,6 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleGroupedTagSelectorDefinition():
       case TagGroupDefinition():
       case TagSelectionDefinition():
-      case TokenValueCardanoADADefinition():
       case DurationInMonthsDefinition():
       case YesNoChoiceDefinition():
       case SPDXLicenceOrUrlDefinition():
@@ -233,6 +243,17 @@ class _PropertyBuilder extends StatelessWidget {
           title: property.schema.title ?? '',
           isEditMode: isEditMode,
           onChanged: onPropertyChanged,
+        );
+       case TokenValueCardanoADADefinition():
+        return DocumentTokenValueWidget(
+          id: property.schema.nodeId,
+          label: property.schema.title ?? '',
+          value: property.value is int ? property.value! as int : null,
+          currency: const Currency.ada(),
+          range: property.schema.range,
+          isEditMode: isEditMode,
+          isRequired: property.schema.isRequired,
+          onChanged: onChanged,
         );
     }
   }
