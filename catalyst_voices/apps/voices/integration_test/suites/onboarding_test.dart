@@ -59,7 +59,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
-          await (await OnboardingPage.closeBtn($)).waitUntilVisible().tap();
+          await OnboardingPage.closeBtn($).tap();
           expect($(OnboardingPage.registrationDialog), findsNothing);
         },
       );
@@ -70,8 +70,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
-          await (await OnboardingPage.detailsPartGetStartedCreateNewBtn($))
-              .tap();
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
             RegistrationState.createKeychainInfo,
@@ -85,8 +84,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
-          await (await OnboardingPage.detailsPartGetStartedCreateNewBtn($))
-              .tap();
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
           expect(
             await OnboardingPage.detailsPartGetStartedCreateNewBtn($),
@@ -101,28 +99,11 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
-          await (await OnboardingPage.detailsPartGetStartedCreateNewBtn($))
-              .tap();
-          await (await OnboardingPage.detailsPartCreateKeychainBtn($)).tap();
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+          await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
             RegistrationState.keychainCreated,
-          );
-        },
-      );
-
-      patrolWidgetTest(
-        'visitor - create keychain mnemonic writedown screen looks as expected',
-            (PatrolTester $) async {
-          await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
-          await (await OnboardingPage.detailsPartGetStartedCreateNewBtn($))
-              .tap();
-          await (await OnboardingPage.detailsPartCreateKeychainBtn($)).tap();
-          await OnboardingPage.onboardingScreenLooksAsExpected(
-            $,
-            RegistrationState.keychainCreateMnemonicWritedown,
           );
         },
       );
@@ -133,8 +114,8 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
-          await (await OnboardingPage.detailsPartGetStartedCreateNewBtn($)).tap();
-          await (await OnboardingPage.detailsPartCreateKeychainBtn($)).tap();
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+          await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
           expect(
             await OnboardingPage.detailsPartCreateKeychainBtn($),

@@ -19,6 +19,7 @@ class OnboardingPage {
   static const registrationDetailsTitle = Key('RegistrationDetailsTitle');
   static const registrationDetailsBody = Key('RegistrationDetailsBody');
   static const backButton = Key('BackButton');
+  static const nextButton = Key('NextButton');
   static const progressBar = Key('ProgressBar');
 
   static Future<String?> infoPartHeaderTitleText(PatrolTester $) async {
@@ -34,7 +35,9 @@ class OnboardingPage {
   }
 
   static Future<PatrolFinder> closeBtn(PatrolTester $) async {
-    return $(registrationDialog).$(CommonPage.dialogCloseButton);
+    return $(registrationDialog)
+        .$(CommonPage.dialogCloseButton)
+        .waitUntilVisible();
   }
 
   static Future<String?> infoPartLearnMoreButtonText(PatrolTester $) async {
@@ -77,7 +80,8 @@ class OnboardingPage {
     PatrolTester $,
   ) async {
     return $(registrationDetailsPanel)
-        .$(const Key('CreateAccountType.createNew'));
+        .$(const Key('CreateAccountType.createNew'))
+        .waitUntilVisible();
   }
 
   static Future<PatrolFinder> detailsPartGetStartedRecoverBtn(
@@ -90,7 +94,9 @@ class OnboardingPage {
   static Future<PatrolFinder> detailsPartCreateKeychainBtn(
     PatrolTester $,
   ) async {
-    return $(registrationDetailsPanel).$(const Key('CreateKeychainButton'));
+    return $(registrationDetailsPanel)
+        .$(const Key('CreateKeychainButton'))
+        .waitUntilVisible();
   }
 
   static Future<void> onboardingScreenLooksAsExpected(
@@ -128,7 +134,9 @@ class OnboardingPage {
         expect(
           await infoPartHeaderBodyText($),
           T.get(
-              'Make sure you create an offline backup of your recovery phrase as well.'),
+            'Make sure you create an offline backup of your recovery phrase '
+            'as well.',
+          ),
         );
         expect(await infoPartLearnMoreButtonText($), T.get('Learn More'));
         expect(infoPartTaskPicture($), findsOneWidget);
@@ -204,6 +212,7 @@ class OnboardingPage {
         );
         expect(detailsPartGetStartedTitleBody($), isNotEmpty);
         expect($(backButton), findsOneWidget);
+        expect($(nextButton), findsOneWidget);
         break;
       case RegistrationState.keychainCreateMnemonicWritedown:
         throw UnimplementedError();

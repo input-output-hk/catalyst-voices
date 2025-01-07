@@ -30,6 +30,7 @@ class RegistrationBackNextNavigation extends StatelessWidget {
               : null,
         ),
         VoicesNextButton(
+          key: const Key('NextButton'),
           onTap: isNextEnabled
               ? onNextTap ?? () => RegistrationCubit.of(context).nextStep()
               : null,
