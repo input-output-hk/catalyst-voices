@@ -40,6 +40,8 @@ void main() {
         expect(serializedJsonString, equals(originalJsonString));
       },
       // TODO(dtscalac): fix parsing the document and enable this test
+      // the reason it fails is that we are ignoring some properties
+      // and not outputting them back but they are present in the original doc
       skip: true,
     );
 

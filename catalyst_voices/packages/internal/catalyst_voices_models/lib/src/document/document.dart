@@ -12,6 +12,7 @@ import 'package:equatable/equatable.dart';
 final class Document extends Equatable {
   /// The url of the [schema].
   final String schemaUrl;
+
   /// The schema which explains how to interpret this document.
   final DocumentSchema schema;
 
