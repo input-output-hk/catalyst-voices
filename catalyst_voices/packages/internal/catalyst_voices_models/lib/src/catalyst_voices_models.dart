@@ -7,6 +7,7 @@ export 'campaign/campaign_category.dart';
 export 'campaign/campaign_publish.dart';
 export 'campaign/campaign_section.dart';
 export 'crypto/lock_factor.dart';
+export 'document/defined_property/grouped_tags.dart';
 export 'document/document.dart';
 export 'document/document_builder.dart';
 export 'document/document_change.dart';
