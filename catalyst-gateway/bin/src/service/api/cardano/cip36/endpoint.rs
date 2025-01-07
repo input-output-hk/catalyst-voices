@@ -6,7 +6,7 @@ use tracing::error;
 use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
 use super::{
     cardano::{self},
-    filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key},
+    filter::{get_all, get_registration_given_stake_key_hash, get_registration_given_vote_key},
     response, NoneOrRBAC, SlotNo,
 };
 use crate::{
@@ -68,12 +68,18 @@ pub(crate) async fn cip36_registrations(
                 .await;
             },
             StakeAddressOrPublicKey::All => {
-                return response::AllRegistration::unprocessable_content(vec![
-                    poem::Error::from_string(
-                        "Invalid Stake Address or Voter Key",
-                        StatusCode::UNPROCESSABLE_ENTITY,
-                    ),
-                ]);
+                match asat {
+                    Some(slot_no) => return get_all(session, &slot_no).await,
+                    None => {
+                        return response::AllRegistration::unprocessable_content(vec![
+                            poem::Error::from_string(
+                                "Must include the Slot in which Registrations are valid until."
+                                    .to_string(),
+                                StatusCode::UNPROCESSABLE_ENTITY,
+                            ),
+                        ])
+                    },
+                };
             },
         };
     };
@@ -81,10 +87,6 @@ pub(crate) async fn cip36_registrations(
     // If _for is not defined, use the stake addresses defined for Role0 in the _auth
     // parameter. _auth not yet implemented, so put placeholder for that, and return not
     // found until _auth is implemented.
-
-    // return 404 for auth
-    // distill down to stake addr or list of stake addr
-    // stake addr hash for cip36 registratioin
 
     response::Cip36Registration::NotFound.into()
 }

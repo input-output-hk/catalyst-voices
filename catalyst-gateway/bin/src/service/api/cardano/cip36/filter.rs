@@ -4,6 +4,7 @@ use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
 use poem::http::StatusCode;
+use poem_openapi::types::Type;
 use tracing::error;
 
 use super::{
@@ -20,6 +21,7 @@ use super::{
 };
 use crate::db::index::{
     queries::registrations::{
+        get_all_with_limit::{GetAllWithLimitsParams, GetAllWithLimitsQuery},
         get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
         get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
         get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
@@ -97,26 +99,24 @@ pub async fn get_registration_from_stake_addr(
     stake_pub_key: Ed25519HexEncodedPublicKey, asat: Option<SlotNo>,
     session: Arc<CassandraSession>, vote_key: Option<Ed25519HexEncodedPublicKey>,
 ) -> AllRegistration {
-    let mut registrations = match get_all_registrations_from_stake_pub_key(
-        session.clone(),
-        stake_pub_key.clone(),
-    )
-    .await
-    {
-        Ok(registration) => registration,
-        Err(err) => {
-            error!(
-                id="get_registration_from_stake_addr",
-                error=?err,
-                "Failed to query stake addr"
-            );
+    let mut registrations =
+        match get_all_registrations_from_stake_pub_key(&session.clone(), stake_pub_key.clone())
+            .await
+        {
+            Ok(registration) => registration,
+            Err(err) => {
+                error!(
+                    id="get_registration_from_stake_addr",
+                    error=?err,
+                    "Failed to query stake addr"
+                );
 
-            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                format!("Failed to query stake addr {err:?}"),
-                StatusCode::UNPROCESSABLE_ENTITY,
-            )]);
-        },
-    };
+                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                    format!("Failed to query stake addr {err:?}"),
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                )]);
+            },
+        };
 
     // check registrations (stake addrs) are still actively associated with the voting key,
     // and have not been registered to another voting key.
@@ -208,11 +208,58 @@ pub async fn get_registration_from_stake_addr(
 
 /// Get all cip36 registrations for a given stake address.
 async fn get_all_registrations_from_stake_pub_key(
-    session: Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
+    session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(&session, GetRegistrationParams {
-        stake_address: stake_pub_key.try_into()?,
-    })
+    let mut registrations_iter = GetRegistrationQuery::execute(
+        session,
+        GetRegistrationParams {
+            stake_address: stake_pub_key.try_into()?,
+        },
+    )
+    .await?;
+    let mut registrations = Vec::new();
+    while let Some(row) = registrations_iter.next().await {
+        let row = row?;
+
+        let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
+            *nonce
+        } else {
+            continue;
+        };
+
+        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
+            *slot_no
+        } else {
+            continue;
+        };
+
+        let cip36 = Cip36Details {
+            slot_no: SlotNo::from(slot_no),
+            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
+            vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
+            nonce: Some(Nonce::from(nonce)),
+            txn: Some(TxnIndex::try_from(row.txn)?),
+            payment_address: Some(Cip19ShelleyAddress::new(hex::encode(row.payment_address))),
+            is_payable: row.is_payable,
+            cip15: !row.cip36,
+            errors: vec![],
+        };
+
+        registrations.push(cip36);
+    }
+    Ok(registrations)
+}
+
+/// Get all cip36 registrations for a given stake address.
+async fn get_all_registrations_from_vote_key(
+    session: &Arc<CassandraSession>, vote_key: Ed25519HexEncodedPublicKey,
+) -> Result<Vec<Cip36Details>, anyhow::Error> {
+    let mut registrations_iter = GetRegistrationQuery::execute(
+        session,
+        GetRegistrationParams {
+            stake_address: vote_key.try_into()?,
+        },
+    )
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
@@ -298,7 +345,7 @@ async fn get_invalid_registrations(
     Ok(invalid_registrations)
 }
 
-/// Get registration given a stake key hash, time specific based on asat param,
+/// Get registration given a vote key, time specific based on asat param,
 /// or latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_vote_key(
     vote_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>, asat: Option<SlotNo>,
@@ -390,4 +437,115 @@ fn cross_reference_key(
         Some(key) => key == *associated_voting_key,
         None => false,
     }
+}
+
+/// Get all registrations with given page contraints
+pub async fn get_all(session: Arc<CassandraSession>, slot_no: &SlotNo) -> AllRegistration {
+    let stake_addrs = match get_all_stake_addrs(&session.clone()).await {
+        Ok(stake_addrs) => stake_addrs,
+        Err(err) => {
+            error!(
+                id="get_all_with_limit",
+                error=?err,
+                "Failed to all"
+            );
+
+            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                format!("Failed to query ALL {err:?}"),
+                StatusCode::UNPROCESSABLE_ENTITY,
+            )]);
+        },
+    };
+
+    let mut all_registrations_after_filtering = Vec::new();
+    let mut all_invalids_after_filtering = Vec::new();
+
+    for (stake_public_key, vote_pub_key) in &stake_addrs {
+        let registrations_for_given_stake_pub_key = match get_all_registrations_from_stake_pub_key(
+            &session,
+            stake_public_key.clone(),
+        )
+        .await
+        {
+            Ok(registrations) => registrations,
+            Err(err) => {
+                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                    format!("Failed to query ALL {err:?}"),
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                )])
+            },
+        };
+
+        // Any registrations that occurred after this Slot are not included in the list.
+        let filtered_registrations = slot_filter(registrations_for_given_stake_pub_key, slot_no);
+
+        if filtered_registrations.len().is_empty() {
+            continue;
+        }
+
+        all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
+            vote_pub_key: vote_pub_key.clone(),
+            registrations: filtered_registrations,
+        });
+
+        // include any erroneous registrations which occur AFTER the slot# of the last valid
+        // registration
+        let invalids_report = match get_invalid_registrations(
+            stake_public_key.clone(),
+            slot_no.clone(),
+            session.clone(),
+        )
+        .await
+        {
+            Ok(invalids) => invalids,
+            Err(err) => {
+                error!(
+                    id="get_latest_registration_from_stake_key_hash_invalid_registrations_for_stake_addr",
+                    error=?err,
+                    "Failed to obtain invalid registrations for given stake addr",
+                );
+
+                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
+                    format!("Failed to obtain invalid registrations for given stake addr {err:?}"),
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                )]);
+            },
+        };
+        all_invalids_after_filtering.push(invalids_report);
+    }
+
+    AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
+        Cip36RegistrationList {
+            slot: slot_no.clone(),
+            voting_key: all_registrations_after_filtering,
+            invalid: vec![],
+            page: None,
+        },
+    )))
+}
+
+///  Get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)]
+pub async fn get_all_stake_addrs(
+    session: &Arc<CassandraSession>,
+) -> Result<Vec<(Ed25519HexEncodedPublicKey, Ed25519HexEncodedPublicKey)>, anyhow::Error> {
+    let mut stake_addr_iter =
+        GetAllWithLimitsQuery::execute(session, GetAllWithLimitsParams {}).await?;
+    let mut vote_key_stake_addr_pair = Vec::new();
+    while let Some(row) = stake_addr_iter.next().await {
+        let row = row?;
+
+        let stake_addr = Ed25519HexEncodedPublicKey::try_from(row.stake_address)?;
+        let vote_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key)?;
+
+        vote_key_stake_addr_pair.push((stake_addr, vote_key));
+    }
+    Ok(vote_key_stake_addr_pair)
+}
+
+/// Filter out any registrations that occurred after this Slot no
+fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36Details> {
+    registrations
+        .into_iter()
+        .filter(|registration| registration.slot_no < *slot_no)
+        .collect()
 }

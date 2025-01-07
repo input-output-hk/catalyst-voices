@@ -16,8 +16,9 @@ use rbac::{
     get_role0_chain_root::GetRole0ChainRootQuery,
 };
 use registrations::{
-    get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
-    get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
+    get_all_with_limit::GetAllWithLimitsQuery, get_from_stake_addr::GetRegistrationQuery,
+    get_from_stake_hash::GetStakeAddrQuery, get_from_vote_key::GetStakeAddrFromVoteKeyQuery,
+    get_invalid::GetInvalidRegistrationQuery,
 };
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
@@ -96,6 +97,8 @@ pub(crate) enum PreparedSelectQuery {
     RegistrationsByChainRoot,
     /// Get chain root by role0 key
     ChainRootByRole0Key,
+    /// Get all with limit
+    GetAllWithLimit,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -157,6 +160,8 @@ pub(crate) struct PreparedQueries {
     registrations_by_chain_root_query: PreparedStatement,
     /// Get chain root by role0 key
     chain_root_by_role0_key_query: PreparedStatement,
+    /// Get all with limit
+    get_all_with_limit_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -193,7 +198,8 @@ impl PreparedQueries {
         let chain_root_by_stake_address = GetChainRootQuery::prepare(session.clone()).await;
         let registrations_by_chain_root =
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
-        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session).await;
+        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
+        let get_all_with_limit = GetAllWithLimitsQuery::prepare(session).await;
 
         let (
             txo_insert_queries,
@@ -241,6 +247,7 @@ impl PreparedQueries {
             chain_root_by_stake_address_query: chain_root_by_stake_address?,
             registrations_by_chain_root_query: registrations_by_chain_root?,
             chain_root_by_role0_key_query: chain_root_by_role0_key?,
+            get_all_with_limit_query: get_all_with_limit?,
         })
     }
 
@@ -331,6 +338,7 @@ impl PreparedQueries {
                 &self.registrations_by_chain_root_query
             },
             PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
+            PreparedSelectQuery::GetAllWithLimit => &self.get_all_with_limit_query,
         };
 
         session
