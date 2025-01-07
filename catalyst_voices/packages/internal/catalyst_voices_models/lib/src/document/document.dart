@@ -65,6 +65,19 @@ final class DocumentSection extends Equatable {
     required this.properties,
   });
 
+  /// Validates whether the section [properties] are valid against the [schema].
+  ///
+  /// Returns the first failed validation result
+  /// or [SuccessfulDocumentValidation] if all are valid.
+  DocumentValidationResult validate() {
+    for (final property in properties) {
+      final result = property.validate();
+      if (result.isInvalid) return result;
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
   /// Creates a new [DocumentSectionBuilder] from this section.
   DocumentSectionBuilder toBuilder() {
     return DocumentSectionBuilder.fromSection(this);

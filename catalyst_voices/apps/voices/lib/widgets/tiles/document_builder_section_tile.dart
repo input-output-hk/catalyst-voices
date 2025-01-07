@@ -47,10 +47,7 @@ class _DocumentBuilderSectionTileState
 
     _editedSection = widget.section;
     _builder = _editedSection.toBuilder();
-
-    // TODO(damian-molinski): validation
-    _isValid =
-        _editedSection.properties.every((element) => element.value != null);
+    _isValid = _editedSection.validate().isValid;
   }
 
   @override
@@ -62,9 +59,7 @@ class _DocumentBuilderSectionTileState
       _builder = _editedSection.toBuilder();
       _pendingChanges.clear();
 
-      // TODO(damian-molinski): validation
-      _isValid =
-          _editedSection.properties.every((element) => element.value != null);
+      _isValid = _editedSection.validate().isValid;
     }
   }
 
@@ -128,10 +123,7 @@ class _DocumentBuilderSectionTileState
       _builder.addChange(change);
       _editedSection = _builder.build();
       _pendingChanges.add(change);
-
-      // TODO(damian-molinski): validation
-      _isValid =
-          _editedSection.properties.every((element) => element.value != null);
+      _isValid = _editedSection.validate().isValid;
     });
   }
 }
