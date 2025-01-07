@@ -378,11 +378,16 @@ fn check_stake_addr_voting_key_association(
 ) -> Vec<Cip36Details> {
     registrations
         .into_iter()
-        .filter(|r| {
-            r.vote_pub_key
-                .clone()
-                .unwrap_or(Ed25519HexEncodedPublicKey::examples(0))
-                == *associated_voting_key
-        })
+        .filter(|registration| cross_reference_key(associated_voting_key, registration))
         .collect()
+}
+
+/// Check associated voting key matches registration voting key
+fn cross_reference_key(
+    associated_voting_key: &Ed25519HexEncodedPublicKey, r: &Cip36Details,
+) -> bool {
+    match r.vote_pub_key.clone() {
+        Some(key) => key == *associated_voting_key,
+        None => false,
+    }
 }

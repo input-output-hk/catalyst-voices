@@ -1,5 +1,6 @@
 //! Command line and environment variable settings for the service
 use std::{
+    env,
     net::{IpAddr, Ipv4Addr, SocketAddr},
     path::PathBuf,
     str::FromStr,
@@ -169,6 +170,8 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             Duration::from_secs(5)
         },
     };
+
+    env::set_var("INTERNAL_API_KEY", "catv1.UP6jrII9HzfRdP9CbJGBMa1QAZRA9fjV8GH-0BQZ0H4GxVhAjPgtsUqyvIbNEMX24Mhgyz4miy7J5q84lxE8AJ2kzfRPw9Cz9tWUTHe1ebNw-rYjBbxspBr2ajr__7dood7pDw");
 
     EnvVars {
         github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),

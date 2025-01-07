@@ -1,7 +1,7 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
 use poem::http::{HeaderMap, StatusCode};
-use tracing::{error, info};
+use tracing::error;
 
 use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
 use super::{
@@ -40,7 +40,8 @@ pub(crate) async fn cip36_registrations(
                 // We need to convert this to a stake hash as per our data model to then find the,
                 // Full Stake Public Key (32 byte Ed25519 Public key, not hashed)
                 // Get latest registration given address or Restrict the query to a
-                // time; which can be represented as either the blockchains slot number.
+                // time; which can be represented as either the blockchains slot number or unix
+                // timestamp.
                 let stake_hash: HexEncodedHash28 = match cip19_stake_address.try_into() {
                     Ok(stake_hash) => stake_hash,
                     Err(err) => {
@@ -57,7 +58,8 @@ pub(crate) async fn cip36_registrations(
             },
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
                 // Get latest registration given voting key or Restrict the query to a
-                // time; which can be represented as either the blockchains slot number.
+                // time; which can be represented as either the blockchains slot number or unix time
+                // ts.
                 return get_registration_given_vote_key(
                     ed25519_hex_encoded_public_key,
                     session,
@@ -66,7 +68,6 @@ pub(crate) async fn cip36_registrations(
                 .await;
             },
             StakeAddressOrPublicKey::All => {
-                info!("ALL");
                 return response::AllRegistration::unprocessable_content(vec![
                     poem::Error::from_string(
                         "Invalid Stake Address or Voter Key",
