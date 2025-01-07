@@ -67,7 +67,7 @@ class _DocumentCheckboxBuilderWidgetState
       children: [
         if (_description.data.isNotEmpty) ...[
           MarkdownText(
-            markdownText: _description,
+            data: _description,
           ),
           const SizedBox(height: 22),
         ],

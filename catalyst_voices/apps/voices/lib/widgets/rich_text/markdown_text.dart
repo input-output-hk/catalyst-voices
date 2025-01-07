@@ -5,17 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class MarkdownText extends StatelessWidget with LaunchUrlMixin {
-  final MarkdownData markdownText;
+  final MarkdownData data;
+  final bool selectable;
   const MarkdownText({
     super.key,
-    required this.markdownText,
+    required this.data,
+    this.selectable = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return MarkdownBody(
-      data: markdownText.data,
-      selectable: true,
+      data: data.data,
+      selectable: selectable,
       onTapLink: (text, href, title) async {
         if (href != null) {
           await launchHrefUrl(href.getUri());
