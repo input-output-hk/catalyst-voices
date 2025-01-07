@@ -73,12 +73,12 @@ final class DocumentSection extends Equatable {
   List<Object?> get props => [schema, properties];
 }
 
-final class DocumentProperty extends Equatable {
+final class DocumentProperty<T extends Object> extends Equatable {
   /// The schema of the document property.
-  final DocumentSchemaProperty schema;
+  final DocumentSchemaProperty<T> schema;
 
   /// The current value this property holds.
-  final Object? value;
+  final T? value;
 
   /// The default constructor for the [DocumentProperty].
   const DocumentProperty({
