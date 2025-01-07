@@ -26,7 +26,8 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case SectionDefinition():
         return NoopConverter<T>();
       case SingleGroupedTagSelectorDefinition():
-        return GroupedTagsSelectionConverter as JsonConverter<T?, Object?>;
+        return const GroupedTagsSelectionConverter()
+            as JsonConverter<T?, Object?>;
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
       case SingleLineHttpsURLEntryListDefinition():
