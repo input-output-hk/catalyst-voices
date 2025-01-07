@@ -35,5 +35,6 @@ export 'utils/active_aware.dart';
 export 'utils/date_time_ext.dart';
 export 'utils/future_ext.dart';
 export 'utils/iterable_ext.dart';
+export 'utils/launch_url_mixin.dart';
 export 'utils/lockable.dart';
 export 'utils/typedefs.dart';

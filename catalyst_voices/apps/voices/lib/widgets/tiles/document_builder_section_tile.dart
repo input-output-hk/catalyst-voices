@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -213,7 +214,8 @@ class _PropertyBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (property.schema.definition) {
+    final definition = property.schema.definition;
+    switch (definition) {
       case SegmentDefinition():
       case SectionDefinition():
         throw UnsupportedError(
@@ -248,6 +250,21 @@ class _PropertyBuilder extends StatelessWidget {
         );
       case TagGroupDefinition():
       case TagSelectionDefinition():
+      case DurationInMonthsDefinition():
+      case YesNoChoiceDefinition():
+      case SPDXLicenceOrUrlDefinition():
+      case LanguageCodeDefinition():
+        throw UnimplementedError();
+      case AgreementConfirmationDefinition():
+        return AgreementConfirmationWidget(
+          value: definition.castProperty(property).value,
+          definition: definition,
+          nodeId: property.schema.nodeId,
+          description: property.schema.description ?? '',
+          title: property.schema.title ?? '',
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
       case TokenValueCardanoADADefinition():
         return DocumentTokenValueWidget(
           id: property.schema.nodeId,
@@ -259,11 +276,6 @@ class _PropertyBuilder extends StatelessWidget {
           isRequired: property.schema.isRequired,
           onChanged: onChanged,
         );
-      case DurationInMonthsDefinition():
-      case YesNoChoiceDefinition():
-      case AgreementConfirmationDefinition():
-      case SPDXLicenceOrUrlDefinition():
-        throw UnimplementedError();
     }
   }
 }
