@@ -9,16 +9,9 @@ class Range<T extends num> extends Equatable {
 
   const Range({required this.min, required this.max});
 
-  static Range<T>? optionalRangeOf<T extends num>({T? min, T? max}) {
-    if (min == null || max == null) {
-      return null;
-    }
-    return Range(min: min, max: max);
-  }
-
   /// Creates an [int] [Range] which assumes if
   /// min or max are null then they are unconstrained.
-  static Range<int>? optionalIntRangeOf({int? min, int? max}) {
+  static Range<int>? optionalRangeOf({int? min, int? max}) {
     if (min != null && max != null) {
       return Range(min: min, max: max);
     } else if (max != null) {
@@ -31,9 +24,7 @@ class Range<T extends num> extends Equatable {
   }
 
   /// Returns true if this range contains the [value], false otherwise.
-  bool contains(num value) {
-    return min >= value && value <= max;
-  }
+  bool contains(num value) => value >= min && value <= max;
 
   @override
   List<Object?> get props => [min, max];
