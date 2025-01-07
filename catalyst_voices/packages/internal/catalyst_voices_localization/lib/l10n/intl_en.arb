@@ -1178,5 +1178,11 @@
     }
   },
   "searchProposals": "Search Proposals",
-  "search": "Search…"
+  "search": "Search…",
+  "requestedAmountShouldBeBetween": "Requested amount should be between",
+  "and": "and",
+  "@and": {
+    "description": "General text. May be used in context of A4000 and $5000"
+  },
+  "errorValidationTokenNotParsed": "Invalid input. Could not parse parse."
 }
