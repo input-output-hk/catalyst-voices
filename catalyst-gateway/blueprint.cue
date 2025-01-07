@@ -23,7 +23,7 @@ project: {
 						tag:        _ @forge(name="GIT_HASH_OR_TAG")
 					}
 
-					containerPort: 8080
+					containerPort: 3030
 					strategy:      "Recreate"
           ingressHost: "gateway.dev.project-catalyst.io"
 
