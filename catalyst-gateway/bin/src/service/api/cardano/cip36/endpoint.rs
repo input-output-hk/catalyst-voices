@@ -35,12 +35,12 @@ pub(crate) async fn cip36_registrations(
         match StakeAddressOrPublicKey::from(stake_or_voter) {
             StakeAddressOrPublicKey::Address(cip19_stake_address) => {
                 // Typically, a stake address will start with 'stake1',
-                // for example: stake1ux7k5ztvhwj7ykv5v7vwjjzdfckjk0v74z9p9m5w0t5534clf62eq,
+                // for example: stake1ux7k5ztvhwj7ykv5v7vwjjzdfckjk0v74z9p9m5w0t5534clf62eq
                 // We need to convert this to a stake hash as per our data model to then find the,
-                // Full Stake Public Key (32 byte Ed25519 Public key, not hashed)
-                // Get latest registration given address or Restrict the query to a
-                // time; which can be represented as either the blockchains slot number or unix
-                // timestamp.
+                // Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
+                // We then get the latest registration or from a specific time as optionally
+                // specified in the query parameter. This can be represented as either
+                // the blockchains slot number or a unix timestamp.
                 let stake_hash: HexEncodedHash28 = match cip19_stake_address.try_into() {
                     Ok(stake_hash) => stake_hash,
                     Err(err) => {
@@ -56,9 +56,8 @@ pub(crate) async fn cip36_registrations(
                 return get_registration_given_stake_key_hash(stake_hash, session, asat).await;
             },
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
-                // Get latest registration given voting key or Restrict the query to a
-                // time; which can be represented as either the blockchains slot number or unix time
-                // ts.
+                // As above...
+                // Except using a voting key.
                 return get_registration_given_vote_key(
                     ed25519_hex_encoded_public_key,
                     session,
@@ -67,9 +66,9 @@ pub(crate) async fn cip36_registrations(
                 .await;
             },
             StakeAddressOrPublicKey::All =>
-            // Snapshot replacement, returns all registrations or returns a subset of registrations
-            // constrained by slot no if given.
-            // Any registrations that occurred after this Slot are not included in the list.
+            // As above...
+            // Snapshot replacement, returns all registrations or returns a
+            // subset of registrations if constrained by a given time.
             {
                 return snapshot(session, asat).await
             },
