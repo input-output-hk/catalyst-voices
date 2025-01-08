@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -67,16 +68,11 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var label = widget.label;
-    if (widget.isRequired) {
-      label = '*$label';
-    }
-
     return TokenField(
       controller: _controller,
       focusNode: _focusNode,
       onFieldSubmitted: _notifyChangeListener,
-      labelText: label,
+      labelText: widget.label.starred(isEnabled: widget.isRequired),
       range: widget.range,
       currency: widget.currency,
       showHelper: widget.isEditMode,
