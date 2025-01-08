@@ -50,7 +50,7 @@ fn merge_consecutive_sync_records(mut synced_chunks: Vec<SyncStatus>) -> Vec<Syn
                 // The new record is contained fully within the previous one.
                 // We will ignore the new record and use the previous one instead.
                 current_status = Some(current);
-            } else if rec.start_slot <= current.end_slot + 1 {
+            } else if rec.start_slot <= current.end_slot.saturating_add(1) {
                 // Either overlaps, or is directly consecutive.
                 // But not fully contained within the previous one.
                 current_status = Some(SyncStatus {
