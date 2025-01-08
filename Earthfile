@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:fix/pin-poetry-version AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:fix/pin-poetry-version AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/pin-poetry-version AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.2.29 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.2.29 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.29 AS postgresql-ci
 
 FROM debian:stable-slim
 
