@@ -28,7 +28,9 @@ class OnboardingPage {
   static const resetButton = Key('ResetButton');
 
   static Future<int> writedownSeedPhraseNumber(
-      PatrolTester $, int index,) async {
+    PatrolTester $,
+    int index,
+  ) async {
     final rawNumber = $(Key('SeedPhrase${index}CellKey'))
         .$(const Key('SeedPhraseNumber'))
         .text;
@@ -36,15 +38,18 @@ class OnboardingPage {
   }
 
   static Future<int> writedownSeedPhraseWord(
-      PatrolTester $, int index,) async {
-    final rawNumber = $(Key('SeedPhrase${index}CellKey'))
-        .$(const Key('SeedPhraseWord'))
-        .text;
+    PatrolTester $,
+    int index,
+  ) async {
+    final rawNumber =
+        $(Key('SeedPhrase${index}CellKey')).$(const Key('SeedPhraseWord')).text;
     return int.parse(rawNumber!.split('.').first);
   }
 
   static Future<String> inputSeedPhraseCompleterWord(
-      PatrolTester $, int index,) async {
+    PatrolTester $,
+    int index,
+  ) async {
     final seedWord = await getChildNodeText(
       $,
       $(Key('CompleterSeedPhrase${index}CellKey')).$(CommonPage.decoratorData),
@@ -52,10 +57,11 @@ class OnboardingPage {
     return seedWord!;
   }
 
-  static Future<String?> inputSeedPhrasePickerWord(PatrolTester $, int index) async {
+  static Future<String?> inputSeedPhrasePickerWord(
+      PatrolTester $, int index) async {
     final seedWord = await getChildNodeText(
       $,
-      $(Key('PickerSeedPhrase${index+1}CellKey')),
+      $(Key('PickerSeedPhrase${index + 1}CellKey')),
     );
     return seedWord!;
   }

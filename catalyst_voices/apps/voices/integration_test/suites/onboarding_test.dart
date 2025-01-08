@@ -159,7 +159,7 @@ void main() async {
 
       patrolWidgetTest(
         'visitor - create - mnemonic writedown screen next button is disabled',
-            (PatrolTester $) async {
+        (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
@@ -171,13 +171,15 @@ void main() async {
             RegistrationState.keychainCreateMnemonicWritedown,
           );
           OnboardingPage.voicesFilledButtonIsDisabled(
-            $, OnboardingPage.nextButton,);
+            $,
+            OnboardingPage.nextButton,
+          );
         },
       );
 
       patrolWidgetTest(
         'visitor - create - mnemonic input info screen looks OK',
-            (PatrolTester $) async {
+        (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
@@ -195,7 +197,7 @@ void main() async {
 
       patrolWidgetTest(
         'visitor - create - mnemonic input info screen back button works',
-            (PatrolTester $) async {
+        (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
@@ -214,7 +216,7 @@ void main() async {
 
       patrolWidgetTest(
         'visitor - create - mnemonic input screen looks OK',
-            (PatrolTester $) async {
+        (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
@@ -235,7 +237,7 @@ void main() async {
 
       patrolWidgetTest(
         'visitor - create - mnemonic input screen back button works',
-            (PatrolTester $) async {
+        (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
