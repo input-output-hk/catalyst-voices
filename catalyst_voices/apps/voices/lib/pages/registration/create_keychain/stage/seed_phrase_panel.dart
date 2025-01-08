@@ -91,6 +91,7 @@ class _SeedPhraseWords extends StatelessWidget {
           SeedPhrasesViewer(words: words),
           const SizedBox(height: 10),
           VoicesTextButton(
+            key: const Key('DownloadSeedPhraseButton'),
             onTap: () => unawaited(_downloadSeedPhrase(context)),
             child: Text(context.l10n.createKeychainSeedPhraseDownload),
           ),
@@ -130,6 +131,7 @@ class _StoredCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesCheckbox(
+      key: const Key('SeedPhraseStoredCheckbox'),
       value: isConfirmed,
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
       onChanged: (value) {

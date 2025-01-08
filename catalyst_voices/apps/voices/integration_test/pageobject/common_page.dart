@@ -1,5 +1,3 @@
-library dashboard_page;
-
 import 'package:flutter/material.dart';
 
 class CommonPage {
