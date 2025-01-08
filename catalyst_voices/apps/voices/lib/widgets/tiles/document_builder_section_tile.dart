@@ -40,7 +40,6 @@ class _DocumentBuilderSectionTileState
   final _pendingChanges = <DocumentChange>[];
 
   bool _isEditMode = false;
-  bool _isValid = false;
 
   @override
   void initState() {
@@ -48,7 +47,6 @@ class _DocumentBuilderSectionTileState
 
     _editedSection = widget.section;
     _builder = _editedSection.toBuilder();
-    _isValid = _editedSection.validate().isValid;
   }
 
   @override
@@ -58,7 +56,6 @@ class _DocumentBuilderSectionTileState
     if (oldWidget.section != widget.section) {
       _editedSection = widget.section;
       _builder = _editedSection.toBuilder();
-      _isValid = _editedSection.validate().isValid;
       _pendingChanges.clear();
     }
   }
@@ -91,7 +88,7 @@ class _DocumentBuilderSectionTileState
             if (_isEditMode) ...[
               const SizedBox(height: 12),
               _Footer(
-                isValid: _isValid,
+                isValid: _editedSection.isValid,
                 onSave: _saveChanges,
               ),
             ],
@@ -122,7 +119,6 @@ class _DocumentBuilderSectionTileState
     setState(() {
       _builder.addChange(change);
       _editedSection = _builder.build();
-      _isValid = _editedSection.validate().isValid;
       _pendingChanges.add(change);
     });
   }

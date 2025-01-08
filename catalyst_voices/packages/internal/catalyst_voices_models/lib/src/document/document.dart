@@ -72,15 +72,15 @@ final class DocumentSection extends Equatable {
     required this.properties,
   });
 
-  /// Returns the first failed validation result
-  /// or [SuccessfulDocumentValidation] if all are valid.
-  DocumentValidationResult validate() {
+  /// Returns `false` if any of the section [properties] is invalid,
+  /// `true` otherwise.
+  bool get isValid {
     for (final property in properties) {
       final result = property.validationResult;
-      if (result.isInvalid) return result;
+      if (result.isInvalid) return false;
     }
 
-    return const SuccessfulDocumentValidation();
+    return true;
   }
 
   /// Creates a new [DocumentSectionBuilder] from this section.
