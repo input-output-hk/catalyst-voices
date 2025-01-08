@@ -343,10 +343,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         return textStyle;
       }),
 
-      suffixIcon: _wrapIconIfExists(
-        widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
-        const EdgeInsetsDirectional.only(start: 4, end: 8),
-      ),
+      suffixIcon:
+          _wrapIconIfAdditionalExists(widget.decoration?.additionalSuffixIcons),
       suffixText: widget.decoration?.suffixText,
       counterText: widget.decoration?.counterText,
       counterStyle: widget.enabled
@@ -403,6 +401,22 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         return Icon(Icons.warning_outlined, color: color);
       case VoicesTextFieldStatus.error:
         return Icon(Icons.error_outline, color: color);
+    }
+  }
+
+  Widget? _wrapIconIfAdditionalExists(Widget? child) {
+    final suffixIcon = _wrapIconIfExists(
+      widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+      const EdgeInsetsDirectional.only(start: 4, end: 8),
+    );
+    if (child == null) {
+      return suffixIcon;
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [child, suffixIcon ?? const SizedBox.shrink()],
+      );
     }
   }
 
@@ -676,6 +690,8 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.fillColor].
   final Color? fillColor;
 
+  final Widget? additionalSuffixIcons;
+
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -695,6 +711,7 @@ class VoicesTextFieldDecoration {
     this.prefixIcon,
     this.prefixText,
     this.suffixIcon,
+    this.additionalSuffixIcons,
     this.suffixText,
     this.counterText,
     this.showStatusSuffixIcon = true,

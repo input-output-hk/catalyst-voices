@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -223,7 +224,6 @@ class _PropertyBuilder extends StatelessWidget {
           'by $DocumentBuilderSectionTile',
         );
       case SingleLineTextEntryDefinition():
-      case SingleLineHttpsURLEntryDefinition():
       case MultiLineTextEntryDefinition():
       case MultiLineTextEntryMarkdownDefinition():
       case DropDownSingleSelectDefinition():
@@ -233,6 +233,18 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
+      case TagGroupDefinition():
+      case TagSelectionDefinition():
+      case DurationInMonthsDefinition():
+      case YesNoChoiceDefinition():
+      case SPDXLicenceOrUrlDefinition():
+      case LanguageCodeDefinition():
+        throw UnimplementedError();
+      case SingleLineHttpsURLEntryDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleLineHttpsUrlWidget(
+          description: castProperty.schema.description ?? '',
+        );
       case SingleGroupedTagSelectorDefinition():
         final value = property.value;
 
@@ -248,13 +260,6 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
           isRequired: property.schema.isRequired,
         );
-      case TagGroupDefinition():
-      case TagSelectionDefinition():
-      case DurationInMonthsDefinition():
-      case YesNoChoiceDefinition():
-      case SPDXLicenceOrUrlDefinition():
-      case LanguageCodeDefinition():
-        throw UnimplementedError();
       case AgreementConfirmationDefinition():
         return AgreementConfirmationWidget(
           value: definition.castProperty(property).value,
