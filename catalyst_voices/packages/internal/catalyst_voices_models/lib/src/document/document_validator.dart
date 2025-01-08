@@ -30,9 +30,9 @@ final class DocumentValidator {
 
     final schema = property.schema;
     final value = property.value;
-    final strRange = schema.strRange;
+    final strRange = schema.strLengthRange;
 
-    if (strRange != null && value is String) {
+    if (strRange != null && value != null) {
       if (!strRange.contains(value.length)) {
         return DocumentStringOutOfRange(
           invalidNodeId: schema.nodeId,
@@ -55,7 +55,7 @@ final class DocumentValidator {
     final value = property.value;
     final numRange = schema.numRange;
 
-    if (numRange != null && value is num) {
+    if (numRange != null && value != null) {
       if (!numRange.contains(value)) {
         return DocumentNumOutOfRange(
           invalidNodeId: schema.nodeId,
@@ -80,7 +80,7 @@ final class DocumentValidator {
     final value = property.value;
     final itemsRange = schema.itemsRange;
 
-    if (itemsRange != null && value is List) {
+    if (itemsRange != null && value != null) {
       if (!itemsRange.contains(value.length)) {
         return DocumentItemsOutOfRange(
           invalidNodeId: schema.nodeId,

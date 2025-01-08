@@ -70,7 +70,7 @@ final class DocumentSchemaPropertyDto {
       guidance: guidance,
       enumValues: enumValues,
       numRange: Range.optionalIntRangeOf(min: minimum, max: maximum),
-      strRange: Range.optionalIntRangeOf(min: minLength, max: maxLength),
+      strLengthRange: Range.optionalIntRangeOf(min: minLength, max: maxLength),
       itemsRange: Range.optionalIntRangeOf(min: minItems, max: maxItems),
       oneOf: oneOf?.map((e) => e.toModel(definitions)).toList(),
       isRequired: isRequired,

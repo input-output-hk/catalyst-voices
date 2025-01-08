@@ -29,7 +29,7 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
   ///
   /// Use the [BuildContext] to get the [VoicesLocalizations]
   /// or any other context dependent formatting utilities.
-  String message(BuildContext context);
+  String? message(BuildContext context);
 }
 
 final class LocalizedSuccessfulDocumentValidation
@@ -37,9 +37,9 @@ final class LocalizedSuccessfulDocumentValidation
   const LocalizedSuccessfulDocumentValidation();
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // it's valid, no need to specify the message
-    return '';
+    return null;
   }
 
   @override
@@ -51,7 +51,7 @@ final class LocalizedMissingRequiredDocumentValue
   const LocalizedMissingRequiredDocumentValue();
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // TODO(dtscalac): define the text
     return 'LocalizedMissingRequiredDocumentValue';
   }
@@ -65,7 +65,7 @@ final class LocalizedDocumentNumOutOfRange
   const LocalizedDocumentNumOutOfRange();
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // TODO(dtscalac): define the text
     return 'LocalizedDocumentNumOutOfRange';
   }
@@ -79,7 +79,7 @@ final class LocalizedDocumentStringOutOfRange
   const LocalizedDocumentStringOutOfRange();
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // TODO(dtscalac): define the text
     return 'LocalizedDocumentStringOutOfRange';
   }
@@ -93,7 +93,7 @@ final class LocalizedDocumentItemsOutOfRange
   const LocalizedDocumentItemsOutOfRange();
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // TODO(dtscalac): define the text
     return 'LocalizedDocumentItemsOutOfRange';
   }
