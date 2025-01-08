@@ -115,5 +115,5 @@ final class DocumentProperty<T extends Object> extends Equatable {
   }
 
   @override
-  List<Object?> get props => [schema, value];
+  List<Object?> get props => [schema, value, validationResult];
 }
