@@ -58,7 +58,7 @@ impl Api {
             if lookup.is_all(headers).is_err() {
                 return response::AllRegistration::unprocessable_content(vec![
                     poem::Error::from_string(
-                        "Invalid Stake Address or Voter Keyz",
+                        "Invalid Stake Address or Voter key",
                         StatusCode::UNPROCESSABLE_ENTITY,
                     ),
                 ]);
