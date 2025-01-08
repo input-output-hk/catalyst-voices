@@ -7,7 +7,7 @@ use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddres
 use super::{
     cardano::{self},
     filter::{get_all, get_registration_given_stake_key_hash, get_registration_given_vote_key},
-    response, NoneOrRBAC, SlotNo,
+    response, SlotNo,
 };
 use crate::{
     db::index::session::CassandraSession,
@@ -21,8 +21,7 @@ use crate::{
 pub(crate) async fn cip36_registrations(
     lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
-    _limit: common::types::generic::query::pagination::Limit, _auth: NoneOrRBAC,
-    _headers: &HeaderMap,
+    _limit: common::types::generic::query::pagination::Limit, _headers: &HeaderMap,
 ) -> response::AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
@@ -67,20 +66,7 @@ pub(crate) async fn cip36_registrations(
                 )
                 .await;
             },
-            StakeAddressOrPublicKey::All => {
-                match asat {
-                    Some(slot_no) => return get_all(session, &slot_no).await,
-                    None => {
-                        return response::AllRegistration::unprocessable_content(vec![
-                            poem::Error::from_string(
-                                "Must include the Slot in which Registrations are valid until."
-                                    .to_string(),
-                                StatusCode::UNPROCESSABLE_ENTITY,
-                            ),
-                        ])
-                    },
-                };
-            },
+            StakeAddressOrPublicKey::All => return get_all(session, asat).await,
         };
     };
 

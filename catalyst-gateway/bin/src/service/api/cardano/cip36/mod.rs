@@ -7,7 +7,6 @@ use self::cardano::slot_no::SlotNo;
 use super::Ed25519HexEncodedPublicKey;
 use crate::service::common::{
     self,
-    auth::none_or_rbac::NoneOrRBAC,
     tags::ApiTags,
     types::cardano::{self},
 };
@@ -48,8 +47,6 @@ impl Api {
         asat: Query<Option<cardano::query::AsAt>>,
         page: Query<Option<common::types::generic::query::pagination::Page>>,
         limit: Query<Option<common::types::generic::query::pagination::Limit>>,
-        /// No Authorization required, but Token permitted.
-        auth: NoneOrRBAC,
         /// Headers, used if the query is requesting ALL to determine if the secret API
         /// Key is also defined.
         headers: &HeaderMap,
@@ -73,7 +70,6 @@ impl Api {
             SlotNo::into_option(asat.0),
             page.0.unwrap_or_default(),
             limit.0.unwrap_or_default(),
-            auth,
             headers,
         )
         .await

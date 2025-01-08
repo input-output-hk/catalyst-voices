@@ -174,8 +174,12 @@ pub async fn get_registration_from_stake_addr(
 
     // include any erroneous registrations which occur AFTER the slot# of the last valid
     // registration
-    let invalids_report = match get_invalid_registrations(stake_pub_key, slot_no.clone(), session)
-        .await
+    let invalids_report = match get_invalid_registrations(
+        stake_pub_key,
+        Some(slot_no.clone()),
+        session,
+    )
+    .await
     {
         Ok(invalids) => invalids,
         Err(err) => {
@@ -209,9 +213,12 @@ pub async fn get_registration_from_stake_addr(
 async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
-        stake_address: stake_pub_key.try_into()?,
-    })
+    let mut registrations_iter = GetRegistrationQuery::execute(
+        session,
+        GetRegistrationParams {
+            stake_address: stake_pub_key.try_into()?,
+        },
+    )
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
@@ -266,8 +273,17 @@ fn get_registration_given_slot_no(
 
 /// Get invalid registrations for stake addr after given slot no
 async fn get_invalid_registrations(
-    stake_pub_key: Ed25519HexEncodedPublicKey, slot_no: SlotNo, session: Arc<CassandraSession>,
+    stake_pub_key: Ed25519HexEncodedPublicKey, slot_no: Option<SlotNo>,
+    session: Arc<CassandraSession>,
 ) -> anyhow::Result<Vec<Cip36Details>> {
+    // include any erroneous registrations which occur AFTER the slot# of the last valid
+    // registration or return all invalids if no slot# declared.
+    let slot_no = if let Some(slot_no) = slot_no {
+        slot_no
+    } else {
+        SlotNo::from(0)
+    };
+
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
         &session,
         GetInvalidRegistrationParams::new(stake_pub_key.try_into()?, slot_no.clone()),
@@ -393,7 +409,7 @@ fn cross_reference_key(
 }
 
 /// Get all registrations with given page contraints
-pub async fn get_all(session: Arc<CassandraSession>, slot_no: &SlotNo) -> AllRegistration {
+pub async fn get_all(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
     let stake_addrs = match get_all_stake_addrs(&session.clone()).await {
         Ok(stake_addrs) => stake_addrs,
         Err(err) => {
@@ -433,20 +449,29 @@ pub async fn get_all(session: Arc<CassandraSession>, slot_no: &SlotNo) -> AllReg
             vote_pub_key,
         );
 
-        // Any registrations that occurred after this Slot are not included in the list.
-        let filtered_registrations = slot_filter(registrations_for_given_stake_pub_key, slot_no);
+        if let Some(ref slot_no) = slot_no {
+            // Any registrations that occurred after this Slot are not included in the list.
+            let filtered_registrations =
+                slot_filter(registrations_for_given_stake_pub_key, slot_no);
 
-        if filtered_registrations.is_empty() {
-            continue;
+            if filtered_registrations.is_empty() {
+                continue;
+            }
+
+            all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
+                vote_pub_key: vote_pub_key.clone(),
+                registrations: filtered_registrations,
+            });
+        } else {
+            // no slot filtering, return ALL registrations without constraints.
+            all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
+                vote_pub_key: vote_pub_key.clone(),
+                registrations: registrations_for_given_stake_pub_key,
+            });
         }
 
-        all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
-            vote_pub_key: vote_pub_key.clone(),
-            registrations: filtered_registrations,
-        });
-
         // include any erroneous registrations which occur AFTER the slot# of the last valid
-        // registration
+        // registration or return all if no slot# declared.
         let invalids_report = match get_invalid_registrations(
             stake_public_key.clone(),
             slot_no.clone(),
@@ -473,7 +498,7 @@ pub async fn get_all(session: Arc<CassandraSession>, slot_no: &SlotNo) -> AllReg
 
     AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
-            slot: slot_no.clone(),
+            slot: slot_no.unwrap_or(SlotNo::from(0)),
             voting_key: all_registrations_after_filtering,
             invalid: all_invalids_after_filtering.into_iter().flatten().collect(),
             page: None,
