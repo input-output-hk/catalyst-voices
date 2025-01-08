@@ -20,7 +20,9 @@ use super::{
 };
 use crate::db::index::{
     queries::registrations::{
-        get_all_with_limit::{GetAllWithLimitsParams, GetAllWithLimitsQuery},
+        get_all_stakes_and_vote_keys::{
+            GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
+        },
         get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
         get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
         get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
@@ -508,7 +510,7 @@ pub async fn get_all_stake_addrs(
     session: &Arc<CassandraSession>,
 ) -> Result<Vec<(Ed25519HexEncodedPublicKey, Ed25519HexEncodedPublicKey)>, anyhow::Error> {
     let mut stake_addr_iter =
-        GetAllWithLimitsQuery::execute(session, GetAllWithLimitsParams {}).await?;
+        GetAllStakesAndVoteKeysQuery::execute(session, GetAllStakesAndVoteKeysParams {}).await?;
     let mut vote_key_stake_addr_pair = Vec::new();
     while let Some(row) = stake_addr_iter.next().await {
         let row = row?;
