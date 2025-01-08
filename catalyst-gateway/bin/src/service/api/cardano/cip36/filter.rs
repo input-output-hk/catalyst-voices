@@ -4,7 +4,6 @@ use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
 use poem::http::StatusCode;
-use poem_openapi::types::Type;
 use tracing::error;
 
 use super::{
@@ -437,7 +436,7 @@ pub async fn get_all(session: Arc<CassandraSession>, slot_no: &SlotNo) -> AllReg
         // Any registrations that occurred after this Slot are not included in the list.
         let filtered_registrations = slot_filter(registrations_for_given_stake_pub_key, slot_no);
 
-        if filtered_registrations.len().is_empty() {
+        if filtered_registrations.is_empty() {
             continue;
         }
 
