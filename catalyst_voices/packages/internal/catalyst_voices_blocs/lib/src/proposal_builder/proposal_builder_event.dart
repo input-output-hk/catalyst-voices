@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 sealed class ProposalBuilderEvent extends Equatable {
@@ -18,7 +17,7 @@ final class LoadProposalEvent extends ProposalBuilderEvent {
 }
 
 final class UpdateStepAnswerEvent extends ProposalBuilderEvent {
-  final SectionStepId id;
+  final NodeId id;
   final MarkdownData? data;
 
   const UpdateStepAnswerEvent({
@@ -31,7 +30,7 @@ final class UpdateStepAnswerEvent extends ProposalBuilderEvent {
 }
 
 final class ActiveStepChangedEvent extends ProposalBuilderEvent {
-  final SectionStepId? id;
+  final NodeId? id;
 
   const ActiveStepChangedEvent(this.id);
 
