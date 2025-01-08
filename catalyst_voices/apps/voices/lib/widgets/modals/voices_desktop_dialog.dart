@@ -153,7 +153,6 @@ class _CloseButtonPosition extends StatelessWidget {
     );
 
     return Align(
-      key: const Key('DialogCloseButton'),
       alignment: alignment,
       child: IconButtonTheme(
         data: const IconButtonThemeData(style: buttonStyle),
@@ -169,6 +168,7 @@ class _CloseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return XButton(
+      key: const Key('DialogCloseButton'),
       onTap: () {
         unawaited(Navigator.of(context).maybePop());
       },
