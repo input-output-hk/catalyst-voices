@@ -1186,6 +1186,49 @@
     "description": "General text. May be used in context of A4000 and $5000"
   },
   "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
+  "@errorValidationTokenNotParsed": {
+    "description": "A validation error when user enters input which cannot be parsed into token value."
+  },
+  "errorValidationMissingRequiredField": "Please fill this field.",
+  "@errorValidationMissingRequiredField": {
+    "description": "A validation error for a missing required form field."
+  },
+  "errorValidationNumFieldOutOfRange": "The value should be between {min} and {max}",
+  "@errorValidationNumFieldOutOfRange": {
+    "description": "The numerical value is out of allowed range between min and max (both inclusive)",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringFieldOutOfRange": "The text should be between {min} and {max} characters.",
+  "@errorValidationStringFieldOutOfRange": {
+    "description": "The user entered text is out of allowed range between min and max (both inclusive) characters",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationListItemsOutOfRange": "There should be between {min} and {max} items.",
+  "@errorValidationListItemsOutOfRange": {
+    "description": "The number of items in a list/array is out of allowed range between min and max (both inclusive)",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "noTagSelected": "No Tag Selected",
   "@noTagSelected": {
     "description": "For example in context of document builder"

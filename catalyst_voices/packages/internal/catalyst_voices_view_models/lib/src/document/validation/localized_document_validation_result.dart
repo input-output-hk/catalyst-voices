@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -18,9 +18,12 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
         const LocalizedSuccessfulDocumentValidation(),
       MissingRequiredDocumentValue() =>
         const LocalizedMissingRequiredDocumentValue(),
-      DocumentNumOutOfRange() => const LocalizedDocumentNumOutOfRange(),
-      DocumentStringOutOfRange() => const LocalizedDocumentStringOutOfRange(),
-      DocumentItemsOutOfRange() => const LocalizedDocumentItemsOutOfRange(),
+      DocumentNumOutOfRange() =>
+        LocalizedDocumentNumOutOfRange(range: result.expectedRange),
+      DocumentStringOutOfRange() =>
+        LocalizedDocumentStringOutOfRange(range: result.expectedRange),
+      DocumentItemsOutOfRange() =>
+        LocalizedDocumentItemsOutOfRange(range: result.expectedRange),
     };
   }
 
@@ -52,8 +55,7 @@ final class LocalizedMissingRequiredDocumentValue
 
   @override
   String message(BuildContext context) {
-    // TODO(dtscalac): define the text
-    return 'LocalizedMissingRequiredDocumentValue';
+    return context.l10n.errorValidationMissingRequiredField;
   }
 
   @override
@@ -62,42 +64,50 @@ final class LocalizedMissingRequiredDocumentValue
 
 final class LocalizedDocumentNumOutOfRange
     extends LocalizedDocumentValidationResult {
-  const LocalizedDocumentNumOutOfRange();
+  final Range<int> range;
+
+  const LocalizedDocumentNumOutOfRange({required this.range});
 
   @override
   String message(BuildContext context) {
-    // TODO(dtscalac): define the text
-    return 'LocalizedDocumentNumOutOfRange';
+    // TODO: if min or max not limited
+    return context.l10n.errorValidationNumFieldOutOfRange(range.min, range.max);
   }
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [range];
 }
 
 final class LocalizedDocumentStringOutOfRange
     extends LocalizedDocumentValidationResult {
-  const LocalizedDocumentStringOutOfRange();
+  final Range<int> range;
+
+  const LocalizedDocumentStringOutOfRange({required this.range});
 
   @override
   String message(BuildContext context) {
-    // TODO(dtscalac): define the text
-    return 'LocalizedDocumentStringOutOfRange';
+    // TODO: if min or max not limited
+    return context.l10n
+        .errorValidationStringFieldOutOfRange(range.min, range.max);
   }
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [range];
 }
 
 final class LocalizedDocumentItemsOutOfRange
     extends LocalizedDocumentValidationResult {
-  const LocalizedDocumentItemsOutOfRange();
+  final Range<int> range;
+
+  const LocalizedDocumentItemsOutOfRange({required this.range});
 
   @override
   String message(BuildContext context) {
-    // TODO(dtscalac): define the text
-    return 'LocalizedDocumentItemsOutOfRange';
+    // TODO: if min or max not limited
+    return context.l10n
+        .errorValidationListItemsOutOfRange(range.min, range.max);
   }
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [range];
 }
