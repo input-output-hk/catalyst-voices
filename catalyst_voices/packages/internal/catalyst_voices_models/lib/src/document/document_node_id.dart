@@ -13,7 +13,7 @@ final class DocumentNodeId extends NodeId {
   const DocumentNodeId._(super.value);
 
   /// The nested paths in a document that lead to an object.
-  List<String> get paths => value.split('.');
+  List<String> get paths => value.isNotEmpty ? value.split('.') : const [];
 
   /// Utility constructor which ensure that value always has correct format.
   DocumentNodeId._fromPaths(List<String> paths) : this._(paths.join('.'));

@@ -5,6 +5,17 @@ void main() {
   group(DocumentNodeId, () {
     const paths = ['setup', 'title', 'title'];
 
+    test('root node id has empty paths', () {
+      // Given
+      const id = DocumentNodeId.root;
+
+      // When
+      final paths = id.paths;
+
+      // Then
+      expect(paths, isEmpty);
+    });
+
     test('paths getter returns expected values', () {
       // Given
 
@@ -15,7 +26,7 @@ void main() {
       );
 
       // Then
-      expect(nodeId.paths.skip(1), paths);
+      expect(nodeId.paths, paths);
     });
 
     test('two nodes from same paths equals', () {
