@@ -21,9 +21,13 @@ pub(crate) enum Responses {
     #[oai(status = 204)]
     NoContent,
     /// Error Response
+    ///
+    /// The document submitted is invalid.
     #[oai(status = 400)]
     BadRequest(Json<PutDocumentBadRequest>),
     /// Payload Too Large
+    ///
+    /// The document exceeds the maximum size of a legitimate single document.
     #[oai(status = 413)]
     PayloadTooLarge,
 }
