@@ -475,7 +475,7 @@ pub async fn get_all(session: Arc<CassandraSession>, slot_no: &SlotNo) -> AllReg
         Cip36RegistrationList {
             slot: slot_no.clone(),
             voting_key: all_registrations_after_filtering,
-            invalid: vec![],
+            invalid: all_invalids_after_filtering.into_iter().flatten().collect(),
             page: None,
         },
     )))

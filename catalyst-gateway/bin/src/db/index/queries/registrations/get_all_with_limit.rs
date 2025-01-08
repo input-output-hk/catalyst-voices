@@ -14,7 +14,7 @@ use crate::db::index::{
 };
 
 /// Get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)]
-const GET_ALL_WITH_LIMIT: &str = include_str!("../cql/get_all_stake_addrs.cql");
+const GET_ALL_WITH_STAKES_AND_VOTE_KEYS: &str = include_str!("../cql/get_all_stake_addrs.cql");
 
 /// Get registration
 #[derive(SerializeRow)]
@@ -34,7 +34,7 @@ impl GetAllWithLimitsQuery {
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         let get_registrations_query = PreparedQueries::prepare(
             session,
-            GET_ALL_WITH_LIMIT,
+            GET_ALL_WITH_STAKES_AND_VOTE_KEYS,
             scylla::statement::Consistency::All,
             true,
         )
