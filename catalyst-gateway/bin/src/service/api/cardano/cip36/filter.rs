@@ -215,9 +215,12 @@ pub async fn get_registration_from_stake_addr(
 async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
-        stake_address: stake_pub_key.try_into()?,
-    })
+    let mut registrations_iter = GetRegistrationQuery::execute(
+        session,
+        GetRegistrationParams {
+            stake_address: stake_pub_key.try_into()?,
+        },
+    )
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
@@ -276,7 +279,7 @@ async fn get_invalid_registrations(
     session: Arc<CassandraSession>,
 ) -> anyhow::Result<Vec<Cip36Details>> {
     // include any erroneous registrations which occur AFTER the slot# of the last valid
-    // registration or return all invalids if no slot# declared.
+    // registration or return all invalids if NO slot# declared.
     let slot_no = if let Some(slot_no) = slot_no {
         slot_no
     } else {
@@ -470,7 +473,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         }
 
         // include any erroneous registrations which occur AFTER the slot# of the last valid
-        // registration or return all if no slot# declared.
+        // registration or return all if NO slot# declared.
         let invalids_report = match get_invalid_registrations(
             stake_public_key.clone(),
             slot_no.clone(),
