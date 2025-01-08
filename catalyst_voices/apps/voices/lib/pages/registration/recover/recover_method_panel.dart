@@ -67,6 +67,7 @@ class RecoverMethodPanel extends StatelessWidget {
         ),
         const Spacer(),
         VoicesBackButton(
+          key: const Key('BackButton'),
           onTap: () => RegistrationCubit.of(context).previousStep(),
         ),
       ],

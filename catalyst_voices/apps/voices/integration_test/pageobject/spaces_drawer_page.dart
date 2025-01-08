@@ -1,5 +1,3 @@
-library spaces_drawer_page;
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
