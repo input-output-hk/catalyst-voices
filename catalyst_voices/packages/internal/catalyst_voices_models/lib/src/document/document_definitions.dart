@@ -1,6 +1,7 @@
 library catalysts_voices_models;
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -133,6 +134,42 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
   static bool isKnownType(String refPath) {
     final ref = refPath.split('/').last;
     return refPathToDefinitionType[ref] != null;
+  }
+
+  /// Creates an instance of [DocumentSchemaProperty]
+  /// of the same type [T] as this definition has.
+  ///
+  /// This is needed when processing schemas
+  /// in bulk and when the type T is not known.
+  DocumentSchemaProperty<T> createSchema({
+    required DocumentNodeId nodeId,
+    required String id,
+    required String? title,
+    required String? description,
+    required T? defaultValue,
+    required String? guidance,
+    required List<String>? enumValues,
+    required Range<int>? numRange,
+    required Range<int>? strLengthRange,
+    required Range<int>? itemsRange,
+    required List<DocumentSchemaLogicalGroup>? oneOf,
+    required bool isRequired,
+  }) {
+    return DocumentSchemaProperty(
+      definition: this,
+      nodeId: nodeId,
+      id: id,
+      title: title,
+      description: description,
+      defaultValue: defaultValue,
+      guidance: guidance,
+      enumValues: enumValues,
+      numRange: numRange,
+      strLengthRange: strLengthRange,
+      itemsRange: itemsRange,
+      oneOf: oneOf,
+      isRequired: isRequired,
+    );
   }
 
   /// Casts a dynamic value from external JSON to type [T].

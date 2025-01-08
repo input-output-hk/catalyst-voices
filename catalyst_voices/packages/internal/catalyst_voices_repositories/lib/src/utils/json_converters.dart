@@ -47,6 +47,21 @@ final class ListStringConverter
   List<dynamic>? toJson(List<String>? object) => object;
 }
 
+final class ListOfJsonConverter
+    implements JsonConverter<List<Map<String, dynamic>>?, List<dynamic>?> {
+  const ListOfJsonConverter();
+
+  @override
+  List<Map<String, dynamic>>? fromJson(List<dynamic>? json) {
+    if (json == null) return null;
+
+    return json.cast();
+  }
+
+  @override
+  List<dynamic>? toJson(List<Map<String, dynamic>>? object) => object;
+}
+
 /// A converter that only casts json to a target type.
 ///
 /// Can be used for simple types like [String], [int], etc,

@@ -163,7 +163,7 @@ final class DocumentSectionDto {
 }
 
 final class DocumentPropertyDto<T extends Object> {
-  final DocumentSchemaProperty schema;
+  final DocumentSchemaProperty<T> schema;
   final T? value;
 
   const DocumentPropertyDto({
@@ -175,7 +175,7 @@ final class DocumentPropertyDto<T extends Object> {
     DocumentSchemaProperty<T> schema, {
     required DocumentPropertiesDto properties,
   }) {
-    return DocumentPropertyDto(
+    return DocumentPropertyDto<T>(
       schema: schema,
       value: schema.definition.converter
           .fromJson(properties.getProperty(schema.nodeId)),
@@ -183,14 +183,14 @@ final class DocumentPropertyDto<T extends Object> {
   }
 
   factory DocumentPropertyDto.fromModel(DocumentProperty<T> model) {
-    return DocumentPropertyDto(
+    return DocumentPropertyDto<T>(
       schema: model.schema,
       value: model.value,
     );
   }
 
-  DocumentProperty toModel() {
-    return DocumentProperty(
+  DocumentProperty<T> toModel() {
+    return DocumentProperty<T>(
       schema: schema,
       value: value,
       validationResult: schema.validatePropertyValue(value),
