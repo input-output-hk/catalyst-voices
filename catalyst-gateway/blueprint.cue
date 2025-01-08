@@ -25,7 +25,7 @@ project: {
 
 					containerPort: 3030
 					strategy:      "Recreate"
-          ingressHost: "gateway.dev.project-catalyst.io"
+					ingressHost:   "gateway.dev.project-catalyst.io"
 
 					persistentVolumeClaims: [
 						{
@@ -137,11 +137,11 @@ project: {
 					resources: {
 						requests: {
 							cpu:    "1"
-							memory: "16Gi"
+							memory: "8Gi"
 						}
 						limits: {
 							cpu:    "8"
-							memory: "20Gi"
+							memory: "12Gi"
 						}
 					}
 
