@@ -1,4 +1,4 @@
-//! Get all stake and vote keys (stake_pub_key,vote_key) for snapshot
+//! Get all stake and vote keys (`stake_pub_key,vote_key`) for snapshot
 
 use std::sync::Arc;
 
