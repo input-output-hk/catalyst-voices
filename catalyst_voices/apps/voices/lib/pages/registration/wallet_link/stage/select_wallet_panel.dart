@@ -53,6 +53,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         ),
         const SizedBox(height: 24),
         VoicesBackButton(
+          key: const Key('BackButton'),
           onTap: () {
             RegistrationCubit.of(context).previousStep();
           },
