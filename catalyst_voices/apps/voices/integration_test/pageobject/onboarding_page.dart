@@ -58,7 +58,9 @@ class OnboardingPage {
   }
 
   static Future<String?> inputSeedPhrasePickerWord(
-      PatrolTester $, int index,) async {
+    PatrolTester $,
+    int index,
+  ) async {
     final seedWord = await getChildNodeText(
       $,
       $(Key('PickerSeedPhrase${index + 1}CellKey')),
