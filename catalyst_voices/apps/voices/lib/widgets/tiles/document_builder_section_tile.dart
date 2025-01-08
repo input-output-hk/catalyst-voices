@@ -1,8 +1,7 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -38,7 +37,6 @@ class _DocumentBuilderSectionTileState
     extends State<DocumentBuilderSectionTile> {
   late DocumentSection _editedSection;
   late DocumentSectionBuilder _builder;
-
   final _pendingChanges = <DocumentChange>[];
 
   bool _isEditMode = false;
@@ -234,6 +232,13 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
+      case TagGroupDefinition():
+      case TagSelectionDefinition():
+      case DurationInMonthsDefinition():
+      case YesNoChoiceDefinition():
+      case SPDXLicenceOrUrlDefinition():
+      case LanguageCodeDefinition():
+        throw UnimplementedError();
       case SingleGroupedTagSelectorDefinition():
         final value = property.value;
 
@@ -249,23 +254,17 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
           isRequired: property.schema.isRequired,
         );
-      case TagGroupDefinition():
-      case TagSelectionDefinition():
-      case DurationInMonthsDefinition():
-      case YesNoChoiceDefinition():
-      case SPDXLicenceOrUrlDefinition():
-      case LanguageCodeDefinition():
-        throw UnimplementedError();
-        case DropDownSingleSelectDefinition():
+      case DropDownSingleSelectDefinition():
+        final castProperty = definition.castProperty(property);
         return SingleDropdownSelectionWidget(
-          value: definition.castProperty(property).value,
-          defaultValue:
-              definition.castValue(property.schema.defaultValue) ?? '',
-          items: property.schema.enumValues ?? [],
+          value: castProperty.value,
+          defaultValue: castProperty.schema.defaultValue ?? '',
+          items: castProperty.schema.enumValues ?? [],
           definition: definition,
-          nodeId: property.schema.nodeId,
-          title: property.schema.title ?? '',
+          nodeId: castProperty.schema.nodeId,
+          title: castProperty.schema.title ?? '',
           isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
           onChanged: onChanged,
         );
       case AgreementConfirmationDefinition():
