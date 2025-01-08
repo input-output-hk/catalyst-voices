@@ -1205,8 +1205,8 @@
       }
     }
   },
-  "errorValidationStringFieldBelowMin": "The text should be at least {min} {min, plural, =0{characters} =1{character} other{characters}}.",
-  "@errorValidationStringFieldBelowMin": {
+  "errorValidationStringLengthBelowMin": "The text should be at least {min} {min, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthBelowMin": {
     "description": "The user entered text is shorter than min length",
     "placeholders": {
       "min": {
@@ -1214,8 +1214,8 @@
       }
     }
   },
-  "errorValidationStringFieldOverMax": "The text should be no longer than {max} {max, plural, =0{characters} =1{character} other{characters}}.",
-  "@errorValidationStringFieldOverMax": {
+  "errorValidationStringLengthAboveMax": "The text should be no longer than {max} {max, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthAboveMax": {
     "description": "The user entered text is longer than max length",
     "placeholders": {
       "max": {
@@ -1223,8 +1223,8 @@
       }
     }
   },
-  "errorValidationStringFieldOutOfRange": "The text should be between {min} and {max} {max, plural, =0{characters} =1{character} other{characters}}.",
-  "@errorValidationStringFieldOutOfRange": {
+  "errorValidationStringLengthOutOfRange": "The text should be between {min} and {max} {max, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthOutOfRange": {
     "description": "The user entered text is out of allowed range between min and max (both inclusive) characters",
     "placeholders": {
       "min": {

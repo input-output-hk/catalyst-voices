@@ -91,14 +91,14 @@ final class LocalizedDocumentStringOutOfRange
     final max = range.max;
 
     if (min != null && max != null) {
-      return context.l10n.errorValidationStringFieldOutOfRange(min, max);
+      return context.l10n.errorValidationStringLengthOutOfRange(min, max);
     } else if (min != null) {
-      return context.l10n.errorValidationStringFieldBelowMin(min);
+      return context.l10n.errorValidationStringLengthBelowMin(min);
     } else if (max != null) {
-      return context.l10n.errorValidationStringFieldOverMax(max);
+      return context.l10n.errorValidationStringLengthAboveMax(max);
     } else {
       // the range is unconstrained, so any value is allowed
-      return '';
+      return null;
     }
   }
 
