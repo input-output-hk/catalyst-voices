@@ -7,10 +7,12 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_de
 /// Encodable as json but to decode with [DocumentDto.fromJsonSchema]
 /// a [DocumentSchema] is needed which explains how to interpret the data.
 final class DocumentDto {
+  final String schemaUrl;
   final DocumentSchema schema;
   final List<DocumentSegmentDto> segments;
 
   const DocumentDto({
+    required this.schemaUrl,
     required this.schema,
     required this.segments,
   });
@@ -22,6 +24,7 @@ final class DocumentDto {
     final properties = DocumentPropertiesDto.fromJson(json);
 
     return DocumentDto(
+      schemaUrl: json[r'$schema'] as String,
       schema: schema,
       segments: schema.segments
           .map(
@@ -36,6 +39,7 @@ final class DocumentDto {
 
   factory DocumentDto.fromModel(Document model) {
     return DocumentDto(
+      schemaUrl: model.schemaUrl,
       schema: model.schema,
       segments: model.segments.map(DocumentSegmentDto.fromModel).toList(),
     );
@@ -44,6 +48,7 @@ final class DocumentDto {
   Document toModel() {
     // building a document via builder to sort segments/sections/properties
     return DocumentBuilder(
+      schemaUrl: schemaUrl,
       schema: schema,
       segments: segments
           .map((e) => DocumentSegmentBuilder.fromSegment(e.toModel()))
@@ -53,7 +58,7 @@ final class DocumentDto {
 
   Map<String, dynamic> toJson() {
     return {
-      r'$schema': schema,
+      r'$schema': schemaUrl,
       for (final segment in segments) ...segment.toJson(),
     };
   }
@@ -158,7 +163,7 @@ final class DocumentSectionDto {
 }
 
 final class DocumentPropertyDto<T extends Object> {
-  final DocumentSchemaProperty schema;
+  final DocumentSchemaProperty<T> schema;
   final T? value;
 
   const DocumentPropertyDto({
@@ -170,7 +175,7 @@ final class DocumentPropertyDto<T extends Object> {
     DocumentSchemaProperty<T> schema, {
     required DocumentPropertiesDto properties,
   }) {
-    return DocumentPropertyDto(
+    return DocumentPropertyDto<T>(
       schema: schema,
       value: schema.definition.converter
           .fromJson(properties.getProperty(schema.nodeId)),
@@ -178,16 +183,17 @@ final class DocumentPropertyDto<T extends Object> {
   }
 
   factory DocumentPropertyDto.fromModel(DocumentProperty<T> model) {
-    return DocumentPropertyDto(
+    return DocumentPropertyDto<T>(
       schema: model.schema,
       value: model.value,
     );
   }
 
-  DocumentProperty toModel() {
-    return DocumentProperty(
+  DocumentProperty<T> toModel() {
+    return DocumentProperty<T>(
       schema: schema,
       value: value,
+      validationResult: schema.validatePropertyValue(value),
     );
   }
 
