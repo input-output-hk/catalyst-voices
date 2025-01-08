@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/src/document/document_builder.dart';
 import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/document_validator.dart';
+import 'package:catalyst_voices_models/src/optional.dart';
 import 'package:equatable/equatable.dart';
 
 // TODO(dtscalac): tests
@@ -115,6 +116,17 @@ final class DocumentProperty<T extends Object> extends Equatable {
   /// Creates a new [DocumentPropertyBuilder] from this property.
   DocumentPropertyBuilder toBuilder() {
     return DocumentPropertyBuilder.fromProperty(this);
+  }
+
+  /// A copy of the property with updated fields.
+  DocumentProperty<T> copyWith({
+    DocumentSchemaProperty<T>? schema,
+    Optional<T>? value,
+  }) {
+    return DocumentProperty(
+      schema: schema ?? this.schema,
+      value: value.dataOr(this.value),
+    );
   }
 
   @override
