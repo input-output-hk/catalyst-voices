@@ -52,7 +52,7 @@ impl TryFrom<&str> for StakeAddressOrPublicKey {
     fn try_from(value: &str) -> std::result::Result<Self, Self::Error> {
         /// Regex to parse the parameter
         #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.  Can never panic in prod.
-        static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+        static _RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
 
         // First check it is the special "ALL" parameter.
         if value == "ALL" {
@@ -105,16 +105,14 @@ const FORMAT: &str = concatcp!(
 );
 
 /// Schema.
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
-    MetaSchema {
-        title: Some(TITLE.to_owned()),
-        description: Some(DESCRIPTION),
-        example: Some(Value::String(EXAMPLE.to_string())),
-        max_length: Some(*MAX_LENGTH),
-        min_length: Some(*MIN_LENGTH),
-        pattern: Some(PATTERN.to_string()),
-        ..poem_openapi::registry::MetaSchema::ANY
-    }
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
+    title: Some(TITLE.to_owned()),
+    description: Some(DESCRIPTION),
+    example: Some(Value::String(EXAMPLE.to_string())),
+    max_length: Some(*MAX_LENGTH),
+    min_length: Some(*MIN_LENGTH),
+    pattern: Some(PATTERN.to_string()),
+    ..poem_openapi::registry::MetaSchema::ANY
 });
 
 /// Either a Stake Address or a ED25519 Public key.
