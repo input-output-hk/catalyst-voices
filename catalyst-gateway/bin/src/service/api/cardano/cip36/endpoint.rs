@@ -6,7 +6,7 @@ use tracing::error;
 use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
 use super::{
     cardano::{self},
-    filter::{get_all, get_registration_given_stake_key_hash, get_registration_given_vote_key},
+    filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key, snapshot},
     response, SlotNo,
 };
 use crate::{
@@ -66,7 +66,13 @@ pub(crate) async fn cip36_registrations(
                 )
                 .await;
             },
-            StakeAddressOrPublicKey::All => return get_all(session, asat).await,
+            StakeAddressOrPublicKey::All =>
+            // Snapshot replacement, returns all registrations or returns a subset of registrations
+            // constrained by slot no if given.
+            // Any registrations that occurred after this Slot are not included in the list.
+            {
+                return snapshot(session, asat).await
+            },
         };
     };
 
