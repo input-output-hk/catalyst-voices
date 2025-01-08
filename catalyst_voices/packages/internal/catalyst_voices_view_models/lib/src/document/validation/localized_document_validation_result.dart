@@ -124,9 +124,19 @@ final class LocalizedDocumentItemsOutOfRange
 
   @override
   String? message(BuildContext context) {
-    // TODO: if min or max not limited
-    return context.l10n
-        .errorValidationListItemsOutOfRange(range.min ?? 0, range.max ?? 0);
+    final min = range.min;
+    final max = range.max;
+
+    if (min != null && max != null) {
+      return context.l10n.errorValidationListItemsOutOfRange(min, max);
+    } else if (min != null) {
+      return context.l10n.errorValidationListItemsBelowMin(min);
+    } else if (max != null) {
+      return context.l10n.errorValidationListItemsAboveMax(max);
+    } else {
+      // the range is unconstrained, so any value is allowed
+      return null;
+    }
   }
 
   @override
