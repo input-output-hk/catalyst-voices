@@ -97,7 +97,7 @@ pub(crate) enum PreparedSelectQuery {
     RegistrationsByChainRoot,
     /// Get chain root by role0 key
     ChainRootByRole0Key,
-    /// Get all stake and vote keys for snapshot
+    /// Get all stake and vote keys for snapshot (stake_pub_key,vote_key)
     GetAllStakesAndVoteKeys,
 }
 
@@ -301,7 +301,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_upsert<P>(
         &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
     ) -> anyhow::Result<()>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match upsert_query {
             PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
         };
@@ -321,7 +323,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
