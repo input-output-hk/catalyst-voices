@@ -6,6 +6,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+const _padding = 12.0;
+
 class AccountPopup extends StatelessWidget {
   final String avatarLetter;
   final VoidCallback? onProfileKeychainTap;
@@ -38,6 +40,7 @@ class AccountPopup extends StatelessWidget {
             padding: EdgeInsets.zero,
             enabled: false,
             value: null,
+            key: const Key('PopUpMenuAccountHeader'),
             child: _Header(
               accountLetter: avatarLetter,
               walletName: 'Wallet name',
@@ -52,6 +55,7 @@ class AccountPopup extends StatelessWidget {
             ),
           ),
           const PopupMenuItem(
+            key: Key('PopUpMenuMyAccount'),
             height: 48,
             padding: EdgeInsets.zero,
             enabled: false,
@@ -61,6 +65,7 @@ class AccountPopup extends StatelessWidget {
           PopupMenuItem(
             padding: EdgeInsets.zero,
             value: _MenuItemValue.profileAndKeychain,
+            key: const Key('PopUpMenuProfileAndKeychain'),
             child: _MenuItem(
               'Profile & Keychain',
               VoicesAssets.icons.userCircle,
@@ -69,6 +74,7 @@ class AccountPopup extends StatelessWidget {
           PopupMenuItem(
             padding: EdgeInsets.zero,
             value: _MenuItemValue.lock,
+            key: const Key('PopUpMenuLockAccount'),
             child: _MenuItem(
               'Lock account',
               VoicesAssets.icons.lockClosed,
@@ -221,6 +227,11 @@ class _MenuItem extends StatelessWidget {
   }
 }
 
+enum _MenuItemValue {
+  profileAndKeychain,
+  lock,
+}
+
 class _Section extends StatelessWidget {
   final String text;
 
@@ -250,11 +261,4 @@ class _Section extends StatelessWidget {
       ],
     );
   }
-}
-
-const _padding = 12.0;
-
-enum _MenuItemValue {
-  profileAndKeychain,
-  lock,
 }

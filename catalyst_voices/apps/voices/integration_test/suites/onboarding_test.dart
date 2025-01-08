@@ -6,9 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
-import 'pageobject/app_bar_page.dart';
-import 'pageobject/onboarding_page.dart';
-import 'pageobject/overall_spaces_page.dart';
+import '../pageobject/app_bar_page.dart';
+import '../pageobject/onboarding_page.dart';
+import '../pageobject/overall_spaces_page.dart';
 
 void main() async {
   late final GoRouter router;

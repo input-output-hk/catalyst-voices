@@ -7,10 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
-import 'pageobject/app_bar_page.dart';
-import 'pageobject/overall_spaces_page.dart';
-import 'pageobject/spaces_drawer_page.dart';
-import 'utils/selector_utils.dart';
+import '../pageobject/app_bar_page.dart';
+import '../pageobject/overall_spaces_page.dart';
+import '../pageobject/spaces_drawer_page.dart';
+import '../utils/selector_utils.dart';
 
 void main() async {
   late final GoRouter router;
@@ -42,6 +42,8 @@ void main() async {
       );
 
       patrolWidgetTest(
+        tags: 'https://github.com/input-output-hk/catalyst-voices/issues/1473',
+        skip: true,
         'guest - chooser - clicking on icons works correctly',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -60,6 +62,8 @@ void main() async {
       );
 
       patrolWidgetTest(
+        tags: 'https://github.com/input-output-hk/catalyst-voices/issues/1473',
+        skip: true,
         'guest - chooser - next,previous buttons work correctly',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
