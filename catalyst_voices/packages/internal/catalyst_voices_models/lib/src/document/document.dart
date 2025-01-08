@@ -72,13 +72,11 @@ final class DocumentSection extends Equatable {
     required this.properties,
   });
 
-  /// Validates whether the section [properties] are valid against the [schema].
-  ///
   /// Returns the first failed validation result
   /// or [SuccessfulDocumentValidation] if all are valid.
   DocumentValidationResult validate() {
     for (final property in properties) {
-      final result = property.validate();
+      final result = property.validationResult;
       if (result.isInvalid) return result;
     }
 
@@ -101,16 +99,15 @@ final class DocumentProperty<T extends Object> extends Equatable {
   /// The current value this property holds.
   final T? value;
 
+  /// The validation result for the [value] against the [schema].
+  final DocumentValidationResult validationResult;
+
   /// The default constructor for the [DocumentProperty].
   const DocumentProperty({
     required this.schema,
     required this.value,
+    required this.validationResult,
   });
-
-  /// Validates whether the property [value] is valid against the [schema].
-  DocumentValidationResult validate() {
-    return schema.definition.validateProperty(this);
-  }
 
   /// Creates a new [DocumentPropertyBuilder] from this property.
   DocumentPropertyBuilder toBuilder() {

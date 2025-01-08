@@ -163,11 +163,6 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
     return property as DocumentProperty<T>;
   }
 
-  /// Validates the [property] against document rules.
-  DocumentValidationResult validateProperty(DocumentProperty<T> property) {
-    return validatePropertyValue(property.schema, property.value);
-  }
-
   /// Validates the property [value] against document rules.
   DocumentValidationResult validatePropertyValue(
     DocumentSchemaProperty<T> schema,

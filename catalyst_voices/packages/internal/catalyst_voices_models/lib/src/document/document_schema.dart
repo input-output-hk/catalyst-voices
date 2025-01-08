@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/document/document_validator.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -169,6 +170,11 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     this.oneOf,
     this.isRequired = false,
   });
+
+  /// Validates the property [value] against document rules.
+  DocumentValidationResult validatePropertyValue(T? value) {
+    return definition.validatePropertyValue(this, value);
+  }
 
   @override
   List<Object?> get props => [

@@ -255,6 +255,7 @@ final class DocumentPropertyBuilder<T extends Object> implements DocumentNode {
     return DocumentProperty(
       schema: _schema,
       value: _value,
+      validationResult: _schema.validatePropertyValue(_value),
     );
   }
 }
