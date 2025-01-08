@@ -11,7 +11,7 @@ package-schemathesis:
     ARG openapi_spec
     # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG seed
-    ENTRYPOINT st run --endpoint '^/api/v1/health' $openapi_spec \
+    ENTRYPOINT st run --endpoint '^/api/v1/health' --checks=all $openapi_spec \
                     --workers=2 \
                     --wait-for-schema=120 \
                     --max-response-time=5000 \
