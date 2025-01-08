@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/text_field/voices_num_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -8,6 +9,7 @@ class TokenField extends StatelessWidget {
   final VoicesIntFieldController? controller;
   final ValueChanged<int?>? onFieldSubmitted;
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
+  final VoicesNumFieldValidator<int>? validator;
   final String? labelText;
   final String? errorText;
   final FocusNode? focusNode;
@@ -22,6 +24,7 @@ class TokenField extends StatelessWidget {
     this.controller,
     required this.onFieldSubmitted,
     this.onStatusChanged,
+    this.validator,
     this.labelText,
     this.errorText,
     this.focusNode,
@@ -74,9 +77,9 @@ class TokenField extends StatelessWidget {
       return VoicesTextFieldValidationResult.error(message);
     }
 
-    if (value != null && !(range?.contains(value) ?? true)) {
-      // Do not append any text
-      return const VoicesTextFieldValidationResult.error();
+    final validator = this.validator;
+    if (validator != null) {
+      return validator(value, text);
     }
 
     return const VoicesTextFieldValidationResult.none();
@@ -94,6 +97,8 @@ class _Helper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(damian-molinski): Range can accept null as min/max
+    // meaning they are unconstrained, handle it
     // TODO(damian-molinski): Refactor text formatting with smarter syntax
     return Text.rich(
       TextSpan(

@@ -1,29 +1,22 @@
 import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
+import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DocumentTokenValueWidget extends StatefulWidget {
-  final DocumentNodeId id;
-  final String label;
-  final int? value;
+  final DocumentProperty<int> property;
   final Currency currency;
-  final Range<int>? range;
   final bool isEditMode;
-  final bool isRequired;
   final ValueChanged<DocumentChange> onChanged;
 
   const DocumentTokenValueWidget({
     super.key,
-    required this.id,
-    required this.label,
-    this.value,
+    required this.property,
     required this.currency,
-    this.range,
     this.isEditMode = false,
-    this.isRequired = true,
     required this.onChanged,
   });
 
@@ -41,7 +34,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   void initState() {
     super.initState();
 
-    _controller = VoicesIntFieldController(widget.value);
+    _controller = VoicesIntFieldController(widget.property.value);
     _controller.addListener(_handleControllerChange);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
@@ -50,8 +43,8 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   void didUpdateWidget(covariant DocumentTokenValueWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.value != oldWidget.value) {
-      _controller.value = widget.value;
+    if (widget.property.value != oldWidget.property.value) {
+      _controller.value = widget.property.value;
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -68,12 +61,16 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final schema = widget.property.schema;
+    final label = schema.title ?? '';
+
     return TokenField(
       controller: _controller,
       focusNode: _focusNode,
       onFieldSubmitted: _notifyChangeListener,
-      labelText: widget.label.starred(isEnabled: widget.isRequired),
-      range: widget.range,
+      validator: _validate,
+      labelText: label.starred(isEnabled: schema.isRequired),
+      range: schema.numRange,
       currency: widget.currency,
       showHelper: widget.isEditMode,
       readOnly: !widget.isEditMode,
@@ -97,7 +94,22 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   void _notifyChangeListener(int? value) {
-    final change = DocumentChange(nodeId: widget.id, value: value);
+    final change = DocumentChange(
+      nodeId: widget.property.schema.nodeId,
+      value: value,
+    );
+
     widget.onChanged(change);
+  }
+
+  VoicesTextFieldValidationResult _validate(int? value, String text) {
+    final schema = widget.property.schema;
+    final result = schema.validatePropertyValue(value);
+    if (result.isValid) {
+      return const VoicesTextFieldValidationResult.none();
+    } else {
+      final localized = LocalizedDocumentValidationResult.from(result);
+      return VoicesTextFieldValidationResult.error(localized.message(context));
+    }
   }
 }
