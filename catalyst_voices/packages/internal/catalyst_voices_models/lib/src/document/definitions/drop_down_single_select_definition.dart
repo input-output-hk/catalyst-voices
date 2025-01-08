@@ -15,8 +15,11 @@ final class DropDownSingleSelectDefinition
   });
 
   @override
-  DocumentValidationResult validateProperty(DocumentProperty<String> property) {
-    return DocumentValidator.validateString(property);
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<String> schema,
+    String? value,
+  ) {
+    return DocumentValidator.validateString(schema, value);
   }
 
   @override

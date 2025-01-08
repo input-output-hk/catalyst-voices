@@ -20,7 +20,10 @@ final class SectionDefinition extends BaseDocumentDefinition {
   }
 
   @override
-  DocumentValidationResult validateProperty(DocumentProperty<Object> property) {
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<Object> schema,
+    Object? value,
+  ) {
     throw UnsupportedError('Section cannot have a property');
   }
 

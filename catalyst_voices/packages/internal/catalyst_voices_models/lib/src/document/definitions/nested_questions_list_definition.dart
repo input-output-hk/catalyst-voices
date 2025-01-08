@@ -16,10 +16,11 @@ final class NestedQuestionsListDefinition
   });
 
   @override
-  DocumentValidationResult validateProperty(
-    DocumentProperty<List<Map<String, dynamic>>> property,
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<List<Map<String, dynamic>>> schema,
+    List<Map<String, dynamic>>? value,
   ) {
-    return DocumentValidator.validateList(property);
+    return DocumentValidator.validateList(schema, value);
   }
 
   @override

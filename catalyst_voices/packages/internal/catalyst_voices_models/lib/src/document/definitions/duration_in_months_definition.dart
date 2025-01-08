@@ -10,8 +10,11 @@ final class DurationInMonthsDefinition extends BaseDocumentDefinition<int> {
   });
 
   @override
-  DocumentValidationResult validateProperty(DocumentProperty<int> property) {
-    return DocumentValidator.validateNum(property);
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<int> schema,
+    int? value,
+  ) {
+    return DocumentValidator.validateNum(schema, value);
   }
 
   @override
