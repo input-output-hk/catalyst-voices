@@ -1193,6 +1193,24 @@
   "@errorValidationMissingRequiredField": {
     "description": "A validation error for a missing required form field."
   },
+  "errorValidationNumFieldBelowMin": "The value should be at least {min}.",
+  "@errorValidationNumFieldBelowMin": {
+    "description": "The user entered numerical value is smaller than min",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationNumFieldAboveMax": "The value should be no bigger than {max}.",
+  "@errorValidationNumFieldAboveMax": {
+    "description": "The user entered numerical value is bigger than max",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "errorValidationNumFieldOutOfRange": "The value should be between {min} and {max}",
   "@errorValidationNumFieldOutOfRange": {
     "description": "The numerical value is out of allowed range between min and max (both inclusive)",
