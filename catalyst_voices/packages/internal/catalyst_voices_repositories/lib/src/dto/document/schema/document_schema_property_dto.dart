@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_converter_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_logical_property_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -60,13 +61,13 @@ final class DocumentSchemaPropertyDto {
     required DocumentNodeId parentNodeId,
     required bool isRequired,
   }) {
-    return DocumentSchemaProperty(
-      definition: definitions.getDefinition(ref),
+    final definition = definitions.getDefinition(ref);
+    return definition.createSchema(
       nodeId: parentNodeId.child(id),
       id: id,
       title: title,
       description: description,
-      defaultValue: defaultValue,
+      defaultValue: definition.converter.fromJson(defaultValue),
       guidance: guidance,
       enumValues: enumValues,
       numRange: Range.optionalIntRangeOf(min: minimum, max: maximum),
