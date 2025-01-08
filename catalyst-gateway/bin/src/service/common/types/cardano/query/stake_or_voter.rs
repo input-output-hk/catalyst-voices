@@ -105,14 +105,16 @@ const FORMAT: &str = concatcp!(
 );
 
 /// Schema.
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
-    title: Some(TITLE.to_owned()),
-    description: Some(DESCRIPTION),
-    example: Some(Value::String(EXAMPLE.to_string())),
-    max_length: Some(*MAX_LENGTH),
-    min_length: Some(*MIN_LENGTH),
-    pattern: Some(PATTERN.to_string()),
-    ..poem_openapi::registry::MetaSchema::ANY
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
+    MetaSchema {
+        title: Some(TITLE.to_owned()),
+        description: Some(DESCRIPTION),
+        example: Some(Value::String(EXAMPLE.to_string())),
+        max_length: Some(*MAX_LENGTH),
+        min_length: Some(*MIN_LENGTH),
+        pattern: Some(PATTERN.to_string()),
+        ..poem_openapi::registry::MetaSchema::ANY
+    }
 });
 
 /// Either a Stake Address or a ED25519 Public key.
