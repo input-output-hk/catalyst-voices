@@ -449,9 +449,8 @@ final class NestedQuestionsDefinition
       ];
 }
 
-// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
 final class SingleGroupedTagSelectorDefinition
-    extends BaseDocumentDefinition<Map<String, dynamic>> {
+    extends BaseDocumentDefinition<GroupedTagsSelection> {
   final DocumentDefinitionsFormat format;
   final bool additionalProperties;
 
