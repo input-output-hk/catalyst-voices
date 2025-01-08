@@ -14,10 +14,11 @@ final class NestedQuestionsDefinition
   });
 
   @override
-  DocumentValidationResult validateProperty(
-    DocumentProperty<List<String>> property,
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<List<String>> schema,
+    List<String>? value,
   ) {
-    return DocumentValidator.validateList(property);
+    return DocumentValidator.validateList(schema, value);
   }
 
   @override

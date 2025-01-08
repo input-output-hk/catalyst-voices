@@ -13,10 +13,11 @@ final class MultiSelectDefinition
   });
 
   @override
-  DocumentValidationResult validateProperty(
-    DocumentProperty<List<dynamic>> property,
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<List<dynamic>> schema,
+    List<dynamic>? value,
   ) {
-    return DocumentValidator.validateList(property);
+    return DocumentValidator.validateList(schema, value);
   }
 
   @override

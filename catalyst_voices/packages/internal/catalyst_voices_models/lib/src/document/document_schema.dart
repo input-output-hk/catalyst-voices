@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/document/document_validator.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -126,7 +127,7 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
   final Range<int>? numRange;
 
   /// Minimum-maximum (both inclusive) length of a string.
-  final Range<int>? strRange;
+  final Range<int>? strLengthRange;
 
   /// Minimum-maximum (both inclusive) count of items.
   final Range<int>? itemsRange;
@@ -147,7 +148,7 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     required this.guidance,
     required this.enumValues,
     required this.numRange,
-    required this.strRange,
+    required this.strLengthRange,
     required this.itemsRange,
     required this.oneOf,
     required this.isRequired,
@@ -164,11 +165,16 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     this.guidance,
     this.enumValues,
     this.numRange,
-    this.strRange,
+    this.strLengthRange,
     this.itemsRange,
     this.oneOf,
     this.isRequired = false,
   });
+
+  /// Validates the property [value] against document rules.
+  DocumentValidationResult validatePropertyValue(T? value) {
+    return definition.validatePropertyValue(this, value);
+  }
 
   @override
   List<Object?> get props => [
@@ -181,7 +187,7 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
         guidance,
         enumValues,
         numRange,
-        strRange,
+        strLengthRange,
         itemsRange,
         oneOf,
         isRequired,

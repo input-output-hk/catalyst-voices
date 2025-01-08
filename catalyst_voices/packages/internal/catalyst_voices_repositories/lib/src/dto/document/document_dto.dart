@@ -193,6 +193,7 @@ final class DocumentPropertyDto<T extends Object> {
     return DocumentProperty(
       schema: schema,
       value: value,
+      validationResult: schema.validatePropertyValue(value),
     );
   }
 

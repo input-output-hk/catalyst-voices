@@ -1,19 +1,20 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 /// Validates [DocumentProperty].
 final class DocumentValidator {
-  /// Validates the [property] against all common rules that
+  /// Validates the property [value] against all common rules that
   /// apply to all properties.
   ///
   /// There are no specific checks for different types like [String] or [int].
   static DocumentValidationResult validateBasic(
-    DocumentProperty<Object> property,
+    DocumentSchemaProperty<Object> schema,
+    Object? value,
   ) {
-    final schema = property.schema;
-    if (schema.isRequired && property.value == null) {
+    if (schema.isRequired && value == null) {
       return MissingRequiredDocumentValue(invalidNodeId: schema.nodeId);
     }
 
@@ -21,17 +22,15 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateString(
-    DocumentProperty<String> property,
+    DocumentSchemaProperty<String> schema,
+    String? value,
   ) {
-    final result = validateBasic(property);
+    final result = validateBasic(schema, value);
     if (result.isInvalid) {
       return result;
     }
 
-    final schema = property.schema;
-    final value = property.value;
-    final strRange = schema.strRange;
-
+    final strRange = schema.strLengthRange;
     if (strRange != null && value != null) {
       if (!strRange.contains(value.length)) {
         return DocumentStringOutOfRange(
@@ -45,16 +44,16 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateNum(DocumentProperty<num> property) {
-    final result = validateBasic(property);
+  static DocumentValidationResult validateNum(
+    DocumentSchemaProperty<num> schema,
+    num? value,
+  ) {
+    final result = validateBasic(schema, value);
     if (result.isInvalid) {
       return result;
     }
 
-    final schema = property.schema;
-    final value = property.value;
     final numRange = schema.numRange;
-
     if (numRange != null && value != null) {
       if (!numRange.contains(value)) {
         return DocumentNumOutOfRange(
@@ -69,17 +68,15 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateList(
-    DocumentProperty<List<dynamic>> property,
+    DocumentSchemaProperty<List<dynamic>> schema,
+    List<dynamic>? value,
   ) {
-    final result = validateBasic(property);
+    final result = validateBasic(schema, value);
     if (result.isInvalid) {
       return result;
     }
 
-    final schema = property.schema;
-    final value = property.value;
     final itemsRange = schema.itemsRange;
-
     if (itemsRange != null && value != null) {
       if (!itemsRange.contains(value.length)) {
         return DocumentItemsOutOfRange(
@@ -94,9 +91,11 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateBool(
-    DocumentProperty<bool> property,
+    DocumentSchemaProperty<bool> schema,
+    // ignore: avoid_positional_boolean_parameters
+    bool? value,
   ) {
-    return validateBasic(property);
+    return validateBasic(schema, value);
   }
 }
 

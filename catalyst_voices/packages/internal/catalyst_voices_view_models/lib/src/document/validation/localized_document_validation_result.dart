@@ -32,7 +32,7 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
   ///
   /// Use the [BuildContext] to get the [VoicesLocalizations]
   /// or any other context dependent formatting utilities.
-  String message(BuildContext context);
+  String? message(BuildContext context);
 }
 
 final class LocalizedSuccessfulDocumentValidation
@@ -40,9 +40,9 @@ final class LocalizedSuccessfulDocumentValidation
   const LocalizedSuccessfulDocumentValidation();
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // it's valid, no need to specify the message
-    return '';
+    return null;
   }
 
   @override
@@ -54,7 +54,7 @@ final class LocalizedMissingRequiredDocumentValue
   const LocalizedMissingRequiredDocumentValue();
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     return context.l10n.errorValidationMissingRequiredField;
   }
 
@@ -69,7 +69,7 @@ final class LocalizedDocumentNumOutOfRange
   const LocalizedDocumentNumOutOfRange({required this.range});
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // TODO: if min or max not limited
     return context.l10n.errorValidationNumFieldOutOfRange(range.min, range.max);
   }
@@ -85,7 +85,7 @@ final class LocalizedDocumentStringOutOfRange
   const LocalizedDocumentStringOutOfRange({required this.range});
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // TODO: if min or max not limited
     return context.l10n
         .errorValidationStringFieldOutOfRange(range.min, range.max);
@@ -102,7 +102,7 @@ final class LocalizedDocumentItemsOutOfRange
   const LocalizedDocumentItemsOutOfRange({required this.range});
 
   @override
-  String message(BuildContext context) {
+  String? message(BuildContext context) {
     // TODO: if min or max not limited
     return context.l10n
         .errorValidationListItemsOutOfRange(range.min, range.max);

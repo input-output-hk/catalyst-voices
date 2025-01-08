@@ -22,15 +22,15 @@ final class SingleGroupedTagSelectorDefinition
         );
 
   @override
-  DocumentValidationResult validateProperty(
-    DocumentProperty<GroupedTagsSelection> property,
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<GroupedTagsSelection> schema,
+    GroupedTagsSelection? value,
   ) {
-    final result = DocumentValidator.validateBasic(property);
+    final result = DocumentValidator.validateBasic(schema, value);
     if (result.isInvalid) {
       return result;
     }
 
-    final value = property.value;
     if (value == null) {
       // whether the property is required or not is validated by the
       // validateBasic since it passed the validation the property
@@ -44,7 +44,7 @@ final class SingleGroupedTagSelectorDefinition
       return const SuccessfulDocumentValidation();
     } else {
       return MissingRequiredDocumentValue(
-        invalidNodeId: property.schema.nodeId,
+        invalidNodeId: schema.nodeId,
       );
     }
   }
