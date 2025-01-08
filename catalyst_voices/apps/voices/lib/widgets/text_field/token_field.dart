@@ -94,6 +94,8 @@ class _Helper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(damian-molinski): Range can accept null as min/max
+    // meaning they are unconstrained, handle it
     // TODO(damian-molinski): Refactor text formatting with smarter syntax
     return Text.rich(
       TextSpan(

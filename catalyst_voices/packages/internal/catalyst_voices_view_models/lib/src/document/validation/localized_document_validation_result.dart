@@ -71,7 +71,8 @@ final class LocalizedDocumentNumOutOfRange
   @override
   String? message(BuildContext context) {
     // TODO: if min or max not limited
-    return context.l10n.errorValidationNumFieldOutOfRange(range.min, range.max);
+    return context.l10n
+        .errorValidationNumFieldOutOfRange(range.min ?? 0, range.max ?? 0);
   }
 
   @override
@@ -86,9 +87,19 @@ final class LocalizedDocumentStringOutOfRange
 
   @override
   String? message(BuildContext context) {
-    // TODO: if min or max not limited
-    return context.l10n
-        .errorValidationStringFieldOutOfRange(range.min, range.max);
+    final min = range.min;
+    final max = range.max;
+
+    if (min != null && max != null) {
+      return context.l10n.errorValidationStringFieldOutOfRange(min, max);
+    } else if (min != null) {
+      return context.l10n.errorValidationStringFieldBelowMin(min);
+    } else if (max != null) {
+      return context.l10n.errorValidationStringFieldOverMax(max);
+    } else {
+      // the range is unconstrained, so any value is allowed
+      return '';
+    }
   }
 
   @override
@@ -105,7 +116,7 @@ final class LocalizedDocumentItemsOutOfRange
   String? message(BuildContext context) {
     // TODO: if min or max not limited
     return context.l10n
-        .errorValidationListItemsOutOfRange(range.min, range.max);
+        .errorValidationListItemsOutOfRange(range.min ?? 0, range.max ?? 0);
   }
 
   @override

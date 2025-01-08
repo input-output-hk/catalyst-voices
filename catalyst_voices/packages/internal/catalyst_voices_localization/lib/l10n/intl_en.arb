@@ -1205,7 +1205,25 @@
       }
     }
   },
-  "errorValidationStringFieldOutOfRange": "The text should be between {min} and {max} characters.",
+  "errorValidationStringFieldBelowMin": "The text should be at least {min} {min, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringFieldBelowMin": {
+    "description": "The user entered text is shorter than min length",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringFieldOverMax": "The text should be no longer than {max} {max, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringFieldOverMax": {
+    "description": "The user entered text is longer than max length",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringFieldOutOfRange": "The text should be between {min} and {max} {max, plural, =0{characters} =1{character} other{characters}}.",
   "@errorValidationStringFieldOutOfRange": {
     "description": "The user entered text is out of allowed range between min and max (both inclusive) characters",
     "placeholders": {
