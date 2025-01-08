@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../types/registration_state.dart';
+import '../utils/selector_utils.dart';
 import '../utils/translations_utils.dart';
 import 'common_page.dart';
 
@@ -21,6 +22,43 @@ class OnboardingPage {
   static const backButton = Key('BackButton');
   static const nextButton = Key('NextButton');
   static const progressBar = Key('ProgressBar');
+  static const downloadSeedPhraseButton = Key('DownloadSeedPhraseButton');
+  static const seedPhraseStoredCheckbox = Key('SeedPhraseStoredCheckbox');
+  static const uploadKeyButton = Key('UploadKeyButton');
+  static const resetButton = Key('ResetButton');
+
+  static Future<int> writedownSeedPhraseNumber(
+      PatrolTester $, int index,) async {
+    final rawNumber = $(Key('SeedPhrase${index}CellKey'))
+        .$(const Key('SeedPhraseNumber'))
+        .text;
+    return int.parse(rawNumber!.split('.').first);
+  }
+
+  static Future<int> writedownSeedPhraseWord(
+      PatrolTester $, int index,) async {
+    final rawNumber = $(Key('SeedPhrase${index}CellKey'))
+        .$(const Key('SeedPhraseWord'))
+        .text;
+    return int.parse(rawNumber!.split('.').first);
+  }
+
+  static Future<String> inputSeedPhraseCompleterWord(
+      PatrolTester $, int index,) async {
+    final seedWord = await getChildNodeText(
+      $,
+      $(Key('CompleterSeedPhrase${index}CellKey')).$(CommonPage.decoratorData),
+    );
+    return seedWord!;
+  }
+
+  static Future<String?> inputSeedPhrasePickerWord(PatrolTester $, int index) async {
+    final seedWord = await getChildNodeText(
+      $,
+      $(Key('PickerSeedPhrase${index+1}CellKey')),
+    );
+    return seedWord!;
+  }
 
   static Future<String?> infoPartHeaderTitleText(PatrolTester $) async {
     return $(registrationInfoPanel).$(headerTitle).text;
@@ -40,9 +78,12 @@ class OnboardingPage {
         .waitUntilVisible();
   }
 
-  static Future<String?> infoPartLearnMoreButtonText(PatrolTester $) async {
+  static Future<String?> getChildNodeText(
+    PatrolTester $,
+    FinderBase<Element> parent,
+  ) async {
     final child = find.descendant(
-      of: $(registrationInfoPanel).$(CommonPage.decoratorData),
+      of: parent,
       matching: find.byType(Text),
     );
     return $(child).text;
@@ -56,20 +97,26 @@ class OnboardingPage {
     return child;
   }
 
-  static String? detailsPartGetStartedTitle(PatrolTester $) {
+  static void voicesFilledButtonIsEnabled(
+    PatrolTester $,
+    Key button,
+  ) {
     final child = find.descendant(
-      of: $(registrationDetailsPanel).$(registrationDetailsTitle),
-      matching: find.byType(Text),
+      of: $(button),
+      matching: find.byType(FilledButton),
     );
-    return $(child).text;
+    SelectorUtils.isEnabled($, $(child));
   }
 
-  static String? detailsPartGetStartedTitleBody(PatrolTester $) {
+  static void voicesFilledButtonIsDisabled(
+    PatrolTester $,
+    Key button,
+  ) {
     final child = find.descendant(
-      of: $(registrationDetailsPanel).$(registrationDetailsBody),
-      matching: find.byType(Text),
+      of: $(button),
+      matching: find.byType(FilledButton),
     );
-    return $(child).text;
+    SelectorUtils.isDisabled($, $(child));
   }
 
   static String? detailsPartGetStartedQuestionText(PatrolTester $) {
@@ -115,15 +162,27 @@ class OnboardingPage {
     switch (step) {
       case RegistrationState.getStarted:
         expect(await infoPartHeaderTitleText($), T.get('Get Started'));
-        expect(await infoPartLearnMoreButtonText($), T.get('Learn More'));
         expect(infoPartTaskPicture($), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
         break;
       case RegistrationState.createKeychainInfo:
       case RegistrationState.keychainCreated:
         expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
-        expect(await infoPartLearnMoreButtonText($), T.get('Learn More'));
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
         break;
       case RegistrationState.keychainCreateMnemonicWritedown:
         expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
@@ -138,14 +197,49 @@ class OnboardingPage {
             'as well.',
           ),
         );
-        expect(await infoPartLearnMoreButtonText($), T.get('Learn More'));
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
         break;
       case RegistrationState.keychainCreateMnemonicInputInfo:
-        throw UnimplementedError();
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
       case RegistrationState.keychainCreateMnemonicInput:
-        throw UnimplementedError();
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(
+          await infoPartHeaderSubtitleText($),
+          T.get('Input your Catalyst security keys'),
+        );
+        expect(
+          await infoPartHeaderBodyText($),
+          T.get(
+            'Select your 12 written down words in  the correct order.',
+          ),
+        );
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
+        break;
       case RegistrationState.keychainCreateMnemonicVerified:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreChoice:
@@ -187,8 +281,20 @@ class OnboardingPage {
   ) async {
     switch (step) {
       case RegistrationState.getStarted:
-        expect(detailsPartGetStartedTitle($), T.get('Welcome to Catalyst'));
-        expect(detailsPartGetStartedTitleBody($), isNotEmpty);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsTitle),
+          ),
+          T.get('Welcome to Catalyst'),
+        );
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsBody),
+          ),
+          isNotEmpty,
+        );
         expect(
           detailsPartGetStartedQuestionText($),
           T.get('What do you want to do?'),
@@ -198,28 +304,87 @@ class OnboardingPage {
         break;
       case RegistrationState.createKeychainInfo:
         expect(
-          detailsPartGetStartedTitle($),
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsTitle),
+          ),
           T.get('Create your Catalyst Keychain'),
         );
-        expect(detailsPartGetStartedTitleBody($), isNotEmpty);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsBody),
+          ),
+          isNotEmpty,
+        );
         expect(await detailsPartCreateKeychainBtn($), findsOneWidget);
         expect($(backButton), findsOneWidget);
         break;
       case RegistrationState.keychainCreated:
         expect(
-          detailsPartGetStartedTitle($),
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsTitle),
+          ),
           T.get('Great! Your Catalyst Keychain  has been created.'),
         );
-        expect(detailsPartGetStartedTitleBody($), isNotEmpty);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsBody),
+          ),
+          isNotEmpty,
+        );
         expect($(backButton), findsOneWidget);
         expect($(nextButton), findsOneWidget);
         break;
       case RegistrationState.keychainCreateMnemonicWritedown:
-        throw UnimplementedError();
+        await writedownSeedPhrasesAreDisplayed($);
+        expect($(downloadSeedPhraseButton), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(downloadSeedPhraseButton).$(CommonPage.decoratorData),
+          ),
+          T.get('Download Catalyst key'),
+        );
+        expect($(seedPhraseStoredCheckbox), findsOneWidget);
+        expect(
+          await getChildNodeText($, $(seedPhraseStoredCheckbox)),
+          T.get('I have written down/downloaded my 12 words'),
+        );
+        expect($(backButton), findsOneWidget);
+        expect($(nextButton), findsOneWidget);
+        break;
       case RegistrationState.keychainCreateMnemonicInputInfo:
-        throw UnimplementedError();
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsTitle),
+          ),
+          T.get('Check your Catalyst security keys'),
+        );
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsBody),
+          ),
+          isNotEmpty,
+        );
+        break;
       case RegistrationState.keychainCreateMnemonicInput:
-        throw UnimplementedError();
+        await inputSeedPhrasesAreDisplayed($);
+        expect($(uploadKeyButton), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(uploadKeyButton).$(CommonPage.decoratorData),
+          ),
+          T.get('Upload Catalyst Key'),
+        );
+        expect($(backButton), findsOneWidget);
+        expect($(nextButton), findsOneWidget);
+        break;
       case RegistrationState.keychainCreateMnemonicVerified:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreChoice:
@@ -252,6 +417,20 @@ class OnboardingPage {
         throw UnimplementedError();
       case RegistrationState.accountCreationSuccess:
         throw UnimplementedError();
+    }
+  }
+
+  static Future<void> writedownSeedPhrasesAreDisplayed(PatrolTester $) async {
+    for (var i = 0; i < 12; i++) {
+      expect(await writedownSeedPhraseNumber($, i), i + 1);
+      expect(await writedownSeedPhraseWord($, i), isNotEmpty);
+    }
+  }
+
+  static Future<void> inputSeedPhrasesAreDisplayed(PatrolTester $) async {
+    for (var i = 0; i < 12; i++) {
+      expect(await inputSeedPhrasePickerWord($, i), isNotEmpty);
+      expect(await inputSeedPhraseCompleterWord($, i), isNotEmpty);
     }
   }
 }

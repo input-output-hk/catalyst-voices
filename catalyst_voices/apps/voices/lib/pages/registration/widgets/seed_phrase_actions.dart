@@ -17,12 +17,14 @@ class SeedPhraseActions extends StatelessWidget {
     return Row(
       children: [
         VoicesTextButton(
+          key: const Key('UploadKeyButton'),
           onTap: onUploadKeyTap,
           child: Text(context.l10n.uploadCatalystKey),
         ),
         const Spacer(),
         if (onResetTap != null)
           VoicesTextButton(
+            key: const Key('ResetButton'),
             onTap: onResetTap,
             child: Text(context.l10n.reset),
           ),
