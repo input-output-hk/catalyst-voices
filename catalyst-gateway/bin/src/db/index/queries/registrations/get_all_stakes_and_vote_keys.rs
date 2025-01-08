@@ -1,4 +1,4 @@
-//! Get stake addr registrations
+//! Get all stake and vote keys (stake_pub_key,vote_key) for snapshot
 
 use std::sync::Arc;
 
@@ -21,7 +21,7 @@ const GET_ALL_WITH_STAKES_AND_VOTE_KEYS: &str = include_str!("../cql/get_all_sta
 #[derive(SerializeRow)]
 pub(crate) struct GetAllStakesAndVoteKeysParams {}
 
-/// Get registration query.
+/// Get stakes and vote keys for snapshot.
 #[derive(DeserializeRow)]
 pub(crate) struct GetAllStakesAndVoteKeysQuery {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
