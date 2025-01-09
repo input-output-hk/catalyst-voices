@@ -523,8 +523,7 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36D
         .collect()
 }
 
-///  Get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)] from cip36
-/// registrations.
+/// Get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)] from cip36 registrations.
 pub async fn get_all_stake_addrs_and_vote_keys(
     session: &Arc<CassandraSession>,
 ) -> Result<Vec<(Ed25519HexEncodedPublicKey, Ed25519HexEncodedPublicKey)>, anyhow::Error> {
