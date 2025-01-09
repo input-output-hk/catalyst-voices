@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/document/document_validator.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
@@ -121,9 +122,20 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
   final T? defaultValue;
   final String? guidance;
   final List<String>? enumValues;
-  final Range<int>? range;
+
+  /// Minimum-maximum (both inclusive) numerical range.
+  final Range<int>? numRange;
+
+  /// Minimum-maximum (both inclusive) length of a string.
+  final Range<int>? strLengthRange;
+
+  /// Minimum-maximum (both inclusive) count of items.
   final Range<int>? itemsRange;
+
+  /// Allowed combination of values this property can take.
   final List<DocumentSchemaLogicalGroup>? oneOf;
+
+  /// Whether the property is required.
   final bool isRequired;
 
   const DocumentSchemaProperty({
@@ -135,7 +147,8 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     required this.defaultValue,
     required this.guidance,
     required this.enumValues,
-    required this.range,
+    required this.numRange,
+    required this.strLengthRange,
     required this.itemsRange,
     required this.oneOf,
     required this.isRequired,
@@ -151,11 +164,17 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
     this.defaultValue,
     this.guidance,
     this.enumValues,
-    this.range,
+    this.numRange,
+    this.strLengthRange,
     this.itemsRange,
     this.oneOf,
     this.isRequired = false,
   });
+
+  /// Validates the property [value] against document rules.
+  DocumentValidationResult validatePropertyValue(T? value) {
+    return definition.validatePropertyValue(this, value);
+  }
 
   @override
   List<Object?> get props => [
@@ -167,7 +186,8 @@ final class DocumentSchemaProperty<T extends Object> extends Equatable
         defaultValue,
         guidance,
         enumValues,
-        range,
+        numRange,
+        strLengthRange,
         itemsRange,
         oneOf,
         isRequired,

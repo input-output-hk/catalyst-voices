@@ -33,7 +33,7 @@ class SingleGroupedTagSelectorWidget extends StatefulWidget {
 
 class _SingleGroupedTagSelectorWidgetState
     extends State<SingleGroupedTagSelectorWidget> {
-  GroupedTagsSelection _selection = const GroupedTagsSelection();
+  late GroupedTagsSelection _selection;
 
   @override
   void initState() {

@@ -1,7 +1,33 @@
+library catalysts_voices_models;
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+
+part 'definitions/agreement_confirmation_definition.dart';
+part 'definitions/drop_down_single_select_definition.dart';
+part 'definitions/duration_in_months_definition.dart';
+part 'definitions/language_code_definition.dart';
+part 'definitions/multi_line_text_entry_definition.dart';
+part 'definitions/multi_line_text_entry_list_markdown_definition.dart';
+part 'definitions/multi_line_text_entry_markdown_definition.dart';
+part 'definitions/multi_select_definition.dart';
+part 'definitions/nested_questions_definition.dart';
+part 'definitions/nested_questions_list_definition.dart';
+part 'definitions/section_definition.dart';
+part 'definitions/segment_definition.dart';
+part 'definitions/single_grouped_tag_selector_definition.dart';
+part 'definitions/single_line_https_url_entry_definition.dart';
+part 'definitions/single_line_https_url_entry_list_definition.dart';
+part 'definitions/single_line_text_entry_definition.dart';
+part 'definitions/single_line_text_entry_list_definition.dart';
+part 'definitions/spdx_license_or_url_definition.dart';
+part 'definitions/tag_group_definition.dart';
+part 'definitions/tag_selection_definition.dart';
+part 'definitions/token_value_cardano_ada_definition.dart';
+part 'definitions/yes_no_choice_definition.dart';
 
 enum DocumentDefinitionsObjectType {
   string,
@@ -110,6 +136,42 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
     return refPathToDefinitionType[ref] != null;
   }
 
+  /// Creates an instance of [DocumentSchemaProperty]
+  /// of the same type [T] as this definition has.
+  ///
+  /// This is needed when processing schemas
+  /// in bulk and when the type T is not known.
+  DocumentSchemaProperty<T> createSchema({
+    required DocumentNodeId nodeId,
+    required String id,
+    required String? title,
+    required String? description,
+    required T? defaultValue,
+    required String? guidance,
+    required List<String>? enumValues,
+    required Range<int>? numRange,
+    required Range<int>? strLengthRange,
+    required Range<int>? itemsRange,
+    required List<DocumentSchemaLogicalGroup>? oneOf,
+    required bool isRequired,
+  }) {
+    return DocumentSchemaProperty(
+      definition: this,
+      nodeId: nodeId,
+      id: id,
+      title: title,
+      description: description,
+      defaultValue: defaultValue,
+      guidance: guidance,
+      enumValues: enumValues,
+      numRange: numRange,
+      strLengthRange: strLengthRange,
+      itemsRange: itemsRange,
+      oneOf: oneOf,
+      isRequired: isRequired,
+    );
+  }
+
   /// Casts a dynamic value from external JSON to type [T].
   ///
   /// Since JSON data types are dynamic, this method uses known
@@ -137,524 +199,12 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
     }
     return property as DocumentProperty<T>;
   }
-}
 
-final class SegmentDefinition extends BaseDocumentDefinition {
-  final bool additionalProperties;
-
-  const SegmentDefinition({
-    required super.type,
-    required super.note,
-    required this.additionalProperties,
-  });
-
-  @override
-  Object? castValue(Object? value) {
-    throw UnsupportedError('Segment cannot have a value');
-  }
-
-  @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    throw UnsupportedError('Segment cannot have a property');
-  }
-
-  @override
-  List<Object?> get props => [
-        type,
-        note,
-        additionalProperties,
-      ];
-}
-
-final class SectionDefinition extends BaseDocumentDefinition {
-  final bool additionalProperties;
-
-  const SectionDefinition({
-    required super.type,
-    required super.note,
-    required this.additionalProperties,
-  });
-
-  @override
-  Object? castValue(Object? value) {
-    throw UnsupportedError('Section cannot have a value');
-  }
-
-  @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
-    throw UnsupportedError('Section cannot have a property');
-  }
-
-  @override
-  List<Object?> get props => [
-        additionalProperties,
-        type,
-        note,
-      ];
-}
-
-final class SingleLineTextEntryDefinition
-    extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsContentMediaType contentMediaType;
-  final String pattern;
-
-  const SingleLineTextEntryDefinition({
-    required super.type,
-    required super.note,
-    required this.contentMediaType,
-    required this.pattern,
-  });
-
-  @override
-  List<Object?> get props => [
-        contentMediaType,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class SingleLineHttpsURLEntryDefinition
-    extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsFormat format;
-  final String pattern;
-
-  const SingleLineHttpsURLEntryDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.pattern,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class MultiLineTextEntryDefinition
-    extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsContentMediaType contentMediaType;
-  final String pattern;
-
-  const MultiLineTextEntryDefinition({
-    required super.type,
-    required super.note,
-    required this.contentMediaType,
-    required this.pattern,
-  });
-
-  @override
-  List<Object?> get props => [
-        contentMediaType,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class MultiLineTextEntryMarkdownDefinition
-    extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsContentMediaType contentMediaType;
-  final String pattern;
-
-  const MultiLineTextEntryMarkdownDefinition({
-    required super.type,
-    required super.note,
-    required this.contentMediaType,
-    required this.pattern,
-  });
-
-  @override
-  List<Object?> get props => [
-        contentMediaType,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class DropDownSingleSelectDefinition
-    extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsFormat format;
-  final DocumentDefinitionsContentMediaType contentMediaType;
-  final String pattern;
-
-  const DropDownSingleSelectDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.contentMediaType,
-    required this.pattern,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        contentMediaType,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class MultiSelectDefinition
-    extends BaseDocumentDefinition<List<dynamic>> {
-  final DocumentDefinitionsFormat format;
-  final bool uniqueItems;
-
-  const MultiSelectDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.uniqueItems,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        uniqueItems,
-        type,
-        note,
-      ];
-}
-
-final class SingleLineTextEntryListDefinition
-    extends BaseDocumentDefinition<List<String>> {
-  final DocumentDefinitionsFormat format;
-  final bool uniqueItems;
-  final List<String> defaultValues;
-  final Map<String, dynamic> items;
-
-  const SingleLineTextEntryListDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.uniqueItems,
-    required this.defaultValues,
-    required this.items,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        uniqueItems,
-        type,
-        note,
-        defaultValues,
-        items,
-      ];
-}
-
-final class MultiLineTextEntryListMarkdownDefinition
-    extends BaseDocumentDefinition<List<String>> {
-  final DocumentDefinitionsFormat format;
-  final bool uniqueItems;
-  final List<String> defaultValue;
-  final Map<String, dynamic> items;
-
-  const MultiLineTextEntryListMarkdownDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.uniqueItems,
-    required this.defaultValue,
-    required this.items,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        uniqueItems,
-        type,
-        note,
-        defaultValue,
-        items,
-      ];
-}
-
-final class SingleLineHttpsURLEntryListDefinition
-    extends BaseDocumentDefinition<List<String>> {
-  final DocumentDefinitionsFormat format;
-  final bool uniqueItems;
-  final List<String> defaultValue;
-  final Map<String, dynamic> items;
-
-  const SingleLineHttpsURLEntryListDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.uniqueItems,
-    required this.defaultValue,
-    required this.items,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        uniqueItems,
-        type,
-        note,
-        defaultValue,
-        items,
-      ];
-}
-
-final class NestedQuestionsListDefinition
-    extends BaseDocumentDefinition<List<String>> {
-  final DocumentDefinitionsFormat format;
-  final bool uniqueItems;
-  final List<String> defaultValue;
-
-  const NestedQuestionsListDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.uniqueItems,
-    required this.defaultValue,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        uniqueItems,
-        type,
-        note,
-        defaultValue,
-      ];
-}
-
-// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
-final class NestedQuestionsDefinition
-    extends BaseDocumentDefinition<List<String>> {
-  final DocumentDefinitionsFormat format;
-  final bool additionalProperties;
-
-  const NestedQuestionsDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.additionalProperties,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        additionalProperties,
-        type,
-        note,
-      ];
-}
-
-final class SingleGroupedTagSelectorDefinition
-    extends BaseDocumentDefinition<GroupedTagsSelection> {
-  final DocumentDefinitionsFormat format;
-  final bool additionalProperties;
-
-  const SingleGroupedTagSelectorDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.additionalProperties,
-  });
-
-  @visibleForTesting
-  const SingleGroupedTagSelectorDefinition.dummy()
-      : this(
-          type: DocumentDefinitionsObjectType.object,
-          note: '',
-          format: DocumentDefinitionsFormat.singleGroupedTagSelector,
-          additionalProperties: true,
-        );
-
-  @override
-  List<Object?> get props => [
-        format,
-        additionalProperties,
-        type,
-        note,
-      ];
-}
-
-final class TagGroupDefinition extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsFormat format;
-  final String pattern;
-
-  const TagGroupDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.pattern,
-  });
-
-  @visibleForTesting
-  const TagGroupDefinition.dummy()
-      : this(
-          type: DocumentDefinitionsObjectType.string,
-          note: '',
-          format: DocumentDefinitionsFormat.tagGroup,
-          pattern: '',
-        );
-
-  @override
-  List<Object?> get props => [
-        format,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class TagSelectionDefinition extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsFormat format;
-  final String pattern;
-
-  const TagSelectionDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.pattern,
-  });
-
-  @visibleForTesting
-  const TagSelectionDefinition.dummy()
-      : this(
-          type: DocumentDefinitionsObjectType.string,
-          note: '',
-          format: DocumentDefinitionsFormat.tagSelection,
-          pattern: '',
-        );
-
-  @override
-  List<Object?> get props => [
-        format,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class TokenValueCardanoADADefinition extends BaseDocumentDefinition<int> {
-  final DocumentDefinitionsFormat format;
-
-  const TokenValueCardanoADADefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        type,
-        note,
-      ];
-}
-
-final class DurationInMonthsDefinition extends BaseDocumentDefinition<int> {
-  final DocumentDefinitionsFormat format;
-
-  const DurationInMonthsDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-  });
-
-  @override
-  List<Object?> get props => [
-        type,
-        note,
-        format,
-      ];
-}
-
-final class YesNoChoiceDefinition extends BaseDocumentDefinition<bool> {
-  final DocumentDefinitionsFormat format;
-  final bool defaultValue;
-
-  const YesNoChoiceDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.defaultValue,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        defaultValue,
-        type,
-        note,
-      ];
-}
-
-final class AgreementConfirmationDefinition
-    extends BaseDocumentDefinition<bool> {
-  final DocumentDefinitionsFormat format;
-  final bool defaultValue;
-  final bool constValue;
-
-  const AgreementConfirmationDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.defaultValue,
-    required this.constValue,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        defaultValue,
-        constValue,
-        type,
-        note,
-      ];
-}
-
-final class SPDXLicenceOrUrlDefinition extends BaseDocumentDefinition<String> {
-  final DocumentDefinitionsFormat format;
-  final String pattern;
-  final DocumentDefinitionsContentMediaType contentMediaType;
-
-  const SPDXLicenceOrUrlDefinition({
-    required super.type,
-    required super.note,
-    required this.format,
-    required this.pattern,
-    required this.contentMediaType,
-  });
-
-  @override
-  List<Object?> get props => [
-        format,
-        pattern,
-        type,
-        note,
-      ];
-}
-
-final class LanguageCodeDefinition extends BaseDocumentDefinition<String> {
-  final String defaultValue;
-  final List<String> enumValues;
-
-  const LanguageCodeDefinition({
-    required super.type,
-    required super.note,
-    required this.defaultValue,
-    required this.enumValues,
-  });
-
-  @override
-  List<Object?> get props => [
-        defaultValue,
-        enumValues,
-        note,
-        type,
-      ];
+  /// Validates the property [value] against document rules.
+  DocumentValidationResult validatePropertyValue(
+    DocumentSchemaProperty<T> schema,
+    T? value,
+  );
 }
 
 extension BaseDocumentDefinitionListExt on List<BaseDocumentDefinition> {

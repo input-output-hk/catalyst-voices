@@ -11,19 +11,26 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 ///
 /// Once edits are done convert the builder to a [Document] with [build] method.
 final class DocumentBuilder implements DocumentNode {
+  String _schemaUrl;
   DocumentSchema _schema;
   List<DocumentSegmentBuilder> _segments;
 
   /// The default constructor for the [DocumentBuilder].
   DocumentBuilder({
+    required String schemaUrl,
     required DocumentSchema schema,
     required List<DocumentSegmentBuilder> segments,
-  })  : _schema = schema,
+  })  : _schemaUrl = schemaUrl,
+        _schema = schema,
         _segments = segments;
 
   /// Creates an empty [DocumentBuilder] from a [schema].
-  factory DocumentBuilder.fromSchema(DocumentSchema schema) {
+  factory DocumentBuilder.fromSchema({
+    required String schemaUrl,
+    required DocumentSchema schema,
+  }) {
     return DocumentBuilder(
+      schemaUrl: schemaUrl,
       schema: schema,
       segments: schema.segments.map(DocumentSegmentBuilder.fromSchema).toList(),
     );
@@ -32,6 +39,7 @@ final class DocumentBuilder implements DocumentNode {
   /// Creates a [DocumentBuilder] from existing [document].
   factory DocumentBuilder.fromDocument(Document document) {
     return DocumentBuilder(
+      schemaUrl: document.schemaUrl,
       schema: document.schema,
       segments:
           document.segments.map(DocumentSegmentBuilder.fromSegment).toList(),
@@ -69,6 +77,7 @@ final class DocumentBuilder implements DocumentNode {
     _segments.sortByOrder(_schema.order);
 
     return Document(
+      schemaUrl: _schemaUrl,
       schema: _schema,
       segments: List.unmodifiable(_segments.map((e) => e.build())),
     );
@@ -246,6 +255,7 @@ final class DocumentPropertyBuilder<T extends Object> implements DocumentNode {
     return DocumentProperty(
       schema: _schema,
       value: _value,
+      validationResult: _schema.validatePropertyValue(_value),
     );
   }
 }

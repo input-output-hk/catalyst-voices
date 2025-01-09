@@ -71,12 +71,14 @@ class _WordCell extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
+              key: const Key('SeedPhraseNumber'),
               '${number.toString().padLeft(2, '0')}.',
               style: TextStyle(color: theme.colors.textOnPrimary),
             ),
             const SizedBox(width: 6),
             Flexible(
               child: Text(
+                key: const Key('SeedPhraseWord'),
                 data,
                 style: TextStyle(color: theme.colors.textPrimary),
                 maxLines: 1,
