@@ -31,7 +31,7 @@ use crate::db::index::{
     session::CassandraSession,
 };
 
-/// Get registration given a stake key hash, it can time specific based on asat param,
+/// Get registration given a stake key hash, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_stake_key_hash(
     stake_hash: HexEncodedHash28, session: Arc<CassandraSession>, asat: Option<SlotNo>,
@@ -185,7 +185,7 @@ pub async fn get_registration_from_stake_addr(
             Ok(invalids) => invalids,
             Err(err) => {
                 error!(
-                    id="get_registration_from_stake_key_hash_invalid_registrations_for_stake_addr",
+                    id="get_registration_from_stake_key_hash_invalid_registrations_lookup",
                     error=?err,
                     "Failed to obtain invalid registrations for given stake pub key",
                 );
@@ -227,10 +227,10 @@ fn check_stake_addr_voting_key_association(
 fn cross_reference_key(
     associated_voting_key: &Ed25519HexEncodedPublicKey, r: &Cip36Details,
 ) -> bool {
-    match r.vote_pub_key.clone() {
-        Some(key) => key == *associated_voting_key,
-        None => false,
-    }
+    r.vote_pub_key
+        .clone()
+        .map(|key| key == *associated_voting_key)
+        .is_some()
 }
 
 /// Get all cip36 registrations for a given stake address.
