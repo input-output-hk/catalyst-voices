@@ -14,7 +14,7 @@ package-schemathesis:
     COPY ./hooks/hooks.py .
     VOLUME /results
     ENTRYPOINT st run --include-path-regex '^/api/v1/health/' \
-                    --exclude-path '/api/v1/health/inspection' #excluding since this is a internal debug endpoint \
+                    --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     --checks=all $openapi_spec \
                     --workers=2 \
                     --wait-for-schema=120 \
@@ -49,7 +49,7 @@ test-fuzzer-api:
         --service cat-gateway \
         --allow-privileged
 
-        RUN docker run --net=host --name=st schemathesis:latest && \
+        RUN docker run --net=host --name=st schemathesis:latest; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
