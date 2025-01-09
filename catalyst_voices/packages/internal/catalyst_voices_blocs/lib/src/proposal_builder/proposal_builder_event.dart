@@ -23,10 +23,10 @@ final class LoadProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [id];
 }
 
-final class ActiveStepChangedEvent extends ProposalBuilderEvent {
+final class ActiveNodeChangedEvent extends ProposalBuilderEvent {
   final NodeId? id;
 
-  const ActiveStepChangedEvent(this.id);
+  const ActiveNodeChangedEvent(this.id);
 
   @override
   List<Object?> get props => [id];

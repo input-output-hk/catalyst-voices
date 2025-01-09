@@ -5,7 +5,6 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +27,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _bodyItemScrollController;
 
-  NodeId? _activeSegmentId;
   StreamSubscription<List<Segment>>? _segmentsSub;
 
   @override
@@ -41,7 +39,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     _bodyItemScrollController = ItemScrollController();
 
     _segmentsController
-      ..addListener(_handleSectionsControllerChange)
+      ..addListener(_handleSegmentsControllerChange)
       ..attachItemsScrollController(_bodyItemScrollController);
 
     _segmentsSub = bloc.stream
@@ -102,14 +100,10 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     _segmentsController.value = newState;
   }
 
-  void _handleSectionsControllerChange() {
+  void _handleSegmentsControllerChange() {
     final activeSectionId = _segmentsController.value.activeSectionId;
 
-    if (_activeSegmentId != activeSectionId) {
-      _activeSegmentId = activeSectionId;
-
-      final event = ActiveStepChangedEvent(activeSectionId);
-      context.read<ProposalBuilderBloc>().add(event);
-    }
+    final event = ActiveNodeChangedEvent(activeSectionId);
+    context.read<ProposalBuilderBloc>().add(event);
   }
 }
