@@ -49,9 +49,9 @@ async fn queries_test() {
     ];
 
     for doc in &docs {
-        doc.store().await.unwrap();
+        assert!(doc.store().await.unwrap());
         // try to insert the same data again
-        doc.store().await.unwrap();
+        assert!(!doc.store().await.unwrap());
         // try another doc with the same `id` and `ver` and with different other fields
         let another_doc = FullSignedDoc::new(
             SignedDocBody::new(*doc.id(), *doc.ver(), doc_type, "Neil".to_string(), None),

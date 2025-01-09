@@ -58,6 +58,8 @@ impl FullSignedDoc {
     }
 
     /// Uploads a `FullSignedDoc` to the event db.
+    /// Returns `true` if document was added into the db, `false` if it was already added
+    /// previously.
     ///
     /// Make an insert query into the `event-db` by adding data into the `signed_docs`
     /// table.
@@ -73,21 +75,21 @@ impl FullSignedDoc {
     ///  - `ver` is a UUID v7
     ///  - `doc_type` is a UUID v4
     #[allow(dead_code)]
-    pub(crate) async fn store(&self) -> anyhow::Result<()> {
+    pub(crate) async fn store(&self) -> anyhow::Result<bool> {
         match Self::retrieve(self.id(), Some(self.ver())).await {
             Ok(res_doc) => {
                 anyhow::ensure!(
                     &res_doc == self,
                     "Document with the same `id` and `ver` already exists"
                 );
-                return Ok(());
+                Ok(false)
             },
-            Err(err) if err.is::<NotFoundError>() => {},
-            Err(err) => return Err(err),
+            Err(err) if err.is::<NotFoundError>() => {
+                EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await?;
+                Ok(false)
+            },
+            Err(err) => Err(err),
         }
-
-        EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await?;
-        Ok(())
     }
 
     /// Loads a `FullSignedDoc` from the event db.
