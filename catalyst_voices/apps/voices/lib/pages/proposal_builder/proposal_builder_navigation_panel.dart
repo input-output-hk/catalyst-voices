@@ -14,8 +14,8 @@ class ProposalBuilderNavigationPanel extends StatelessWidget {
       tabs: [
         SpaceSidePanelTab(
           name: context.l10n.workspaceProposalNavigationSegments,
-          body: SectionsMenuListener(
-            controller: SectionsControllerScope.of(context),
+          body: SegmentsMenuListener(
+            controller: SegmentsControllerScope.of(context),
           ),
         ),
       ],

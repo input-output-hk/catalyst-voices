@@ -1,10 +1,10 @@
-import 'package:equatable/equatable.dart';
+import 'package:catalyst_voices_models/src/node_id.dart';
 
 /// The unique id of an object in a document for segments/sections/properties
 /// in a format of paths from the top-level node down to the nested node.
-final class DocumentNodeId extends Equatable {
+final class DocumentNodeId extends NodeId {
   /// The top-level node in the document.
-  static const DocumentNodeId root = DocumentNodeId._([]);
+  static const DocumentNodeId root = DocumentNodeId._('', paths: []);
 
   /// The nested paths in a document that lead to an object.
   final List<String> paths;
@@ -13,7 +13,21 @@ final class DocumentNodeId extends Equatable {
   ///
   /// From outside this file new nodes must be created by interacting
   /// with [root] node and calling either [child] or [parent] methods.
-  const DocumentNodeId._(this.paths);
+  const DocumentNodeId._(
+    super.value, {
+    required this.paths,
+  });
+
+  // TODO(damian-molinski): uncomment if we have confirmation about dots in
+  // paths
+  // List<String> get paths => value.isNotEmpty ? value.split('.') : const [];
+
+  /// Utility constructor which ensure that value always has correct format.
+  DocumentNodeId._fromPaths(List<String> paths)
+      : this._(
+          paths.join('.'),
+          paths: paths,
+        );
 
   /// Returns a parent node.
   ///
@@ -24,39 +38,21 @@ final class DocumentNodeId extends Equatable {
     }
 
     final newPaths = List.of(paths)..removeLast();
-    return DocumentNodeId._(newPaths);
+    return DocumentNodeId._fromPaths(newPaths);
   }
 
   /// Returns a child node at given [path].
   ///
   /// The [path] is appended to the parent's [path].
   DocumentNodeId child(String path) {
-    return DocumentNodeId._([
+    return DocumentNodeId._fromPaths([
       ...paths,
       path,
     ]);
   }
 
-  /// Returns true if this node is a child of [parent] node, false otherwise.
-  bool isChildOf(DocumentNodeId parent) {
-    if (parent.paths.length >= paths.length) {
-      return false;
-    }
-
-    for (var i = 0; i < parent.paths.length; i++) {
-      if (parent.paths[i] != paths[i]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   @override
-  List<Object?> get props => paths;
-
-  @override
-  String toString() => paths.join('.');
+  String toString() => value;
 }
 
 /// The interface that every object in a document should implement,
