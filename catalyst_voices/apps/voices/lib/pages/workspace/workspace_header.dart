@@ -122,11 +122,7 @@ class _DraftProposalButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: () async {
-        final id = await context.read<WorkspaceBloc>().createNewDraftProposal();
-
-        if (context.mounted) {
-          ProposalBuilderRoute(proposalId: id).go(context);
-        }
+        const ProposalBuilderNewRoute().go(context);
       },
       leading: VoicesAssets.icons.plus.buildIcon(),
       child: Text(context.l10n.newDraftProposal),

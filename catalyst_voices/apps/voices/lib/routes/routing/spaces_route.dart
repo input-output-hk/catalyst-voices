@@ -22,8 +22,15 @@ const _prefix = Routes.currentMilestone;
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(path: '/$_prefix/discovery'),
-    TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
-    TypedGoRoute<ProposalBuilderRoute>(path: '/$_prefix/workspace/:proposalId'),
+    TypedGoRoute<WorkspaceRoute>(
+      path: '/$_prefix/workspace',
+      routes: [
+        TypedGoRoute<ProposalBuilderNewRoute>(path: 'proposal_builder'),
+        TypedGoRoute<ProposalBuilderRoute>(
+          path: 'proposal_builder/:proposalId',
+        ),
+      ],
+    ),
     TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
     TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
     TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
@@ -87,6 +94,22 @@ final class WorkspaceRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const WorkspacePage();
+  }
+}
+
+final class ProposalBuilderNewRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  const ProposalBuilderNewRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => [
+        const SessionUnlockedGuard(),
+        const UserAccessGuard(),
+      ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ProposalBuilderPage();
   }
 }
 

@@ -13,11 +13,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalBuilderPage extends StatefulWidget {
-  final String proposalId;
+  final String? proposalId;
 
   const ProposalBuilderPage({
     super.key,
-    required this.proposalId,
+    this.proposalId,
   });
 
   @override
@@ -49,7 +49,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
         .distinct(listEquals)
         .listen(_updateSegments);
 
-    bloc.add(LoadProposalEvent(id: widget.proposalId));
+    final proposalId = widget.proposalId;
+    final event = proposalId != null
+        ? LoadProposalEvent(id: proposalId)
+        : const StartNewProposalEvent();
+    bloc.add(event);
   }
 
   @override
@@ -57,7 +61,10 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId) {
-      final event = LoadProposalEvent(id: widget.proposalId);
+      final proposalId = widget.proposalId;
+      final event = proposalId != null
+          ? LoadProposalEvent(id: proposalId)
+          : const StartNewProposalEvent();
       context.read<ProposalBuilderBloc>().add(event);
     }
   }
