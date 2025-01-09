@@ -36,6 +36,16 @@ pub(crate) enum RetryAfterOption {
     Some(RetryAfterHeader),
 }
 
+impl From<RetryAfterOption> for Option<RetryAfterHeader> {
+    fn from(value: RetryAfterOption) -> Self {
+        match value {
+            RetryAfterOption::Default => Some(RetryAfterHeader::default()),
+            RetryAfterOption::None => None,
+            RetryAfterOption::Some(value) => Some(value),
+        }
+    }
+}
+
 impl Display for RetryAfterHeader {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
