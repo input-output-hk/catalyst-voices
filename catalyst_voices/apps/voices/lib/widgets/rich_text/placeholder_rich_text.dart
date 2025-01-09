@@ -8,6 +8,11 @@ typedef PlaceholderSpanBuilder = InlineSpan Function(
 );
 
 class PlaceholderRichText extends StatefulWidget {
+  final String text;
+  final PlaceholderSpanBuilder placeholderSpanBuilder;
+  final TextStyle? style;
+  final TextAlign textAlign;
+
   const PlaceholderRichText(
     this.text, {
     super.key,
@@ -15,11 +20,6 @@ class PlaceholderRichText extends StatefulWidget {
     this.style,
     this.textAlign = TextAlign.start,
   });
-
-  final String text;
-  final PlaceholderSpanBuilder placeholderSpanBuilder;
-  final TextStyle? style;
-  final TextAlign textAlign;
 
   @override
   State<PlaceholderRichText> createState() => _PlaceholderRichTextState();

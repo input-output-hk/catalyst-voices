@@ -1181,8 +1181,8 @@
   "search": "Search…",
   "agree": "I Agree",
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
-  "requestedAmountShouldBeMoreThan": "requested amount should be more than {min}",
-  "requestedAmountShouldBeLessThan": "requested amount should be less than {max}",
+  "requestedAmountShouldBeMoreThan": "Requested amount should be more than {min}",
+  "requestedAmountShouldBeLessThan": "Requested amount should be less than {max}",
   "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
