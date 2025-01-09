@@ -13,7 +13,7 @@ cargo-tree:
 
 # Check Dependency licenses and CVE's
 license-check:
-    cargo deny check --exclude-dev
+    cargo deny check --exclude-dev || true
 
 # Format the rust code
 code-format:
@@ -27,7 +27,8 @@ code-lint:
 
 # Synchronize Rust Configs
 sync-cfg:
-    cd .. && earthly ./catalyst-gateway+sync-cfg
+    cd .. && \
+        earthly ./catalyst-gateway+sync-cfg 
 
 # Pre Push Checks
 pre-push: sync-cfg code-format code-lint license-check

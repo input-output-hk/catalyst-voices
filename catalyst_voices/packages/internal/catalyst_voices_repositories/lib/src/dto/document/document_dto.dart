@@ -1,15 +1,18 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_properties_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_converter_ext.dart';
 
 /// A data transfer object for the [Document].
 ///
 /// Encodable as json but to decode with [DocumentDto.fromJsonSchema]
 /// a [DocumentSchema] is needed which explains how to interpret the data.
 final class DocumentDto {
+  final String schemaUrl;
   final DocumentSchema schema;
   final List<DocumentSegmentDto> segments;
 
   const DocumentDto({
+    required this.schemaUrl,
     required this.schema,
     required this.segments,
   });
@@ -21,6 +24,7 @@ final class DocumentDto {
     final properties = DocumentPropertiesDto.fromJson(json);
 
     return DocumentDto(
+      schemaUrl: json[r'$schema'] as String,
       schema: schema,
       segments: schema.segments
           .map(
@@ -35,6 +39,7 @@ final class DocumentDto {
 
   factory DocumentDto.fromModel(Document model) {
     return DocumentDto(
+      schemaUrl: model.schemaUrl,
       schema: model.schema,
       segments: model.segments.map(DocumentSegmentDto.fromModel).toList(),
     );
@@ -43,6 +48,7 @@ final class DocumentDto {
   Document toModel() {
     // building a document via builder to sort segments/sections/properties
     return DocumentBuilder(
+      schemaUrl: schemaUrl,
       schema: schema,
       segments: segments
           .map((e) => DocumentSegmentBuilder.fromSegment(e.toModel()))
@@ -52,7 +58,7 @@ final class DocumentDto {
 
   Map<String, dynamic> toJson() {
     return {
-      r'$schema': schema,
+      r'$schema': schemaUrl,
       for (final segment in segments) ...segment.toJson(),
     };
   }
@@ -156,9 +162,9 @@ final class DocumentSectionDto {
   }
 }
 
-final class DocumentPropertyDto {
-  final DocumentSchemaProperty schema;
-  final dynamic value;
+final class DocumentPropertyDto<T extends Object> {
+  final DocumentSchemaProperty<T> schema;
+  final T? value;
 
   const DocumentPropertyDto({
     required this.schema,
@@ -166,33 +172,33 @@ final class DocumentPropertyDto {
   });
 
   factory DocumentPropertyDto.fromJsonSchema(
-    DocumentSchemaProperty schema, {
+    DocumentSchemaProperty<T> schema, {
     required DocumentPropertiesDto properties,
   }) {
-    return DocumentPropertyDto(
+    final property = properties.getProperty(schema.nodeId);
+    final value = schema.definition.converter.fromJson(property);
+    return DocumentPropertyDto<T>(
       schema: schema,
-      // TODO(dtscalac): validate that value is of correct type, ignore if not
-      value: properties.getProperty(schema.nodeId),
-    );
-  }
-
-  factory DocumentPropertyDto.fromModel(DocumentProperty model) {
-    return DocumentPropertyDto(
-      schema: model.schema,
-      // TODO(dtscalac): convert to json from model
-      value: model.value,
-    );
-  }
-
-  DocumentProperty toModel() {
-    return DocumentProperty(
-      schema: schema,
-      // TODO(dtscalac): convert from json to model
       value: value,
     );
   }
 
+  factory DocumentPropertyDto.fromModel(DocumentProperty<T> model) {
+    return DocumentPropertyDto<T>(
+      schema: model.schema,
+      value: model.value,
+    );
+  }
+
+  DocumentProperty<T> toModel() {
+    return DocumentProperty<T>(
+      schema: schema,
+      value: value,
+      validationResult: schema.validatePropertyValue(value),
+    );
+  }
+
   Map<String, dynamic> toJson() => {
-        schema.id: value,
+        schema.id: schema.definition.converter.toJson(value),
       };
 }

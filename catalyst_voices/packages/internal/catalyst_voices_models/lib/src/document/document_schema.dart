@@ -1,7 +1,9 @@
 import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/document/document_validator.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 /// A document schema that describes the structure of a document.
 ///
@@ -78,7 +80,7 @@ final class DocumentSchemaSection extends Equatable implements DocumentNode {
   @override
   final DocumentNodeId nodeId;
   final String id;
-  final String title;
+  final String? title;
   final String? description;
   final List<DocumentSchemaProperty> properties;
   final bool isRequired;
@@ -109,18 +111,31 @@ final class DocumentSchemaSection extends Equatable implements DocumentNode {
 }
 
 /// A single property (field) in a document.
-final class DocumentSchemaProperty extends Equatable implements DocumentNode {
-  final BaseDocumentDefinition definition;
+final class DocumentSchemaProperty<T extends Object> extends Equatable
+    implements DocumentNode {
+  final BaseDocumentDefinition<T> definition;
   @override
   final DocumentNodeId nodeId;
   final String id;
-  final String title;
+  final String? title;
   final String? description;
-  final Object? defaultValue;
+  final T? defaultValue;
   final String? guidance;
   final List<String>? enumValues;
-  final Range<int>? range;
+
+  /// Minimum-maximum (both inclusive) numerical range.
+  final Range<int>? numRange;
+
+  /// Minimum-maximum (both inclusive) length of a string.
+  final Range<int>? strLengthRange;
+
+  /// Minimum-maximum (both inclusive) count of items.
   final Range<int>? itemsRange;
+
+  /// Allowed combination of values this property can take.
+  final List<DocumentSchemaLogicalGroup>? oneOf;
+
+  /// Whether the property is required.
   final bool isRequired;
 
   const DocumentSchemaProperty({
@@ -132,10 +147,34 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
     required this.defaultValue,
     required this.guidance,
     required this.enumValues,
-    required this.range,
+    required this.numRange,
+    required this.strLengthRange,
     required this.itemsRange,
+    required this.oneOf,
     required this.isRequired,
   });
+
+  @visibleForTesting
+  const DocumentSchemaProperty.optional({
+    required this.definition,
+    required this.nodeId,
+    required this.id,
+    this.title,
+    this.description,
+    this.defaultValue,
+    this.guidance,
+    this.enumValues,
+    this.numRange,
+    this.strLengthRange,
+    this.itemsRange,
+    this.oneOf,
+    this.isRequired = false,
+  });
+
+  /// Validates the property [value] against document rules.
+  DocumentValidationResult validatePropertyValue(T? value) {
+    return definition.validatePropertyValue(this, value);
+  }
 
   @override
   List<Object?> get props => [
@@ -147,8 +186,45 @@ final class DocumentSchemaProperty extends Equatable implements DocumentNode {
         defaultValue,
         guidance,
         enumValues,
-        range,
+        numRange,
+        strLengthRange,
         itemsRange,
+        oneOf,
         isRequired,
+      ];
+}
+
+final class DocumentSchemaLogicalGroup extends Equatable {
+  final List<DocumentSchemaLogicalCondition> conditions;
+
+  const DocumentSchemaLogicalGroup({
+    required this.conditions,
+  });
+
+  @override
+  List<Object?> get props => [
+        conditions,
+      ];
+}
+
+final class DocumentSchemaLogicalCondition extends Equatable {
+  final BaseDocumentDefinition definition;
+  final String id;
+  final Object? value;
+  final List<String>? enumValues;
+
+  const DocumentSchemaLogicalCondition({
+    required this.definition,
+    required this.id,
+    required this.value,
+    required this.enumValues,
+  });
+
+  @override
+  List<Object?> get props => [
+        definition,
+        id,
+        value,
+        enumValues,
       ];
 }

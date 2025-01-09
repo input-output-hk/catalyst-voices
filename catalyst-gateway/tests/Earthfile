@@ -1,5 +1,45 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.24 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.27 AS spectral-ci
+IMPORT .. AS gateway
+
+# INSTALL_SCYLLA - Installs scylla for bookworm-slim/debian
+INSTALL_SCYLLA:
+    FUNCTION
+
+    ARG --required VERSION
+
+    RUN apt-get update && \
+        apt-get install -y --no-install-recommends \
+        wget gnupg ca-certificates && \
+        mkdir -p /etc/apt/keyrings && \
+        gpg --homedir /tmp --no-default-keyring --keyring /etc/apt/keyrings/scylladb.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys a43e06657bac99e3 && \
+        wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-$VERSION.list && \
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+        scylla
+
+package-cat-gateway-integration:
+    FROM python:3.14.0a3-slim-bookworm
+    ENV LOG_LEVEL=error
+    ENV DATA_REFRESH_TICK=5
+    ENV CHECK_CONFIG_TICK=5
+    ENV MACHINE_ID="UID"
+    ENV CHAIN_FOLLOWER_SYNC_TASKS="16"
+    ENV RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+    ENV CHAIN_NETWORK="Preprod"
+    ENV CAT_ADDRESS=0.0.0.0:3030
+    ENV INTERNAL_API_KEY=123
+    ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+
+    DO +INSTALL_SCYLLA --VERSION=6.2
+
+    COPY node1-scylla.yaml /etc/scylla/scylla.yaml
+    COPY ../+build/cat-gateway .
+    # https://github.com/scylladb/scylladb/issues/3142
+    ENTRYPOINT ( scylla --options-file /etc/scylla/scylla.yaml --developer-mode 1 --default-log-level error & ) && \
+         ./cat-gateway run
+    SAVE IMAGE cat-gateway-integration:latest
 
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
@@ -12,3 +52,32 @@ test-lint-openapi:
     COPY --dir ./openapi-v3.0-lints/* .
     # Scan the doc directory where type of file is JSON.
     DO spectral-ci+LINT --dir=./doc
+
+test-postgres:
+    FROM gateway+builder-src
+
+    COPY ./docker/docker-compose.postgres.yml docker-compose.yml
+
+    ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+
+    WITH DOCKER \
+        --compose "./docker-compose.yml" \
+        --load ../event-db+build \
+        --pull alpine:3.20.3 \
+        --service event-db-is-running
+        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+            cargo nextest run --release --run-ignored=only signed_docs
+    END
+
+# test-scylla - Runs the integration test for scylla.
+test-scylla:
+    FROM gateway+builder-src
+
+    DO +INSTALL_SCYLLA --VERSION=6.2
+
+    # limit the nextest duration to prevent freezing in case of failure.
+    RUN sed -i '/\[profile.default\]/a\slow-timeout = { period = "30s", terminate-after = 2 }' .config/nextest.toml
+
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        scylla --options-file /etc/scylla/scylla.yaml --smp=2 --memory=4G --overprovisioned --developer-mode=1 & \
+        cargo nextest run --release --run-ignored=only scylla_session scylla_queries
