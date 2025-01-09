@@ -124,3 +124,7 @@ test-results/
 extensions/
 browser_extensions/
 !catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/extensions/
+
+#Test report and coverage
+.junit-report.xml
+.coverage.info

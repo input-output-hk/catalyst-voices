@@ -31,7 +31,7 @@ package-schemathesis:
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
 test-fuzzer-api:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
+    RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
     LET OPENAPI_SPEC="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG seed
