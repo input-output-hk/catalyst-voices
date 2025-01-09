@@ -117,11 +117,9 @@ class _DocumentBuilderSectionTileState
   }
 
   void _handlePropertyChange(DocumentChange change) {
-    setState(() {
-      _builder.addChange(change);
-      _editedSection = _builder.build();
-      _pendingChanges.add(change);
-    });
+    _builder.addChange(change);
+    _editedSection = _builder.build();
+    _pendingChanges.add(change);
   }
 }
 
@@ -225,7 +223,10 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleLineHttpsURLEntryDefinition():
         final castProperty = definition.castProperty(property);
         return SingleLineHttpsUrlWidget(
+          property: castProperty,
           description: castProperty.schema.description ?? '',
+          isEditMode: isEditMode,
+          onChanged: onChanged,
         );
       case SingleGroupedTagSelectorDefinition():
         final castProperty = definition.castProperty(property);

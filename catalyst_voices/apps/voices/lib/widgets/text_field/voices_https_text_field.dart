@@ -1,16 +1,21 @@
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesHttpsTextField extends StatefulWidget {
   final ValueChanged<String?>? onFieldSubmitted;
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final VoicesTextFieldValidator? validator;
-  final bool readOnly;
+  final bool enabled;
   const VoicesHttpsTextField({
     super.key,
     this.onFieldSubmitted,
-    this.readOnly = false,
+    this.focusNode,
+    this.enabled = false,
     this.controller,
     this.validator,
   });
@@ -20,26 +25,18 @@ class VoicesHttpsTextField extends StatefulWidget {
 }
 
 class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField> {
-  late final TextEditingController _textEditingController;
-
   TextEditingController? _controller;
   TextEditingController get _effectiveController {
     return widget.controller ?? (_controller ??= TextEditingController());
   }
 
-  bool _offstageClearButton = true;
-
   @override
   void initState() {
     super.initState();
-
-    _effectiveController.addListener(_changeClearButtonVisibility);
   }
 
   @override
   void dispose() {
-    _textEditingController.dispose();
-
     _controller?.dispose();
     _controller = null;
 
@@ -48,31 +45,76 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final onFieldSubmitted = widget.onFieldSubmitted;
     return VoicesTextField(
       controller: _effectiveController,
-      onFieldSubmitted: onFieldSubmitted,
+      focusNode: widget.focusNode,
+      onFieldSubmitted: widget.onFieldSubmitted,
       validator: widget.validator,
       decoration: VoicesTextFieldDecoration(
-        hintText: widget.readOnly ? 'No URL added' : 'Add URL',
+        hintText:
+            widget.enabled ? context.l10n.noUrlAdded : context.l10n.addUrl,
         prefixIcon: VoicesAssets.icons.link.buildIcon(),
-        showStatusSuffixIcon: !widget.readOnly,
-        additionalSuffixIcons: Offstage(
-          offstage: _offstageClearButton,
-          child: TextButton(
-            onPressed: () => _effectiveController.clear(),
-            child: const Text('Clear'),
+        showStatusSuffixIcon: widget.enabled,
+        additionalSuffixIcons: _AdditionalSuffixIcons(
+          enabled: widget.enabled,
+          effectiveController: _effectiveController,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       ),
-      readOnly: widget.readOnly,
-      enabled: !widget.readOnly,
+      readOnly: !widget.enabled,
       autovalidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+}
+
+class _AdditionalSuffixIcons extends StatefulWidget {
+  final bool enabled;
+  final TextEditingController effectiveController;
+
+  const _AdditionalSuffixIcons({
+    required this.enabled,
+    required this.effectiveController,
+  });
+
+  @override
+  State<_AdditionalSuffixIcons> createState() => _AdditionalSuffixIconsState();
+}
+
+class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
+    with LaunchUrlMixin {
+  bool _offstageClearButton = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.effectiveController.addListener(_changeClearButtonVisibility);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.enabled && widget.effectiveController.text.isNotEmpty) {
+      return VoicesIconButton(
+        onTap: () async {
+          await launchHrefUrl(widget.effectiveController.text.getUri());
+        },
+        child: VoicesAssets.icons.externalLink.buildIcon(),
+      );
+    }
+    return Offstage(
+      offstage: _offstageClearButton,
+      child: TextButton(
+        onPressed: widget.effectiveController.clear,
+        child: Text(context.l10n.clear),
+      ),
     );
   }
 
   void _changeClearButtonVisibility() {
-    if (!widget.readOnly && _effectiveController.text.isNotEmpty) {
+    if (widget.enabled && widget.effectiveController.text.isNotEmpty) {
       setState(() {
         _offstageClearButton = false;
       });
