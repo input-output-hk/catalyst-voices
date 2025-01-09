@@ -32,25 +32,31 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
 class _SingleDropdownSelectionWidgetState
     extends State<SingleDropdownSelectionWidget> {
   late List<DropdownMenuEntry<String>> _dropdownMenuEntries;
-  final TextEditingController _textEditingController = TextEditingController();
+  late TextEditingController _textEditingController;
+
   String? value;
+
+  List<DropdownMenuEntry<String>> get _mapItems {
+    final items = widget.items;
+    return items.map((e) => DropdownMenuEntry(value: e, label: e)).toList();
+  }
 
   @override
   void initState() {
     super.initState();
-    _dropdownMenuEntries = widget.items
-        .map(
-          (e) => DropdownMenuEntry(
-            value: e,
-            label: e,
-          ),
-        )
-        .toList();
+    _textEditingController = TextEditingController();
+    _textEditingController.text = widget.value;
+
+    _dropdownMenuEntries = _mapItems;
   }
 
   @override
   void didUpdateWidget(covariant SingleDropdownSelectionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.items != widget.items) {
+      _dropdownMenuEntries = _mapItems;
+    }
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
       final value = widget.value;
