@@ -60,6 +60,8 @@ export 'navigation/sections_controller.dart';
 export 'navigation/sections_list_view.dart';
 export 'navigation/sections_list_view_builder.dart';
 export 'navigation/sections_menu.dart';
+export 'rich_text/markdown_text.dart';
+export 'rich_text/placeholder_rich_text.dart';
 export 'scrollbar/voices_scrollbar.dart';
 export 'seed_phrase/seed_phrases_completer.dart';
 export 'seed_phrase/seed_phrases_picker.dart';

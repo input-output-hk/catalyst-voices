@@ -1180,11 +1180,9 @@
   "searchProposals": "Search Proposals",
   "search": "Search…",
   "agree": "I Agree",
-  "requestedAmountShouldBeBetween": "Requested amount should be between",
-  "and": "and",
-  "@and": {
-    "description": "General text. May be used in context of A4000 and $5000"
-  },
+  "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
+  "requestedAmountShouldBeMoreThan": "Requested amount should be at least {min}",
+  "requestedAmountShouldBeLessThan": "Requested amount should be at most {max}",
   "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
