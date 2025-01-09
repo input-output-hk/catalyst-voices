@@ -1,8 +1,8 @@
-import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_categories_step.dart';
-import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_details_step.dart';
-import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_stages_edit_step.dart';
-import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_stages_view_step.dart';
-import 'package:catalyst_voices/pages/treasury/steps/treasury_proposal_template_step.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_categories_step.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_details_tile.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_stages_edit_tile.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_stages_view_tile.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_proposal_template_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -18,21 +18,21 @@ class TreasuryBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SectionsListViewBuilder(
+    return SegmentsListViewBuilder(
       builder: (context, value, child) {
-        return SectionsListView<TreasurySection, TreasurySectionStep>(
+        return SegmentsListView<TreasurySegment, TreasurySection>(
           itemScrollController: itemScrollController,
           items: value,
-          stepBuilder: (context, step) {
-            switch (step) {
-              case SetupCampaignDetailsStep():
-                return TreasuryCampaignDetailsStep(step: step);
-              case SetupCampaignStagesStep():
-                return _TreasuryCampaignStagesStep(step: step);
-              case SetupProposalTemplateStep():
-                return TreasuryProposalTemplateStep(step: step);
-              case SetupCampaignCategoriesStep():
-                return TreasuryCampaignCategoriesStep(step: step);
+          sectionBuilder: (context, data) {
+            switch (data) {
+              case SetupCampaignDetails():
+                return TreasuryCampaignDetailsTile(data);
+              case SetupCampaignStages():
+                return _TreasuryCampaignStagesSection(data);
+              case SetupProposalTemplate():
+                return TreasuryProposalTemplateTile(data);
+              case SetupCampaignCategories():
+                return TreasuryCampaignCategoriesTile(data);
             }
           },
         );
@@ -41,20 +41,20 @@ class TreasuryBody extends StatelessWidget {
   }
 }
 
-class _TreasuryCampaignStagesStep extends StatelessWidget {
-  final TreasurySectionStep step;
+class _TreasuryCampaignStagesSection extends StatelessWidget {
+  final TreasurySection data;
 
-  const _TreasuryCampaignStagesStep({required this.step});
+  const _TreasuryCampaignStagesSection(this.data);
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: SectionsControllerScope.of(context),
+      valueListenable: SegmentsControllerScope.of(context),
       builder: (context, sectionsState, child) {
-        final isEditing = sectionsState.isEditing(step.sectionStepId);
+        final isEditing = sectionsState.isEditing(data.id);
         return isEditing
-            ? TreasuryCampaignStagesEditStep(step: step)
-            : TreasuryCampaignStagesViewStep(step: step);
+            ? TreasuryCampaignStagesEditTile(data)
+            : TreasuryCampaignStagesViewTile(data);
       },
     );
   }
