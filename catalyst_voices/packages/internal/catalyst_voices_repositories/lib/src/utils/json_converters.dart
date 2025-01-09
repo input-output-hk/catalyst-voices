@@ -31,3 +31,47 @@ final class ShelleyAddressConverter
   @override
   String toJson(ShelleyAddress object) => object.toBech32();
 }
+
+final class ListStringConverter
+    implements JsonConverter<List<String>?, List<dynamic>?> {
+  const ListStringConverter();
+
+  @override
+  List<String>? fromJson(List<dynamic>? json) {
+    if (json == null) return null;
+
+    return json.cast();
+  }
+
+  @override
+  List<dynamic>? toJson(List<String>? object) => object;
+}
+
+final class ListOfJsonConverter
+    implements JsonConverter<List<Map<String, dynamic>>?, List<dynamic>?> {
+  const ListOfJsonConverter();
+
+  @override
+  List<Map<String, dynamic>>? fromJson(List<dynamic>? json) {
+    if (json == null) return null;
+
+    return json.cast();
+  }
+
+  @override
+  List<dynamic>? toJson(List<Map<String, dynamic>>? object) => object;
+}
+
+/// A converter that only casts json to a target type.
+///
+/// Can be used for simple types like [String], [int], etc,
+/// which have a direct representation in json.
+final class NoopConverter<T> implements JsonConverter<T?, Object?> {
+  const NoopConverter();
+
+  @override
+  T? fromJson(Object? json) => json as T?;
+
+  @override
+  Object? toJson(T? object) => object as Object?;
+}

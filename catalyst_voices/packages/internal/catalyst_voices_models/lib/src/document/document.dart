@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/src/document/document_builder.dart';
 import 'package:catalyst_voices_models/src/document/document_schema.dart';
+import 'package:catalyst_voices_models/src/document/document_validator.dart';
 import 'package:equatable/equatable.dart';
 
 // TODO(dtscalac): tests
@@ -9,11 +10,18 @@ import 'package:equatable/equatable.dart';
 /// The document is immutable, in order to edit it make use
 /// of [toBuilder] method and act on [DocumentBuilder] instance.
 final class Document extends Equatable {
+  /// The url of the [schema].
+  final String schemaUrl;
+
+  /// The schema which explains how to interpret this document.
   final DocumentSchema schema;
+
+  /// The top-level groupings for sections.
   final List<DocumentSegment> segments;
 
   /// The default constructor for the [Document].
   const Document({
+    required this.schemaUrl,
     required this.schema,
     required this.segments,
   });
@@ -24,7 +32,7 @@ final class Document extends Equatable {
   }
 
   @override
-  List<Object?> get props => [schema, segments];
+  List<Object?> get props => [schemaUrl, schema, segments];
 }
 
 /// A segment that groups multiple [DocumentSection]'s.
@@ -64,6 +72,17 @@ final class DocumentSection extends Equatable {
     required this.properties,
   });
 
+  /// Returns `false` if any of the section [properties] is invalid,
+  /// `true` otherwise.
+  bool get isValid {
+    for (final property in properties) {
+      final result = property.validationResult;
+      if (result.isInvalid) return false;
+    }
+
+    return true;
+  }
+
   /// Creates a new [DocumentSectionBuilder] from this section.
   DocumentSectionBuilder toBuilder() {
     return DocumentSectionBuilder.fromSection(this);
@@ -73,17 +92,21 @@ final class DocumentSection extends Equatable {
   List<Object?> get props => [schema, properties];
 }
 
-final class DocumentProperty extends Equatable {
+final class DocumentProperty<T extends Object> extends Equatable {
   /// The schema of the document property.
-  final DocumentSchemaProperty schema;
+  final DocumentSchemaProperty<T> schema;
 
   /// The current value this property holds.
-  final Object? value;
+  final T? value;
+
+  /// The validation result for the [value] against the [schema].
+  final DocumentValidationResult validationResult;
 
   /// The default constructor for the [DocumentProperty].
   const DocumentProperty({
     required this.schema,
     required this.value,
+    required this.validationResult,
   });
 
   /// Creates a new [DocumentPropertyBuilder] from this property.
@@ -92,5 +115,5 @@ final class DocumentProperty extends Equatable {
   }
 
   @override
-  List<Object?> get props => [schema, value];
+  List<Object?> get props => [schema, value, validationResult];
 }

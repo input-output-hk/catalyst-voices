@@ -1,3 +1,6 @@
+import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -37,7 +40,6 @@ class _DocumentBuilderSectionTileState
   final _pendingChanges = <DocumentChange>[];
 
   bool _isEditMode = false;
-  bool _isValid = false;
 
   @override
   void initState() {
@@ -77,16 +79,16 @@ class _DocumentBuilderSectionTileState
             for (final property in widget.section.properties) ...[
               const SizedBox(height: 8),
               _PropertyBuilder(
-                key: ObjectKey(property.schema.nodeId),
+                key: ValueKey(property.schema.nodeId),
                 property: property,
                 isEditMode: _isEditMode,
-                onPropertyChanged: _handlePropertyChange,
+                onChanged: _handlePropertyChange,
               ),
             ],
             if (_isEditMode) ...[
               const SizedBox(height: 12),
               _Footer(
-                isValid: _isValid,
+                isValid: _editedSection.isValid,
                 onSave: _saveChanges,
               ),
             ],
@@ -102,12 +104,14 @@ class _DocumentBuilderSectionTileState
     // ignore: unnecessary_lambdas
     setState(() {
       _pendingChanges.clear();
+      _isEditMode = false;
     });
   }
 
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
+      _pendingChanges.clear();
     });
   }
 
@@ -116,9 +120,6 @@ class _DocumentBuilderSectionTileState
       _builder.addChange(change);
       _editedSection = _builder.build();
       _pendingChanges.add(change);
-
-      // TODO(damian-molinski): validation
-      _isValid = false;
     });
   }
 }
@@ -154,7 +155,6 @@ class _Header extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
-        const SizedBox(width: 16),
       ],
     );
   }
@@ -184,18 +184,20 @@ class _Footer extends StatelessWidget {
 class _PropertyBuilder extends StatelessWidget {
   final DocumentProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onPropertyChanged;
+  final ValueChanged<DocumentChange> onChanged;
 
   const _PropertyBuilder({
     required super.key,
     required this.property,
     required this.isEditMode,
-    required this.onPropertyChanged,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    switch (property.schema.definition) {
+    final definition = property.schema.definition;
+
+    switch (definition) {
       case SegmentDefinition():
       case SectionDefinition():
         throw UnsupportedError(
@@ -213,15 +215,41 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
-      case SingleGroupedTagSelectorDefinition():
       case TagGroupDefinition():
       case TagSelectionDefinition():
-      case TokenValueCardanoADADefinition():
       case DurationInMonthsDefinition():
       case YesNoChoiceDefinition():
-      case AgreementConfirmationDefinition():
       case SPDXLicenceOrUrlDefinition():
-        throw UnimplementedError();
+      case LanguageCodeDefinition():
+        throw UnimplementedError('${definition.type} not implemented');
+      case SingleGroupedTagSelectorDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleGroupedTagSelectorWidget(
+          id: castProperty.schema.nodeId,
+          selection: castProperty.value ?? const GroupedTagsSelection(),
+          groupedTags: definition.groupedTags(castProperty.schema),
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+          isRequired: castProperty.schema.isRequired,
+        );
+      case AgreementConfirmationDefinition():
+        final castProperty = definition.castProperty(property);
+        return AgreementConfirmationWidget(
+          value: castProperty.value,
+          definition: definition,
+          nodeId: castProperty.schema.nodeId,
+          description: castProperty.schema.description ?? '',
+          title: castProperty.schema.title ?? '',
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case TokenValueCardanoADADefinition():
+        return DocumentTokenValueWidget(
+          property: definition.castProperty(property),
+          currency: const Currency.ada(),
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
     }
   }
 }

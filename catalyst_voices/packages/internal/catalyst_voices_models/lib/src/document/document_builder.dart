@@ -11,19 +11,26 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 ///
 /// Once edits are done convert the builder to a [Document] with [build] method.
 final class DocumentBuilder implements DocumentNode {
+  String _schemaUrl;
   DocumentSchema _schema;
   List<DocumentSegmentBuilder> _segments;
 
   /// The default constructor for the [DocumentBuilder].
   DocumentBuilder({
+    required String schemaUrl,
     required DocumentSchema schema,
     required List<DocumentSegmentBuilder> segments,
-  })  : _schema = schema,
+  })  : _schemaUrl = schemaUrl,
+        _schema = schema,
         _segments = segments;
 
   /// Creates an empty [DocumentBuilder] from a [schema].
-  factory DocumentBuilder.fromSchema(DocumentSchema schema) {
+  factory DocumentBuilder.fromSchema({
+    required String schemaUrl,
+    required DocumentSchema schema,
+  }) {
     return DocumentBuilder(
+      schemaUrl: schemaUrl,
       schema: schema,
       segments: schema.segments.map(DocumentSegmentBuilder.fromSchema).toList(),
     );
@@ -32,6 +39,7 @@ final class DocumentBuilder implements DocumentNode {
   /// Creates a [DocumentBuilder] from existing [document].
   factory DocumentBuilder.fromDocument(Document document) {
     return DocumentBuilder(
+      schemaUrl: document.schemaUrl,
       schema: document.schema,
       segments:
           document.segments.map(DocumentSegmentBuilder.fromSegment).toList(),
@@ -69,6 +77,7 @@ final class DocumentBuilder implements DocumentNode {
     _segments.sortByOrder(_schema.order);
 
     return Document(
+      schemaUrl: _schemaUrl,
       schema: _schema,
       segments: List.unmodifiable(_segments.map((e) => e.build())),
     );
@@ -196,22 +205,22 @@ final class DocumentSectionBuilder implements DocumentNode {
   }
 }
 
-final class DocumentPropertyBuilder implements DocumentNode {
+final class DocumentPropertyBuilder<T extends Object> implements DocumentNode {
   /// The schema of the document property.
-  DocumentSchemaProperty _schema;
+  DocumentSchemaProperty<T> _schema;
 
   /// The current value this property holds.
-  Object? _value;
+  T? _value;
 
   /// The default constructor for the [DocumentPropertyBuilder].
   DocumentPropertyBuilder({
-    required DocumentSchemaProperty schema,
-    required Object? value,
+    required DocumentSchemaProperty<T> schema,
+    required T? value,
   })  : _schema = schema,
         _value = value;
 
   /// Creates a [DocumentPropertyBuilder] from a [schema].
-  factory DocumentPropertyBuilder.fromSchema(DocumentSchemaProperty schema) {
+  factory DocumentPropertyBuilder.fromSchema(DocumentSchemaProperty<T> schema) {
     return DocumentPropertyBuilder(
       schema: schema,
       value: schema.defaultValue,
@@ -219,7 +228,7 @@ final class DocumentPropertyBuilder implements DocumentNode {
   }
 
   /// Creates a [DocumentPropertyBuilder] from existing [property].
-  factory DocumentPropertyBuilder.fromProperty(DocumentProperty property) {
+  factory DocumentPropertyBuilder.fromProperty(DocumentProperty<T> property) {
     return DocumentPropertyBuilder(
       schema: property.schema,
       value: property.value,
@@ -238,14 +247,15 @@ final class DocumentPropertyBuilder implements DocumentNode {
       );
     }
 
-    _value = change.value;
+    _value = _schema.definition.castValue(change.value);
   }
 
   /// Builds an immutable [DocumentProperty].
-  DocumentProperty build() {
+  DocumentProperty<T> build() {
     return DocumentProperty(
       schema: _schema,
       value: _value,
+      validationResult: _schema.validatePropertyValue(_value),
     );
   }
 }
