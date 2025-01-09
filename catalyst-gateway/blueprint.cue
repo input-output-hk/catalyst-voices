@@ -13,7 +13,7 @@ project: {
 		environment: "dev"
 		modules: main: {
 			container: "blueprint-deployment"
-			version:   "0.2.4"
+			version:   "0.2.5"
 			values: {
 				app: {
 					environment: "dev"
@@ -24,6 +24,7 @@ project: {
 					}
 
 					containerPort: 3030
+          servicePort: 80
 					strategy:      "Recreate"
 					ingressHost:   "gateway.dev.project-catalyst.io"
 
@@ -149,14 +150,14 @@ project: {
 					// readinessProbe: {
 					// 	httpGet: {
 					// 		path: "/v1/health/ready"
-					// 		port: 8080
+					// 		port: 3030
 					// 	}
 					// }
 
 					// livenessProbe: {
 					// 	httpGet: {
 					// 		path: "/v1/health/live"
-					// 		port: 8080
+					// 		port: 3030
 					// 	}
 					// }
 
