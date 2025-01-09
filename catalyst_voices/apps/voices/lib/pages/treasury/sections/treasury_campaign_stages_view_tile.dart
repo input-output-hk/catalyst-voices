@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
-import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_widgets.dart';
-import 'package:catalyst_voices/widgets/navigation/section_step_state_builder.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_widgets.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -9,24 +8,24 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TreasuryCampaignStagesViewStep extends StatelessWidget {
-  final TreasurySectionStep step;
+class TreasuryCampaignStagesViewTile extends StatelessWidget {
+  final TreasurySection data;
 
-  const TreasuryCampaignStagesViewStep({
+  const TreasuryCampaignStagesViewTile(
+    this.data, {
     super.key,
-    required this.step,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SectionStepStateBuilder(
-      id: step.sectionStepId,
+    return SectionStateBuilder(
+      id: data.id,
       builder: (context, value, child) {
         return SelectableTile(
           isSelected: value.isSelected,
           child: Column(
             children: [
-              TreasuryCampaignStepHeader(step: step),
+              TreasuryCampaignStepHeader(data),
               const SizedBox(height: 12),
               const TreasuryCampaignTimezone(),
               const SizedBox(height: 24),

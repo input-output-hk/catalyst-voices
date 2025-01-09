@@ -175,10 +175,11 @@ final class DocumentPropertyDto<T extends Object> {
     DocumentSchemaProperty<T> schema, {
     required DocumentPropertiesDto properties,
   }) {
+    final property = properties.getProperty(schema.nodeId);
+    final value = schema.definition.converter.fromJson(property);
     return DocumentPropertyDto<T>(
       schema: schema,
-      value: schema.definition.converter
-          .fromJson(properties.getProperty(schema.nodeId)),
+      value: value,
     );
   }
 
