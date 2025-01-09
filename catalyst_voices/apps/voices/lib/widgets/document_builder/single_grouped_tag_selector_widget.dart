@@ -187,7 +187,7 @@ class _TagGroupsDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleSelectDropdown<GroupedTags>(
-      dropdownMenuEntries: groupedTags
+      items: groupedTags
           .map((e) => DropdownMenuEntry(value: e, label: e.group))
           .toList(),
       initialValue: value,

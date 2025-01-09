@@ -37,6 +37,7 @@ class _DocumentBuilderSectionTileState
     extends State<DocumentBuilderSectionTile> {
   late DocumentSection _editedSection;
   late DocumentSectionBuilder _builder;
+
   final _pendingChanges = <DocumentChange>[];
 
   bool _isEditMode = false;
@@ -257,8 +258,7 @@ class _PropertyBuilder extends StatelessWidget {
       case DropDownSingleSelectDefinition():
         final castProperty = definition.castProperty(property);
         return SingleDropdownSelectionWidget(
-          value: castProperty.value,
-          defaultValue: castProperty.schema.defaultValue ?? '',
+          value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
           items: castProperty.schema.enumValues ?? [],
           definition: definition,
           nodeId: castProperty.schema.nodeId,

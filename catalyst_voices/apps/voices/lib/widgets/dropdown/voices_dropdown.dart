@@ -76,9 +76,9 @@ class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
 
 class SingleSelectDropdown<T> extends StatelessWidget {
   final TextEditingController? textEditingController;
-  final List<DropdownMenuEntry<T>> dropdownMenuEntries;
+  final List<DropdownMenuEntry<T>> items;
   final T? initialValue;
-  final bool isEditMode;
+  final bool enabled;
   final ValueChanged<T?>? onSelected;
   final String? hintText;
 
@@ -86,8 +86,8 @@ class SingleSelectDropdown<T> extends StatelessWidget {
     super.key,
     this.textEditingController,
     this.initialValue,
-    required this.dropdownMenuEntries,
-    this.isEditMode = true,
+    required this.items,
+    this.enabled = true,
     required this.onSelected,
     this.hintText,
   });
@@ -98,9 +98,9 @@ class SingleSelectDropdown<T> extends StatelessWidget {
       width: double.infinity,
       controller: textEditingController,
       initialSelection: initialValue,
-      enabled: isEditMode,
+      enabled: enabled,
       hintText: hintText,
-      dropdownMenuEntries: dropdownMenuEntries,
+      dropdownMenuEntries: items,
       onSelected: onSelected,
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -113,7 +113,7 @@ class SingleSelectDropdown<T> extends StatelessWidget {
         focusedBorder: _border(context),
       ),
       trailingIcon: Offstage(
-        offstage: isEditMode,
+        offstage: enabled,
         child: VoicesAssets.icons.chevronDown.buildIcon(),
       ),
       menuStyle: MenuStyle(
