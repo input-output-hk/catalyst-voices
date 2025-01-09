@@ -4,7 +4,6 @@
 VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.27 AS postgresql-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.27 AS python-ci
 
 # cspell: words
 
@@ -40,21 +39,4 @@ local:
     # Publish to the local development cluster
     IF [ "$local_registry" != "" ]
         SAVE IMAGE --push --insecure $local_registry/event-db:latest
-    END
-
-# Run the queries_tests.py
-test:
-    FROM python-ci+python-base
-
-    DO python-ci+BUILDER
-    COPY --dir tests .
-    COPY --dir queries .
-
-    WITH DOCKER \
-        --compose "./tests/docker-compose.yml" \
-        --load event-db:latest=+build \
-        --pull alpine:3.20.3 \
-        --service event-db-is-running \
-        --allow-privileged
-        RUN poetry run pytest -s -m ci
     END

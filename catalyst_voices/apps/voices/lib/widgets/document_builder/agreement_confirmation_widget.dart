@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -36,7 +35,9 @@ class _DocumentCheckboxBuilderWidgetState
   late bool _currentEditValue;
 
   DocumentNodeId get _nodeId => widget.nodeId;
+
   MarkdownData get _description => MarkdownData(widget.description);
+
   bool get _defaultValue => widget.definition.defaultValue;
 
   @override
