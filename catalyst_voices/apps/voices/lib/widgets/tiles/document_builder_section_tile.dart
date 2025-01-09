@@ -250,15 +250,10 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case TokenValueCardanoADADefinition():
-        final castProperty = definition.castProperty(property);
         return DocumentTokenValueWidget(
-          id: castProperty.schema.nodeId,
-          label: castProperty.schema.title ?? '',
-          value: castProperty.value,
+          property: definition.castProperty(property),
           currency: const Currency.ada(),
-          range: castProperty.schema.numRange,
           isEditMode: isEditMode,
-          isRequired: castProperty.schema.isRequired,
           onChanged: onChanged,
         );
     }

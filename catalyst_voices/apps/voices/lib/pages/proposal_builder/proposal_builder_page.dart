@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_body.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
-import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
-import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,11 +25,11 @@ class ProposalBuilderPage extends StatefulWidget {
 }
 
 class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
-  late final SectionsController _sectionsController;
+  late final SegmentsController _segmentsController;
   late final ItemScrollController _bodyItemScrollController;
 
-  SectionStepId? _activeStepId;
-  StreamSubscription<List<Section>>? _sectionsSub;
+  NodeId? _activeSegmentId;
+  StreamSubscription<List<Segment>>? _segmentsSub;
 
   @override
   void initState() {
@@ -37,17 +37,17 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
 
     final bloc = context.read<ProposalBuilderBloc>();
 
-    _sectionsController = SectionsController();
+    _segmentsController = SegmentsController();
     _bodyItemScrollController = ItemScrollController();
 
-    _sectionsController
+    _segmentsController
       ..addListener(_handleSectionsControllerChange)
       ..attachItemsScrollController(_bodyItemScrollController);
 
-    _sectionsSub = bloc.stream
-        .map((event) => event.sections)
+    _segmentsSub = bloc.stream
+        .map((event) => event.segments)
         .distinct(listEquals)
-        .listen(_updateSections);
+        .listen(_updateSegments);
 
     bloc.add(LoadProposalEvent(id: widget.proposalId));
   }
@@ -64,17 +64,17 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
 
   @override
   void dispose() {
-    unawaited(_sectionsSub?.cancel());
-    _sectionsSub = null;
+    unawaited(_segmentsSub?.cancel());
+    _segmentsSub = null;
 
-    _sectionsController.dispose();
+    _segmentsController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SectionsControllerScope(
-      controller: _sectionsController,
+    return SegmentsControllerScope(
+      controller: _segmentsController,
       child: SpaceScaffold(
         left: const ProposalBuilderNavigationPanel(),
         body: ProposalBuilderBody(
@@ -85,23 +85,23 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     );
   }
 
-  void _updateSections(List<Section> data) {
-    final state = _sectionsController.value;
+  void _updateSegments(List<Segment> data) {
+    final state = _segmentsController.value;
 
-    final newState = state.sections.isEmpty
-        ? SectionsControllerState.initial(sections: data)
-        : state.copyWith(sections: data);
+    final newState = state.segments.isEmpty
+        ? SegmentsControllerState.initial(segments: data)
+        : state.copyWith(segments: data);
 
-    _sectionsController.value = newState;
+    _segmentsController.value = newState;
   }
 
   void _handleSectionsControllerChange() {
-    final activeStepId = _sectionsController.value.activeStepId;
+    final activeSectionId = _segmentsController.value.activeSectionId;
 
-    if (_activeStepId != activeStepId) {
-      _activeStepId = activeStepId;
+    if (_activeSegmentId != activeSectionId) {
+      _activeSegmentId = activeSectionId;
 
-      final event = ActiveStepChangedEvent(activeStepId);
+      final event = ActiveStepChangedEvent(activeSectionId);
       context.read<ProposalBuilderBloc>().add(event);
     }
   }
