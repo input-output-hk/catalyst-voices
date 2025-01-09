@@ -53,7 +53,7 @@ class TokenField extends StatelessWidget {
         filled: true,
         helper: range != null && showHelper
             ? _Helper(
-                symbol: currency.symbol,
+                currency: currency,
                 range: range,
               )
             : null,
@@ -87,37 +87,58 @@ class TokenField extends StatelessWidget {
 }
 
 class _Helper extends StatelessWidget {
-  final String symbol;
+  final Currency currency;
   final Range<int> range;
 
   const _Helper({
-    required this.symbol,
+    required this.currency,
     required this.range,
   });
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): Range can accept null as min/max
-    // meaning they are unconstrained, handle it
-    // TODO(damian-molinski): Refactor text formatting with smarter syntax
-    return Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(text: context.l10n.requestedAmountShouldBeBetween),
-          const TextSpan(text: ' '),
-          TextSpan(
-            text: '$symbol${range.min}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const TextSpan(text: ' '),
-          TextSpan(text: context.l10n.and),
-          const TextSpan(text: ' '),
-          TextSpan(
-            text: '$symbol${range.max}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
+    final min = range.min;
+    final max = range.max;
+
+    const boldStyle = TextStyle(fontWeight: FontWeight.bold);
+
+    if (min != null && max != null) {
+      return PlaceholderRichText(
+        context.l10n.requestedAmountShouldBeBetweenMinAndMax,
+        placeholderSpanBuilder: (context, placeholder) {
+          return switch (placeholder) {
+            'min' => TextSpan(text: currency.format(min), style: boldStyle),
+            'max' => TextSpan(text: currency.format(max), style: boldStyle),
+            _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
+          };
+        },
+      );
+    }
+
+    if (min != null) {
+      return PlaceholderRichText(
+        context.l10n.requestedAmountShouldBeMoreThan,
+        placeholderSpanBuilder: (context, placeholder) {
+          return switch (placeholder) {
+            'min' => TextSpan(text: currency.format(min), style: boldStyle),
+            _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
+          };
+        },
+      );
+    }
+
+    if (max != null) {
+      return PlaceholderRichText(
+        context.l10n.requestedAmountShouldBeLessThan,
+        placeholderSpanBuilder: (context, placeholder) {
+          return switch (placeholder) {
+            'max' => TextSpan(text: currency.format(max), style: boldStyle),
+            _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
+          };
+        },
+      );
+    }
+
+    return const Text('');
   }
 }
