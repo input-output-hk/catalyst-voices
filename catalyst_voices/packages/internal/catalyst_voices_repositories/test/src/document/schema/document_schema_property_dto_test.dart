@@ -1,19 +1,18 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:test/test.dart';
-
-import '../../../helpers/read_json.dart';
 
 void main() {
   group(DocumentSchemaPropertyDto, () {
-    const schemaPath =
-        'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
-
     late Map<String, dynamic> schemaJson;
 
     setUpAll(() {
-      schemaJson = json.decode(readJson(schemaPath)) as Map<String, dynamic>;
+      final encodedSchema = File(Paths.f14ProposalSchema).readAsStringSync();
+
+      schemaJson = json.decode(encodedSchema) as Map<String, dynamic>;
     });
 
     test('includeIfNull does not add keys for values that are null', () {

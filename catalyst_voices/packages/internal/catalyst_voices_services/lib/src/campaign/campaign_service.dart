@@ -4,11 +4,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 abstract interface class CampaignService {
   factory CampaignService(
     CampaignRepository campaignRepository,
-  ) {
-    return CampaignServiceImpl(
-      campaignRepository,
-    );
-  }
+  ) = CampaignServiceImpl;
 
   Future<bool> isAnyCampaignActive();
 

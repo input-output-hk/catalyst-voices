@@ -16,9 +16,11 @@ void main() {
       startDate: DateTime.now(),
       endDate: DateTime.now().plusDays(1),
       proposalsCount: 0,
-      sections: const [],
       publish: CampaignPublish.published,
-      proposalTemplate: const ProposalTemplate(sections: []),
+      // TODO(damian-molinski): util for loading DocumentSchema
+      proposalTemplate: () {
+        throw UnimplementedError();
+      }(),
     );
 
     final proposal = Proposal(
@@ -32,19 +34,10 @@ void main() {
       publish: ProposalPublish.draft,
       access: ProposalAccess.private,
       commentsCount: 0,
-      sections: List.generate(3, (index) {
-        return ProposalSection(
-          id: 'f14/0_$index',
-          name: 'Section_$index',
-          steps: [
-            ProposalSectionStep(
-              id: 'f14/0_${index}_1',
-              name: 'Topic 1',
-              answer: index < 1 ? const MarkdownData('Ans') : null,
-            ),
-          ],
-        );
-      }),
+      // TODO(damian-molinski): util for loading DocumentSchema
+      document: () {
+        throw UnimplementedError();
+      }(),
     );
 
     final pendingProposal = PendingProposal.fromProposal(

@@ -1,7 +1,15 @@
-import 'package:catalyst_voices_models/src/campaign/campaign_publish.dart';
-import 'package:catalyst_voices_models/src/campaign/campaign_section.dart';
-import 'package:catalyst_voices_models/src/proposal/proposal_template.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+
+/// Enum representing the state of a campaign.
+/// Draft: campaign is not published yet.
+/// Published: campaign is published and can be seen by users.
+enum CampaignPublish {
+  draft,
+  published;
+
+  bool get isDraft => this == draft;
+}
 
 final class Campaign extends Equatable {
   final String id;
@@ -10,9 +18,8 @@ final class Campaign extends Equatable {
   final DateTime startDate;
   final DateTime endDate;
   final int proposalsCount;
-  final List<CampaignSection> sections;
   final CampaignPublish publish;
-  final ProposalTemplate proposalTemplate;
+  final DocumentSchema proposalTemplate;
 
   const Campaign({
     required this.id,
@@ -21,12 +28,11 @@ final class Campaign extends Equatable {
     required this.startDate,
     required this.endDate,
     required this.proposalsCount,
-    required this.sections,
     required this.publish,
     required this.proposalTemplate,
   });
 
-  int get categoriesCount => sections.map((e) => e.category).toSet().length;
+  int get categoriesCount => 0;
 
   Campaign copyWith({
     String? id,
@@ -35,9 +41,8 @@ final class Campaign extends Equatable {
     DateTime? startDate,
     DateTime? endDate,
     int? proposalsCount,
-    List<CampaignSection>? sections,
     CampaignPublish? publish,
-    ProposalTemplate? proposalTemplate,
+    DocumentSchema? proposalTemplate,
   }) {
     return Campaign(
       id: id ?? this.id,
@@ -46,7 +51,6 @@ final class Campaign extends Equatable {
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       proposalsCount: proposalsCount ?? this.proposalsCount,
-      sections: sections ?? this.sections,
       publish: publish ?? this.publish,
       proposalTemplate: proposalTemplate ?? this.proposalTemplate,
     );
@@ -60,7 +64,6 @@ final class Campaign extends Equatable {
         startDate,
         endDate,
         proposalsCount,
-        sections,
         publish,
         proposalTemplate,
       ];

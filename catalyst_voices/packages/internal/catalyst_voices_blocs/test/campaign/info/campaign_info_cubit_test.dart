@@ -15,9 +15,10 @@ void main() {
       startDate: DateTime.now(),
       endDate: DateTime.now().plusDays(2),
       proposalsCount: 0,
-      sections: const [],
       publish: CampaignPublish.draft,
-      proposalTemplate: const ProposalTemplate(sections: []),
+      proposalTemplate: () {
+        throw UnimplementedError();
+      }(),
     );
 
     final campaignStage = CampaignStage.fromCampaign(

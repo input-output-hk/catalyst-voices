@@ -9,13 +9,14 @@ final _logger = Logger('ProposalBuilderBloc');
 
 final class ProposalBuilderBloc
     extends Bloc<ProposalBuilderEvent, ProposalBuilderState> {
-  // ignore: unused_field
   final CampaignService _campaignService;
+  final DocumentService _documentService;
 
   NodeId? _activeNodeId;
 
   ProposalBuilderBloc(
     this._campaignService,
+    this._documentService,
   ) : super(const ProposalBuilderState()) {
     on<StartNewProposalEvent>(_startNewProposal);
     on<LoadProposalEvent>(_loadProposal);

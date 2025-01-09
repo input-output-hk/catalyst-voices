@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 class ProposalRepository {
@@ -9,8 +13,13 @@ class ProposalRepository {
   Future<List<Proposal>> getProposals({
     required String campaignId,
   }) async {
-    // simulate network delay
-    await Future<void>.delayed(const Duration(seconds: 1));
+    const path = Paths.f14ProposalSchema;
+    final encodedSchema = File(path).readAsStringSync();
+    final schema = json.decode(encodedSchema) as Map<String, dynamic>;
+
+    final proposalTemplateDto = DocumentSchemaDto.fromJson(schema);
+    final documentSchema = proposalTemplateDto.toModel();
+
     // optionally filter by status.
     return _proposals;
   }
@@ -36,18 +45,9 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    sections: List.generate(13, (index) {
-      return ProposalSection(
-        id: 'f14/0_$index',
-        name: 'Section_$index',
-        steps: [
-          ProposalSectionStep(
-            id: 'f14/0_${index}_1',
-            name: 'Topic 1',
-          ),
-        ],
-      );
-    }),
+    document: () {
+      throw UnimplementedError();
+    }(),
   ),
   Proposal(
     id: 'f14/1',
@@ -60,19 +60,9 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    sections: List.generate(13, (index) {
-      return ProposalSection(
-        id: 'f14/0_$index',
-        name: 'Section_$index',
-        steps: [
-          ProposalSectionStep(
-            id: 'f14/0_${index}_1',
-            name: 'Topic 1',
-            answer: index < 7 ? const MarkdownData('Ans') : null,
-          ),
-        ],
-      );
-    }),
+    document: () {
+      throw UnimplementedError();
+    }(),
   ),
   Proposal(
     id: 'f14/2',
@@ -85,18 +75,8 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    sections: List.generate(13, (index) {
-      return ProposalSection(
-        id: 'f14/0_$index',
-        name: 'Section_$index',
-        steps: [
-          ProposalSectionStep(
-            id: 'f14/0_${index}_1',
-            name: 'Topic 1',
-            answer: const MarkdownData('Ans'),
-          ),
-        ],
-      );
-    }),
+    document: () {
+      throw UnimplementedError();
+    }(),
   ),
 ];

@@ -101,6 +101,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
           get<CampaignService>(),
+          get<DocumentService>(),
         );
       });
   }
@@ -118,7 +119,8 @@ final class Dependencies extends DependencyProvider {
           get<UserStorage>(),
           get<KeychainProvider>(),
         );
-      });
+      })
+      ..registerLazySingleton<DocumentRepository>(DocumentRepository.new);
   }
 
   void _registerServices() {
@@ -167,6 +169,11 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<ConfigService>(() {
       return ConfigService(
         get<ConfigRepository>(),
+      );
+    });
+    registerLazySingleton<DocumentService>(() {
+      return DocumentService(
+        get<DocumentRepository>(),
       );
     });
   }

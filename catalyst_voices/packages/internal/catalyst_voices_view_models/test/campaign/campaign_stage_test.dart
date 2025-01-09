@@ -13,9 +13,11 @@ void main() {
       startDate: date,
       endDate: date,
       proposalsCount: 0,
-      sections: const [],
       publish: CampaignPublish.draft,
-      proposalTemplate: const ProposalTemplate(sections: []),
+      // TODO(damian-molinski): util for loading DocumentSchema
+      proposalTemplate: () {
+        throw UnimplementedError();
+      }(),
     );
 
     test('draft campaign resolves to draft stage', () {

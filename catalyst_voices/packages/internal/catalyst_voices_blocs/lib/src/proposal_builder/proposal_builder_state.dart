@@ -30,18 +30,18 @@ final class ProposalBuilderState extends Equatable {
 
 final class ProposalGuidance extends Equatable {
   final bool isNoneSelected;
-  final List<Guidance> guidances;
+  final List<MarkdownData> guidanceList;
 
   const ProposalGuidance({
     this.isNoneSelected = false,
-    this.guidances = const [],
+    this.guidanceList = const [],
   });
 
-  bool get showEmptyState => !isNoneSelected && guidances.isEmpty;
+  bool get showEmptyState => !isNoneSelected && guidanceList.isEmpty;
 
   @override
   List<Object?> get props => [
         isNoneSelected,
-        guidances,
+        guidanceList,
       ];
 }
