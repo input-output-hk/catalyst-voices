@@ -26,7 +26,7 @@ project: {
 					containerPort: 3030
           servicePort: 80
 					strategy:      "Recreate"
-					ingressHost:   "gateway.dev.project-catalyst.io"
+					ingressHost:   "gateway.dev.projectcatalyst.io"
 
 					persistentVolumeClaims: [
 						{
@@ -154,12 +154,12 @@ project: {
 					// 	}
 					// }
 
-					// livenessProbe: {
-					// 	httpGet: {
-					// 		path: "/v1/health/live"
-					// 		port: 3030
-					// 	}
-					// }
+					livenessProbe: {
+						httpGet: {
+							path: "/v1/health/live"
+							port: 3030
+						}
+					}
 
 					nodeSelector: {
 						"node-group": "catalyst-gateway"
