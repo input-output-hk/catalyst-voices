@@ -16,19 +16,6 @@ final class LoadProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [id];
 }
 
-final class UpdateStepAnswerEvent extends ProposalBuilderEvent {
-  final NodeId id;
-  final MarkdownData? data;
-
-  const UpdateStepAnswerEvent({
-    required this.id,
-    this.data,
-  });
-
-  @override
-  List<Object?> get props => [id, data];
-}
-
 final class ActiveStepChangedEvent extends ProposalBuilderEvent {
   final NodeId? id;
 

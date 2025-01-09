@@ -12,7 +12,6 @@ final class ProposalBuilderBloc
     this._campaignService,
   ) : super(const ProposalBuilderState()) {
     on<LoadProposalEvent>(_loadProposal);
-    on<UpdateStepAnswerEvent>(_updateStepAnswer);
     on<ActiveStepChangedEvent>(_handleActiveStepEvent);
   }
 
@@ -20,11 +19,6 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {}
-
-  void _updateStepAnswer(
-    UpdateStepAnswerEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) {}
 
   void _handleActiveStepEvent(
     ActiveStepChangedEvent event,
