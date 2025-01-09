@@ -32,7 +32,7 @@ class TestContext {
       return TestContext.instance.context[key]!;
     }
     throw Exception(
-        'You tried to access $key property, but it does not exist.');
+        'You tried to access $key property, but it does not exist.',);
   }
 
   static void clearContext() {
