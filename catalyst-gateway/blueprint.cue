@@ -146,13 +146,12 @@ project: {
 						}
 					}
 
-					// TODO: Re-enable when deployment is working
-					// readinessProbe: {
-					// 	httpGet: {
-					// 		path: "/v1/health/ready"
-					// 		port: 3030
-					// 	}
-					// }
+					readinessProbe: {
+						httpGet: {
+							path: "/v1/health/ready"
+							port: 3030
+						}
+					}
 
 					livenessProbe: {
 						httpGet: {
