@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.29 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.3 AS spectral-ci
 IMPORT .. AS gateway
 
 # cspell: words oapi
