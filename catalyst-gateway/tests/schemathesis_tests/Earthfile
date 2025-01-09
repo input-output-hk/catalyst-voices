@@ -3,14 +3,15 @@ VERSION 0.8
 package-schemathesis:
     FROM python:3.12-alpine3.20
     # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
+    ARG openapi_spec
+    # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
+    ARG seed
+
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==3.27.1
     RUN mkdir /results
     COPY ./hooks/hooks.py .
     VOLUME /results
-    ARG openapi_spec
-    # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
-    ARG seed
     ENTRYPOINT st run --endpoint '^/api/v1/health' --checks=all $openapi_spec \
                     --workers=2 \
                     --wait-for-schema=120 \
