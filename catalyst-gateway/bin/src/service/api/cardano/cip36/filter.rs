@@ -237,9 +237,12 @@ fn cross_reference_key(
 async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
-        stake_address: stake_pub_key.try_into()?,
-    })
+    let mut registrations_iter = GetRegistrationQuery::execute(
+        session,
+        GetRegistrationParams {
+            stake_address: stake_pub_key.try_into()?,
+        },
+    )
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
@@ -274,8 +277,7 @@ async fn get_all_registrations_from_stake_pub_key(
     Ok(registrations)
 }
 
-/// Sort latest registrations for a given stake address, sort by slot no and return
-/// latest.
+/// Sort latest registrations for a given stake address, sort by slot no and return latest.
 fn sort_latest_registration(mut registrations: Vec<Cip36Details>) -> anyhow::Result<Cip36Details> {
     registrations.sort_by_key(|registration| Reverse(registration.slot_no.clone()));
     registrations.into_iter().next().ok_or(anyhow::anyhow!(
