@@ -50,12 +50,16 @@ final class DocumentSchemaDto {
   DocumentSchema toModel() {
     const nodeId = DocumentNodeId.root;
     final order = this.order ?? const [];
+    final definitionModels = definitions.models;
 
     final mappedSegments = segments
-        .where((e) => e.ref.contains('segment'))
+        .where((e) {
+          final def = definitionModels.getDefinition(e.ref);
+          return def is SegmentDefinition;
+        })
         .map(
           (e) => e.toModel(
-            definitions.models,
+            definitionModels,
             parentNodeId: DocumentNodeId.root,
           ),
         )

@@ -44,7 +44,10 @@ final class DocumentSchemaSegmentDto {
     final required = this.required ?? const [];
 
     final mappedSections = sections
-        .where((section) => section.ref.contains('section'))
+        .where((section) {
+          final def = definitions.getDefinition(section.ref);
+          return def is SectionDefinition;
+        })
         .map(
           (e) => e.toModel(
             definitions,
