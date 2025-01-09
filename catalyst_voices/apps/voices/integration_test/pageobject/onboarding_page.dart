@@ -439,8 +439,11 @@ class OnboardingPage {
           await getChildNodeText($, $(nextStepTitle)),
           T.get('Your next step'),
         );
-        expect($(nextStepBody).text, T.get('Now let’s set your Unlock password '
-            'for this device!'),);
+        expect(
+          $(nextStepBody).text,
+          T.get('Now let’s set your Unlock password '
+              'for this device!'),
+        );
         expect($(backButton), findsOneWidget);
         expect($(nextButton), findsOneWidget);
         break;

@@ -254,7 +254,7 @@ void main() async {
 
       patrolWidgetTest(
         'visitor - create - mnemonic input - correct words unlock next button',
-            (PatrolTester $) async {
+        (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
               .tap(settleTimeout: const Duration(seconds: 10));
