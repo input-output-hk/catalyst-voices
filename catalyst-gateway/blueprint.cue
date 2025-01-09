@@ -148,14 +148,14 @@ project: {
 
 					readinessProbe: {
 						httpGet: {
-							path: "/v1/health/ready"
+							path: "/api/v1/health/ready"
 							port: 3030
 						}
 					}
 
 					livenessProbe: {
 						httpGet: {
-							path: "/v1/health/live"
+							path: "/api/v1/health/live"
 							port: 3030
 						}
 					}
