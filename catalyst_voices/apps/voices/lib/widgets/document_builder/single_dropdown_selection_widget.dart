@@ -68,7 +68,6 @@ class _SingleDropdownSelectionWidgetState
   void dispose() {
     _textEditingController.dispose();
     super.dispose();
-
   }
 
   @override
