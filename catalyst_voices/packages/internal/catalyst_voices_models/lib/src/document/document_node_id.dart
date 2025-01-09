@@ -4,19 +4,30 @@ import 'package:catalyst_voices_models/src/node_id.dart';
 /// in a format of paths from the top-level node down to the nested node.
 final class DocumentNodeId extends NodeId {
   /// The top-level node in the document.
-  static const DocumentNodeId root = DocumentNodeId._('');
+  static const DocumentNodeId root = DocumentNodeId._('', paths: []);
+
+  /// The nested paths in a document that lead to an object.
+  final List<String> paths;
 
   /// The default constructor for the [DocumentNodeId].
   ///
   /// From outside this file new nodes must be created by interacting
   /// with [root] node and calling either [child] or [parent] methods.
-  const DocumentNodeId._(super.value);
+  const DocumentNodeId._(
+    super.value, {
+    required this.paths,
+  });
 
-  /// The nested paths in a document that lead to an object.
-  List<String> get paths => value.isNotEmpty ? value.split('.') : const [];
+  // TODO(damian-molinski): uncomment if we have confirmation about dots in
+  // paths
+  // List<String> get paths => value.isNotEmpty ? value.split('.') : const [];
 
   /// Utility constructor which ensure that value always has correct format.
-  DocumentNodeId._fromPaths(List<String> paths) : this._(paths.join('.'));
+  DocumentNodeId._fromPaths(List<String> paths)
+      : this._(
+          paths.join('.'),
+          paths: paths,
+        );
 
   /// Returns a parent node.
   ///
