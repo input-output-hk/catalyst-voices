@@ -1,32 +1,31 @@
-import 'package:catalyst_voices/widgets/navigation/section_step_state_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class TreasuryCampaignDetailsStep extends StatelessWidget {
-  final TreasurySectionStep step;
+class TreasuryCampaignCategoriesTile extends StatelessWidget {
+  final TreasurySection data;
 
-  const TreasuryCampaignDetailsStep({
+  const TreasuryCampaignCategoriesTile(
+    this.data, {
     super.key,
-    required this.step,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SectionStepStateBuilder(
-      id: step.sectionStepId,
+    return SectionStateBuilder(
+      id: data.id,
       builder: (context, value, child) {
         return WorkspaceTextTileContainer(
-          name: step.localizedDesc(context),
+          name: data.resolveDesc(context) ?? data.resolveTitle(context),
           isSelected: value.isSelected,
           headerActions: [
             VoicesTextButton(
-              onTap: step.isEditable ? () {} : null,
+              onTap: data.isEditable ? () {} : null,
               child: Text(context.l10n.stepEdit),
             ),
           ],
-          content: step.localizedDesc(context),
+          content: data.resolveDesc(context) ?? data.resolveTitle(context),
         );
       },
     );

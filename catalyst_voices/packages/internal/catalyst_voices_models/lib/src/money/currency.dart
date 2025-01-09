@@ -16,6 +16,8 @@ final class Currency extends Equatable {
           symbol: '₳',
         );
 
+  String format(num money) => '$symbol$money';
+
   @override
   List<Object?> get props => [
         name,

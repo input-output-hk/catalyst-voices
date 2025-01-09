@@ -3,27 +3,27 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBuilderState extends Equatable {
-  final List<Section> sections;
+  final List<Segment> segments;
   final ProposalGuidance guidance;
 
   const ProposalBuilderState({
-    this.sections = const [],
+    this.segments = const [],
     this.guidance = const ProposalGuidance(),
   });
 
   ProposalBuilderState copyWith({
-    List<Section>? sections,
+    List<Segment>? segments,
     ProposalGuidance? guidance,
   }) {
     return ProposalBuilderState(
-      sections: sections ?? this.sections,
+      segments: segments ?? this.segments,
       guidance: guidance ?? this.guidance,
     );
   }
 
   @override
   List<Object?> get props => [
-        sections,
+        segments,
         guidance,
       ];
 }
