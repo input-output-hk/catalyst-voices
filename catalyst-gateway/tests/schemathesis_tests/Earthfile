@@ -9,10 +9,11 @@ package-schemathesis:
     COPY ./hooks/hooks.py .
     VOLUME /results
     ARG openapi_spec
-    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                    && st run --checks all $openapi_spec \
+    # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
+    ARG seed
+    ENTRYPOINT st run --endpoint '^/api/v1/health' $openapi_spec \
                     --workers=2 \
-                    --wait-for-schema=15 \
+                    --wait-for-schema=120 \
                     --max-response-time=5000 \
                     --hypothesis-max-examples=1000 \
                     --data-generation-method=all \
@@ -21,24 +22,25 @@ package-schemathesis:
                     --show-trace \
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
-                    --cassette-path=/results/cassette.yaml
+                    --cassette-path=/results/cassette.yaml \
+                    $seed
 
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
-# Disabled in CI, to enable it rename to `test-fuzzer-api`.
-fuzzer-api:
-    FROM earthly/dind:alpine-alpine-3.20-docker-26.1.5-r0
+test-fuzzer-api:
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
-    RUN apk add yq zstd
     COPY schemathesis-docker-compose.yml .
-    LET OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
+    LET OPENAPI_SPEC="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG seed
+
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
+        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC --seed=$seed) \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway) \
+        --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
