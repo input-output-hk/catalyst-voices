@@ -410,7 +410,7 @@ pub(crate) async fn get_registration_given_vote_key(
 }
 
 /// ALL
-/// Get all registrations or contrain if slot# given.
+/// Get all registrations or constrain if slot# given.
 pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
     let all_stakes_and_vote_keys = match get_all_stake_addrs_and_vote_keys(&session.clone()).await {
         Ok(key_pairs) => key_pairs,
@@ -434,7 +434,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     // We now have all stake pub keys and vote keys for cip36 registrations.
     // Iterate through them and individually get all valid and invalid registrations.
     // Compose the result into a snapshot.
-    // TODO: Optimise: Can be done parallel.
+    // TODO: Optimize: Can be done parallel.
     for (stake_public_key, vote_pub_key) in &all_stakes_and_vote_keys {
         let mut registrations_for_given_stake_pub_key =
             match get_all_registrations_from_stake_pub_key(&session, stake_public_key.clone()).await
@@ -455,7 +455,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
             vote_pub_key,
         );
 
-        // ALL: Snapshot can be contrained into a subset with a time contraint or NOT.
+        // ALL: Snapshot can be constrained into a subset with a time constraint or NOT.
         if let Some(ref slot_no) = slot_no {
             // Any registrations that occurred after this Slot are not included in the list.
             let filtered_registrations =

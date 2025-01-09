@@ -35,7 +35,6 @@ pub(crate) async fn cip36_registrations(
         match StakeAddressOrPublicKey::from(stake_or_voter) {
             StakeAddressOrPublicKey::Address(cip19_stake_address) => {
                 // Typically, a stake address will start with 'stake1',
-                // for example: stake1ux7k5ztvhwj7ykv5v7vwjjzdfckjk0v74z9p9m5w0t5534clf62eq
                 // We need to convert this to a stake hash as per our data model to then find the,
                 // Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
                 // We then get the latest registration or from a specific time as optionally
