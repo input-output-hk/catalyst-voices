@@ -414,7 +414,7 @@ pub(crate) async fn get_registration_given_vote_key(
 /// ALL
 /// Get all registrations or contrain if slot# given.
 pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
-    let all_stakes_and_vote_keys = match get_all_stake_addrs(&session.clone()).await {
+    let all_stakes_and_vote_keys = match get_all_stake_addrs_and_vote_keys(&session.clone()).await {
         Ok(key_pairs) => key_pairs,
         Err(err) => {
             error!(
@@ -525,7 +525,7 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36D
 
 ///  Get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)] from cip36
 /// registrations.
-pub async fn get_all_stake_addrs(
+pub async fn get_all_stake_addrs_and_vote_keys(
     session: &Arc<CassandraSession>,
 ) -> Result<Vec<(Ed25519HexEncodedPublicKey, Ed25519HexEncodedPublicKey)>, anyhow::Error> {
     let mut stake_addr_iter =
