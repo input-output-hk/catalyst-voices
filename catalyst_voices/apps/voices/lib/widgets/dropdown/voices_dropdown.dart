@@ -113,9 +113,10 @@ class SingleSelectDropdown<T> extends StatelessWidget {
         focusedBorder: _border(context),
       ),
       trailingIcon: Offstage(
-        offstage: enabled,
+        offstage: !enabled,
         child: VoicesAssets.icons.chevronDown.buildIcon(),
       ),
+      selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
       menuStyle: MenuStyle(
         backgroundColor: WidgetStatePropertyAll(
           Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
