@@ -12,7 +12,6 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case MultiLineTextEntryDefinition():
       case MultiLineTextEntryMarkdownDefinition():
       case DropDownSingleSelectDefinition():
-      case MultiSelectDefinition():
       case NestedQuestionsDefinition():
       case TagGroupDefinition():
       case TagSelectionDefinition():
@@ -28,6 +27,7 @@ extension DocumentDefinitionConverterExt<T extends Object>
       case SingleGroupedTagSelectorDefinition():
         return const GroupedTagsSelectionConverter()
             as JsonConverter<T?, Object?>;
+      case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
       case SingleLineHttpsURLEntryListDefinition():

@@ -1,7 +1,7 @@
 part of '../document_definitions.dart';
 
 final class MultiSelectDefinition
-    extends BaseDocumentDefinition<List<dynamic>> {
+    extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
   final bool uniqueItems;
 
