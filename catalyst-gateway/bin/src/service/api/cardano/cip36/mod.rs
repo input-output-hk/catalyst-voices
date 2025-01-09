@@ -3,7 +3,7 @@
 use poem::http::{HeaderMap, StatusCode};
 use poem_openapi::{param::Query, OpenApi};
 
-use self::cardano::slot_no::SlotNo;
+use self::{cardano::slot_no::SlotNo, common::auth::none::NoAuthorization};
 use super::Ed25519HexEncodedPublicKey;
 use crate::service::common::{
     self,
@@ -50,6 +50,7 @@ impl Api {
         /// Headers, used if the query is requesting ALL to determine if the secret API
         /// Key is also defined.
         headers: &HeaderMap,
+        _auth: NoAuthorization,
     ) -> response::AllRegistration {
         // Special validation for the `lookup` parameter.
         // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
