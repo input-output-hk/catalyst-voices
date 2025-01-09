@@ -170,10 +170,7 @@ void main() async {
             $,
             RegistrationState.keychainCreateMnemonicWritedown,
           );
-          OnboardingPage.voicesFilledButtonIsDisabled(
-            $,
-            OnboardingPage.nextButton,
-          );
+          OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
         },
       );
 
@@ -251,6 +248,30 @@ void main() async {
           await OnboardingPage.registrationInfoPanelLooksAsExpected(
             $,
             RegistrationState.keychainCreateMnemonicInputInfo,
+          );
+        },
+      );
+
+      patrolWidgetTest(
+        'visitor - create - mnemonic input - correct words unlock next button',
+            (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await $(AppBarPage.getStartedBtn)
+              .tap(settleTimeout: const Duration(seconds: 10));
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+          await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.storeSeedPhrases($);
+          await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          //temporary: remove reset when seeds are no longer prefilled
+          await $(OnboardingPage.resetButton).tap();
+          await OnboardingPage.enterStoredSeedPhrases($);
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.onboardingScreenLooksAsExpected(
+            $,
+            RegistrationState.keychainCreateMnemonicVerified,
           );
         },
       );

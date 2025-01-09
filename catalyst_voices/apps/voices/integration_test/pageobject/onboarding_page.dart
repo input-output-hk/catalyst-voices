@@ -4,6 +4,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 
 import '../types/registration_state.dart';
 import '../utils/selector_utils.dart';
+import '../utils/test_context.dart';
 import '../utils/translations_utils.dart';
 import 'common_page.dart';
 
@@ -26,6 +27,9 @@ class OnboardingPage {
   static const seedPhraseStoredCheckbox = Key('SeedPhraseStoredCheckbox');
   static const uploadKeyButton = Key('UploadKeyButton');
   static const resetButton = Key('ResetButton');
+  static const seedPhrasesPicker = Key('SeedPhrasesPicker');
+  static const nextStepTitle = Key('NextStepTitle');
+  static const nextStepBody = Key('NextStepBody');
 
   static Future<int> writedownSeedPhraseNumber(
     PatrolTester $,
@@ -37,16 +41,16 @@ class OnboardingPage {
     return int.parse(rawNumber!.split('.').first);
   }
 
-  static Future<int> writedownSeedPhraseWord(
+  static Future<String> writedownSeedPhraseWord(
     PatrolTester $,
     int index,
   ) async {
-    final rawNumber =
+    final rawWord =
         $(Key('SeedPhrase${index}CellKey')).$(const Key('SeedPhraseWord')).text;
-    return int.parse(rawNumber!.split('.').first);
+    return rawWord!;
   }
 
-  static Future<String> inputSeedPhraseCompleterWord(
+  static Future<String> inputSeedPhraseCompleterText(
     PatrolTester $,
     int index,
   ) async {
@@ -57,7 +61,7 @@ class OnboardingPage {
     return seedWord!;
   }
 
-  static Future<String?> inputSeedPhrasePickerWord(
+  static Future<String?> inputSeedPhrasePickerText(
     PatrolTester $,
     int index,
   ) async {
@@ -66,6 +70,13 @@ class OnboardingPage {
       $(Key('PickerSeedPhrase${index + 1}CellKey')),
     );
     return seedWord!;
+  }
+
+  static Future<PatrolFinder> inputSeedPhrasePicker(
+    PatrolTester $,
+    String word,
+  ) async {
+    return $(seedPhrasesPicker).$(find.text(word));
   }
 
   static Future<String?> infoPartHeaderTitleText(PatrolTester $) async {
@@ -105,7 +116,7 @@ class OnboardingPage {
     return child;
   }
 
-  static void voicesFilledButtonIsEnabled(
+  static void voicesButtonIsEnabled(
     PatrolTester $,
     Key button,
   ) {
@@ -116,7 +127,7 @@ class OnboardingPage {
     SelectorUtils.isEnabled($, $(child));
   }
 
-  static void voicesFilledButtonIsDisabled(
+  static void voicesButtonIsDisabled(
     PatrolTester $,
     Key button,
   ) {
@@ -226,6 +237,7 @@ class OnboardingPage {
           ),
           T.get('Learn More'),
         );
+        break;
       case RegistrationState.keychainCreateMnemonicInput:
         expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         expect(
@@ -249,7 +261,18 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateMnemonicVerified:
-        throw UnimplementedError();
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        //temporary: check for specific picture (green checked icon)
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
+        break;
       case RegistrationState.keychainRestoreChoice:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInfo:
@@ -394,7 +417,33 @@ class OnboardingPage {
         expect($(nextButton), findsOneWidget);
         break;
       case RegistrationState.keychainCreateMnemonicVerified:
-        throw UnimplementedError();
+        await $(registrationDetailsPanel)
+            .$(registrationDetailsTitle)
+            .waitUntilVisible();
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsTitle),
+          ),
+          T.get("Nice job! You've successfully verified the seed phrase for "
+              'your keychain.'),
+        );
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsBody),
+          ),
+          isNotEmpty,
+        );
+        expect(
+          await getChildNodeText($, $(nextStepTitle)),
+          T.get('Your next step'),
+        );
+        expect($(nextStepBody).text, T.get('Now let’s set your Unlock password '
+            'for this device!'),);
+        expect($(backButton), findsOneWidget);
+        expect($(nextButton), findsOneWidget);
+        break;
       case RegistrationState.keychainRestoreChoice:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInfo:
@@ -437,8 +486,21 @@ class OnboardingPage {
 
   static Future<void> inputSeedPhrasesAreDisplayed(PatrolTester $) async {
     for (var i = 0; i < 12; i++) {
-      expect(await inputSeedPhrasePickerWord($, i), isNotEmpty);
-      expect(await inputSeedPhraseCompleterWord($, i), isNotEmpty);
+      expect(await inputSeedPhrasePickerText($, i), isNotEmpty);
+      expect(await inputSeedPhraseCompleterText($, i), isNotEmpty);
+    }
+  }
+
+  static Future<void> storeSeedPhrases(PatrolTester $) async {
+    for (var i = 0; i < 12; i++) {
+      final v1 = await writedownSeedPhraseWord($, i);
+      TestContext.save(key: 'word$i', value: v1);
+    }
+  }
+
+  static Future<void> enterStoredSeedPhrases(PatrolTester $) async {
+    for (var i = 0; i < 12; i++) {
+      await inputSeedPhrasePicker($, TestContext.get(key: 'word$i')).tap();
     }
   }
 }
