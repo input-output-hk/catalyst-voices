@@ -18,7 +18,7 @@ use crate::db::index::{
 /// [(`stake_addr,vote_key`)]
 const GET_ALL_STAKES_AND_VOTE_KEYS: &str = include_str!("../cql/get_all_stake_addrs.cql");
 
-/// Get registration
+/// Get all stake and vote keys from cip36 registration
 #[derive(SerializeRow)]
 pub(crate) struct GetAllStakesAndVoteKeysParams {}
 
