@@ -31,7 +31,7 @@
         },
         "singleLineHttpsURLEntry": {
             "$comment": "UI - Single Line text entry for HTTPS Urls.",
-            "type": ["string", "null"],
+            "type": "string",
             "format": "uri",
             "pattern": "^https:.*",
             "x-note": "Enter a valid HTTPS URL. Must start with 'https://' and be a complete, working web address."
@@ -224,6 +224,7 @@
                         }
                     },
                     "required": [
+                        "title"
                     ]
                 },
                 "proposer": {
