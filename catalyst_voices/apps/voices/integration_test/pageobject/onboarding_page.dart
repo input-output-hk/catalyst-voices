@@ -35,6 +35,14 @@ class OnboardingPage {
   static const passwordConfirmInputField = Key('PasswordConfirmInputField');
   static const passwordStrengthIndicator = Key('PasswordStrengthIndicator');
   static const passwordStrengthLabel = Key('PasswordStrengthLabel');
+  static const finishAccountCreationPanel = Key('FinishAccountCreationPanel');
+  static const finishAccountKeychainCreated =
+      Key('StepRegistrationProgressStepGroup.createKeychainRowKey');
+  static const finishAccountLinkWallet =
+      Key('StepRegistrationProgressStepGroup.linkWalletRowKey');
+  static const finishAccountAccountComplete =
+      Key('StepRegistrationProgressStepGroup.accountCompletedRowKey');
+  static const linkWalletAndRolesButton = Key('LinkWalletAndRolesButton');
 
   static Future<int> writedownSeedPhraseNumber(
     PatrolTester $,
@@ -314,6 +322,19 @@ class OnboardingPage {
           T.get('Learn More'),
         );
         break;
+      case RegistrationState.keychainCreateSuccess:
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        //temporary: check for specific picture (green key locked icon)
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
+        break;
       case RegistrationState.keychainRestoreChoice:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInfo:
@@ -321,8 +342,6 @@ class OnboardingPage {
       case RegistrationState.keychainRestoreMnemonicInput:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreSuccess:
-        throw UnimplementedError();
-      case RegistrationState.keychainCreateSuccess:
         throw UnimplementedError();
       case RegistrationState.linkWalletInfo:
         throw UnimplementedError();
@@ -523,6 +542,37 @@ class OnboardingPage {
         expect($(nextButton), findsOneWidget);
         OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
         break;
+      case RegistrationState.keychainCreateSuccess:
+        expect(
+          await $(finishAccountCreationPanel).$(Text).text,
+          T.get('Congratulations your Catalyst  Keychain is created!'),
+        );
+        expect(
+          await $(finishAccountKeychainCreated).$(Text).text,
+          T.get('Catalyst Keychain created'),
+        );
+        expect(
+          await $(finishAccountLinkWallet).$(Text).text,
+          T.get('Link Cardano Wallet & Roles'),
+        );
+        expect(
+          await $(finishAccountAccountComplete).$(Text).text,
+          T.get('Catalyst account creation completed!'),
+        );
+        expect(
+          await getChildNodeText($, $(nextStepTitle)),
+          T.get('Your next step'),
+        );
+        expect(
+          $(nextStepBody).text,
+          T.get('In the next step you write your Catalyst roles and  account '
+              'to the Cardano Mainnet.'),
+        );
+        expect(
+          $(linkWalletAndRolesButton).$(Text).text,
+          T.get('Link your Cardano Wallet & Roles'),
+        );
+        break;
       case RegistrationState.keychainRestoreChoice:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInfo:
@@ -530,8 +580,6 @@ class OnboardingPage {
       case RegistrationState.keychainRestoreMnemonicInput:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreSuccess:
-        throw UnimplementedError();
-      case RegistrationState.keychainCreateSuccess:
         throw UnimplementedError();
       case RegistrationState.linkWalletInfo:
         throw UnimplementedError();

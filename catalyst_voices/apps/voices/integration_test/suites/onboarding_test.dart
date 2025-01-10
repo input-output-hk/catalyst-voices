@@ -431,8 +431,7 @@ void main() async {
       );
 
       patrolWidgetTest(
-        'visitor - create - password input - valid minimal length password '
-        'enable next button',
+        'visitor - create - password input - valid minimum length password',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
@@ -465,8 +464,7 @@ void main() async {
       );
 
       patrolWidgetTest(
-        'visitor - create - password input - valid long password enable next '
-        'button',
+        'visitor - create - password input - valid long password',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
@@ -497,7 +495,7 @@ void main() async {
       );
 
       patrolWidgetTest(
-        'visitor - create - password input - too short password disable next ',
+        'visitor - create - password input - too short password',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
@@ -527,8 +525,7 @@ void main() async {
       );
 
       patrolWidgetTest(
-        'visitor - create - password input - valid password, no confirmation '
-        'then next disabled',
+        'visitor - create - password input - valid password, no confirmation',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
@@ -558,8 +555,7 @@ void main() async {
       );
 
       patrolWidgetTest(
-        'visitor - create - password input - not matching confirmation '
-        'then next button disabled',
+        'visitor - create - password input - not matching confirmation',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
@@ -585,6 +581,35 @@ void main() async {
           );
           await OnboardingPage.passwordConfirmErrorIconIsShown($);
           OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
+        },
+      );
+
+      patrolWidgetTest(
+        'visitor - create - keychain created success screen looks OK',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await $(AppBarPage.getStartedBtn)
+              .tap(settleTimeout: const Duration(seconds: 10));
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+          await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.storeSeedPhrases($);
+          await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          //temporary: remove reset when seeds are no longer prefilled
+          await $(OnboardingPage.resetButton).tap();
+          await OnboardingPage.enterStoredSeedPhrases($);
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.enterPassword($, 'Test1234');
+          await OnboardingPage.enterPasswordConfirm($, 'Test1234');
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.onboardingScreenLooksAsExpected(
+            $,
+            RegistrationState.keychainCreateSuccess,
+          );
         },
       );
     },
