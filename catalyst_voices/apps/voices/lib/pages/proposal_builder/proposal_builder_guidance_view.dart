@@ -46,7 +46,7 @@ class _ProposalBuilderGuidanceViewState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        VoicesDropdown<GuidanceType?>(
+        FilterByDropdown<GuidanceType?>(
           items: GuidanceType.values
               .map(
                 (e) => VoicesDropdownMenuEntry<GuidanceType>(
