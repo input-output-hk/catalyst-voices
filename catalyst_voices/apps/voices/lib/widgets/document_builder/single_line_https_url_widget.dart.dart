@@ -83,8 +83,11 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   void _handleControllerChange() {
-    final value = _textEditingController.text;
-    _notifyChangeListener(value);
+    final controllerValue = _textEditingController.text;
+    if (widget.property.value != controllerValue &&
+        controllerValue.isNotEmpty) {
+      _notifyChangeListener(controllerValue);
+    }
   }
 
   void _notifyChangeListener(String? value) {

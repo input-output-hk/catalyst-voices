@@ -117,9 +117,11 @@ class _DocumentBuilderSectionTileState
   }
 
   void _handlePropertyChange(DocumentChange change) {
-    _builder.addChange(change);
-    _editedSection = _builder.build();
-    _pendingChanges.add(change);
+    setState(() {
+      _builder.addChange(change);
+      _editedSection = _builder.build();
+      _pendingChanges.add(change);
+    });
   }
 }
 
