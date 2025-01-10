@@ -58,7 +58,7 @@ final class DocumentSchemaSegmentDto {
         .toList();
 
     return DocumentSchemaSegment(
-      definition: definitions.getDefinition(ref),
+      definition: definitions.getDefinition(ref) as SegmentDefinition,
       nodeId: nodeId,
       id: id,
       title: title,

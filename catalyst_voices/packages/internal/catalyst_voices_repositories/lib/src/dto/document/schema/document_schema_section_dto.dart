@@ -55,7 +55,7 @@ final class DocumentSchemaSectionDto {
         .toList();
 
     return DocumentSchemaSection(
-      definition: definitions.getDefinition(ref),
+      definition: definitions.getDefinition(ref) as SectionDefinition,
       nodeId: nodeId,
       id: id,
       title: title,

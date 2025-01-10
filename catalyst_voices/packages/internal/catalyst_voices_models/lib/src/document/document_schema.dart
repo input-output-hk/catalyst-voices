@@ -43,7 +43,7 @@ final class DocumentSchema extends Equatable implements DocumentNode {
 
 /// A top-level grouping object of the document.
 final class DocumentSchemaSegment extends Equatable implements DocumentNode {
-  final BaseDocumentDefinition definition;
+  final SegmentDefinition definition;
   @override
   final DocumentNodeId nodeId;
   final String id;
@@ -76,7 +76,7 @@ final class DocumentSchemaSegment extends Equatable implements DocumentNode {
 
 /// A grouping object in a document on a section level.
 final class DocumentSchemaSection extends Equatable implements DocumentNode {
-  final BaseDocumentDefinition definition;
+  final SectionDefinition definition;
   @override
   final DocumentNodeId nodeId;
   final String id;
