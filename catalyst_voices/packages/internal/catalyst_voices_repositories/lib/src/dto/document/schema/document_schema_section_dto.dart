@@ -34,7 +34,7 @@ final class DocumentSchemaSectionDto {
 
   Map<String, dynamic> toJson() => _$DocumentSchemaSectionDtoToJson(this);
 
-  DocumentSchemaSection toModel(
+  DocumentSectionSchema toModel(
     List<BaseDocumentDefinition> definitions, {
     required DocumentNodeId parentNodeId,
     required bool isRequired,
@@ -54,7 +54,7 @@ final class DocumentSchemaSectionDto {
         )
         .toList();
 
-    return DocumentSchemaSection(
+    return DocumentSectionSchema(
       definition: definitions.getDefinition(ref) as SectionDefinition,
       nodeId: nodeId,
       id: id,

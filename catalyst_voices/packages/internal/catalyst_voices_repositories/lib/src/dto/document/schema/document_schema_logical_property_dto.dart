@@ -6,8 +6,8 @@ part 'document_schema_logical_property_dto.g.dart';
 
 @JsonSerializable(includeIfNull: false)
 final class DocumentSchemaLogicalGroupDto {
-  @DocumentSchemaLogicalPropertiesDtoConverter()
   @JsonKey(name: 'properties')
+  @DocumentSchemaLogicalPropertiesDtoConverter()
   final List<DocumentSchemaLogicalConditionDto>? conditions;
 
   DocumentSchemaLogicalGroupDto({

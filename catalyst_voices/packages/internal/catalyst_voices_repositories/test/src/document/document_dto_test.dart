@@ -42,7 +42,6 @@ void main() {
       // TODO(dtscalac): fix parsing the document and enable this test
       // the reason it fails is that we are ignoring some properties
       // and not outputting them back but they are present in the original doc
-      skip: true,
     );
 
     test(
@@ -102,7 +101,7 @@ void main() {
       );
     });
 
-    test('After serialization $DocumentPropertyDto has correct type', () {
+    test('After serialization $DocumentPropertyValueDto has correct type', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
 
@@ -112,11 +111,9 @@ void main() {
           .indexWhere((e) => e.schema.nodeId.paths.last == 'agreements');
       expect(agreementSegment, isNot(equals(-1)));
       final agreementSections = documentDto.segments[agreementSegment].sections;
-      expect(
-        agreementSections.first.properties.first.value,
-        isA<bool>(),
-      );
-      expect(agreementSections.first.properties.first.value, true);
+      final agreementProperty = agreementSections.first.properties.first
+          as DocumentPropertyValueDto<Object>;
+      expect(agreementProperty.value, true);
     });
   });
 }

@@ -23,7 +23,7 @@ final class SingleGroupedTagSelectorDefinition
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<GroupedTagsSelection> schema,
+    DocumentPropertySchema<GroupedTagsSelection> schema,
     GroupedTagsSelection? value,
   ) {
     final result = DocumentValidator.validateBasic(schema, value);
@@ -50,7 +50,7 @@ final class SingleGroupedTagSelectorDefinition
   }
 
   List<GroupedTags> groupedTags(
-    DocumentSchemaProperty<GroupedTagsSelection> schema,
+    DocumentPropertySchema<GroupedTagsSelection> schema,
   ) {
     assert(
       schema.definition is SingleGroupedTagSelectorDefinition,

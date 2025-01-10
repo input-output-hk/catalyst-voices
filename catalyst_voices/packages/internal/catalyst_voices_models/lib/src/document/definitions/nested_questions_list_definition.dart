@@ -17,7 +17,7 @@ final class NestedQuestionsListDefinition
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<List<Map<String, dynamic>>> schema,
+    DocumentPropertySchema<List<Map<String, dynamic>>> schema,
     List<Map<String, dynamic>>? value,
   ) {
     return DocumentValidator.validateList(schema, value);

@@ -14,7 +14,7 @@ final class SingleLineHttpsURLEntryDefinition
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<String> schema,
+    DocumentPropertySchema<String> schema,
     String? value,
   ) {
     return DocumentValidator.validateString(schema, value);

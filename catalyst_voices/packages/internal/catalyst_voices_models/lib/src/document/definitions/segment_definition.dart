@@ -23,7 +23,7 @@ final class SegmentDefinition extends BaseDocumentDefinition {
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<Object> schema,
+    DocumentPropertySchema<Object> schema,
     Object? value,
   ) {
     throw UnsupportedError('Segment cannot have a property');

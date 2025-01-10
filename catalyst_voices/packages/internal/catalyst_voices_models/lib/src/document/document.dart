@@ -38,7 +38,7 @@ final class Document extends Equatable {
 /// A segment that groups multiple [DocumentSection]'s.
 final class DocumentSegment extends Equatable {
   /// The schema of the document segment.
-  final DocumentSchemaSegment schema;
+  final DocumentSegmentSchema schema;
 
   /// The list of sections that group the [DocumentPropertyValue].
   final List<DocumentSection> sections;
@@ -61,7 +61,7 @@ final class DocumentSegment extends Equatable {
 /// A section that groups multiple [DocumentPropertyValue]'s.
 final class DocumentSection extends Equatable {
   /// The schema of the document section.
-  final DocumentSchemaSection schema;
+  final DocumentSectionSchema schema;
 
   /// The list of properties within this section.
   final List<DocumentProperty> properties;
@@ -97,7 +97,7 @@ final class DocumentSection extends Equatable {
 sealed class DocumentProperty extends Equatable {
   const DocumentProperty();
 
-  DocumentSchemaProperty get schema;
+  DocumentPropertySchema get schema;
 
   bool get isValid;
 }
@@ -108,7 +108,7 @@ sealed class DocumentProperty extends Equatable {
 /// More properties of the same type might be added to the list.
 final class DocumentPropertyList extends DocumentProperty {
   @override
-  final DocumentSchemaProperty schema;
+  final DocumentPropertySchema schema;
   final List<DocumentProperty> properties;
 
   const DocumentPropertyList({
@@ -133,7 +133,7 @@ final class DocumentPropertyList extends DocumentProperty {
 /// More properties cannot be added to the list.
 final class DocumentPropertyObject extends DocumentProperty {
   @override
-  final DocumentSchemaProperty schema;
+  final DocumentPropertySchema schema;
   final List<DocumentProperty> properties;
 
   const DocumentPropertyObject({
@@ -157,7 +157,7 @@ final class DocumentPropertyObject extends DocumentProperty {
 final class DocumentPropertyValue<T extends Object> extends DocumentProperty {
   /// The schema of the document property.
   @override
-  final DocumentSchemaProperty<T> schema;
+  final DocumentPropertySchema<T> schema;
 
   /// The current value this property holds.
   final T? value;

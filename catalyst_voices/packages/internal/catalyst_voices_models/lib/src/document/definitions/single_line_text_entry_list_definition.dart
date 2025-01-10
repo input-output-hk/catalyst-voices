@@ -18,7 +18,7 @@ final class SingleLineTextEntryListDefinition
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<List<String>> schema,
+    DocumentPropertySchema<List<String>> schema,
     List<String>? value,
   ) {
     return DocumentValidator.validateList(schema, value);

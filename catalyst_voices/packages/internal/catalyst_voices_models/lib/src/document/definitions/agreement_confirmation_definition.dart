@@ -16,7 +16,7 @@ final class AgreementConfirmationDefinition
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<bool> schema,
+    DocumentPropertySchema<bool> schema,
     bool? value,
   ) {
     return DocumentValidator.validateBool(schema, value);

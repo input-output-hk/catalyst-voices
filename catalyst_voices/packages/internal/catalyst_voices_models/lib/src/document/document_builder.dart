@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/document_change.dart';
+import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -87,20 +88,20 @@ final class DocumentBuilder implements DocumentNode {
 
 final class DocumentSegmentBuilder implements DocumentNode {
   /// The schema of the document segment.
-  DocumentSchemaSegment _schema;
+  DocumentSegmentSchema _schema;
 
   /// The list of sections that group the [DocumentPropertyValueBuilder].
   List<DocumentSectionBuilder> _sections;
 
   /// The default constructor for the [DocumentSegmentBuilder].
   DocumentSegmentBuilder({
-    required DocumentSchemaSegment schema,
+    required DocumentSegmentSchema schema,
     required List<DocumentSectionBuilder> sections,
   })  : _schema = schema,
         _sections = sections;
 
   /// Creates a [DocumentSegmentBuilder] from a [schema].
-  factory DocumentSegmentBuilder.fromSchema(DocumentSchemaSegment schema) {
+  factory DocumentSegmentBuilder.fromSchema(DocumentSegmentSchema schema) {
     return DocumentSegmentBuilder(
       schema: schema,
       sections: schema.sections.map(DocumentSectionBuilder.fromSchema).toList(),
@@ -147,20 +148,20 @@ final class DocumentSegmentBuilder implements DocumentNode {
 
 final class DocumentSectionBuilder implements DocumentNode {
   /// The schema of the document section.
-  DocumentSchemaSection _schema;
+  DocumentSectionSchema _schema;
 
   /// The list of properties within this section.
   List<DocumentPropertyBuilder> _properties;
 
   /// The default constructor for the [DocumentSectionBuilder].
   DocumentSectionBuilder({
-    required DocumentSchemaSection schema,
+    required DocumentSectionSchema schema,
     required List<DocumentPropertyBuilder> properties,
   })  : _schema = schema,
         _properties = properties;
 
   /// Creates a [DocumentSectionBuilder] from a [schema].
-  factory DocumentSectionBuilder.fromSchema(DocumentSchemaSection schema) {
+  factory DocumentSectionBuilder.fromSchema(DocumentSectionSchema schema) {
     return DocumentSectionBuilder(
       schema: schema,
       properties: schema.properties
@@ -211,6 +212,23 @@ sealed class DocumentPropertyBuilder implements DocumentNode {
   /// The default constructor for the [DocumentPropertyBuilder].
   const DocumentPropertyBuilder();
 
+  /// Creates a [DocumentPropertyBuilder] from a [schema].
+  factory DocumentPropertyBuilder.fromSchema(
+    DocumentPropertySchema schema,
+  ) {
+    switch (schema.definition.type) {
+      case DocumentDefinitionsObjectType.array:
+        return DocumentPropertyListBuilder.fromSchema(schema);
+      case DocumentDefinitionsObjectType.object:
+        return DocumentPropertyObjectBuilder.fromSchema(schema);
+      case DocumentDefinitionsObjectType.string:
+      case DocumentDefinitionsObjectType.integer:
+      case DocumentDefinitionsObjectType.boolean:
+      case DocumentDefinitionsObjectType.unknown:
+        return DocumentPropertyValueBuilder.fromSchema(schema);
+    }
+  }
+
   /// Creates a [DocumentSectionBuilder] from a [property].
   factory DocumentPropertyBuilder.fromProperty(DocumentProperty property) {
     switch (property) {
@@ -232,26 +250,24 @@ sealed class DocumentPropertyBuilder implements DocumentNode {
 
 final class DocumentPropertyListBuilder extends DocumentPropertyBuilder {
   /// The schema of the document property.
-  DocumentSchemaProperty _schema;
+  DocumentPropertySchema _schema;
 
   /// The list of children.
   List<DocumentPropertyBuilder> _properties;
 
   /// The default constructor for the [DocumentPropertyListBuilder].
   DocumentPropertyListBuilder({
-    required DocumentSchemaProperty schema,
+    required DocumentPropertySchema schema,
     required List<DocumentPropertyBuilder> properties,
   })  : _schema = schema,
         _properties = properties;
 
   /// Creates a [DocumentPropertyListBuilder] from a [schema].
   factory DocumentPropertyListBuilder.fromSchema(
-    DocumentSchemaProperty schema,
+    DocumentPropertySchema schema,
   ) {
     return DocumentPropertyListBuilder(
       schema: schema,
-      // TODO(dtscalac): extract items from schema,
-      // assign them default values
       properties: [],
     );
   }
@@ -306,13 +322,8 @@ final class DocumentPropertyListBuilder extends DocumentPropertyBuilder {
   void _handleAddListItemChange(DocumentAddListItemChange change) {
     if (change.nodeId == nodeId) {
       // targets this property
-
-      // TODO(dtscalac): based on schema just create a new property
-      // assign new node ID based on the index or something unique.
-      //
-      // maybe index is not a good idea because if user reorders
-      // we want to keep the node id but change the index.
-      _properties.add(_properties.last);
+      final property = _schema.items!.createListItem();
+      _properties.add(DocumentPropertyBuilder.fromProperty(property));
     } else {
       // targets child property
       for (final property in _properties) {
@@ -352,26 +363,26 @@ final class DocumentPropertyListBuilder extends DocumentPropertyBuilder {
 
 final class DocumentPropertyObjectBuilder extends DocumentPropertyBuilder {
   /// The schema of the document property.
-  DocumentSchemaProperty _schema;
+  DocumentPropertySchema _schema;
 
   /// The list of children.
   List<DocumentPropertyBuilder> _properties;
 
   /// The default constructor for the [DocumentPropertyObjectBuilder].
   DocumentPropertyObjectBuilder({
-    required DocumentSchemaProperty schema,
+    required DocumentPropertySchema schema,
     required List<DocumentPropertyBuilder> properties,
   })  : _schema = schema,
         _properties = properties;
 
   /// Creates a [DocumentPropertyObjectBuilder] from a [schema].
   factory DocumentPropertyObjectBuilder.fromSchema(
-    DocumentSchemaProperty schema,
+    DocumentPropertySchema schema,
   ) {
+    final properties = schema.properties ?? const [];
     return DocumentPropertyObjectBuilder(
       schema: schema,
-      // TODO(dtscalac): extract items from schema
-      properties: [],
+      properties: properties.map(DocumentPropertyBuilder.fromSchema).toList(),
     );
   }
 
@@ -415,21 +426,21 @@ final class DocumentPropertyObjectBuilder extends DocumentPropertyBuilder {
 final class DocumentPropertyValueBuilder<T extends Object>
     extends DocumentPropertyBuilder {
   /// The schema of the document property.
-  DocumentSchemaProperty<T> _schema;
+  DocumentPropertySchema<T> _schema;
 
   /// The current value this property holds.
   T? _value;
 
   /// The default constructor for the [DocumentPropertyValueBuilder].
   DocumentPropertyValueBuilder({
-    required DocumentSchemaProperty<T> schema,
+    required DocumentPropertySchema<T> schema,
     required T? value,
   })  : _schema = schema,
         _value = value;
 
   /// Creates a [DocumentPropertyValueBuilder] from a [schema].
   factory DocumentPropertyValueBuilder.fromSchema(
-    DocumentSchemaProperty<T> schema,
+    DocumentPropertySchema<T> schema,
   ) {
     return DocumentPropertyValueBuilder(
       schema: schema,

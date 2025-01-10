@@ -11,9 +11,10 @@ final class DocumentValidator {
   ///
   /// There are no specific checks for different types like [String] or [int].
   static DocumentValidationResult validateBasic(
-    DocumentSchemaProperty<Object> schema,
+    DocumentPropertySchema<Object> schema,
     Object? value,
   ) {
+    // TODO(dtscalac): validate type
     if (schema.isRequired && value == null) {
       return MissingRequiredDocumentValue(invalidNodeId: schema.nodeId);
     }
@@ -22,7 +23,7 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateString(
-    DocumentSchemaProperty<String> schema,
+    DocumentPropertySchema<String> schema,
     String? value,
   ) {
     final result = validateBasic(schema, value);
@@ -45,7 +46,7 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateNum(
-    DocumentSchemaProperty<num> schema,
+    DocumentPropertySchema<num> schema,
     num? value,
   ) {
     final result = validateBasic(schema, value);
@@ -68,7 +69,7 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateList(
-    DocumentSchemaProperty<List<dynamic>> schema,
+    DocumentPropertySchema<List<dynamic>> schema,
     List<dynamic>? value,
   ) {
     final result = validateBasic(schema, value);
@@ -91,7 +92,7 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateBool(
-    DocumentSchemaProperty<bool> schema,
+    DocumentPropertySchema<bool> schema,
     // ignore: avoid_positional_boolean_parameters
     bool? value,
   ) {

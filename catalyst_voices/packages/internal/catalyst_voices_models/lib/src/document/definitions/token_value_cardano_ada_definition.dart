@@ -11,7 +11,7 @@ final class TokenValueCardanoADADefinition extends BaseDocumentDefinition<int> {
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<int> schema,
+    DocumentPropertySchema<int> schema,
     int? value,
   ) {
     return DocumentValidator.validateNum(schema, value);

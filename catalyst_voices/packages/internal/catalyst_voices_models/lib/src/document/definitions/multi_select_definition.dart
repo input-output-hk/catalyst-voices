@@ -13,7 +13,7 @@ final class MultiSelectDefinition extends BaseDocumentDefinition<List<String>> {
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<List<dynamic>> schema,
+    DocumentPropertySchema<List<dynamic>> schema,
     List<dynamic>? value,
   ) {
     return DocumentValidator.validateList(schema, value);

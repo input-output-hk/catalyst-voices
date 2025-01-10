@@ -13,7 +13,7 @@ final class YesNoChoiceDefinition extends BaseDocumentDefinition<bool> {
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<bool> schema,
+    DocumentPropertySchema<bool> schema,
     bool? value,
   ) {
     return DocumentValidator.validateBool(schema, value);

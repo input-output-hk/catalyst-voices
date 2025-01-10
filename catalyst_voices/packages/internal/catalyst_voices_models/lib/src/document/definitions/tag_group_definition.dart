@@ -22,7 +22,7 @@ final class TagGroupDefinition extends BaseDocumentDefinition<String> {
 
   @override
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<String> schema,
+    DocumentPropertySchema<String> schema,
     String? value,
   ) {
     return DocumentValidator.validateString(schema, value);

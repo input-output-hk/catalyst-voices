@@ -91,6 +91,7 @@ enum DocumentDefinitionsFormat {
 }
 
 sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
+  // TODO(dtscalac): make it a list
   final DocumentDefinitionsObjectType type;
   final String note;
 
@@ -136,12 +137,12 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
     return refPathToDefinitionType[ref] != null;
   }
 
-  /// Creates an instance of [DocumentSchemaProperty]
+  /// Creates an instance of [DocumentPropertySchema]
   /// of the same type [T] as this definition has.
   ///
   /// This is needed when processing schemas
   /// in bulk and when the type T is not known.
-  DocumentSchemaProperty<T> createSchema({
+  DocumentPropertySchema<T> createSchema({
     required DocumentNodeId nodeId,
     required String id,
     required String? title,
@@ -149,13 +150,16 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
     required T? defaultValue,
     required String? guidance,
     required List<String>? enumValues,
+    required List<DocumentPropertySchema> properties,
+    required DocumentPropertySchema? items,
     required Range<int>? numRange,
     required Range<int>? strLengthRange,
     required Range<int>? itemsRange,
     required List<DocumentSchemaLogicalGroup>? oneOf,
     required bool isRequired,
+    required List<DocumentNodeId> order,
   }) {
-    return DocumentSchemaProperty(
+    return DocumentPropertySchema(
       definition: this,
       nodeId: nodeId,
       id: id,
@@ -164,11 +168,14 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
       defaultValue: defaultValue,
       guidance: guidance,
       enumValues: enumValues,
+      properties: properties,
+      items: items,
       numRange: numRange,
       strLengthRange: strLengthRange,
       itemsRange: itemsRange,
       oneOf: oneOf,
       isRequired: isRequired,
+      order: order,
     );
   }
 
@@ -204,7 +211,7 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
 
   /// Validates the property [value] against document rules.
   DocumentValidationResult validatePropertyValue(
-    DocumentSchemaProperty<T> schema,
+    DocumentPropertySchema<T> schema,
     T? value,
   );
 }
