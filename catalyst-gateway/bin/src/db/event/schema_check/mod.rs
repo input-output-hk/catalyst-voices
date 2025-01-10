@@ -20,19 +20,19 @@ impl EventDB {
     /// return the current schema version if its current.
     /// Otherwise return an error.
     pub(crate) async fn schema_version_check() -> anyhow::Result<i32> {
-        /*let schema_check = Self::query_one(SELECT_MAX_VERSION_SQL, &[]).await?;
-
-        let current_ver = schema_check.try_get("max")?;
-
-        if current_ver == DATABASE_SCHEMA_VERSION {
-            Ok(current_ver)
-        } else {
-            Err(MismatchedSchemaError {
-                was: current_ver,
-                expected: DATABASE_SCHEMA_VERSION,
-            }
-            .into())
-        }*/
+        // let schema_check = Self::query_one(SELECT_MAX_VERSION_SQL, &[]).await?;
+        //
+        // let current_ver = schema_check.try_get("max")?;
+        //
+        // if current_ver == DATABASE_SCHEMA_VERSION {
+        // Ok(current_ver)
+        // } else {
+        // Err(MismatchedSchemaError {
+        // was: current_ver,
+        // expected: DATABASE_SCHEMA_VERSION,
+        // }
+        // .into())
+        // }
 
         Ok(DATABASE_SCHEMA_VERSION)
     }
