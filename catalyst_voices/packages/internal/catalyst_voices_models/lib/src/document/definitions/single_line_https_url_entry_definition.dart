@@ -22,7 +22,7 @@ final class SingleLineHttpsURLEntryDefinition
     if (stringValidationResult.isInvalid) {
       return stringValidationResult;
     }
-    return DocumentValidator.validatePattern(schema, pattern, value);
+    return DocumentValidator.validatePattern(pattern, value);
   }
 
   @override

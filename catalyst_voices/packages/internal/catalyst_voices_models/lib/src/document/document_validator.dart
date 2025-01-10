@@ -99,15 +99,9 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validatePattern(
-    DocumentSchemaProperty<String> schema,
     String pattern,
     String? value,
   ) {
-    final result = validateBasic(schema, value);
-    if (result.isInvalid) {
-      return result;
-    }
-
     final regex = RegExp(pattern);
     if (value != null) {
       if (!regex.hasMatch(value)) {
