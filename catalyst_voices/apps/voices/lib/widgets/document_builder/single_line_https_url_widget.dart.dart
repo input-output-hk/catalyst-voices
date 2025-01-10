@@ -9,6 +9,7 @@ class SingleLineHttpsUrlWidget extends StatefulWidget {
   final String description;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
+
   const SingleLineHttpsUrlWidget({
     super.key,
     required this.property,
@@ -23,17 +24,13 @@ class SingleLineHttpsUrlWidget extends StatefulWidget {
 }
 
 class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
-  late TextEditingController _textEditingController;
+  late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController();
-    final value = widget.property.value;
-    if (value != null) {
-      _textEditingController.text = value;
-    }
+    _textEditingController = TextEditingController(text: widget.property.value);
     _textEditingController.addListener(_handleControllerChange);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
@@ -54,8 +51,8 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
 
   @override
   void dispose() {
-    super.dispose();
     _textEditingController.dispose();
+    super.dispose();
   }
 
   @override

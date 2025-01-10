@@ -12,6 +12,7 @@ class VoicesHttpsTextField extends StatefulWidget {
   final FocusNode? focusNode;
   final VoicesTextFieldValidator? validator;
   final bool enabled;
+
   const VoicesHttpsTextField({
     super.key,
     this.onFieldSubmitted,
@@ -30,11 +31,6 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
   TextEditingController? _controller;
   TextEditingController get _effectiveController {
     return widget.controller ?? (_controller ??= TextEditingController());
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -59,7 +55,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
               widget.enabled ? context.l10n.noUrlAdded : context.l10n.addUrl,
           prefixIcon: VoicesAssets.icons.link.buildIcon(),
           showStatusSuffixIcon: widget.enabled,
-          additionalSuffixIcons: _AdditionalSuffixIcons(
+          suffixIcon: _AdditionalSuffixIcons(
             enabled: widget.enabled,
             effectiveController: _effectiveController,
           ),
@@ -126,7 +122,7 @@ class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
   @override
   void initState() {
     super.initState();
-    widget.effectiveController.addListener(changeClearButtonVisibility);
+    widget.effectiveController.addListener(_changeClearButtonVisibility);
   }
 
   @override
@@ -150,7 +146,7 @@ class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
     );
   }
 
-  void changeClearButtonVisibility() {
+  void _changeClearButtonVisibility() {
     if (widget.enabled && widget.effectiveController.text.isNotEmpty) {
       setState(() {
         offstageClearButton = false;

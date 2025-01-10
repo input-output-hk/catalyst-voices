@@ -99,15 +99,22 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validatePattern(
+    DocumentSchemaProperty<String> schema,
     String pattern,
     String? value,
   ) {
-    final regex = RegExp(pattern);
-    if (regex.hasMatch(value ?? '')) {
-      return const SuccessfulDocumentValidation();
-    } else {
-      return DocumentPatternMismatch(pattern: pattern, value: value);
+    final result = validateBasic(schema, value);
+    if (result.isInvalid) {
+      return result;
     }
+
+    final regex = RegExp(pattern);
+    if (value != null) {
+      if (!regex.hasMatch(value)) {
+        return DocumentPatternMismatch(pattern: pattern, value: value);
+      }
+    }
+    return const SuccessfulDocumentValidation();
   }
 }
 

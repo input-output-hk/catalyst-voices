@@ -19,8 +19,10 @@ final class SingleLineHttpsURLEntryDefinition
   ) {
     final stringValidationResult =
         DocumentValidator.validateString(schema, value);
-    if (stringValidationResult.isInvalid) return stringValidationResult;
-    return DocumentValidator.validatePattern(pattern, value);
+    if (stringValidationResult.isInvalid) {
+      return stringValidationResult;
+    }
+    return DocumentValidator.validatePattern(schema, pattern, value);
   }
 
   @override

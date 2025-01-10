@@ -343,8 +343,10 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         return textStyle;
       }),
 
-      suffixIcon:
-          _wrapIconIfAdditionalExists(widget.decoration?.additionalSuffixIcons),
+      suffixIcon: _wrapSuffixIfExists(
+        widget.decoration?.suffixIcon,
+        const EdgeInsetsDirectional.only(start: 4, end: 8),
+      ),
       suffixText: widget.decoration?.suffixText,
       counterText: widget.decoration?.counterText,
       counterStyle: widget.enabled
@@ -404,22 +406,6 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     }
   }
 
-  Widget? _wrapIconIfAdditionalExists(Widget? child) {
-    final suffixIcon = _wrapIconIfExists(
-      widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
-      const EdgeInsetsDirectional.only(start: 4, end: 8),
-    );
-    if (child == null) {
-      return suffixIcon;
-    } else {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [child, suffixIcon ?? const SizedBox.shrink()],
-      );
-    }
-  }
-
   Widget? _wrapIconIfExists(Widget? child, EdgeInsetsDirectional padding) {
     if (child == null) return null;
 
@@ -436,6 +422,33 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           child: child,
         ),
       ),
+    );
+  }
+
+  Widget? _wrapSuffixIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    final statusSuffixWidget = _getStatusSuffixWidget();
+    if (child == null) return statusSuffixWidget;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconTheme(
+          data: IconThemeData(
+            size: 24,
+            color: Theme.of(context).colors.iconsForeground,
+          ),
+          child: Padding(
+            padding: padding,
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: child,
+            ),
+          ),
+        ),
+        if (statusSuffixWidget != null) statusSuffixWidget,
+      ],
     );
   }
 
@@ -690,8 +703,6 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.fillColor].
   final Color? fillColor;
 
-  final Widget? additionalSuffixIcons;
-
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -711,7 +722,6 @@ class VoicesTextFieldDecoration {
     this.prefixIcon,
     this.prefixText,
     this.suffixIcon,
-    this.additionalSuffixIcons,
     this.suffixText,
     this.counterText,
     this.showStatusSuffixIcon = true,
