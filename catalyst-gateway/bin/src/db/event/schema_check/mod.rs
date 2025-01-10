@@ -19,6 +19,7 @@ impl EventDB {
     /// Check the schema version.
     /// return the current schema version if its current.
     /// Otherwise return an error.
+    #[allow(clippy::unused_async)]
     pub(crate) async fn schema_version_check() -> anyhow::Result<i32> {
         // let schema_check = Self::query_one(SELECT_MAX_VERSION_SQL, &[]).await?;
         //
