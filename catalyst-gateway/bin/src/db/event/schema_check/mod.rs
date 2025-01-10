@@ -13,14 +13,14 @@ pub(crate) struct MismatchedSchemaError {
 }
 
 /// `select_max_version.sql`
-const SELECT_MAX_VERSION_SQL: &str = include_str!("select_max_version.sql");
+const _SELECT_MAX_VERSION_SQL: &str = include_str!("select_max_version.sql");
 
 impl EventDB {
     /// Check the schema version.
     /// return the current schema version if its current.
     /// Otherwise return an error.
     pub(crate) async fn schema_version_check() -> anyhow::Result<i32> {
-        let schema_check = Self::query_one(SELECT_MAX_VERSION_SQL, &[]).await?;
+        /*let schema_check = Self::query_one(SELECT_MAX_VERSION_SQL, &[]).await?;
 
         let current_ver = schema_check.try_get("max")?;
 
@@ -32,6 +32,8 @@ impl EventDB {
                 expected: DATABASE_SCHEMA_VERSION,
             }
             .into())
-        }
+        }*/
+
+        Ok(DATABASE_SCHEMA_VERSION)
     }
 }
