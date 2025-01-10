@@ -81,7 +81,7 @@ class _SingleGroupedTagSelectorWidgetState
     setState(() {
       _selection = value;
 
-      final change = DocumentChange(nodeId: widget.id, value: value);
+      final change = DocumentValueChange(nodeId: widget.id, value: value);
       widget.onChanged(change);
     });
   }

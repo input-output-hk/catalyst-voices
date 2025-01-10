@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DocumentTokenValueWidget extends StatefulWidget {
-  final DocumentProperty<int> property;
+  final DocumentPropertyValue<int> property;
   final Currency currency;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
@@ -94,7 +94,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   void _notifyChangeListener(int? value) {
-    final change = DocumentChange(
+    final change = DocumentValueChange(
       nodeId: widget.property.schema.nodeId,
       value: value,
     );

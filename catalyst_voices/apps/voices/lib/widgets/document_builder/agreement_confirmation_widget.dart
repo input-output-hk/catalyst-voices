@@ -96,7 +96,7 @@ class _DocumentCheckboxBuilderWidgetState
     });
 
     widget.onChanged(
-      DocumentChange(
+      DocumentValueChange(
         nodeId: _nodeId,
         value: _currentEditValue,
       ),

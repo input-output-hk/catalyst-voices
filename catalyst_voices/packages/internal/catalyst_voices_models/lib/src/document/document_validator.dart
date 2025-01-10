@@ -4,7 +4,7 @@ import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-/// Validates [DocumentProperty].
+/// Validates [DocumentPropertyValue].
 final class DocumentValidator {
   /// Validates the property [value] against all common rules that
   /// apply to all properties.

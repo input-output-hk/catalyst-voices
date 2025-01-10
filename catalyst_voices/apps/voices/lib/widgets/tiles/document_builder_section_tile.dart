@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 /// Displays a [DocumentSection] as list tile in edit / view mode.
 class DocumentBuilderSectionTile extends StatefulWidget {
-  /// A section of the document that groups [DocumentProperty].
+  /// A section of the document that groups [DocumentPropertyValue].
   final DocumentSection section;
 
   /// A callback that should be called with a list of [DocumentChange]
@@ -189,6 +189,106 @@ class _PropertyBuilder extends StatelessWidget {
 
   const _PropertyBuilder({
     required super.key,
+    required this.property,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final property = this.property;
+    switch (property) {
+      case DocumentPropertyList():
+        return _PropertyListBuilder(
+          list: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentPropertyObject():
+        return _PropertyObjectBuilder(
+          object: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentPropertyValue():
+        return _PropertyValueBuilder(
+          property: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+    }
+  }
+}
+
+class _PropertyListBuilder extends StatelessWidget {
+  final DocumentPropertyList list;
+  final bool isEditMode;
+  final ValueChanged<DocumentChange> onChanged;
+
+  const _PropertyListBuilder({
+    required this.list,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO(dtscalac): build a property list, similar to a section,
+    // below is just dummy implementation
+
+    // TODO(dtscalac): there should be a plus button or something similar
+    // to add more items into the list
+
+    return Column(
+      children: [
+        for (final property in list.properties)
+          _PropertyBuilder(
+            key: key,
+            property: property,
+            isEditMode: isEditMode,
+            onChanged: onChanged,
+          ),
+      ],
+    );
+  }
+}
+
+class _PropertyObjectBuilder extends StatelessWidget {
+  final DocumentPropertyObject object;
+  final bool isEditMode;
+  final ValueChanged<DocumentChange> onChanged;
+
+  const _PropertyObjectBuilder({
+    required this.object,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO(dtscalac): build a property object, similar to a section,
+    // below is just dummy implementation
+
+    return Column(
+      children: [
+        for (final property in object.properties)
+          _PropertyBuilder(
+            key: key,
+            property: property,
+            isEditMode: isEditMode,
+            onChanged: onChanged,
+          ),
+      ],
+    );
+  }
+}
+
+class _PropertyValueBuilder extends StatelessWidget {
+  final DocumentPropertyValue property;
+  final bool isEditMode;
+  final ValueChanged<DocumentChange> onChanged;
+
+  const _PropertyValueBuilder({
     required this.property,
     required this.isEditMode,
     required this.onChanged,

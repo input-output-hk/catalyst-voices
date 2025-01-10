@@ -184,20 +184,22 @@ sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
 
   /// Casts a [DocumentProperty<Object>] to [DocumentProperty<T>].
   ///
-  /// This method sets a specific type [T] for a [DocumentProperty],
+  /// This method sets a specific type [T] for a [DocumentPropertyValue],
   /// which holds a user-provided answer in the frontend.
   ///
   /// [property] is the [DocumentProperty<Object>] to be cast.
   ///
-  /// Returns a [DocumentProperty] with its value cast to type [T].
-  DocumentProperty<T> castProperty(DocumentProperty<Object> property) {
+  /// Returns a [DocumentPropertyValue] with its value cast to type [T].
+  DocumentPropertyValue<T> castProperty(
+    DocumentPropertyValue<Object> property,
+  ) {
     if (property.schema.definition != this) {
       throw ArgumentError(
         'The ${property.schema.nodeId} cannot be cast '
         'by $this document definition',
       );
     }
-    return property as DocumentProperty<T>;
+    return property as DocumentPropertyValue<T>;
   }
 
   /// Validates the property [value] against document rules.

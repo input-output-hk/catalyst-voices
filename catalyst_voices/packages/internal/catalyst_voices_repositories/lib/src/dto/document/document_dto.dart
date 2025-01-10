@@ -183,15 +183,15 @@ final class DocumentPropertyDto<T extends Object> {
     );
   }
 
-  factory DocumentPropertyDto.fromModel(DocumentProperty<T> model) {
+  factory DocumentPropertyDto.fromModel(DocumentPropertyValue<T> model) {
     return DocumentPropertyDto<T>(
       schema: model.schema,
       value: model.value,
     );
   }
 
-  DocumentProperty<T> toModel() {
-    return DocumentProperty<T>(
+  DocumentPropertyValue<T> toModel() {
+    return DocumentPropertyValue<T>(
       schema: schema,
       value: value,
       validationResult: schema.validatePropertyValue(value),

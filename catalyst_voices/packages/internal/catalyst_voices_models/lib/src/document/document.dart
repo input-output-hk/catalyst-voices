@@ -40,7 +40,7 @@ final class DocumentSegment extends Equatable {
   /// The schema of the document segment.
   final DocumentSchemaSegment schema;
 
-  /// The list of sections that group the [DocumentProperty].
+  /// The list of sections that group the [DocumentPropertyValue].
   final List<DocumentSection> sections;
 
   /// The default constructor for the [DocumentSegment].
@@ -58,7 +58,7 @@ final class DocumentSegment extends Equatable {
   List<Object?> get props => [schema, sections];
 }
 
-/// A section that groups multiple [DocumentProperty]'s.
+/// A section that groups multiple [DocumentPropertyValue]'s.
 final class DocumentSection extends Equatable {
   /// The schema of the document section.
   final DocumentSchemaSection schema;
@@ -76,10 +76,8 @@ final class DocumentSection extends Equatable {
   /// `true` otherwise.
   bool get isValid {
     for (final property in properties) {
-      final result = property.validationResult;
-      if (result.isInvalid) return false;
+      if (!property.isValid) return false;
     }
-
     return true;
   }
 
@@ -92,8 +90,73 @@ final class DocumentSection extends Equatable {
   List<Object?> get props => [schema, properties];
 }
 
-final class DocumentProperty<T extends Object> extends Equatable {
+/// A child of [DocumentSection].
+///
+/// Describes a property of the document which is
+/// neither a [DocumentSegment] nor a [DocumentSection].
+sealed class DocumentProperty extends Equatable {
+  const DocumentProperty();
+
+  DocumentSchemaProperty get schema;
+
+  bool get isValid;
+}
+
+/// A list of properties, each property in [properties]
+/// will have exactly the same type.
+///
+/// More properties of the same type might be added to the list.
+final class DocumentPropertyList extends DocumentProperty {
+  @override
+  final DocumentSchemaProperty schema;
+  final List<DocumentProperty> properties;
+
+  const DocumentPropertyList({
+    required this.schema,
+    required this.properties,
+  });
+
+  @override
+  bool get isValid {
+    for (final property in properties) {
+      if (!property.isValid) return false;
+    }
+    return true;
+  }
+
+  @override
+  List<Object?> get props => [schema, properties];
+}
+
+/// A list of properties, each property can be a different type.
+///
+/// More properties cannot be added to the list.
+final class DocumentPropertyObject extends DocumentProperty {
+  @override
+  final DocumentSchemaProperty schema;
+  final List<DocumentProperty> properties;
+
+  const DocumentPropertyObject({
+    required this.schema,
+    required this.properties,
+  });
+
+  @override
+  bool get isValid {
+    for (final property in properties) {
+      if (!property.isValid) return false;
+    }
+    return true;
+  }
+
+  @override
+  List<Object?> get props => [schema, properties];
+}
+
+/// A property with a value with no additional children.
+final class DocumentPropertyValue<T extends Object> extends DocumentProperty {
   /// The schema of the document property.
+  @override
   final DocumentSchemaProperty<T> schema;
 
   /// The current value this property holds.
@@ -102,16 +165,21 @@ final class DocumentProperty<T extends Object> extends Equatable {
   /// The validation result for the [value] against the [schema].
   final DocumentValidationResult validationResult;
 
-  /// The default constructor for the [DocumentProperty].
-  const DocumentProperty({
+  /// The default constructor for the [DocumentPropertyValue].
+  const DocumentPropertyValue({
     required this.schema,
     required this.value,
     required this.validationResult,
   });
 
-  /// Creates a new [DocumentPropertyBuilder] from this property.
-  DocumentPropertyBuilder toBuilder() {
-    return DocumentPropertyBuilder.fromProperty(this);
+  @override
+  bool get isValid {
+    return validationResult.isValid;
+  }
+
+  /// Creates a new [DocumentPropertyValueBuilder] from this property.
+  DocumentPropertyValueBuilder toBuilder() {
+    return DocumentPropertyValueBuilder.fromProperty(this);
   }
 
   @override

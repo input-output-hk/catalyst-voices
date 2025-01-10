@@ -85,7 +85,11 @@ class _SingleDropdownSelectionWidgetState
           items: _dropdownMenuEntries,
           enabled: widget.isEditMode,
           onSelected: (val) {
-            widget.onChanged(DocumentChange(nodeId: widget.nodeId, value: val));
+            final change = DocumentValueChange(
+              nodeId: widget.nodeId,
+              value: val,
+            );
+            widget.onChanged(change);
           },
           initialValue: widget.value,
         ),

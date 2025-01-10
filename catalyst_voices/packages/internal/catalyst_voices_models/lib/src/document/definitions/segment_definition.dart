@@ -15,7 +15,9 @@ final class SegmentDefinition extends BaseDocumentDefinition {
   }
 
   @override
-  DocumentProperty<Object> castProperty(DocumentProperty<Object> property) {
+  DocumentPropertyValue<Object> castProperty(
+    DocumentPropertyValue<Object> property,
+  ) {
     throw UnsupportedError('Segment cannot have a property');
   }
 
