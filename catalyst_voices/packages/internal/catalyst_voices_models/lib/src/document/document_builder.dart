@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/src/document/document_change.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 
 /// A mutable document builder that understands the [DocumentSchema].
 ///
@@ -88,7 +89,7 @@ final class DocumentSegmentBuilder implements DocumentNode {
   /// The schema of the document segment.
   DocumentSchemaSegment _schema;
 
-  /// The list of sections that group the [DocumentPropertyBuilder].
+  /// The list of sections that group the [DocumentPropertyValueBuilder].
   List<DocumentSectionBuilder> _sections;
 
   /// The default constructor for the [DocumentSegmentBuilder].
@@ -121,7 +122,7 @@ final class DocumentSegmentBuilder implements DocumentNode {
   /// Applies a [change] on this instance.
   void addChange(DocumentChange change) {
     final sectionIndex =
-        _sections.indexWhere((e) => change.nodeId.isChildOf(e._schema.nodeId));
+        _sections.indexWhere((e) => change.targetsDocumentNode(e));
 
     if (sectionIndex < 0) {
       throw ArgumentError(
@@ -162,8 +163,9 @@ final class DocumentSectionBuilder implements DocumentNode {
   factory DocumentSectionBuilder.fromSchema(DocumentSchemaSection schema) {
     return DocumentSectionBuilder(
       schema: schema,
-      properties:
-          schema.properties.map(DocumentPropertyBuilder.fromSchema).toList(),
+      properties: schema.properties
+          .map(DocumentPropertyValueBuilder.fromSchema)
+          .toList(),
     );
   }
 
@@ -181,17 +183,17 @@ final class DocumentSectionBuilder implements DocumentNode {
 
   /// Applies a [change] on this instance.
   void addChange(DocumentChange change) {
-    final propertyIndex =
-        _properties.indexWhere((e) => e._schema.nodeId == change.nodeId);
+    final property =
+        _properties.firstWhereOrNull((e) => change.targetsDocumentNode(e));
 
-    if (propertyIndex < 0) {
+    if (property == null) {
       throw ArgumentError(
         'Cannot edit property ${change.nodeId}, '
         'it does not exist in this section',
       );
     }
 
-    _properties[propertyIndex].addChange(change);
+    property.addChange(change);
   }
 
   /// Builds an immutable [DocumentSection].
@@ -205,31 +207,241 @@ final class DocumentSectionBuilder implements DocumentNode {
   }
 }
 
-final class DocumentPropertyBuilder<T extends Object> implements DocumentNode {
+sealed class DocumentPropertyBuilder implements DocumentNode {
+  /// The default constructor for the [DocumentPropertyBuilder].
+  const DocumentPropertyBuilder();
+
+  /// Creates a [DocumentSectionBuilder] from a [property].
+  factory DocumentPropertyBuilder.fromProperty(DocumentProperty property) {
+    switch (property) {
+      case DocumentPropertyList():
+        return DocumentPropertyListBuilder.fromProperty(property);
+      case DocumentPropertyObject():
+        return DocumentPropertyObjectBuilder.fromProperty(property);
+      case DocumentPropertyValue():
+        return DocumentPropertyValueBuilder.fromProperty(property);
+    }
+  }
+
+  /// Applies a change on this builder or any child builder.
+  void addChange(DocumentChange change);
+
+  /// Builds an immutable [DocumentProperty].
+  DocumentProperty build();
+}
+
+final class DocumentPropertyListBuilder extends DocumentPropertyBuilder {
+  /// The schema of the document property.
+  DocumentSchemaProperty _schema;
+
+  /// The list of children.
+  List<DocumentPropertyBuilder> _properties;
+
+  /// The default constructor for the [DocumentPropertyListBuilder].
+  DocumentPropertyListBuilder({
+    required DocumentSchemaProperty schema,
+    required List<DocumentPropertyBuilder> properties,
+  })  : _schema = schema,
+        _properties = properties;
+
+  /// Creates a [DocumentPropertyListBuilder] from a [schema].
+  factory DocumentPropertyListBuilder.fromSchema(
+    DocumentSchemaProperty schema,
+  ) {
+    return DocumentPropertyListBuilder(
+      schema: schema,
+      // TODO(dtscalac): extract items from schema,
+      // assign them default values
+      properties: [],
+    );
+  }
+
+  /// Creates a [DocumentPropertyListBuilder] from existing [property].
+  factory DocumentPropertyListBuilder.fromProperty(
+    DocumentPropertyList property,
+  ) {
+    return DocumentPropertyListBuilder(
+      schema: property.schema,
+      properties: property.properties
+          .map(DocumentPropertyBuilder.fromProperty)
+          .toList(),
+    );
+  }
+
+  @override
+  DocumentNodeId get nodeId => _schema.nodeId;
+
+  @override
+  void addChange(DocumentChange change) {
+    switch (change) {
+      case DocumentValueChange():
+        _handleValueChange(change);
+      case DocumentAddListItemChange():
+        _handleAddListItemChange(change);
+      case DocumentRemoveListItemChange():
+        _handleRemoveListItemChange(change);
+    }
+  }
+
+  /// Builds an immutable [DocumentPropertyList].
+  @override
+  DocumentPropertyList build() {
+    _properties.sortByOrder(_schema.order);
+
+    return DocumentPropertyList(
+      schema: _schema,
+      properties: _properties.map((e) => e.build()).toList(),
+    );
+  }
+
+  void _handleValueChange(DocumentValueChange change) {
+    for (final property in _properties) {
+      if (change.targetsDocumentNode(property)) {
+        property.addChange(change);
+        return;
+      }
+    }
+  }
+
+  void _handleAddListItemChange(DocumentAddListItemChange change) {
+    if (change.nodeId == nodeId) {
+      // targets this property
+
+      // TODO(dtscalac): based on schema just create a new property
+      // assign new node ID based on the index or something unique.
+      //
+      // maybe index is not a good idea because if user reorders
+      // we want to keep the node id but change the index.
+      _properties.add(_properties.last);
+    } else {
+      // targets child property
+      for (final property in _properties) {
+        if (change.targetsDocumentNode(property)) {
+          property.addChange(change);
+          return;
+        }
+      }
+
+      throw ArgumentError(
+        "Couldn't find a suitable node to apply "
+        'a change to ${change.nodeId} in this node: $nodeId',
+      );
+    }
+  }
+
+  void _handleRemoveListItemChange(DocumentRemoveListItemChange change) {
+    if (change.nodeId == nodeId) {
+      // targets this property
+      _properties.removeWhere((e) => e.nodeId == change.nodeId);
+    } else {
+      // targets child property
+      for (final property in _properties) {
+        if (change.targetsDocumentNode(property)) {
+          property.addChange(change);
+          return;
+        }
+      }
+
+      throw ArgumentError(
+        "Couldn't find a suitable node to apply "
+        'a change to ${change.nodeId} in this node: $nodeId',
+      );
+    }
+  }
+}
+
+final class DocumentPropertyObjectBuilder extends DocumentPropertyBuilder {
+  /// The schema of the document property.
+  DocumentSchemaProperty _schema;
+
+  /// The list of children.
+  List<DocumentPropertyBuilder> _properties;
+
+  /// The default constructor for the [DocumentPropertyObjectBuilder].
+  DocumentPropertyObjectBuilder({
+    required DocumentSchemaProperty schema,
+    required List<DocumentPropertyBuilder> properties,
+  })  : _schema = schema,
+        _properties = properties;
+
+  /// Creates a [DocumentPropertyObjectBuilder] from a [schema].
+  factory DocumentPropertyObjectBuilder.fromSchema(
+    DocumentSchemaProperty schema,
+  ) {
+    return DocumentPropertyObjectBuilder(
+      schema: schema,
+      // TODO(dtscalac): extract items from schema
+      properties: [],
+    );
+  }
+
+  /// Creates a [DocumentPropertyObjectBuilder] from existing [property].
+  factory DocumentPropertyObjectBuilder.fromProperty(
+    DocumentPropertyObject property,
+  ) {
+    return DocumentPropertyObjectBuilder(
+      schema: property.schema,
+      properties: property.properties
+          .map(DocumentPropertyBuilder.fromProperty)
+          .toList(),
+    );
+  }
+
+  @override
+  DocumentNodeId get nodeId => _schema.nodeId;
+
+  @override
+  void addChange(DocumentChange change) {
+    for (final property in _properties) {
+      if (change.targetsDocumentNode(property)) {
+        property.addChange(change);
+        return;
+      }
+    }
+  }
+
+  /// Builds an immutable [DocumentPropertyObject].
+  @override
+  DocumentPropertyObject build() {
+    _properties.sortByOrder(_schema.order);
+
+    return DocumentPropertyObject(
+      schema: _schema,
+      properties: _properties.map((e) => e.build()).toList(),
+    );
+  }
+}
+
+final class DocumentPropertyValueBuilder<T extends Object>
+    extends DocumentPropertyBuilder {
   /// The schema of the document property.
   DocumentSchemaProperty<T> _schema;
 
   /// The current value this property holds.
   T? _value;
 
-  /// The default constructor for the [DocumentPropertyBuilder].
-  DocumentPropertyBuilder({
+  /// The default constructor for the [DocumentPropertyValueBuilder].
+  DocumentPropertyValueBuilder({
     required DocumentSchemaProperty<T> schema,
     required T? value,
   })  : _schema = schema,
         _value = value;
 
-  /// Creates a [DocumentPropertyBuilder] from a [schema].
-  factory DocumentPropertyBuilder.fromSchema(DocumentSchemaProperty<T> schema) {
-    return DocumentPropertyBuilder(
+  /// Creates a [DocumentPropertyValueBuilder] from a [schema].
+  factory DocumentPropertyValueBuilder.fromSchema(
+    DocumentSchemaProperty<T> schema,
+  ) {
+    return DocumentPropertyValueBuilder(
       schema: schema,
       value: schema.defaultValue,
     );
   }
 
-  /// Creates a [DocumentPropertyBuilder] from existing [property].
-  factory DocumentPropertyBuilder.fromProperty(DocumentProperty<T> property) {
-    return DocumentPropertyBuilder(
+  /// Creates a [DocumentPropertyValueBuilder] from existing [property].
+  factory DocumentPropertyValueBuilder.fromProperty(
+    DocumentPropertyValue<T> property,
+  ) {
+    return DocumentPropertyValueBuilder(
       schema: property.schema,
       value: property.value,
     );
@@ -238,8 +450,14 @@ final class DocumentPropertyBuilder<T extends Object> implements DocumentNode {
   @override
   DocumentNodeId get nodeId => _schema.nodeId;
 
-  /// Applies a [change] on this property.
+  @override
   void addChange(DocumentChange change) {
+    if (change is! DocumentValueChange) {
+      throw ArgumentError(
+        '$DocumentPropertyValueBuilder only supports $DocumentValueChange',
+      );
+    }
+
     if (_schema.nodeId != change.nodeId) {
       throw ArgumentError(
         'Cannot apply change to ${_schema.nodeId}, '
@@ -250,9 +468,10 @@ final class DocumentPropertyBuilder<T extends Object> implements DocumentNode {
     _value = _schema.definition.castValue(change.value);
   }
 
-  /// Builds an immutable [DocumentProperty].
-  DocumentProperty<T> build() {
-    return DocumentProperty(
+  /// Builds an immutable [DocumentPropertyValue].
+  @override
+  DocumentPropertyValue<T> build() {
+    return DocumentPropertyValue(
       schema: _schema,
       value: _value,
       validationResult: _schema.validatePropertyValue(_value),
