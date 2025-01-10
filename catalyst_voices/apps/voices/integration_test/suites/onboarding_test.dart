@@ -451,14 +451,18 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await OnboardingPage.enterPassword($, 'Test1234');
           await OnboardingPage.enterPasswordConfirm($, 'Test1234');
-          OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true,);
+          OnboardingPage.passwordConfirmErrorIconIsShown(
+            $,
+            reverse: true,
+          );
           OnboardingPage.checkValidationIndicator(
             $,
             PasswordValidationStatus.normal,
           );
-          OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true,);
+          OnboardingPage.passwordConfirmErrorIconIsShown(
+            $,
+            reverse: true,
+          );
           OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
         },
       );
@@ -488,8 +492,10 @@ void main() async {
             $,
             PasswordValidationStatus.good,
           );
-          OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true,);
+          OnboardingPage.passwordConfirmErrorIconIsShown(
+            $,
+            reverse: true,
+          );
           OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
         },
       );
@@ -518,8 +524,10 @@ void main() async {
             $,
             PasswordValidationStatus.weak,
           );
-          OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true,);
+          OnboardingPage.passwordConfirmErrorIconIsShown(
+            $,
+            reverse: true,
+          );
           OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
         },
       );
@@ -548,8 +556,10 @@ void main() async {
             $,
             PasswordValidationStatus.normal,
           );
-          OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true,);
+          OnboardingPage.passwordConfirmErrorIconIsShown(
+            $,
+            reverse: true,
+          );
           OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
         },
       );
