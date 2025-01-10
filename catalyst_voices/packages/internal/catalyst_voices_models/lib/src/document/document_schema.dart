@@ -5,6 +5,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
+// TODO(dtscalac): split schema property into schema list, schema object and schema value
+
 /// A document schema that describes the structure of a document.
 ///
 /// The document consists of top level [segments].
