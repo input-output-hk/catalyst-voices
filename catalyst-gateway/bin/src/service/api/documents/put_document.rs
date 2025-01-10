@@ -1,10 +1,13 @@
 //! Implementation of the PUT `/document` endpoint
 
-use bytes::Bytes;
+use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use crate::service::common::{
-    objects::document::bad_put_request::PutDocumentBadRequest, responses::WithErrorResponses,
+use crate::{
+    db::event::signed_docs::{FullSignedDoc, SignedDocBody},
+    service::common::{
+        objects::document::bad_put_request::PutDocumentBadRequest, responses::WithErrorResponses,
+    },
 };
 
 /// Maximum size of a Signed Document (1MB)
@@ -36,9 +39,29 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
-#[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
-pub(crate) async fn endpoint(document: Bytes) -> AllResponses {
-    let _doc = document;
+#[allow(clippy::no_effect_underscore_binding)]
+pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
+    match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
+        Ok(doc) => {
+            let doc_body = SignedDocBody::new(
+                doc.doc_id(),
+                doc.doc_ver(),
+                doc.doc_type(),
+                String::new(),
+                None,
+            );
 
-    Responses::BadRequest(Json(PutDocumentBadRequest::new("unimplemented"))).into()
+            match FullSignedDoc::new(doc_body, None, doc_bytes).store().await {
+                Ok(true) => Responses::Created.into(),
+                Ok(false) => Responses::NoContent.into(),
+                Err(err) => AllResponses::handle_error(&err),
+            }
+        },
+        Err(e) => {
+            Responses::BadRequest(Json(PutDocumentBadRequest::new(format!(
+                "Cannot decode Catalyst Signed Document, err {e}"
+            ))))
+            .into()
+        },
+    }
 }

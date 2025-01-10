@@ -1,7 +1,7 @@
 //! Signed Documents API endpoints
 
 use anyhow::anyhow;
-use poem::{error::ReadBodyError, Body};
+use poem::error::ReadBodyError;
 use poem_openapi::{
     param::{Path, Query},
     payload::Json,
@@ -69,12 +69,12 @@ impl DocumentApi {
     )]
     async fn put_document(
         &self, /// The document to PUT
-        document: Cbor<Body>,
+        cbor: Cbor,
         /// Authorization required.
         _auth: CatalystRBACSecurityScheme,
     ) -> put_document::AllResponses {
-        match document.0.into_bytes_limit(MAXIMUM_DOCUMENT_SIZE).await {
-            Ok(document) => put_document::endpoint(document).await,
+        match cbor.into_bytes_with_limit(MAXIMUM_DOCUMENT_SIZE).await {
+            Ok(doc_bytes) => put_document::endpoint(doc_bytes).await,
             Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
             Err(_err) => {
                 put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(

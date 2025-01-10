@@ -1,6 +1,3 @@
-use std::ops::{Deref, DerefMut};
-
-use bytes::Bytes;
 use poem::{Body, FromRequest, IntoResponse, Request, RequestBody, Response, Result};
 use poem_openapi::{
     impl_apirequest_for_payload,
@@ -8,12 +5,6 @@ use poem_openapi::{
     registry::{MetaMediaType, MetaResponse, MetaResponses, MetaSchema, MetaSchemaRef, Registry},
     ApiResponse,
 };
-
-// use crate::{
-//    payload::{ParsePayload, Payload},
-//    registry::{MetaMediaType, MetaResponse, MetaResponses, MetaSchema, MetaSchemaRef,
-// Registry},    ApiResponse,
-//};
 
 /// A cbor binary payload.
 ///
@@ -73,24 +64,19 @@ use poem_openapi::{
 /// resp.assert_text("6").await;
 /// # });
 /// ```
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct Cbor<T>(pub T);
+#[derive(Debug)]
+pub struct Cbor(Body);
 
-impl<T> Deref for Cbor<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
+impl Cbor {
+    /// Returns an inner bytes with the limit
+    pub(crate) async fn into_bytes_with_limit(
+        self, limit: usize,
+    ) -> Result<Vec<u8>, poem::error::ReadBodyError> {
+        Ok(self.0.into_bytes_limit(limit).await?.to_vec())
     }
 }
 
-impl<T> DerefMut for Cbor<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
-impl<T: Send> Payload for Cbor<T> {
+impl Payload for Cbor {
     const CONTENT_TYPE: &'static str = "application/cbor";
 
     fn check_content_type(content_type: &str) -> bool {
@@ -109,23 +95,7 @@ impl<T: Send> Payload for Cbor<T> {
     }
 }
 
-impl ParsePayload for Cbor<Vec<u8>> {
-    const IS_REQUIRED: bool = true;
-
-    async fn from_request(request: &Request, body: &mut RequestBody) -> Result<Self> {
-        Ok(Self(<Vec<u8>>::from_request(request, body).await?))
-    }
-}
-
-impl ParsePayload for Cbor<Bytes> {
-    const IS_REQUIRED: bool = true;
-
-    async fn from_request(request: &Request, body: &mut RequestBody) -> Result<Self> {
-        Ok(Self(Bytes::from_request(request, body).await?))
-    }
-}
-
-impl ParsePayload for Cbor<Body> {
+impl ParsePayload for Cbor {
     const IS_REQUIRED: bool = true;
 
     async fn from_request(request: &Request, body: &mut RequestBody) -> Result<Self> {
@@ -133,15 +103,15 @@ impl ParsePayload for Cbor<Body> {
     }
 }
 
-impl<T: Into<Body> + Send> IntoResponse for Cbor<T> {
+impl IntoResponse for Cbor {
     fn into_response(self) -> Response {
         Response::builder()
             .content_type(Self::CONTENT_TYPE)
-            .body(self.0.into())
+            .body(self.0)
     }
 }
 
-impl<T: Into<Body> + Send> ApiResponse for Cbor<T> {
+impl ApiResponse for Cbor {
     fn meta() -> MetaResponses {
         MetaResponses {
             responses: vec![MetaResponse {
@@ -159,6 +129,4 @@ impl<T: Into<Body> + Send> ApiResponse for Cbor<T> {
     fn register(_registry: &mut Registry) {}
 }
 
-impl_apirequest_for_payload!(Cbor<Vec<u8>>);
-impl_apirequest_for_payload!(Cbor<Bytes>);
-impl_apirequest_for_payload!(Cbor<Body>);
+impl_apirequest_for_payload!(Cbor);
