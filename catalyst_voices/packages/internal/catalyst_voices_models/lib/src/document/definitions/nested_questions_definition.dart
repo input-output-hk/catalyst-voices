@@ -1,6 +1,6 @@
 part of '../document_definitions.dart';
 
-// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
+// TODO(dtscalac): parse into a list with properties
 final class NestedQuestionsDefinition
     extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;
