@@ -44,7 +44,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (widget.enabled) ? null : _launchUrl,
+      onTap: widget.enabled ? null : _launchUrl,
       child: VoicesTextField(
         controller: _effectiveController,
         focusNode: widget.focusNode,
@@ -57,7 +57,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
           showStatusSuffixIcon: widget.enabled,
           suffixIcon: _AdditionalSuffixIcons(
             enabled: widget.enabled,
-            effectiveController: _effectiveController,
+            controller: _effectiveController,
           ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
@@ -95,6 +95,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
 
   Future<void> _launchUrl() async {
     if (_effectiveController.text.isEmpty) return;
+
     final url = Uri.tryParse(_effectiveController.text);
     if (url != null) {
       await launchHrefUrl(url);
@@ -104,11 +105,11 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
 
 class _AdditionalSuffixIcons extends StatefulWidget {
   final bool enabled;
-  final TextEditingController effectiveController;
+  final TextEditingController controller;
 
   const _AdditionalSuffixIcons({
     required this.enabled,
-    required this.effectiveController,
+    required this.controller,
   });
 
   @override
@@ -122,15 +123,24 @@ class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
   @override
   void initState() {
     super.initState();
-    widget.effectiveController.addListener(_changeClearButtonVisibility);
+    widget.controller.addListener(_changeClearButtonVisibility);
+  }
+
+  @override
+  void didUpdateWidget(covariant _AdditionalSuffixIcons oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_changeClearButtonVisibility);
+      widget.controller.addListener(_changeClearButtonVisibility);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.enabled && widget.effectiveController.text.isNotEmpty) {
+    if (!widget.enabled && widget.controller.text.isNotEmpty) {
       return VoicesIconButton(
         onTap: () async {
-          await launchHrefUrl(widget.effectiveController.text.getUri());
+          await launchHrefUrl(widget.controller.text.getUri());
         },
         child: VoicesAssets.icons.externalLink.buildIcon(
           color: Theme.of(context).colorScheme.primary,
@@ -140,14 +150,14 @@ class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
     return Offstage(
       offstage: offstageClearButton,
       child: TextButton(
-        onPressed: widget.effectiveController.clear,
+        onPressed: widget.controller.clear,
         child: Text(context.l10n.clear),
       ),
     );
   }
 
   void _changeClearButtonVisibility() {
-    if (widget.enabled && widget.effectiveController.text.isNotEmpty) {
+    if (widget.enabled && widget.controller.text.isNotEmpty) {
       setState(() {
         offstageClearButton = false;
       });
