@@ -4,6 +4,7 @@ project: {
 	ci: {
     targets: {
       "test-fuzzer-api": privileged: true
+      "test-nightly-test-fuzzer-api": privileged: true
     }
   }
 }
