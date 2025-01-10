@@ -451,14 +451,14 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await OnboardingPage.enterPassword($, 'Test1234');
           await OnboardingPage.enterPasswordConfirm($, 'Test1234');
-          await OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true);
-          await OnboardingPage.checkValidationIndicator(
+          OnboardingPage.passwordConfirmErrorIconIsShown($,
+              reverse: true,);
+          OnboardingPage.checkValidationIndicator(
             $,
             PasswordValidationStatus.normal,
           );
-          await OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true);
+          OnboardingPage.passwordConfirmErrorIconIsShown($,
+              reverse: true,);
           OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
         },
       );
@@ -484,12 +484,12 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await OnboardingPage.enterPassword($, 'Test1234Test1234');
           await OnboardingPage.enterPasswordConfirm($, 'Test1234Test1234');
-          await OnboardingPage.checkValidationIndicator(
+          OnboardingPage.checkValidationIndicator(
             $,
             PasswordValidationStatus.good,
           );
-          await OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true);
+          OnboardingPage.passwordConfirmErrorIconIsShown($,
+              reverse: true,);
           OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
         },
       );
@@ -514,12 +514,12 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           await OnboardingPage.enterPassword($, 'Test123');
-          await OnboardingPage.checkValidationIndicator(
+          OnboardingPage.checkValidationIndicator(
             $,
             PasswordValidationStatus.weak,
           );
-          await OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true);
+          OnboardingPage.passwordConfirmErrorIconIsShown($,
+              reverse: true,);
           OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
         },
       );
@@ -544,12 +544,12 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           await OnboardingPage.enterPassword($, 'Test1234');
-          await OnboardingPage.checkValidationIndicator(
+          OnboardingPage.checkValidationIndicator(
             $,
             PasswordValidationStatus.normal,
           );
-          await OnboardingPage.passwordConfirmErrorIconIsShown($,
-              reverse: true);
+          OnboardingPage.passwordConfirmErrorIconIsShown($,
+              reverse: true,);
           OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
         },
       );
@@ -575,11 +575,11 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await OnboardingPage.enterPassword($, 'Test1234');
           await OnboardingPage.enterPasswordConfirm($, 'Test123');
-          await OnboardingPage.checkValidationIndicator(
+          OnboardingPage.checkValidationIndicator(
             $,
             PasswordValidationStatus.normal,
           );
-          await OnboardingPage.passwordConfirmErrorIconIsShown($);
+          OnboardingPage.passwordConfirmErrorIconIsShown($);
           OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
         },
       );

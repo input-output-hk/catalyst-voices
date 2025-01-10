@@ -544,19 +544,19 @@ class OnboardingPage {
         break;
       case RegistrationState.keychainCreateSuccess:
         expect(
-          await $(finishAccountCreationPanel).$(Text).text,
+          $(finishAccountCreationPanel).$(Text).text,
           T.get('Congratulations your Catalyst  Keychain is created!'),
         );
         expect(
-          await $(finishAccountKeychainCreated).$(Text).text,
+          $(finishAccountKeychainCreated).$(Text).text,
           T.get('Catalyst Keychain created'),
         );
         expect(
-          await $(finishAccountLinkWallet).$(Text).text,
+          $(finishAccountLinkWallet).$(Text).text,
           T.get('Link Cardano Wallet & Roles'),
         );
         expect(
-          await $(finishAccountAccountComplete).$(Text).text,
+          $(finishAccountAccountComplete).$(Text).text,
           T.get('Catalyst account creation completed!'),
         );
         expect(
@@ -638,10 +638,10 @@ class OnboardingPage {
     await $(passwordConfirmInputField).enterText(password);
   }
 
-  static Future<void> checkValidationIndicator(
+  static void checkValidationIndicator(
     PatrolTester $,
     PasswordValidationStatus validationStatus,
-  ) async {
+  ) {
     expect($(passwordStrengthLabel), findsOneWidget);
 
     switch (validationStatus) {
@@ -666,10 +666,10 @@ class OnboardingPage {
     }
   }
 
-  static Future<void> passwordConfirmErrorIconIsShown(
+  static void passwordConfirmErrorIconIsShown(
     PatrolTester $, {
     bool reverse = false,
-  }) async {
+  }) {
     if (reverse) {
       expect(
         $(registrationDetailsPanel).$(CommonPage.voicesTextField).$(Icon),
