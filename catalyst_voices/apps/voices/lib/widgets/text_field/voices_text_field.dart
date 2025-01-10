@@ -210,6 +210,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           resizableHorizontally: resizable,
           resizableVertically: resizable,
           child: TextFormField(
+            key: const Key('VoicesTextField'),
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
             expands: resizable,

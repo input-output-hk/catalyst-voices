@@ -5,4 +5,5 @@ class CommonPage {
   static const decoratorIconBefore = Key('DecoratorIconBefore');
   static const decoratorIconAfter = Key('DecoratorIconAfter');
   static const dialogCloseButton = Key('DialogCloseButton');
+  static const voicesTextField = Key('VoicesTextField');
 }

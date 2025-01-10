@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
+import '../types/password_validation_states.dart';
 import '../types/registration_state.dart';
 import '../utils/selector_utils.dart';
 import '../utils/test_context.dart';
@@ -30,6 +31,10 @@ class OnboardingPage {
   static const seedPhrasesPicker = Key('SeedPhrasesPicker');
   static const nextStepTitle = Key('NextStepTitle');
   static const nextStepBody = Key('NextStepBody');
+  static const passwordInputField = Key('PasswordInputField');
+  static const passwordConfirmInputField = Key('PasswordConfirmInputField');
+  static const passwordStrengthIndicator = Key('PasswordStrengthIndicator');
+  static const passwordStrengthLabel = Key('PasswordStrengthLabel');
 
   static Future<int> writedownSeedPhraseNumber(
     PatrolTester $,
@@ -273,6 +278,42 @@ class OnboardingPage {
           T.get('Learn More'),
         );
         break;
+      case RegistrationState.passwordInfo:
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        //temporary: check for specific picture (locked icon)
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
+        break;
+      case RegistrationState.passwordInput:
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(
+          await infoPartHeaderSubtitleText($),
+          T.get('Catalyst unlock password'),
+        );
+        expect(
+          await infoPartHeaderBodyText($),
+          T.get(
+            'Please provide a password for your Catalyst Keychain.',
+          ),
+        );
+        //temporary: check for specific picture (locked icon)
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect($(progressBar), findsOneWidget);
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationInfoPanel).$(CommonPage.decoratorData),
+          ),
+          T.get('Learn More'),
+        );
+        break;
       case RegistrationState.keychainRestoreChoice:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInfo:
@@ -280,10 +321,6 @@ class OnboardingPage {
       case RegistrationState.keychainRestoreMnemonicInput:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreSuccess:
-        throw UnimplementedError();
-      case RegistrationState.passwordInfo:
-        throw UnimplementedError();
-      case RegistrationState.passwordInput:
         throw UnimplementedError();
       case RegistrationState.keychainCreateSuccess:
         throw UnimplementedError();
@@ -447,6 +484,45 @@ class OnboardingPage {
         expect($(backButton), findsOneWidget);
         expect($(nextButton), findsOneWidget);
         break;
+      case RegistrationState.passwordInfo:
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsTitle),
+          ),
+          T.get('Set your Catalyst unlock password  for this device'),
+        );
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(registrationDetailsBody),
+          ),
+          isNotEmpty,
+        );
+        expect($(backButton), findsOneWidget);
+        expect($(nextButton), findsOneWidget);
+        break;
+      case RegistrationState.passwordInput:
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(passwordInputField),
+          ),
+          T.get('Enter password'),
+        );
+        expect(
+          await getChildNodeText(
+            $,
+            $(registrationDetailsPanel).$(passwordConfirmInputField),
+          ),
+          T.get('Confirm password'),
+        );
+        expect($(passwordStrengthLabel), findsNothing);
+        expect($(passwordStrengthIndicator), findsNothing);
+        expect($(backButton), findsOneWidget);
+        expect($(nextButton), findsOneWidget);
+        OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
+        break;
       case RegistrationState.keychainRestoreChoice:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInfo:
@@ -454,10 +530,6 @@ class OnboardingPage {
       case RegistrationState.keychainRestoreMnemonicInput:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreSuccess:
-        throw UnimplementedError();
-      case RegistrationState.passwordInfo:
-        throw UnimplementedError();
-      case RegistrationState.passwordInput:
         throw UnimplementedError();
       case RegistrationState.keychainCreateSuccess:
         throw UnimplementedError();
@@ -504,6 +576,62 @@ class OnboardingPage {
   static Future<void> enterStoredSeedPhrases(PatrolTester $) async {
     for (var i = 0; i < 12; i++) {
       await inputSeedPhrasePicker($, TestContext.get(key: 'word$i')).tap();
+    }
+  }
+
+  static Future<void> enterPassword(PatrolTester $, String password) async {
+    await $(passwordInputField).enterText(password);
+  }
+
+  static Future<void> enterPasswordConfirm(
+    PatrolTester $,
+    String password,
+  ) async {
+    await $(passwordConfirmInputField).enterText(password);
+  }
+
+  static Future<void> checkValidationIndicator(
+    PatrolTester $,
+    PasswordValidationStatus validationStatus,
+  ) async {
+    expect($(passwordStrengthLabel), findsOneWidget);
+
+    switch (validationStatus) {
+      case PasswordValidationStatus.weak:
+        expect(
+          $(passwordStrengthLabel).text,
+          T.get('Weak password strength'),
+        );
+        break;
+      case PasswordValidationStatus.normal:
+        expect(
+          $(passwordStrengthLabel).text,
+          T.get('Normal password strength'),
+        );
+        break;
+      case PasswordValidationStatus.good:
+        expect(
+          $(passwordStrengthLabel).text,
+          T.get('Good password strength'),
+        );
+        break;
+    }
+  }
+
+  static Future<void> passwordConfirmErrorIconIsShown(
+    PatrolTester $, {
+    bool reverse = false,
+  }) async {
+    if (reverse) {
+      expect(
+        $(registrationDetailsPanel).$(CommonPage.voicesTextField).$(Icon),
+        findsNothing,
+      );
+    } else {
+      expect(
+        $(registrationDetailsPanel).$(CommonPage.voicesTextField).$(Icon),
+        findsOneWidget,
+      );
     }
   }
 }
