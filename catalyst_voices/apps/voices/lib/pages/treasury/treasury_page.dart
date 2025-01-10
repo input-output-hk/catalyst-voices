@@ -2,18 +2,19 @@ import 'package:catalyst_voices/pages/treasury/treasury_body.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_details_panel.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_navigation_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-const sections = [
-  TreasurySection(
-    id: '0',
-    steps: [
-      SetupCampaignDetailsStep(id: '0', sectionId: '0'),
-      SetupCampaignStagesStep(id: '1', sectionId: '0'),
-      SetupProposalTemplateStep(id: '2', sectionId: '0'),
-      SetupCampaignCategoriesStep(id: '3', sectionId: '0'),
+const _segments = [
+  TreasurySegment(
+    id: NodeId(''),
+    sections: [
+      SetupCampaignDetails(id: NodeId('0')),
+      SetupCampaignStages(id: NodeId('1')),
+      SetupProposalTemplate(id: NodeId('2')),
+      SetupCampaignCategories(id: NodeId('3')),
     ],
   ),
 ];
@@ -26,31 +27,31 @@ class TreasuryPage extends StatefulWidget {
 }
 
 class _TreasuryPageState extends State<TreasuryPage> {
-  late final SectionsController _sectionsController;
+  late final SegmentsController _segmentsController;
   late final ItemScrollController _bodyItemScrollController;
 
   @override
   void initState() {
     super.initState();
 
-    _sectionsController = SectionsController();
+    _segmentsController = SegmentsController();
     _bodyItemScrollController = ItemScrollController();
 
-    _sectionsController.attachItemsScrollController(_bodyItemScrollController);
+    _segmentsController.attachItemsScrollController(_bodyItemScrollController);
 
     _populateSections();
   }
 
   @override
   void dispose() {
-    _sectionsController.dispose();
+    _segmentsController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SectionsControllerScope(
-      controller: _sectionsController,
+    return SegmentsControllerScope(
+      controller: _segmentsController,
       child: SpaceScaffold(
         left: const TreasuryNavigationPanel(),
         body: TreasuryBody(
@@ -62,8 +63,8 @@ class _TreasuryPageState extends State<TreasuryPage> {
   }
 
   void _populateSections() {
-    _sectionsController.value = SectionsControllerState.initial(
-      sections: sections,
+    _segmentsController.value = SegmentsControllerState.initial(
+      segments: _segments,
     );
   }
 }

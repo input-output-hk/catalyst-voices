@@ -1,5 +1,4 @@
-import 'package:catalyst_voices/pages/treasury/steps/treasury_campaign_widgets.dart';
-import 'package:catalyst_voices/widgets/navigation/section_step_state_builder.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_widgets.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -7,28 +6,28 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TreasuryCampaignStagesEditStep extends StatelessWidget {
-  final TreasurySectionStep step;
+class TreasuryCampaignStagesEditTile extends StatelessWidget {
+  final TreasurySection data;
 
-  const TreasuryCampaignStagesEditStep({
+  const TreasuryCampaignStagesEditTile(
+    this.data, {
     super.key,
-    required this.step,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SectionStepStateBuilder(
-      id: step.sectionStepId,
+    return SectionStateBuilder(
+      id: data.id,
       builder: (context, value, child) {
         return SelectableTile(
           isSelected: value.isSelected,
           child: Column(
             children: [
-              TreasuryCampaignStepHeader(step: step),
+              TreasuryCampaignStepHeader(data),
               const SizedBox(height: 12),
               const TreasuryCampaignTimezone(),
               const SizedBox(height: 24),
-              _DateRange(step: step),
+              _DateRange(data: data),
             ],
           ),
         );
@@ -38,9 +37,9 @@ class TreasuryCampaignStagesEditStep extends StatelessWidget {
 }
 
 class _DateRange extends StatefulWidget {
-  final TreasurySectionStep step;
+  final TreasurySection data;
 
-  const _DateRange({required this.step});
+  const _DateRange({required this.data});
 
   @override
   State<_DateRange> createState() => _DateRangeState();
@@ -99,8 +98,8 @@ class _DateRangeState extends State<_DateRange> {
                       endDate: _endDateController.value,
                     );
 
-                SectionsControllerScope.of(context).editStep(
-                  widget.step.sectionStepId,
+                SegmentsControllerScope.of(context).editSection(
+                  widget.data.id,
                   enabled: false,
                 );
               },
