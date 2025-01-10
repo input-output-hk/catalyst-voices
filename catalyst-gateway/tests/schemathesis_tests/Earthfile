@@ -91,8 +91,8 @@ nightly-package-schemathesis:
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
-# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
-test-nightly-test-fuzzer-api:
+# nightly-test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
+nightly-test-fuzzer-api:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
