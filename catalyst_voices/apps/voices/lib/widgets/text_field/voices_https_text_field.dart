@@ -118,7 +118,7 @@ class _AdditionalSuffixIcons extends StatefulWidget {
 
 class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
     with LaunchUrlMixin {
-  bool offstageClearButton = true;
+  bool _offstageClearButton = true;
 
   @override
   void initState() {
@@ -132,6 +132,7 @@ class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_changeClearButtonVisibility);
       widget.controller.addListener(_changeClearButtonVisibility);
+      _changeClearButtonVisibility();
     }
   }
 
@@ -148,7 +149,7 @@ class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
       );
     }
     return Offstage(
-      offstage: offstageClearButton,
+      offstage: _offstageClearButton,
       child: TextButton(
         onPressed: widget.controller.clear,
         child: Text(context.l10n.clear),
@@ -157,14 +158,9 @@ class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
   }
 
   void _changeClearButtonVisibility() {
-    if (widget.enabled && widget.controller.text.isNotEmpty) {
-      setState(() {
-        offstageClearButton = false;
-      });
-    } else {
-      setState(() {
-        offstageClearButton = true;
-      });
-    }
+    setState(() {
+      _offstageClearButton =
+          widget.enabled && widget.controller.text.isNotEmpty;
+    });
   }
 }
