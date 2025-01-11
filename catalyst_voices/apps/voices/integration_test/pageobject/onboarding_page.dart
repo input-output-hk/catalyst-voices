@@ -67,10 +67,10 @@ class OnboardingPage {
     PatrolTester $,
     int index,
   ) async {
-    final seedWord = await getChildNodeText(
-      $,
-      $(Key('CompleterSeedPhrase${index}CellKey')).$(CommonPage.decoratorData),
-    );
+    final seedWord = $(Key('CompleterSeedPhrase${index}CellKey'))
+        .$(CommonPage.decorData)
+        .$(Text)
+        .text;
     return seedWord!;
   }
 
@@ -78,10 +78,7 @@ class OnboardingPage {
     PatrolTester $,
     int index,
   ) async {
-    final seedWord = await getChildNodeText(
-      $,
-      $(Key('PickerSeedPhrase${index + 1}CellKey')),
-    );
+    final seedWord = $(Key('PickerSeedPhrase${index + 1}CellKey')).$(Text).text;
     return seedWord!;
   }
 
@@ -110,33 +107,17 @@ class OnboardingPage {
         .waitUntilVisible();
   }
 
-  static Future<String?> getChildNodeText(
-    PatrolTester $,
-    FinderBase<Element> parent,
-  ) async {
-    final child = find.descendant(
-      of: parent,
-      matching: find.byType(Text),
-    );
-    return $(child).text;
-  }
-
   static Finder infoPartTaskPicture(PatrolTester $) {
-    final child = find.descendant(
-      of: $(registrationInfoPanel).$(registrationInfoPictureContainer),
-      matching: find.byType(IconTheme),
-    );
-    return child;
+    return $(registrationInfoPanel)
+        .$(registrationInfoPictureContainer)
+        .$(IconTheme);
   }
 
   static void voicesButtonIsEnabled(
     PatrolTester $,
     Key button,
   ) {
-    final child = find.descendant(
-      of: $(button),
-      matching: find.byType(FilledButton),
-    );
+    final child = $(button).$(FilledButton);
     SelectorUtils.isEnabled($, $(child));
   }
 
@@ -144,10 +125,7 @@ class OnboardingPage {
     PatrolTester $,
     Key button,
   ) {
-    final child = find.descendant(
-      of: $(button),
-      matching: find.byType(FilledButton),
-    );
+    final child = $(button).$(FilledButton);
     SelectorUtils.isDisabled($, $(child));
   }
 
@@ -196,10 +174,7 @@ class OnboardingPage {
         expect(await infoPartHeaderTitleText($), T.get('Get Started'));
         expect(infoPartTaskPicture($), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -209,10 +184,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -232,10 +204,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -244,10 +213,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -266,10 +232,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -279,10 +242,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -292,10 +252,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -315,10 +272,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -328,10 +282,7 @@ class OnboardingPage {
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationInfoPanel).$(CommonPage.decoratorData),
-          ),
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
           T.get('Learn More'),
         );
         break;
@@ -369,17 +320,11 @@ class OnboardingPage {
     switch (step) {
       case RegistrationState.getStarted:
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsTitle),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
           T.get('Welcome to Catalyst'),
         );
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsBody),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
           isNotEmpty,
         );
         expect(
@@ -391,17 +336,11 @@ class OnboardingPage {
         break;
       case RegistrationState.createKeychainInfo:
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsTitle),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
           T.get('Create your Catalyst Keychain'),
         );
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsBody),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
           isNotEmpty,
         );
         expect(await detailsPartCreateKeychainBtn($), findsOneWidget);
@@ -409,17 +348,11 @@ class OnboardingPage {
         break;
       case RegistrationState.keychainCreated:
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsTitle),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
           T.get('Great! Your Catalyst Keychain  has been created.'),
         );
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsBody),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
           isNotEmpty,
         );
         expect($(backButton), findsOneWidget);
@@ -429,15 +362,12 @@ class OnboardingPage {
         await writedownSeedPhrasesAreDisplayed($);
         expect($(downloadSeedPhraseButton), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(downloadSeedPhraseButton).$(CommonPage.decoratorData),
-          ),
+          $(downloadSeedPhraseButton).$(CommonPage.decorData).$(Text).text,
           T.get('Download Catalyst key'),
         );
         expect($(seedPhraseStoredCheckbox), findsOneWidget);
         expect(
-          await getChildNodeText($, $(seedPhraseStoredCheckbox)),
+          $(seedPhraseStoredCheckbox).$(Text).text,
           T.get('I have written down/downloaded my 12 words'),
         );
         expect($(backButton), findsOneWidget);
@@ -445,17 +375,11 @@ class OnboardingPage {
         break;
       case RegistrationState.keychainCreateMnemonicInputInfo:
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsTitle),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
           T.get('Check your Catalyst security keys'),
         );
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsBody),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
           isNotEmpty,
         );
         break;
@@ -463,10 +387,7 @@ class OnboardingPage {
         await inputSeedPhrasesAreDisplayed($);
         expect($(uploadKeyButton), findsOneWidget);
         expect(
-          await getChildNodeText(
-            $,
-            $(uploadKeyButton).$(CommonPage.decoratorData),
-          ),
+          $(uploadKeyButton).$(CommonPage.decorData).$(Text).text,
           T.get('Upload Catalyst Key'),
         );
         expect($(backButton), findsOneWidget);
@@ -477,22 +398,16 @@ class OnboardingPage {
             .$(registrationDetailsTitle)
             .waitUntilVisible();
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsTitle),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
           T.get("Nice job! You've successfully verified the seed phrase for "
               'your keychain.'),
         );
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsBody),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
           isNotEmpty,
         );
         expect(
-          await getChildNodeText($, $(nextStepTitle)),
+          $(nextStepTitle).$(Text).text,
           T.get('Your next step'),
         );
         expect(
@@ -505,17 +420,11 @@ class OnboardingPage {
         break;
       case RegistrationState.passwordInfo:
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsTitle),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
           T.get('Set your Catalyst unlock password  for this device'),
         );
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(registrationDetailsBody),
-          ),
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
           isNotEmpty,
         );
         expect($(backButton), findsOneWidget);
@@ -523,17 +432,11 @@ class OnboardingPage {
         break;
       case RegistrationState.passwordInput:
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(passwordInputField),
-          ),
+          $(registrationDetailsPanel).$(passwordInputField).$(Text).text,
           T.get('Enter password'),
         );
         expect(
-          await getChildNodeText(
-            $,
-            $(registrationDetailsPanel).$(passwordConfirmInputField),
-          ),
+          $(registrationDetailsPanel).$(passwordConfirmInputField).$(Text).text,
           T.get('Confirm password'),
         );
         expect($(passwordStrengthLabel), findsNothing);
@@ -560,7 +463,7 @@ class OnboardingPage {
           T.get('Catalyst account creation completed!'),
         );
         expect(
-          await getChildNodeText($, $(nextStepTitle)),
+          $(nextStepTitle).$(Text).text,
           T.get('Your next step'),
         );
         expect(
