@@ -1,5 +1,14 @@
+# ignores all files not intended to be published to pub.dev
+
 .dart_tool/
 build
 coverage
 example
 target
+.secret
+blueprint.cue
+Earthfile
+Justfile
+*.log
+*.iml
+pubspec_overrides.yaml
