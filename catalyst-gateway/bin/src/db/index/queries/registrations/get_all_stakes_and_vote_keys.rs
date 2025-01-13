@@ -42,11 +42,9 @@ impl GetAllStakesAndVoteKeysQuery {
         )
         .await;
 
-        if let Err(ref error) = get_all_stake_and_vote_keys {
-            error!(error=%error, "Failed to prepare get all (stake addrs, vote_keys)");
-        };
-
-        get_all_stake_and_vote_keys
+        get_all_stake_and_vote_keys.inspect_err(
+            |error| error!(error=%error, "Failed to prepare get all (stake addrs, vote_keys)"),
+        )
     }
 
     /// Executes get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)]
