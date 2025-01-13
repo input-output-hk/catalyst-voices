@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 enum _YesNoChoice {
@@ -28,7 +29,6 @@ enum _YesNoChoice {
 class YesNoChoiceWidget extends StatefulWidget {
   final DocumentProperty<bool> property;
   final ValueChanged<DocumentChange> onChanged;
-  final String description;
   final bool isEditMode;
   final bool isRequired;
 
@@ -36,7 +36,6 @@ class YesNoChoiceWidget extends StatefulWidget {
     super.key,
     required this.property,
     required this.onChanged,
-    required this.description,
     required this.isEditMode,
     required this.isRequired,
   });
@@ -46,7 +45,7 @@ class YesNoChoiceWidget extends StatefulWidget {
 }
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
-  late Set<_YesNoChoice> selectedValue;
+  late bool? selectedValue;
 
   @override
   void initState() {
@@ -82,29 +81,32 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
-          value: selectedValue,
-          onChanged: _handleValueChanged,
+          context,
+          value: widget.property.value,
           enabled: widget.isEditMode,
+          onChanged: _handleValueChanged,
+          validator: (value) {
+            // TODO(dtscalac): add validation
+            final result = widget.property.schema.validatePropertyValue(value);
+
+            return LocalizedDocumentValidationResult.from(result)
+                .message(context);
+          },
         ),
       ],
     );
   }
 
   void _handleInitialValue() {
-    final value = widget.property.value;
-    if (value != null) {
-      selectedValue = {_YesNoChoice.fromBool(value)};
-    } else {
-      selectedValue = {};
-    }
+    selectedValue = widget.property.value;
   }
 
-  void _handleValueChanged(Set<_YesNoChoice> value) {
+  void _handleValueChanged(bool? value) {
     setState(() {
-      selectedValue = Set.from(value);
+      selectedValue = widget.property.value;
     });
-    if (widget.property.value != value.first.value && value.isNotEmpty) {
-      _notifyChangeListener(value.first.value);
+    if (value == null && widget.property.value != value) {
+      _notifyChangeListener(value);
     }
   }
 
@@ -118,33 +120,73 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   }
 }
 
-class _YesNoChoiceSegmentButton extends StatelessWidget {
-  final Set<_YesNoChoice> value;
-  final ValueChanged<Set<_YesNoChoice>> onChanged;
-  final bool enabled;
+class _YesNoChoiceSegmentButton extends FormField<bool?> {
+  final bool? value;
+  final ValueChanged<bool?>? onChanged;
 
-  const _YesNoChoiceSegmentButton({
+  _YesNoChoiceSegmentButton(
+    BuildContext context, {
+    super.key,
     required this.value,
     required this.onChanged,
-    required this.enabled,
-  });
+    super.validator,
+    super.enabled,
+    AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
+  }) : super(
+          initialValue: value,
+          autovalidateMode: autovalidateMode,
+          builder: (field) {
+            void onChangedHandler(Set<bool> selected) {
+              final newValue = selected.isEmpty ? null : selected.first;
+              field.didChange(newValue);
+              onChanged?.call(newValue);
+            }
 
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      ignoring: !enabled,
-      child: VoicesSegmentedButton<_YesNoChoice>(
-        segments: _YesNoChoice.values
-            .map(
-              (choice) => ButtonSegment(
-                value: choice,
-                label: Text(choice.localizedName(context.l10n)),
-              ),
-            )
-            .toList(),
-        selected: value,
-        onChanged: onChanged,
-        emptySelectionAllowed: true,
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IgnorePointer(
+                  ignoring: !enabled,
+                  child: VoicesSegmentedButton<bool>(
+                    key: key,
+                    segments: [
+                      ButtonSegment(
+                        value: true,
+                        label: Text(context.l10n.yes),
+                      ),
+                      ButtonSegment(
+                        value: false,
+                        label: Text(context.l10n.no),
+                      ),
+                    ],
+                    selected: value != null ? {value} : {},
+                    onChanged: onChangedHandler,
+                    emptySelectionAllowed: true,
+                    style: _getButtonStyle(field),
+                  ),
+                ),
+                if (field.hasError)
+                  Text(
+                    field.errorText ?? context.l10n.snackbarErrorLabelText,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  ),
+              ],
+            );
+          },
+        );
+
+  static ButtonStyle? _getButtonStyle(FormFieldState<bool?> field) {
+    if (field.errorText == null) return null;
+
+    return ButtonStyle(
+      side: WidgetStatePropertyAll(
+        BorderSide(
+          color: Theme.of(field.context).colorScheme.error,
+        ),
       ),
     );
   }
