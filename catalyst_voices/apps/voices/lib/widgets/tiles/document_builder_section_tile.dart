@@ -113,7 +113,11 @@ class _DocumentBuilderSectionTileState
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
-      _pendingChanges.clear();
+      if (!_isEditMode) {
+        _pendingChanges.clear();
+        _editedSection = widget.section;
+        _builder = _editedSection.toBuilder();
+      }
     });
   }
 

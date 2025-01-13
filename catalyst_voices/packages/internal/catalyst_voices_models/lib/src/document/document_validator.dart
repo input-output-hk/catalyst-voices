@@ -95,7 +95,16 @@ final class DocumentValidator {
     // ignore: avoid_positional_boolean_parameters
     bool? value,
   ) {
-    return validateBasic(schema, value);
+    final result = validateBasic(schema, value);
+
+    if (result.isInvalid) {
+      return result;
+    }
+
+    if (value == null) {
+      return MissingRequiredDocumentValue(invalidNodeId: schema.nodeId);
+    }
+    return const SuccessfulDocumentValidation();
   }
 }
 
