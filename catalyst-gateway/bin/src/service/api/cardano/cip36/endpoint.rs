@@ -1,6 +1,6 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use poem::http::{HeaderMap, StatusCode};
+use poem::http::HeaderMap;
 use tracing::error;
 
 use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
@@ -13,7 +13,7 @@ use crate::{
     db::index::session::CassandraSession,
     service::{
         api::cardano::cip36::response::AllRegistration,
-        common::{self},
+        common::{self, types::headers::retry_after::RetryAfterOption},
     },
 };
 
@@ -25,10 +25,10 @@ pub(crate) async fn cip36_registrations(
 ) -> response::AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
-        return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-            "Connection issue",
-            StatusCode::UNPROCESSABLE_ENTITY,
-        )]);
+        return AllRegistration::service_unavailable(
+            &anyhow::anyhow!("Failed to acquire db session"),
+            RetryAfterOption::Default,
+        );
     };
 
     if let Some(stake_or_voter) = lookup {
@@ -43,12 +43,10 @@ pub(crate) async fn cip36_registrations(
                 let stake_hash: HexEncodedHash28 = match cip19_stake_address.try_into() {
                     Ok(stake_hash) => stake_hash,
                     Err(err) => {
-                        return response::AllRegistration::unprocessable_content(vec![
-                            poem::Error::from_string(
-                                format!("Stake addr to stake hash conversion error: {err:?}"),
-                                StatusCode::UNPROCESSABLE_ENTITY,
-                            ),
-                        ]);
+                        return AllRegistration::handle_error(&anyhow::anyhow!(
+                            "Given stake pub key is corrupt {:?}",
+                            err
+                        ));
                     },
                 };
 

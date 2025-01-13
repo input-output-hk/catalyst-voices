@@ -4,7 +4,6 @@ use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
 use poem::http::StatusCode;
-use tracing::error;
 
 use super::{
     cardano::{
@@ -45,16 +44,9 @@ pub(crate) async fn get_registration_given_stake_key_hash(
     {
         Ok(stake_addr) => stake_addr,
         Err(err) => {
-            error!(
-                id="get_registration_from_stake_key_hash_query_stake_addr",
-                error=?err,
-                "Failed to query stake addr from stake hash"
-            );
-
-            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                format!("Failed to query stake addr from stake hash {err:?}"),
-                StatusCode::UNPROCESSABLE_ENTITY,
-            )]);
+            return AllRegistration::handle_error(&anyhow::anyhow!(
+                "Failed to query stake addr from stake hash {err:?}",
+            ));
         },
     };
 
@@ -62,16 +54,9 @@ pub(crate) async fn get_registration_given_stake_key_hash(
         let row = match row_stake_addr {
             Ok(r) => r,
             Err(err) => {
-                error!(
-                    id="get_registration_from_stake_key_hash_registration",
-                    error=?err,
-                    "Failed to get latest registration"
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to get stake addr from stake hash {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::handle_error(&anyhow::anyhow!(
+                    "Failed to query stake addr from stake hash {err:?}",
+                ));
             },
         };
 
@@ -80,10 +65,9 @@ pub(crate) async fn get_registration_given_stake_key_hash(
         let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_address.clone()) {
             Ok(key) => key,
             Err(err) => {
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to type stake address {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::internal_error(&anyhow::anyhow!(
+                    "Failed to type stake address {err:?}",
+                ));
             },
         };
 
@@ -107,16 +91,9 @@ pub async fn get_registration_from_stake_addr(
         {
             Ok(registration) => registration,
             Err(err) => {
-                error!(
-                    id="get_registration_from_stake_pub_key",
-                    error=?err,
-                    "Failed to query stake stake pub key"
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to query stake stake pub key{err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::handle_error(&anyhow::anyhow!(
+                    "Failed to query stake stake pub key {err:?}",
+                ));
             },
         };
 
@@ -131,16 +108,9 @@ pub async fn get_registration_from_stake_addr(
         match get_registration_given_slot_no(registrations, &slot_no) {
             Ok(registration) => registration,
             Err(err) => {
-                error!(
-                    id="get_registration_given_slot_no",
-                    error=?err,
-                    "Failed to get registration given slot no"
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to get registration given slot no {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::internal_error(&anyhow::anyhow!(
+                    "Failed to get registration given slot no {err:?}",
+                ));
             },
         }
     } else {
@@ -148,16 +118,9 @@ pub async fn get_registration_from_stake_addr(
         match sort_latest_registration(registrations) {
             Ok(registration) => registration,
             Err(err) => {
-                error!(
-                    id="get_latest_registration",
-                    error=?err,
-                    "Failed to sort latest registration"
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to sort latest registration {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::internal_error(&anyhow::anyhow!(
+                    "Failed to sort latest registration {err:?}",
+                ));
             },
         }
     };
@@ -165,17 +128,15 @@ pub async fn get_registration_from_stake_addr(
     // Registration found, now find invalids.
     let slot_no = registration.clone().slot_no;
     let Some(stake_pub_key) = registration.clone().stake_pub_key else {
-        return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-            format!("Stake pub key not in registration {stake_pub_key:?}"),
-            StatusCode::UNPROCESSABLE_ENTITY,
-        )]);
+        return AllRegistration::internal_error(&anyhow::anyhow!(
+            "Stake pub key not in registration {stake_pub_key:?}",
+        ));
     };
 
     let Some(vote_pub_key) = registration.clone().vote_pub_key else {
-        return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-            format!("Vote pub key not in registration {stake_pub_key:?}"),
-            StatusCode::UNPROCESSABLE_ENTITY,
-        )]);
+        return AllRegistration::internal_error(&anyhow::anyhow!(
+            "Vote pub key not in registration {stake_pub_key:?}",
+        ));
     };
 
     // include any erroneous registrations which occur AFTER the slot# of the last valid
@@ -184,18 +145,9 @@ pub async fn get_registration_from_stake_addr(
         match get_invalid_registrations(stake_pub_key, Some(slot_no.clone()), session).await {
             Ok(invalids) => invalids,
             Err(err) => {
-                error!(
-                    id="get_registration_from_stake_key_hash_invalid_registrations_lookup",
-                    error=?err,
-                    "Failed to obtain invalid registrations for given stake pub key",
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!(
-                        "Failed to obtain invalid registrations for given stake pub key {err:?}"
-                    ),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::handle_error(&anyhow::anyhow!(
+                    "Failed to obtain invalid registrations for given stake pub key {err:?}",
+                ));
             },
         };
 
@@ -237,9 +189,12 @@ fn cross_reference_key(
 async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
-        stake_address: stake_pub_key.try_into()?,
-    })
+    let mut registrations_iter = GetRegistrationQuery::execute(
+        session,
+        GetRegistrationParams {
+            stake_address: stake_pub_key.try_into()?,
+        },
+    )
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
@@ -343,10 +298,9 @@ pub(crate) async fn get_registration_given_vote_key(
     let voting_key: Vec<u8> = match vote_key.clone().try_into() {
         Ok(vote_key) => vote_key,
         Err(err) => {
-            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                format!("Failed to convert vote key to bytes {err:?}"),
-                StatusCode::UNPROCESSABLE_ENTITY,
-            )]);
+            return AllRegistration::internal_error(&anyhow::anyhow!(
+                "Failed to convert vote key to bytes {err:?}",
+            ));
         },
     };
 
@@ -359,15 +313,9 @@ pub(crate) async fn get_registration_given_vote_key(
     {
         Ok(stake_addr) => stake_addr,
         Err(err) => {
-            error!(
-                id="get_associated_vote_key_registrations_query_stake_addr_from_vote_key",
-                error=?err,
-                "Failed to query stake addr from vote key"
-            );
-            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                format!("Failed to query stake addr from vote key {err:?}"),
-                StatusCode::UNPROCESSABLE_ENTITY,
-            )]);
+            return AllRegistration::handle_error(&anyhow::anyhow!(
+                "Failed to query stake addr from vote key {err:?}",
+            ));
         },
     };
 
@@ -375,15 +323,9 @@ pub(crate) async fn get_registration_given_vote_key(
         let row = match row_stake_addr {
             Ok(r) => r,
             Err(err) => {
-                error!(
-                    id="get_associated_vote_key_registrations_latest_registration",
-                    error=?err,
-                    "Failed to get latest registration"
-                );
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to query stake addr from vote key {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::handle_error(&anyhow::anyhow!(
+                    "Failed to query stake addr from vote key {err:?}",
+                ));
             },
         };
 
@@ -392,10 +334,9 @@ pub(crate) async fn get_registration_given_vote_key(
         let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_address.clone()) {
             Ok(key) => key,
             Err(err) => {
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to type stake address {err:?}"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::internal_error(&anyhow::anyhow!(
+                    "Failed to type stake address {err:?}",
+                ));
             },
         };
 
@@ -415,16 +356,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     let all_stakes_and_vote_keys = match get_all_stake_addrs_and_vote_keys(&session.clone()).await {
         Ok(key_pairs) => key_pairs,
         Err(err) => {
-            error!(
-                id="get_all_stake_and_vote_keys",
-                error=?err,
-                "Failed to obtain all"
-            );
-
-            return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                format!("Failed to query ALL {err:?}"),
-                StatusCode::UNPROCESSABLE_ENTITY,
-            )]);
+            return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
         },
     };
 
@@ -441,10 +373,9 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
             {
                 Ok(registrations) => registrations,
                 Err(err) => {
-                    return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                        format!("Failed to query ALL {err:?}"),
-                        StatusCode::UNPROCESSABLE_ENTITY,
-                    )])
+                    return AllRegistration::handle_error(&anyhow::anyhow!(
+                        "Failed to query ALL {err:?}",
+                    ));
                 },
             };
 
@@ -488,16 +419,9 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         {
             Ok(invalids) => invalids,
             Err(err) => {
-                error!(
-                    id="get_invalid_registrations_snapshot",
-                    error=?err,
-                    "Failed to obtain invalid registrations for given stake addr in snapshot",
-                );
-
-                return AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-                    format!("Failed to obtain invalid registrations for given stake addr {err:?} in snapshot"),
-                    StatusCode::UNPROCESSABLE_ENTITY,
-                )]);
+                return AllRegistration::handle_error(&anyhow::anyhow!(
+                    "Failed to obtain invalid registrations for given stake addr {err:?} in snapshot",
+                ));
             },
         };
         all_invalids_after_filtering.push(invalids_report);
