@@ -520,7 +520,8 @@ class OnboardingPage {
         expect(
           $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
           T.get(
-              'Select the Cardano wallet to link\nto your Catalyst Keychain.',),
+            'Select the Cardano wallet to link\nto your Catalyst Keychain.',
+          ),
         );
         expect(
           $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
