@@ -18,7 +18,7 @@ async fn queries_test() {
                 uuid::Uuid::now_v7(),
                 uuid::Uuid::now_v7(),
                 doc_type,
-                "Alex".to_string(),
+                vec!["Alex".to_string()],
                 Some(serde_json::Value::Null),
             ),
             Some(serde_json::Value::Null),
@@ -29,7 +29,7 @@ async fn queries_test() {
                 uuid::Uuid::now_v7(),
                 uuid::Uuid::now_v7(),
                 doc_type,
-                "Steven".to_string(),
+                vec!["Steven".to_string()],
                 Some(serde_json::Value::Null),
             ),
             Some(serde_json::Value::Null),
@@ -40,7 +40,7 @@ async fn queries_test() {
                 uuid::Uuid::now_v7(),
                 uuid::Uuid::now_v7(),
                 doc_type,
-                "Sasha".to_string(),
+                vec!["Sasha".to_string()],
                 None,
             ),
             None,
@@ -54,7 +54,13 @@ async fn queries_test() {
         assert!(!doc.store().await.unwrap());
         // try another doc with the same `id` and `ver` and with different other fields
         let another_doc = FullSignedDoc::new(
-            SignedDocBody::new(*doc.id(), *doc.ver(), doc_type, "Neil".to_string(), None),
+            SignedDocBody::new(
+                *doc.id(),
+                *doc.ver(),
+                doc_type,
+                vec!["Neil".to_string()],
+                None,
+            ),
             None,
             vec![],
         );
@@ -87,7 +93,7 @@ async fn queries_test() {
         assert!(res_docs.try_next().await.unwrap().is_none());
 
         let mut res_docs = SignedDocBody::retrieve(
-            &DocsQueryFilter::Author(doc.author().clone()),
+            &DocsQueryFilter::Author(doc.authors().first().unwrap().clone()),
             &QueryLimits::ALL,
         )
         .await

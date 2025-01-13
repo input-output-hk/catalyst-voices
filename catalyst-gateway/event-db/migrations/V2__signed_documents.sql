@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS signed_docs (
   id UUID NOT NULL, -- UUID v7
   ver UUID NOT NULL, -- UUID v7
   type UUID NOT NULL, -- UUID v4
-  author TEXT NOT NULL,
+  authors TEXT[] NOT NULL,
   metadata JSONB NULL,
   payload JSONB NULL,
   raw BYTEA NOT NULL,
@@ -32,8 +32,8 @@ COMMENT ON COLUMN signed_docs.ver IS
 'The Signed Documents Document Version Number (ULID).';
 COMMENT ON COLUMN signed_docs.type IS
 'The Signed Document type identifier.';
-COMMENT ON COLUMN signed_docs.author IS
-'The Primary Author of the Signed Document.';
+COMMENT ON COLUMN signed_docs.authors IS
+'The Primary Author`s list of the Signed Document.';
 COMMENT ON COLUMN signed_docs.metadata IS
 'Extra metadata extracted from the Signed Document, and encoded as JSON.';
 COMMENT ON COLUMN signed_docs.payload IS
@@ -45,13 +45,13 @@ CREATE INDEX IF NOT EXISTS idx_signed_docs_type ON signed_docs (type);
 COMMENT ON INDEX idx_signed_docs_type IS
 'Index to help finding documents by a known type faster.';
 
-CREATE INDEX IF NOT EXISTS idx_signed_docs_author ON signed_docs (author);
-COMMENT ON INDEX idx_signed_docs_author IS
-'Index to help finding documents by a known author faster.';
+CREATE INDEX IF NOT EXISTS idx_signed_docs_authors ON signed_docs (authors);
+COMMENT ON INDEX idx_signed_docs_authors IS
+'Index to help finding documents by a known authors faster.';
 
-CREATE INDEX IF NOT EXISTS idx_signed_docs_type_author ON signed_docs (type, author);
-COMMENT ON INDEX idx_signed_docs_type_author IS
-'Index to help finding documents by a known author for a specific document type faster.';
+CREATE INDEX IF NOT EXISTS idx_signed_docs_type_authors ON signed_docs (type, authors);
+COMMENT ON INDEX idx_signed_docs_type_authors IS
+'Index to help finding documents by a known authors for a specific document type faster.';
 
 
 CREATE INDEX IF NOT EXISTS idx_signed_docs_metadata ON signed_docs USING gin (metadata);

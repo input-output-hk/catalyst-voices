@@ -47,8 +47,8 @@ impl FullSignedDoc {
 
     /// Returns the document author.
     #[allow(dead_code)]
-    pub(crate) fn author(&self) -> &String {
-        self.body.author()
+    pub(crate) fn authors(&self) -> &Vec<String> {
+        self.body.authors()
     }
 
     /// Returns the `SignedDocBody`.
@@ -92,7 +92,7 @@ impl FullSignedDoc {
             },
             Err(err) if err.is::<NotFoundError>() => {
                 EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await?;
-                Ok(false)
+                Ok(true)
             },
             Err(err) => Err(err),
         }
@@ -154,7 +154,7 @@ impl FullSignedDoc {
                 *id,
                 ver,
                 row.try_get("type")?,
-                row.try_get("author")?,
+                row.try_get("authors")?,
                 row.try_get("metadata")?,
             ),
             payload: row.try_get("payload")?,
