@@ -11,25 +11,35 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 ///
 /// Once edits are done convert the builder to a [Document] with [build] method.
 final class DocumentBuilder implements DocumentNode {
+  String _documentId;
+  String _documentVersion;
   String _schemaUrl;
   DocumentSchema _schema;
   List<DocumentSegmentBuilder> _segments;
 
   /// The default constructor for the [DocumentBuilder].
   DocumentBuilder({
+    required String documentId,
+    required String documentVersion,
     required String schemaUrl,
     required DocumentSchema schema,
     required List<DocumentSegmentBuilder> segments,
-  })  : _schemaUrl = schemaUrl,
+  })  : _documentId = documentId,
+        _documentVersion = documentVersion,
+        _schemaUrl = schemaUrl,
         _schema = schema,
         _segments = segments;
 
   /// Creates an empty [DocumentBuilder] from a [schema].
   factory DocumentBuilder.fromSchema({
+    required String documentId,
+    required String documentVersion,
     required String schemaUrl,
     required DocumentSchema schema,
   }) {
     return DocumentBuilder(
+      documentId: documentId,
+      documentVersion: documentVersion,
       schemaUrl: schemaUrl,
       schema: schema,
       segments: schema.segments.map(DocumentSegmentBuilder.fromSchema).toList(),
@@ -39,6 +49,8 @@ final class DocumentBuilder implements DocumentNode {
   /// Creates a [DocumentBuilder] from existing [document].
   factory DocumentBuilder.fromDocument(Document document) {
     return DocumentBuilder(
+      documentId: document.id,
+      documentVersion: document.version,
       schemaUrl: document.schemaUrl,
       schema: document.schema,
       segments:
@@ -77,6 +89,8 @@ final class DocumentBuilder implements DocumentNode {
     _segments.sortByOrder(_schema.order);
 
     return Document(
+      id: _documentId,
+      version: _documentVersion,
       schemaUrl: _schemaUrl,
       schema: _schema,
       segments: List.unmodifiable(_segments.map((e) => e.build())),

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/src/document/document_base.dart';
 import 'package:catalyst_voices_models/src/document/document_builder.dart';
 import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/document_validator.dart';
@@ -9,7 +10,7 @@ import 'package:equatable/equatable.dart';
 ///
 /// The document is immutable, in order to edit it make use
 /// of [toBuilder] method and act on [DocumentBuilder] instance.
-final class Document extends Equatable {
+final class Document extends DocumentBase {
   /// The url of the [schema].
   final String schemaUrl;
 
@@ -21,6 +22,8 @@ final class Document extends Equatable {
 
   /// The default constructor for the [Document].
   const Document({
+    required super.id,
+    required super.version,
     required this.schemaUrl,
     required this.schema,
     required this.segments,
@@ -32,7 +35,12 @@ final class Document extends Equatable {
   }
 
   @override
-  List<Object?> get props => [schemaUrl, schema, segments];
+  List<Object?> get props => [
+        ...super.props,
+        schemaUrl,
+        schema,
+        segments,
+      ];
 }
 
 /// A segment that groups multiple [DocumentSection]'s.

@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart'
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   group(DocumentDto, () {
@@ -15,6 +16,9 @@ void main() {
 
     late Map<String, dynamic> schemaJson;
     late Map<String, dynamic> documentJson;
+
+    final id = const Uuid().v7();
+    final version = const Uuid().v7();
 
     setUpAll(() {
       final encodedSchema = File(schemaPath).readAsStringSync();
@@ -28,7 +32,10 @@ void main() {
       'Roundtrip from json string to dto and reverse '
       'should result in the same document',
       () {
-        final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
+        final schema = DocumentSchemaDto.fromJson(schemaJson).toModel(
+          documentId: id,
+          documentVersion: version,
+        );
         final data = DocumentDataDto.fromJson(documentJson);
 
         // original
@@ -51,18 +58,27 @@ void main() {
     test(
         'Roundtrip from json to model and reverse '
         'should result in the same document', () {
-      final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
+      final schema = DocumentSchemaDto.fromJson(schemaJson).toModel(
+        documentId: id,
+        documentVersion: version,
+      );
       final data = DocumentDataDto.fromJson(documentJson);
 
       // original
       final originalDocDto = DocumentDto.fromJsonSchema(data, schema);
-      final originalDoc = originalDocDto.toModel();
+      final originalDoc = originalDocDto.toModel(
+        documentId: id,
+        documentVersion: version,
+      );
 
       // serialized and deserialized
       final serializedDocJson = DocumentDto.fromModel(originalDoc).toJson();
       final deserializedDocDto =
           DocumentDto.fromJsonSchema(serializedDocJson, schema);
-      final deserializedDoc = deserializedDocDto.toModel();
+      final deserializedDoc = deserializedDocDto.toModel(
+        documentId: id,
+        documentVersion: version,
+      );
 
       // verify they are the same
       expect(deserializedDoc, equals(originalDoc));
@@ -70,9 +86,14 @@ void main() {
 
     test('Converts segments list into object for JSON', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      final schema = schemaDto.toModel();
+      final schema = schemaDto.toModel(
+        documentId: id,
+        documentVersion: version,
+      );
 
       final document = DocumentBuilder.fromSchema(
+        documentId: id,
+        documentVersion: version,
         schemaUrl: schemaPath,
         schema: schema,
       ).build();
@@ -87,9 +108,14 @@ void main() {
 
     test('Converts object from JSON into List of segments', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      final schema = schemaDto.toModel();
+      final schema = schemaDto.toModel(
+        documentId: id,
+        documentVersion: version,
+      );
 
       final document = DocumentBuilder.fromSchema(
+        documentId: id,
+        documentVersion: version,
         schemaUrl: schemaPath,
         schema: schema,
       ).build();
@@ -108,7 +134,10 @@ void main() {
 
     test('After serialization $DocumentPropertyDto has correct type', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      final schema = schemaDto.toModel();
+      final schema = schemaDto.toModel(
+        documentId: id,
+        documentVersion: version,
+      );
       final data = DocumentDataDto.fromJson(documentJson);
 
       final documentDto = DocumentDto.fromJsonSchema(data, schema);

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/src/document/document_base.dart';
 import 'package:catalyst_voices_models/src/document/document_definitions.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/document_validator.dart';
@@ -10,8 +11,8 @@ import 'package:meta/meta.dart';
 /// The document consists of top level [segments].
 /// [segments] contain [DocumentSchemaSegment.sections]
 /// and sections contain [DocumentSchemaProperty]'s.
-final class DocumentSchema extends Equatable implements DocumentNode {
-  final String schema;
+final class DocumentSchema extends DocumentBase implements DocumentNode {
+  final String jsonSchema;
   final String title;
   final String description;
   final List<DocumentSchemaSegment> segments;
@@ -19,7 +20,9 @@ final class DocumentSchema extends Equatable implements DocumentNode {
   final String propertiesSchema;
 
   const DocumentSchema({
-    required this.schema,
+    required super.id,
+    required super.version,
+    required this.jsonSchema,
     required this.title,
     required this.description,
     required this.segments,
@@ -32,7 +35,8 @@ final class DocumentSchema extends Equatable implements DocumentNode {
 
   @override
   List<Object?> get props => [
-        schema,
+        ...super.props,
+        jsonSchema,
         title,
         description,
         segments,

@@ -26,8 +26,9 @@ final class Dependencies extends DependencyProvider {
     registerSingleton<AppConfig>(config);
 
     _registerStorages();
-    _registerServices();
+    _registerUtils();
     _registerRepositories();
+    _registerServices();
     _registerBlocsWithDependencies();
 
     _isInitialized = true;
@@ -120,7 +121,11 @@ final class Dependencies extends DependencyProvider {
           get<KeychainProvider>(),
         );
       })
-      ..registerLazySingleton<DocumentRepository>(DocumentRepository.new);
+      ..registerLazySingleton<DocumentRepository>(() {
+        return DocumentRepository(
+          get<SignedDocumentManager>(),
+        );
+      });
   }
 
   void _registerServices() {
@@ -182,5 +187,9 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
+  }
+
+  void _registerUtils() {
+    registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
   }
 }

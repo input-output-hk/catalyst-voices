@@ -9,9 +9,9 @@ part 'document_schema_dto.g.dart';
 @JsonSerializable()
 final class DocumentSchemaDto {
   @JsonKey(name: r'$schema')
-  final String schema;
+  final String jsonSchema;
   @JsonKey(name: r'$id')
-  final String id;
+  final String jsonSchemaId;
   final String title;
   final String description;
   final DocumentDefinitionsDto definitions;
@@ -26,8 +26,8 @@ final class DocumentSchemaDto {
   final String propertiesSchema;
 
   const DocumentSchemaDto({
-    required this.schema,
-    required this.id,
+    required this.jsonSchema,
+    required this.jsonSchemaId,
     required this.title,
     required this.description,
     required this.definitions,
@@ -37,6 +37,7 @@ final class DocumentSchemaDto {
     required this.order,
     required this.propertiesSchema,
   });
+
   factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
     final segmentsMap = json['properties'] as Map<String, dynamic>;
     json['propertiesSchema'] =
@@ -47,7 +48,10 @@ final class DocumentSchemaDto {
 
   Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
 
-  DocumentSchema toModel() {
+  DocumentSchema toModel({
+    required String documentId,
+    required String documentVersion,
+  }) {
     const nodeId = DocumentNodeId.root;
     final order = this.order ?? const [];
 
@@ -62,7 +66,9 @@ final class DocumentSchemaDto {
         .toList();
 
     return DocumentSchema(
-      schema: schema,
+      id: documentId,
+      version: documentVersion,
+      jsonSchema: jsonSchema,
       title: title,
       description: description,
       segments: mappedSegments,
