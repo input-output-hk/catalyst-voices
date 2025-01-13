@@ -1,15 +1,15 @@
 //! Metrics related to memory analytics.
 
-use memory_stats::memory_stats;
-use stats_alloc::{Region, Stats, StatsAlloc, INSTRUMENTED_SYSTEM};
-use tracing::log::error;
-
-use std::alloc::System;
 use std::{
+    alloc::System,
     sync::{Arc, Mutex},
     thread,
     time::Duration,
 };
+
+use memory_stats::memory_stats;
+use stats_alloc::{Region, Stats, StatsAlloc, INSTRUMENTED_SYSTEM};
+use tracing::log::error;
 
 lazy_static::lazy_static! {
   /// A global, thread-safe container for memory metrics.
@@ -27,7 +27,8 @@ static GLOBAL: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
 /// and physical/virtual memory usage.
 #[derive(Debug, Default, Clone)]
 pub(crate) struct MemoryMetrics {
-    /// Statistics from the global allocator, including allocations and deallocations from `stats_alloc::Stats`.
+    /// Statistics from the global allocator, including allocations and deallocations from
+    /// `stats_alloc::Stats`.
     pub(crate) allocator_stats: Stats,
     /// Physical memory usage of the application, if available.
     pub(crate) physical_usage: Option<usize>,
