@@ -19,7 +19,7 @@ lazy_static::lazy_static! {
   static ref GLOBAL_METRICS: Arc<Mutex<MemoryMetrics>> = Arc::new(Mutex::new(MemoryMetrics::default()));
 }
 
-/// This is to prevent the init function from accidentially being called multiple times.
+/// This is to prevent the init function from accidentally being called multiple times.
 static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
 /// Interval for updating memory metrics, in milliseconds.
