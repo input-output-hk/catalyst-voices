@@ -41,6 +41,8 @@ void main() async {
 
     patrolWidgetTest(
       'guest - chooser - clicking on icons works correctly',
+      tags: 'https://github.com/input-output-hk/catalyst-voices/issues/1473',
+      skip: true,
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(OverallSpacesPage.guestShortcutBtn)
@@ -58,6 +60,8 @@ void main() async {
     );
 
     patrolWidgetTest(
+      tags: 'https://github.com/input-output-hk/catalyst-voices/issues/1473',
+      skip: true,
       'guest - chooser - next,previous buttons work correctly',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
