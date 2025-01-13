@@ -67,6 +67,12 @@ use poem_openapi::{
 #[derive(Debug)]
 pub struct Cbor(Body);
 
+impl From<Vec<u8>> for Cbor {
+    fn from(value: Vec<u8>) -> Self {
+        Self(value.into())
+    }
+}
+
 impl Cbor {
     /// Returns an inner bytes with the limit
     pub(crate) async fn into_bytes_with_limit(

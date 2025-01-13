@@ -57,6 +57,12 @@ impl FullSignedDoc {
         &self.body
     }
 
+    /// Returns the document raw bytes.
+    #[allow(dead_code)]
+    pub(crate) fn raw(&self) -> &Vec<u8> {
+        &self.raw
+    }
+
     /// Uploads a `FullSignedDoc` to the event db.
     /// Returns `true` if document was added into the db, `false` if it was already added
     /// previously.

@@ -1,9 +1,11 @@
 //! Implementation of the GET `/document` endpoint
 
-use poem::Body;
 use poem_openapi::ApiResponse;
 
-use crate::service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor};
+use crate::{
+    db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
+    service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor},
+};
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -11,7 +13,7 @@ use crate::service::common::{responses::WithErrorResponses, types::payload::cbor
 pub(crate) enum Responses {
     /// The Document that was requested.
     #[oai(status = 200)]
-    Ok(Cbor<Body>),
+    Ok(Cbor),
     /// The document could not be found.
     #[oai(status = 404)]
     NotFound,
@@ -23,8 +25,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/document`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
-    let _doc = document_id;
-    let _ver = version;
-
-    Responses::NotFound.into()
+    match FullSignedDoc::retrieve(&document_id, version.as_ref()).await {
+        Ok(doc) => Responses::Ok(doc.raw().clone().into()).into(),
+        Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
+        Err(err) => AllResponses::handle_error(&err),
+    }
 }

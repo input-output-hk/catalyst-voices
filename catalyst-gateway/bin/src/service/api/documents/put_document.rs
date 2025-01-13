@@ -51,7 +51,24 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 None,
             );
 
-            match FullSignedDoc::new(doc_body, None, doc_bytes).store().await {
+            let payload = if doc.doc_content().is_json() {
+                match serde_json::from_slice(doc.doc_content().bytes()) {
+                    Ok(payload) => Some(payload),
+                    Err(e) => {
+                        return Responses::BadRequest(Json(PutDocumentBadRequest::new(format!(
+                            "Ivalid Document Content, not Json encoded: {e}"
+                        ))))
+                        .into()
+                    },
+                }
+            } else {
+                None
+            };
+
+            match FullSignedDoc::new(doc_body, payload, doc_bytes)
+                .store()
+                .await
+            {
                 Ok(true) => Responses::Created.into(),
                 Ok(false) => Responses::NoContent.into(),
                 Err(err) => AllResponses::handle_error(&err),
