@@ -38,6 +38,7 @@ class AccountPopup extends StatelessWidget {
             padding: EdgeInsets.zero,
             enabled: false,
             value: null,
+            key: const Key('PopUpMenuAccountHeader'),
             child: _Header(
               accountLetter: avatarLetter,
               walletName: 'Wallet name',
@@ -56,11 +57,13 @@ class AccountPopup extends StatelessWidget {
             padding: EdgeInsets.zero,
             enabled: false,
             value: null,
+            key: Key('PopUpMenuMyAccount'),
             child: _Section('My account'),
           ),
           PopupMenuItem(
             padding: EdgeInsets.zero,
             value: _MenuItemValue.profileAndKeychain,
+            key: const Key('PopUpMenuProfileAndKeychain'),
             child: _MenuItem(
               'Profile & Keychain',
               VoicesAssets.icons.userCircle,
@@ -69,6 +72,7 @@ class AccountPopup extends StatelessWidget {
           PopupMenuItem(
             padding: EdgeInsets.zero,
             value: _MenuItemValue.lock,
+            key: const Key('PopUpMenuLockAccount'),
             child: _MenuItem(
               'Lock account',
               VoicesAssets.icons.lockClosed,
