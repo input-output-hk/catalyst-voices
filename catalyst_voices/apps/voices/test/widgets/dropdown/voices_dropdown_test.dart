@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/helpers.dart';
 
 void main() {
-  group('VoicesDropdown Widget Tests', () {
+  group('$FilterByDropdown Widget Tests', () {
     late List<DropdownMenuEntry<String>> items;
     setUp(() {
       items = [
@@ -23,7 +23,7 @@ void main() {
     testWidgets('renders correctly with initial value', (tester) async {
       await tester.pumpApp(
         Scaffold(
-          body: VoicesDropdown(
+          body: FilterByDropdown(
             items: items,
             value: 'item1',
             onChanged: (value) {},
@@ -49,7 +49,7 @@ void main() {
     testWidgets('renders correctly without initial value', (tester) async {
       await tester.pumpApp(
         Scaffold(
-          body: VoicesDropdown(
+          body: FilterByDropdown(
             items: items,
             onChanged: (value) {},
           ),
@@ -73,7 +73,7 @@ void main() {
     testWidgets('renders correctly without initial value', (tester) async {
       await tester.pumpApp(
         Scaffold(
-          body: VoicesDropdown(
+          body: FilterByDropdown(
             items: items,
             onChanged: (value) {},
           ),
@@ -103,7 +103,7 @@ void main() {
     testWidgets('Changes value correctly', (tester) async {
       await tester.pumpApp(
         Scaffold(
-          body: VoicesDropdown(
+          body: FilterByDropdown(
             items: items,
             onChanged: (value) {},
           ),
@@ -140,7 +140,7 @@ void main() {
       final log = <int>[];
       await tester.pumpApp(
         Scaffold(
-          body: VoicesDropdown(
+          body: FilterByDropdown(
             items: items,
             onChanged: (value) {
               log.add(0);

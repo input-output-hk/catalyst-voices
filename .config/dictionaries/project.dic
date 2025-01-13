@@ -30,6 +30,7 @@ bimap
 bindgen
 bkioshn
 bluefireteam
+bridgefor
 BROTLI
 canvaskit
 cardano
@@ -105,6 +106,7 @@ fmtfix
 fontawesome
 fontello
 Formz
+frbgen
 fuzzer
 gapless
 gcloud
