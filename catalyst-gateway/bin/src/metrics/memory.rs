@@ -1,7 +1,9 @@
 //! Metrics related to memory analytics.
 
 use memory_stats::memory_stats;
+use tracing::log::error;
 use stats_alloc::{Region, Stats, StatsAlloc, INSTRUMENTED_SYSTEM};
+
 use std::alloc::System;
 use std::{
     sync::{Arc, Mutex},
@@ -43,13 +45,16 @@ impl MemoryMetrics {
 }
 
 pub(crate) fn start_metrics_updater() {
-    let metrics_clone = Arc::clone(&GLOBAL_METRICS);
     thread::spawn(move || {
         let interval = Duration::from_millis(UPDATE_INTERVAL_MILLI); // Update every 5 seconds
         loop {
             {
-                let mut metrics = metrics_clone.lock().unwrap();
-                metrics.update();
+              match GLOBAL_METRICS.lock() {
+                  Ok(mut metrics) => metrics.update(),
+                  Err(err) => {
+                    error!("Failed to update memory usage metrics: {:?}", err);
+                  }
+              }
             }
             thread::sleep(interval);
         }
