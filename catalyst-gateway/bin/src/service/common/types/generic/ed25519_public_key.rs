@@ -34,16 +34,14 @@ pub(crate) const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
 pub(crate) const FORMAT: &str = "hex:ed25519-public-key";
 
 /// Schema
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
-    MetaSchema {
-        title: Some(TITLE.to_owned()),
-        description: Some(DESCRIPTION),
-        example: Some(Value::String(EXAMPLE.to_string())),
-        max_length: Some(ENCODED_LENGTH),
-        min_length: Some(ENCODED_LENGTH),
-        pattern: Some(PATTERN.to_string()),
-        ..poem_openapi::registry::MetaSchema::ANY
-    }
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
+    title: Some(TITLE.to_owned()),
+    description: Some(DESCRIPTION),
+    example: Some(Value::String(EXAMPLE.to_string())),
+    max_length: Some(ENCODED_LENGTH),
+    min_length: Some(ENCODED_LENGTH),
+    pattern: Some(PATTERN.to_string()),
+    ..poem_openapi::registry::MetaSchema::ANY
 });
 
 /// Because ALL the constraints are defined above, we do not ever need to define them in
@@ -74,21 +72,15 @@ impl Ed25519HexEncodedPublicKey {
     /// Extra examples of 32 bytes ED25519 Public Key.
     pub(crate) fn examples(index: usize) -> Self {
         match index {
-            0 => {
-                Self(
-                    "0xDEF855AE45F3BF9640A5298A38B97617DE75600F796F17579BFB815543624B24".to_owned(),
-                )
-            },
-            1 => {
-                Self(
-                    "0x83B3B55589797EF953E24F4F0DBEE4D50B6363BCF041D15F6DBD33E014E54711".to_owned(),
-                )
-            },
-            _ => {
-                Self(
-                    "0xA3E52361AFDE840918E2589DBAB9967C8027FB4431E83D36E338748CD6E3F820".to_owned(),
-                )
-            },
+            0 => Self(
+                "0xDEF855AE45F3BF9640A5298A38B97617DE75600F796F17579BFB815543624B24".to_owned(),
+            ),
+            1 => Self(
+                "0x83B3B55589797EF953E24F4F0DBEE4D50B6363BCF041D15F6DBD33E014E54711".to_owned(),
+            ),
+            _ => Self(
+                "0xA3E52361AFDE840918E2589DBAB9967C8027FB4431E83D36E338748CD6E3F820".to_owned(),
+            ),
         }
     }
 }
@@ -148,6 +140,7 @@ mod tests {
 
     #[test]
     fn hex_to_pub_key() {
+        // https://cexplorer.io/article/understanding-cardano-addresses
         assert!(Ed25519HexEncodedPublicKey::try_from(
             "0x76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de".to_string(),
         )
