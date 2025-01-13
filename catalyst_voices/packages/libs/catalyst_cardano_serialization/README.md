@@ -31,6 +31,7 @@ and submission are outside of scope of this package.
 ```yaml
 dependencies:
   catalyst_cardano_serialization: any # or the latest version on Pub
+  catalyst_key_derivation: any # or the latest version on Pub
 ```
 
 ## Example
@@ -51,7 +52,9 @@ import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
 /* cSpell:disable */
-void main() {
+Future<void> main() async {
+  await CatalystKeyDerivation.init();
+
   const txBuilderConfig = TransactionBuilderConfig(
     feeAlgo: TieredFee(
       constant: 155381,
