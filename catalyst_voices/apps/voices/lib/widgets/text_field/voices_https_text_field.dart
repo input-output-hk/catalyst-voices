@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -55,9 +54,16 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
               widget.enabled ? context.l10n.noUrlAdded : context.l10n.addUrl,
           prefixIcon: VoicesAssets.icons.link.buildIcon(),
           showStatusSuffixIcon: widget.enabled,
-          suffixIcon: _AdditionalSuffixIcons(
-            enabled: widget.enabled,
-            controller: _effectiveController,
+          suffixIcon: ValueListenableBuilder(
+            valueListenable: _effectiveController,
+            builder: (context, value, child) {
+              return _AdditionalSuffixIcons(
+                enabled: widget.enabled,
+                canClear: value.text.isNotEmpty,
+                onLinkTap: _launchUrl,
+                onClearTap: _onClearTap,
+              );
+            },
           ),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
@@ -101,66 +107,41 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
       await launchHrefUrl(url);
     }
   }
+
+  void _onClearTap() {
+    _effectiveController.clear();
+  }
 }
 
-class _AdditionalSuffixIcons extends StatefulWidget {
+class _AdditionalSuffixIcons extends StatelessWidget {
   final bool enabled;
-  final TextEditingController controller;
+  final bool canClear;
+  final VoidCallback onLinkTap;
+  final VoidCallback onClearTap;
 
   const _AdditionalSuffixIcons({
     required this.enabled,
-    required this.controller,
+    required this.canClear,
+    required this.onLinkTap,
+    required this.onClearTap,
   });
 
   @override
-  State<_AdditionalSuffixIcons> createState() => _AdditionalSuffixIconsState();
-}
-
-class _AdditionalSuffixIconsState extends State<_AdditionalSuffixIcons>
-    with LaunchUrlMixin {
-  bool _offstageClearButton = true;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_changeClearButtonVisibility);
-  }
-
-  @override
-  void didUpdateWidget(covariant _AdditionalSuffixIcons oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller) {
-      oldWidget.controller.removeListener(_changeClearButtonVisibility);
-      widget.controller.addListener(_changeClearButtonVisibility);
-      _changeClearButtonVisibility();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (!widget.enabled && widget.controller.text.isNotEmpty) {
+    if (!enabled) {
       return VoicesIconButton(
-        onTap: () async {
-          await launchHrefUrl(widget.controller.text.getUri());
-        },
+        onTap: onLinkTap,
         child: VoicesAssets.icons.externalLink.buildIcon(
           color: Theme.of(context).colorScheme.primary,
         ),
       );
     }
     return Offstage(
-      offstage: _offstageClearButton,
+      offstage: !canClear,
       child: TextButton(
-        onPressed: widget.controller.clear,
+        onPressed: onClearTap,
         child: Text(context.l10n.clear),
       ),
     );
-  }
-
-  void _changeClearButtonVisibility() {
-    setState(() {
-      _offstageClearButton =
-          widget.enabled && widget.controller.text.isNotEmpty;
-    });
   }
 }

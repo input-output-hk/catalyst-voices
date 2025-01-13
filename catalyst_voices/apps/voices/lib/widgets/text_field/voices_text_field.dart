@@ -429,26 +429,29 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final statusSuffixWidget = _getStatusSuffixWidget();
     if (child == null) return statusSuffixWidget;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconTheme(
-          data: IconThemeData(
-            size: 24,
-            color: Theme.of(context).colors.iconsForeground,
-          ),
-          child: Padding(
-            padding: padding,
+    return Padding(
+      padding: padding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconTheme(
+            data: IconThemeData(
+              size: 24,
+              color: Theme.of(context).colors.iconsForeground,
+            ),
             child: Align(
               widthFactor: 1,
               heightFactor: 1,
               child: child,
             ),
           ),
-        ),
-        if (statusSuffixWidget != null) statusSuffixWidget,
-      ],
+          if (statusSuffixWidget != null) ...[
+            const SizedBox(width: 2),
+            statusSuffixWidget,
+          ],
+        ],
+      ),
     );
   }
 

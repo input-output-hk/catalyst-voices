@@ -60,6 +60,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     final description = widget.property.schema.description ?? '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (description.isNotEmpty) ...[
           Text(
