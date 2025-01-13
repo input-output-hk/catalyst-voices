@@ -622,6 +622,99 @@ void main() async {
           );
         },
       );
+
+      patrolWidgetTest(
+        'visitor - create - link wallet info screen looks OK',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await $(AppBarPage.getStartedBtn)
+              .tap(settleTimeout: const Duration(seconds: 10));
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+          await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.storeSeedPhrases($);
+          await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          //temporary: remove reset when seeds are no longer prefilled
+          await $(OnboardingPage.resetButton).tap();
+          await OnboardingPage.enterStoredSeedPhrases($);
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.enterPassword($, 'Test1234');
+          await OnboardingPage.enterPasswordConfirm($, 'Test1234');
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.linkWalletAndRolesButton).tap();
+          await OnboardingPage.onboardingScreenLooksAsExpected(
+            $,
+            RegistrationState.linkWalletInfo,
+          );
+        },
+      );
+
+      patrolWidgetTest(
+        'visitor - create - link wallet select screen looks OK',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await $(AppBarPage.getStartedBtn)
+              .tap(settleTimeout: const Duration(seconds: 10));
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+          await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.storeSeedPhrases($);
+          await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          //temporary: remove reset when seeds are no longer prefilled
+          await $(OnboardingPage.resetButton).tap();
+          await OnboardingPage.enterStoredSeedPhrases($);
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.enterPassword($, 'Test1234');
+          await OnboardingPage.enterPasswordConfirm($, 'Test1234');
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.linkWalletAndRolesButton).tap();
+          await $(OnboardingPage.chooseCardanoWalletButton).tap();
+          await OnboardingPage.onboardingScreenLooksAsExpected(
+            $,
+            RegistrationState.linkWalletSelect,
+          );
+        },
+      );
+
+      patrolWidgetTest(
+        'visitor - create - link wallet select screen back button works',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await $(AppBarPage.getStartedBtn)
+              .tap(settleTimeout: const Duration(seconds: 10));
+          await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+          await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.storeSeedPhrases($);
+          await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          //temporary: remove reset when seeds are no longer prefilled
+          await $(OnboardingPage.resetButton).tap();
+          await OnboardingPage.enterStoredSeedPhrases($);
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.nextButton).tap();
+          await OnboardingPage.enterPassword($, 'Test1234');
+          await OnboardingPage.enterPasswordConfirm($, 'Test1234');
+          await $(OnboardingPage.nextButton).tap();
+          await $(OnboardingPage.linkWalletAndRolesButton).tap();
+          await $(OnboardingPage.chooseCardanoWalletButton).tap();
+          await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
+          await OnboardingPage.onboardingScreenLooksAsExpected(
+            $,
+            RegistrationState.linkWalletInfo,
+          );
+        },
+      );
     },
   );
 }

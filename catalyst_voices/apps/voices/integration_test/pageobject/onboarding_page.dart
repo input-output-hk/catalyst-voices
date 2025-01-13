@@ -43,6 +43,9 @@ class OnboardingPage {
   static const finishAccountAccountComplete =
       Key('StepRegistrationProgressStepGroup.accountCompletedRowKey');
   static const linkWalletAndRolesButton = Key('LinkWalletAndRolesButton');
+  static const chooseCardanoWalletButton = Key('ChooseCardanoWalletButton');
+  static const seeAllSupportedWalletsBtn = Key('SeeAllSupportedWalletsButton');
+  static const walletsLinkBuilder = Key('WalletsLinkBuilder');
 
   static Future<int> writedownSeedPhraseNumber(
     PatrolTester $,
@@ -295,9 +298,23 @@ class OnboardingPage {
       case RegistrationState.keychainRestoreSuccess:
         throw UnimplementedError();
       case RegistrationState.linkWalletInfo:
-        throw UnimplementedError();
       case RegistrationState.linkWalletSelect:
-        throw UnimplementedError();
+        expect(
+          await infoPartHeaderTitleText($),
+          T.get('Link keys to your Catalyst Keychain'),
+        );
+        expect(
+          await infoPartHeaderSubtitleText($),
+          T.get('Link your Cardano wallet'),
+        );
+        //temporary: check for specific picture (blue key icon)
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect($(progressBar), findsOneWidget);
+        expect(
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+          T.get('Learn More'),
+        );
+        break;
       case RegistrationState.linkWalletSuccess:
         throw UnimplementedError();
       case RegistrationState.rolesSelect:
@@ -485,9 +502,34 @@ class OnboardingPage {
       case RegistrationState.keychainRestoreSuccess:
         throw UnimplementedError();
       case RegistrationState.linkWalletInfo:
-        throw UnimplementedError();
+        expect(
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
+          T.get('Link Cardano Wallet & Catalyst Roles to you Catalyst '
+              'Keychain.'),
+        );
+        expect(
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
+          isNotEmpty,
+        );
+        expect(
+          $(chooseCardanoWalletButton).$(Text).text,
+          T.get('Choose Cardano Wallet'),
+        );
+        break;
       case RegistrationState.linkWalletSelect:
-        throw UnimplementedError();
+        expect(
+          $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
+          T.get(
+              'Select the Cardano wallet to link\nto your Catalyst Keychain.'),
+        );
+        expect(
+          $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
+          isNotEmpty,
+        );
+        expect($(walletsLinkBuilder), findsOneWidget);
+        expect($(backButton), findsOneWidget);
+        expect($(seeAllSupportedWalletsBtn), findsOneWidget);
+        break;
       case RegistrationState.linkWalletSuccess:
         throw UnimplementedError();
       case RegistrationState.rolesSelect:
