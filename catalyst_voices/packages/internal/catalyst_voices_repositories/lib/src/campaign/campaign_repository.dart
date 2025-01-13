@@ -1,24 +1,22 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:uuid/uuid.dart';
 
-class CampaignRepository {
-  Future<Campaign> getCampaign({
-    required String id,
-  }) async {
+// ignore: one_member_abstracts
+abstract interface class CampaignRepository {
+  factory CampaignRepository() = CampaignRepositoryImpl;
+
+  Future<CampaignBase> getCampaign({required String id});
+}
+
+final class CampaignRepositoryImpl implements CampaignRepository {
+  const CampaignRepositoryImpl();
+
+  @override
+  Future<CampaignBase> getCampaign({required String id}) async {
     final now = DateTime.now();
+    final proposalTemplateId = const Uuid().v7();
 
-    const path = Paths.f14ProposalSchema;
-    final encodedSchema = File(path).readAsStringSync();
-    final decodedSchema = json.decode(encodedSchema) as Map<String, dynamic>;
-
-    final proposalTemplateDto = DocumentSchemaDto.fromJson(decodedSchema);
-    final documentSchema = proposalTemplateDto.toModel();
-
-    return Campaign(
+    return CampaignBase(
       id: id,
       name: 'Boost Social Entrepreneurship',
       description: 'We are currently only decentralizing our technology, '
@@ -28,7 +26,7 @@ class CampaignRepository {
       endDate: now.add(const Duration(days: 92)),
       proposalsCount: 0,
       publish: CampaignPublish.draft,
-      proposalTemplate: documentSchema,
+      proposalTemplateId: proposalTemplateId,
     );
   }
 }

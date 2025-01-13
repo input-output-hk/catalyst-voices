@@ -10,13 +10,13 @@ final _logger = Logger('ProposalBuilderBloc');
 final class ProposalBuilderBloc
     extends Bloc<ProposalBuilderEvent, ProposalBuilderState> {
   final CampaignService _campaignService;
-  final DocumentService _documentService;
+  final ProposalService _proposalService;
 
   NodeId? _activeNodeId;
 
   ProposalBuilderBloc(
     this._campaignService,
-    this._documentService,
+    this._proposalService,
   ) : super(const ProposalBuilderState()) {
     on<StartNewProposalEvent>(_startNewProposal);
     on<LoadProposalEvent>(_loadProposal);

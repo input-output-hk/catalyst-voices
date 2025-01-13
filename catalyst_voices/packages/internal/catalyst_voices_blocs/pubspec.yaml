@@ -34,6 +34,7 @@ dependencies:
   formz: ^0.7.0
   meta: ^1.10.0
   result_type: ^0.2.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   bloc_test: ^9.1.4
@@ -44,3 +45,7 @@ dev_dependencies:
   plugin_platform_interface: ^2.1.8
   shared_preferences: ^2.3.3
   shared_preferences_platform_interface: ^2.4.1
+
+flutter:
+  assets:
+    - ../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/

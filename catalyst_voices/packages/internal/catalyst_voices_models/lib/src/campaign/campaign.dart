@@ -1,39 +1,21 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:equatable/equatable.dart';
 
-/// Enum representing the state of a campaign.
-/// Draft: campaign is not published yet.
-/// Published: campaign is published and can be seen by users.
-enum CampaignPublish {
-  draft,
-  published;
-
-  bool get isDraft => this == draft;
-}
-
-final class Campaign extends Equatable {
-  final String id;
-  final String name;
-  final String description;
-  final DateTime startDate;
-  final DateTime endDate;
-  final int proposalsCount;
-  final CampaignPublish publish;
+final class Campaign extends CampaignBase {
   final DocumentSchema proposalTemplate;
 
   const Campaign({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.startDate,
-    required this.endDate,
-    required this.proposalsCount,
-    required this.publish,
+    required super.id,
+    required super.name,
+    required super.description,
+    required super.startDate,
+    required super.endDate,
+    required super.proposalsCount,
+    required super.publish,
+    required super.proposalTemplateId,
     required this.proposalTemplate,
   });
 
-  int get categoriesCount => 0;
-
+  @override
   Campaign copyWith({
     String? id,
     String? name,
@@ -42,6 +24,7 @@ final class Campaign extends Equatable {
     DateTime? endDate,
     int? proposalsCount,
     CampaignPublish? publish,
+    String? proposalTemplateId,
     DocumentSchema? proposalTemplate,
   }) {
     return Campaign(
@@ -52,19 +35,14 @@ final class Campaign extends Equatable {
       endDate: endDate ?? this.endDate,
       proposalsCount: proposalsCount ?? this.proposalsCount,
       publish: publish ?? this.publish,
+      proposalTemplateId: proposalTemplateId ?? this.proposalTemplateId,
       proposalTemplate: proposalTemplate ?? this.proposalTemplate,
     );
   }
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        startDate,
-        endDate,
-        proposalsCount,
-        publish,
+        ...super.props,
         proposalTemplate,
       ];
 }

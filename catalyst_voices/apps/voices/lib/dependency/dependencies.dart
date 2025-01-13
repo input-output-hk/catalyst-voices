@@ -81,7 +81,7 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerFactory<CampaignDetailsBloc>(() {
         return CampaignDetailsBloc(
-          get<CampaignRepository>(),
+          get<CampaignService>(),
         );
       })
       ..registerLazySingleton<CampaignInfoCubit>(() {
@@ -102,7 +102,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
           get<CampaignService>(),
-          get<DocumentService>(),
+          get<ProposalService>(),
         );
       });
   }
@@ -164,21 +164,18 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
         get<CampaignRepository>(),
+        get<DocumentRepository>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
       return ProposalService(
         get<ProposalRepository>(),
+        get<DocumentRepository>(),
       );
     });
     registerLazySingleton<ConfigService>(() {
       return ConfigService(
         get<ConfigRepository>(),
-      );
-    });
-    registerLazySingleton<DocumentService>(() {
-      return DocumentService(
-        get<DocumentRepository>(),
       );
     });
   }

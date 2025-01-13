@@ -1,15 +1,15 @@
 import 'package:catalyst_voices_blocs/src/campaign/details/campaign_details.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class CampaignDetailsBloc
     extends Bloc<CampaignDetailsEvent, CampaignDetailsState> {
-  final CampaignRepository _campaignRepository;
+  final CampaignService _campaignService;
 
   CampaignDetailsBloc(
-    this._campaignRepository,
+    this._campaignService,
   ) : super(const CampaignDetailsState()) {
     on<LoadCampaignEvent>(_onLoadCampaignEvent);
   }
@@ -27,7 +27,7 @@ final class CampaignDetailsBloc
       ),
     );
 
-    final campaign = await _campaignRepository.getCampaign(id: id);
+    final campaign = await _campaignService.getCampaign(id: id);
     final listItems = _mapCampaignToListItems(campaign);
 
     emit(

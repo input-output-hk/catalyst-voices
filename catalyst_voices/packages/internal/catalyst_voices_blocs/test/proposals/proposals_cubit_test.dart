@@ -6,9 +6,29 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   group(ProposalsCubit, () {
+    final proposalTemplate = DocumentSchema(
+      id: const Uuid().v7(),
+      version: const Uuid().v7(),
+      jsonSchema: '',
+      title: '',
+      description: '',
+      segments: const [],
+      order: const [],
+      propertiesSchema: '',
+    );
+
+    final proposalDocument = Document(
+      id: const Uuid().v7(),
+      version: const Uuid().v7(),
+      schemaUrl: '',
+      schema: proposalTemplate,
+      segments: const [],
+    );
+
     final campaign = Campaign(
       id: 'F14',
       name: 'campaign',
@@ -17,10 +37,8 @@ void main() {
       endDate: DateTime.now().plusDays(1),
       proposalsCount: 0,
       publish: CampaignPublish.published,
-      // TODO(damian-molinski): util for loading DocumentSchema
-      proposalTemplate: () {
-        throw UnimplementedError();
-      }(),
+      proposalTemplateId: const Uuid().v7(),
+      proposalTemplate: proposalTemplate,
     );
 
     final proposal = Proposal(
@@ -34,10 +52,9 @@ void main() {
       publish: ProposalPublish.draft,
       access: ProposalAccess.private,
       commentsCount: 0,
-      // TODO(damian-molinski): util for loading DocumentSchema
-      document: () {
-        throw UnimplementedError();
-      }(),
+      documentId: const Uuid().v7(),
+      documentVersion: const Uuid().v7(),
+      document: proposalDocument,
     );
 
     final pendingProposal = PendingProposal.fromProposal(
