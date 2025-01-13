@@ -2,7 +2,10 @@
 
 use std::{
     alloc::System,
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
     thread,
     time::Duration,
 };
@@ -15,6 +18,9 @@ lazy_static::lazy_static! {
   /// A global, thread-safe container for memory metrics.
   static ref GLOBAL_METRICS: Arc<Mutex<MemoryMetrics>> = Arc::new(Mutex::new(MemoryMetrics::default()));
 }
+
+/// This is to prevent the init function from accidentially being called multiple times.
+static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
 /// Interval for updating memory metrics, in milliseconds.
 const UPDATE_INTERVAL_MILLI: u64 = 1000;
@@ -57,9 +63,18 @@ impl MemoryMetrics {
     ///
     /// # Returns
     /// * A clone of the `MemoryMetrics` structure containing the latest metrics.
-    pub(crate) fn retrieve_metrics() -> Self {
-        let metrics = GLOBAL_METRICS.lock().unwrap();
-        metrics.clone()
+    #[allow(dead_code)]
+    pub(crate) fn retrieve_metrics() -> Result<Self, String> {
+        match GLOBAL_METRICS.lock() {
+            Ok(metrics) => Ok(metrics.clone()),
+            Err(err) => {
+                let msg = format!("Failed to retrieve memory usage info: {err:?}");
+
+                error!("{err:?}");
+
+                Err(msg)
+            },
+        }
     }
 
     /// Starts a background thread to periodically update memory metrics.
@@ -67,6 +82,12 @@ impl MemoryMetrics {
     /// This function spawns a thread that updates the global `MemoryMetrics`
     /// structure at regular intervals defined by `UPDATE_INTERVAL_MILLI`.
     pub(crate) fn start_metrics_updater() {
+        if IS_INITIALIZED.load(Ordering::SeqCst) {
+            return;
+        }
+
+        IS_INITIALIZED.store(true, Ordering::SeqCst);
+
         let stats = Region::new(GLOBAL);
 
         thread::spawn(move || {
