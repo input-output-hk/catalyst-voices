@@ -93,6 +93,10 @@ enum DocumentDefinitionsFormat {
   }
 }
 
+// TODO(dtscalac): for each type create a definition, then definition
+// should become ref which would be a DocumentProperty
+// schema like everything else. Custom logic would be in definitions
+
 sealed class BaseDocumentDefinition<T extends Object> extends Equatable {
   // TODO(dtscalac): make it a list
   final DocumentDefinitionsObjectType type;
