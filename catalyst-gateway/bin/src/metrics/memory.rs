@@ -67,7 +67,7 @@ impl MemoryMetrics {
     /// This function spawns a thread that updates the global `MemoryMetrics`
     /// structure at regular intervals defined by `UPDATE_INTERVAL_MILLI`.
     pub(crate) fn start_metrics_updater() {
-        let stats = Region::new(&GLOBAL);
+        let stats = Region::new(GLOBAL);
 
         thread::spawn(move || {
             let interval = Duration::from_millis(UPDATE_INTERVAL_MILLI);

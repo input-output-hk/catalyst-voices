@@ -13,7 +13,6 @@ const CLIENT_METRIC_LABELS: [&str; 2] = ["client", "status_code"];
 
 /// HTTP Request duration histogram.
 pub(crate) static HTTP_REQ_DURATION_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
     register_histogram_vec!(
         "http_request_duration_ms",
         "Duration of HTTP requests in milliseconds",
@@ -24,7 +23,6 @@ pub(crate) static HTTP_REQ_DURATION_MS: LazyLock<HistogramVec> = LazyLock::new(|
 
 /// HTTP Request CPU Time histogram.
 pub(crate) static HTTP_REQ_CPU_TIME_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
     register_histogram_vec!(
         "http_request_cpu_time_ms",
         "CPU Time of HTTP requests in milliseconds",
@@ -43,7 +41,6 @@ pub(crate) static HTTP_REQ_CPU_TIME_MS: LazyLock<HistogramVec> = LazyLock::new(|
 
 /// HTTP Request count histogram.
 pub(crate) static HTTP_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
     register_int_counter_vec!(
         "http_request_count",
         "Number of HTTP requests",
@@ -54,7 +51,6 @@ pub(crate) static HTTP_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(||
 
 /// Client Request Count histogram.
 pub(crate) static CLIENT_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
     register_int_counter_vec!(
         "client_request_count",
         "Number of HTTP requests per client",
