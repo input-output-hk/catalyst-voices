@@ -2,8 +2,8 @@ import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
+import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -278,7 +278,6 @@ class _PropertyBuilder extends StatelessWidget {
         return YesNoChoiceWidget(
           property: castProperty,
           onChanged: onChanged,
-          description: castProperty.schema.description ?? '',
           isEditMode: isEditMode,
           isRequired: castProperty.schema.isRequired,
         );

@@ -1,30 +1,9 @@
+import 'package:catalyst_voices/common/ext/document_property_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-
-enum _YesNoChoice {
-  yes(true),
-  no(false);
-
-  // ignore: avoid_positional_boolean_parameters
-  const _YesNoChoice(this.value);
-
-  // ignore: avoid_positional_boolean_parameters
-  static _YesNoChoice fromBool(bool value) {
-    return _YesNoChoice.values.firstWhere((e) => e.value == value);
-  }
-
-  final bool value;
-
-  String localizedName(VoicesLocalizations localizations) {
-    return switch (this) {
-      yes => localizations.yes,
-      no => localizations.no,
-    };
-  }
-}
 
 class YesNoChoiceWidget extends StatefulWidget {
   final DocumentProperty<bool> property;
@@ -46,6 +25,8 @@ class YesNoChoiceWidget extends StatefulWidget {
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   late bool? selectedValue;
+
+  String get _description => widget.property.formattedDescription;
 
   @override
   void initState() {
@@ -73,16 +54,16 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (widget.description.isNotEmpty) ...[
+        if (_description.isNotEmpty) ...[
           Text(
-            widget.description,
+            _description,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
           context,
-          value: widget.property.value,
+          value: selectedValue,
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
           validator: (value) {
@@ -103,7 +84,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
 
   void _handleValueChanged(bool? value) {
     setState(() {
-      selectedValue = widget.property.value;
+      selectedValue = value;
     });
     if (value == null && widget.property.value != value) {
       _notifyChangeListener(value);
