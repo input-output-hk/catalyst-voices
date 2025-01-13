@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/document_builder/document_token_value_wi
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -211,7 +212,6 @@ class _PropertyBuilder extends StatelessWidget {
           'by $DocumentBuilderSectionTile',
         );
       case SingleLineTextEntryDefinition():
-      case SingleLineHttpsURLEntryDefinition():
       case MultiLineTextEntryDefinition():
       case MultiLineTextEntryMarkdownDefinition():
       case MultiSelectDefinition():
@@ -225,7 +225,14 @@ class _PropertyBuilder extends StatelessWidget {
       case DurationInMonthsDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
-        throw UnimplementedError();
+        throw UnimplementedError('${definition.type} not implemented');
+      case SingleLineHttpsURLEntryDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleLineHttpsUrlWidget(
+          property: castProperty,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
       case SingleGroupedTagSelectorDefinition():
         final castProperty = definition.castProperty(property);
         return SingleGroupedTagSelectorWidget(
