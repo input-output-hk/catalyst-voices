@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_answers_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_converter_ext.dart';
 
 /// A data transfer object for the [Document].
@@ -18,17 +18,17 @@ final class DocumentDto {
   });
 
   factory DocumentDto.fromJsonSchema(
-    DocumentAnswersDto answers,
+    DocumentDataDto data,
     DocumentSchema schema,
   ) {
     return DocumentDto(
-      schemaUrl: answers.schemaUrl,
+      schemaUrl: data.schemaUrl,
       schema: schema,
       segments: schema.segments
           .map(
             (segment) => DocumentSegmentDto.fromJsonSchema(
               segment,
-              answers: answers,
+              data: data,
             ),
           )
           .toList(),
@@ -54,8 +54,8 @@ final class DocumentDto {
     ).build();
   }
 
-  DocumentAnswersDto toJson() {
-    return DocumentAnswersDto.fromDocument(
+  DocumentDataDto toJson() {
+    return DocumentDataDto.fromDocument(
       schemaUrl: schemaUrl,
       segments: segments.map((e) => e.toJson()),
     );
@@ -73,7 +73,7 @@ final class DocumentSegmentDto {
 
   factory DocumentSegmentDto.fromJsonSchema(
     DocumentSchemaSegment schema, {
-    required DocumentAnswersDto answers,
+    required DocumentDataDto data,
   }) {
     return DocumentSegmentDto(
       schema: schema,
@@ -81,7 +81,7 @@ final class DocumentSegmentDto {
           .map(
             (section) => DocumentSectionDto.fromJsonSchema(
               section,
-              answers: answers,
+              data: data,
             ),
           )
           .toList(),
@@ -122,7 +122,7 @@ final class DocumentSectionDto {
 
   factory DocumentSectionDto.fromJsonSchema(
     DocumentSchemaSection schema, {
-    required DocumentAnswersDto answers,
+    required DocumentDataDto data,
   }) {
     return DocumentSectionDto(
       schema: schema,
@@ -130,7 +130,7 @@ final class DocumentSectionDto {
           .map(
             (property) => DocumentPropertyDto.fromJsonSchema(
               property,
-              answers: answers,
+              data: data,
             ),
           )
           .toList(),
@@ -171,9 +171,9 @@ final class DocumentPropertyDto<T extends Object> {
 
   factory DocumentPropertyDto.fromJsonSchema(
     DocumentSchemaProperty<T> schema, {
-    required DocumentAnswersDto answers,
+    required DocumentDataDto data,
   }) {
-    final property = answers.getProperty(schema.nodeId);
+    final property = data.getProperty(schema.nodeId);
     final value = schema.definition.converter.fromJson(property);
     return DocumentPropertyDto<T>(
       schema: schema,

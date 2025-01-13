@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_answers_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -29,13 +29,13 @@ void main() {
       'should result in the same document',
       () {
         final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
-        final answers = DocumentAnswersDto.fromJson(documentJson);
+        final data = DocumentDataDto.fromJson(documentJson);
 
         // original
         final originalJsonString = json.encode(documentJson);
 
         // serialized and deserialized
-        final documentDto = DocumentDto.fromJsonSchema(answers, schema);
+        final documentDto = DocumentDto.fromJsonSchema(data, schema);
         final documentDtoJson = documentDto.toJson();
         final serializedJsonString = json.encode(documentDtoJson);
 
@@ -52,10 +52,10 @@ void main() {
         'Roundtrip from json to model and reverse '
         'should result in the same document', () {
       final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
-      final answers = DocumentAnswersDto.fromJson(documentJson);
+      final data = DocumentDataDto.fromJson(documentJson);
 
       // original
-      final originalDocDto = DocumentDto.fromJsonSchema(answers, schema);
+      final originalDocDto = DocumentDto.fromJsonSchema(data, schema);
       final originalDoc = originalDocDto.toModel();
 
       // serialized and deserialized
@@ -109,9 +109,9 @@ void main() {
     test('After serialization $DocumentPropertyDto has correct type', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
       final schema = schemaDto.toModel();
-      final answers = DocumentAnswersDto.fromJson(documentJson);
+      final data = DocumentDataDto.fromJson(documentJson);
 
-      final documentDto = DocumentDto.fromJsonSchema(answers, schema);
+      final documentDto = DocumentDto.fromJsonSchema(data, schema);
 
       final agreementSegment = documentDto.segments
           .indexWhere((e) => e.schema.nodeId.paths.last == 'agreements');

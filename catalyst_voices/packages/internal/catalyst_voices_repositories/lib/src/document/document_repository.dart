@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_answers_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -31,7 +31,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     const path = Paths.f14Proposal;
     final encodedAnswers = File(path).readAsStringSync();
     final decodedAnswers = json.decode(encodedAnswers) as Map<String, dynamic>;
-    final answers = DocumentAnswersDto.fromJson(decodedAnswers);
+    final answers = DocumentDataDto.fromJson(decodedAnswers);
 
     // TODO(damian-molinski): schema id may need to be updated
     final schemaUrl = answers.schemaUrl;

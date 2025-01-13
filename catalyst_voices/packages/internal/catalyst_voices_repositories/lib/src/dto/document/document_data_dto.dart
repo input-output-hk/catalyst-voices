@@ -1,18 +1,18 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Utility structure for traversing a json map using [DocumentNodeId]'s.
-final class DocumentAnswersDto {
+final class DocumentDataDto {
   final Map<String, dynamic> json;
 
   String get schemaUrl => json[r'$schema'] as String;
 
-  const DocumentAnswersDto.fromJson(this.json);
+  const DocumentDataDto.fromJson(this.json);
 
-  factory DocumentAnswersDto.fromDocument({
+  factory DocumentDataDto.fromDocument({
     required String schemaUrl,
     required Iterable<Map<String, dynamic>> segments,
   }) {
-    return DocumentAnswersDto.fromJson({
+    return DocumentDataDto.fromJson({
       r'$schema': schemaUrl,
       for (final segment in segments) ...segment,
     });
