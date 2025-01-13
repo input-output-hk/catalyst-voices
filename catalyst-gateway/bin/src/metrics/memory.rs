@@ -1,8 +1,8 @@
 //! Metrics related to memory analytics.
 
 use memory_stats::memory_stats;
-use tracing::log::error;
 use stats_alloc::{Region, Stats, StatsAlloc, INSTRUMENTED_SYSTEM};
+use tracing::log::error;
 
 use std::alloc::System;
 use std::{
@@ -12,7 +12,7 @@ use std::{
 };
 
 lazy_static::lazy_static! {
-  static ref GLOBAL_METRICS: Arc<Mutex<MemoryMetrics>> = Arc::new(Mutex::new(MemoryMetrics::default()));
+  pub(crate) static ref GLOBAL_METRICS: Arc<Mutex<MemoryMetrics>> = Arc::new(Mutex::new(MemoryMetrics::default()));
 }
 
 const UPDATE_INTERVAL_MILLI: u64 = 1000;
@@ -22,7 +22,7 @@ const UPDATE_INTERVAL_MILLI: u64 = 1000;
 static GLOBAL: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
 
 #[derive(Debug, Default)]
-struct MemoryMetrics {
+pub(crate) struct MemoryMetrics {
     pub(crate) allocator_stats: Stats,
     pub(crate) physical_usage: Option<usize>,
     pub(crate) virtual_usage: Option<usize>,
@@ -42,21 +42,21 @@ impl MemoryMetrics {
             self.virtual_usage = None;
         }
     }
-}
 
-pub(crate) fn start_metrics_updater() {
-    thread::spawn(move || {
-        let interval = Duration::from_millis(UPDATE_INTERVAL_MILLI); // Update every 5 seconds
-        loop {
-            {
-              match GLOBAL_METRICS.lock() {
-                  Ok(mut metrics) => metrics.update(),
-                  Err(err) => {
-                    error!("Failed to update memory usage metrics: {:?}", err);
-                  }
-              }
+    pub(crate) fn start_metrics_updater() {
+        thread::spawn(move || {
+            let interval = Duration::from_millis(UPDATE_INTERVAL_MILLI); // Update every 5 seconds
+            loop {
+                {
+                    match GLOBAL_METRICS.lock() {
+                        Ok(mut metrics) => metrics.update(),
+                        Err(err) => {
+                            error!("Failed to update memory usage metrics: {:?}", err);
+                        },
+                    }
+                }
+                thread::sleep(interval);
             }
-            thread::sleep(interval);
-        }
-    });
+        });
+    }
 }
