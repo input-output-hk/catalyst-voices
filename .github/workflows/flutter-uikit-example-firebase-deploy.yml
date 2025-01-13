@@ -20,13 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.5.0
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.5.1
         with:
           version: 0.8.0
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.5.0
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.5.1
       - name: Build Flutter Web
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.5.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.5.1
         if: always()
         continue-on-error: true
         with:

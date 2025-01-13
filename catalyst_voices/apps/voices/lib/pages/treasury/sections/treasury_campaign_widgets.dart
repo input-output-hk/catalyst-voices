@@ -1,7 +1,5 @@
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
-import 'package:catalyst_voices/widgets/headers/segment_header.dart';
-import 'package:catalyst_voices/widgets/navigation/sections_controller.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -10,11 +8,11 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class TreasuryCampaignStepHeader extends StatelessWidget {
-  final TreasurySectionStep step;
+  final TreasurySection data;
 
-  const TreasuryCampaignStepHeader({
+  const TreasuryCampaignStepHeader(
+    this.data, {
     super.key,
-    required this.step,
   });
 
   @override
@@ -22,15 +20,15 @@ class TreasuryCampaignStepHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: SegmentHeader(
-        name: step.localizedDesc(context),
+        name: data.resolveDesc(context) ?? data.resolveTitle(context),
         actions: [
           ValueListenableBuilder(
-            valueListenable: SectionsControllerScope.of(context),
+            valueListenable: SegmentsControllerScope.of(context),
             builder: (context, sectionsState, child) {
-              final isEditing = sectionsState.isEditing(step.sectionStepId);
+              final isEditing = sectionsState.isEditing(data.id);
 
               return VoicesTextButton(
-                onTap: step.isEditable
+                onTap: data.isEditable
                     ? () => _onToggleEditing(context, !isEditing)
                     : null,
                 child: Text(
@@ -47,8 +45,8 @@ class TreasuryCampaignStepHeader extends StatelessWidget {
   }
 
   void _onToggleEditing(BuildContext context, bool isEditing) {
-    SectionsControllerScope.of(context).editStep(
-      step.sectionStepId,
+    SegmentsControllerScope.of(context).editSection(
+      data.id,
       enabled: isEditing,
     );
   }

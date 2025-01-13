@@ -1,12 +1,12 @@
-import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices/widgets/segments/segments_controller.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-final class SectionStepState extends Equatable {
+final class SectionState extends Equatable {
   final bool isSelected;
 
-  const SectionStepState({
+  const SectionState({
     required this.isSelected,
   });
 
@@ -16,12 +16,12 @@ final class SectionStepState extends Equatable {
       ];
 }
 
-class SectionStepStateBuilder extends StatelessWidget {
-  final SectionStepId id;
-  final ValueWidgetBuilder<SectionStepState> builder;
+class SectionStateBuilder extends StatelessWidget {
+  final NodeId id;
+  final ValueWidgetBuilder<SectionState> builder;
   final Widget? child;
 
-  const SectionStepStateBuilder({
+  const SectionStateBuilder({
     super.key,
     required this.id,
     required this.builder,
@@ -30,14 +30,14 @@ class SectionStepStateBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = SectionsControllerScope.of(context);
+    final controller = SegmentsControllerScope.of(context);
 
     return ValueListenableBuilder(
       valueListenable: controller,
       builder: (context, value, child) {
-        final isSelected = value.activeStepId == id;
+        final isSelected = value.activeSectionId == id;
 
-        final state = SectionStepState(
+        final state = SectionState(
           isSelected: isSelected,
         );
 
