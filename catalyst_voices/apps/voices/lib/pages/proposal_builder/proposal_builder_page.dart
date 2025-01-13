@@ -13,11 +13,16 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalBuilderPage extends StatefulWidget {
   final String? proposalId;
+  final String? templateId;
 
   const ProposalBuilderPage({
     super.key,
     this.proposalId,
-  });
+    this.templateId,
+  }) : assert(
+          proposalId != null && templateId == null,
+          'If proposalId is set templateId have to be null',
+        );
 
   @override
   State<ProposalBuilderPage> createState() => _ProposalBuilderPageState();
@@ -47,23 +52,16 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
         .distinct(listEquals)
         .listen(_updateSegments);
 
-    final proposalId = widget.proposalId;
-    final event = proposalId != null
-        ? LoadProposalEvent(id: proposalId)
-        : const StartNewProposalEvent();
-    bloc.add(event);
+    _updateSource(bloc: bloc);
   }
 
   @override
   void didUpdateWidget(covariant ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.proposalId != oldWidget.proposalId) {
-      final proposalId = widget.proposalId;
-      final event = proposalId != null
-          ? LoadProposalEvent(id: proposalId)
-          : const StartNewProposalEvent();
-      context.read<ProposalBuilderBloc>().add(event);
+    if (widget.proposalId != oldWidget.proposalId ||
+        widget.templateId != oldWidget.templateId) {
+      _updateSource();
     }
   }
 
@@ -105,5 +103,26 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _updateSource({
+    ProposalBuilderBloc? bloc,
+  }) {
+    bloc ??= context.read<ProposalBuilderBloc>();
+
+    final proposalId = widget.proposalId;
+    final templateId = widget.templateId;
+
+    if (proposalId != null) {
+      bloc.add(LoadProposalEvent(id: proposalId));
+      return;
+    }
+
+    if (templateId != null) {
+      bloc.add(LoadProposalTemplateEvent(id: templateId));
+      return;
+    }
+
+    bloc.add(const LoadDefaultProposalTemplateEvent());
   }
 }

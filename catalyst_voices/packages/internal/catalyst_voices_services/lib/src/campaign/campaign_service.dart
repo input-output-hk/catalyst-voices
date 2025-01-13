@@ -9,7 +9,9 @@ abstract interface class CampaignService {
 
   Future<Campaign?> getActiveCampaign();
 
-  Future<Campaign> getCampaign({required String id});
+  Future<Campaign> getCampaign({
+    required String id,
+  });
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -25,12 +27,14 @@ final class CampaignServiceImpl implements CampaignService {
   Future<Campaign?> getActiveCampaign() => getCampaign(id: 'F14');
 
   @override
-  Future<Campaign> getCampaign({required String id}) async {
+  Future<Campaign> getCampaign({
+    required String id,
+  }) async {
     final campaignBase = await _campaignRepository.getCampaign(id: id);
 
     final documentId = campaignBase.proposalTemplateId;
     final documentSchema = await _documentRepository.getDocumentSchema(
-      documentId,
+      id: documentId,
     );
 
     final campaign = campaignBase.toCampaign(proposalTemplate: documentSchema);

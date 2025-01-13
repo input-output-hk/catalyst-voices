@@ -121,8 +121,8 @@ class _DraftProposalButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      onTap: () async {
-        const ProposalBuilderNewRoute().go(context);
+      onTap: () {
+        const ProposalBuilderDraftRoute().go(context);
       },
       leading: VoicesAssets.icons.plus.buildIcon(),
       child: Text(context.l10n.newDraftProposal),

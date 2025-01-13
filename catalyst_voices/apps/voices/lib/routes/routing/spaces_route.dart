@@ -25,7 +25,9 @@ const _prefix = Routes.currentMilestone;
     TypedGoRoute<WorkspaceRoute>(
       path: '/$_prefix/workspace',
       routes: [
-        TypedGoRoute<ProposalBuilderNewRoute>(path: 'proposal_builder'),
+        TypedGoRoute<ProposalBuilderDraftRoute>(
+          path: 'proposal_builder/draft',
+        ),
         TypedGoRoute<ProposalBuilderRoute>(
           path: 'proposal_builder/:proposalId',
         ),
@@ -97,9 +99,13 @@ final class WorkspaceRoute extends GoRouteData
   }
 }
 
-final class ProposalBuilderNewRoute extends GoRouteData
+final class ProposalBuilderDraftRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const ProposalBuilderNewRoute();
+  final String? templateId;
+
+  const ProposalBuilderDraftRoute({
+    this.templateId,
+  });
 
   @override
   List<RouteGuard> get routeGuards => [
@@ -109,7 +115,7 @@ final class ProposalBuilderNewRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const ProposalBuilderPage();
+    return ProposalBuilderPage(templateId: templateId);
   }
 }
 

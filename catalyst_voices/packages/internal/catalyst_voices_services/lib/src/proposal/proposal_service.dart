@@ -13,8 +13,18 @@ abstract interface class ProposalService {
     );
   }
 
+  Future<DocumentSchema> getProposal({
+    required String id,
+  });
+
+  Future<DocumentSchema> getProposalTemplate({
+    required String id,
+  });
+
   /// Fetches proposals for the [campaignId].
-  Future<List<Proposal>> getProposals({required String campaignId});
+  Future<List<Proposal>> getProposals({
+    required String campaignId,
+  });
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -27,21 +37,39 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
-  Future<List<Proposal>> getProposals({required String campaignId}) async {
+  Future<DocumentSchema> getProposal({
+    required String id,
+  }) async {
+    // TODO: implement getProposal
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<DocumentSchema> getProposalTemplate({
+    required String id,
+  }) async {
+    // TODO: implement getProposalTemplate
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Proposal>> getProposals({
+    required String campaignId,
+  }) async {
     final proposalBases = await _proposalRepository.getProposals(
       campaignId: campaignId,
     );
 
-    final futures = proposalBases.map(_convertProposalBaseToProposal);
+    final futures = proposalBases.map(_buildProposal);
 
     final proposals = await Future.wait(futures);
 
     return proposals;
   }
 
-  Future<Proposal> _convertProposalBaseToProposal(ProposalBase base) async {
+  Future<Proposal> _buildProposal(ProposalBase base) async {
     final document = await _documentRepository.getDocument(
-      base.documentId,
+      id: base.documentId,
       version: base.documentVersion,
     );
 

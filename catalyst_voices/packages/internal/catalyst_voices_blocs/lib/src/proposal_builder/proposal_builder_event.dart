@@ -5,11 +5,22 @@ sealed class ProposalBuilderEvent extends Equatable {
   const ProposalBuilderEvent();
 }
 
-final class StartNewProposalEvent extends ProposalBuilderEvent {
-  const StartNewProposalEvent();
+final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {
+  const LoadDefaultProposalTemplateEvent();
 
   @override
   List<Object?> get props => [];
+}
+
+final class LoadProposalTemplateEvent extends ProposalBuilderEvent {
+  final String id;
+
+  const LoadProposalTemplateEvent({
+    required this.id,
+  });
+
+  @override
+  List<Object?> get props => [id];
 }
 
 final class LoadProposalEvent extends ProposalBuilderEvent {

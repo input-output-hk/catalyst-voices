@@ -18,7 +18,8 @@ final class ProposalBuilderBloc
     this._campaignService,
     this._proposalService,
   ) : super(const ProposalBuilderState()) {
-    on<StartNewProposalEvent>(_startNewProposal);
+    on<LoadDefaultProposalTemplateEvent>(_loadDefaultProposalTemplate);
+    on<LoadProposalTemplateEvent>(_loadProposalTemplate);
     on<LoadProposalEvent>(_loadProposal);
     on<ActiveNodeChangedEvent>(
       _handleActiveStepEvent,
@@ -26,27 +27,43 @@ final class ProposalBuilderBloc
     );
   }
 
-  Future<void> _startNewProposal(
-    StartNewProposalEvent event,
+  Future<void> _loadDefaultProposalTemplate(
+    LoadDefaultProposalTemplateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.finest('Starting new proposal');
+    _logger.info('Loading default proposal template');
+
+    final campaign = await _campaignService.getActiveCampaign();
+
+    final proposalTemplate = campaign?.proposalTemplate;
+  }
+
+  Future<void> _loadProposalTemplate(
+    LoadProposalTemplateEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    _logger.info('Loading proposal template[${event.id}]');
+
+    final proposalTemplate = await _proposalService.getProposalTemplate(
+      id: event.id,
+    );
   }
 
   Future<void> _loadProposal(
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.finest('Loading proposal[${event.id}]');
+    _logger.info('Loading proposal[${event.id}]');
+
+    final proposal = await _proposalService.getProposal(id: event.id);
   }
 
   void _handleActiveStepEvent(
     ActiveNodeChangedEvent event,
     Emitter<ProposalBuilderState> emit,
   ) {
-    final id = event.id;
-    _logger.finest('Active node changed to [$id]');
+    _logger.info('Active node changed to [${event.id}]');
 
-    _activeNodeId = id;
+    _activeNodeId = event.id;
   }
 }

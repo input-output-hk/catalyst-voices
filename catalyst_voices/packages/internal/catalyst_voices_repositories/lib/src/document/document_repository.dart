@@ -16,9 +16,15 @@ abstract interface class DocumentRepository {
 
   Future<void> publishDocument(Document document);
 
-  Future<Document> getDocument(String id, {String? version});
+  Future<Document> getDocument({
+    required String id,
+    String? version,
+  });
 
-  Future<DocumentSchema> getDocumentSchema(String id, {String? version});
+  Future<DocumentSchema> getDocumentSchema({
+    required String id,
+    String? version,
+  });
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
@@ -37,7 +43,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<Document> getDocument(String id, {String? version}) async {
+  Future<Document> getDocument({
+    required String id,
+    String? version,
+  }) async {
     // TODO(damian-molinski): use real id when API call is implemented.
     final signedDocument = await _getSignedDocument(Paths.f14Proposal);
 
@@ -45,7 +54,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     // TODO(damian-molinski): get schema id from signedDocument.
     final documentSchemaId = const Uuid().v7();
-    final documentSchema = await getDocumentSchema(documentSchemaId);
+    final documentSchema = await getDocumentSchema(id: documentSchemaId);
 
     final dto = DocumentDto.fromJsonSchema(documentData, documentSchema);
     final document = dto.toModel(
@@ -58,7 +67,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentSchema> getDocumentSchema(String id, {String? version}) async {
+  Future<DocumentSchema> getDocumentSchema({
+    required String id,
+    String? version,
+  }) async {
     // Note. When fetch multiple documents with same schema we want
     // to fetch it only once. That's why lock is here so any following
     // calls will get cached value.

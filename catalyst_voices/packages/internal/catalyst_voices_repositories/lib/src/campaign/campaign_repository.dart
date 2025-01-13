@@ -5,14 +5,18 @@ import 'package:uuid/uuid.dart';
 abstract interface class CampaignRepository {
   factory CampaignRepository() = CampaignRepositoryImpl;
 
-  Future<CampaignBase> getCampaign({required String id});
+  Future<CampaignBase> getCampaign({
+    required String id,
+  });
 }
 
 final class CampaignRepositoryImpl implements CampaignRepository {
   const CampaignRepositoryImpl();
 
   @override
-  Future<CampaignBase> getCampaign({required String id}) async {
+  Future<CampaignBase> getCampaign({
+    required String id,
+  }) async {
     final now = DateTime.now();
     final proposalTemplateId = const Uuid().v7();
 
