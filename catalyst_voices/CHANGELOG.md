@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-13
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`catalyst_cardano` - `v0.4.0+3`](#catalyst_cardano---v0403)
+ - [`catalyst_key_derivation` - `v0.1.2`](#catalyst_key_derivation---v012)
+ - [`catalyst_cardano_serialization` - `v0.5.0+3`](#catalyst_cardano_serialization---v0503)
+ - [`catalyst_cardano_web` - `v0.4.0+3`](#catalyst_cardano_web---v0403)
+ - [`catalyst_cardano_platform_interface` - `v0.4.0+3`](#catalyst_cardano_platform_interface---v0403)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `catalyst_cardano_serialization` - `v0.5.0+3`
+ - `catalyst_cardano_web` - `v0.4.0+3`
+ - `catalyst_cardano_platform_interface` - `v0.4.0+3`
+
+---
+
+#### `catalyst_cardano` - `v0.4.0+3`
+
+ - **FIX**(general): Update cat-ci to latest version to bring in doctest fixes and latest rust compiler ([#1462](https://github.com/input-output-hk/catalyst-voices/issues/1462)). ([6ddc4c5e](https://github.com/input-output-hk/catalyst-voices/commit/6ddc4c5ea6e5e93a0042e188982505ba25cccf76))
+
+#### `catalyst_key_derivation` - `v0.1.2`
+
+ - **FIX**(general): Update cat-ci to latest version to bring in doctest fixes and latest rust compiler ([#1462](https://github.com/input-output-hk/catalyst-voices/issues/1462)). ([6ddc4c5e](https://github.com/input-output-hk/catalyst-voices/commit/6ddc4c5ea6e5e93a0042e188982505ba25cccf76))
+ - **FIX**: add missing dependency. ([1334cb06](https://github.com/input-output-hk/catalyst-voices/commit/1334cb066877b2507af2e469f31b6c3549181146))
+ - **FEAT**(cat-voices): Enable the 'arithmetic_side_effects' Clippy lint ([#1456](https://github.com/input-output-hk/catalyst-voices/issues/1456)). ([5a0e2f46](https://github.com/input-output-hk/catalyst-voices/commit/5a0e2f46859b44ff325d47ca0eb90d4fa904d125))
+ - **DOCS**: update pub.dev topics for catalyst_key_derivation package. ([a6d9bcfa](https://github.com/input-output-hk/catalyst-voices/commit/a6d9bcfa451cbb8d0ded9659e63fbfa290416480))
+
+
 ## 2025-01-02v2
 
 ### Changes

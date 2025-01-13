@@ -3,7 +3,7 @@ description: A Flutter plugin exposing CIP-1852 Cardano HD Key Derivation
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_key_derivation
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [cryptography, encryption]
-version: 0.1.1+1
+version: 0.1.2
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
