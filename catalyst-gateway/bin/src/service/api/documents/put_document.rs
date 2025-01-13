@@ -56,7 +56,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                     Ok(payload) => Some(payload),
                     Err(e) => {
                         return Responses::BadRequest(Json(PutDocumentBadRequest::new(format!(
-                            "Ivalid Document Content, not Json encoded: {e}"
+                            "Invalid Document Content, not Json encoded: {e}"
                         ))))
                         .into()
                     },
