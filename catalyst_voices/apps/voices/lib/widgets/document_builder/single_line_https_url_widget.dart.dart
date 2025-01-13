@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/document_property_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_https_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -6,14 +7,12 @@ import 'package:flutter/material.dart';
 
 class SingleLineHttpsUrlWidget extends StatefulWidget {
   final DocumentProperty<String> property;
-  final String description;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
 
   const SingleLineHttpsUrlWidget({
     super.key,
     required this.property,
-    required this.description,
     required this.isEditMode,
     required this.onChanged,
   });
@@ -26,6 +25,8 @@ class SingleLineHttpsUrlWidget extends StatefulWidget {
 class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
+
+  String get _description => widget.property.formattedDescription;
 
   @override
   void initState() {
@@ -57,14 +58,13 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final description = widget.property.schema.description ?? '';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (description.isNotEmpty) ...[
+        if (_description.isNotEmpty) ...[
           Text(
-            description,
+            _description,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

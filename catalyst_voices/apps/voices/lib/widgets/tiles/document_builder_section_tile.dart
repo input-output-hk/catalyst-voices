@@ -226,7 +226,6 @@ class _PropertyBuilder extends StatelessWidget {
         final castProperty = definition.castProperty(property);
         return SingleLineHttpsUrlWidget(
           property: castProperty,
-          description: castProperty.schema.description ?? '',
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
