@@ -18,8 +18,8 @@ void main() {
     });
 
     test(
-      // ignore: lines_longer_than_80_chars
-      'Check if all definition are in definition list inside DefinitionDto model',
+      'Check if all definition are in definition '
+      'list inside DefinitionDto model',
       () async {
         final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
         final definitions = schemaDto.definitions.models;

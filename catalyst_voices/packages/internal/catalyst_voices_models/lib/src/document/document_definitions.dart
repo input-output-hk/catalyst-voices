@@ -33,13 +33,16 @@ enum DocumentDefinitionsObjectType {
   string,
   object,
   integer,
+  number,
   boolean,
-  array,
-  unknown;
+  array;
 
   static DocumentDefinitionsObjectType fromString(String value) {
-    return DocumentDefinitionsObjectType.values.asNameMap()[value] ??
-        DocumentDefinitionsObjectType.unknown;
+    final type = DocumentDefinitionsObjectType.values.asNameMap()[value];
+    if (type == null) {
+      throw ArgumentError('unsupported object type: $value');
+    }
+    return type;
   }
 }
 

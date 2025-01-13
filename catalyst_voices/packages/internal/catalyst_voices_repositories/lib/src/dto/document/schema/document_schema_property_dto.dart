@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_converter_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_logical_property_dto.dart';
-import 'package:catalyst_voices_repositories/src/utils/document_schema_dto_converter.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -11,8 +10,6 @@ part 'document_schema_property_dto.g.dart';
 final class DocumentSchemaPropertyDto {
   @JsonKey(name: r'$ref')
   final String ref;
-  @JsonKey(includeToJson: false)
-  final String id;
   final String? title;
   final String? description;
   @JsonKey(name: 'default')
@@ -21,8 +18,7 @@ final class DocumentSchemaPropertyDto {
   final String? guidance;
   @JsonKey(name: 'enum')
   final List<String>? enumValues;
-  @DocumentSchemaPropertiesDtoConverter()
-  final List<DocumentSchemaPropertyDto> properties;
+  final Map<String, DocumentSchemaPropertyDto> properties;
   final DocumentSchemaPropertyDto? items;
   final int? minimum;
   final int? maximum;
@@ -43,13 +39,12 @@ final class DocumentSchemaPropertyDto {
 
   const DocumentSchemaPropertyDto({
     this.ref = '',
-    required this.id,
     this.title,
     this.description,
     this.defaultValue,
     this.guidance,
     this.enumValues,
-    this.properties = const [],
+    this.properties = const {},
     this.items,
     this.minimum,
     this.maximum,
@@ -70,33 +65,36 @@ final class DocumentSchemaPropertyDto {
   DocumentPropertySchema toModel(
     List<BaseDocumentDefinition> definitions, {
     required DocumentNodeId parentNodeId,
+    required String childId,
     required bool isRequired,
   }) {
     final definition = definitions.getDefinition(ref);
-    final nodeId = parentNodeId.child(id);
+    final nodeId = parentNodeId.child(childId);
     final required = this.required ?? const [];
     final order = this.order ?? const [];
 
     return definition.createSchema(
       nodeId: nodeId,
-      id: id,
+      id: childId,
       title: title,
       description: description,
       defaultValue: definition.converter.fromJson(defaultValue),
       guidance: guidance,
       enumValues: enumValues,
-      properties: properties
+      properties: properties.entries
           .map(
-            (e) => e.toModel(
+            (prop) => prop.value.toModel(
               definitions,
               parentNodeId: nodeId,
-              isRequired: required.contains(e.id),
+              childId: prop.key,
+              isRequired: required.contains(prop.key),
             ),
           )
           .toList(),
       items: items?.toModel(
         definitions,
         parentNodeId: nodeId,
+        childId: 'items',
         isRequired: false,
       ),
       numRange: Range.optionalIntRangeOf(min: minimum, max: maximum),

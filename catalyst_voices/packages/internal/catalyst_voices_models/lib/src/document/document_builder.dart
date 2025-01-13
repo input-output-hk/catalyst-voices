@@ -223,8 +223,8 @@ sealed class DocumentPropertyBuilder implements DocumentNode {
         return DocumentPropertyObjectBuilder.fromSchema(schema);
       case DocumentDefinitionsObjectType.string:
       case DocumentDefinitionsObjectType.integer:
+      case DocumentDefinitionsObjectType.number:
       case DocumentDefinitionsObjectType.boolean:
-      case DocumentDefinitionsObjectType.unknown:
         return DocumentPropertyValueBuilder.fromSchema(schema);
     }
   }

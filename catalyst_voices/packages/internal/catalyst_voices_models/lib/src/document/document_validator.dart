@@ -96,6 +96,7 @@ final class DocumentValidator {
     // ignore: avoid_positional_boolean_parameters
     bool? value,
   ) {
+    // TODO(dtscalac): validation against type (nullable) and const (true/false)
     return validateBasic(schema, value);
   }
 }

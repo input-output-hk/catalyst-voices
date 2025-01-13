@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
-import 'package:catalyst_voices_repositories/src/utils/document_schema_dto_converter.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_section_dto.g.dart';
@@ -13,8 +12,7 @@ final class DocumentSchemaSectionDto {
   final String ref;
   final String? title;
   final String? description;
-  @DocumentSchemaPropertiesDtoConverter()
-  final List<DocumentSchemaPropertyDto> properties;
+  final Map<String, DocumentSchemaPropertyDto> properties;
   final List<String>? required;
   @JsonKey(name: 'x-order')
   final List<String>? order;
@@ -43,13 +41,14 @@ final class DocumentSchemaSectionDto {
     final order = this.order ?? const [];
     final required = this.required ?? const [];
 
-    final mappedProperties = properties
-        .where((property) => BaseDocumentDefinition.isKnownType(property.ref))
+    final mappedProperties = properties.entries
+        .where((prop) => BaseDocumentDefinition.isKnownType(prop.value.ref))
         .map(
-          (e) => e.toModel(
+          (prop) => prop.value.toModel(
             definitions,
             parentNodeId: nodeId,
-            isRequired: required.contains(e.id),
+            childId: prop.key,
+            isRequired: required.contains(prop.key),
           ),
         )
         .toList();

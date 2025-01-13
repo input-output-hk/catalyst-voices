@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_logical_property_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_section_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_segment_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -47,29 +46,6 @@ final class DocumentSchemaSectionsDtoConverter
   Map<String, dynamic>? toJson(List<DocumentSchemaSectionDto> sections) {
     return {
       for (final section in sections) section.id: section.toJson(),
-    };
-  }
-}
-
-final class DocumentSchemaPropertiesDtoConverter
-    implements
-        JsonConverter<List<DocumentSchemaPropertyDto>, Map<String, dynamic>?> {
-  const DocumentSchemaPropertiesDtoConverter();
-
-  @override
-  List<DocumentSchemaPropertyDto> fromJson(Map<String, dynamic>? json) {
-    if (json == null) {
-      return [];
-    }
-
-    final properties = json.convertMapToListWithIds();
-    return properties.map(DocumentSchemaPropertyDto.fromJson).toList();
-  }
-
-  @override
-  Map<String, dynamic>? toJson(List<DocumentSchemaPropertyDto> properties) {
-    return {
-      for (final property in properties) property.id: property.toJson(),
     };
   }
 }

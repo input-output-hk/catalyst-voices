@@ -20,8 +20,8 @@ void main() {
       // Given
       const dto = DocumentSchemaPropertyDto(
         ref: '#/definitions/section',
-        id: 'solution',
       );
+
       const expectedJson = {
         r'$ref': '#/definitions/section',
       };

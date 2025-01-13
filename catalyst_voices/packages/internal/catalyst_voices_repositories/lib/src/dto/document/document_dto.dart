@@ -182,8 +182,8 @@ sealed class DocumentPropertyDto {
         );
       case DocumentDefinitionsObjectType.string:
       case DocumentDefinitionsObjectType.integer:
+      case DocumentDefinitionsObjectType.number:
       case DocumentDefinitionsObjectType.boolean:
-      case DocumentDefinitionsObjectType.unknown:
         return DocumentPropertyValueDto.fromJsonSchema(
           schema,
           properties: properties,
@@ -225,7 +225,7 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
     return DocumentPropertyListDto(
       schema: schema,
       properties: [
-        // TODO(random nodeId)
+        // TODO(dtscalac): random nodeId
         for (final value in values)
           DocumentPropertyValueDto(
             schema: itemSchema,
