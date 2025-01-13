@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -185,12 +186,12 @@ class _TagGroupsDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDropdownFormField<GroupedTags>(
+    return SingleSelectDropdown<GroupedTags>(
       items: groupedTags
-          .map((e) => DropdownMenuItem(value: e, child: Text(e.group)))
+          .map((e) => DropdownMenuEntry(value: e, label: e.group))
           .toList(),
-      value: value,
-      onChanged: onChanged,
+      initialValue: value,
+      onSelected: onChanged,
     );
   }
 }

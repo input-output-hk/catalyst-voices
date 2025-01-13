@@ -97,6 +97,19 @@ final class DocumentValidator {
   ) {
     return validateBasic(schema, value);
   }
+
+  static DocumentValidationResult validatePattern(
+    String pattern,
+    String? value,
+  ) {
+    final regex = RegExp(pattern);
+    if (value != null) {
+      if (!regex.hasMatch(value)) {
+        return DocumentPatternMismatch(pattern: pattern, value: value);
+      }
+    }
+    return const SuccessfulDocumentValidation();
+  }
 }
 
 sealed class DocumentValidationResult extends Equatable {
@@ -175,4 +188,17 @@ final class DocumentItemsOutOfRange<T extends num>
 
   @override
   List<Object?> get props => [invalidNodeId, expectedRange, actualItems];
+}
+
+final class DocumentPatternMismatch extends DocumentValidationResult {
+  final String pattern;
+  final String? value;
+
+  const DocumentPatternMismatch({
+    required this.pattern,
+    required this.value,
+  });
+
+  @override
+  List<Object?> get props => [pattern, value];
 }
