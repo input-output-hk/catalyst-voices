@@ -3,6 +3,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -34,7 +35,8 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Slot number
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
+
 pub(crate) struct SlotNo(u64);
 
 /// Is the Slot Number valid?
@@ -90,6 +92,12 @@ impl ParseFromJSON for SlotNo {
         } else {
             Err(ParseError::expected_type(value))
         }
+    }
+}
+
+impl From<SlotNo> for BigInt {
+    fn from(val: SlotNo) -> Self {
+        BigInt::from(val.0)
     }
 }
 
