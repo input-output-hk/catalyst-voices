@@ -4,7 +4,7 @@ use std::{
     alloc::System,
     sync::{
         atomic::{AtomicBool, Ordering},
-        Arc, Mutex,
+        Arc, LazyLock, RwLock,
     },
     thread,
     time::Duration,
@@ -14,20 +14,21 @@ use memory_stats::memory_stats;
 use stats_alloc::{Region, Stats, StatsAlloc, INSTRUMENTED_SYSTEM};
 use tracing::log::error;
 
-lazy_static::lazy_static! {
-  /// A global, thread-safe container for memory metrics.
-  static ref GLOBAL_METRICS: Arc<Mutex<MemoryMetrics>> = Arc::new(Mutex::new(MemoryMetrics::default()));
-}
+/// Use the instrumented allocator for gathering allocation statistics.
+/// Note: This wraps the global allocator.
+/// All structs that use the global allocator can be tracked.
+#[global_allocator]
+static GLOBAL: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
+
+/// A global, thread-safe container for memory metrics.
+static GLOBAL_METRICS: LazyLock<Arc<RwLock<MemoryMetrics>>> =
+    LazyLock::new(|| Arc::new(RwLock::new(MemoryMetrics::default())));
 
 /// This is to prevent the init function from accidentally being called multiple times.
 static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
 /// Interval for updating memory metrics, in milliseconds.
 const UPDATE_INTERVAL_MILLI: u64 = 1000;
-
-/// Use the instrumented allocator for gathering allocation statistics.
-#[global_allocator]
-static GLOBAL: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
 
 /// A structure for storing memory metrics, including allocator statistics
 /// and physical/virtual memory usage.
@@ -59,34 +60,14 @@ impl MemoryMetrics {
         }
     }
 
-    /// Retrieves a clone of the current memory metrics.
-    ///
-    /// # Returns
-    /// * A clone of the `MemoryMetrics` structure containing the latest metrics.
-    #[allow(dead_code)]
-    pub(crate) fn retrieve_metrics() -> Result<Self, String> {
-        match GLOBAL_METRICS.lock() {
-            Ok(metrics) => Ok(metrics.clone()),
-            Err(err) => {
-                let msg = format!("Failed to retrieve memory usage info: {err:?}");
-
-                error!("{err:?}");
-
-                Err(msg)
-            },
-        }
-    }
-
     /// Starts a background thread to periodically update memory metrics.
     ///
     /// This function spawns a thread that updates the global `MemoryMetrics`
     /// structure at regular intervals defined by `UPDATE_INTERVAL_MILLI`.
-    pub(crate) fn start_metrics_updater() {
-        if IS_INITIALIZED.load(Ordering::SeqCst) {
+    pub(crate) fn init_metrics_updater() {
+        if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
             return;
         }
-
-        IS_INITIALIZED.store(true, Ordering::SeqCst);
 
         let stats = Region::new(GLOBAL);
 
@@ -94,10 +75,19 @@ impl MemoryMetrics {
             let interval = Duration::from_millis(UPDATE_INTERVAL_MILLI);
             loop {
                 let allocator_stats = stats.change();
-                match GLOBAL_METRICS.lock() {
-                    Ok(mut metrics) => metrics.update(allocator_stats),
+                match GLOBAL_METRICS.read() {
+                    Ok(_) => {
+                        match GLOBAL_METRICS.write() {
+                            Ok(mut writable_metrics) => {
+                                writable_metrics.update(allocator_stats);
+                            },
+                            Err(err) => {
+                                error!("Failed to acquire write lock on metrics: {:?}", err);
+                            },
+                        }
+                    },
                     Err(err) => {
-                        error!("Failed to update memory usage metrics: {:?}", err);
+                        error!("Failed to read memory usage metrics: {:?}", err);
                     },
                 }
                 thread::sleep(interval);

@@ -14,5 +14,7 @@ pub(crate) mod memory;
 /// Returns the default prometheus registry.
 #[must_use]
 pub(crate) fn init_prometheus() -> Registry {
+    memory::MemoryMetrics::init_metrics_updater();
+
     default_registry().clone()
 }
