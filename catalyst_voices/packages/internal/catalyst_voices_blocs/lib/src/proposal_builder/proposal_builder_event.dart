@@ -42,3 +42,14 @@ final class ActiveNodeChangedEvent extends ProposalBuilderEvent {
   @override
   List<Object?> get props => [id];
 }
+
+final class SectionChangedEvent extends ProposalBuilderEvent {
+  final List<DocumentChange> changes;
+
+  const SectionChangedEvent({
+    required this.changes,
+  });
+
+  @override
+  List<Object?> get props => [changes];
+}

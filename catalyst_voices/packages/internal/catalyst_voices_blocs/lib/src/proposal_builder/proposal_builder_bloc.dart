@@ -29,6 +29,32 @@ final class ProposalBuilderBloc
       _handleActiveStepEvent,
       transformer: (events, mapper) => events.distinct(),
     );
+    on<SectionChangedEvent>(_handleSectionChangedEvent);
+  }
+
+  void _handleActiveStepEvent(
+    ActiveNodeChangedEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    _logger.info('Active node changed to [${event.id}]');
+
+    // TODO(damian-molinski): Show guidance for this node and its parents.
+    _activeNodeId = event.id;
+  }
+
+  void _handleSectionChangedEvent(
+    SectionChangedEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) {
+    final documentBuilder = _documentBuilder;
+    assert(documentBuilder != null, 'DocumentBuilder not initialized');
+
+    documentBuilder!.addChanges(event.changes);
+    final document = documentBuilder.build();
+    final segments = _mapDocumentToSegments(document);
+
+    // TODO(damian-molinski): Get guidance + convert to MarkdownData
+    emit(state.copyWith(segments: segments));
   }
 
   Future<void> _loadDefaultProposalTemplate(
@@ -102,15 +128,6 @@ final class ProposalBuilderBloc
     );
   }
 
-  void _handleActiveStepEvent(
-    ActiveNodeChangedEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) {
-    _logger.info('Active node changed to [${event.id}]');
-
-    _activeNodeId = event.id;
-  }
-
   Future<void> _loadDocument({
     required AsyncValueGetter<DocumentBuilder> documentBuilderGetter,
     required Emitter<ProposalBuilderState> emit,
@@ -129,6 +146,7 @@ final class ProposalBuilderBloc
       final document = documentBuilder.build();
       final segments = _mapDocumentToSegments(document);
 
+      // TODO(damian-molinski): Get guidance + convert to MarkdownData
       emit(ProposalBuilderState(segments: segments));
     } on LocalizedException catch (error) {
       emit(ProposalBuilderState(error: error));
