@@ -53,6 +53,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (_description.isNotEmpty) ...[
           Text(
