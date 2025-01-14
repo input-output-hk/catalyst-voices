@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 class ResizableBoxParent extends StatelessWidget {
   final bool resizableVertically;
   final bool resizableHorizontally;
+  final bool maxLineSet;
   final Widget child;
   final double minWidth;
   final double minHeight;
@@ -18,6 +19,7 @@ class ResizableBoxParent extends StatelessWidget {
     required this.child,
     this.minWidth = 40,
     this.minHeight = 40,
+    this.maxLineSet = false,
   });
 
   @override
@@ -34,6 +36,7 @@ class ResizableBoxParent extends StatelessWidget {
           minHeight: minHeight,
           resizableHorizontally: resizableHorizontally,
           resizableVertically: resizableVertically,
+          maxLineSet: maxLineSet,
           child: child,
         );
       },
@@ -48,6 +51,7 @@ class _ResizableBox extends StatefulWidget {
   final double minHeight;
   final bool resizableVertically;
   final bool resizableHorizontally;
+  final bool maxLineSet;
 
   const _ResizableBox({
     required this.constraints,
@@ -56,6 +60,7 @@ class _ResizableBox extends StatefulWidget {
     required this.minHeight,
     required this.resizableVertically,
     required this.resizableHorizontally,
+    required this.maxLineSet,
   });
 
   @override
@@ -91,7 +96,9 @@ class _ResizableBoxState extends State<_ResizableBox> {
           child: widget.child,
         ),
         Positioned(
-          bottom: 0,
+          // when maxLine is set, icon is placed at the max line text
+          // and not at the corner of the text field
+          bottom: widget.maxLineSet ? 18 : 0,
           right: 0,
           child: MouseRegion(
             cursor: SystemMouseCursors.resizeDownRight,

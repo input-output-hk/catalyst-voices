@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/ext/document_property_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -59,10 +58,8 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
 
   String get _description => widget.property.formattedDescription;
   int? get _maxLength => widget.property.schema.strLengthRange?.max;
-  int? get _maxLines =>
-      widget.property.schema.definition is SingleLineTextEntryDefinition
-          ? 1
-          : null;
+  bool get _resizable =>
+      widget.property.schema.definition is MultiLineTextEntryDefinition;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +80,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           onFieldSubmitted: _notifyChangeListener,
           validator: _validate,
           enabled: widget.isEditMode,
-          maxLines: _maxLines,
+          resizable: _resizable,
           maxLength: _maxLength,
         ),
       ],
@@ -138,7 +135,7 @@ class _SimpleDocumentTextField extends StatelessWidget {
   final VoicesTextFieldValidator? validator;
   final FocusNode? focusNode;
   final bool enabled;
-  final int? maxLines;
+  final bool resizable;
   final int? maxLength;
 
   const _SimpleDocumentTextField({
@@ -147,35 +144,23 @@ class _SimpleDocumentTextField extends StatelessWidget {
     this.validator,
     this.focusNode,
     this.enabled = false,
-    this.maxLines,
+    this.resizable = false,
     this.maxLength,
   });
 
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Stack(
-        children: [
-          VoicesTextField(
-            controller: controller,
-            focusNode: focusNode,
-            onFieldSubmitted: onFieldSubmitted,
-            validator: validator,
-            enabled: enabled,
-            resizable: false,
-            maxLengthEnforcement: MaxLengthEnforcement.none,
-            autovalidateMode: AutovalidateMode.disabled,
-            maxLines: maxLines,
-            maxLength: maxLength,
-          ),
-          if (maxLines == null)
-            Positioned(
-              bottom: maxLength != null ? 18 : 0,
-              right: 0,
-              child: VoicesAssets.images.dragger.buildIcon(size: 15),
-            ),
-        ],
-      ),
+    return VoicesTextField(
+      controller: controller,
+      focusNode: focusNode,
+      onFieldSubmitted: onFieldSubmitted,
+      validator: validator,
+      enabled: enabled,
+      resizable: resizable,
+      maxLengthEnforcement: MaxLengthEnforcement.none,
+      autovalidateMode: AutovalidateMode.disabled,
+      maxLines: resizable ? null : 1,
+      maxLength: maxLength,
     );
   }
 }
