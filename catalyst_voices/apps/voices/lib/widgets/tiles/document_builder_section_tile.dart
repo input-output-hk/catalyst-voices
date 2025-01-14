@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -40,7 +42,6 @@ class _DocumentBuilderSectionTileState
   final _pendingChanges = <DocumentChange>[];
 
   bool _isEditMode = false;
-  bool _isValid = false;
 
   @override
   void initState() {
@@ -48,9 +49,6 @@ class _DocumentBuilderSectionTileState
 
     _editedSection = widget.section;
     _builder = _editedSection.toBuilder();
-
-    // TODO(damian-molinski): validation
-    _isValid = _editedSection.properties.every(_dummyValidation);
   }
 
   @override
@@ -61,9 +59,6 @@ class _DocumentBuilderSectionTileState
       _editedSection = widget.section;
       _builder = _editedSection.toBuilder();
       _pendingChanges.clear();
-
-      // TODO(damian-molinski): validation
-      _isValid = _editedSection.properties.every(_dummyValidation);
     }
   }
 
@@ -86,7 +81,7 @@ class _DocumentBuilderSectionTileState
             for (final property in widget.section.properties) ...[
               const SizedBox(height: 8),
               _PropertyBuilder(
-                key: ObjectKey(property.schema.nodeId),
+                key: ValueKey(property.schema.nodeId),
                 property: property,
                 isEditMode: _isEditMode,
                 onChanged: _handlePropertyChange,
@@ -95,7 +90,7 @@ class _DocumentBuilderSectionTileState
             if (_isEditMode) ...[
               const SizedBox(height: 12),
               _Footer(
-                isValid: _isValid,
+                isValid: _editedSection.isValid,
                 onSave: _saveChanges,
               ),
             ],
@@ -127,19 +122,7 @@ class _DocumentBuilderSectionTileState
       _builder.addChange(change);
       _editedSection = _builder.build();
       _pendingChanges.add(change);
-
-      // TODO(damian-molinski): validation
-      _isValid = _editedSection.properties.every(_dummyValidation);
     });
-  }
-
-  bool _dummyValidation(DocumentProperty property) {
-    final value = property.value;
-    if (value is GroupedTagsSelection) {
-      return value.isValid;
-    }
-
-    return value != null;
   }
 }
 
@@ -215,6 +198,7 @@ class _PropertyBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final definition = property.schema.definition;
+
     switch (definition) {
       case SegmentDefinition():
       case SectionDefinition():
@@ -223,57 +207,66 @@ class _PropertyBuilder extends StatelessWidget {
           'by $DocumentBuilderSectionTile',
         );
       case SingleLineTextEntryDefinition():
-      case SingleLineHttpsURLEntryDefinition():
       case MultiLineTextEntryDefinition():
       case MultiLineTextEntryMarkdownDefinition():
-      case DropDownSingleSelectDefinition():
       case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
-      case SingleGroupedTagSelectorDefinition():
-        final value = property.value;
-
-        final selection = value is GroupedTagsSelection
-            ? value
-            : const GroupedTagsSelection();
-
-        return SingleGroupedTagSelectorWidget(
-          id: property.schema.nodeId,
-          selection: selection,
-          groupedTags: property.groupedTags(),
-          isEditMode: isEditMode,
-          onChanged: onChanged,
-          isRequired: property.schema.isRequired,
-        );
       case TagGroupDefinition():
       case TagSelectionDefinition():
       case DurationInMonthsDefinition():
       case YesNoChoiceDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
-        throw UnimplementedError();
-      case AgreementConfirmationDefinition():
-        return AgreementConfirmationWidget(
-          value: definition.castProperty(property).value,
+        throw UnimplementedError('${definition.type} not implemented');
+      case SingleLineHttpsURLEntryDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleLineHttpsUrlWidget(
+          property: castProperty,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case SingleGroupedTagSelectorDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleGroupedTagSelectorWidget(
+          id: castProperty.schema.nodeId,
+          selection: castProperty.value ?? const GroupedTagsSelection(),
+          groupedTags: definition.groupedTags(castProperty.schema),
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+          isRequired: castProperty.schema.isRequired,
+        );
+      case DropDownSingleSelectDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleDropdownSelectionWidget(
+          value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
+          items: castProperty.schema.enumValues ?? [],
           definition: definition,
-          nodeId: property.schema.nodeId,
-          description: property.schema.description ?? '',
-          title: property.schema.title ?? '',
+          nodeId: castProperty.schema.nodeId,
+          title: castProperty.schema.title ?? '',
+          isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
+          onChanged: onChanged,
+        );
+      case AgreementConfirmationDefinition():
+        final castProperty = definition.castProperty(property);
+        return AgreementConfirmationWidget(
+          value: castProperty.value,
+          definition: definition,
+          nodeId: castProperty.schema.nodeId,
+          description: castProperty.schema.description ?? '',
+          title: castProperty.schema.title ?? '',
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
       case TokenValueCardanoADADefinition():
         return DocumentTokenValueWidget(
-          id: property.schema.nodeId,
-          label: property.schema.title ?? '',
-          value: property.value is int ? property.value! as int : null,
+          property: definition.castProperty(property),
           currency: const Currency.ada(),
-          range: property.schema.range,
           isEditMode: isEditMode,
-          isRequired: property.schema.isRequired,
           onChanged: onChanged,
         );
     }

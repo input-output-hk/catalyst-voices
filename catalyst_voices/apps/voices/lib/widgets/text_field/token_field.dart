@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/text_field/voices_num_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -8,6 +9,7 @@ class TokenField extends StatelessWidget {
   final VoicesIntFieldController? controller;
   final ValueChanged<int?>? onFieldSubmitted;
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
+  final VoicesNumFieldValidator<int>? validator;
   final String? labelText;
   final String? errorText;
   final FocusNode? focusNode;
@@ -22,6 +24,7 @@ class TokenField extends StatelessWidget {
     this.controller,
     required this.onFieldSubmitted,
     this.onStatusChanged,
+    this.validator,
     this.labelText,
     this.errorText,
     this.focusNode,
@@ -50,7 +53,7 @@ class TokenField extends StatelessWidget {
         filled: true,
         helper: range != null && showHelper
             ? _Helper(
-                symbol: currency.symbol,
+                currency: currency,
                 range: range,
               )
             : null,
@@ -74,9 +77,9 @@ class TokenField extends StatelessWidget {
       return VoicesTextFieldValidationResult.error(message);
     }
 
-    if (value != null && !(range?.contains(value) ?? true)) {
-      // Do not append any text
-      return const VoicesTextFieldValidationResult.error();
+    final validator = this.validator;
+    if (validator != null) {
+      return validator(value, text);
     }
 
     return const VoicesTextFieldValidationResult.none();
@@ -84,35 +87,58 @@ class TokenField extends StatelessWidget {
 }
 
 class _Helper extends StatelessWidget {
-  final String symbol;
+  final Currency currency;
   final Range<int> range;
 
   const _Helper({
-    required this.symbol,
+    required this.currency,
     required this.range,
   });
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): Refactor text formatting with smarter syntax
-    return Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(text: context.l10n.requestedAmountShouldBeBetween),
-          const TextSpan(text: ' '),
-          TextSpan(
-            text: '$symbol${range.min}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const TextSpan(text: ' '),
-          TextSpan(text: context.l10n.and),
-          const TextSpan(text: ' '),
-          TextSpan(
-            text: '$symbol${range.max}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
+    final min = range.min;
+    final max = range.max;
+
+    const boldStyle = TextStyle(fontWeight: FontWeight.bold);
+
+    if (min != null && max != null) {
+      return PlaceholderRichText(
+        context.l10n.requestedAmountShouldBeBetweenMinAndMax,
+        placeholderSpanBuilder: (context, placeholder) {
+          return switch (placeholder) {
+            'min' => TextSpan(text: currency.format(min), style: boldStyle),
+            'max' => TextSpan(text: currency.format(max), style: boldStyle),
+            _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
+          };
+        },
+      );
+    }
+
+    if (min != null) {
+      return PlaceholderRichText(
+        context.l10n.requestedAmountShouldBeMoreThan,
+        placeholderSpanBuilder: (context, placeholder) {
+          return switch (placeholder) {
+            'min' => TextSpan(text: currency.format(min), style: boldStyle),
+            _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
+          };
+        },
+      );
+    }
+
+    if (max != null) {
+      return PlaceholderRichText(
+        context.l10n.requestedAmountShouldBeLessThan,
+        placeholderSpanBuilder: (context, placeholder) {
+          return switch (placeholder) {
+            'max' => TextSpan(text: currency.format(max), style: boldStyle),
+            _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
+          };
+        },
+      );
+    }
+
+    return const Text('');
   }
 }

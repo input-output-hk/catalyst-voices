@@ -18,10 +18,17 @@ use poem_openapi::{
 use regex::Regex;
 use serde_json::Value;
 
-use crate::service::common::{self, auth::api_key::check_api_key};
+use crate::service::common::{
+    self,
+    auth::api_key::check_api_key,
+    types::{
+        cardano::cip19_stake_address::Cip19StakeAddress,
+        generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
+    },
+};
 
 /// A Query Parameter that can take a CIP-19 stake address, or a public key.
-/// Defining these are mutually exclusive, ao a single parameter is required to be used.
+/// Defining these are mutually exclusive, as a single parameter is required to be used.
 #[derive(Clone)]
 pub(crate) enum StakeAddressOrPublicKey {
     /// A CIP-19 stake address
@@ -45,22 +52,20 @@ impl TryFrom<&str> for StakeAddressOrPublicKey {
     fn try_from(value: &str) -> std::result::Result<Self, Self::Error> {
         /// Regex to parse the parameter
         #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.  Can never panic in prod.
-        static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
+        static _RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
 
         // First check it is the special "ALL" parameter.
         if value == "ALL" {
             return Ok(Self::All);
         }
 
-        // Otherwise, work out use the regex to work out what it is, and validate it.
-        if let Some(results) = RE.captures(value) {
-            if let Some(stake_addr) = results.get(1) {
-                return Ok(Self::Address(stake_addr.as_str().try_into()?));
-            } else if let Some(public_key) = results.get(2) {
-                return Ok(Self::PublicKey(public_key.as_str().try_into()?));
-            }
+        if let Ok(pub_key) = Ed25519HexEncodedPublicKey::try_from(value) {
+            Ok(Self::PublicKey(pub_key))
+        } else if let Ok(stake_addr) = Cip19StakeAddress::try_from(value) {
+            Ok(Self::Address(stake_addr))
+        } else {
+            bail!("Not a valid \"Stake or Public Key\" parameter.");
         }
-        bail!("Not a valid \"Stake or Public Key\" parameter.");
     }
 }
 
@@ -196,5 +201,24 @@ impl TryInto<common::types::generic::ed25519_public_key::Ed25519HexEncodedPublic
             StakeAddressOrPublicKey::PublicKey(key) => Ok(key),
             _ => bail!("Not a Stake Address"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::StakeAddressOrPublicKey;
+
+    #[test]
+    fn hex_to_stake_or_voter() {
+        // https://cexplorer.io/article/understanding-cardano-addresses
+        assert!(StakeAddressOrPublicKey::try_from(
+            "stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq",
+        )
+        .is_ok());
+
+        assert!(StakeAddressOrPublicKey::try_from(
+            "0x83B3B55589797EF953E24F4F0DBEE4D50B6363BCF041D15F6DBD33E014E54711",
+        )
+        .is_ok());
     }
 }
