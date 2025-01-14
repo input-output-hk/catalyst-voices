@@ -31,6 +31,7 @@ bimap
 bindgen
 bkioshn
 bluefireteam
+bridgefor
 BROTLI
 canvaskit
 cardano
@@ -106,6 +107,7 @@ fmtfix
 fontawesome
 fontello
 Formz
+frbgen
 fuzzer
 gapless
 gcloud
@@ -351,3 +353,5 @@ xpub
 xpublic
 xvfb
 yoroi
+stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq
+invalid1u9nlq5nmuzthw3vhgakfpxyq4r0zl2c0p8uqy24gpyjsa6c3df4h6

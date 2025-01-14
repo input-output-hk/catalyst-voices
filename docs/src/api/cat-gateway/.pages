@@ -1,4 +1,8 @@
 nav:
   - index.md
-  - 'Rust docs': rust.md
-  - 'OpenAPI docs': openapi.md
+  - "Catalyst Gateway Service - Rust Internal API Documentation": rust.md
+  - "OpenAPI - Specification": openapi-spec.md
+  - "OpenAPI - SwaggerUI Viewer": openapi-swagger.md
+  - "OpenAPI - OpenAPI Explorer Viewer": openapi-explorer.md
+  - "OpenAPI - Scalar Viewer": openapi-scalar.md
+  - "OpenAPI - Stoplight Elements Viewer": openapi-stoplight-elements.md

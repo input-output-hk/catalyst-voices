@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -205,10 +207,8 @@ class _PropertyBuilder extends StatelessWidget {
           'by $DocumentBuilderSectionTile',
         );
       case SingleLineTextEntryDefinition():
-      case SingleLineHttpsURLEntryDefinition():
       case MultiLineTextEntryDefinition():
       case MultiLineTextEntryMarkdownDefinition():
-      case DropDownSingleSelectDefinition():
       case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
@@ -222,6 +222,13 @@ class _PropertyBuilder extends StatelessWidget {
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
         throw UnimplementedError('${definition.type} not implemented');
+      case SingleLineHttpsURLEntryDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleLineHttpsUrlWidget(
+          property: castProperty,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
       case SingleGroupedTagSelectorDefinition():
         final castProperty = definition.castProperty(property);
         return SingleGroupedTagSelectorWidget(
@@ -231,6 +238,18 @@ class _PropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
           isRequired: castProperty.schema.isRequired,
+        );
+      case DropDownSingleSelectDefinition():
+        final castProperty = definition.castProperty(property);
+        return SingleDropdownSelectionWidget(
+          value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
+          items: castProperty.schema.enumValues ?? [],
+          definition: definition,
+          nodeId: castProperty.schema.nodeId,
+          title: castProperty.schema.title ?? '',
+          isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
+          onChanged: onChanged,
         );
       case AgreementConfirmationDefinition():
         final castProperty = definition.castProperty(property);
