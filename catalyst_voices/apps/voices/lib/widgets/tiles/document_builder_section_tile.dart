@@ -200,6 +200,8 @@ class _PropertyBuilder extends StatelessWidget {
     switch (definition) {
       case SegmentDefinition():
       case SectionDefinition():
+      case TagGroupDefinition():
+      case TagSelectionDefinition():
         throw UnsupportedError(
           '${property.schema.definition} unsupported '
           'by $DocumentBuilderSectionTile',
@@ -215,13 +217,13 @@ class _PropertyBuilder extends StatelessWidget {
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
-      case TagGroupDefinition():
-      case TagSelectionDefinition():
       case DurationInMonthsDefinition():
       case YesNoChoiceDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
-        throw UnimplementedError('${definition.type} not implemented');
+        return Text(
+          '${property.schema.definition.runtimeType} not implemented',
+        );
       case SingleGroupedTagSelectorDefinition():
         final castProperty = definition.castProperty(property);
         return SingleGroupedTagSelectorWidget(

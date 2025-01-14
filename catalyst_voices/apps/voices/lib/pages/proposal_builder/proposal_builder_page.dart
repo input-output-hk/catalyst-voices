@@ -79,17 +79,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
       controller: _segmentsController,
       child: SpaceScaffold(
         left: const ProposalBuilderNavigationPanel(),
-        body: Expanded(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              ProposalBuilderErrorSelector(onRetryTap: _updateSource),
-              ProposalBuilderSegmentsSelector(
-                itemScrollController: _segmentsScrollController,
-              ),
-              const ProposalBuilderLoadingSelector(),
-            ],
-          ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            ProposalBuilderErrorSelector(onRetryTap: _updateSource),
+            ProposalBuilderSegmentsSelector(
+              itemScrollController: _segmentsScrollController,
+            ),
+            const ProposalBuilderLoadingSelector(),
+          ],
         ),
         right: const ProposalBuilderSetupPanel(),
       ),

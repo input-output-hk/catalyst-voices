@@ -44,8 +44,12 @@ class _ProposalBuilderSegments extends StatelessWidget {
           itemScrollController: itemScrollController,
           items: value,
           sectionBuilder: (context, data) {
-            return Text(
-              '${data.id}',
+            return DocumentBuilderSectionTile(
+              key: key,
+              section: data.documentSection,
+              onChanged: (value) {
+                print('Section[${data.id}] changes: $value');
+              },
             );
           },
         );
