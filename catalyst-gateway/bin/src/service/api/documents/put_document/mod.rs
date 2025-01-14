@@ -1,11 +1,12 @@
 //! Implementation of the PUT `/document` endpoint
 
+use bad_put_request::PutDocumentBadRequest;
 use bytes::Bytes;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use crate::service::common::{
-    objects::document::bad_put_request::PutDocumentBadRequest, responses::WithErrorResponses,
-};
+use crate::service::common::responses::WithErrorResponses;
+
+pub(crate) mod bad_put_request;
 
 /// Maximum size of a Signed Document (1MB)
 pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;
