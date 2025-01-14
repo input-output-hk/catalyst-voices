@@ -1,24 +1,27 @@
 //! Document Index Query
 
-use poem::Body;
-use poem_openapi::{ApiResponse, Object};
+use poem_openapi::{payload::Json, ApiResponse, Object};
 use query_filter::DocumentIndexQueryFilter;
+use response::DocumentIndexListDocumented;
 
-use crate::service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor};
+use crate::service::common::responses::WithErrorResponses;
+
+use super::common;
 
 pub(crate) mod query_filter;
+pub(crate) mod response;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## OK
-    /// 
+    ///
     /// The Index of documents which match the query filter.
     #[oai(status = 200)]
-    Ok(Cbor<Body>),
+    Ok(Json<DocumentIndexListDocumented>),
     /// ## Not Found
-    /// 
+    ///
     /// No documents were found which match the query filter.
     #[oai(status = 404)]
     NotFound,
@@ -36,8 +39,14 @@ pub(crate) struct QueryDocumentIndex {
 
 /// # POST `/document/index`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
-pub(crate) async fn endpoint(filter: DocumentIndexQueryFilter) -> AllResponses {
+pub(crate) async fn endpoint(
+    filter: DocumentIndexQueryFilter,
+    page: Option<common::types::generic::query::pagination::Page>,
+    limit: Option<common::types::generic::query::pagination::Limit>,
+) -> AllResponses {
     let _filter = filter;
+    let _page = page;
+    let _limit = limit;
 
     // We return this when the filter results in no documents found.
     Responses::NotFound.into()

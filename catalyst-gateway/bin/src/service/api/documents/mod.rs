@@ -12,6 +12,7 @@ use put_document::{bad_put_request::PutDocumentBadRequest, MAXIMUM_DOCUMENT_SIZE
 
 use crate::service::{
     common::{
+        self,
         auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         tags::ApiTags,
         types::{generic::uuidv7::UUIDv7, payload::cbor::Cbor},
@@ -100,9 +101,11 @@ impl DocumentApi {
     async fn post_document(
         &self, /// The Query Filter Specification
         query: Json<DocumentIndexQueryFilterBody>,
+        page: Query<Option<common::types::generic::query::pagination::Page>>,
+        limit: Query<Option<common::types::generic::query::pagination::Limit>>,
         /// Authorization required.
         _auth: CatalystRBACSecurityScheme,
     ) -> post_document_index_query::AllResponses {
-        post_document_index_query::endpoint(query.0.0).await
+        post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
     }
 }

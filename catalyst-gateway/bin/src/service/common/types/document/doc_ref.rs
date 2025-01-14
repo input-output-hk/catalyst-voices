@@ -4,7 +4,10 @@
 
 use poem_openapi::{types::Example, NewType, Object, Union};
 
-use super::{id::EqOrRangedId, ver::EqOrRangedVer};
+use super::{
+    id::{DocumentId, EqOrRangedId},
+    ver::{DocumentVer, EqOrRangedVer},
+};
 
 #[derive(Object, Debug, PartialEq)]
 /// A Reference to a Document ID/s and their version/s.
@@ -22,7 +25,7 @@ pub(crate) struct IdRefOnly {
 ///
 /// This will match any document that matches the defined Document ID only.
 /// The Document Version is not considered, and will match any version.
-pub(crate) struct IdRefOnlyDocumented(IdRefOnly);
+pub(crate) struct IdRefOnlyDocumented(pub(crate) IdRefOnly);
 
 #[derive(Object, Debug, PartialEq)]
 /// A Reference to a Document ID/s and their version/s.
@@ -59,7 +62,7 @@ impl Example for VerRefWithOptionalId {
 /// specified the Document ID.
 /// If the Document ID is not specified, then all documents that match the version will be
 /// returned in the index.
-pub(crate) struct VerRefWithOptionalIdDocumented(VerRefWithOptionalId);
+pub(crate) struct VerRefWithOptionalIdDocumented(pub(crate) VerRefWithOptionalId);
 
 impl Example for VerRefWithOptionalIdDocumented {
     fn example() -> Self {
@@ -98,10 +101,31 @@ impl Example for IdAndVerRefInner {
 /// to another Documents ID and/or Version.
 ///
 /// *Note: at least one of `id` or `ver` must be defined.*
-pub(crate) struct IdAndVerRef(IdAndVerRefInner);
+pub(crate) struct IdAndVerRef(pub(crate) IdAndVerRefInner);
 
 impl Example for IdAndVerRef {
     fn example() -> Self {
         Self(IdAndVerRefInner::example())
+    }
+}
+
+#[derive(Object, Debug, PartialEq)]
+#[oai(example = true)]
+/// A Reference to another Signed Document
+pub(crate) struct DocumentReference {
+    /// Document ID Reference
+    #[oai(rename = "id")]
+    doc_id: DocumentId,
+    /// Document Version
+    #[oai(skip_serializing_if_is_none)]
+    ver: Option<DocumentVer>,
+}
+
+impl Example for DocumentReference {
+    fn example() -> Self {
+        Self {
+            doc_id: DocumentId::example(),
+            ver: Some(DocumentVer::example()),
+        }
     }
 }
