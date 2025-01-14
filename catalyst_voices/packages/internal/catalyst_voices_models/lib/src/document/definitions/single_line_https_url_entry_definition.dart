@@ -17,7 +17,12 @@ final class SingleLineHttpsURLEntryDefinition
     DocumentSchemaProperty<String> schema,
     String? value,
   ) {
-    return DocumentValidator.validateString(schema, value);
+    final stringValidationResult =
+        DocumentValidator.validateString(schema, value);
+    if (stringValidationResult.isInvalid) {
+      return stringValidationResult;
+    }
+    return DocumentValidator.validatePattern(pattern, value);
   }
 
   @override
