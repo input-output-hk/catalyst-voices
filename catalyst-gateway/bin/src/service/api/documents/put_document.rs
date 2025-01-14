@@ -72,10 +72,9 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 match serde_json::from_slice(doc.doc_content().bytes()) {
                     Ok(payload) => Some(payload),
                     Err(e) => {
-                        return Responses::BadRequest(Json(PutDocumentBadRequest::new(format!(
+                        return AllResponses::internal_error(&anyhow!(
                             "Invalid Document Content, not Json encoded: {e}"
-                        ))))
-                        .into()
+                        ))
                     },
                 }
             } else {
@@ -91,11 +90,6 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(e) => {
-            Responses::BadRequest(Json(PutDocumentBadRequest::new(format!(
-                "Cannot decode Catalyst Signed Document, err {e}"
-            ))))
-            .into()
-        },
+        Err(e) => Responses::BadRequest(Json(PutDocumentBadRequest::new(e.to_string()))).into(),
     }
 }
