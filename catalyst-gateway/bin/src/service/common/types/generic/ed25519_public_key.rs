@@ -133,3 +133,25 @@ impl From<Ed25519HexEncodedPublicKey> for ed25519_dalek::VerifyingKey {
             .expect("This can only fail if the type was invalidly constructed.")
     }
 }
+
+impl TryInto<Vec<u8>> for Ed25519HexEncodedPublicKey {
+    type Error = anyhow::Error;
+
+    fn try_into(self) -> Result<Vec<u8>, Self::Error> {
+        Ok(hex::decode(self.0.trim_start_matches("0x"))?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Ed25519HexEncodedPublicKey;
+
+    #[test]
+    fn hex_to_pub_key() {
+        // https://cexplorer.io/article/understanding-cardano-addresses
+        assert!(Ed25519HexEncodedPublicKey::try_from(
+            "0x76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de".to_string(),
+        )
+        .is_ok());
+    }
+}

@@ -39,7 +39,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Value of a Nonce.
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub(crate) struct Nonce(u64);
 
 /// Is the Nonce valid?
