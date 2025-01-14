@@ -3,7 +3,6 @@
 use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
-use poem::http::StatusCode;
 
 use super::{
     cardano::{
@@ -73,10 +72,8 @@ pub(crate) async fn get_registration_given_stake_key_hash(
 
         return get_registration_from_stake_addr(stake_pub_key, asat, session, None).await;
     }
-    AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-        "Stake hash does not exist",
-        StatusCode::UNPROCESSABLE_ENTITY,
-    )])
+
+    AllRegistration::With(Cip36Registration::NotFound)
 }
 
 /// Get registration from stake addr
@@ -341,10 +338,7 @@ pub(crate) async fn get_registration_given_vote_key(
             .await;
     }
 
-    AllRegistration::unprocessable_content(vec![poem::Error::from_string(
-        "Vote key does not exist",
-        StatusCode::UNPROCESSABLE_ENTITY,
-    )])
+    AllRegistration::With(Cip36Registration::NotFound)
 }
 
 /// ALL
