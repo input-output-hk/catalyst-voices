@@ -1,4 +1,7 @@
 //! Processing for String Environment Variables
+
+// cspell: words smhdwy
+
 use std::{
     env::{self, VarError},
     fmt::{self, Display},
