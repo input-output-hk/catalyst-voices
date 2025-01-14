@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widge
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
+import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -114,7 +115,11 @@ class _DocumentBuilderSectionTileState
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
-      _pendingChanges.clear();
+      if (!_isEditMode) {
+        _pendingChanges.clear();
+        _editedSection = widget.section;
+        _builder = _editedSection.toBuilder();
+      }
     });
   }
 
@@ -218,7 +223,6 @@ class _PropertyBuilder extends StatelessWidget {
       case TagGroupDefinition():
       case TagSelectionDefinition():
       case DurationInMonthsDefinition():
-      case YesNoChoiceDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
         throw UnimplementedError('${definition.type} not implemented');
@@ -277,6 +281,13 @@ class _PropertyBuilder extends StatelessWidget {
           property: castProperty as DocumentProperty<String>,
           isEditMode: isEditMode,
           onChanged: onChanged,
+      case YesNoChoiceDefinition():
+        final castProperty = definition.castProperty(property);
+        return YesNoChoiceWidget(
+          property: castProperty,
+          onChanged: onChanged,
+          isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
         );
     }
   }
