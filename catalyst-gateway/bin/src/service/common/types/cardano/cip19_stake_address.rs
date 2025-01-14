@@ -17,6 +17,7 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
+use super::hash28::HexEncodedHash28;
 use crate::service::common::types::string_types::impl_string_types;
 
 /// Stake address title.
@@ -145,6 +146,15 @@ impl TryInto<StakeAddress> for Cip19StakeAddress {
     }
 }
 
+impl TryInto<HexEncodedHash28> for Cip19StakeAddress {
+    type Error = anyhow::Error;
+
+    fn try_into(self) -> Result<HexEncodedHash28, Self::Error> {
+        let stake_addr: StakeAddress = self.try_into()?;
+        HexEncodedHash28::try_from(stake_addr.payload().as_hash().to_vec())
+    }
+}
+
 impl Example for Cip19StakeAddress {
     fn example() -> Self {
         Self(EXAMPLE.to_owned())
@@ -179,5 +189,15 @@ mod tests {
     fn test_invalid_stake_address_from_string() {
         let stake_address = Cip19StakeAddress::try_from(INVALID_STAKE_ADDRESS.to_string());
         assert!(stake_address.is_err());
+    }
+
+    #[test]
+    fn test_stake_address_to_stake_hash() {
+        let stake_address_prod =
+            Cip19StakeAddress::try_from(VALID_PROD_STAKE_ADDRESS.to_string()).unwrap();
+
+        let stake_addr: StakeAddress = stake_address_prod.try_into().unwrap();
+
+        assert!(stake_addr.payload().as_hash().len() == 28);
     }
 }
