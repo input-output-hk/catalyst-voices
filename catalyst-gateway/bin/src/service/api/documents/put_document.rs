@@ -43,8 +43,14 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
     match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
         Ok(doc) => {
+            let authors = doc
+                .signatures()
+                .kids()
+                .into_iter()
+                .map(|kid| kid.to_string())
+                .collect();
             let doc_body =
-                SignedDocBody::new(doc.doc_id(), doc.doc_ver(), doc.doc_type(), vec![], None);
+                SignedDocBody::new(doc.doc_id(), doc.doc_ver(), doc.doc_type(), authors, None);
 
             let payload = if doc.doc_content().is_json() {
                 match serde_json::from_slice(doc.doc_content().bytes()) {
