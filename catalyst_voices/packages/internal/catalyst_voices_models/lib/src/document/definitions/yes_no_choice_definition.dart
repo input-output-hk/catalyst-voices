@@ -16,6 +16,7 @@ final class YesNoChoiceDefinition extends BaseDocumentDefinition<bool> {
     DocumentSchemaProperty<bool> schema,
     bool? value,
   ) {
+    // TODO(dtscalac): validate yes no choice
     return DocumentValidator.validateBool(schema, value);
   }
 
