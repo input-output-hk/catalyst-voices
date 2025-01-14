@@ -40,16 +40,19 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Proposal> getProposal({
     required String id,
   }) async {
-    // TODO: implement getProposal
-    throw UnimplementedError();
+    final proposalBase = await _proposalRepository.getProposal(id: id);
+    final proposal = await _buildProposal(proposalBase);
+
+    return proposal;
   }
 
   @override
   Future<DocumentSchema> getProposalTemplate({
     required String id,
   }) async {
-    // TODO: implement getProposalTemplate
-    throw UnimplementedError();
+    final documentSchema = _documentRepository.getDocumentSchema(id: id);
+
+    return documentSchema;
   }
 
   @override

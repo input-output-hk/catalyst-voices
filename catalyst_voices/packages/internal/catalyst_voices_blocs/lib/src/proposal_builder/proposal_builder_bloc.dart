@@ -16,6 +16,8 @@ final class ProposalBuilderBloc
   final ProposalService _proposalService;
 
   DocumentBuilder? _documentBuilder;
+
+  // ignore: unused_field
   NodeId? _activeNodeId;
 
   ProposalBuilderBloc(

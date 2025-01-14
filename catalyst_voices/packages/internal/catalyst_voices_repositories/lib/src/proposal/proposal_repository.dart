@@ -7,6 +7,10 @@ import 'package:uuid/uuid.dart';
 abstract interface class ProposalRepository {
   factory ProposalRepository() = ProposalRepositoryImpl;
 
+  Future<ProposalBase> getProposal({
+    required String id,
+  });
+
   /// Fetches all proposals.
   Future<List<ProposalBase>> getProposals({
     required String campaignId,
@@ -15,6 +19,13 @@ abstract interface class ProposalRepository {
 
 final class ProposalRepositoryImpl implements ProposalRepository {
   const ProposalRepositoryImpl();
+
+  @override
+  Future<ProposalBase> getProposal({
+    required String id,
+  }) async {
+    return _proposals.first;
+  }
 
   @override
   Future<List<ProposalBase>> getProposals({
