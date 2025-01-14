@@ -7,12 +7,13 @@ use std::{
         Arc, LazyLock, RwLock,
     },
     thread,
-    time::Duration,
 };
 
 use memory_stats::memory_stats;
 use stats_alloc::{Region, Stats, StatsAlloc, INSTRUMENTED_SYSTEM};
 use tracing::log::error;
+
+use crate::settings::Settings;
 
 /// Use the instrumented allocator for gathering allocation statistics.
 /// Note: This wraps the global allocator.
@@ -26,9 +27,6 @@ static GLOBAL_METRICS: LazyLock<Arc<RwLock<MemoryMetrics>>> =
 
 /// This is to prevent the init function from accidentally being called multiple times.
 static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
-
-/// Interval for updating memory metrics, in milliseconds.
-const UPDATE_INTERVAL_MILLI: u64 = 1000;
 
 /// A structure for storing memory metrics, including allocator statistics
 /// and physical/virtual memory usage.
@@ -72,7 +70,6 @@ impl MemoryMetrics {
         let stats = Region::new(GLOBAL);
 
         thread::spawn(move || {
-            let interval = Duration::from_millis(UPDATE_INTERVAL_MILLI);
             loop {
                 let allocator_stats = stats.change();
                 match GLOBAL_METRICS.read() {
@@ -90,7 +87,7 @@ impl MemoryMetrics {
                         error!("Failed to read memory usage metrics: {:?}", err);
                     },
                 }
-                thread::sleep(interval);
+                thread::sleep(Settings::metrics_memory_interval());
             }
         });
     }

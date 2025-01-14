@@ -3,8 +3,10 @@ use std::{
     env::{self, VarError},
     fmt::{self, Display},
     str::FromStr,
+    time::Duration,
 };
 
+use duration_string::DurationString;
 use strum::VariantNames;
 use tracing::{error, info};
 
@@ -166,6 +168,39 @@ impl StringEnvVar {
         };
 
         value
+    }
+
+    /// Convert an Envvar into the required Duration type.
+    pub(crate) fn new_as_duration(var_name: &str, default: &str) -> Duration {
+        let choices = "A value in the format of `[0-9]+(ns|us|ms|[smhdwy])`";
+
+        let raw_value = StringEnvVar::new(
+            var_name,
+            (default.to_string().as_str(), false, choices).into(),
+        )
+        .as_string();
+
+        match DurationString::try_from(raw_value.clone()) {
+            Ok(duration) => duration.into(),
+            Err(error) => {
+                error!(
+                    "Invalid Duration: {} : {}. Defaulting to {}.",
+                    raw_value, error, default
+                );
+
+                match DurationString::try_from(default.to_string()) {
+                    Ok(duration) => duration.into(),
+                    // The error from parsing the default value must not happen
+                    Err(error) => {
+                        error!(
+                            "Invalid Default Duration: {} : {}. Defaulting to 1s.",
+                            default, error
+                        );
+                        Duration::from_secs(1)
+                    },
+                }
+            },
+        }
     }
 
     /// Convert an Envvar into an integer in the bounded range.
