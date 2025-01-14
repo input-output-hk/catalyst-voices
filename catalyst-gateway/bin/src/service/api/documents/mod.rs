@@ -11,7 +11,7 @@ use put_document::MAXIMUM_DOCUMENT_SIZE;
 
 use crate::service::{
     common::{
-        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
+        auth::none_or_rbac::NoneOrRBAC,
         objects::document::bad_put_request::PutDocumentBadRequest,
         tags::ApiTags,
         types::{generic::uuidv7::UUIDv7, payload::cbor::Cbor},
@@ -71,7 +71,7 @@ impl DocumentApi {
         &self, /// The document to PUT
         cbor: Cbor,
         /// Authorization required.
-        _auth: CatalystRBACSecurityScheme,
+        _auth: NoneOrRBAC,
     ) -> put_document::AllResponses {
         match cbor.into_bytes_with_limit(MAXIMUM_DOCUMENT_SIZE).await {
             Ok(doc_bytes) => put_document::endpoint(doc_bytes).await,

@@ -1,5 +1,6 @@
 //! Implementation of the PUT `/document` endpoint
 
+use anyhow::anyhow;
 use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 
@@ -49,8 +50,23 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 .into_iter()
                 .map(|kid| kid.to_string())
                 .collect();
-            let doc_body =
-                SignedDocBody::new(doc.doc_id(), doc.doc_ver(), doc.doc_type(), authors, None);
+
+            let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
+                Ok(json) => json,
+                Err(e) => {
+                    return AllResponses::internal_error(&anyhow!(
+                        "Cannot decode document metadata into JSON, err: {e}"
+                    ))
+                },
+            };
+
+            let doc_body = SignedDocBody::new(
+                doc.doc_id(),
+                doc.doc_ver(),
+                doc.doc_type(),
+                authors,
+                Some(doc_meta_json),
+            );
 
             let payload = if doc.doc_content().is_json() {
                 match serde_json::from_slice(doc.doc_content().bytes()) {
