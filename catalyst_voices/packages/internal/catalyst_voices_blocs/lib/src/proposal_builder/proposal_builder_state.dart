@@ -15,6 +15,10 @@ final class ProposalBuilderState extends Equatable {
     this.guidance = const ProposalGuidance(),
   });
 
+  bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
+
+  bool get showError => !isLoading && error != null;
+
   ProposalBuilderState copyWith({
     bool? isLoading,
     Optional<LocalizedException>? error,

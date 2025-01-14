@@ -1,7 +1,9 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_body.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -27,7 +29,7 @@ class ProposalBuilderPage extends StatefulWidget {
 
 class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
-  late final ItemScrollController _bodyItemScrollController;
+  late final ItemScrollController _segmentsScrollController;
 
   StreamSubscription<List<Segment>>? _segmentsSub;
 
@@ -38,11 +40,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     final bloc = context.read<ProposalBuilderBloc>();
 
     _segmentsController = SegmentsController();
-    _bodyItemScrollController = ItemScrollController();
+    _segmentsScrollController = ItemScrollController();
 
     _segmentsController
       ..addListener(_handleSegmentsControllerChange)
-      ..attachItemsScrollController(_bodyItemScrollController);
+      ..attachItemsScrollController(_segmentsScrollController);
 
     _segmentsSub = bloc.stream
         .map((event) => event.segments)
@@ -77,8 +79,17 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
       controller: _segmentsController,
       child: SpaceScaffold(
         left: const ProposalBuilderNavigationPanel(),
-        body: ProposalBuilderBody(
-          itemScrollController: _bodyItemScrollController,
+        body: Expanded(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              ProposalBuilderErrorSelector(onRetryTap: _updateSource),
+              ProposalBuilderSegmentsSelector(
+                itemScrollController: _segmentsScrollController,
+              ),
+              const ProposalBuilderLoadingSelector(),
+            ],
+          ),
         ),
         right: const ProposalBuilderSetupPanel(),
       ),
