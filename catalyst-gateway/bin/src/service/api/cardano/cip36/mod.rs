@@ -1,20 +1,20 @@
 //! CIP36 Registration Endpoints
 
-use ed25519_dalek::VerifyingKey;
 use poem::http::{HeaderMap, StatusCode};
 use poem_openapi::{param::Query, OpenApi};
 
-use self::cardano::slot_no::SlotNo;
+use self::{cardano::slot_no::SlotNo, common::auth::none::NoAuthorization};
 use super::Ed25519HexEncodedPublicKey;
 use crate::service::common::{
     self,
-    auth::none_or_rbac::NoneOrRBAC,
     tags::ApiTags,
     types::cardano::{self},
 };
 
 pub(crate) mod endpoint;
-pub(crate) mod old_endpoint;
+
+pub(crate) mod filter;
+
 pub(crate) mod response;
 
 /// Cardano Staking API Endpoints
@@ -47,11 +47,10 @@ impl Api {
         asat: Query<Option<cardano::query::AsAt>>,
         page: Query<Option<common::types::generic::query::pagination::Page>>,
         limit: Query<Option<common::types::generic::query::pagination::Limit>>,
-        /// No Authorization required, but Token permitted.
-        auth: NoneOrRBAC,
         /// Headers, used if the query is requesting ALL to determine if the secret API
         /// Key is also defined.
         headers: &HeaderMap,
+        _auth: NoAuthorization,
     ) -> response::AllRegistration {
         // Special validation for the `lookup` parameter.
         // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
@@ -60,7 +59,7 @@ impl Api {
             if lookup.is_all(headers).is_err() {
                 return response::AllRegistration::unprocessable_content(vec![
                     poem::Error::from_string(
-                        "Invalid Stake Address or Voter Key",
+                        "Invalid Stake Address or Voter key",
                         StatusCode::UNPROCESSABLE_ENTITY,
                     ),
                 ]);
@@ -72,69 +71,8 @@ impl Api {
             SlotNo::into_option(asat.0),
             page.0.unwrap_or_default(),
             limit.0.unwrap_or_default(),
-            auth,
             headers,
         )
         .await
-    }
-
-    /// Get latest CIP36 registrations from stake address.
-    ///
-    /// This endpoint gets the latest registration given a stake address.
-    #[oai(
-        path = "/draft/cardano/cip36/latest_registration/stake_addr",
-        method = "get",
-        operation_id = "latestRegistrationGivenStakeAddr"
-    )]
-    async fn latest_registration_cip36_given_stake_addr(
-        &self,
-        /// Stake Public Key to find the latest registration for.
-        stake_pub_key: Query<Ed25519HexEncodedPublicKey>, // Validation provided by type.
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> old_endpoint::SingleRegistrationResponse {
-        let hex_key = stake_pub_key.0;
-        let pub_key: VerifyingKey = hex_key.into();
-
-        old_endpoint::get_latest_registration_from_stake_addr(&pub_key, true).await
-    }
-
-    /// Get latest CIP36 registrations from a stake key hash.
-    ///
-    /// This endpoint gets the latest registration given a stake key hash.
-    #[oai(
-        path = "/draft/cardano/cip36/latest_registration/stake_key_hash",
-        method = "get",
-        operation_id = "latestRegistrationGivenStakeHash"
-    )]
-    async fn latest_registration_cip36_given_stake_key_hash(
-        &self,
-        /// Stake Key Hash to find the latest registration for.
-        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
-        stake_key_hash: Query<String>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> old_endpoint::SingleRegistrationResponse {
-        old_endpoint::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
-    }
-
-    /// Get latest CIP36 registrations from voting key.
-    ///
-    /// This endpoint returns the list of stake address registrations currently associated
-    /// with a given voting key.
-    #[oai(
-        path = "/draft/cardano/cip36/latest_registration/vote_key",
-        method = "get",
-        operation_id = "latestRegistrationGivenVoteKey"
-    )]
-    async fn latest_registration_cip36_given_vote_key(
-        &self,
-        /// Voting Key to find CIP36 registrations for.
-        #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]"))]
-        vote_key: Query<String>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> old_endpoint::MultipleRegistrationResponse {
-        old_endpoint::get_associated_vote_key_registrations(vote_key.0, true).await
     }
 }
