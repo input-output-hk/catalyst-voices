@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
@@ -34,53 +35,53 @@ final class ProposalBuilderBloc
     LoadDefaultProposalTemplateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    try {
-      _logger.info('Loading default proposal template');
+    await _loadDocument(
+      documentBuilderGetter: () async {
+        _logger.info('Loading default proposal template');
 
-      emit(const ProposalBuilderState(isLoading: true));
+        final campaign = await _campaignService.getActiveCampaign();
 
-      _documentBuilder = null;
+        final proposalTemplate = campaign?.proposalTemplate;
 
-      final campaign = await _campaignService.getActiveCampaign();
+        if (proposalTemplate == null) {
+          throw const ActiveCampaignNotFoundException();
+        }
 
-      final proposalTemplate = campaign?.proposalTemplate;
-
-      if (proposalTemplate == null) {
-        // TODO(damian-molinski): return better exception
-        emit(const ProposalBuilderState(error: LocalizedUnknownException()));
-        return;
-      }
-
-      final newDocumentId = const Uuid().v7();
-      final documentBuilder = DocumentBuilder.fromSchema(
-        documentId: newDocumentId,
-        documentVersion: newDocumentId,
-        // TODO(damian-molinski): not sure what should go here.
-        schemaUrl: proposalTemplate.propertiesSchema,
-        schema: proposalTemplate,
-      );
-
-      final document = documentBuilder.build();
-      final segments = _mapDocumentToSegments(document);
-
-      emit(ProposalBuilderState(segments: segments));
-
-      _documentBuilder = documentBuilder;
-    } catch (error) {
-      emit(const ProposalBuilderState(error: LocalizedUnknownException()));
-    } finally {
-      emit(state.copyWith(isLoading: false));
-    }
+        final newDocumentId = const Uuid().v7();
+        return DocumentBuilder.fromSchema(
+          documentId: newDocumentId,
+          documentVersion: newDocumentId,
+          // TODO(damian-molinski): not sure what should go here.
+          schemaUrl: proposalTemplate.propertiesSchema,
+          schema: proposalTemplate,
+        );
+      },
+      emit: emit,
+    );
   }
 
   Future<void> _loadProposalTemplate(
     LoadProposalTemplateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal template[${event.id}]');
+    await _loadDocument(
+      documentBuilderGetter: () async {
+        _logger.info('Loading proposal template[${event.id}]');
 
-    final proposalTemplate = await _proposalService.getProposalTemplate(
-      id: event.id,
+        final proposalTemplate = await _proposalService.getProposalTemplate(
+          id: event.id,
+        );
+
+        final newDocumentId = const Uuid().v7();
+        return DocumentBuilder.fromSchema(
+          documentId: newDocumentId,
+          documentVersion: newDocumentId,
+          // TODO(damian-molinski): not sure what should go here.
+          schemaUrl: proposalTemplate.propertiesSchema,
+          schema: proposalTemplate,
+        );
+      },
+      emit: emit,
     );
   }
 
@@ -88,9 +89,17 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal[${event.id}]');
+    await _loadDocument(
+      documentBuilderGetter: () async {
+        _logger.info('Loading proposal[${event.id}]');
 
-    final proposal = await _proposalService.getProposal(id: event.id);
+        final proposal = await _proposalService.getProposal(id: event.id);
+        final document = proposal.document;
+
+        return DocumentBuilder.fromDocument(document);
+      },
+      emit: emit,
+    );
   }
 
   void _handleActiveStepEvent(
@@ -100,6 +109,34 @@ final class ProposalBuilderBloc
     _logger.info('Active node changed to [${event.id}]');
 
     _activeNodeId = event.id;
+  }
+
+  Future<void> _loadDocument({
+    required AsyncValueGetter<DocumentBuilder> documentBuilderGetter,
+    required Emitter<ProposalBuilderState> emit,
+  }) async {
+    try {
+      _logger.finer('Changing source to new document');
+
+      emit(const ProposalBuilderState(isLoading: true));
+
+      _documentBuilder = null;
+
+      final documentBuilder = await documentBuilderGetter();
+
+      _documentBuilder = documentBuilder;
+
+      final document = documentBuilder.build();
+      final segments = _mapDocumentToSegments(document);
+
+      emit(ProposalBuilderState(segments: segments));
+    } on LocalizedException catch (error) {
+      emit(ProposalBuilderState(error: error));
+    } catch (error) {
+      emit(const ProposalBuilderState(error: LocalizedUnknownException()));
+    } finally {
+      emit(state.copyWith(isLoading: false));
+    }
   }
 
   List<Segment> _mapDocumentToSegments(Document document) {

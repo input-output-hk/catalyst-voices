@@ -13,7 +13,7 @@ abstract interface class ProposalService {
     );
   }
 
-  Future<DocumentSchema> getProposal({
+  Future<Proposal> getProposal({
     required String id,
   });
 
@@ -37,7 +37,7 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
-  Future<DocumentSchema> getProposal({
+  Future<Proposal> getProposal({
     required String id,
   }) async {
     // TODO: implement getProposal
