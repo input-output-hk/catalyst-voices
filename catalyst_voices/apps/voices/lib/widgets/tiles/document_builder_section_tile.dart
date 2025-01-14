@@ -281,6 +281,7 @@ class _PropertyBuilder extends StatelessWidget {
           property: castProperty as DocumentProperty<String>,
           isEditMode: isEditMode,
           onChanged: onChanged,
+        );
       case YesNoChoiceDefinition():
         final castProperty = definition.castProperty(property);
         return YesNoChoiceWidget(
