@@ -3,6 +3,12 @@
     "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
+    "version": "1.0.0",
+    "lastUpdated": "2025-01-14",
+    "maintainers": ["Cardano Foundation"],
+    "changelog": {
+        "1.0.0": "Initial version"
+    },
     "definitions": {
         "schemaReferenceNonUI": {
             "$comment": "NOT UI: used to identify the kind of template document used.",
@@ -33,8 +39,8 @@
             "$comment": "UI - Single Line text entry for HTTPS Urls.",
             "type": "string",
             "format": "uri",
-            "pattern": "^https:.*",
-            "x-note": "Enter a valid HTTPS URL. Must start with 'https://' and be a complete, working web address."
+            "pattern": "^[^\\n\\r]*$",
+            "x-note": "Must start with 'https://' and is followed by one or more non-whitespace characters, ending at the end of the string."
         },
         "multiLineTextEntry": {
             "$comment": "UI - Multiline text entry without any markup or rich text capability.",
@@ -498,28 +504,25 @@
                     "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
                     "x-guidance": "Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software",
                     "properties": {
-                        "source_code": {
-                            "$ref": "#/definitions/spdxLicenseOrURL"
+                        "isOpenSource": {
+                            "$ref": "#/definitions/yesNoChoice",
+                            "title": "Is the project open source?",
+                            "description": "Select Yes if the project is open source, No if it is not."
                         },
-                        "documentation": {
-                            "$ref": "#/definitions/spdxLicenseOrURL"
-                        },
-                        "note": {
+                        "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "More Information",
-                            "description": "Please provide here more information on the open source status of your project outputs",
-                            "maxLength": 500,
-                            "x-guidance": "<p>If you did not answer PROPRIETARY to the above questions, the project should be open source available throughout the entire lifecycle of the project with a declared open-source repository. Please indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs If only certain elements of your code will be open source please clarify which elements will be open source here. If you answered NO to the above question, please give further details as to why your projects outputs will not be open source METADATA</p>"
+                            "title": "License and Additional Information",
+                            "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "maxLength": 500
                         }
                     },
                     "required": [
-                        "source_code",
-                        "documentation"
+                        "isOpenSource",
+                        "licenseInformation"
                     ],
                     "x-order": [
-                        "source_code",
-                        "documentation",
-                        "note"
+                        "isOpenSource",
+                        "licenseInformation"
                     ]
                 }
             },
