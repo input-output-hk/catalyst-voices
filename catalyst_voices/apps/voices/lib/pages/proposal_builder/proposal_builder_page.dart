@@ -19,10 +19,7 @@ class ProposalBuilderPage extends StatefulWidget {
     super.key,
     this.proposalId,
     this.templateId,
-  }) : assert(
-          proposalId != null && templateId == null,
-          'If proposalId is set templateId have to be null',
-        );
+  });
 
   @override
   State<ProposalBuilderPage> createState() => _ProposalBuilderPageState();

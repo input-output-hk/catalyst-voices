@@ -3,19 +3,27 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalBuilderState extends Equatable {
+  final bool isLoading;
+  final LocalizedException? error;
   final List<Segment> segments;
   final ProposalGuidance guidance;
 
   const ProposalBuilderState({
+    this.isLoading = false,
+    this.error,
     this.segments = const [],
     this.guidance = const ProposalGuidance(),
   });
 
   ProposalBuilderState copyWith({
+    bool? isLoading,
+    Optional<LocalizedException>? error,
     List<Segment>? segments,
     ProposalGuidance? guidance,
   }) {
     return ProposalBuilderState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error.dataOr(this.error),
       segments: segments ?? this.segments,
       guidance: guidance ?? this.guidance,
     );
@@ -23,6 +31,8 @@ final class ProposalBuilderState extends Equatable {
 
   @override
   List<Object?> get props => [
+        isLoading,
+        error,
         segments,
         guidance,
       ];
