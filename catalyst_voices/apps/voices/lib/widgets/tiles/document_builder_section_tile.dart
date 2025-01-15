@@ -108,7 +108,11 @@ class _DocumentBuilderSectionTileState
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
-      _pendingChanges.clear();
+      if (!_isEditMode) {
+        _pendingChanges.clear();
+        _editedSection = widget.section;
+        _builder = _editedSection.toBuilder();
+      }
     });
   }
 
@@ -213,7 +217,6 @@ class _PropertyBuilder extends StatelessWidget {
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
       case DurationInMonthsDefinition():
-      case YesNoChoiceDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
         return Text('${definition.runtimeType} not implemented');
@@ -258,11 +261,20 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );*/
       case TokenValueCardanoADADefinition():
-        /*return DocumentTokenValueWidget(
+      /*return DocumentTokenValueWidget(
           property: definition.castProperty(property),
           currency: const Currency.ada(),
           isEditMode: isEditMode,
           onChanged: onChanged,
+        );
+        );*/
+      case YesNoChoiceDefinition():
+        /*final castProperty = definition.castProperty(property);
+        return YesNoChoiceWidget(
+          property: castProperty,
+          onChanged: onChanged,
+          isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
         );*/
         return Text('${definition.runtimeType} casting problem');
     }
