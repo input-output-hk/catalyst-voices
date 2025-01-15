@@ -96,6 +96,6 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(e) => Responses::BadRequest(Json(PutDocumentBadRequest::new(e.to_string()))).into(),
+        Err(e) => Responses::BadRequest(Json(PutDocumentBadRequest::new(&e))).into(),
     }
 }

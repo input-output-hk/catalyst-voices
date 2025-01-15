@@ -9,11 +9,12 @@ pub(crate) struct PutDocumentBadRequest {
     /// Error messages.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
     error: String,
+    // TODO: Add optional verbose error fields for documents that fail validation.
 }
 
 impl PutDocumentBadRequest {
     /// Create a new instance of `ConfigBadRequest`.
-    pub(crate) fn new(error: impl ToString) -> Self {
+    pub(crate) fn new(error: &impl ToString) -> Self {
         Self {
             error: error.to_string(),
         }

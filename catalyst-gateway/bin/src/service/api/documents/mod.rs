@@ -76,15 +76,15 @@ impl DocumentApi {
     )]
     async fn put_document(
         &self, /// The document to PUT
-        cbor: Cbor,
+        document: Cbor,
         /// Authorization required.
         _auth: NoneOrRBAC,
     ) -> put_document::AllResponses {
-        match cbor.into_bytes_with_limit(MAXIMUM_DOCUMENT_SIZE).await {
+        match document.into_bytes_with_limit(MAXIMUM_DOCUMENT_SIZE).await {
             Ok(doc_bytes) => put_document::endpoint(doc_bytes).await,
             Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
             Err(e) => {
-                put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(format!(
+                put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(&format!(
                     "Failed to read document from the request, err: {e}"
                 ))))
                 .into()
