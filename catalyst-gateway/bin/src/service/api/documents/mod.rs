@@ -7,12 +7,13 @@ use poem_openapi::{
     payload::Json,
     OpenApi,
 };
-use put_document::MAXIMUM_DOCUMENT_SIZE;
+use post_document_index_query::query_filter::DocumentIndexQueryFilterBody;
+use put_document::{bad_put_request::PutDocumentBadRequest, MAXIMUM_DOCUMENT_SIZE};
 
 use crate::service::{
     common::{
-        auth::none_or_rbac::NoneOrRBAC,
-        objects::document::bad_put_request::PutDocumentBadRequest,
+        self,
+        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         tags::ApiTags,
         types::{generic::uuidv7::UUIDv7, payload::cbor::Cbor},
     },
@@ -20,6 +21,7 @@ use crate::service::{
 };
 
 mod get_document;
+mod post_document_index_query;
 mod put_document;
 
 /// Cardano Follower API Endpoints
@@ -83,5 +85,29 @@ impl DocumentApi {
                 .into()
             },
         }
+    }
+
+    /// Post A Signed Document Index Query.
+    ///
+    /// This endpoint produces a summary of signed documents that meet the criteria
+    /// defined in the request body.
+    ///
+    /// It does not return the actual documents, just an index of the document identifiers
+    /// which allows the documents to be retrieved by the `GET document` endpoint.
+    #[oai(
+        path = "/draft/document/index",
+        method = "post",
+        operation_id = "postDocument",
+        transform = "schema_version_validation"
+    )]
+    async fn post_document(
+        &self, /// The Query Filter Specification
+        query: Json<DocumentIndexQueryFilterBody>,
+        page: Query<Option<common::types::generic::query::pagination::Page>>,
+        limit: Query<Option<common::types::generic::query::pagination::Limit>>,
+        /// Authorization required.
+        _auth: CatalystRBACSecurityScheme,
+    ) -> post_document_index_query::AllResponses {
+        post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
     }
 }
