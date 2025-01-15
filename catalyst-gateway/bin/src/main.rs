@@ -7,6 +7,7 @@ mod cli;
 mod db;
 mod jinja;
 mod logger;
+mod metrics;
 mod service;
 mod settings;
 mod utils;
