@@ -65,6 +65,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color onErrorVariant;
   final Color errorContainer;
   final Color onErrorContainer;
+  final Color overlay;
+  final Color dropShadow;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -125,6 +127,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.onErrorVariant,
     required this.errorContainer,
     required this.onErrorContainer,
+    required this.overlay,
+    required this.dropShadow,
   });
 
   @visibleForTesting
@@ -187,6 +191,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.onErrorVariant = Colors.black,
     this.errorContainer = Colors.black,
     this.onErrorContainer = Colors.black,
+    this.overlay = Colors.black,
+    this.dropShadow = Colors.black,
   });
 
   @override
@@ -249,6 +255,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? onErrorVariant,
     Color? errorContainer,
     Color? onErrorContainer,
+    Color? overlay,
+    Color? dropShadow,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -321,6 +329,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       onErrorVariant: onErrorVariant ?? this.onErrorVariant,
       errorContainer: errorContainer ?? this.errorContainer,
       onErrorContainer: onErrorContainer ?? this.onErrorContainer,
+      overlay: overlay ?? this.overlay,
+      dropShadow: dropShadow ?? this.dropShadow,
     );
   }
 
@@ -467,6 +477,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       errorContainer: Color.lerp(errorContainer, other.errorContainer, t)!,
       onErrorContainer:
           Color.lerp(onErrorContainer, other.onErrorContainer, t)!,
+      overlay: Color.lerp(overlay, other.overlay, t)!,
+      dropShadow: Color.lerp(dropShadow, other.dropShadow, t)!,
     );
   }
 }
