@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/multiline_text_entry_markdown_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
@@ -212,8 +213,7 @@ class _PropertyBuilder extends StatelessWidget {
           '${property.schema.definition} unsupported '
           'by $DocumentBuilderSectionTile',
         );
-      case SingleLineTextEntryDefinition():
-      case MultiLineTextEntryDefinition():
+
       case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
@@ -267,9 +267,18 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case TokenValueCardanoADADefinition():
+        final castProperty = definition.castProperty(property);
         return DocumentTokenValueWidget(
-          property: definition.castProperty(property),
+          property: castProperty,
           currency: const Currency.ada(),
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case SingleLineTextEntryDefinition():
+      case MultiLineTextEntryDefinition():
+        final castProperty = definition.castProperty(property);
+        return SimpleTextEntryWidget(
+          property: castProperty as DocumentProperty<String>,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
