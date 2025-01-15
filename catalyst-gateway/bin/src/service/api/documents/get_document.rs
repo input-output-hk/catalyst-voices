@@ -11,9 +11,13 @@ use crate::{
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(crate) enum Responses {
+    /// ## OK
+    ///
     /// The Document that was requested.
     #[oai(status = 200)]
     Ok(Cbor),
+    /// ## Not Found
+    ///
     /// The document could not be found.
     #[oai(status = 404)]
     NotFound,

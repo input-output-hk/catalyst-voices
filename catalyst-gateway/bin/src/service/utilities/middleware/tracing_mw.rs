@@ -1,5 +1,6 @@
 //! Full Tracing and metrics middleware.
-use std::{sync::LazyLock, time::Instant};
+
+use std::time::Instant;
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use poem::{
@@ -8,74 +9,17 @@ use poem::{
     Endpoint, Error, FromRequest, IntoResponse, Middleware, PathPattern, Request, Response, Result,
 };
 use poem_openapi::OperationId;
-use prometheus::{
-    default_registry, register_histogram_vec, register_int_counter_vec, HistogramVec,
-    IntCounterVec, Registry,
-};
 use tracing::{error, field, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
-use crate::{settings::Settings, utils::blake2b_hash::generate_uuid_string_from_data};
-
-/// Labels for the metrics
-const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
-/// Labels for the client metrics
-const CLIENT_METRIC_LABELS: [&str; 2] = ["client", "status_code"];
-
-// Prometheus Metrics maintained by the service
-
-/// HTTP Request duration histogram.
-static HTTP_REQ_DURATION_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
-    register_histogram_vec!(
-        "http_request_duration_ms",
-        "Duration of HTTP requests in milliseconds",
-        &METRIC_LABELS
-    )
-    .unwrap()
-});
-
-/// HTTP Request CPU Time histogram.
-static HTTP_REQ_CPU_TIME_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
-    register_histogram_vec!(
-        "http_request_cpu_time_ms",
-        "CPU Time of HTTP requests in milliseconds",
-        &METRIC_LABELS
-    )
-    .unwrap()
-});
-
-// No Tacho implemented to enable this.
-// static ref HTTP_REQUEST_RATE: GaugeVec = register_gauge_vec!(
-// "http_request_rate",
-// "Rate of HTTP requests per second",
-// &METRIC_LABELS
-// )
-// .unwrap();
-
-/// HTTP Request count histogram.
-static HTTP_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
-    register_int_counter_vec!(
-        "http_request_count",
-        "Number of HTTP requests",
-        &METRIC_LABELS
-    )
-    .unwrap()
-});
-
-/// Client Request Count histogram.
-static CLIENT_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
-    #[allow(clippy::ignored_unit_patterns)]
-    register_int_counter_vec!(
-        "client_request_count",
-        "Number of HTTP requests per client",
-        &CLIENT_METRIC_LABELS
-    )
-    .unwrap()
-});
+use crate::{
+    metrics::endpoint::{
+        CLIENT_REQUEST_COUNT, HTTP_REQUEST_COUNT, HTTP_REQ_CPU_TIME_MS, HTTP_REQ_DURATION_MS,
+    },
+    settings::Settings,
+    utils::blake2b_hash::generate_uuid_string_from_data,
+};
 
 // Currently no way to get these values. TODO.
 // Panic Request Count histogram.
@@ -388,14 +332,4 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
 
         response
     }
-}
-
-/// Initialize Prometheus metrics.
-///
-/// ## Returns
-///
-/// Returns the default prometheus registry.
-#[must_use]
-pub(crate) fn init_prometheus() -> Registry {
-    default_registry().clone()
 }

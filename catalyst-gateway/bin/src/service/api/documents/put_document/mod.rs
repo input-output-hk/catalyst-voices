@@ -1,15 +1,16 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
-use catalyst_signed_doc::CatalystSignedDocument;
+use bad_put_request::PutDocumentBadRequest;
+use catalyst_signed_doc::{CatalystSignedDocument, Decode, Decoder};
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody},
-    service::common::{
-        objects::document::bad_put_request::PutDocumentBadRequest, responses::WithErrorResponses,
-    },
+    service::common::responses::WithErrorResponses,
 };
+
+pub(crate) mod bad_put_request;
 
 /// Maximum size of a Signed Document (1MB)
 pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;
@@ -18,20 +19,25 @@ pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(crate) enum Responses {
+    /// ## Created
+    ///
     /// The Document was stored OK for the first time.
     #[oai(status = 201)]
     Created,
+    /// ## No Content
+    ///
     /// The Document was already stored, and has not changed.
     #[oai(status = 204)]
     NoContent,
-    /// Error Response
+    /// ## Bad Request
     ///
-    /// The document submitted is invalid.
+    /// Error Response. The document submitted is invalid.
     #[oai(status = 400)]
     BadRequest(Json<PutDocumentBadRequest>),
-    /// Payload Too Large
+    /// ## Content Too Large
     ///
-    /// The document exceeds the maximum size of a legitimate single document.
+    /// Payload Too Large. The document exceeds the maximum size of a legitimate single
+    /// document.
     #[oai(status = 413)]
     PayloadTooLarge,
 }
@@ -42,7 +48,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # PUT `/document`
 #[allow(clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
-    match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
+    match CatalystSignedDocument::decode(&mut Decoder::new(doc_bytes.as_slice()), &mut ()) {
         Ok(doc) => {
             let authors = doc
                 .signatures()

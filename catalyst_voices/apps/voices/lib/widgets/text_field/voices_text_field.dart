@@ -83,6 +83,9 @@ class VoicesTextField extends StatefulWidget {
   /// [AutovalidateMode]
   final AutovalidateMode? autovalidateMode;
 
+  /// [MaxLengthEnforcement]
+  final MaxLengthEnforcement? maxLengthEnforcement;
+
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
 
   const VoicesTextField({
@@ -113,6 +116,7 @@ class VoicesTextField extends StatefulWidget {
     this.onSaved,
     this.inputFormatters,
     this.autovalidateMode,
+    this.maxLengthEnforcement,
     this.onStatusChanged,
   });
 
@@ -209,6 +213,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         ResizableBoxParent(
           resizableHorizontally: resizable,
           resizableVertically: resizable,
+          minHeight: widget.maxLines == null ? 65 : 48,
+          iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
@@ -229,6 +235,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             maxLines: widget.maxLines,
             minLines: widget.minLines,
             maxLength: widget.maxLength,
+            maxLengthEnforcement: widget.maxLengthEnforcement,
             readOnly: widget.readOnly,
             ignorePointers: widget.ignorePointers,
             enabled: widget.enabled,
