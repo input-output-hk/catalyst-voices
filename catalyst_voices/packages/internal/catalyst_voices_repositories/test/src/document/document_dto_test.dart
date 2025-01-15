@@ -1,31 +1,26 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  group(DocumentDto, () {
-    const schemaPath = Paths.f14ProposalSchema;
-    const documentPath = Paths.f14Proposal;
+  TestWidgetsFlutterBinding.ensureInitialized();
 
+  group(DocumentDto, () {
     late Map<String, dynamic> schemaJson;
     late Map<String, dynamic> documentJson;
 
     final id = const Uuid().v7();
     final version = const Uuid().v7();
 
-    setUpAll(() {
-      final encodedSchema = File(schemaPath).readAsStringSync();
-      final encodedDocument = File(documentPath).readAsStringSync();
-
-      schemaJson = json.decode(encodedSchema) as Map<String, dynamic>;
-      documentJson = json.decode(encodedDocument) as Map<String, dynamic>;
+    setUpAll(() async {
+      schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
+      documentJson = await VoicesDocumentsTemplates.proposalF14Document;
     });
 
     test(
@@ -94,7 +89,7 @@ void main() {
       final document = DocumentBuilder.fromSchema(
         documentId: id,
         documentVersion: version,
-        schemaUrl: schemaPath,
+        schemaUrl: '',
         schema: schema,
       ).build();
 
@@ -116,7 +111,7 @@ void main() {
       final document = DocumentBuilder.fromSchema(
         documentId: id,
         documentVersion: version,
-        schemaUrl: schemaPath,
+        schemaUrl: '',
         schema: schema,
       ).build();
 

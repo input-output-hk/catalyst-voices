@@ -1,11 +1,9 @@
-import 'dart:convert';
-
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/services.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
 
@@ -48,7 +46,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     String? version,
   }) async {
     // TODO(damian-molinski): use real id when API call is implemented.
-    final signedDocument = await _getSignedDocument(Paths.f14Proposal);
+    final signedDocument = await _getSignedDocument('document');
 
     final documentData = DocumentDataDto.fromJson(signedDocument);
 
@@ -76,7 +74,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     // calls will get cached value.
     final signedDocument = await _documentSchemaLock.synchronized(() {
       // TODO(damian-molinski): use real id when API call is implemented.
-      return _getSignedDocument(Paths.f14ProposalSchema);
+      return _getSignedDocument('schema');
     });
 
     final dto = DocumentSchemaDto.fromJson(signedDocument);
@@ -96,10 +94,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     String id, {
     // ignore: unused_element
     String? version,
-  }) async {
-    final encodedData = await rootBundle.loadString(id);
-    final decodedData = json.decode(encodedData) as Map<String, dynamic>;
-
-    return decodedData;
+  }) {
+    return id == 'schema'
+        ? VoicesDocumentsTemplates.proposalF14Schema
+        : VoicesDocumentsTemplates.proposalF14Document;
   }
 }

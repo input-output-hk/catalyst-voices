@@ -37,5 +37,4 @@ export 'utils/future_ext.dart';
 export 'utils/iterable_ext.dart';
 export 'utils/launch_url_mixin.dart';
 export 'utils/lockable.dart';
-export 'utils/paths.dart';
 export 'utils/typedefs.dart';

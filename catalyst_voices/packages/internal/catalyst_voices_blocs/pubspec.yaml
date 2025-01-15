@@ -45,7 +45,3 @@ dev_dependencies:
   plugin_platform_interface: ^2.1.8
   shared_preferences: ^2.3.3
   shared_preferences_platform_interface: ^2.4.1
-
-flutter:
-  assets:
-    - ../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/

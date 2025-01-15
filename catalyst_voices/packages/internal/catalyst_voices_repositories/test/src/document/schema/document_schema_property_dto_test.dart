@@ -1,18 +1,15 @@
-import 'dart:convert';
-import 'dart:io';
-
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group(DocumentSchemaPropertyDto, () {
     late Map<String, dynamic> schemaJson;
 
-    setUpAll(() {
-      final encodedSchema = File(Paths.f14ProposalSchema).readAsStringSync();
-
-      schemaJson = json.decode(encodedSchema) as Map<String, dynamic>;
+    setUpAll(() async {
+      schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
     });
 
     test('includeIfNull does not add keys for values that are null', () {
