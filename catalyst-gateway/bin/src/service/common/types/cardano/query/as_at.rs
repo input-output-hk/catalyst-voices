@@ -1,4 +1,4 @@
-//! Query Parameter that can take either a Blockchain slot Number of Unix Epoch timestamp.
+//! Query Parameter that can take either a Blockchain slot Number or Unix Epoch timestamp.
 //!
 //! Allows better specifying of times that restrict a GET endpoints response.
 
@@ -165,5 +165,19 @@ impl From<AsAt> for SlotNo {
 impl Display for AsAt {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}:{}", self.0 .0, self.0 .1)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_parameter;
+
+    #[test]
+    fn test_string_to_slot_no() {
+        let slot_no = "SLOT:12396302";
+        assert!(parse_parameter(slot_no).is_ok());
+
+        let unix_timestamp = "TIME:1736164751";
+        assert!(parse_parameter(unix_timestamp).is_ok());
     }
 }

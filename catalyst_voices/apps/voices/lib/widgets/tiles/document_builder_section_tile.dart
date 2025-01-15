@@ -1,7 +1,10 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
+import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -112,7 +115,11 @@ class _DocumentBuilderSectionTileState
   void _toggleEditMode() {
     setState(() {
       _isEditMode = !_isEditMode;
-      _pendingChanges.clear();
+      if (!_isEditMode) {
+        _pendingChanges.clear();
+        _editedSection = widget.section;
+        _builder = _editedSection.toBuilder();
+      }
     });
   }
 
@@ -350,9 +357,36 @@ class _PropertyValueBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
-      case DocumentSingleLineTextEntrySchema():
+      case DocumentYesNoChoiceSchema():
+        final castProperty = schema.castProperty(property);
+        return YesNoChoiceWidget(
+          property: castProperty,
+          onChanged: onChanged,
+          isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
+        );
       case DocumentSingleLineHttpsUrlEntrySchema():
+        final castProperty = schema.castProperty(property);
+        return SingleLineHttpsUrlWidget(
+          property: castProperty,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentSingleLineTextEntrySchema():
+        final castProperty = schema.castProperty(property);
+        return SimpleTextEntryWidget(
+          property: castProperty,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
       case DocumentMultiLineTextEntrySchema():
+        final castProperty = schema.castProperty(property);
+        return SimpleTextEntryWidget(
+          property: castProperty,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+
       case DocumentMultiLineTextEntryMarkdownSchema():
       case DocumentTagGroupSchema():
       case DocumentTagSelectionSchema():
@@ -362,7 +396,6 @@ class _PropertyValueBuilder extends StatelessWidget {
       case DocumentDurationInMonthsSchema():
       case DocumentGenericIntegerSchema():
       case DocumentGenericNumberSchema():
-      case DocumentYesNoChoiceSchema():
       case DocumentGenericBooleanSchema():
         throw UnimplementedError('Unimplemented ${schema.type}');
     }

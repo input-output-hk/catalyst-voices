@@ -11,12 +11,13 @@ use poem::{
 };
 
 use crate::{
+    metrics::init_prometheus,
     service::{
         api::mk_api,
         docs::{docs, favicon},
         utilities::{
             catch_panic::{set_panic_hook, ServicePanicHandler},
-            middleware::tracing_mw::{init_prometheus, Tracing},
+            middleware::tracing_mw::Tracing,
         },
     },
     settings::Settings,
