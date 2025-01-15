@@ -21,7 +21,7 @@ class CampaignBuilderCubit extends Cubit<CampaignBuilderState> {
   void updateCampaignPublish(CampaignPublish publish) {
     emit(state.copyWith(isLoading: true));
 
-    // TODO(ryszard-schossler): call backend to update campaign status
+    // TODO(LynxLynxx): call backend to update campaign status
 
     emit(
       state.copyWith(
@@ -37,7 +37,7 @@ class CampaignBuilderCubit extends Cubit<CampaignBuilderState> {
   }) {
     emit(state.copyWith(isLoading: true));
 
-    // TODO(ryszard-schossler): call backend to update campaign dates
+    // TODO(LynxLynxx): call backend to update campaign dates
 
     emit(
       state.copyWith(

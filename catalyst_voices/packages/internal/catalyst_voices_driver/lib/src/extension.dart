@@ -10,9 +10,9 @@ enum Browser {
       case Browser.chrome:
         return 'https://clients2.google.com/service/update2/crx?response=redirect&os=win&arch=x64&os_arch=x86_64&nacl_arch=x86-64&prod=chromiumcrx&prodchannel=beta&prodversion=79.0.3945.53&lang=ru&acceptformat=crx3&x=id%3D$extensionId%26installsource%3Dondemand%26uc';
       case Browser.brave:
-        return 'https://brave.com/extension/$extensionId'; // TODO(ryszard-schossler): add brave store url
+        return 'https://brave.com/extension/$extensionId'; // TODO(LynxLynxx): add brave store url
       case Browser.firefox:
-        return 'https://addons.mozilla.org/en-US/firefox/addon/$extensionId'; // TODO(ryszard-schossler): add firefox store url
+        return 'https://addons.mozilla.org/en-US/firefox/addon/$extensionId'; // TODO(LynxLynxx): add firefox store url
     }
   }
 }
