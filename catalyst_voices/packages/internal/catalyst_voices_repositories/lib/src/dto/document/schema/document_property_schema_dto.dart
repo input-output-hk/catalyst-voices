@@ -170,6 +170,15 @@ final class DocumentPropertySchemaDto {
   /// Fields from this instance have more priority
   /// (in case they appear in both instances).
   DocumentPropertySchemaDto mergeWith(DocumentPropertySchemaDto other) {
+    final DocumentPropertySchemaDto? mergedItems;
+    final items = this.items;
+    final otherItems = other.items;
+    if (items != null && otherItems != null) {
+      mergedItems = items.mergeWith(otherItems);
+    } else {
+      mergedItems = items ?? otherItems;
+    }
+
     return DocumentPropertySchemaDto(
       ref: ref ?? other.ref,
       type: type ?? other.type,
@@ -177,7 +186,7 @@ final class DocumentPropertySchemaDto {
       description: description ?? other.description,
       defaultValue: defaultValue ?? other.defaultValue,
       properties: properties ?? other.properties,
-      items: items ?? other.items,
+      items: mergedItems,
       minimum: minimum ?? other.minimum,
       maximum: maximum ?? other.maximum,
       minLength: minLength ?? other.minLength,
