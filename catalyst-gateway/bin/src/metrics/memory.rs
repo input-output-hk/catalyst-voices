@@ -58,6 +58,34 @@ impl MemoryMetrics {
         }
     }
 
+    /// Submits the memory metrics at the calling time to the Prometheus service.
+    fn send_metrics(&self) {
+        reporter::MEMORY_PHYSICAL_USAGE
+            .with_label_values(&[""])
+            .observe(0.0);
+        reporter::MEMORY_VIRTUAL_USAGE
+            .with_label_values(&[""])
+            .observe(0.0);
+        reporter::MEMORY_ALLOCATION_COUNT
+            .with_label_values(&[""])
+            .observe(0.0);
+        reporter::MEMORY_DEALLOCATION_COUNT
+            .with_label_values(&[""])
+            .observe(0.0);
+        reporter::MEMORY_REALLOCATION_COUNT
+            .with_label_values(&[""])
+            .observe(0.0);
+        reporter::MEMORY_BYTES_ALLOCATED
+            .with_label_values(&[""])
+            .observe(0.0);
+        reporter::MEMORY_BYTES_DEALLOCATED
+            .with_label_values(&[""])
+            .observe(0.0);
+        reporter::MEMORY_BYTES_REALLOCATED
+            .with_label_values(&[""])
+            .observe(0.0);
+    }
+
     /// Starts a background thread to periodically update memory metrics.
     ///
     /// This function spawns a thread that updates the global `MemoryMetrics`
@@ -71,12 +99,15 @@ impl MemoryMetrics {
 
         thread::spawn(move || {
             loop {
-                let allocator_stats = stats.change();
                 match GLOBAL_METRICS.read() {
                     Ok(_) => {
                         match GLOBAL_METRICS.write() {
                             Ok(mut writable_metrics) => {
+                                let allocator_stats = stats.change();
+
                                 writable_metrics.update(allocator_stats);
+
+                                writable_metrics.send_metrics();
                             },
                             Err(err) => {
                                 error!("Failed to acquire write lock on metrics: {:?}", err);
@@ -91,4 +122,93 @@ impl MemoryMetrics {
             }
         });
     }
+}
+
+mod reporter {
+    use std::sync::LazyLock;
+
+    use prometheus::{register_histogram_vec, HistogramVec};
+
+    /// Labels for the client metrics
+    const MEMORY_METRIC_LABELS: [&str; 1] = ["api_host_names"];
+
+    /// The "physical" memory used by this process, in bytes.
+    pub(super) static MEMORY_PHYSICAL_USAGE: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_physical_usage",
+            "Amount of physical memory usage in bytes",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The "virtual" memory used by this process, in bytes.
+    pub(super) static MEMORY_VIRTUAL_USAGE: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_virtual_usage",
+            "Amount of physical virtual usage in bytes",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The number of allocation count in the heap.
+    pub(super) static MEMORY_ALLOCATION_COUNT: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_allocation_count",
+            "Number of allocation count in the heap",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The number of deallocation count in the heap.
+    pub(super) static MEMORY_DEALLOCATION_COUNT: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_deallocation_count",
+            "Number of deallocation count in the heap",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The number of reallocation count in the heap.
+    pub(super) static MEMORY_REALLOCATION_COUNT: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_reallocation_count",
+            "Number of reallocation count in the heap",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The amount of accumulative allocated bytes in the heap.
+    pub(super) static MEMORY_BYTES_ALLOCATED: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_bytes_allocated",
+            "Amount of accumulative allocated bytes in the heap",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The amount of accumulative deallocated bytes in the heap.
+    pub(super) static MEMORY_BYTES_DEALLOCATED: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_bytes_deallocated",
+            "Amount of accumulative deallocated bytes in the heap",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The amount of accumulative reallocated bytes in the heap.
+    pub(super) static MEMORY_BYTES_REALLOCATED: LazyLock<HistogramVec> = LazyLock::new(|| {
+        register_histogram_vec!(
+            "memory_bytes_reallocated",
+            "Amount of accumulative reallocated bytes in the heap",
+            &MEMORY_METRIC_LABELS
+        )
+        .unwrap()
+    });
 }
