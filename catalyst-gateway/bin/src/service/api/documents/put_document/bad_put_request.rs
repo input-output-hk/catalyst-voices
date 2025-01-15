@@ -14,7 +14,7 @@ pub(crate) struct PutDocumentBadRequest {
 
 impl PutDocumentBadRequest {
     /// Create a new instance of `ConfigBadRequest`.
-    pub(crate) fn new(error: &impl ToString) -> Self {
+    pub(crate) fn new(error: &(impl ToString + ?Sized)) -> Self {
         Self {
             error: error.to_string(),
         }

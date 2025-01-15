@@ -15,7 +15,7 @@ pub(crate) enum Responses {
     ///
     /// The Document that was requested.
     #[oai(status = 200)]
-    Ok(Cbor),
+    Ok(Cbor<Vec<u8>>),
     /// ## Not Found
     ///
     /// The document could not be found.
@@ -30,7 +30,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
     match FullSignedDoc::retrieve(&document_id, version.as_ref()).await {
-        Ok(doc) => Responses::Ok(doc.raw().clone().into()).into(),
+        Ok(doc) => Responses::Ok(Cbor(doc.raw().clone())).into(),
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }
