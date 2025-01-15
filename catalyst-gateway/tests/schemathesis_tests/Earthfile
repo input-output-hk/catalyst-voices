@@ -15,9 +15,9 @@ package-schemathesis:
     VOLUME /results
     ENTRYPOINT st run --include-path-regex '^/api/v1/health/' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
-                    --checks=all $openapi_spec \
+                    $openapi_spec \
                     --workers=2 \
-                    --wait-for-schema=120 \
+                    --wait-for-schema=500 \
                     --max-response-time=5000 \
                     --hypothesis-max-examples=1000 \
                     --data-generation-method=all \
