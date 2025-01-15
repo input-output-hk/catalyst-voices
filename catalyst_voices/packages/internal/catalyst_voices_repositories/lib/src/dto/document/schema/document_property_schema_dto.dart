@@ -76,8 +76,9 @@ final class DocumentPropertySchemaDto {
     required DocumentNodeId nodeId,
     required bool isRequired,
   }) {
-    final definition = definitions.getDefinition(ref);
-    final schema = definition != null ? mergeWith(definition) : this;
+    final definitionSchema = definitions.getDefinition(definition());
+    final schema =
+        definitionSchema != null ? mergeWith(definitionSchema) : this;
 
     switch (schema.type!) {
       case DocumentPropertyType.list:
@@ -196,6 +197,10 @@ final class DocumentPropertySchemaDto {
     }
 
     final index = ref.lastIndexOf('/');
-    return ref.substring(index);
+    if (index < 0) {
+      return null;
+    }
+
+    return ref.substring(index + 1);
   }
 }

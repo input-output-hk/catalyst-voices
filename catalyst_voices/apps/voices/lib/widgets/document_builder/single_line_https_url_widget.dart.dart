@@ -6,7 +6,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SingleLineHttpsUrlWidget extends StatefulWidget {
-  final DocumentProperty<String> property;
+  final DocumentValueProperty<String> property;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
 
@@ -89,7 +89,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   void _notifyChangeListener(String? value) {
-    final change = DocumentChange(
+    final change = DocumentValueChange(
       nodeId: widget.property.schema.nodeId,
       value: value,
     );

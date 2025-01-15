@@ -23,13 +23,7 @@ final class DocumentDefinitionsDto {
     return _definitions.map((key, value) => MapEntry(key, value.toJson()));
   }
 
-  DocumentPropertySchemaDto? getDefinition(String? ref) {
-    if (ref == null) {
-      return null;
-    }
-
-    return _definitions.entries
-        .firstWhereOrNull((def) => ref.contains(def.key))
-        ?.value;
+  DocumentPropertySchemaDto? getDefinition(String? def) {
+    return _definitions.entries.firstWhereOrNull((e) => e.key == def)?.value;
   }
 }

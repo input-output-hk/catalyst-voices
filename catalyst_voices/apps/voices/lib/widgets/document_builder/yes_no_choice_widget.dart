@@ -6,7 +6,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class YesNoChoiceWidget extends StatefulWidget {
-  final DocumentProperty<bool> property;
+  final DocumentValueProperty<bool> property;
   final ValueChanged<DocumentChange> onChanged;
   final bool isEditMode;
   final bool isRequired;
@@ -94,7 +94,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
 
   void _notifyChangeListener(bool? value) {
     widget.onChanged(
-      DocumentChange(
+      DocumentValueChange(
         nodeId: widget.property.schema.nodeId,
         value: value,
       ),

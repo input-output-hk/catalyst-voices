@@ -4,7 +4,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_pr
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 enum _DocumentArrayDefinition {
-  segment('multiSelect'),
+  multiSelect('multiSelect'),
   singleLineTextEntryList('singleLineTextEntryList'),
   multiLineTextEntryListMarkdown('multiLineTextEntryListMarkdown'),
   singleLineHttpsURLEntryList('singleLineHttpsURLEntryList'),
@@ -46,7 +46,7 @@ final class DocumentListSchemaMapper {
     final definition = _DocumentArrayDefinition.fromDef(schema.definition());
 
     switch (definition) {
-      case _DocumentArrayDefinition.segment:
+      case _DocumentArrayDefinition.multiSelect:
         return DocumentMultiSelectSchema(
           nodeId: nodeId,
           title: title,
