@@ -23,6 +23,7 @@ class SessionStateHeader extends StatelessWidget {
               avatarLetter: account?.acronym ?? '',
               onLockAccountTap: () => _onLockAccount(context),
               onProfileKeychainTap: () => _onSeeProfile(context),
+              key: const Key('AccountPopupButton'),
             ),
         };
       },

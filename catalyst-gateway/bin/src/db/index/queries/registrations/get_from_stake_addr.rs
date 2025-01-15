@@ -24,10 +24,10 @@ pub(crate) struct GetRegistrationParams {
     pub stake_address: Vec<u8>,
 }
 
-impl From<&ed25519_dalek::VerifyingKey> for GetRegistrationParams {
-    fn from(value: &ed25519_dalek::VerifyingKey) -> Self {
+impl From<Vec<u8>> for GetRegistrationParams {
+    fn from(value: Vec<u8>) -> Self {
         GetRegistrationParams {
-            stake_address: value.as_bytes().to_vec(),
+            stake_address: value,
         }
     }
 }
