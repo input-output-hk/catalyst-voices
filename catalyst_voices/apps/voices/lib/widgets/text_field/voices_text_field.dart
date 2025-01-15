@@ -214,7 +214,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           resizableHorizontally: resizable,
           resizableVertically: resizable,
           minHeight: widget.maxLines == null ? 65 : 48,
-          maxLineSet: widget.maxLines == null,
+          iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,

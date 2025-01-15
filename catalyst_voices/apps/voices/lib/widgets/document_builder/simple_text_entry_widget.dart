@@ -25,6 +25,11 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
 
+  String get _description => widget.property.formattedDescription;
+  int? get _maxLength => widget.property.schema.strLengthRange?.max;
+  bool get _resizable =>
+      widget.property.schema.definition is MultiLineTextEntryDefinition;
+
   @override
   void initState() {
     super.initState();
@@ -56,11 +61,6 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
     super.dispose();
   }
 
-  String get _description => widget.property.formattedDescription;
-  int? get _maxLength => widget.property.schema.strLengthRange?.max;
-  bool get _resizable =>
-      widget.property.schema.definition is MultiLineTextEntryDefinition;
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -80,6 +80,8 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           onFieldSubmitted: _notifyChangeListener,
           validator: _validate,
           enabled: widget.isEditMode,
+          // TODO(ryszard-schossler): check if this is right after schema is finalized
+          hintText: widget.property.schema.defaultValue,
           resizable: _resizable,
           maxLength: _maxLength,
         ),
@@ -134,6 +136,7 @@ class _SimpleDocumentTextField extends StatelessWidget {
   final ValueChanged<String>? onFieldSubmitted;
   final VoicesTextFieldValidator? validator;
   final FocusNode? focusNode;
+  final String? hintText;
   final bool enabled;
   final bool resizable;
   final int? maxLength;
@@ -143,6 +146,7 @@ class _SimpleDocumentTextField extends StatelessWidget {
     this.onFieldSubmitted,
     this.validator,
     this.focusNode,
+    this.hintText,
     this.enabled = false,
     this.resizable = false,
     this.maxLength,
@@ -155,6 +159,9 @@ class _SimpleDocumentTextField extends StatelessWidget {
       focusNode: focusNode,
       onFieldSubmitted: onFieldSubmitted,
       validator: validator,
+      decoration: VoicesTextFieldDecoration(
+        hintText: hintText,
+      ),
       enabled: enabled,
       resizable: resizable,
       maxLengthEnforcement: MaxLengthEnforcement.none,
