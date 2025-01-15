@@ -94,10 +94,11 @@ void main() {
       ).build();
 
       final documentDto = DocumentDto.fromModel(document);
-      final answers = documentDto.toJson();
+      final documentData = documentDto.toJson();
 
       for (final segment in documentDto.segments) {
-        expect(answers.json[segment.schema.id], isA<Map<String, dynamic>>());
+        final actual = documentData.json[segment.schema.id];
+        expect(actual, isA<Map<String, dynamic>>());
       }
     });
 
