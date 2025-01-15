@@ -9,7 +9,7 @@ extension GuidanceExt on GuidanceType {
         GuidanceType.tips => localizations.tipsGuidanceType,
       };
 
-  // TODO(ryszard-schossler): when designers will
+  // TODO(LynxLynxx): when designers will
   // provide us with icon, change here accordingly
   SvgGenImage get icon {
     return switch (this) {

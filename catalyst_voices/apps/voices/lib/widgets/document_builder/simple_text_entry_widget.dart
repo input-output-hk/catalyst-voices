@@ -80,7 +80,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           onFieldSubmitted: _notifyChangeListener,
           validator: _validate,
           enabled: widget.isEditMode,
-          // TODO(ryszard-schossler): check if this is right after schema is finalized
+          // TODO(LynxLynxx): check if this is right after schema is finalized
           hintText: widget.property.schema.defaultValue,
           resizable: _resizable,
           maxLength: _maxLength,
