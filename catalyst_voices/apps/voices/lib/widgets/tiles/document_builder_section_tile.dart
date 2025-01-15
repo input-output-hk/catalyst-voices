@@ -276,6 +276,7 @@ class _PropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           isRequired: castProperty.schema.isRequired,
         );*/
+        // TODO(dtscalac): uncomment tiles when casting works.
         return Text('${definition.runtimeType} casting problem');
     }
   }
