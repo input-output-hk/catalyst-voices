@@ -6,7 +6,9 @@ import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
 /* cSpell:disable */
-void main() {
+Future<void> main() async {
+  await CatalystKeyDerivation.init();
+
   const txBuilderConfig = TransactionBuilderConfig(
     feeAlgo: TieredFee(
       constant: 155381,

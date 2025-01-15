@@ -3,21 +3,25 @@ VERSION 0.8
 package-schemathesis:
     FROM python:3.12-alpine3.20
     # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
-    RUN apk add --no-cache gcc musl-dev
-    RUN python -m pip install schemathesis==3.27.1
-    RUN mkdir /results
-    COPY ./hooks/hooks.py .
-    VOLUME /results
     ARG openapi_spec
     # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG seed
-    ENTRYPOINT st run --endpoint '^/api/v1/health' $openapi_spec \
+    ARG version=3.39.5
+
+    RUN apk add --no-cache gcc musl-dev
+    RUN python -m pip install schemathesis==$version
+    RUN mkdir /results
+    COPY ./hooks/hooks.py .
+    VOLUME /results
+    ENTRYPOINT st run --include-path-regex '^/api/v1/health/' \
+                    --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
+                    $openapi_spec \
                     --workers=2 \
-                    --wait-for-schema=120 \
+                    --wait-for-schema=500 \
                     --max-response-time=5000 \
                     --hypothesis-max-examples=1000 \
                     --data-generation-method=all \
-                    --skip-deprecated-operations \
+                    --exclude-deprecated \
                     --force-schema-version=30 \
                     --show-trace \
                     --force-color  \
@@ -31,7 +35,7 @@ package-schemathesis:
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
 test-fuzzer-api:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
+    RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
     LET OPENAPI_SPEC="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG seed
@@ -45,11 +49,15 @@ test-fuzzer-api:
         --service cat-gateway \
         --allow-privileged
 
-        RUN docker run --net=host --name=st schemathesis:latest && \
+        RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
         SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+    END
+    IF [ -f fail ]
+        RUN --no-cache echo "Schemathesis test failed. Check the logs for more details" && \
+            exit 1
     END

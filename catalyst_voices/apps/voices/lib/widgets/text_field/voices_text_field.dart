@@ -83,6 +83,9 @@ class VoicesTextField extends StatefulWidget {
   /// [AutovalidateMode]
   final AutovalidateMode? autovalidateMode;
 
+  /// [MaxLengthEnforcement]
+  final MaxLengthEnforcement? maxLengthEnforcement;
+
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
 
   const VoicesTextField({
@@ -113,6 +116,7 @@ class VoicesTextField extends StatefulWidget {
     this.onSaved,
     this.inputFormatters,
     this.autovalidateMode,
+    this.maxLengthEnforcement,
     this.onStatusChanged,
   });
 
@@ -209,6 +213,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         ResizableBoxParent(
           resizableHorizontally: resizable,
           resizableVertically: resizable,
+          minHeight: widget.maxLines == null ? 65 : 48,
+          iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
@@ -229,6 +235,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             maxLines: widget.maxLines,
             minLines: widget.minLines,
             maxLength: widget.maxLength,
+            maxLengthEnforcement: widget.maxLengthEnforcement,
             readOnly: widget.readOnly,
             ignorePointers: widget.ignorePointers,
             enabled: widget.enabled,
@@ -343,8 +350,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         return textStyle;
       }),
 
-      suffixIcon: _wrapIconIfExists(
-        widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+      suffixIcon: _wrapSuffixIfExists(
+        widget.decoration?.suffixIcon,
         const EdgeInsetsDirectional.only(start: 4, end: 8),
       ),
       suffixText: widget.decoration?.suffixText,
@@ -421,6 +428,36 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           heightFactor: 1,
           child: child,
         ),
+      ),
+    );
+  }
+
+  Widget? _wrapSuffixIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    final statusSuffixWidget = _getStatusSuffixWidget();
+    if (child == null) return statusSuffixWidget;
+
+    return Padding(
+      padding: padding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconTheme(
+            data: IconThemeData(
+              size: 24,
+              color: Theme.of(context).colors.iconsForeground,
+            ),
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: child,
+            ),
+          ),
+          if (statusSuffixWidget != null) ...[
+            const SizedBox(width: 2),
+            statusSuffixWidget,
+          ],
+        ],
       ),
     );
   }
