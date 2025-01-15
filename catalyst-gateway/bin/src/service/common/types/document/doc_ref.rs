@@ -1,6 +1,7 @@
 //! Signed Document Reference
 //!
-//! A Reference is used by the `ref` metadata, and any other reference to another document.
+//! A Reference is used by the `ref` metadata, and any other reference to another
+//! document.
 
 use poem_openapi::{types::Example, NewType, Object, Union};
 
@@ -16,7 +17,8 @@ pub(crate) struct IdRefOnly {
     id: EqOrRangedId,
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType, Debug, PartialEq)]
 #[oai(from_multipart = false, from_parameter = false, to_header = false)]
 /// Document ID Reference
@@ -46,7 +48,8 @@ impl Example for VerRefWithOptionalId {
     }
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType, Debug, PartialEq)]
 #[oai(
     from_multipart = false,
@@ -86,7 +89,8 @@ impl Example for IdAndVerRefInner {
     }
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType, Debug, PartialEq)]
 #[oai(
     from_multipart = false,

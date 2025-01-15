@@ -15,9 +15,8 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
-use crate::service::common::types::{generic, string_types::impl_string_types};
-
 use self::generic::uuidv4;
+use crate::service::common::types::{generic, string_types::impl_string_types};
 
 /// Title.
 const TITLE: &str = "Signed Document Type";
@@ -38,19 +37,21 @@ pub(crate) const PATTERN: &str = uuidv4::PATTERN;
 pub(crate) const FORMAT: &str = uuidv4::FORMAT;
 
 /// Schema
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
-    title: Some(TITLE.to_owned()),
-    description: Some(DESCRIPTION),
-    example: Some(Value::String(EXAMPLE.to_string())),
-    max_length: Some(ENCODED_LENGTH),
-    min_length: Some(ENCODED_LENGTH),
-    pattern: Some(PATTERN.to_string()),
-    external_docs: Some(MetaExternalDocument {
-        url: URI.to_owned(),
-        description: Some(URI_DESCRIPTION.to_owned()),
-    }),
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
+    MetaSchema {
+        title: Some(TITLE.to_owned()),
+        description: Some(DESCRIPTION),
+        example: Some(Value::String(EXAMPLE.to_string())),
+        max_length: Some(ENCODED_LENGTH),
+        min_length: Some(ENCODED_LENGTH),
+        pattern: Some(PATTERN.to_string()),
+        external_docs: Some(MetaExternalDocument {
+            url: URI.to_owned(),
+            description: Some(URI_DESCRIPTION.to_owned()),
+        }),
 
-    ..poem_openapi::registry::MetaSchema::ANY
+        ..poem_openapi::registry::MetaSchema::ANY
+    }
 });
 
 /// Because ALL the constraints are defined above, we do not ever need to define them in

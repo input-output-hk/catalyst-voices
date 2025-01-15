@@ -41,8 +41,8 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// ## Document Reference
     ///
     /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
-    /// to another signed document.  This fields can match any reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+    /// to another signed document.  This fields can match any reference that matches the
+    /// defined [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     /// and/or
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     ///
@@ -54,14 +54,15 @@ pub(crate) struct DocumentIndexQueryFilter {
     ///
     /// Documents that are created based on a template include the
     /// [template reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#template-template-reference)
-    /// to another signed document.  This fields can match any template reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+    /// to another signed document.  This fields can match any template reference that
+    /// matches the defined [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     /// and/or
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     ///
     /// The kind of document that the reference refers to is defined by the
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
-    /// however, it will always be a template type document that matches the document itself.
+    /// however, it will always be a template type document that matches the document
+    /// itself.
     #[oai(skip_serializing_if_is_none)]
     template: Option<IdAndVerRef>,
     /// ## Document Reply
@@ -135,7 +136,8 @@ impl Example for DocumentIndexQueryFilter {
     }
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType)]
 #[oai(from_multipart = false, from_parameter = false, to_header = false)]
 /// Document Index Query Filter
@@ -143,7 +145,7 @@ impl Example for DocumentIndexQueryFilter {
 /// A Query Filter which causes documents whose metadata matches the provided
 /// fields to be returned in the index list response.
 ///
-/// Fields which are not set, are not used to filter documents based on those metadata fields.
-/// This is equivalent to returning documents where those metadata fields either do not exist,
-/// or do exist, but have any value.
+/// Fields which are not set, are not used to filter documents based on those metadata
+/// fields. This is equivalent to returning documents where those metadata fields either
+/// do not exist, or do exist, but have any value.
 pub(crate) struct DocumentIndexQueryFilterBody(pub(crate) DocumentIndexQueryFilter);

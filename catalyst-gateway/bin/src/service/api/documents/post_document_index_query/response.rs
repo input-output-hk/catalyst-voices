@@ -1,11 +1,10 @@
 //! Cip36 Registration Query Endpoint Response
 use poem_openapi::{types::Example, NewType, Object};
 
-use crate::service::common;
-
 use self::common::types::document::{
     doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
 };
+use crate::service::common;
 
 /// A single page of documents.
 ///
@@ -32,7 +31,8 @@ impl Example for DocumentIndexList {
     }
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType)]
 #[oai(
     from_multipart = false,
@@ -77,7 +77,8 @@ impl Example for IndexedDocument {
     }
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType)]
 #[oai(
     from_multipart = false,
@@ -141,7 +142,8 @@ impl Example for IndexedDocumentVersion {
     }
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType)]
 #[oai(
     from_multipart = false,
@@ -153,10 +155,10 @@ impl Example for IndexedDocumentVersion {
 ///
 /// A Matching version of the document.
 ///
-/// Metadata fields which are not set in the document, are not included in the version information.
-/// used to filter documents based on those metadata fields.
-/// This is equivalent to returning documents where those metadata fields either do not exist,
-/// or do exist, but have any value.
+/// Metadata fields which are not set in the document, are not included in the version
+/// information. used to filter documents based on those metadata fields.
+/// This is equivalent to returning documents where those metadata fields either do not
+/// exist, or do exist, but have any value.
 pub(crate) struct IndexedDocumentVersionDocumented(pub(crate) IndexedDocumentVersion);
 
 impl Example for IndexedDocumentVersionDocumented {

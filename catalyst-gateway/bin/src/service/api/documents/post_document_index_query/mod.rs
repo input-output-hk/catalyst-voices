@@ -4,9 +4,8 @@ use poem_openapi::{payload::Json, ApiResponse, Object};
 use query_filter::DocumentIndexQueryFilter;
 use response::DocumentIndexListDocumented;
 
-use crate::service::common::responses::WithErrorResponses;
-
 use super::common;
+use crate::service::common::responses::WithErrorResponses;
 
 pub(crate) mod query_filter;
 pub(crate) mod response;

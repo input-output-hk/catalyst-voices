@@ -9,17 +9,15 @@ use std::{
 };
 
 use anyhow::bail;
-use poem_openapi::Union;
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    NewType, Object, Union,
 };
-use poem_openapi::{NewType, Object};
 use serde_json::Value;
 
-use crate::service::common::types::{generic, string_types::impl_string_types};
-
 use self::generic::uuidv7;
+use crate::service::common::types::{generic, string_types::impl_string_types};
 
 /// Title.
 const TITLE: &str = "Signed Document Version";
@@ -46,19 +44,21 @@ pub(crate) const PATTERN: &str = uuidv7::PATTERN;
 pub(crate) const FORMAT: &str = uuidv7::FORMAT;
 
 /// Schema
-static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
-    title: Some(TITLE.to_owned()),
-    description: Some(DESCRIPTION),
-    example: Some(Value::String(EXAMPLE.to_string())),
-    max_length: Some(ENCODED_LENGTH),
-    min_length: Some(ENCODED_LENGTH),
-    pattern: Some(PATTERN.to_string()),
-    external_docs: Some(MetaExternalDocument {
-        url: URI.to_owned(),
-        description: Some(URI_DESCRIPTION.to_owned()),
-    }),
+static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
+    MetaSchema {
+        title: Some(TITLE.to_owned()),
+        description: Some(DESCRIPTION),
+        example: Some(Value::String(EXAMPLE.to_string())),
+        max_length: Some(ENCODED_LENGTH),
+        min_length: Some(ENCODED_LENGTH),
+        pattern: Some(PATTERN.to_string()),
+        external_docs: Some(MetaExternalDocument {
+            url: URI.to_owned(),
+            description: Some(URI_DESCRIPTION.to_owned()),
+        }),
 
-    ..poem_openapi::registry::MetaSchema::ANY
+        ..poem_openapi::registry::MetaSchema::ANY
+    }
 });
 
 /// Because ALL the constraints are defined above, we do not ever need to define them in
@@ -127,7 +127,8 @@ impl Example for VerRangeInner {
     }
 }
 
-// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the openapi docs on an object.
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
 #[derive(NewType, Debug, PartialEq)]
 #[oai(
     from_multipart = false,

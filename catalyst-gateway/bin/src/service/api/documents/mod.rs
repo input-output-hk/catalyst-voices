@@ -78,10 +78,12 @@ impl DocumentApi {
         match document.0.into_bytes_limit(MAXIMUM_DOCUMENT_SIZE).await {
             Ok(document) => put_document::endpoint(document).await,
             Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
-            Err(_err) => put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(
-                "Failed to read document from the request",
-            )))
-            .into(),
+            Err(_err) => {
+                put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                    "Failed to read document from the request",
+                )))
+                .into()
+            },
         }
     }
 
