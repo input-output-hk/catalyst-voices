@@ -376,6 +376,7 @@ class _PropertyValueBuilder extends StatelessWidget {
         final castProperty = schema.castProperty(property);
         return SimpleTextEntryWidget(
           property: castProperty,
+          schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
@@ -383,6 +384,7 @@ class _PropertyValueBuilder extends StatelessWidget {
         final castProperty = schema.castProperty(property);
         return SimpleTextEntryWidget(
           property: castProperty,
+          schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
