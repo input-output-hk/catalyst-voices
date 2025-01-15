@@ -1,20 +1,14 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
+use bad_put_request::PutDocumentBadRequest;
 use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody},
-    service::common::{
-        objects::document::bad_put_request::PutDocumentBadRequest, responses::WithErrorResponses,
-    },
+    service::common::responses::WithErrorResponses,
 };
-use bad_put_request::PutDocumentBadRequest;
-use bytes::Bytes;
-use poem_openapi::{payload::Json, ApiResponse};
-
-use crate::service::common::responses::WithErrorResponses;
 
 pub(crate) mod bad_put_request;
 
@@ -102,6 +96,6 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(e) => Responses::BadRequest(Json(PutDocumentBadRequest::new(e.to_string()))).into(),
+        Err(e) => Responses::BadRequest(Json(PutDocumentBadRequest::new(format!("{e:?}")))).into(),
     }
 }

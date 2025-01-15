@@ -15,7 +15,7 @@ pub(crate) enum Responses {
     ///
     /// The Document that was requested.
     #[oai(status = 200)]
-    Ok(Cbor<Body>),
+    Ok(Cbor),
     /// ## Not Found
     ///
     /// The document could not be found.
