@@ -715,6 +715,50 @@ void main() async {
           );
         },
       );
+
+      patrolWidgetTest(
+        'visitor - restore - keychain choice screen looks OK',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await $(AppBarPage.getStartedBtn)
+              .tap(settleTimeout: const Duration(seconds: 10));
+          await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
+          await OnboardingPage.onboardingScreenLooksAsExpected(
+            $,
+            RegistrationState.keychainRestoreChoice,
+          );
+        },
+      );
+
+      patrolWidgetTest(
+        'visitor - restore - keychain choice screen back button works',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await $(AppBarPage.getStartedBtn)
+              .tap(settleTimeout: const Duration(seconds: 10));
+          await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
+          await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
+          await OnboardingPage.onboardingScreenLooksAsExpected(
+            $,
+            RegistrationState.getStarted,
+          );
+        },
+      );
+    },
+    skip: true,
+  );
+
+  patrolWidgetTest(
+    'visitor - restore - keychain choice screen looks OK',
+    (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn)
+          .tap(settleTimeout: const Duration(seconds: 10));
+      await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
+      await OnboardingPage.onboardingScreenLooksAsExpected(
+        $,
+        RegistrationState.keychainRestoreChoice,
+      );
     },
   );
 }

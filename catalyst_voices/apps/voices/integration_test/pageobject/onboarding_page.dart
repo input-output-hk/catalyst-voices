@@ -46,6 +46,14 @@ class OnboardingPage {
   static const chooseCardanoWalletButton = Key('ChooseCardanoWalletButton');
   static const seeAllSupportedWalletsBtn = Key('SeeAllSupportedWalletsButton');
   static const walletsLinkBuilder = Key('WalletsLinkBuilder');
+  static const recoverKeychainMethodsTitle = Key('RecoverKeychainMethodsTitle');
+  static const keychainNotFoundIndicator = Key('KeychainNotFoundIndicator');
+  static const onDeviceKeychainsWidget = Key('BlocOnDeviceKeychains');
+  static const recoverKeychainMethodsSubtitle =
+      Key('RecoverKeychainMethodsSubtitle');
+  static const recoverKeychainMethodsListTitle =
+      Key('RecoverKeychainMethodsListTitle');
+  static const registrationTileTitle = Key('RegistrationTileTitle');
 
   static Future<int> writedownSeedPhraseNumber(
     PatrolTester $,
@@ -290,7 +298,16 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainRestoreChoice:
-        throw UnimplementedError();
+        expect(
+          await infoPartHeaderTitleText($),
+          T.get('Restore Catalyst keychain'),
+        );
+        expect(infoPartTaskPicture($), findsOneWidget);
+        expect(
+          $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+          T.get('Learn More'),
+        );
+        break;
       case RegistrationState.keychainRestoreMnemonicInfo:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInput:
@@ -494,7 +511,28 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainRestoreChoice:
-        throw UnimplementedError();
+        expect(
+          $(recoverKeychainMethodsTitle).text,
+          T.get('Restore your Catalyst Keychain'),
+        );
+        expect(
+          $(onDeviceKeychainsWidget).$(keychainNotFoundIndicator).$(Text).text,
+          T.get('No Catalyst Keychain found on this device.'),
+        );
+        expect(
+          $(recoverKeychainMethodsSubtitle).text,
+          T.get('Not to worry, in the next step you can choose the recovery '
+              'option that applies to you for this device!'),
+        );
+        expect(
+          $(recoverKeychainMethodsListTitle).text,
+          T.get('How do you want Restore your Catalyst Keychain?'),
+        );
+        expect(
+          $(registrationTileTitle).text,
+          T.get('12 security words'),
+        );
+        break;
       case RegistrationState.keychainRestoreMnemonicInfo:
         throw UnimplementedError();
       case RegistrationState.keychainRestoreMnemonicInput:
