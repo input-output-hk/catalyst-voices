@@ -3,11 +3,14 @@
     "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
-    "version": "1.0.0",
-    "lastUpdated": "2025-01-14",
-    "maintainers": ["Cardano Foundation"],
-    "changelog": {
-        "1.0.0": "Initial version"
+    "maintainers": [{ "name": "Catalyst Team", "url": "https://cardano.org" }],
+    "x-changelog": {
+        "2025-01-14":
+        [
+            "Updated schema to include new fields for proposal details.",
+            "Fixed validation issues with the URL pattern.",
+            "Improved documentation for open source requirements."
+        ]
     },
     "definitions": {
         "schemaReferenceNonUI": {
