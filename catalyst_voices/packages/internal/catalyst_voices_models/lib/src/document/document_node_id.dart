@@ -29,6 +29,8 @@ final class DocumentNodeId extends NodeId {
           paths: paths,
         );
 
+  String get lastPath => paths.isNotEmpty ? paths.last : '';
+
   /// Returns a parent node.
   ///
   /// For [root] node it returns [root] node as it doesn't have any parent.

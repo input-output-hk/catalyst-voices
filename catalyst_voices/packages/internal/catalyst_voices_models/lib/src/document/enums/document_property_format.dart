@@ -24,7 +24,7 @@ enum DocumentPropertyFormat {
 
   const DocumentPropertyFormat(this.value);
 
-  static DocumentPropertyFormat fromString(String value) {
+  factory DocumentPropertyFormat.fromString(String value) {
     final lowerCase = value.toLowerCase();
 
     return DocumentPropertyFormat.values

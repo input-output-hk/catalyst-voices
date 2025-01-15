@@ -22,8 +22,8 @@ dependencies:
     sdk: flutter
   json_annotation: ^4.9.0
   meta: ^1.10.0
-  uuid: ^4.5.1
   password_strength: ^0.2.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   build_runner: ^2.4.12

@@ -3,37 +3,46 @@ import 'package:catalyst_voices_repositories/src/dto/document/defined_property_d
 import 'package:catalyst_voices_repositories/src/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-extension DocumentDefinitionConverterExt<T extends Object>
-    on BaseDocumentDefinition<T> {
+extension DocumentPropertySchemaConverterExt<T extends Object>
+    on DocumentPropertySchema {
   JsonConverter<T?, Object?> get converter {
     switch (this) {
-      case SingleLineTextEntryDefinition():
-      case SingleLineHttpsURLEntryDefinition():
-      case MultiLineTextEntryDefinition():
-      case MultiLineTextEntryMarkdownDefinition():
-      case DropDownSingleSelectDefinition():
-      case NestedQuestionsDefinition():
-      case TagGroupDefinition():
-      case TagSelectionDefinition():
-      case TokenValueCardanoADADefinition():
-      case DurationInMonthsDefinition():
-      case YesNoChoiceDefinition():
-      case AgreementConfirmationDefinition():
-      case SPDXLicenceOrUrlDefinition():
-      case LanguageCodeDefinition():
-      case SegmentDefinition():
-      case SectionDefinition():
-        return NoopConverter<T>();
-      case SingleGroupedTagSelectorDefinition():
+      case DocumentNestedQuestionsListSchema():
+        return const ListOfJsonConverter() as JsonConverter<T?, Object?>;
+
+      case DocumentMultiSelectSchema():
+      case DocumentSingleLineTextEntryListSchema():
+      case DocumentMultiLineTextEntryListMarkdownSchema():
+      case DocumentSingleLineHttpsUrlEntryListSchema():
+        return const ListStringConverter() as JsonConverter<T?, Object?>;
+
+      case DocumentSingleGroupedTagSelectorSchema():
         return const GroupedTagsSelectionConverter()
             as JsonConverter<T?, Object?>;
-      case MultiSelectDefinition():
-      case SingleLineTextEntryListDefinition():
-      case MultiLineTextEntryListMarkdownDefinition():
-      case SingleLineHttpsURLEntryListDefinition():
-        return const ListStringConverter() as JsonConverter<T?, Object?>;
-      case NestedQuestionsListDefinition():
-        return const ListOfJsonConverter() as JsonConverter<T?, Object?>;
+
+      case DocumentGenericListSchema():
+      case DocumentSegmentSchema():
+      case DocumentSectionSchema():
+      case DocumentNestedQuestionsSchema():
+      case DocumentGenericObjectSchema():
+      case DocumentSingleLineTextEntrySchema():
+      case DocumentSingleLineHttpsUrlEntrySchema():
+      case DocumentMultiLineTextEntrySchema():
+      case DocumentMultiLineTextEntryMarkdownSchema():
+      case DocumentDropDownSingleSelectSchema():
+      case DocumentTagGroupSchema():
+      case DocumentTagSelectionSchema():
+      case DocumentSpdxLicenseOrUrlSchema():
+      case DocumentLanguageCodeSchema():
+      case DocumentGenericStringSchema():
+      case DocumentTokenValueCardanoAdaSchema():
+      case DocumentDurationInMonthsSchema():
+      case DocumentGenericIntegerSchema():
+      case DocumentGenericNumberSchema():
+      case DocumentYesNoChoiceSchema():
+      case DocumentAgreementConfirmationSchema():
+      case DocumentGenericBooleanSchema():
+        return NoopConverter<T>();
     }
   }
 }

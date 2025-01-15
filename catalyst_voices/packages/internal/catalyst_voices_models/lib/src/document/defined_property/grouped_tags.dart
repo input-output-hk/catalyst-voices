@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class GroupedTagsSelection extends Equatable {
@@ -52,9 +53,6 @@ final class GroupedTags extends Equatable {
     required this.tags,
   });
 
-  // Note. this method may be converted to factory function for
-  // SingleGroupedTagSelector which extends DocumentProperty.
-  // SingleGroupedTagSelector could easily implement validation.
   static List<GroupedTags> fromLogicalGroups(
     List<DocumentSchemaLogicalGroup> groups, {
     Logger? logger,
@@ -66,20 +64,22 @@ final class GroupedTags extends Equatable {
         return false;
       }
 
-      final group = conditions[0];
-      final selection = conditions[1];
+      final group = conditions
+          .firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema);
+      final selection = conditions
+          .firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema);
 
-      if (group.definition is! TagGroupDefinition) {
+      if (group == null) {
         logger?.warning('Group[$group] definition is not group');
         return false;
       }
 
-      if (group.value is! String) {
+      if (group.constValue is! String) {
         logger?.warning('Group[$group] does not have String value');
         return false;
       }
 
-      if (selection.definition is! TagSelectionDefinition) {
+      if (selection == null) {
         logger?.warning('Group[$selection] definition is not selection');
         return false;
       }
@@ -92,10 +92,13 @@ final class GroupedTags extends Equatable {
       return true;
     }).map(
       (e) {
-        final group = e.conditions[0].value! as String;
-        final values = e.conditions[1].enumValues!;
+        final group = e.conditions[0].constValue! as String;
+        final values = e.conditions[1].enumValues!.cast<String>();
 
-        return GroupedTags(group: group, tags: values);
+        return GroupedTags(
+          group: group,
+          tags: values,
+        );
       },
     ).toList();
   }

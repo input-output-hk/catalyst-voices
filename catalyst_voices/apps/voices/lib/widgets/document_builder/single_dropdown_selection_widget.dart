@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class SingleDropdownSelectionWidget extends StatefulWidget {
   final String value;
   final List<String> items;
-  final DropDownSingleSelectDefinition definition;
+  final DocumentDropDownSingleSelectSchema schema;
   final DocumentNodeId nodeId;
   final String title;
   final bool isEditMode;
@@ -16,7 +16,7 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
     super.key,
     required this.value,
     required this.items,
-    required this.definition,
+    required this.schema,
     required this.nodeId,
     required this.title,
     required this.isEditMode,

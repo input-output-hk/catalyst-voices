@@ -4,14 +4,14 @@ import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-/// Validates [DocumentPropertyValue].
+/// Validates [DocumentValueProperty].
 final class DocumentValidator {
   /// Validates the property [value] against all common rules that
   /// apply to all properties.
   ///
   /// There are no specific checks for different types like [String] or [int].
   static DocumentValidationResult validateBasic(
-    DocumentPropertySchema<Object> schema,
+    DocumentPropertySchema schema,
     Object? value,
   ) {
     // TODO(dtscalac): validate type
@@ -23,7 +23,7 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateString(
-    DocumentPropertySchema<String> schema,
+    DocumentStringSchema schema,
     String? value,
   ) {
     final result = validateBasic(schema, value);
@@ -45,9 +45,32 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateNum(
-    DocumentPropertySchema<num> schema,
-    num? value,
+  static DocumentValidationResult validateInteger(
+    DocumentIntegerSchema schema,
+    int? value,
+  ) {
+    final result = validateBasic(schema, value);
+    if (result.isInvalid) {
+      return result;
+    }
+
+    final numRange = schema.numRange;
+    if (numRange != null && value != null) {
+      if (!numRange.contains(value)) {
+        return DocumentNumOutOfRange(
+          invalidNodeId: schema.nodeId,
+          expectedRange: numRange,
+          actualValue: value,
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateNumber(
+    DocumentNumberSchema schema,
+    double? value,
   ) {
     final result = validateBasic(schema, value);
     if (result.isInvalid) {
@@ -69,7 +92,7 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateList(
-    DocumentPropertySchema<List<dynamic>> schema,
+    DocumentListSchema schema,
     List<dynamic>? value,
   ) {
     final result = validateBasic(schema, value);
@@ -92,7 +115,7 @@ final class DocumentValidator {
   }
 
   static DocumentValidationResult validateBool(
-    DocumentPropertySchema<bool> schema,
+    DocumentBooleanSchema schema,
     // ignore: avoid_positional_boolean_parameters
     bool? value,
   ) {
@@ -132,7 +155,7 @@ final class MissingRequiredDocumentValue extends DocumentValidationResult {
 /// The numerical [actualValue] is not within [expectedRange].
 final class DocumentNumOutOfRange extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final Range<int> expectedRange;
+  final Range<num> expectedRange;
   final num actualValue;
 
   const DocumentNumOutOfRange({

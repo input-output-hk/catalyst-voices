@@ -5,21 +5,17 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class AgreementConfirmationWidget extends StatefulWidget {
+  final DocumentAgreementConfirmationSchema schema;
   final bool? value;
-  final AgreementConfirmationDefinition definition;
   final DocumentNodeId nodeId;
-  final String description;
-  final String title;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
 
   const AgreementConfirmationWidget({
     super.key,
     required this.value,
-    required this.definition,
+    required this.schema,
     required this.nodeId,
-    required this.description,
-    required this.title,
     required this.isEditMode,
     required this.onChanged,
   });
@@ -36,9 +32,10 @@ class _DocumentCheckboxBuilderWidgetState
 
   DocumentNodeId get _nodeId => widget.nodeId;
 
-  MarkdownData get _description => MarkdownData(widget.description);
+  MarkdownData get _description =>
+      MarkdownData(widget.schema.description ?? '');
 
-  bool get _defaultValue => widget.definition.defaultValue;
+  bool get _defaultValue => widget.schema.defaultValue ?? false;
 
   @override
   void initState() {

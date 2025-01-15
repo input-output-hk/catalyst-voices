@@ -1,16 +1,16 @@
-enum DocumentPropertyType {
-  array,
-  object,
-  string,
-  integer,
-  number,
-  boolean;
+import 'package:json_annotation/json_annotation.dart';
 
-  static DocumentPropertyType fromString(String value) {
-    final type = DocumentPropertyType.values.asNameMap()[value.toLowerCase()];
-    if (type == null) {
-      throw ArgumentError('Unsupported property type: $value');
-    }
-    return type;
-  }
+enum DocumentPropertyType {
+  @JsonValue('array')
+  list,
+  @JsonValue('object')
+  object,
+  @JsonValue('string')
+  string,
+  @JsonValue('integer')
+  integer,
+  @JsonValue('number')
+  number,
+  @JsonValue('boolean')
+  boolean,
 }

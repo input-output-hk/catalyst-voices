@@ -17,8 +17,14 @@ final class DocumentPropertiesDto {
     for (final path in nodeId.paths) {
       if (object is Map<String, dynamic>) {
         object = object[path];
+      } else if (object is List) {
+        final index = int.tryParse(path);
+        if (index == null) {
+          // index can't be anything else than a number
+          return null;
+        }
+        object = object[index];
       } else {
-        // invalid path
         return null;
       }
     }

@@ -40,9 +40,9 @@ final class DocumentValueChange extends DocumentChange {
   List<Object?> get props => [nodeId, value];
 }
 
-/// Describes an intent to add a new (empty) item in a [DocumentPropertyList].
+/// Describes an intent to add a new (empty) item in a [DocumentListProperty].
 final class DocumentAddListItemChange extends DocumentChange {
-  /// The [DocumentNodeId] of the [DocumentPropertyList]
+  /// The [DocumentNodeId] of the [DocumentListProperty]
   /// where the new item will be added.
   @override
   final DocumentNodeId nodeId;
@@ -56,9 +56,9 @@ final class DocumentAddListItemChange extends DocumentChange {
   List<Object?> get props => [nodeId];
 }
 
-/// Describes an intent to remove an item from the [DocumentPropertyList].
+/// Describes an intent to remove an item from the [DocumentListProperty].
 final class DocumentRemoveListItemChange extends DocumentChange {
-  /// The [DocumentNodeId] of the child in [DocumentPropertyList]
+  /// The [DocumentNodeId] of the child in [DocumentListProperty]
   /// which is going to be removed.
   @override
   final DocumentNodeId nodeId;
