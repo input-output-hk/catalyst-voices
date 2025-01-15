@@ -15,20 +15,25 @@ pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(crate) enum Responses {
+    /// ## Created
+    ///
     /// The Document was stored OK for the first time.
     #[oai(status = 201)]
     Created,
+    /// ## No Content
+    ///
     /// The Document was already stored, and has not changed.
     #[oai(status = 204)]
     NoContent,
-    /// Error Response
+    /// ## Bad Request
     ///
-    /// The document submitted is invalid.
+    /// Error Response. The document submitted is invalid.
     #[oai(status = 400)]
     BadRequest(Json<PutDocumentBadRequest>),
-    /// Payload Too Large
+    /// ## Content Too Large
     ///
-    /// The document exceeds the maximum size of a legitimate single document.
+    /// Payload Too Large. The document exceeds the maximum size of a legitimate single
+    /// document.
     #[oai(status = 413)]
     PayloadTooLarge,
 }

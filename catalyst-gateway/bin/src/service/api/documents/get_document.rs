@@ -9,9 +9,13 @@ use crate::service::common::{responses::WithErrorResponses, types::payload::cbor
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(crate) enum Responses {
+    /// ## OK
+    ///
     /// The Document that was requested.
     #[oai(status = 200)]
     Ok(Cbor<Body>),
+    /// ## Not Found
+    ///
     /// The document could not be found.
     #[oai(status = 404)]
     NotFound,
