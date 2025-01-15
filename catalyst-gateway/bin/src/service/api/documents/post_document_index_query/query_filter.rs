@@ -5,8 +5,9 @@
 
 use poem_openapi::{types::Example, NewType, Object};
 
+use super::common::types::document::ver::EqOrRangedVerDocumented;
 use crate::service::common::types::document::{
-    doc_ref::IdAndVerRef, doc_type::DocumentType, id::EqOrRangedId, ver::EqOrRangedVer,
+    doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
 };
 
 /// Query Filter for the generation of a signed document index.
@@ -31,13 +32,13 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Either an absolute single Document ID or a range of
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     #[oai(skip_serializing_if_is_none)]
-    id: Option<EqOrRangedId>,
+    id: Option<EqOrRangedIdDocumented>,
     /// ## Document Version
     ///
     /// Either an absolute single Document Version or a range of
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     #[oai(skip_serializing_if_is_none)]
-    ver: Option<EqOrRangedVer>,
+    ver: Option<EqOrRangedVerDocumented>,
     /// ## Document Reference
     ///
     /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
@@ -49,7 +50,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// The kind of document that the reference refers to is defined by the
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
     #[oai(rename = "ref", skip_serializing_if_is_none)]
-    doc_ref: Option<IdAndVerRef>,
+    doc_ref: Option<IdAndVerRefDocumented>,
     /// ## Document Template
     ///
     /// Documents that are created based on a template include the
@@ -64,7 +65,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// however, it will always be a template type document that matches the document
     /// itself.
     #[oai(skip_serializing_if_is_none)]
-    template: Option<IdAndVerRef>,
+    template: Option<IdAndVerRefDocumented>,
     /// ## Document Reply
     ///
     /// This is a
@@ -79,7 +80,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// The kind of document that the reference refers to is defined by the
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    reply: Option<IdAndVerRef>,
+    reply: Option<IdAndVerRefDocumented>,
     /// ## Brand
     ///
     /// This is a
@@ -93,7 +94,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Whether a Document Type has a brand reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    brand: Option<IdAndVerRef>,
+    brand: Option<IdAndVerRefDocumented>,
     /// ## Campaign
     ///
     /// This is a
@@ -107,7 +108,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Whether a Document Type has a campaign reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    campaign: Option<IdAndVerRef>,
+    campaign: Option<IdAndVerRefDocumented>,
     /// ## Category
     ///
     /// This is a
@@ -121,16 +122,18 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Whether a Document Type has a category reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    category: Option<IdAndVerRef>,
+    category: Option<IdAndVerRefDocumented>,
 }
 
 impl Example for DocumentIndexQueryFilter {
     fn example() -> Self {
         Self {
             doc_type: Some(DocumentType::example()),
-            id: Some(EqOrRangedId::example()),
-            ver: Some(EqOrRangedVer::example()),
-            doc_ref: Some(IdAndVerRef::example()),
+            id: Some(EqOrRangedIdDocumented::example()),
+            ver: Some(EqOrRangedVerDocumented::example()),
+            doc_ref: Some(IdAndVerRefDocumented::example_id_ref()),
+            template: Some(IdAndVerRefDocumented::example_id_and_ver_ref()),
+            reply: Some(IdAndVerRefDocumented::example()),
             ..Default::default()
         }
     }

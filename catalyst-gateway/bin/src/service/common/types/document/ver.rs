@@ -29,7 +29,7 @@ UUIDv7 Formatted 128bit value.";
 const EXAMPLE: &str = "01944e87-e68c-7f22-9df1-816863cfa5ff";
 /// Example - Range min.
 const EXAMPLE_MAX: &str = "01944e87-e68c-7f22-9df1-000000000000";
-/// Example.
+/// Example - Ranged max
 const EXAMPLE_MIN: &str = "01944e87-e68c-7f22-9df1-ffffffffffff";
 /// External Documentation URI
 const URI: &str =
@@ -83,6 +83,18 @@ impl Example for DocumentVer {
     }
 }
 
+impl DocumentVer {
+    /// An example of a minimum Document ID when specifying ranges
+    fn example_min() -> Self {
+        Self(EXAMPLE_MIN.to_owned())
+    }
+
+    /// An example of a maximum Document ID when specifying ranges
+    fn example_max() -> Self {
+        Self(EXAMPLE_MAX.to_owned())
+    }
+}
+
 impl TryFrom<&str> for DocumentVer {
     type Error = anyhow::Error;
 
@@ -111,19 +123,58 @@ impl From<uuidv7::UUIDv7> for DocumentVer {
 #[derive(Object, Debug, PartialEq)]
 #[oai(example = true)]
 /// Version Range
-pub(crate) struct VerRangeInner {
+///
+/// A Range of document versions from minimum to maximum inclusive.
+pub(crate) struct VerRange {
     /// Minimum Document Version to find (inclusive)
     min: DocumentVer,
     /// Maximum Document Version to find (inclusive)
     max: DocumentVer,
 }
 
-impl Example for VerRangeInner {
+impl Example for VerRange {
     fn example() -> Self {
         Self {
-            min: DocumentVer(EXAMPLE_MIN.to_owned()),
-            max: DocumentVer(EXAMPLE_MAX.to_owned()),
+            min: DocumentVer::example_min(),
+            max: DocumentVer::example_max(),
         }
+    }
+}
+
+#[derive(Object, Debug, PartialEq)]
+#[oai(example = true)]
+/// A single Document IDs.
+pub(crate) struct VerEq {
+    /// The exact Document ID to match against.
+    eq: DocumentVer,
+}
+
+impl Example for VerEq {
+    fn example() -> Self {
+        Self {
+            eq: DocumentVer::example(),
+        }
+    }
+}
+
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
+#[derive(NewType, Debug, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// Version Equals
+///
+/// A specific single
+/// [Document Version](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver).
+pub(crate) struct VerEqDocumented(VerEq);
+
+impl Example for VerEqDocumented {
+    fn example() -> Self {
+        Self(VerEq::example())
     }
 }
 
@@ -139,11 +190,11 @@ impl Example for VerRangeInner {
 /// Version Range
 ///
 /// A range of [Document Versions]().
-pub(crate) struct VerRange(VerRangeInner);
+pub(crate) struct VerRangeDocumented(VerRange);
 
-impl Example for VerRange {
+impl Example for VerRangeDocumented {
     fn example() -> Self {
-        Self(VerRangeInner::example())
+        Self(VerRange::example())
     }
 }
 
@@ -152,16 +203,16 @@ impl Example for VerRange {
 /// Document or Range of Documents
 ///
 /// Either a Single Document Version, or a Range of Document Versions
-pub(crate) enum EqOrRangedVerInner {
+pub(crate) enum EqOrRangedVer {
     /// This exact Document ID
-    Eq(DocumentVer),
+    Eq(VerEqDocumented),
     /// Document Versions in this range
-    Range(VerRange),
+    Range(VerRangeDocumented),
 }
 
-impl Example for EqOrRangedVerInner {
+impl Example for EqOrRangedVer {
     fn example() -> Self {
-        Self::Range(VerRange::example())
+        Self::Range(VerRangeDocumented::example())
     }
 }
 
@@ -175,10 +226,10 @@ impl Example for EqOrRangedVerInner {
 /// Document Version Selector
 ///
 /// Either a absolute single Document Version or a range of Document Versions
-pub(crate) struct EqOrRangedVer(EqOrRangedVerInner);
+pub(crate) struct EqOrRangedVerDocumented(EqOrRangedVer);
 
-impl Example for EqOrRangedVer {
+impl Example for EqOrRangedVerDocumented {
     fn example() -> Self {
-        Self(EqOrRangedVerInner::example())
+        Self(EqOrRangedVer::example())
     }
 }

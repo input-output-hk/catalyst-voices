@@ -6,21 +6,35 @@
 use poem_openapi::{types::Example, NewType, Object, Union};
 
 use super::{
-    id::{DocumentId, EqOrRangedId},
-    ver::{DocumentVer, EqOrRangedVer},
+    id::{DocumentId, EqOrRangedIdDocumented},
+    ver::{DocumentVer, EqOrRangedVerDocumented},
 };
 
 #[derive(Object, Debug, PartialEq)]
+#[oai(example = true)]
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct IdRefOnly {
     /// Document ID, or range of Document IDs
-    id: EqOrRangedId,
+    id: EqOrRangedIdDocumented,
+}
+
+impl Example for IdRefOnly {
+    fn example() -> Self {
+        Self {
+            id: EqOrRangedIdDocumented::example(),
+        }
+    }
 }
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
 #[derive(NewType, Debug, PartialEq)]
-#[oai(from_multipart = false, from_parameter = false, to_header = false)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
 /// Document ID Reference
 ///
 /// A Reference to the Document ID Only.
@@ -29,21 +43,37 @@ pub(crate) struct IdRefOnly {
 /// The Document Version is not considered, and will match any version.
 pub(crate) struct IdRefOnlyDocumented(pub(crate) IdRefOnly);
 
+impl Example for IdRefOnlyDocumented {
+    fn example() -> Self {
+        Self(IdRefOnly::example())
+    }
+}
+
 #[derive(Object, Debug, PartialEq)]
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct VerRefWithOptionalId {
     /// Document ID, or range of Document IDs
     #[oai(skip_serializing_if_is_none)]
-    id: Option<EqOrRangedId>,
+    id: Option<EqOrRangedIdDocumented>,
     /// Document Version, or Range of Document Versions
-    ver: EqOrRangedVer,
+    ver: EqOrRangedVerDocumented,
 }
 
 impl Example for VerRefWithOptionalId {
     fn example() -> Self {
         Self {
             id: None,
-            ver: EqOrRangedVer::example(),
+            ver: EqOrRangedVerDocumented::example(),
+        }
+    }
+}
+
+impl VerRefWithOptionalId {
+    /// Returns an example of this type that includes both an `id` and `ver`
+    fn example_id_and_ver_ref() -> Self {
+        Self {
+            id: Some(EqOrRangedIdDocumented::example()),
+            ver: EqOrRangedVerDocumented::example(),
         }
     }
 }
@@ -73,19 +103,37 @@ impl Example for VerRefWithOptionalIdDocumented {
     }
 }
 
+impl VerRefWithOptionalIdDocumented {
+    /// Returns an example of this type that includes both an `id` and `ver`
+    fn example_id_and_ver_ref() -> Self {
+        Self(VerRefWithOptionalId::example_id_and_ver_ref())
+    }
+}
+
 #[derive(Union, Debug, PartialEq)]
-#[oai(one_of)]
 /// Either a Single Document ID, or a Range of Document IDs
-pub(crate) enum IdAndVerRefInner {
+pub(crate) enum IdAndVerRef {
     /// Document ID Reference ONLY
     IdRefOnly(IdRefOnlyDocumented),
     /// Version Reference with Optional Document ID Reference
     IdAndVerRef(VerRefWithOptionalIdDocumented),
 }
 
-impl Example for IdAndVerRefInner {
+impl Example for IdAndVerRef {
     fn example() -> Self {
         Self::IdAndVerRef(VerRefWithOptionalIdDocumented::example())
+    }
+}
+
+impl IdAndVerRef {
+    /// Returns an example of this type that only an `id`
+    fn example_id_ref() -> Self {
+        Self::IdRefOnly(IdRefOnlyDocumented::example())
+    }
+
+    /// Returns an example of this type that includes both an `id` and `ver`
+    fn example_id_and_ver_ref() -> Self {
+        Self::IdAndVerRef(VerRefWithOptionalIdDocumented::example_id_and_ver_ref())
     }
 }
 
@@ -105,11 +153,23 @@ impl Example for IdAndVerRefInner {
 /// to another Documents ID and/or Version.
 ///
 /// *Note: at least one of `id` or `ver` must be defined.*
-pub(crate) struct IdAndVerRef(pub(crate) IdAndVerRefInner);
+pub(crate) struct IdAndVerRefDocumented(pub(crate) IdAndVerRef);
 
-impl Example for IdAndVerRef {
+impl Example for IdAndVerRefDocumented {
     fn example() -> Self {
-        Self(IdAndVerRefInner::example())
+        Self(IdAndVerRef::example())
+    }
+}
+
+impl IdAndVerRefDocumented {
+    /// Returns an example of this type that includes only an `id`
+    pub(crate) fn example_id_ref() -> Self {
+        Self(IdAndVerRef::example_id_ref())
+    }
+
+    /// Returns an example of this type that includes both an `id` and `ver`
+    pub(crate) fn example_id_and_ver_ref() -> Self {
+        Self(IdAndVerRef::example_id_and_ver_ref())
     }
 }
 

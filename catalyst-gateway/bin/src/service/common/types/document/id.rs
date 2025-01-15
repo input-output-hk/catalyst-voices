@@ -27,6 +27,10 @@ const DESCRIPTION: &str = "Unique [Document ID](https://input-output-hk.github.i
 UUIDv7 Formatted 128bit value.";
 /// Example.
 const EXAMPLE: &str = "01944e87-e68c-7f22-9df1-816863cfa5ff";
+/// Example minimum - Timestamp retained, random value set to all `0`
+const EXAMPLE_MIN: &str = "01944e87-e68c-7000-8000-000000000000";
+/// Example maximum - Timestamp retained, random value set to all `f`
+const EXAMPLE_MAX: &str = "01944e87-e68c-7fff-bfff-ffffffffffff";
 /// External Documentation URI
 const URI: &str =
     "https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id";
@@ -73,6 +77,18 @@ impl Example for DocumentId {
     }
 }
 
+impl DocumentId {
+    /// An example of a minimum Document ID when specifying ranges
+    fn example_min() -> Self {
+        Self(EXAMPLE_MIN.to_owned())
+    }
+
+    /// An example of a maximum Document ID when specifying ranges
+    fn example_max() -> Self {
+        Self(EXAMPLE_MAX.to_owned())
+    }
+}
+
 impl TryFrom<&str> for DocumentId {
     type Error = anyhow::Error;
 
@@ -99,37 +115,93 @@ impl From<uuidv7::UUIDv7> for DocumentId {
 }
 
 #[derive(Object, Debug, PartialEq)]
+#[oai(example = true)]
 /// A range of Document IDs.
-pub(crate) struct IdRangeInner {
+pub(crate) struct IdRange {
     /// Minimum Document ID to find (inclusive)
     min: DocumentId,
     /// Maximum Document ID to find (inclusive)
     max: DocumentId,
 }
 
+impl Example for IdRange {
+    fn example() -> Self {
+        Self {
+            min: DocumentId::example_min(),
+            max: DocumentId::example_max(),
+        }
+    }
+}
+
+#[derive(Object, Debug, PartialEq)]
+#[oai(example = true)]
+/// A single Document IDs.
+pub(crate) struct IdEq {
+    /// The exact Document ID to match against.
+    eq: DocumentId,
+}
+
+impl Example for IdEq {
+    fn example() -> Self {
+        Self {
+            eq: DocumentId::example(),
+        }
+    }
+}
+
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
 #[derive(NewType, Debug, PartialEq)]
-#[oai(from_multipart = false, from_parameter = false, to_header = false)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// ID Equals
+///
+/// A specific single
+/// [Document ID](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id).
+pub(crate) struct IdEqDocumented(IdEq);
+impl Example for IdEqDocumented {
+    fn example() -> Self {
+        Self(IdEq::example())
+    }
+}
+
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
+#[derive(NewType, Debug, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
 /// ID Range
 ///
 /// A range of
 /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id).
-pub(crate) struct IdRange(IdRangeInner);
+pub(crate) struct IdRangeDocumented(IdRange);
+impl Example for IdRangeDocumented {
+    fn example() -> Self {
+        Self(IdRange::example())
+    }
+}
 
 #[derive(Union, Debug, PartialEq)]
 #[oai(one_of)]
 /// Either a Single Document ID, or a Range of Document IDs
-pub(crate) enum EqOrRangedIdInner {
+pub(crate) enum EqOrRangedId {
     /// This exact Document ID
-    Eq(DocumentId),
+    Eq(IdEqDocumented),
     /// Document IDs in this range
-    Range(IdRange),
+    Range(IdRangeDocumented),
 }
 
-impl Example for EqOrRangedIdInner {
+impl Example for EqOrRangedId {
     fn example() -> Self {
-        Self::Eq(DocumentId::example())
+        Self::Eq(IdEqDocumented::example())
     }
 }
 
@@ -143,10 +215,10 @@ impl Example for EqOrRangedIdInner {
 /// Document ID Selector
 ///
 /// Either a absolute single Document ID or a range of Document IDs
-pub(crate) struct EqOrRangedId(EqOrRangedIdInner);
+pub(crate) struct EqOrRangedIdDocumented(pub(crate) EqOrRangedId);
 
-impl Example for EqOrRangedId {
+impl Example for EqOrRangedIdDocumented {
     fn example() -> Self {
-        Self(EqOrRangedIdInner::example())
+        Self(EqOrRangedId::example())
     }
 }

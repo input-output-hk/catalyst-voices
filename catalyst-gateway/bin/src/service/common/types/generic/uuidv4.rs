@@ -22,7 +22,7 @@ const TITLE: &str = "UUIDv4";
 /// Description.
 const DESCRIPTION: &str = "128 Bit UUID Version 4 - Random";
 /// Example.
-const EXAMPLE: &str = "c9993e54-1ee1-41f7-ab99-3fdec865c744 ";
+const EXAMPLE: &str = "c9993e54-1ee1-41f7-ab99-3fdec865c744";
 /// Length of the hex encoded string
 pub(crate) const ENCODED_LENGTH: usize = EXAMPLE.len();
 /// Validation Regex Pattern
