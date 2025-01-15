@@ -136,6 +136,11 @@ class _VoicesRichTextState extends State<VoicesRichText> {
       old?.removeListener(_onEditModeControllerChanged);
       current?.addListener(_onEditModeControllerChanged);
     }
+
+    // if (widget.editModeController?.value !=
+    //     oldWidget.editModeController?.value) {
+    //   _toggleEditMode();
+    // }
   }
 
   @override
@@ -160,15 +165,17 @@ class _VoicesRichTextState extends State<VoicesRichText> {
     final charsLimit = widget.charsLimit;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 24, top: 20, bottom: 20),
-          child: _TopBar(
-            title: widget.title,
-            isEditMode: _effectiveEditModeController.value,
-            onToggleEditMode: _toggleEditMode,
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(left: 24, top: 20, bottom: 20),
+        //   child: _TopBar(
+        //     title: widget.title,
+        //     isEditMode: _effectiveEditModeController.value,
+        //     onToggleEditMode: _toggleEditMode,
+        //   ),
+        // ),
         Offstage(
           offstage: !_effectiveEditModeController.value,
           child: Padding(
@@ -176,6 +183,13 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             child: _Toolbar(controller: _effectiveController),
           ),
         ),
+        if (widget.title.isNotEmpty) ...[
+          Text(
+            widget.title,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+        ],
         _EditorDecoration(
           isEditMode: _effectiveEditModeController.value,
           child: _Editor(
@@ -191,25 +205,25 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             charsLimit: charsLimit,
           ),
         ),
-        const SizedBox(height: 16),
-        Offstage(
-          offstage: !_effectiveEditModeController.value,
-          child: _Footer(
-            onSave: _saveDocument,
-          ),
-        ),
-        if (!_effectiveEditModeController.value) const SizedBox(height: 24),
+        // const SizedBox(height: 16),
+        // Offstage(
+        //   offstage: !_effectiveEditModeController.value,
+        //   child: _Footer(
+        //     onSave: _saveDocument,
+        //   ),
+        // ),
+        // if (!_effectiveEditModeController.value) const SizedBox(height: 24),
       ],
     );
   }
 
-  Future<void> _toggleEditMode() async {
-    if (!_effectiveEditModeController.value) {
-      if (!widget.canEditDocumentGetter(_effectiveController.document)) {
-        widget.onEditBlocked?.call();
-        return;
-      }
-    }
+  void _toggleEditMode() {
+    // if (!_effectiveEditModeController.value) {
+    //   if (!widget.canEditDocumentGetter(_effectiveController.document)) {
+    //     widget.onEditBlocked?.call();
+    //     return;
+    //   }
+    // }
 
     if (_effectiveEditModeController.value) {
       _stopEdit();
@@ -247,7 +261,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
     }
   }
 
-  void _onEditModeControllerChanged() {
+  Future<void> _onEditModeControllerChanged() async {
     setState(() {
       _effectiveFocusNode.canRequestFocus = _effectiveEditModeController.value;
     });
@@ -294,30 +308,28 @@ class _EditorDecoration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      // TODO(jakub): enable after implementing https://github.com/input-output-hk/catalyst-voices/issues/846
-      // child: ResizableBoxParent(
-      //   minHeight: 470,
-      //   resizableVertically: true,
-      //   resizableHorizontally: false,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: isEditMode
-              ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
-              : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outlineVariant,
-          ),
-          borderRadius: BorderRadius.circular(8),
+    return
+        // TODO(jakub): enable after implementing https://github.com/input-output-hk/catalyst-voices/issues/846
+        // child: ResizableBoxParent(
+        //   minHeight: 470,
+        //   resizableVertically: true,
+        //   resizableHorizontally: false,
+        DecoratedBox(
+      decoration: BoxDecoration(
+        color: isEditMode
+            ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
+            : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
         ),
-        child: IgnorePointer(
-          ignoring: !isEditMode,
-          child: child,
-        ),
+        borderRadius: BorderRadius.circular(8),
       ),
-      // ),
+      child: IgnorePointer(
+        ignoring: !isEditMode,
+        child: child,
+      ),
     );
+    // ),
   }
 }
 
@@ -334,6 +346,8 @@ class _Editor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     return QuillEditor(
       controller: controller,
       focusNode: focusNode,
@@ -341,6 +355,16 @@ class _Editor extends StatelessWidget {
       configurations: QuillEditorConfigurations(
         padding: const EdgeInsets.all(16),
         placeholder: context.l10n.placeholderRichText,
+        customStyles: DefaultStyles(
+          placeHolder: DefaultTextBlockStyle(
+            textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
+                DefaultTextStyle.of(context).style,
+            HorizontalSpacing.zero,
+            VerticalSpacing.zero,
+            VerticalSpacing.zero,
+            null,
+          ),
+        ),
         embedBuilders: CatalystPlatform.isWeb
             ? FlutterQuillEmbeds.editorWebBuilders()
             : FlutterQuillEmbeds.editorBuilders(),
