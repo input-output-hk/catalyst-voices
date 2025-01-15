@@ -8,6 +8,7 @@ adminer
 afinet
 androidx
 anypolicy
+apirequest
 appbar
 appspot
 Arbritrary
@@ -174,6 +175,7 @@ lovelace
 lovelaces
 LTRB
 Lynxx
+LynxLynxx
 mdlint
 metadatum
 metadatums
@@ -258,7 +260,6 @@ rustflags
 rustfmt
 rustls
 rxdart
-ryszard-schossler
 saibatizoku
 Schemathesis
 Scripthash
@@ -319,6 +320,7 @@ Unstaked
 upskilling
 UTXO
 Utxos
+uuidv
 varint
 Vespr
 vite

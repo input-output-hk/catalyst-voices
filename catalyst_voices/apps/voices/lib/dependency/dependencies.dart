@@ -90,7 +90,7 @@ final class Dependencies extends DependencyProvider {
           get<AdminTools>(),
         );
       })
-      // TODO(ryszard-schossler): add repository for campaign management
+      // TODO(LynxLynxx): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
       )

@@ -1,6 +1,6 @@
 part of '../document_definitions.dart';
 
-// TODO(ryszard-schossler): Verify BaseDocumentDefinition type
+// TODO(LynxLynxx): Verify BaseDocumentDefinition type
 final class NestedQuestionsDefinition
     extends BaseDocumentDefinition<List<String>> {
   final DocumentDefinitionsFormat format;

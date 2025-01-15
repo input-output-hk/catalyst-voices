@@ -207,8 +207,7 @@ class _PropertyBuilder extends StatelessWidget {
           '${property.schema.definition} unsupported '
           'by $DocumentBuilderSectionTile',
         );
-      case SingleLineTextEntryDefinition():
-      case MultiLineTextEntryDefinition():
+
       case MultiLineTextEntryMarkdownDefinition():
       case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
@@ -261,12 +260,20 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );*/
       case TokenValueCardanoADADefinition():
-      /*return DocumentTokenValueWidget(
-          property: definition.castProperty(property),
+      /*final castProperty = definition.castProperty(property);
+        return DocumentTokenValueWidget(
+          property: castProperty as DocumentProperty<int>,
           currency: const Currency.ada(),
           isEditMode: isEditMode,
           onChanged: onChanged,
-        );
+        );*/
+      case SingleLineTextEntryDefinition():
+      case MultiLineTextEntryDefinition():
+      /*final castProperty = definition.castProperty(property);
+        return SimpleTextEntryWidget(
+          property: castProperty as DocumentProperty<String>,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
         );*/
       case YesNoChoiceDefinition():
         /*final castProperty = definition.castProperty(property);
