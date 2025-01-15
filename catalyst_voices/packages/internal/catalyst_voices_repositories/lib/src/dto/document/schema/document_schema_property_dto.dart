@@ -27,7 +27,7 @@ final class DocumentSchemaPropertyDto {
   final int? minItems;
   final int? maxItems;
 
-  // TODO(ryszard-schossler): return to this
+  // TODO(LynxLynxx): return to this
   final Map<String, dynamic>? items;
 
   /// Logical boolean algebra conditions.
