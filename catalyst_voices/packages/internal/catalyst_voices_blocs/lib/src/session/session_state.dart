@@ -54,8 +54,6 @@ final class GuestSessionState extends SessionState {
 
 /// The user has registered and unlocked the keychain.
 final class ActiveAccountSessionState extends SessionState {
-  // TODO(damian-molinski): Try limiting exposed Account to something smaller.
-  final Account? account;
   @override
   final List<Space> spaces;
   @override
@@ -63,7 +61,6 @@ final class ActiveAccountSessionState extends SessionState {
   final Map<Space, ShortcutActivator> spacesShortcuts;
 
   const ActiveAccountSessionState({
-    this.account,
     required this.spaces,
     required this.overallSpaces,
     required this.spacesShortcuts,
@@ -71,16 +68,8 @@ final class ActiveAccountSessionState extends SessionState {
 
   @override
   List<Object?> get props => [
-        account,
         spaces,
         overallSpaces,
         spacesShortcuts,
       ];
-}
-
-extension SessionStateExt on SessionState {
-  Account? get account => switch (this) {
-        ActiveAccountSessionState(:final account) => account,
-        _ => null,
-      };
 }

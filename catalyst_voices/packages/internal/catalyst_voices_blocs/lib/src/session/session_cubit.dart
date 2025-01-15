@@ -121,13 +121,7 @@ final class SessionCubit extends Cubit<SessionState>
 
   void _updateState() {
     if (_adminToolsState.enabled) {
-      unawaited(
-        _createMockedSessionState().then((value) {
-          if (!isClosed) {
-            emit(value);
-          }
-        }),
-      );
+      emit(_createMockedSessionState());
     } else {
       emit(_createSessionState());
     }
@@ -151,21 +145,16 @@ final class SessionCubit extends Cubit<SessionState>
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
     return ActiveAccountSessionState(
-      account: account,
       spaces: spaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
     );
   }
 
-  Future<SessionState> _createMockedSessionState() async {
+  SessionState _createMockedSessionState() {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
-        // TODO(damian-molinski): Limiting exposed Account so its not future.
-        final dummyAccount = await _getDummyAccount();
-
         return ActiveAccountSessionState(
-          account: dummyAccount,
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
