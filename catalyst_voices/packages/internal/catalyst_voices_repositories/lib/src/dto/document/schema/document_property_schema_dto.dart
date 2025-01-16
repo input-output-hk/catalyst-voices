@@ -14,7 +14,7 @@ part 'document_property_schema_dto.g.dart';
 final class DocumentPropertySchemaDto {
   @JsonKey(name: r'$ref')
   final String? ref;
-  final DocumentPropertyType? type;
+  final String? type;
   final String? title;
   final String? description;
   @JsonKey(name: 'default')
@@ -79,8 +79,9 @@ final class DocumentPropertySchemaDto {
     final definitionSchema = definitions.getDefinition(definition());
     final schema =
         definitionSchema != null ? mergeWith(definitionSchema) : this;
+    final type = DocumentPropertyType.fromString(schema.type!);
 
-    switch (schema.type!) {
+    switch (type) {
       case DocumentPropertyType.list:
         return DocumentListSchemaMapper.toModel(
           definitions: definitions,
@@ -167,16 +168,17 @@ final class DocumentPropertySchemaDto {
   /// Returns a new copy of the [DocumentPropertySchemaDto],
   /// fields from this and [other] instance are merged into a single instance.
   ///
-  /// Fields from this instance have more priority
-  /// (in case they appear in both instances).
+  /// Fields from this instance have more priority than from the
+  /// [other] instance (in case they appear in both instances).
   DocumentPropertySchemaDto mergeWith(DocumentPropertySchemaDto other) {
-    final DocumentPropertySchemaDto? mergedItems;
-    final items = this.items;
-    final otherItems = other.items;
-    if (items != null && otherItems != null) {
-      mergedItems = items.mergeWith(otherItems);
-    } else {
-      mergedItems = items ?? otherItems;
+    final mergedItems = _mergeItems(items, other.items);
+    final mergedOneOf = oneOf ?? other.oneOf;
+
+    var mergedProperties = _mergeProperties(properties, other.properties);
+    if (mergedOneOf != null) {
+      for (final item in mergedOneOf) {
+        mergedProperties = _mergeProperties(mergedProperties, item.properties);
+      }
     }
 
     return DocumentPropertySchemaDto(
@@ -185,7 +187,7 @@ final class DocumentPropertySchemaDto {
       title: title ?? other.title,
       description: description ?? other.description,
       defaultValue: defaultValue ?? other.defaultValue,
-      properties: properties ?? other.properties,
+      properties: mergedProperties,
       items: mergedItems,
       minimum: minimum ?? other.minimum,
       maximum: maximum ?? other.maximum,
@@ -197,6 +199,38 @@ final class DocumentPropertySchemaDto {
       required: required ?? other.required,
       order: order ?? other.order,
     );
+  }
+
+  DocumentPropertySchemaDto? _mergeItems(
+    DocumentPropertySchemaDto? first,
+    DocumentPropertySchemaDto? second,
+  ) {
+    if (first == null || second == null) {
+      return first ?? second;
+    } else {
+      return first.mergeWith(second);
+    }
+  }
+
+  Map<String, DocumentPropertySchemaDto>? _mergeProperties(
+    Map<String, DocumentPropertySchemaDto>? first,
+    Map<String, DocumentPropertySchemaDto>? second,
+  ) {
+    if (first == null || second == null) {
+      return first ?? second;
+    }
+
+    final map = Map.of(first);
+    for (final entry in second.entries) {
+      final firstEntry = map[entry.key];
+      if (firstEntry != null) {
+        map[entry.key] = firstEntry.mergeWith(entry.value);
+      } else {
+        map[entry.key] = entry.value;
+      }
+    }
+
+    return map;
   }
 
   String? definition() {
