@@ -11,6 +11,7 @@ import '../pageobject/onboarding_page.dart';
 import '../pageobject/overall_spaces_page.dart';
 import '../types/password_validation_states.dart';
 import '../types/registration_state.dart';
+import '../utils/constants.dart';
 import '../utils/test_context.dart';
 import '../utils/translations_utils.dart';
 
@@ -39,7 +40,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.visitorShortcutBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await $(AppBarPage.getStartedBtn).tap();
           expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
           expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
@@ -51,7 +52,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
             RegistrationState.getStarted,
@@ -64,7 +65,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.closeBtn($).tap();
           expect($(OnboardingPage.registrationDialog), findsNothing);
         },
@@ -75,7 +76,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
@@ -89,7 +90,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
           await OnboardingPage.registrationInfoPanelLooksAsExpected(
@@ -104,7 +105,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
@@ -119,7 +120,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
@@ -134,7 +135,7 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(AppBarPage.getStartedBtn)
-            .tap(settleTimeout: const Duration(seconds: 10));
+            .tap(settleTimeout: TimeConstants.long.duration);
         await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
         await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
         await $(OnboardingPage.nextButton).tap();
@@ -149,7 +150,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -166,7 +167,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -183,7 +184,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -201,7 +202,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -220,7 +221,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -228,6 +229,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
@@ -241,7 +243,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -261,7 +263,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -270,6 +272,8 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531//temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
@@ -281,7 +285,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -290,6 +294,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -305,7 +310,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -314,6 +319,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -330,7 +336,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -339,6 +345,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -355,7 +362,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -364,6 +371,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -382,7 +390,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -391,6 +399,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -408,7 +417,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -417,6 +426,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -435,7 +445,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -444,6 +454,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -472,7 +483,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -481,6 +492,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -505,7 +517,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -514,6 +526,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -537,7 +550,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -546,6 +559,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -569,7 +583,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -578,6 +592,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -599,7 +614,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -608,6 +623,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -628,7 +644,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -637,6 +653,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -658,7 +675,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -667,6 +684,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -689,7 +707,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -698,6 +716,7 @@ void main() async {
           await $(OnboardingPage.nextButton).tap();
           await $(OnboardingPage.nextButton).tap();
           //temporary: remove reset when seeds are no longer prefilled
+          //https://github.com/input-output-hk/catalyst-voices/issues/1531
           await $(OnboardingPage.resetButton).tap();
           await OnboardingPage.enterStoredSeedPhrases($);
           await $(OnboardingPage.nextButton).tap();
@@ -721,7 +740,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
@@ -735,7 +754,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: TimeConstants.long.duration);
           await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
@@ -753,7 +772,7 @@ void main() async {
     (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
       await $(AppBarPage.getStartedBtn)
-          .tap(settleTimeout: const Duration(seconds: 10));
+          .tap(settleTimeout: TimeConstants.long.duration);
       await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
       await OnboardingPage.onboardingScreenLooksAsExpected(
         $,
