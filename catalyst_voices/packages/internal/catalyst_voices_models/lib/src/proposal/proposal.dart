@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 final class Proposal extends ProposalBase {
-  final Document document;
+  final ProposalDocument document;
 
   const Proposal({
     required super.id,
@@ -14,8 +14,6 @@ final class Proposal extends ProposalBase {
     required super.access,
     required super.category,
     required super.commentsCount,
-    required super.documentId,
-    required super.documentVersion,
     required this.document,
   });
 

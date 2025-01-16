@@ -29,9 +29,6 @@ base class ProposalBase extends Equatable {
   // Those may be getters.
   final int commentsCount;
 
-  final String documentId;
-  final String documentVersion;
-
   const ProposalBase({
     required this.id,
     required this.title,
@@ -44,12 +41,10 @@ base class ProposalBase extends Equatable {
     required this.access,
     required this.category,
     required this.commentsCount,
-    required this.documentId,
-    required this.documentVersion,
   });
 
   Proposal toProposal({
-    required Document document,
+    required ProposalDocument document,
   }) {
     return Proposal(
       id: id,
@@ -62,8 +57,6 @@ base class ProposalBase extends Equatable {
       access: access,
       category: category,
       commentsCount: commentsCount,
-      documentId: documentId,
-      documentVersion: documentVersion,
       document: document,
     );
   }
@@ -71,6 +64,9 @@ base class ProposalBase extends Equatable {
   int get totalSegments => 0;
 
   int get completedSegments => 0;
+
+  // TODO(damian-molinski): this should come from api
+  SignedDocumentRef get ref => const SignedDocumentRef(id: 'document');
 
   @override
   @mustCallSuper
@@ -86,7 +82,5 @@ base class ProposalBase extends Equatable {
         access,
         category,
         commentsCount,
-        documentId,
-        documentVersion,
       ];
 }

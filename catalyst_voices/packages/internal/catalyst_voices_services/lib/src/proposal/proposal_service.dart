@@ -17,8 +17,8 @@ abstract interface class ProposalService {
     required String id,
   });
 
-  Future<DocumentSchema> getProposalTemplate({
-    required String id,
+  Future<ProposalTemplate> getProposalTemplate({
+    required SignedDocumentRef ref,
   });
 
   /// Fetches proposals for the [campaignId].
@@ -47,12 +47,14 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentSchema> getProposalTemplate({
-    required String id,
+  Future<ProposalTemplate> getProposalTemplate({
+    required SignedDocumentRef ref,
   }) async {
-    final documentSchema = _documentRepository.getDocumentSchema(id: id);
+    final proposalTemplate = await _documentRepository.getProposalTemplate(
+      ref: ref,
+    );
 
-    return documentSchema;
+    return proposalTemplate;
   }
 
   @override
@@ -71,13 +73,10 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {
-    final document = await _documentRepository.getDocument(
-      id: base.documentId,
-      version: base.documentVersion,
+    final proposalDocument = await _documentRepository.getProposalDocument(
+      ref: base.ref,
     );
 
-    final proposal = base.toProposal(document: document);
-
-    return proposal;
+    return base.toProposal(document: proposalDocument);
   }
 }

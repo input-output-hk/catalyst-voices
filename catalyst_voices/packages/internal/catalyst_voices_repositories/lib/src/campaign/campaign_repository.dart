@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:uuid/uuid.dart';
 
 // ignore: one_member_abstracts
 abstract interface class CampaignRepository {
@@ -18,7 +17,6 @@ final class CampaignRepositoryImpl implements CampaignRepository {
     required String id,
   }) async {
     final now = DateTime.now();
-    final proposalTemplateId = const Uuid().v7();
 
     return CampaignBase(
       id: id,
@@ -30,7 +28,6 @@ final class CampaignRepositoryImpl implements CampaignRepository {
       endDate: now.add(const Duration(days: 92)),
       proposalsCount: 0,
       publish: CampaignPublish.draft,
-      proposalTemplateId: proposalTemplateId,
     );
   }
 }

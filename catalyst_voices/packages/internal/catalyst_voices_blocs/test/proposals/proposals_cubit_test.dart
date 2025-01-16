@@ -10,23 +10,25 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   group(ProposalsCubit, () {
-    final proposalTemplate = DocumentSchema(
-      id: const Uuid().v7(),
-      version: const Uuid().v7(),
+    const proposalTemplate = DocumentSchema(
       jsonSchema: '',
       title: '',
       description: '',
-      segments: const [],
-      order: const [],
+      segments: [],
+      order: [],
       propertiesSchema: '',
     );
 
-    final proposalDocument = Document(
-      id: const Uuid().v7(),
-      version: const Uuid().v7(),
-      schemaUrl: '',
-      schema: proposalTemplate,
-      segments: const [],
+    final proposalDocument = ProposalDocument(
+      metadata: ProposalMetadata(
+        id: const Uuid().v7(),
+        version: const Uuid().v7(),
+      ),
+      document: const Document(
+        schemaUrl: '',
+        schema: proposalTemplate,
+        segments: [],
+      ),
     );
 
     final campaign = Campaign(
@@ -37,8 +39,6 @@ void main() {
       endDate: DateTime.now().plusDays(1),
       proposalsCount: 0,
       publish: CampaignPublish.published,
-      proposalTemplateId: const Uuid().v7(),
-      proposalTemplate: proposalTemplate,
     );
 
     final proposal = Proposal(
@@ -52,8 +52,6 @@ void main() {
       publish: ProposalPublish.draft,
       access: ProposalAccess.private,
       commentsCount: 0,
-      documentId: const Uuid().v7(),
-      documentVersion: const Uuid().v7(),
       document: proposalDocument,
     );
 

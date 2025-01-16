@@ -22,7 +22,6 @@ base class CampaignBase extends Equatable {
   final DateTime endDate;
   final int proposalsCount;
   final CampaignPublish publish;
-  final String proposalTemplateId;
 
   const CampaignBase({
     required this.id,
@@ -32,14 +31,16 @@ base class CampaignBase extends Equatable {
     required this.endDate,
     required this.proposalsCount,
     required this.publish,
-    required this.proposalTemplateId,
   });
 
   int get categoriesCount => 0;
 
-  Campaign toCampaign({
-    required DocumentSchema proposalTemplate,
-  }) {
+  // TODO(damian-molinski): this should come from api
+  SignedDocumentRef get proposalTemplateRef {
+    return const SignedDocumentRef(id: 'schema');
+  }
+
+  Campaign toCampaign() {
     return Campaign(
       id: id,
       name: name,
@@ -48,8 +49,6 @@ base class CampaignBase extends Equatable {
       endDate: endDate,
       proposalsCount: proposalsCount,
       publish: publish,
-      proposalTemplateId: proposalTemplateId,
-      proposalTemplate: proposalTemplate,
     );
   }
 
@@ -61,7 +60,6 @@ base class CampaignBase extends Equatable {
     DateTime? endDate,
     int? proposalsCount,
     CampaignPublish? publish,
-    String? proposalTemplateId,
   }) {
     return CampaignBase(
       id: id ?? this.id,
@@ -71,7 +69,6 @@ base class CampaignBase extends Equatable {
       endDate: endDate ?? this.endDate,
       proposalsCount: proposalsCount ?? this.proposalsCount,
       publish: publish ?? this.publish,
-      proposalTemplateId: proposalTemplateId ?? this.proposalTemplateId,
     );
   }
 
@@ -85,6 +82,5 @@ base class CampaignBase extends Equatable {
         endDate,
         proposalsCount,
         publish,
-        proposalTemplateId,
       ];
 }

@@ -2,16 +2,12 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid/uuid.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group(DocumentSchemaDto, () {
     late Map<String, dynamic> schemaJson;
-
-    final id = const Uuid().v7();
-    final version = const Uuid().v7();
 
     setUpAll(() async {
       schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
@@ -20,10 +16,7 @@ void main() {
     test('X-order of segments is kept in model class', () async {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
 
-      final schema = schemaDto.toModel(
-        documentId: id,
-        documentVersion: version,
-      );
+      final schema = schemaDto.toModel();
 
       if (schemaDto.order?.length != schema.segments.length) {
         return;
@@ -35,10 +28,7 @@ void main() {
 
     test('X-order of section is kept in model class', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      final schema = schemaDto.toModel(
-        documentId: id,
-        documentVersion: version,
-      );
+      final schema = schemaDto.toModel();
 
       for (var i = 0; i < schema.segments.length; i++) {
         if (schemaDto.segments[i].order?.length !=
@@ -56,10 +46,7 @@ void main() {
 
     test('Check if every segment has a SegmentDefinition as ref', () {
       final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      final schema = schemaDto.toModel(
-        documentId: id,
-        documentVersion: version,
-      );
+      final schema = schemaDto.toModel();
 
       for (final segment in schema.segments) {
         expect(segment.definition, isA<SegmentDefinition>());

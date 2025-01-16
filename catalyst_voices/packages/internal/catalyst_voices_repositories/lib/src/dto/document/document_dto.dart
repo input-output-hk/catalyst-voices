@@ -43,14 +43,9 @@ final class DocumentDto {
     );
   }
 
-  Document toModel({
-    required String documentId,
-    required String documentVersion,
-  }) {
+  Document toModel() {
     // building a document via builder to sort segments/sections/properties
     return DocumentBuilder(
-      documentId: documentId,
-      documentVersion: documentVersion,
       schemaUrl: schemaUrl,
       schema: schema,
       segments: segments

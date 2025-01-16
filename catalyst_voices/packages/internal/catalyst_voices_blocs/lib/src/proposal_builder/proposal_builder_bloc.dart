@@ -6,7 +6,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
 
 final _logger = Logger('ProposalBuilderBloc');
 
@@ -69,19 +68,20 @@ final class ProposalBuilderBloc
 
         final campaign = await _campaignService.getActiveCampaign();
 
-        final proposalTemplate = campaign?.proposalTemplate;
+        final proposalTemplateRef = campaign?.proposalTemplateRef;
 
-        if (proposalTemplate == null) {
+        if (proposalTemplateRef == null) {
           throw const ActiveCampaignNotFoundException();
         }
 
-        final newDocumentId = const Uuid().v7();
+        final proposalTemplate = await _proposalService.getProposalTemplate(
+          ref: proposalTemplateRef,
+        );
+
         return DocumentBuilder.fromSchema(
-          documentId: newDocumentId,
-          documentVersion: newDocumentId,
           // TODO(damian-molinski): not sure what should go here.
-          schemaUrl: proposalTemplate.propertiesSchema,
-          schema: proposalTemplate,
+          schemaUrl: proposalTemplate.schema.propertiesSchema,
+          schema: proposalTemplate.schema,
         );
       },
       emit: emit,
@@ -96,17 +96,15 @@ final class ProposalBuilderBloc
       documentBuilderGetter: () async {
         _logger.info('Loading proposal template[${event.id}]');
 
+        final ref = SignedDocumentRef(id: event.id);
         final proposalTemplate = await _proposalService.getProposalTemplate(
-          id: event.id,
+          ref: ref,
         );
 
-        final newDocumentId = const Uuid().v7();
         return DocumentBuilder.fromSchema(
-          documentId: newDocumentId,
-          documentVersion: newDocumentId,
           // TODO(damian-molinski): not sure what should go here.
-          schemaUrl: proposalTemplate.propertiesSchema,
-          schema: proposalTemplate,
+          schemaUrl: proposalTemplate.schema.propertiesSchema,
+          schema: proposalTemplate.schema,
         );
       },
       emit: emit,
@@ -122,7 +120,7 @@ final class ProposalBuilderBloc
         _logger.info('Loading proposal[${event.id}]');
 
         final proposal = await _proposalService.getProposal(id: event.id);
-        final document = proposal.document;
+        final document = proposal.document.document;
 
         return DocumentBuilder.fromDocument(document);
       },

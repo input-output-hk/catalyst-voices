@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/signed_document_data_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
@@ -12,16 +13,14 @@ abstract interface class DocumentRepository {
     SignedDocumentManager signedDocumentManager,
   ) = DocumentRepositoryImpl;
 
-  Future<void> publishDocument(Document document);
+  Future<void> publishDocument(SignedDocumentData document);
 
-  Future<Document> getDocument({
-    required String id,
-    String? version,
+  Future<ProposalDocument> getProposalDocument({
+    required SignedDocumentRef ref,
   });
 
-  Future<DocumentSchema> getDocumentSchema({
-    required String id,
-    String? version,
+  Future<ProposalTemplate> getProposalTemplate({
+    required SignedDocumentRef ref,
   });
 }
 
@@ -29,74 +28,118 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   // ignore: unused_field
   final SignedDocumentManager _signedDocumentManager;
 
-  final _documentSchemaLock = Lock();
+  final _proposalTemplateLock = Lock();
 
   DocumentRepositoryImpl(
     this._signedDocumentManager,
   );
 
   @override
-  Future<void> publishDocument(Document document) {
+  Future<void> publishDocument(SignedDocumentData document) {
     throw UnimplementedError();
   }
 
   @override
-  Future<Document> getDocument({
-    required String id,
-    String? version,
+  Future<ProposalDocument> getProposalDocument({
+    required SignedDocumentRef ref,
   }) async {
-    // TODO(damian-molinski): use real id when API call is implemented.
-    final signedDocument = await _getSignedDocument('document');
+    // TODO(damian-molinski): remove this override once we have API
+    ref = const SignedDocumentRef(id: 'proposal');
 
-    final documentData = DocumentDataDto.fromJson(signedDocument);
+    final signedDocumentData = await _getSignedDocumentData(ref: ref);
 
-    // TODO(damian-molinski): get schema id from signedDocument.
-    final documentSchemaId = const Uuid().v7();
-    final documentSchema = await getDocumentSchema(id: documentSchemaId);
-
-    final dto = DocumentDto.fromJsonSchema(documentData, documentSchema);
-    final document = dto.toModel(
-      documentId: id,
-      // TODO(damian-molinski): get version from signedDocument.
-      documentVersion: version ?? const Uuid().v7(),
+    assert(
+      signedDocumentData.metadata.type == SignedDocumentType.proposalDocument,
+      'Invalid Proposal SignedDocument type',
+    );
+    assert(
+      signedDocumentData.metadata.template != null,
+      'Proposal metadata has no template',
     );
 
-    return document;
+    final templateRef = signedDocumentData.metadata.template!;
+
+    final template = await _proposalTemplateLock.synchronized(() {
+      return getProposalTemplate(ref: templateRef);
+    });
+
+    final metadata = ProposalMetadata(
+      id: signedDocumentData.metadata.id,
+      version: signedDocumentData.metadata.version,
+    );
+
+    final data = DocumentDataDto.fromJson(signedDocumentData.payload.data);
+    final schema = template.schema;
+    final document = DocumentDto.fromJsonSchema(data, schema).toModel();
+
+    return ProposalDocument(
+      metadata: metadata,
+      document: document,
+    );
   }
 
   @override
-  Future<DocumentSchema> getDocumentSchema({
-    required String id,
-    String? version,
+  Future<ProposalTemplate> getProposalTemplate({
+    required SignedDocumentRef ref,
   }) async {
-    // Note. When fetch multiple documents with same schema we want
-    // to fetch it only once. That's why lock is here so any following
-    // calls will get cached value.
-    final signedDocument = await _documentSchemaLock.synchronized(() {
-      // TODO(damian-molinski): use real id when API call is implemented.
-      return _getSignedDocument('schema');
-    });
+    // TODO(damian-molinski): remove this override once we have API
+    ref = const SignedDocumentRef(id: 'schema');
 
-    final dto = DocumentSchemaDto.fromJson(signedDocument);
-    final documentSchema = dto.toModel(
-      documentId: id,
-      // TODO(damian-molinski): get version from signedDocument.
-      documentVersion: version ?? const Uuid().v7(),
+    final signedDocumentData = await _getSignedDocumentData(ref: ref);
+
+    assert(
+      signedDocumentData.metadata.type == SignedDocumentType.proposalTemplate,
+      'Invalid SignedDocument type',
     );
 
-    return documentSchema;
+    final metadata = ProposalTemplateMetadata(
+      id: signedDocumentData.metadata.id,
+      version: signedDocumentData.metadata.version,
+    );
+
+    final json = signedDocumentData.payload.data;
+    final schema = DocumentSchemaDto.fromJson(json).toModel();
+
+    return ProposalTemplate(
+      metadata: metadata,
+      schema: schema,
+    );
   }
 
   // TODO(damian-molinski): should return SignedDocument.
   // TODO(damian-molinski): make API call.
   // TODO(damian-molinski): implement caching.
-  Future<Map<String, dynamic>> _getSignedDocument(
-    String id, {
-    // ignore: unused_element
-    String? version,
-  }) {
-    return id == 'schema'
+  Future<SignedDocumentData> _getSignedDocumentData({
+    required SignedDocumentRef ref,
+  }) async {
+    final isSchema = ref.id == 'schema';
+
+    final signedDocument = await (isSchema
         ? VoicesDocumentsTemplates.proposalF14Schema
-        : VoicesDocumentsTemplates.proposalF14Document;
+        : VoicesDocumentsTemplates.proposalF14Document);
+
+    final type = isSchema
+        ? SignedDocumentType.proposalTemplate
+        : SignedDocumentType.proposalDocument;
+    final ver = ref.version ?? const Uuid().v7();
+    final template = !isSchema ? const SignedDocumentRef(id: 'schema') : null;
+
+    final metadata = SignedDocumentMetadataDto(
+      type: type,
+      id: ref.id,
+      ver: ver,
+      template: template,
+    );
+
+    final payload = SignedDocumentDataPayload(signedDocument);
+
+    final dto = SignedDocumentDataDto(
+      metadata: metadata,
+      payload: payload,
+    );
+
+    final model = dto.toModel();
+
+    return model;
   }
 }

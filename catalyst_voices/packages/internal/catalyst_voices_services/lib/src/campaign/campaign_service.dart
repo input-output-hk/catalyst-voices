@@ -16,6 +16,8 @@ abstract interface class CampaignService {
 
 final class CampaignServiceImpl implements CampaignService {
   final CampaignRepository _campaignRepository;
+
+  // ignore: unused_field
   final DocumentRepository _documentRepository;
 
   const CampaignServiceImpl(
@@ -32,12 +34,9 @@ final class CampaignServiceImpl implements CampaignService {
   }) async {
     final campaignBase = await _campaignRepository.getCampaign(id: id);
 
-    final documentId = campaignBase.proposalTemplateId;
-    final documentSchema = await _documentRepository.getDocumentSchema(
-      id: documentId,
-    );
+    // TODO(damian-molinski): get proposalTemplateRef, document and map.
 
-    final campaign = campaignBase.toCampaign(proposalTemplate: documentSchema);
+    final campaign = campaignBase.toCampaign();
 
     return campaign;
   }

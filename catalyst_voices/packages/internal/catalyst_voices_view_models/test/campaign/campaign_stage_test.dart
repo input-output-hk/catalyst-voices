@@ -2,7 +2,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
 
 void main() {
   group(CampaignStage, () {
@@ -15,17 +14,6 @@ void main() {
       endDate: date,
       proposalsCount: 0,
       publish: CampaignPublish.draft,
-      proposalTemplateId: const Uuid().v7(),
-      proposalTemplate: const DocumentSchema(
-        id: '',
-        version: '',
-        jsonSchema: '',
-        title: '',
-        description: '',
-        segments: [],
-        order: [],
-        propertiesSchema: '',
-      ),
     );
 
     test('draft campaign resolves to draft stage', () {

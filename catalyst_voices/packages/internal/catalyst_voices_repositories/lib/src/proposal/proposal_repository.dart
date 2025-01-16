@@ -1,7 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:uuid/uuid.dart';
 
 // ignore: one_member_abstracts
 abstract interface class ProposalRepository {
@@ -56,8 +55,6 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    documentId: const Uuid().v7(),
-    documentVersion: const Uuid().v7(),
   ),
   ProposalBase(
     id: 'f14/1',
@@ -70,8 +67,6 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    documentId: const Uuid().v7(),
-    documentVersion: const Uuid().v7(),
   ),
   ProposalBase(
     id: 'f14/2',
@@ -84,7 +79,5 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
-    documentId: const Uuid().v7(),
-    documentVersion: const Uuid().v7(),
   ),
 ];

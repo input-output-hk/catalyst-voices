@@ -1,8 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 final class Campaign extends CampaignBase {
-  final DocumentSchema proposalTemplate;
-
   const Campaign({
     required super.id,
     required super.name,
@@ -11,8 +9,6 @@ final class Campaign extends CampaignBase {
     required super.endDate,
     required super.proposalsCount,
     required super.publish,
-    required super.proposalTemplateId,
-    required this.proposalTemplate,
   });
 
   @override
@@ -24,8 +20,6 @@ final class Campaign extends CampaignBase {
     DateTime? endDate,
     int? proposalsCount,
     CampaignPublish? publish,
-    String? proposalTemplateId,
-    DocumentSchema? proposalTemplate,
   }) {
     return Campaign(
       id: id ?? this.id,
@@ -35,14 +29,11 @@ final class Campaign extends CampaignBase {
       endDate: endDate ?? this.endDate,
       proposalsCount: proposalsCount ?? this.proposalsCount,
       publish: publish ?? this.publish,
-      proposalTemplateId: proposalTemplateId ?? this.proposalTemplateId,
-      proposalTemplate: proposalTemplate ?? this.proposalTemplate,
     );
   }
 
   @override
   List<Object?> get props => [
         ...super.props,
-        proposalTemplate,
       ];
 }

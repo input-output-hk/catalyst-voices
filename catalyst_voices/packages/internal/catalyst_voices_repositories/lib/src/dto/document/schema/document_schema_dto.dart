@@ -48,10 +48,7 @@ final class DocumentSchemaDto {
 
   Map<String, dynamic> toJson() => _$DocumentSchemaDtoToJson(this);
 
-  DocumentSchema toModel({
-    required String documentId,
-    required String documentVersion,
-  }) {
+  DocumentSchema toModel() {
     const nodeId = DocumentNodeId.root;
     final order = this.order ?? const [];
 
@@ -66,8 +63,6 @@ final class DocumentSchemaDto {
         .toList();
 
     return DocumentSchema(
-      id: documentId,
-      version: documentVersion,
       jsonSchema: jsonSchema,
       title: title,
       description: description,

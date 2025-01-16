@@ -5,7 +5,6 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:uuid/uuid.dart';
 
 void main() {
   group(CampaignInfoCubit, () {
@@ -16,17 +15,6 @@ void main() {
     late AdminToolsCubit adminToolsCubit;
 
     setUpAll(() {
-      final proposalTemplate = DocumentSchema(
-        id: const Uuid().v7(),
-        version: const Uuid().v7(),
-        jsonSchema: '',
-        title: '',
-        description: '',
-        segments: const [],
-        order: const [],
-        propertiesSchema: '',
-      );
-
       campaign = Campaign(
         id: 'campaign-id',
         name: 'name',
@@ -35,8 +23,6 @@ void main() {
         endDate: DateTime.now().plusDays(2),
         proposalsCount: 0,
         publish: CampaignPublish.draft,
-        proposalTemplateId: const Uuid().v7(),
-        proposalTemplate: proposalTemplate,
       );
 
       campaignStage = CampaignStage.fromCampaign(
