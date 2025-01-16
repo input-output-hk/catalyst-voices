@@ -3,7 +3,7 @@
     "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
-    "maintainers": [{ "name": "Catalyst Team", "url": "https://cardano.org" }],
+    "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
         "2025-01-14":
         [
