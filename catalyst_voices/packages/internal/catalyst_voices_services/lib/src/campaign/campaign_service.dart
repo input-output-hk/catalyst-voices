@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 abstract interface class CampaignService {
-  factory CampaignService(
+  const factory CampaignService(
     CampaignRepository campaignRepository,
     DocumentRepository documentRepository,
   ) = CampaignServiceImpl;

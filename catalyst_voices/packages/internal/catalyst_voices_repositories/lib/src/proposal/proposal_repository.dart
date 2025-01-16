@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 // ignore: one_member_abstracts
 abstract interface class ProposalRepository {
-  factory ProposalRepository() = ProposalRepositoryImpl;
+  const factory ProposalRepository() = ProposalRepositoryImpl;
 
   Future<ProposalBase> getProposal({
     required String id,
