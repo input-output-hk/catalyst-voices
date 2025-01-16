@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS signed_docs (
   id UUID NOT NULL, -- UUID v7
   ver UUID NOT NULL, -- UUID v7
   type UUID NOT NULL, -- UUID v4
-  authors TEXT[] NOT NULL,
+  authors TEXT [] NOT NULL,
   metadata JSONB NULL,
   payload JSONB NULL,
   raw BYTEA NOT NULL,
