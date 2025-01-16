@@ -40,7 +40,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.visitorShortcutBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await $(AppBarPage.getStartedBtn).tap();
           expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
           expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
@@ -52,7 +52,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
             RegistrationState.getStarted,
@@ -65,7 +65,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.closeBtn($).tap();
           expect($(OnboardingPage.registrationDialog), findsNothing);
         },
@@ -76,7 +76,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
@@ -90,7 +90,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
           await OnboardingPage.registrationInfoPanelLooksAsExpected(
@@ -105,7 +105,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
@@ -120,7 +120,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
@@ -135,7 +135,7 @@ void main() async {
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(AppBarPage.getStartedBtn)
-            .tap(settleTimeout: TimeConstants.long.duration);
+            .tap(settleTimeout: Time.long.duration);
         await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
         await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
         await $(OnboardingPage.nextButton).tap();
@@ -150,7 +150,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -167,7 +167,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -184,7 +184,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -202,7 +202,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -221,7 +221,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -243,7 +243,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -263,7 +263,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -285,7 +285,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -310,7 +310,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -336,7 +336,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -362,7 +362,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -390,7 +390,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -417,7 +417,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -445,7 +445,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -483,7 +483,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -517,7 +517,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -550,7 +550,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -583,7 +583,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -614,7 +614,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -644,7 +644,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -675,7 +675,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -707,7 +707,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
           await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
           await $(OnboardingPage.nextButton).tap();
@@ -740,7 +740,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
             $,
@@ -754,7 +754,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(AppBarPage.getStartedBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
           await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
           await OnboardingPage.onboardingScreenLooksAsExpected(
@@ -771,8 +771,7 @@ void main() async {
     'visitor - restore - keychain choice screen looks OK',
     (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn)
-          .tap(settleTimeout: TimeConstants.long.duration);
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
       await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
       await OnboardingPage.onboardingScreenLooksAsExpected(
         $,

@@ -35,7 +35,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.userShortcutBtn)
-              .tap(settleTimeout: TimeConstants.long.duration);
+              .tap(settleTimeout: Time.long.duration);
           await $(AppBarPage.accountPopupBtn).tap();
           await AccountDropdownPage.accountDropdownLooksAsExpected($);
           await AccountDropdownPage.accountDropdownContainsSpecificData($);
