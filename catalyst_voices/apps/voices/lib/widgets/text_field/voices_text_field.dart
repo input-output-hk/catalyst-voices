@@ -216,6 +216,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           minHeight: widget.maxLines == null ? 65 : 48,
           iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
+            key: const Key('VoicesTextField'),
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
             expands: resizable,
