@@ -42,7 +42,7 @@
             "$comment": "UI - Single Line text entry for HTTPS Urls.",
             "type": "string",
             "format": "uri",
-            "pattern": "^[^\\n\\r]*$",
+            "pattern": "^https://[^\\s]+$",
             "x-note": "Must start with 'https://' and is followed by one or more non-whitespace characters, ending at the end of the string."
         },
         "multiLineTextEntry": {
