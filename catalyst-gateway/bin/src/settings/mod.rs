@@ -54,6 +54,9 @@ const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
 /// Default `METRICS_MEMORY_INTERVAL`.
 const METRICS_MEMORY_INTERVAL_DEFAULT: &str = "1s";
 
+/// Default `METRICS_FOLLOWER_INTERVAL`.
+const METRICS_FOLLOWER_INTERVAL_DEFAULT: &str = "1s";
+
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
@@ -149,6 +152,9 @@ struct EnvVars {
 
     /// Interval for updating and sending memory metrics.
     metrics_memory_interval: Duration,
+
+    /// Interval for updating and sending Chain Follower metrics.
+    metrics_follower_interval: Duration,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -193,6 +199,10 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         metrics_memory_interval: StringEnvVar::new_as_duration(
             "METRICS_MEMORY_INTERVAL",
             METRICS_MEMORY_INTERVAL_DEFAULT,
+        ),
+        metrics_follower_interval: StringEnvVar::new_as_duration(
+            "METRICS_FOLLOWER_INTERVAL",
+            METRICS_FOLLOWER_INTERVAL_DEFAULT,
         ),
     }
 });
@@ -290,6 +300,11 @@ impl Settings {
     /// The memory metrics interval
     pub(crate) fn metrics_memory_interval() -> Duration {
         ENV_VARS.metrics_memory_interval
+    }
+
+    /// The Chain Follower metrics interval
+    pub(crate) fn metrics_follower_interval() -> Duration {
+        ENV_VARS.metrics_follower_interval
     }
 
     /// Get a list of all host names to serve the API on.
