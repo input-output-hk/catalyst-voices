@@ -11,6 +11,22 @@ part 'document_number_schema.dart';
 part 'document_object_schema.dart';
 part 'document_string_schema.dart';
 
+/// A schema of [DocumentProperty].
+/// Defines the type, formatting, appearance and validation rules.
+///
+/// There are two major types of properties, grouping properties:
+/// - [DocumentObjectSchema]
+/// - [DocumentListSchema]
+///
+/// and properties with values:
+///
+/// - [DocumentValueSchema]
+/// - [DocumentBooleanSchema]
+/// - [DocumentIntegerSchema]
+/// - [DocumentNumberSchema]
+/// - [DocumentStringSchema]
+///
+/// Grouping properties have children, value properties have values.
 sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   @override
   final DocumentNodeId nodeId;
@@ -35,10 +51,14 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   /// The most nested object ID in the schema.
   String get id => nodeId.lastPath;
 
-  /// new property for the list
+  /// Creates a new property from this schema with a default value.
+  ///
+  /// Specify the [parentNodeId] if the created property should
+  /// be moved to another node. By default it is created under
+  /// the same node that this schema points to.
   DocumentProperty createProperty([DocumentNodeId? parentNodeId]);
 
-  /// Moves the schema and it's children to a new nodeId
+  /// Moves the schema and it's children to the [nodeId].
   DocumentPropertySchema withNodeId(DocumentNodeId nodeId);
 
   @override
@@ -53,6 +73,7 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
       ];
 }
 
+/// A schema property that can have a value.
 sealed class DocumentValueSchema<T extends Object>
     extends DocumentPropertySchema {
   final T? defaultValue;
@@ -83,6 +104,8 @@ sealed class DocumentValueSchema<T extends Object>
     );
   }
 
+  /// Casts the property linked to this schema so that
+  /// the property type is synced with schema type.
   DocumentValueProperty<T> castProperty(
     DocumentValueProperty<Object> property,
   ) {
@@ -94,6 +117,8 @@ sealed class DocumentValueSchema<T extends Object>
     return property as DocumentValueProperty<T>;
   }
 
+  /// Casts the property value linked to this schema so that
+  /// the property value type is synced with schema type.
   T? castValue(Object? value) {
     return value as T?;
   }

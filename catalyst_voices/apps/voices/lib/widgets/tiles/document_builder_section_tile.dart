@@ -105,7 +105,6 @@ class _DocumentBuilderSectionTileState
   void _saveChanges() {
     widget.onChanged(List.of(_pendingChanges));
 
-    // ignore: unnecessary_lambdas
     setState(() {
       _pendingChanges.clear();
       _isEditMode = false;
@@ -133,12 +132,12 @@ class _DocumentBuilderSectionTileState
 }
 
 class _Header extends StatelessWidget {
-  final String? title;
+  final String title;
   final bool isEditMode;
   final VoidCallback? onToggleEditMode;
 
   const _Header({
-    this.title,
+    required this.title,
     this.isEditMode = false,
     this.onToggleEditMode,
   });
@@ -149,7 +148,7 @@ class _Header extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            title ?? '',
+            title,
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
