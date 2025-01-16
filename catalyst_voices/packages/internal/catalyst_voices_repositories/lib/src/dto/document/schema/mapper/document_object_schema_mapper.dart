@@ -31,6 +31,7 @@ final class DocumentObjectSchemaMapper {
     required DocumentNodeId nodeId,
     required bool isRequired,
   }) {
+    final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
     final properties = schema.properties ?? const {};
     final required = schema.required ?? const [];
@@ -63,6 +64,7 @@ final class DocumentObjectSchemaMapper {
       case _DocumentObjectDefinition.segment:
         return DocumentSegmentSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -74,6 +76,7 @@ final class DocumentObjectSchemaMapper {
       case _DocumentObjectDefinition.section:
         return DocumentSectionSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -84,6 +87,7 @@ final class DocumentObjectSchemaMapper {
       case _DocumentObjectDefinition.nestedQuestions:
         return DocumentNestedQuestionsSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -94,6 +98,7 @@ final class DocumentObjectSchemaMapper {
       case _DocumentObjectDefinition.singleGroupedTagSelector:
         return DocumentSingleGroupedTagSelectorSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -104,6 +109,7 @@ final class DocumentObjectSchemaMapper {
       case _DocumentObjectDefinition.unknown:
         return DocumentGenericObjectSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,

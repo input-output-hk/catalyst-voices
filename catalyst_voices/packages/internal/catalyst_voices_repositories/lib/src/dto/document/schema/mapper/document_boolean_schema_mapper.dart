@@ -29,6 +29,7 @@ final class DocumentBooleanSchemaMapper {
     required DocumentNodeId nodeId,
     required bool isRequired,
   }) {
+    final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
     final defaultValue = schema.defaultValue as bool?;
     final enumValues = schema.enumValues?.cast<bool>();
@@ -38,6 +39,7 @@ final class DocumentBooleanSchemaMapper {
       case _DocumentBooleanDefinition.yesNoChoice:
         return DocumentYesNoChoiceSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -47,6 +49,7 @@ final class DocumentBooleanSchemaMapper {
       case _DocumentBooleanDefinition.agreementConfirmation:
         return DocumentAgreementConfirmationSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -56,6 +59,7 @@ final class DocumentBooleanSchemaMapper {
       case _DocumentBooleanDefinition.unknown:
         return DocumentGenericBooleanSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,

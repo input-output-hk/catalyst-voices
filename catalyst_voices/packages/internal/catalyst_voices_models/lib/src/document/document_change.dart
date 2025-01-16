@@ -22,13 +22,13 @@ sealed class DocumentChange extends Equatable {
 }
 
 /// Describes an intent to change a property value in the document.
-final class DocumentValueChange extends DocumentChange {
+final class DocumentValueChange<T extends Object> extends DocumentChange {
   /// The id of the document node to be updated.
   @override
   final DocumentNodeId nodeId;
 
   /// The new value to be assigned to the [nodeId] in the [Document].
-  final Object? value;
+  final T? value;
 
   /// The default constructor for the [DocumentValueChange].
   const DocumentValueChange({

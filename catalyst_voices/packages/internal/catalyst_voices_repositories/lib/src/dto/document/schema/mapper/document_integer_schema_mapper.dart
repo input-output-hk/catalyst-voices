@@ -30,6 +30,7 @@ final class DocumentIntegerSchemaMapper {
     required DocumentNodeId nodeId,
     required bool isRequired,
   }) {
+    final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
     final description = schema.description;
     final defaultValue = schema.defaultValue as int?;
@@ -42,6 +43,7 @@ final class DocumentIntegerSchemaMapper {
       case _DocumentIntegerDefinition.tokenValueCardanoAda:
         return DocumentTokenValueCardanoAdaSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: description,
           isRequired: isRequired,
@@ -52,6 +54,7 @@ final class DocumentIntegerSchemaMapper {
       case _DocumentIntegerDefinition.durationInMonths:
         return DocumentDurationInMonthsSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: description,
           isRequired: isRequired,
@@ -62,6 +65,7 @@ final class DocumentIntegerSchemaMapper {
       case _DocumentIntegerDefinition.unknown:
         return DocumentGenericIntegerSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: description,
           isRequired: isRequired,

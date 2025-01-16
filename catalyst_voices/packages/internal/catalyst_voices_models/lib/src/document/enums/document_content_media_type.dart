@@ -1,20 +1,20 @@
-import 'package:collection/collection.dart';
-
+/// The content type of document's string property.
 enum DocumentContentMediaType {
   textPlain('text/plain'),
   markdown('text/markdown'),
   unknown('unknown');
 
-  final String schemaValue;
+  final String value;
 
-  const DocumentContentMediaType(this.schemaValue);
+  const DocumentContentMediaType(this.value);
 
-  static DocumentContentMediaType fromString(String value) {
-    final lowerCase = value.toLowerCase();
+  factory DocumentContentMediaType.fromString(String string) {
+    for (final type in values) {
+      if (type.value.toLowerCase() == string.toLowerCase()) {
+        return type;
+      }
+    }
 
-    return DocumentContentMediaType.values.firstWhereOrNull(
-          (e) => e.schemaValue.toLowerCase() == lowerCase,
-        ) ??
-        DocumentContentMediaType.unknown;
+    return DocumentContentMediaType.unknown;
   }
 }

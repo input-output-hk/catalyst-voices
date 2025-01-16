@@ -1,5 +1,4 @@
-import 'package:collection/collection.dart';
-
+/// The format expected by the property value.
 enum DocumentPropertyFormat {
   path('path'),
   uri('uri'),
@@ -7,28 +6,29 @@ enum DocumentPropertyFormat {
   multiSelect('multiSelect'),
   singleLineTextEntryList('singleLineTextEntryList'),
   singleLineTextEntryListMarkdown('singleLineTextEntryListMarkdown'),
-  singleLineHttpsURLEntryList('singleLineHttpsURLEntryList'),
+  singleLineHttpsUrlEntryList('singleLineHttpsURLEntryList'),
   nestedQuestionsList('nestedQuestionsList'),
   nestedQuestions('nestedQuestions'),
   singleGroupedTagSelector('singleGroupedTagSelector'),
   tagGroup('tagGroup'),
   tagSelection('tagSelection'),
-  tokenCardanoADA('token:cardano:ada'),
+  tokenCardanoAda('token:cardano:ada'),
   durationInMonths('datetime:duration:months'),
   yesNoChoice('yesNoChoice'),
   agreementConfirmation('agreementConfirmation'),
-  spdxLicenseOrURL('spdxLicenseOrURL'),
+  spdxLicenseOrUrl('spdxLicenseOrURL'),
   unknown('unknown');
 
   final String value;
 
   const DocumentPropertyFormat(this.value);
 
-  factory DocumentPropertyFormat.fromString(String value) {
-    final lowerCase = value.toLowerCase();
-
-    return DocumentPropertyFormat.values
-            .firstWhereOrNull((e) => e.value.toLowerCase() == lowerCase) ??
-        DocumentPropertyFormat.unknown;
+  factory DocumentPropertyFormat.fromString(String string) {
+    for (final format in values) {
+      if (format.value.toLowerCase() == string.toLowerCase()) {
+        return format;
+      }
+    }
+    return DocumentPropertyFormat.unknown;
   }
 }

@@ -1,10 +1,9 @@
 import 'package:catalyst_voices_models/src/document/document_builder.dart';
-import 'package:catalyst_voices_models/src/document/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/document_validator.dart';
+import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
+import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
-
-// TODO(dtscalac): tests
 
 /// A class that represents the content described by a [DocumentSchema].
 ///
@@ -36,13 +35,24 @@ final class Document extends Equatable {
   List<Object?> get props => [schemaUrl, schema, properties];
 }
 
+/// A property of the [Document].
+///
+/// See:
+/// - [DocumentListProperty]
+/// - [DocumentObjectProperty]
+/// - [DocumentValueProperty].
 sealed class DocumentProperty extends Equatable {
+  /// The default constructor for the [DocumentProperty].
   const DocumentProperty();
 
+  /// The schema of the property.
   DocumentPropertySchema get schema;
 
+  /// Returns true if the property (including children properties) are valid,
+  /// false otherwise.
   bool get isValid;
 
+  /// Returns a builder that can update the property state.
   DocumentPropertyBuilder toBuilder();
 }
 

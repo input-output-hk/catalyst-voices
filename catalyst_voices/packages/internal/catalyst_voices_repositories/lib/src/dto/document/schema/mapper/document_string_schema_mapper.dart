@@ -37,114 +37,149 @@ final class DocumentStringSchemaMapper {
     required DocumentNodeId nodeId,
     required bool isRequired,
   }) {
+    final format = DocumentPropertyFormat.fromString(schema.format ?? '');
+    final contentMediaType =
+        DocumentContentMediaType.fromString(schema.contentMediaType ?? '');
     final title = schema.title ?? '';
     final description = schema.description;
     final defaultValue = schema.defaultValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
     final strLengthRange =
         Range.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
+    final pattern = schema.pattern;
+    final patternRegExp = pattern != null ? RegExp(pattern) : null;
     final definition = _DocumentStringDefinition.fromDef(schema.definition());
 
     switch (definition) {
       case _DocumentStringDefinition.singleLineTextEntry:
         return DocumentSingleLineTextEntrySchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.singleLineHttpsUrlEntry:
         return DocumentSingleLineHttpsUrlEntrySchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.multiLineTextEntry:
         return DocumentMultiLineTextEntrySchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.multiLineTextEntryMarkdown:
         return DocumentMultiLineTextEntryMarkdownSchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.dropDownSingleSelect:
         return DocumentDropDownSingleSelectSchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.tagGroup:
         return DocumentTagGroupSchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.tagSelection:
         return DocumentTagSelectionSchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.spdxLicenseOrUrl:
         return DocumentSpdxLicenseOrUrlSchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.languageCode:
         return DocumentLanguageCodeSchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
       case _DocumentStringDefinition.unknown:
         return DocumentGenericStringSchema(
           nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
           title: title,
           description: schema.description,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
+          pattern: patternRegExp,
         );
     }
   }

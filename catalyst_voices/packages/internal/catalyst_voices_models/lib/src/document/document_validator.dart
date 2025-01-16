@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
-import 'package:catalyst_voices_models/src/document/document_schema.dart';
+import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 

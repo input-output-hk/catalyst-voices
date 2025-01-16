@@ -1,7 +1,8 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/document_change.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
-import 'package:catalyst_voices_models/src/document/document_schema.dart';
+import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
+import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 /// A mutable document builder that understands the [DocumentSchema].
@@ -86,6 +87,7 @@ final class DocumentBuilder implements DocumentNode {
   }
 }
 
+/// A builder for a single [DocumentProperty].
 sealed class DocumentPropertyBuilder implements DocumentNode {
   /// The default constructor for the [DocumentPropertyBuilder].
   const DocumentPropertyBuilder();
@@ -123,11 +125,12 @@ sealed class DocumentPropertyBuilder implements DocumentNode {
   DocumentProperty build();
 }
 
+/// A [DocumentProperty] builder suited to work with [DocumentListProperty].
 final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   /// The schema of the document property.
   DocumentListSchema _schema;
 
-  /// The list of children.
+  /// The list of children properties.
   List<DocumentPropertyBuilder> _properties;
 
   /// The default constructor for the [DocumentListPropertyBuilder].
@@ -234,11 +237,12 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   }
 }
 
+/// A [DocumentProperty] builder suited to work with [DocumentObjectProperty].
 final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   /// The schema of the document property.
   DocumentObjectSchema _schema;
 
-  /// The list of children.
+  /// The list of children properties.
   List<DocumentPropertyBuilder> _properties;
 
   /// The default constructor for the [DocumentObjectPropertyBuilder].
@@ -296,6 +300,7 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   }
 }
 
+/// A [DocumentProperty] builder suited to work with [DocumentValueProperty].
 final class DocumentValuePropertyBuilder<T extends Object>
     extends DocumentPropertyBuilder {
   /// The schema of the document property.

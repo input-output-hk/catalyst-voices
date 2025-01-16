@@ -33,6 +33,7 @@ final class DocumentListSchemaMapper {
     required DocumentNodeId nodeId,
     required bool isRequired,
   }) {
+    final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
     final itemsSchema = schema.items!.toModel(
       definitions: definitions,
@@ -49,6 +50,7 @@ final class DocumentListSchemaMapper {
       case _DocumentArrayDefinition.multiSelect:
         return DocumentMultiSelectSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -58,6 +60,7 @@ final class DocumentListSchemaMapper {
       case _DocumentArrayDefinition.singleLineTextEntryList:
         return DocumentSingleLineTextEntryListSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -67,6 +70,7 @@ final class DocumentListSchemaMapper {
       case _DocumentArrayDefinition.multiLineTextEntryListMarkdown:
         return DocumentMultiLineTextEntryListMarkdownSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -76,6 +80,7 @@ final class DocumentListSchemaMapper {
       case _DocumentArrayDefinition.singleLineHttpsURLEntryList:
         return DocumentSingleLineHttpsUrlEntryListSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -85,6 +90,7 @@ final class DocumentListSchemaMapper {
       case _DocumentArrayDefinition.nestedQuestionsList:
         return DocumentNestedQuestionsListSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,
@@ -94,6 +100,7 @@ final class DocumentListSchemaMapper {
       case _DocumentArrayDefinition.unknown:
         return DocumentGenericListSchema(
           nodeId: nodeId,
+          format: format,
           title: title,
           description: schema.description,
           isRequired: isRequired,

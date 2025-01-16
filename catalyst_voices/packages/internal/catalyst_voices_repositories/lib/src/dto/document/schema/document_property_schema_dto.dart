@@ -15,6 +15,8 @@ final class DocumentPropertySchemaDto {
   @JsonKey(name: r'$ref')
   final String? ref;
   final String? type;
+  final String? format;
+  final String? contentMediaType;
   final String? title;
   final String? description;
   @JsonKey(name: 'default')
@@ -33,6 +35,7 @@ final class DocumentPropertySchemaDto {
   final int? maxLength;
   final int? minItems;
   final int? maxItems;
+  final String? pattern;
 
   /// Logical boolean algebra conditions.
   final List<DocumentPropertySchemaDto>? oneOf;
@@ -47,6 +50,8 @@ final class DocumentPropertySchemaDto {
   const DocumentPropertySchemaDto({
     this.ref,
     this.type,
+    this.format,
+    this.contentMediaType,
     this.title,
     this.description,
     this.defaultValue,
@@ -64,6 +69,7 @@ final class DocumentPropertySchemaDto {
     this.oneOf,
     this.required,
     this.order,
+    this.pattern,
   });
 
   factory DocumentPropertySchemaDto.fromJson(Map<String, dynamic> json) =>
@@ -184,6 +190,8 @@ final class DocumentPropertySchemaDto {
     return DocumentPropertySchemaDto(
       ref: ref ?? other.ref,
       type: type ?? other.type,
+      format: format ?? other.format,
+      contentMediaType: contentMediaType ?? other.contentMediaType,
       title: title ?? other.title,
       description: description ?? other.description,
       defaultValue: defaultValue ?? other.defaultValue,
@@ -198,6 +206,7 @@ final class DocumentPropertySchemaDto {
       oneOf: oneOf ?? other.oneOf,
       required: required ?? other.required,
       order: order ?? other.order,
+      pattern: pattern ?? other.pattern,
     );
   }
 

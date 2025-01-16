@@ -28,6 +28,7 @@ final class DocumentNumberSchemaMapper {
     required DocumentNodeId nodeId,
     required bool isRequired,
   }) {
+    final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
     final defaultValue = schema.defaultValue as double?;
     final enumValues = schema.enumValues?.cast<double>();
@@ -42,6 +43,7 @@ final class DocumentNumberSchemaMapper {
         return DocumentGenericNumberSchema(
           nodeId: nodeId,
           title: title,
+          format: format,
           description: schema.description,
           isRequired: isRequired,
           defaultValue: defaultValue,
