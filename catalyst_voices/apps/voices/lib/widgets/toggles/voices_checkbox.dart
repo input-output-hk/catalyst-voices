@@ -59,7 +59,7 @@ class VoicesCheckbox extends StatelessWidget {
             side: isDisabled
                 ? BorderSide(
                     width: 2,
-                    color: Theme.of(context).colors.onSurfaceNeutral012!,
+                    color: Theme.of(context).colors.onSurfaceNeutral012,
                   )
                 : null,
           ),

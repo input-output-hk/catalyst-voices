@@ -23,7 +23,7 @@ class SelectableTile extends StatelessWidget {
         borderRadius: _borderRadius(isSelected),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0!,
+            color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
             offset: const Offset(0, 1),
             blurRadius: 4,
           ),
