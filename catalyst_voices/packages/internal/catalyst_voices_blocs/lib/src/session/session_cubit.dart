@@ -123,7 +123,9 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   Future<void> _checkAvailableWallets() async {
-    final wallets = await _registrationService.getCardanoWallets();
+    final wallets = await _registrationService
+        .getCardanoWallets()
+        .onError((_, __) => const []);
 
     _hasWallets = wallets.isNotEmpty;
 
@@ -147,11 +149,14 @@ final class SessionCubit extends Cubit<SessionState>
 
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
-      return VisitorSessionState(isRegistrationInProgress: !isEmpty);
+      return VisitorSessionState(
+        canCreateAccount: hasWallets,
+        isRegistrationInProgress: !isEmpty,
+      );
     }
 
     if (!isUnlocked) {
-      return const GuestSessionState();
+      return GuestSessionState(canCreateAccount: hasWallets);
     }
 
     final sessionAccount = SessionAccount.fromAccount(account);
