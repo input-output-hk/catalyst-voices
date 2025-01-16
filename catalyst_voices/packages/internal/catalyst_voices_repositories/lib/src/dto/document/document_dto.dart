@@ -146,7 +146,7 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
   @override
   DocumentListProperty toModel() {
     final mappedProperties = properties.map((e) => e.toModel()).toList();
-    
+
     return DocumentListProperty(
       schema: schema,
       properties: mappedProperties,
