@@ -80,7 +80,7 @@ class _WarningIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = theme.colors.iconsError!;
+    final color = theme.colors.iconsError;
 
     return VoicesAvatar(
       border: Border.all(
