@@ -96,6 +96,11 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(e) => Responses::BadRequest(Json(PutDocumentBadRequest::new(&e))).into(),
+        Err(_) => {
+            Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                "Invalid CBOR encoded document",
+            )))
+            .into()
+        },
     }
 }
