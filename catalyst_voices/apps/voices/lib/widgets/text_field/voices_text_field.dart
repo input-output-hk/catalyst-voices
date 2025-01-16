@@ -216,6 +216,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           minHeight: widget.maxLines == null ? 65 : 48,
           iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
+            key: const Key('VoicesTextField'),
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
             expands: resizable,
@@ -467,9 +468,9 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       case VoicesTextFieldStatus.none:
         return orDefault;
       case VoicesTextFieldStatus.success:
-        return Theme.of(context).colors.success!;
+        return Theme.of(context).colors.success;
       case VoicesTextFieldStatus.warning:
-        return Theme.of(context).colors.warning!;
+        return Theme.of(context).colors.warning;
       case VoicesTextFieldStatus.error:
         return Theme.of(context).colorScheme.error;
     }

@@ -7,11 +7,11 @@ class SelectorUtils {
     PatrolFinder widget, {
     bool? reverse = false,
   }) {
-    final widgetProps = $.tester.widget(widget).toString().split('(').last;
+    final dynamic widgetProps = $.tester.widget(widget);
     final expectedState = reverse! ? 'enabled' : 'disabled';
     expect(
-      widgetProps.contains('disabled'),
-      !reverse,
+      widgetProps.enabled, // ignore: avoid_dynamic_calls
+      reverse,
       reason: 'Expected $expectedState (${widget.description})',
     );
   }

@@ -27,7 +27,7 @@ class WalletSummary extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           width: 1.5,
-          color: Theme.of(context).colors.outlineBorderVariant!,
+          color: Theme.of(context).colors.outlineBorderVariant,
         ),
       ),
       child: Column(

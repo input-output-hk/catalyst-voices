@@ -9,6 +9,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../pageobject/account_dropdown_page.dart';
 import '../pageobject/app_bar_page.dart';
 import '../pageobject/overall_spaces_page.dart';
+import '../utils/constants.dart';
 
 void main() async {
   late final GoRouter router;
@@ -34,7 +35,7 @@ void main() async {
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.userShortcutBtn)
-              .tap(settleTimeout: const Duration(seconds: 10));
+              .tap(settleTimeout: Time.long.duration);
           await $(AppBarPage.accountPopupBtn).tap();
           await AccountDropdownPage.accountDropdownLooksAsExpected($);
           await AccountDropdownPage.accountDropdownContainsSpecificData($);

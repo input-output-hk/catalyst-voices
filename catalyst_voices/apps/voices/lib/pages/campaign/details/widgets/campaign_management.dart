@@ -82,7 +82,7 @@ class _CampaignStatusIndicator extends StatelessWidget {
         decoration: BoxDecoration(
           color: currentStatus == campaignStatus
               ? theme.colors.success
-              : theme.colors.onSurfaceNeutral012?.withOpacity(.12),
+              : theme.colors.onSurfaceNeutral012.withOpacity(.12),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Padding(
