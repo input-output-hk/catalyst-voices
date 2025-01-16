@@ -75,6 +75,31 @@ final class DocumentPropertySchemaDto {
     required this.pattern,
   });
 
+  const DocumentPropertySchemaDto.optional({
+    this.ref,
+    this.types,
+    this.format,
+    this.contentMediaType,
+    this.title,
+    this.description,
+    this.defaultValue,
+    this.guidance,
+    this.constValue,
+    this.enumValues,
+    this.properties,
+    this.items,
+    this.minimum,
+    this.maximum,
+    this.minLength,
+    this.maxLength,
+    this.maxItems,
+    this.minItems,
+    this.oneOf,
+    this.required,
+    this.order,
+    this.pattern,
+  });
+
   factory DocumentPropertySchemaDto.fromJson(Map<String, dynamic> json) =>
       _$DocumentPropertySchemaDtoFromJson(json);
 
@@ -142,7 +167,7 @@ final class DocumentPropertySchemaDto {
           isRequired: isRequiredAndNonNullable,
         );
       case DocumentPropertyTypeDto.nullable:
-        throw ArgumentError('The primary property type cannot be null');
+        throw ArgumentError('The primary property type cannot be "null".');
     }
   }
 
