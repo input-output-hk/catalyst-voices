@@ -12,7 +12,7 @@ use put_document::{bad_put_request::PutDocumentBadRequest, MAXIMUM_DOCUMENT_SIZE
 
 use crate::service::{
     common::{
-        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
+        auth::rbac::scheme::CatalystRBACSecurityScheme,
         tags::ApiTags,
         types::{
             generic::{
