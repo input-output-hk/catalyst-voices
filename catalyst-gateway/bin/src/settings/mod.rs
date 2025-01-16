@@ -11,7 +11,6 @@ use anyhow::anyhow;
 use cardano_chain_follower::Network;
 use clap::Args;
 use dotenvy::dotenv;
-use duration_string::DurationString;
 use str_env_var::StringEnvVar;
 use tracing::error;
 use url::Url;
@@ -51,6 +50,9 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 
 /// Default `CHECK_CONFIG_TICK` used in development.
 const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
+
+/// Default `METRICS_MEMORY_INTERVAL`.
+const METRICS_MEMORY_INTERVAL_DEFAULT: &str = "1s";
 
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
@@ -144,6 +146,9 @@ struct EnvVars {
     /// Tick every N seconds until config exists in db
     #[allow(unused)]
     check_config_tick: Duration,
+
+    /// Interval for updating and sending memory metrics.
+    metrics_memory_interval: Duration,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -156,19 +161,6 @@ struct EnvVars {
 static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
-
-    let check_interval = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT.into());
-    let check_config_tick = match DurationString::try_from(check_interval.as_string()) {
-        Ok(duration) => duration.into(),
-        Err(error) => {
-            error!(
-                "Invalid Check Config Tick Duration: {} : {}. Defaulting to 5 seconds.",
-                check_interval.as_str(),
-                error
-            );
-            Duration::from_secs(5)
-        },
-    };
 
     EnvVars {
         github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),
@@ -194,7 +186,14 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         ),
         chain_follower: chain_follower::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
-        check_config_tick,
+        check_config_tick: StringEnvVar::new_as_duration(
+            "CHECK_CONFIG_TICK",
+            CHECK_CONFIG_TICK_DEFAULT,
+        ),
+        metrics_memory_interval: StringEnvVar::new_as_duration(
+            "METRICS_MEMORY_INTERVAL",
+            METRICS_MEMORY_INTERVAL_DEFAULT,
+        ),
     }
 });
 
@@ -286,6 +285,11 @@ impl Settings {
     /// The Service UUID
     pub(crate) fn service_id() -> &'static str {
         ENV_VARS.service_id.as_str()
+    }
+
+    /// The memory metrics interval
+    pub(crate) fn metrics_memory_interval() -> Duration {
+        ENV_VARS.metrics_memory_interval
     }
 
     /// Get a list of all host names to serve the API on.
