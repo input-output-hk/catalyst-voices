@@ -122,7 +122,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
           ? RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: Theme.of(context).colors.outlineBorderVariant!,
+                color: Theme.of(context).colors.outlineBorderVariant,
               ),
             )
           : Theme.of(context).dialogTheme.shape,

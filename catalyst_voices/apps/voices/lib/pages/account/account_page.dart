@@ -120,7 +120,7 @@ class _KeychainCard extends StatelessWidget {
           Radius.circular(16),
         ),
         border: Border.all(
-          color: Theme.of(context).colors.outlineBorderVariant!,
+          color: Theme.of(context).colors.outlineBorderVariant,
           width: 1,
         ),
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
