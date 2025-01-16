@@ -22,8 +22,8 @@ static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
 /// Starts a background thread to periodically update memory metrics.
 ///
-/// This function spawns a thread that updates the global `MemoryMetrics`
-/// structure at regular intervals defined by `UPDATE_INTERVAL_MILLI`.
+/// This function spawns a thread that updates the memory metrics
+/// at regular intervals defined by the `METRICS_MEMORY_INTERVAL` envar.
 pub(crate) fn init_metrics_updater() {
     if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
         return;
@@ -82,7 +82,7 @@ mod reporter {
 
     use prometheus::{register_int_gauge_vec, IntGaugeVec};
 
-    /// Labels for the client metrics
+    /// Labels for the memory metrics
     const MEMORY_METRIC_LABELS: [&str; 2] = ["api_host_names", "service_id"];
 
     /// The "physical" memory used by this process, in bytes.
