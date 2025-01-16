@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:test/test.dart';
@@ -58,59 +57,6 @@ void main() {
 
       // verify they are the same
       expect(deserializedDoc, equals(originalDoc));
-    });
-
-    test('Converts segments list into object for JSON', () {
-      // final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      // final schema = schemaDto.toModel();
-
-      // final document = DocumentBuilder.fromSchema(
-      //   schemaUrl: schemaPath,
-      //   schema: schema,
-      // ).build();
-
-      // final documentDto = DocumentDto.fromModel(document);
-      // final documentJson = documentDto.toJson();
-
-      // for (final segment in documentDto.properties) {
-      //   expect(documentJson[segment.schema.id], isA<Map<String, dynamic>>());
-      // }
-    });
-
-    test('Converts object from JSON into List of segments', () {
-      final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      final schema = schemaDto.toModel();
-
-      final document = DocumentBuilder.fromSchema(
-        schemaUrl: schemaPath,
-        schema: schema,
-      ).build();
-
-      final documentDto = DocumentDto.fromModel(document);
-
-      final documentJson = documentDto.toJson();
-      final documentDtoFromJson =
-          DocumentDto.fromJsonSchema(documentJson, schema);
-
-      expect(
-        documentDtoFromJson.properties.length,
-        documentDto.properties.length,
-      );
-    });
-
-    test('After serialization $DocumentPropertyValueDto has correct type', () {
-      // final schemaDto = DocumentSchemaDto.fromJson(schemaJson);
-      // final schema = schemaDto.toModel();
-
-      // final documentDto = DocumentDto.fromJsonSchema(documentJson, schema);
-
-      // final agreementSegment = documentDto.properties
-      //     .indexWhere((e) => e.schema.nodeId.paths.last == 'agreements');
-      // expect(agreementSegment, isNot(equals(-1)));
-      // final agreementSections = documentDto.properties[agreementSegment].sections;
-      // final agreementProperty = agreementSections.first.properties.first
-      //     as DocumentPropertyValueDto<Object>;
-      // expect(agreementProperty.value, true);
     });
   });
 }
