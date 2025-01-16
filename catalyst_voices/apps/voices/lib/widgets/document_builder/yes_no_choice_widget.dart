@@ -69,7 +69,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
           onChanged: _handleValueChanged,
           validator: (value) {
             // TODO(dtscalac): add validation
-            final result = widget.property.schema.validatePropertyValue(value);
+            final result = widget.property.schema.validate(value);
 
             return LocalizedDocumentValidationResult.from(result)
                 .message(context);

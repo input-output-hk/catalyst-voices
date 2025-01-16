@@ -102,7 +102,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
       return const VoicesTextFieldValidationResult.none();
     }
     final schema = widget.property.schema;
-    final result = schema.validatePropertyValue(value);
+    final result = schema.validate(value);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.success();
     } else {

@@ -105,7 +105,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   VoicesTextFieldValidationResult _validate(int? value, String text) {
-    final result = widget.schema.validatePropertyValue(value);
+    final result = widget.schema.validate(value);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {

@@ -14,8 +14,11 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
         );
 
   @override
-  DocumentValidationResult validatePropertyValue(bool? value) {
-    return DocumentValidator.validateBool(this, value);
+  DocumentValidationResult validate(bool? value) {
+    return DocumentValidationResult.merge([
+      DocumentValidator.validateIfRequired(this, value),
+      DocumentValidator.validateBool(this, value),
+    ]);
   }
 }
 

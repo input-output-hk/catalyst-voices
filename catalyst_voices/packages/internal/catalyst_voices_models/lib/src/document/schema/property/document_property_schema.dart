@@ -18,6 +18,9 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   final DocumentPropertyFormat? format;
   final String title;
   final String? description;
+
+  /// True if the property must exist and be non-nullable,
+  /// false if the property may not exist or be nullable.
   final bool isRequired;
 
   const DocumentPropertySchema({
@@ -76,7 +79,7 @@ sealed class DocumentValueSchema<T extends Object>
     return DocumentValueProperty(
       schema: withNodeId(parentNodeId.child(childId)) as DocumentValueSchema<T>,
       value: value,
-      validationResult: validatePropertyValue(value),
+      validationResult: validate(value),
     );
   }
 
@@ -96,7 +99,7 @@ sealed class DocumentValueSchema<T extends Object>
   }
 
   /// Validates the property [value] against document rules.
-  DocumentValidationResult validatePropertyValue(T? value);
+  DocumentValidationResult validate(T? value);
 
   @override
   @mustCallSuper

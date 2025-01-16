@@ -1,7 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_properties_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_converter_ext.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 /// A data transfer object for the [Document].
 ///
@@ -47,7 +45,7 @@ final class DocumentDto {
   }
 
   Document toModel() {
-    // building a document via builder to sort segments/sections/properties
+    // building a document via builder to sort properties
     return DocumentBuilder(
       schemaUrl: schemaUrl,
       schema: schema,
@@ -147,9 +145,12 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
 
   @override
   DocumentListProperty toModel() {
+    final mappedProperties = properties.map((e) => e.toModel()).toList();
+    
     return DocumentListProperty(
       schema: schema,
-      properties: properties.map((e) => e.toModel()).toList(),
+      properties: mappedProperties,
+      validationResult: schema.validate(mappedProperties),
     );
   }
 
@@ -195,9 +196,12 @@ final class DocumentPropertyObjectDto extends DocumentPropertyDto {
 
   @override
   DocumentObjectProperty toModel() {
+    final mappedProperties = properties.map((e) => e.toModel()).toList();
+
     return DocumentObjectProperty(
       schema: schema,
-      properties: properties.map((e) => e.toModel()).toList(),
+      properties: mappedProperties,
+      validationResult: schema.validate(mappedProperties),
     );
   }
 
@@ -225,11 +229,10 @@ final class DocumentPropertyValueDto<T extends Object>
     required DocumentPropertiesDto properties,
   }) {
     final property = properties.getProperty(schema.nodeId);
-    final converter = schema.converter as JsonConverter<T?, Object?>;
 
     return DocumentPropertyValueDto<T>(
       schema: schema,
-      value: converter.fromJson(property),
+      value: property as T?,
     );
   }
 
@@ -245,12 +248,12 @@ final class DocumentPropertyValueDto<T extends Object>
     return DocumentValueProperty<T>(
       schema: schema,
       value: value,
-      validationResult: schema.validatePropertyValue(value),
+      validationResult: schema.validate(value),
     );
   }
 
   @override
   Map<String, dynamic> toJson() => {
-        schema.id: schema.converter.toJson(value),
+        schema.id: value,
       };
 }

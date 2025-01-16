@@ -122,7 +122,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       return const VoicesTextFieldValidationResult.none();
     }
     final schema = widget.schema;
-    final result = schema.validatePropertyValue(value);
+    final result = schema.validate(value);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {

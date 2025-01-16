@@ -17,8 +17,11 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
         );
 
   @override
-  DocumentValidationResult validatePropertyValue(double? value) {
-    return DocumentValidator.validateNumber(this, value);
+  DocumentValidationResult validate(double? value) {
+    return DocumentValidationResult.merge([
+      DocumentValidator.validateIfRequired(this, value),
+      DocumentValidator.validateNumberRange(this, value),
+    ]);
   }
 
   @override

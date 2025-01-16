@@ -21,8 +21,12 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
         );
 
   @override
-  DocumentValidationResult validatePropertyValue(String? value) {
-    return DocumentValidator.validateString(this, value);
+  DocumentValidationResult validate(String? value) {
+    return DocumentValidationResult.merge([
+      DocumentValidator.validateIfRequired(this, value),
+      DocumentValidator.validateStringLength(this, value),
+      DocumentValidator.validateStringPattern(this, value),
+    ]);
   }
 
   @override

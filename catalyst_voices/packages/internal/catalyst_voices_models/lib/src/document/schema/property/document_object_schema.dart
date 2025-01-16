@@ -25,11 +25,21 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
     final childId = const Uuid().v4();
     final childNodeId = parentNodeId.child(childId);
 
+    final updatedSchema = withNodeId(childNodeId) as DocumentObjectSchema;
+    final updatedProperties =
+        properties.map((e) => e.createProperty(parentNodeId)).toList();
+
     return DocumentObjectProperty(
-      schema: withNodeId(childNodeId) as DocumentObjectSchema,
-      properties:
-          properties.map((e) => e.createProperty(parentNodeId)).toList(),
+      schema: updatedSchema,
+      properties: updatedProperties,
+      validationResult: updatedSchema.validate(updatedProperties),
     );
+  }
+
+  /// Validates the property against document rules.
+  DocumentValidationResult validate(List<DocumentProperty> properties) {
+    // TODO(dtscalac): object type validation
+    return const SuccessfulDocumentValidation();
   }
 
   @override

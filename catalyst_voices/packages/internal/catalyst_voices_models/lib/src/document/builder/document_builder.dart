@@ -1,5 +1,5 @@
+import 'package:catalyst_voices_models/src/document/builder/document_change.dart';
 import 'package:catalyst_voices_models/src/document/document.dart';
-import 'package:catalyst_voices_models/src/document/document_change.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
@@ -77,12 +77,13 @@ final class DocumentBuilder implements DocumentNode {
 
   /// Builds an immutable [Document].
   Document build() {
-    _properties.sortByOrder(_schema.order);
+    final mappedProperties = _properties.map((e) => e.build()).toList()
+      ..sortByOrder(_schema.order);
 
     return Document(
       schemaUrl: _schemaUrl,
       schema: _schema,
-      properties: List.unmodifiable(_properties.map((e) => e.build())),
+      properties: List.unmodifiable(mappedProperties),
     );
   }
 }
@@ -180,9 +181,12 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   /// Builds an immutable [DocumentListProperty].
   @override
   DocumentListProperty build() {
+    final mappedProperties = _properties.map((e) => e.build()).toList();
+
     return DocumentListProperty(
       schema: _schema,
-      properties: _properties.map((e) => e.build()).toList(),
+      properties: List.unmodifiable(mappedProperties),
+      validationResult: _schema.validate(mappedProperties),
     );
   }
 
@@ -291,11 +295,13 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   /// Builds an immutable [DocumentObjectProperty].
   @override
   DocumentObjectProperty build() {
-    _properties.sortByOrder(_schema.order);
+    final mappedProperties = _properties.map((e) => e.build()).toList()
+      ..sortByOrder(_schema.order);
 
     return DocumentObjectProperty(
       schema: _schema,
-      properties: _properties.map((e) => e.build()).toList(),
+      properties: List.unmodifiable(mappedProperties),
+      validationResult: _schema.validate(mappedProperties),
     );
   }
 }
@@ -363,7 +369,7 @@ final class DocumentValuePropertyBuilder<T extends Object>
     return DocumentValueProperty(
       schema: _schema,
       value: _value,
-      validationResult: _schema.validatePropertyValue(_value),
+      validationResult: _schema.validate(_value),
     );
   }
 }

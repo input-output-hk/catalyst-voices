@@ -17,8 +17,11 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
         );
 
   @override
-  DocumentValidationResult validatePropertyValue(int? value) {
-    return DocumentValidator.validateInteger(this, value);
+  DocumentValidationResult validate(int? value) {
+    return DocumentValidationResult.merge([
+      DocumentValidator.validateIfRequired(this, value),
+      DocumentValidator.validateIntegerRange(this, value),
+    ]);
   }
 
   @override

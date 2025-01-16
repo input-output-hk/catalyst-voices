@@ -1,7 +1,8 @@
-import 'package:catalyst_voices_models/src/document/document_builder.dart';
-import 'package:catalyst_voices_models/src/document/document_validator.dart';
+import 'package:catalyst_voices_models/src/document/builder/document_builder.dart';
+import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
+import 'package:catalyst_voices_models/src/document/validation/document_validation_result.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
@@ -41,9 +42,12 @@ final class Document extends Equatable {
 /// - [DocumentListProperty]
 /// - [DocumentObjectProperty]
 /// - [DocumentValueProperty].
-sealed class DocumentProperty extends Equatable {
+sealed class DocumentProperty extends Equatable implements DocumentNode {
   /// The default constructor for the [DocumentProperty].
   const DocumentProperty();
+
+  @override
+  DocumentNodeId get nodeId => schema.nodeId;
 
   /// The schema of the property.
   DocumentPropertySchema get schema;
@@ -61,20 +65,32 @@ sealed class DocumentProperty extends Equatable {
 ///
 /// More properties of the same type might be added to the list.
 final class DocumentListProperty extends DocumentProperty {
+  /// The schema of the document property.
   @override
   final DocumentListSchema schema;
+
+  /// The children properties.
   final List<DocumentProperty> properties;
+
+  /// The validation result against the [schema].
+  final DocumentValidationResult validationResult;
 
   const DocumentListProperty({
     required this.schema,
     required this.properties,
+    required this.validationResult,
   });
 
   @override
   bool get isValid {
+    if (validationResult.isInvalid) {
+      return false;
+    }
+
     for (final property in properties) {
       if (!property.isValid) return false;
     }
+
     return true;
   }
 
@@ -91,20 +107,32 @@ final class DocumentListProperty extends DocumentProperty {
 ///
 /// More properties cannot be added to the list.
 final class DocumentObjectProperty extends DocumentProperty {
+  /// The schema of the document property.
   @override
   final DocumentObjectSchema schema;
+
+  /// The children properties.
   final List<DocumentProperty> properties;
+
+  /// The validation result against the [schema].
+  final DocumentValidationResult validationResult;
 
   const DocumentObjectProperty({
     required this.schema,
     required this.properties,
+    required this.validationResult,
   });
 
   @override
   bool get isValid {
+    if (validationResult.isInvalid) {
+      return false;
+    }
+
     for (final property in properties) {
       if (!property.isValid) return false;
     }
+
     return true;
   }
 
@@ -119,7 +147,7 @@ final class DocumentObjectProperty extends DocumentProperty {
   }
 
   @override
-  List<Object?> get props => [schema, properties];
+  List<Object?> get props => [schema, properties, validationResult];
 }
 
 /// A property with a value with no additional children.
@@ -131,7 +159,7 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
   /// The current value this property holds.
   final T? value;
 
-  /// The validation result for the [value] against the [schema].
+  /// The validation result against the [schema].
   final DocumentValidationResult validationResult;
 
   /// The default constructor for the [DocumentValueProperty].

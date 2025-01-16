@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/enum/document_property_type_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/mapper/document_boolean_schema_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/mapper/document_integer_schema_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/mapper/document_list_schema_mapper.dart';
@@ -14,7 +15,9 @@ part 'document_property_schema_dto.g.dart';
 final class DocumentPropertySchemaDto {
   @JsonKey(name: r'$ref')
   final String? ref;
-  final String? type;
+  @JsonKey(name: 'type')
+  @DocumentPropertyTypeDtoConverter()
+  final List<DocumentPropertyTypeDto>? types;
   final String? format;
   final String? contentMediaType;
   final String? title;
@@ -49,7 +52,7 @@ final class DocumentPropertySchemaDto {
 
   const DocumentPropertySchemaDto({
     this.ref,
-    this.type,
+    this.types,
     this.format,
     this.contentMediaType,
     this.title,
@@ -85,51 +88,61 @@ final class DocumentPropertySchemaDto {
     final definitionSchema = definitions.getDefinition(definition());
     final schema =
         definitionSchema != null ? mergeWith(definitionSchema) : this;
-    final type = DocumentPropertyType.fromString(schema.type!);
+    final types = schema.types ?? [];
+    final isRequiredAndNonNullable =
+        isRequired && !types.contains(DocumentPropertyTypeDto.nullable);
+
+    final type = types.firstWhere(
+      (e) => e != DocumentPropertyTypeDto.nullable,
+      orElse: () =>
+          throw ArgumentError('Property type cannot be empty or nullable'),
+    );
 
     switch (type) {
-      case DocumentPropertyType.list:
+      case DocumentPropertyTypeDto.array:
         return DocumentListSchemaMapper.toModel(
           definitions: definitions,
           schema: schema,
           nodeId: nodeId,
-          isRequired: isRequired,
+          isRequired: isRequiredAndNonNullable,
         );
-      case DocumentPropertyType.object:
+      case DocumentPropertyTypeDto.object:
         return DocumentObjectSchemaMapper.toModel(
           definitions: definitions,
           schema: schema,
           nodeId: nodeId,
-          isRequired: isRequired,
+          isRequired: isRequiredAndNonNullable,
         );
-      case DocumentPropertyType.string:
+      case DocumentPropertyTypeDto.string:
         return DocumentStringSchemaMapper.toModel(
           definitions: definitions,
           schema: schema,
           nodeId: nodeId,
-          isRequired: isRequired,
+          isRequired: isRequiredAndNonNullable,
         );
-      case DocumentPropertyType.integer:
+      case DocumentPropertyTypeDto.integer:
         return DocumentIntegerSchemaMapper.toModel(
           definitions: definitions,
           schema: schema,
           nodeId: nodeId,
-          isRequired: isRequired,
+          isRequired: isRequiredAndNonNullable,
         );
-      case DocumentPropertyType.number:
+      case DocumentPropertyTypeDto.number:
         return DocumentNumberSchemaMapper.toModel(
           definitions: definitions,
           schema: schema,
           nodeId: nodeId,
-          isRequired: isRequired,
+          isRequired: isRequiredAndNonNullable,
         );
-      case DocumentPropertyType.boolean:
+      case DocumentPropertyTypeDto.boolean:
         return DocumentBooleanSchemaMapper.toModel(
           definitions: definitions,
           schema: schema,
           nodeId: nodeId,
-          isRequired: isRequired,
+          isRequired: isRequiredAndNonNullable,
         );
+      case DocumentPropertyTypeDto.nullable:
+        throw ArgumentError('The primary property type cannot be null');
     }
   }
 
@@ -189,7 +202,7 @@ final class DocumentPropertySchemaDto {
 
     return DocumentPropertySchemaDto(
       ref: ref ?? other.ref,
-      type: type ?? other.type,
+      types: types ?? other.types,
       format: format ?? other.format,
       contentMediaType: contentMediaType ?? other.contentMediaType,
       title: title ?? other.title,

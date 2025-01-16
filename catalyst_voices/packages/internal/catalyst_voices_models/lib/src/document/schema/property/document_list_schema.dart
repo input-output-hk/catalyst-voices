@@ -23,10 +23,19 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
     final childId = const Uuid().v4();
     final childNodeId = parentNodeId.child(childId);
 
+    final updatedSchema = withNodeId(childNodeId) as DocumentListSchema;
+    const updatedProperties = <DocumentProperty>[];
+
     return DocumentListProperty(
-      schema: withNodeId(childNodeId) as DocumentListSchema,
-      properties: const [],
+      schema: updatedSchema,
+      properties: updatedProperties,
+      validationResult: updatedSchema.validate(updatedProperties),
     );
+  }
+
+  /// Validates the property against document rules.
+  DocumentValidationResult validate(List<DocumentProperty> properties) {
+    return DocumentValidator.validateListItems(this, properties);
   }
 
   @override

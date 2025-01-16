@@ -20,7 +20,7 @@ final class DocumentPropertiesDto {
       } else if (object is List) {
         final index = int.tryParse(path);
         if (index == null) {
-          // index can't be anything else than a number
+          // index must be a number
           return null;
         }
         object = object[index];
