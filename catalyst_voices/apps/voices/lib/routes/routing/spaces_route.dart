@@ -88,9 +88,9 @@ final class WorkspaceRoute extends GoRouteData
   const WorkspaceRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -108,9 +108,9 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   });
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -128,9 +128,9 @@ final class ProposalBuilderRoute extends GoRouteData
   });
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -144,9 +144,9 @@ final class VotingRoute extends GoRouteData
   const VotingRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -160,9 +160,9 @@ final class FundedProjectsRoute extends GoRouteData
   const FundedProjectsRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -176,9 +176,9 @@ final class TreasuryRoute extends GoRouteData
   const TreasuryRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const AdminAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        AdminAccessGuard(),
       ];
 
   @override
