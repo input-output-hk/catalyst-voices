@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
-// Note. This class should be removed once Repository does not build document's
-// base on it.
+// TODO(damian-molinski): This class should be removed once Repository does not
+// build document's base on it.
 class VoicesDocumentsTemplates {
   VoicesDocumentsTemplates._();
 
