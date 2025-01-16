@@ -134,10 +134,12 @@ impl<T> WithErrorResponses<T> {
     pub(crate) fn service_unavailable(err: &anyhow::Error, retry: RetryAfterOption) -> Self {
         let error = ServiceUnavailable::new(None);
         error!(id=%error.id(), error=?err, retry_after=?retry);
-        WithErrorResponses::Error(ErrorResponses::ServiceUnavailable(
-            Json(error),
-            retry.into(),
-        ))
+        let retry = match retry {
+            RetryAfterOption::Default => Some(RetryAfterHeader::default()),
+            RetryAfterOption::None => None,
+            RetryAfterOption::Some(value) => Some(value),
+        };
+        WithErrorResponses::Error(ErrorResponses::ServiceUnavailable(Json(error), retry))
     }
 
     /// Handle a 500 internal error response.
