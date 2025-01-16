@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_dto.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 final class DocumentSchemaDto {
   @JsonKey(name: r'$schema')
   final String schema;
@@ -36,6 +36,7 @@ final class DocumentSchemaDto {
     required this.order,
     required this.propertiesSchema,
   });
+
   factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
     final segmentsMap = json['properties'] as Map<String, dynamic>;
     json['propertiesSchema'] =
