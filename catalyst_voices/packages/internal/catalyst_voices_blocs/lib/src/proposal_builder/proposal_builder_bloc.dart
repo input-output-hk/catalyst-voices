@@ -28,13 +28,13 @@ final class ProposalBuilderBloc
     on<LoadProposalTemplateEvent>(_loadProposalTemplate);
     on<LoadProposalEvent>(_loadProposal);
     on<ActiveNodeChangedEvent>(
-      _handleActiveStepEvent,
+      _handleActiveNodeChangedEvent,
       transformer: (events, mapper) => events.distinct(),
     );
     on<SectionChangedEvent>(_handleSectionChangedEvent);
   }
 
-  void _handleActiveStepEvent(
+  void _handleActiveNodeChangedEvent(
     ActiveNodeChangedEvent event,
     Emitter<ProposalBuilderState> emit,
   ) {
