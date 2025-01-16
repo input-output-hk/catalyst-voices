@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -6,12 +7,15 @@ import 'package:flutter/material.dart';
 sealed class SessionState extends Equatable {
   const SessionState();
 
+  /// Currently used account by this session. Null when not active.
+  SessionAccount? get account => null;
+
   /// Returns a list of all available spaces
   /// corresponding to the current session state.
-  List<Space> get spaces;
+  List<Space> get spaces => const [];
 
   /// Returns a list of [spaces] that should be shown in overall spaces menu.
-  List<Space> get overallSpaces;
+  List<Space> get overallSpaces => const [];
 }
 
 /// The user hasn't registered yet nor setup the keychain.
@@ -24,11 +28,6 @@ final class VisitorSessionState extends SessionState {
 
   @override
   List<Space> get spaces => const [Space.discovery];
-
-  @override
-  List<Space> get overallSpaces => const [
-        // not supported
-      ];
 
   @override
   List<Object?> get props => [
@@ -44,16 +43,13 @@ final class GuestSessionState extends SessionState {
   List<Space> get spaces => const [Space.discovery];
 
   @override
-  List<Space> get overallSpaces => const [
-        // not supported
-      ];
-
-  @override
   List<Object?> get props => [];
 }
 
 /// The user has registered and unlocked the keychain.
 final class ActiveAccountSessionState extends SessionState {
+  @override
+  final SessionAccount account;
   @override
   final List<Space> spaces;
   @override
@@ -61,6 +57,7 @@ final class ActiveAccountSessionState extends SessionState {
   final Map<Space, ShortcutActivator> spacesShortcuts;
 
   const ActiveAccountSessionState({
+    required this.account,
     required this.spaces,
     required this.overallSpaces,
     required this.spacesShortcuts,
@@ -68,6 +65,7 @@ final class ActiveAccountSessionState extends SessionState {
 
   @override
   List<Object?> get props => [
+        account,
         spaces,
         overallSpaces,
         spacesShortcuts,

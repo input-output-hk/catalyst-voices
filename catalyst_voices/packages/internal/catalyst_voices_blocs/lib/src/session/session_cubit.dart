@@ -140,11 +140,13 @@ final class SessionCubit extends Cubit<SessionState>
       return const GuestSessionState();
     }
 
+    final sessionAccount = SessionAccount.fromAccount(account);
     final spaces = _accessControl.spacesAccess(account);
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
     return ActiveAccountSessionState(
+      account: sessionAccount,
       spaces: spaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
@@ -155,6 +157,7 @@ final class SessionCubit extends Cubit<SessionState>
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
         return ActiveAccountSessionState(
+          account: const SessionAccount.mocked(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
