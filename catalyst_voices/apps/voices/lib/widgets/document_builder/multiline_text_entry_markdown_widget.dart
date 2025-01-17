@@ -6,7 +6,6 @@ import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:flutter_quill/flutter_quill.dart';
 
 class MultilineTextEntryMarkdownWidget extends StatefulWidget {
   final DocumentProperty<String> property;
@@ -33,11 +32,8 @@ class _MultilineTextEntryMarkdownWidgetState
   late final VoicesRichTextFocusNode _focus;
   late final ScrollController _scrollController;
 
-  final MarkdownEncoder _encoder = const MarkdownEncoder();
-  final MarkdownDecoder _decoder = const MarkdownDecoder();
-
   quill.Document? _observedDocument;
-  StreamSubscription<DocChange>? _documentChangeSub;
+  StreamSubscription<quill.DocChange>? _documentChangeSub;
   quill.Document? _preEditDocument;
 
   String get _description => widget.property.formattedDescription;
@@ -48,7 +44,7 @@ class _MultilineTextEntryMarkdownWidgetState
   void initState() {
     super.initState();
 
-    _handleInitialValue();
+    _buildController(value: _value);
     _controller.addListener(_onControllerChanged);
 
     _focus = VoicesRichTextFocusNode();
@@ -66,7 +62,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _handleInitialValue();
+      _buildController(value: _value);
     }
   }
 
@@ -96,16 +92,18 @@ class _MultilineTextEntryMarkdownWidgetState
     );
   }
 
-  void _handleInitialValue() {
-    if (_value != null) {
-      final input = MarkdownData(_value!);
-      final delta = _decoder.convert(input);
-      _controller = VoicesRichTextController(
+  VoicesRichTextController _buildController({
+    String? value,
+  }) {
+    if (value != null) {
+      final input = MarkdownData(value);
+      final delta = markdown.encoder.convert(input);
+      return VoicesRichTextController(
         document: quill.Document.fromDelta(delta),
         selection: const TextSelection.collapsed(offset: 0),
       );
     } else {
-      _controller = VoicesRichTextController(
+      return VoicesRichTextController(
         document: quill.Document(),
         selection: const TextSelection.collapsed(offset: 0),
       );
@@ -124,7 +122,7 @@ class _MultilineTextEntryMarkdownWidgetState
     _documentChangeSub = _observedDocument?.changes.listen(_onDocumentChanged);
   }
 
-  void _onDocumentChanged(DocChange change) {
+  void _onDocumentChanged(quill.DocChange change) {
     if (change.change.last.data != '\n') {
       _notifyChangeListener();
     }
@@ -132,7 +130,7 @@ class _MultilineTextEntryMarkdownWidgetState
 
   void _notifyChangeListener() {
     final delta = _controller.document.toDelta();
-    final markdownData = _encoder.convert(delta);
+    final markdownData = markdown.decoder.convert(delta);
     widget.onChanged(
       DocumentChange(
         nodeId: widget.property.schema.nodeId,
