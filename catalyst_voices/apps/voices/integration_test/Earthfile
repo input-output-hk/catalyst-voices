@@ -32,7 +32,7 @@ integration-test-web:
             # https://github.com/flutter/flutter/issues/154727
             --web-browser-flag=--disable-web-security \
             --web-browser-flag=--disable-gpu \
-            --web-browser-flag=--headless=old \
+            --web-browser-flag=--headless=new \
             --web-browser-flag=--disable-search-engine-choice-screen \
             --profile || echo fail > fail
     WAIT
