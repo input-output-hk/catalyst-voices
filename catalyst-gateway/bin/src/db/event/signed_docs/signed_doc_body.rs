@@ -23,8 +23,8 @@ pub(crate) struct SignedDocBody {
     ver: uuid::Uuid,
     /// `signed_doc` table `type` field
     doc_type: uuid::Uuid,
-    /// `signed_doc` table `author` field
-    author: String,
+    /// `signed_doc` table `authors` field
+    authors: Vec<String>,
     /// `signed_doc` table `metadata` field
     metadata: Option<serde_json::Value>,
 }
@@ -40,9 +40,9 @@ impl SignedDocBody {
         &self.ver
     }
 
-    /// Returns the document author.
-    pub(crate) fn author(&self) -> &String {
-        &self.author
+    /// Returns the document authors.
+    pub(crate) fn authors(&self) -> &Vec<String> {
+        &self.authors
     }
 
     /// Returns all signed document fields for the event db queries
@@ -51,22 +51,21 @@ impl SignedDocBody {
             &self.id,
             &self.ver,
             &self.doc_type,
-            &self.author,
+            &self.authors,
             &self.metadata,
         ]
     }
 
     /// Creates a  `SignedDocBody` instance.
-    #[allow(dead_code)]
     pub(crate) fn new(
-        id: uuid::Uuid, ver: uuid::Uuid, doc_type: uuid::Uuid, author: String,
+        id: uuid::Uuid, ver: uuid::Uuid, doc_type: uuid::Uuid, authors: Vec<String>,
         metadata: Option<serde_json::Value>,
     ) -> Self {
         Self {
             id,
             ver,
             doc_type,
-            author,
+            authors,
             metadata,
         }
     }
@@ -91,13 +90,13 @@ impl SignedDocBody {
         let id = row.try_get("id")?;
         let ver = row.try_get("ver")?;
         let doc_type = row.try_get("type")?;
-        let author = row.try_get("author")?;
+        let authors = row.try_get("authors")?;
         let metadata = row.try_get("metadata")?;
         Ok(Self {
             id,
             ver,
             doc_type,
-            author,
+            authors,
             metadata,
         })
     }

@@ -4,7 +4,7 @@ use poem_openapi::{payload::Json, ApiResponse, Object};
 use query_filter::DocumentIndexQueryFilter;
 use response::DocumentIndexListDocumented;
 
-use super::common;
+use super::{Limit, Page};
 use crate::service::common::responses::WithErrorResponses;
 
 pub(crate) mod query_filter;
@@ -39,9 +39,7 @@ pub(crate) struct QueryDocumentIndex {
 /// # POST `/document/index`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    filter: DocumentIndexQueryFilter,
-    page: Option<common::types::generic::query::pagination::Page>,
-    limit: Option<common::types::generic::query::pagination::Limit>,
+    filter: DocumentIndexQueryFilter, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
     let _filter = filter;
     let _page = page;
