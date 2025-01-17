@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/multiline_text_entry_markdown_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
@@ -388,6 +389,14 @@ class _PropertyValueBuilder extends StatelessWidget {
         );
 
       case DocumentMultiLineTextEntryMarkdownSchema():
+        final castProperty = schema.castProperty(property);
+        return MultilineTextEntryMarkdownWidget(
+          property: castProperty,
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+
       case DocumentTagGroupSchema():
       case DocumentTagSelectionSchema():
       case DocumentSpdxLicenseOrUrlSchema():
