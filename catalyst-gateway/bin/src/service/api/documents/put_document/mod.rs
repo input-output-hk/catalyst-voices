@@ -1,10 +1,14 @@
 //! Implementation of the PUT `/document` endpoint
 
+use anyhow::anyhow;
 use bad_put_request::PutDocumentBadRequest;
-use bytes::Bytes;
+use catalyst_signed_doc::{CatalystSignedDocument, Decode, Decoder};
 use poem_openapi::{payload::Json, ApiResponse};
 
-use crate::service::common::responses::WithErrorResponses;
+use crate::{
+    db::event::signed_docs::{FullSignedDoc, SignedDocBody},
+    service::common::responses::WithErrorResponses,
+};
 
 pub(crate) mod bad_put_request;
 
@@ -42,9 +46,61 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
-#[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
-pub(crate) async fn endpoint(document: Bytes) -> AllResponses {
-    let _doc = document;
+#[allow(clippy::no_effect_underscore_binding)]
+pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
+    match CatalystSignedDocument::decode(&mut Decoder::new(&doc_bytes), &mut ()) {
+        Ok(doc) => {
+            let authors = doc
+                .signatures()
+                .kids()
+                .into_iter()
+                .map(|kid| kid.to_string())
+                .collect();
 
-    Responses::BadRequest(Json(PutDocumentBadRequest::new("unimplemented"))).into()
+            let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
+                Ok(json) => json,
+                Err(e) => {
+                    return AllResponses::internal_error(&anyhow!(
+                        "Cannot decode document metadata into JSON, err: {e}"
+                    ))
+                },
+            };
+
+            let doc_body = SignedDocBody::new(
+                doc.doc_id(),
+                doc.doc_ver(),
+                doc.doc_type(),
+                authors,
+                Some(doc_meta_json),
+            );
+
+            let payload = if doc.doc_content().is_json() {
+                match serde_json::from_slice(doc.doc_content().bytes()) {
+                    Ok(payload) => Some(payload),
+                    Err(e) => {
+                        return AllResponses::internal_error(&anyhow!(
+                            "Invalid Document Content, not Json encoded: {e}"
+                        ))
+                    },
+                }
+            } else {
+                None
+            };
+
+            match FullSignedDoc::new(doc_body, payload, doc_bytes)
+                .store()
+                .await
+            {
+                Ok(true) => Responses::Created.into(),
+                Ok(false) => Responses::NoContent.into(),
+                Err(err) => AllResponses::handle_error(&err),
+            }
+        },
+        Err(_) => {
+            Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                "Invalid CBOR encoded document",
+            )))
+            .into()
+        },
+    }
 }

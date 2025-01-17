@@ -11,7 +11,7 @@ import 'package:meta/meta.dart';
 /// [segments] contain [DocumentSchemaSegment.sections]
 /// and sections contain [DocumentSchemaProperty]'s.
 final class DocumentSchema extends Equatable implements DocumentNode {
-  final String schema;
+  final String jsonSchema;
   final String title;
   final String description;
   final List<DocumentSchemaSegment> segments;
@@ -19,7 +19,7 @@ final class DocumentSchema extends Equatable implements DocumentNode {
   final String propertiesSchema;
 
   const DocumentSchema({
-    required this.schema,
+    required this.jsonSchema,
     required this.title,
     required this.description,
     required this.segments,
@@ -32,7 +32,7 @@ final class DocumentSchema extends Equatable implements DocumentNode {
 
   @override
   List<Object?> get props => [
-        schema,
+        jsonSchema,
         title,
         description,
         segments,

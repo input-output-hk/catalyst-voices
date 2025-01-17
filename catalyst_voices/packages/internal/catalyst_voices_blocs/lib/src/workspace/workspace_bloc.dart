@@ -26,10 +26,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
     );
   }
 
-  Future<String> createNewDraftProposal() async {
-    return 'new-draft-id';
-  }
-
   Future<void> _loadProposals(
     LoadProposalsEvent event,
     Emitter<WorkspaceState> emit,

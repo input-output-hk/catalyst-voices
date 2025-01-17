@@ -32,7 +32,11 @@ final class Document extends Equatable {
   }
 
   @override
-  List<Object?> get props => [schemaUrl, schema, segments];
+  List<Object?> get props => [
+        schemaUrl,
+        schema,
+        segments,
+      ];
 }
 
 /// A segment that groups multiple [DocumentSection]'s.
