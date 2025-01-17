@@ -208,7 +208,6 @@ class _PropertyBuilder extends StatelessWidget {
           'by $DocumentBuilderSectionTile',
         );
 
-      case MultiLineTextEntryMarkdownDefinition():
       case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
@@ -276,13 +275,24 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );*/
       case YesNoChoiceDefinition():
-        /*final castProperty = definition.castProperty(property);
+      /*final castProperty = definition.castProperty(property);
         return YesNoChoiceWidget(
           property: castProperty,
           onChanged: onChanged,
           isEditMode: isEditMode,
           isRequired: castProperty.schema.isRequired,
         );*/
+
+      case MultiLineTextEntryMarkdownDefinition():
+        /*final castProperty = definition.castProperty(property);
+        final castProperty = definition.castProperty(property);
+        return MultilineTextEntryMarkdownWidget(
+          property: castProperty,
+          onChanged: onChanged,
+          isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
+        );*/
+
         // TODO(dtscalac): uncomment tiles when casting works.
         return Text('${definition.runtimeType} casting problem');
     }
