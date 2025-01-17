@@ -26,14 +26,14 @@ extension ButtonsThemeExt on ThemeData {
           side: WidgetStateProperty.resolveWith(
             (states) {
               if (states.contains(WidgetState.disabled)) {
-                return BorderSide(color: colors.onSurfaceNeutral012!);
+                return BorderSide(color: colors.onSurfaceNeutral012);
               }
 
               if (states.contains(WidgetState.focused)) {
                 return BorderSide(color: colorScheme.primary);
               }
 
-              return BorderSide(color: colors.outlineBorder!);
+              return BorderSide(color: colors.outlineBorder);
             },
           ),
         ).merge(_buildBaseButtonStyle(textTheme)),
@@ -72,10 +72,10 @@ extension ButtonsThemeExt on ThemeData {
           side: WidgetStateProperty.resolveWith(
             (states) {
               if (states.contains(WidgetState.disabled)) {
-                return BorderSide(color: colors.iconsDisabled!);
+                return BorderSide(color: colors.iconsDisabled);
               }
 
-              return BorderSide(color: colors.outlineBorder!);
+              return BorderSide(color: colors.outlineBorder);
             },
           ),
           iconSize: const WidgetStatePropertyAll(18),

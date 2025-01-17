@@ -3,51 +3,121 @@ VERSION 0.8
 package-schemathesis:
     FROM python:3.12-alpine3.20
     # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
+    ARG api_spec
+    ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
+    ARG version=3.39.5
+
     RUN apk add --no-cache gcc musl-dev
-    RUN python -m pip install schemathesis==3.27.1
+    RUN python -m pip install schemathesis==$version
     RUN mkdir /results
     COPY ./hooks/hooks.py .
     VOLUME /results
-    ARG openapi_spec
-    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                    && st run --checks all $openapi_spec \
+
+    ENTRYPOINT st run --exclude-path-regex 'draft' \
+                    --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
+                    $api_spec \
                     --workers=2 \
-                    --wait-for-schema=15 \
+                    --wait-for-schema=500 \
                     --max-response-time=5000 \
                     --hypothesis-max-examples=1000 \
                     --data-generation-method=all \
-                    --skip-deprecated-operations \
+                    --exclude-deprecated \
                     --force-schema-version=30 \
                     --show-trace \
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
-                    --cassette-path=/results/cassette.yaml
+                    --cassette-path=/results/cassette.yaml \
+                    $seed
 
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
-# Disabled in CI, to enable it rename to `test-fuzzer-api`.
-fuzzer-api:
-    FROM earthly/dind:alpine-alpine-3.20-docker-26.1.5-r0
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
-    RUN apk add yq zstd
+test-fuzzer-api:
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
+    RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
-    LET OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
+    LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG seed
+
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
+        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway) \
+        --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
 
-        RUN docker run --net=host --name=st schemathesis:latest && \
+        RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
         SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+    END
+    IF [ -f fail ]
+        RUN --no-cache echo "Schemathesis test failed. Check the logs for more details" && \
+            exit 1
+    END
+
+nightly-package-schemathesis:
+    FROM python:3.12-alpine3.20
+    # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
+    ARG api_spec
+    # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
+    ARG seed
+    ARG version=3.39.5
+
+    RUN apk add --no-cache gcc musl-dev
+    RUN python -m pip install schemathesis==$version
+    RUN mkdir /results
+    COPY ./hooks/hooks.py .
+    VOLUME /results
+    ENTRYPOINT st run --checks=all $api_spec \
+                    --workers=2 \
+                    --wait-for-schema=120 \
+                    --max-response-time=300 \
+                    --hypothesis-max-examples=1000 \
+                    --data-generation-method=all \
+                    --exclude-deprecated \
+                    --force-schema-version=30 \
+                    --show-trace \
+                    --force-color  \
+                    --junit-xml=/results/junit-report.xml \
+                    --cassette-path=/results/cassette.yaml \
+                    $seed
+
+    ARG tag="latest"
+    SAVE IMAGE schemathesis:$tag
+
+# nightly-test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
+nightly-test-fuzzer-api:
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
+    RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
+    COPY schemathesis-docker-compose.yml .
+    LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG seed
+
+    WITH DOCKER \
+        --compose schemathesis-docker-compose.yml \
+        --load schemathesis:latest=(+nightly-package-schemathesis --api_spec=$api_spec --seed=$seed) \
+        --load event-db:latest=(../../event-db+build) \
+        --load cat-gateway:latest=(../+package-cat-gateway-integration) \
+        --service event-db \
+        --service cat-gateway \
+        --allow-privileged
+
+        RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+            docker cp st:/results/junit-report.xml junit-report.xml && \
+            docker cp st:/results/cassette.yaml cassette.yaml
+    END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly.junit-report.xml
+        SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+    END
+    IF [ -f fail ]
+        RUN --no-cache echo "Nightly schemathesis test failed. Check the logs for more details" && \
+            exit 1
     END

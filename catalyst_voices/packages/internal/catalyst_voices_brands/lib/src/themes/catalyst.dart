@@ -4,6 +4,8 @@ import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_dialog_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -84,6 +86,8 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   onErrorVariant: VoicesColors.darkOnErrorVariant,
   errorContainer: VoicesColors.darkErrorContainer,
   onErrorContainer: VoicesColors.darkOnErrorContainer,
+  overlay: Color(0xA610141C),
+  dropShadow: Color(0xA610141C),
 );
 
 const ColorScheme lightColorScheme = ColorScheme.light(
@@ -166,6 +170,8 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   onErrorVariant: VoicesColors.lightOnErrorVariant,
   errorContainer: VoicesColors.lightErrorContainer,
   onErrorContainer: VoicesColors.lightOnErrorContainer,
+  overlay: Color(0x9904080F),
+  dropShadow: Color(0x9904080F),
 );
 
 /// [ThemeData] for the `catalyst` brand.
@@ -314,13 +320,7 @@ ThemeData _buildThemeData(
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
-    dialogTheme: DialogTheme(
-      // N10-38
-      barrierColor: const Color(0x212A3D61),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.hardEdge,
-      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv1White,
-    ),
+    dialogTheme: VoicesDialogTheme(colors: voicesColorScheme),
     listTileTheme: ListTileThemeData(
       shape: const StadiumBorder(),
       minTileHeight: 56,
@@ -356,6 +356,11 @@ ThemeData _buildThemeData(
     ],
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: voicesColorScheme.textPrimary,
+    ),
+    inputDecorationTheme: VoicesInputDecorationTheme(
+      textTheme: textTheme,
+      colorsSchema: colorScheme,
+      colors: voicesColorScheme,
     ),
   ).copyWithButtonsTheme().copyWithTogglesTheme();
 }

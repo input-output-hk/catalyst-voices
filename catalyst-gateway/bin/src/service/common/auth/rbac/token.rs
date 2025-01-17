@@ -160,7 +160,13 @@ impl CatalystRBACTokenV1 {
         // The token is considered old if it was issued more than max_age ago.
         // And newer than an allowed clock skew value
         // This is a safety measure to avoid replay attacks.
-        ((now - max_age) < token_age) && ((now + max_skew) > token_age)
+        let Some(min_time) = now.checked_sub(max_age) else {
+            return false;
+        };
+        let Some(max_time) = now.checked_add(max_skew) else {
+            return false;
+        };
+        (min_time < token_age) && (max_time > token_age)
     }
 }
 

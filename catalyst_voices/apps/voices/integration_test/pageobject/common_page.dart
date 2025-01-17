@@ -1,10 +1,9 @@
-library dashboard_page;
-
 import 'package:flutter/material.dart';
 
 class CommonPage {
-  static const decoratorData = Key('DecoratorData');
-  static const decoratorIconBefore = Key('DecoratorIconBefore');
-  static const decoratorIconAfter = Key('DecoratorIconAfter');
+  static const decorData = Key('DecoratorData');
+  static const decorIconBefore = Key('DecoratorIconBefore');
+  static const decorIconAfter = Key('DecoratorIconAfter');
   static const dialogCloseButton = Key('DialogCloseButton');
+  static const voicesTextField = Key('VoicesTextField');
 }

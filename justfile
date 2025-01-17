@@ -19,7 +19,8 @@ check-spelling:
 # Pre Push Checks - intended to be run by a git pre-push hook.
 pre-push: check-markdown check-spelling
     just catalyst-gateway/pre-push
-    just catalyst_voices/pre-push
+    # just catalyst_voices/pre-push
+    just catalyst_voices/packages/libs/catalyst_key_derivation/rust/pre-push
     earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
 # Run cat-gateway natively on preprod

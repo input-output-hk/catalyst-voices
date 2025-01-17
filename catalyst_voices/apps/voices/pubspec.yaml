@@ -10,10 +10,10 @@ environment:
 dependencies:
   animated_text_kit: ^4.2.2
   animations: ^2.0.11
-  catalyst_cardano: ^0.4.0+2
-  catalyst_cardano_serialization: ^0.5.0+2
-  catalyst_cardano_web: ^0.4.0+2
-  catalyst_key_derivation: ^0.1.1+1
+  catalyst_cardano: ^0.4.0+3
+  catalyst_cardano_serialization: ^0.5.0+3
+  catalyst_cardano_web: ^0.4.0+3
+  catalyst_key_derivation: ^0.1.2
   catalyst_voices_assets:
     path: ../../packages/internal/catalyst_voices_assets
   catalyst_voices_blocs:
@@ -46,6 +46,7 @@ dependencies:
   flutter_dropzone_platform_interface: 2.0.6
   flutter_dropzone_web: 4.0.2
   flutter_localized_locales: ^2.0.5
+  flutter_markdown: ^0.7.4+3
   flutter_quill: ^10.8.2
   flutter_quill_extensions: ^10.8.2
   flutter_secure_storage: ^9.2.2

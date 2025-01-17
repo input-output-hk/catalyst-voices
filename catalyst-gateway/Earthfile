@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.24 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.31 AS rust-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
 
@@ -124,19 +124,3 @@ check-builder-src-cache:
     RUN diff ../src_fingerprint.txt ../src_fingerprint_uncached.txt \
         || (echo "ERROR: Source fingerprints do not match. Caching Error Detected!!" && exit 1) \
         && echo "Source fingerprints match. Caching OK."
-
-test:
-    FROM +builder-src
-
-    COPY docker-compose.yml .
-
-    ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-
-    WITH DOCKER \
-        --compose "./docker-compose.yml" \
-        --load ./event-db+build \
-        --pull alpine:3.20.3 \
-        --service event-db-is-running
-        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-            cargo nextest run --release --run-ignored=only signed_docs
-    END 

@@ -1178,5 +1178,120 @@
     }
   },
   "searchProposals": "Search Proposals",
-  "search": "Search…"
+  "search": "Search…",
+  "agree": "I Agree",
+  "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
+  "requestedAmountShouldBeMoreThan": "Requested amount should be at least {min}",
+  "requestedAmountShouldBeLessThan": "Requested amount should be at most {max}",
+  "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
+  "@errorValidationTokenNotParsed": {
+    "description": "A validation error when user enters input which cannot be parsed into token value."
+  },
+  "errorValidationMissingRequiredField": "Please fill this field.",
+  "@errorValidationMissingRequiredField": {
+    "description": "A validation error for a missing required form field."
+  },
+  "errorValidationNumFieldBelowMin": "The value should be at least {min}.",
+  "@errorValidationNumFieldBelowMin": {
+    "description": "Validation error when the user entered numerical value is smaller than min",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationNumFieldAboveMax": "The value should be no bigger than {max}.",
+  "@errorValidationNumFieldAboveMax": {
+    "description": "Validation error when the user entered numerical value is bigger than max",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationNumFieldOutOfRange": "The value should be between {min} and {max}",
+  "@errorValidationNumFieldOutOfRange": {
+    "description": "Validation error when the numerical value is out of allowed range between min and max (both inclusive)",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringLengthBelowMin": "The text should be at least {min} {min, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthBelowMin": {
+    "description": "Validation error when the user entered text is shorter than min length",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringLengthAboveMax": "The text should be no longer than {max} {max, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthAboveMax": {
+    "description": "Validation error when the user entered text is longer than max length",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationStringLengthOutOfRange": "The text should be between {min} and {max} {max, plural, =0{characters} =1{character} other{characters}}.",
+  "@errorValidationStringLengthOutOfRange": {
+    "description": "Validation error when the user entered text is out of allowed range between min and max (both inclusive) characters",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationListItemsBelowMin": "There should be at least {min} {min, plural, =0{items} =1{item} other{items}}.",
+  "@errorValidationListItemsBelowMin": {
+    "description": "Validation error when the user entered less than min items in the list.",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationListItemsAboveMax": "There should be no more than {max} {max, plural, =0{items} =1{item} other{items}}.",
+  "@errorValidationListItemsAboveMax": {
+    "description": "Validation error when the user entered more than max items in the list.",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "errorValidationListItemsOutOfRange": "There should be between {min} and {max} {max, plural, =0{items} =1{item} other{items}}.",
+  "@errorValidationListItemsOutOfRange": {
+    "description": "The number of items in a list/array is out of allowed range between min and max (both inclusive)",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "noTagSelected": "No Tag Selected",
+  "@noTagSelected": {
+    "description": "For example in context of document builder"
+  },
+  "errorValidationPatternMismatch": "The value does not match the valid pattern.",
+  "@errorValidationPatternMismatch": {
+    "description": "Validation error when the user entered value does not match the pattern"
+  },
+  "singleGroupedTagSelectorTitle": "Please choose the most relevant category group and tag related to the outcomes of your proposal",
+  "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag",
+  "noUrlAdded": "No URL added",
+  "addUrl": "Add URL",
+  "clear": "Clear"
 }

@@ -24,6 +24,7 @@ class RecoverMethodPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         Text(
+          key: const Key('RecoverKeychainMethodsTitle'),
           context.l10n.recoverKeychainMethodsTitle,
           style: theme.textTheme.titleMedium?.copyWith(color: colorLvl1),
         ),
@@ -31,11 +32,13 @@ class RecoverMethodPanel extends StatelessWidget {
         _BlocOnDeviceKeychains(onUnlockTap: _unlockKeychain),
         const SizedBox(height: 12),
         Text(
+          key: const Key('RecoverKeychainMethodsSubtitle'),
           context.l10n.recoverKeychainMethodsSubtitle,
           style: theme.textTheme.bodyMedium?.copyWith(color: colorLvl1),
         ),
         const SizedBox(height: 32),
         Text(
+          key: const Key('RecoverKeychainMethodsListTitle'),
           context.l10n.recoverKeychainMethodsListTitle,
           style: theme.textTheme.titleSmall?.copyWith(color: colorLvl0),
         ),
@@ -67,6 +70,7 @@ class RecoverMethodPanel extends StatelessWidget {
         ),
         const Spacer(),
         VoicesBackButton(
+          key: const Key('BackButton'),
           onTap: () => RegistrationCubit.of(context).previousStep(),
         ),
       ],
@@ -88,6 +92,7 @@ class _BlocOnDeviceKeychains extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocRecoverBuilder<bool>(
+      key: const Key('BlocOnDeviceKeychains'),
       selector: (state) => state.foundKeychain,
       builder: (context, state) {
         return _OnDeviceKeychains(
@@ -150,6 +155,7 @@ class _KeychainNotFoundIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIndicator(
+      key: const Key('KeychainNotFoundIndicator'),
       type: VoicesIndicatorType.error,
       icon: VoicesAssets.icons.exclamation,
       message: Text(

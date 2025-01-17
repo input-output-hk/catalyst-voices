@@ -8,10 +8,10 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
-  catalyst_cardano_serialization: ^0.5.0+2
+  catalyst_cardano_serialization: ^0.5.0+3
   catalyst_compression: ^0.4.0
   catalyst_cose: ^0.4.0
-  catalyst_key_derivation: ^0.1.1+1
+  catalyst_key_derivation: ^0.1.2
   catalyst_voices_models:
     path: ../catalyst_voices_models
   cbor: ^6.2.0
@@ -27,6 +27,7 @@ dependencies:
   json_annotation: ^4.9.0
   logging: ^1.2.0
   shared_preferences: ^2.3.3
+  url_launcher: ^6.2.2
   uuid: ^4.5.1
   web: ^1.1.0
 

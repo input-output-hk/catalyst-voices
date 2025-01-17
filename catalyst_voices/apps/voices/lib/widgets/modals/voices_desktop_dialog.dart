@@ -122,7 +122,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
           ? RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: Theme.of(context).colors.outlineBorderVariant!,
+                color: Theme.of(context).colors.outlineBorderVariant,
               ),
             )
           : Theme.of(context).dialogTheme.shape,
@@ -153,7 +153,6 @@ class _CloseButtonPosition extends StatelessWidget {
     );
 
     return Align(
-      key: const Key('DialogCloseButton'),
       alignment: alignment,
       child: IconButtonTheme(
         data: const IconButtonThemeData(style: buttonStyle),
@@ -169,6 +168,7 @@ class _CloseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return XButton(
+      key: const Key('DialogCloseButton'),
       onTap: () {
         unawaited(Navigator.of(context).maybePop());
       },

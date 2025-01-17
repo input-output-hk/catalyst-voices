@@ -9,9 +9,9 @@ enum VoicesIndicatorType {
 
   Color _iconColor(BuildContext context) {
     return switch (this) {
-      VoicesIndicatorType.normal => Theme.of(context).colors.iconsForeground!,
-      VoicesIndicatorType.error => Theme.of(context).colors.iconsError!,
-      VoicesIndicatorType.success => Theme.of(context).colors.iconsSuccess!,
+      VoicesIndicatorType.normal => Theme.of(context).colors.iconsForeground,
+      VoicesIndicatorType.error => Theme.of(context).colors.iconsError,
+      VoicesIndicatorType.success => Theme.of(context).colors.iconsSuccess,
     };
   }
 }
@@ -38,7 +38,7 @@ class VoicesIndicator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
       decoration: BoxDecoration(
         border: Border.all(
-          color: theme.colors.outlineBorderVariant!,
+          color: theme.colors.outlineBorderVariant,
           width: 1,
         ),
         borderRadius: BorderRadius.circular(8),

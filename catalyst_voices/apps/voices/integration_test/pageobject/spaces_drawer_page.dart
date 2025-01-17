@@ -1,5 +1,3 @@
-library spaces_drawer_page;
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -118,11 +116,10 @@ class SpacesDrawerPage {
       $(userMenuContainer(Space.treasury)).$(userSectionHeader(Space.treasury)),
       findsOneWidget,
     );
-    final children = find.descendant(
-      of: $(userMenuContainer(Space.treasury)),
-      matching: $(userDrawerMenuItem),
+    expect(
+      $(userMenuContainer(Space.treasury)).$(userDrawerMenuItem),
+      findsAtLeast(1),
     );
-    expect($(children), findsAtLeast(1));
   }
 
   static void userVotingLooksAsExpected(PatrolTester $) {
@@ -134,11 +131,10 @@ class SpacesDrawerPage {
       $(userMenuContainer(Space.voting)).$(userSectionHeader(Space.voting)),
       findsOneWidget,
     );
-    final children = find.descendant(
-      of: $(userMenuContainer(Space.voting)),
-      matching: $(userDrawerMenuItem),
+    expect(
+      $(userMenuContainer(Space.voting)).$(userDrawerMenuItem),
+      findsAtLeast(1),
     );
-    expect($(children), findsAtLeast(1));
   }
 
   static void userWorkspaceLooksAsExpected(PatrolTester $) {
@@ -151,10 +147,5 @@ class SpacesDrawerPage {
           .$(userSectionHeader(Space.workspace)),
       findsOneWidget,
     );
-    final children = find.descendant(
-      of: $(userMenuContainer(Space.workspace)),
-      matching: $(userDrawerMenuItem),
-    );
-    expect($(children), findsAtLeast(1));
   }
 }

@@ -37,8 +37,7 @@ const DUMMY_PUB_KEY_BYTES: [u8; PUBLIC_KEY_LENGTH] = [
     bearer_format = "catalyst-rbac-token",
     checker = "checker_api_catalyst_auth"
 )]
-#[allow(clippy::module_name_repetitions)]
-#[allow(dead_code)]
+#[allow(dead_code, clippy::module_name_repetitions)]
 pub struct CatalystRBACSecurityScheme(pub CatalystRBACTokenV1);
 
 /// Error with the Authorization Token

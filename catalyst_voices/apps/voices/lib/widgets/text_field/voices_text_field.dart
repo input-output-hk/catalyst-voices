@@ -14,6 +14,9 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.controller]
   final TextEditingController? controller;
 
+  /// [TextField.statesController]
+  final WidgetStatesController? statesController;
+
   /// [TextField.focusNode]
   final FocusNode? focusNode;
 
@@ -50,6 +53,12 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.enabled].
   final bool enabled;
 
+  /// [TextField.readOnly].
+  final bool readOnly;
+
+  /// [TextField.ignorePointers].
+  final bool? ignorePointers;
+
   /// Whether the text field can be resized by the user
   /// in HTML's text area fashion.
   ///
@@ -74,9 +83,15 @@ class VoicesTextField extends StatefulWidget {
   /// [AutovalidateMode]
   final AutovalidateMode? autovalidateMode;
 
+  /// [MaxLengthEnforcement]
+  final MaxLengthEnforcement? maxLengthEnforcement;
+
+  final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
+
   const VoicesTextField({
     super.key,
     this.controller,
+    this.statesController,
     this.focusNode,
     this.decoration,
     this.autofocus = false,
@@ -89,6 +104,8 @@ class VoicesTextField extends StatefulWidget {
     this.maxLines = 1,
     this.minLines,
     this.enabled = true,
+    this.readOnly = false,
+    this.ignorePointers,
     this.validator,
     this.onChanged,
     this.resizable,
@@ -99,6 +116,8 @@ class VoicesTextField extends StatefulWidget {
     this.onSaved,
     this.inputFormatters,
     this.autovalidateMode,
+    this.maxLengthEnforcement,
+    this.onStatusChanged,
   });
 
   @override
@@ -109,7 +128,19 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   TextEditingController? _customController;
 
   VoicesTextFieldValidationResult _validation =
-      const VoicesTextFieldValidationResult(status: VoicesTextFieldStatus.none);
+      const VoicesTextFieldValidationResult.none();
+
+  bool get _isResizable {
+    final resizable = widget.resizable ??
+        (CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop);
+
+    // expands property is not supported if any of these are specified,
+    // both must be null
+    final hasNoLineConstraints =
+        widget.maxLines == null && widget.minLines == null;
+
+    return resizable && hasNoLineConstraints;
+  }
 
   @override
   void initState() {
@@ -182,106 +213,21 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         ResizableBoxParent(
           resizableHorizontally: resizable,
           resizableVertically: resizable,
+          minHeight: widget.maxLines == null ? 65 : 48,
+          iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
+            key: const Key('VoicesTextField'),
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
             expands: resizable,
             controller: _obtainController(),
+            statesController: widget.statesController,
             focusNode: widget.focusNode,
             onFieldSubmitted: widget.onFieldSubmitted,
             onSaved: widget.onSaved,
             inputFormatters: widget.inputFormatters,
             autovalidateMode: widget.autovalidateMode,
-            decoration: InputDecoration(
-              filled: widget.decoration?.filled,
-              fillColor: widget.decoration?.fillColor,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              border: widget.decoration?.border ??
-                  _getBorder(
-                    orDefault: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: theme.colorScheme.outlineVariant,
-                      ),
-                    ),
-                  ),
-              enabledBorder: widget.decoration?.enabledBorder ??
-                  _getBorder(
-                    orDefault: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: theme.colorScheme.outlineVariant,
-                      ),
-                    ),
-                  ),
-              disabledBorder: widget.decoration?.disabledBorder ??
-                  OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: theme.colorScheme.outline,
-                    ),
-                  ),
-              errorBorder: widget.decoration?.errorBorder ??
-                  OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 2,
-                      color: _getStatusColor(
-                        orDefault: theme.colorScheme.error,
-                      ),
-                    ),
-                  ),
-              focusedBorder: widget.decoration?.focusedBorder ??
-                  _getBorder(
-                    orDefault: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-              focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
-                  _getBorder(
-                    orDefault: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 2,
-                        color: theme.colorScheme.error,
-                      ),
-                    ),
-                  ),
-              helperText: widget.decoration?.helperText,
-              helperStyle: widget.enabled
-                  ? textTheme.bodySmall
-                  : textTheme.bodySmall!
-                      .copyWith(color: theme.colors.textDisabled),
-              hintText: widget.decoration?.hintText,
-              hintStyle: _getHintStyle(
-                textTheme,
-                theme,
-                orDefault: widget.enabled
-                    ? textTheme.bodyLarge
-                    : textTheme.bodyLarge!
-                        .copyWith(color: theme.colors.textDisabled),
-              ),
-              errorText:
-                  widget.decoration?.errorText ?? _validation.errorMessage,
-              errorMaxLines: widget.decoration?.errorMaxLines,
-              errorStyle: _getErrorStyle(textTheme, theme),
-              prefixIcon: _wrapIconIfExists(
-                widget.decoration?.prefixIcon,
-                const EdgeInsetsDirectional.only(start: 8, end: 4),
-              ),
-              prefixText: widget.decoration?.prefixText,
-              suffixIcon: _wrapIconIfExists(
-                widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
-                const EdgeInsetsDirectional.only(start: 4, end: 8),
-              ),
-              suffixText: widget.decoration?.suffixText,
-              counterText: widget.decoration?.counterText,
-              counterStyle: widget.enabled
-                  ? textTheme.bodySmall
-                  : textTheme.bodySmall!
-                      .copyWith(color: theme.colors.textDisabled),
-            ),
+            decoration: _buildDecoration(context),
             keyboardType: widget.keyboardType,
             textInputAction: widget.textInputAction,
             textCapitalization: widget.textCapitalization,
@@ -290,6 +236,9 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             maxLines: widget.maxLines,
             minLines: widget.minLines,
             maxLength: widget.maxLength,
+            maxLengthEnforcement: widget.maxLengthEnforcement,
+            readOnly: widget.readOnly,
+            ignorePointers: widget.ignorePointers,
             enabled: widget.enabled,
             onChanged: widget.onChanged,
           ),
@@ -298,16 +247,120 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     );
   }
 
-  bool get _isResizable {
-    final resizable = widget.resizable ??
-        (CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop);
+  InputDecoration _buildDecoration(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colors = theme.colors;
+    final colorScheme = theme.colorScheme;
 
-    // expands property is not supported if any of these are specified,
-    // both must be null
-    final hasNoLineConstraints =
-        widget.maxLines == null && widget.minLines == null;
+    return InputDecoration(
+      filled: widget.decoration?.filled,
+      fillColor: widget.decoration?.fillColor,
+      // Note. prefixText is not visible when field is not focused without
+      // this.
+      // Should be removed once this is resolved
+      // https://github.com/flutter/flutter/issues/64552#issuecomment-2074034179
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
+      border: widget.decoration?.border ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+      enabledBorder: widget.decoration?.enabledBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+      disabledBorder: widget.decoration?.disabledBorder ??
+          OutlineInputBorder(
+            borderSide: BorderSide(
+              color: colorScheme.outline,
+            ),
+          ),
+      errorBorder: widget.decoration?.errorBorder ??
+          OutlineInputBorder(
+            borderSide: BorderSide(
+              width: 2,
+              color: _getStatusColor(
+                orDefault: colorScheme.error,
+              ),
+            ),
+          ),
+      focusedBorder: widget.decoration?.focusedBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                width: 2,
+                color: colorScheme.primary,
+              ),
+            ),
+          ),
+      focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderSide: BorderSide(
+                width: 2,
+                color: colorScheme.error,
+              ),
+            ),
+          ),
+      helper: widget.decoration?.helper != null
+          ? DefaultTextStyle(
+              style: widget.enabled
+                  ? textTheme.bodySmall!
+                  : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+              child: widget.decoration!.helper!,
+            )
+          : null,
+      helperText: widget.decoration?.helperText,
+      helperStyle: widget.enabled
+          ? textTheme.bodySmall
+          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+      hintText: widget.decoration?.hintText,
+      hintStyle: _getHintStyle(
+        textTheme,
+        theme,
+        orDefault: textTheme.bodyLarge!.copyWith(color: colors.textDisabled),
+      ),
+      errorText: widget.decoration?.errorText ?? _validation.errorMessage,
+      errorMaxLines: widget.decoration?.errorMaxLines,
+      errorStyle: _getErrorStyle(textTheme, theme),
+      prefixIcon: _wrapIconIfExists(
+        widget.decoration?.prefixIcon,
+        const EdgeInsetsDirectional.only(start: 8, end: 4),
+      ),
+      prefixText: widget.decoration?.prefixText,
+      prefixStyle: WidgetStateTextStyle.resolveWith((states) {
+        var textStyle = textTheme.bodyLarge ?? const TextStyle();
 
-    return resizable && hasNoLineConstraints;
+        if (!states.contains(WidgetState.focused) &&
+            _obtainController().text.isEmpty) {
+          textStyle = textStyle.copyWith(color: colors.textDisabled);
+        }
+
+        return textStyle;
+      }),
+
+      suffixIcon: _wrapSuffixIfExists(
+        widget.decoration?.suffixIcon,
+        const EdgeInsetsDirectional.only(start: 4, end: 8),
+      ),
+      suffixText: widget.decoration?.suffixText,
+      counterText: widget.decoration?.counterText,
+      counterStyle: widget.enabled
+          ? textTheme.bodySmall
+          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+    );
   }
 
   InputBorder _getBorder({required InputBorder orDefault}) {
@@ -380,14 +433,44 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     );
   }
 
+  Widget? _wrapSuffixIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    final statusSuffixWidget = _getStatusSuffixWidget();
+    if (child == null) return statusSuffixWidget;
+
+    return Padding(
+      padding: padding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconTheme(
+            data: IconThemeData(
+              size: 24,
+              color: Theme.of(context).colors.iconsForeground,
+            ),
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: child,
+            ),
+          ),
+          if (statusSuffixWidget != null) ...[
+            const SizedBox(width: 2),
+            statusSuffixWidget,
+          ],
+        ],
+      ),
+    );
+  }
+
   Color _getStatusColor({required Color orDefault}) {
     switch (_validation.status) {
       case VoicesTextFieldStatus.none:
         return orDefault;
       case VoicesTextFieldStatus.success:
-        return Theme.of(context).colors.success!;
+        return Theme.of(context).colors.success;
       case VoicesTextFieldStatus.warning:
-        return Theme.of(context).colors.warning!;
+        return Theme.of(context).colors.warning;
       case VoicesTextFieldStatus.error:
         return Theme.of(context).colorScheme.error;
     }
@@ -425,20 +508,14 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final errorText = widget.decoration?.errorText;
     if (errorText != null) {
       _onValidationResultChanged(
-        VoicesTextFieldValidationResult(
-          status: VoicesTextFieldStatus.error,
-          errorMessage: errorText,
-        ),
+        VoicesTextFieldValidationResult.error(errorText),
       );
       return;
     }
 
     final result = widget.validator?.call(value);
     _onValidationResultChanged(
-      result ??
-          const VoicesTextFieldValidationResult(
-            status: VoicesTextFieldStatus.none,
-          ),
+      result ?? const VoicesTextFieldValidationResult.none(),
     );
   }
 
@@ -446,6 +523,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     if (_validation != validation) {
       setState(() {
         _validation = validation;
+        widget.onStatusChanged?.call(validation.status);
       });
     }
   }
@@ -480,6 +558,11 @@ class VoicesTextFieldValidationResult with EquatableMixin {
                   status == VoicesTextFieldStatus.error) ||
               errorMessage == null,
           'errorMessage can be only used for warning or error status',
+        );
+
+  const VoicesTextFieldValidationResult.none()
+      : this(
+          status: VoicesTextFieldStatus.none,
         );
 
   /// Returns a successful validation result.
@@ -585,6 +668,9 @@ class VoicesTextFieldDecoration {
   /// the floating behavior and is instead above the text field instead.
   final String? labelText;
 
+  /// [InputDecoration.helper].
+  final Widget? helper;
+
   /// [InputDecoration.helperText].
   final String? helperText;
 
@@ -637,6 +723,7 @@ class VoicesTextFieldDecoration {
     this.focusedBorder,
     this.focusedErrorBorder,
     this.labelText,
+    this.helper,
     this.helperText,
     this.hintText,
     this.hintStyle,
