@@ -2,7 +2,6 @@
 # See https://www.dartlang.org/guides/libraries/private-files
 devtools_options.yaml
 
-
 # Generated files from code generation tools
 *.g.dart
 *.freezed.dart
@@ -153,5 +152,3 @@ coverage/
 
 # Fastlane.swift runner binary
 **/fastlane/FastlaneRunner
-
-devtools_options.yaml

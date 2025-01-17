@@ -8,9 +8,9 @@ part 'document_schema_dto.g.dart';
 @JsonSerializable(includeIfNull: false)
 final class DocumentSchemaDto {
   @JsonKey(name: r'$schema')
-  final String schema;
+  final String jsonSchema;
   @JsonKey(name: r'$id')
-  final String id;
+  final String jsonSchemaId;
   final String title;
   final String description;
   final DocumentDefinitionsDto definitions;
@@ -24,8 +24,8 @@ final class DocumentSchemaDto {
   final String propertiesSchema;
 
   const DocumentSchemaDto({
-    required this.schema,
-    required this.id,
+    required this.jsonSchema,
+    required this.jsonSchemaId,
     required this.title,
     required this.description,
     required this.definitions,
@@ -63,7 +63,7 @@ final class DocumentSchemaDto {
         .toList();
 
     return DocumentSchema(
-      schema: schema,
+      jsonSchema: jsonSchema,
       title: title,
       description: description,
       properties: mappedProperties,

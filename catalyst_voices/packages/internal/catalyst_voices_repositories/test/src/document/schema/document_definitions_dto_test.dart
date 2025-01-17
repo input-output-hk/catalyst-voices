@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(DocumentDefinitionsDto, () {

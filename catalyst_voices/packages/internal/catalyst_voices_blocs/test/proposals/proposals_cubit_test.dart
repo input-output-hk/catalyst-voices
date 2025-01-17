@@ -6,9 +6,31 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   group(ProposalsCubit, () {
+    const proposalTemplate = DocumentSchema(
+      jsonSchema: '',
+      title: '',
+      description: '',
+      properties: [],
+      order: [],
+      propertiesSchema: '',
+    );
+
+    final proposalDocument = ProposalDocument(
+      metadata: ProposalMetadata(
+        id: const Uuid().v7(),
+        version: const Uuid().v7(),
+      ),
+      document: const Document(
+        schemaUrl: '',
+        schema: proposalTemplate,
+        properties: [],
+      ),
+    );
+
     final campaign = Campaign(
       id: 'F14',
       name: 'campaign',
@@ -16,9 +38,7 @@ void main() {
       startDate: DateTime.now(),
       endDate: DateTime.now().plusDays(1),
       proposalsCount: 0,
-      sections: const [],
       publish: CampaignPublish.published,
-      proposalTemplate: const ProposalTemplate(sections: []),
     );
 
     final proposal = Proposal(
@@ -32,19 +52,7 @@ void main() {
       publish: ProposalPublish.draft,
       access: ProposalAccess.private,
       commentsCount: 0,
-      sections: List.generate(3, (index) {
-        return ProposalSection(
-          id: 'f14/0_$index',
-          name: 'Section_$index',
-          steps: [
-            ProposalSectionStep(
-              id: 'f14/0_${index}_1',
-              name: 'Topic 1',
-              answer: index < 1 ? const MarkdownData('Ans') : null,
-            ),
-          ],
-        );
-      }),
+      document: proposalDocument,
     );
 
     final pendingProposal = PendingProposal.fromProposal(

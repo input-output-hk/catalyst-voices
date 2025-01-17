@@ -8,20 +8,20 @@ import 'package:equatable/equatable.dart';
 /// [properties] contain [DocumentSegmentSchema.sections]
 /// and sections contain [DocumentPropertySchema]'s.
 final class DocumentSchema extends Equatable implements DocumentNode {
-  final String schema;
+  final String jsonSchema;
+  final String propertiesSchema;
   final String title;
   final String description;
   final List<DocumentPropertySchema> properties;
   final List<DocumentNodeId> order;
-  final String propertiesSchema;
 
   const DocumentSchema({
-    required this.schema,
+    required this.jsonSchema,
+    required this.propertiesSchema,
     required this.title,
     required this.description,
     required this.properties,
     required this.order,
-    required this.propertiesSchema,
   });
 
   @override
@@ -32,12 +32,12 @@ final class DocumentSchema extends Equatable implements DocumentNode {
 
   @override
   List<Object?> get props => [
-        schema,
+        jsonSchema,
+        propertiesSchema,
         title,
         description,
         properties,
         order,
-        propertiesSchema,
       ];
 }
 

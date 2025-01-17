@@ -1,24 +1,21 @@
 import 'dart:convert';
 
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:test/test.dart';
-
-import '../../helpers/read_json.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(DocumentDto, () {
-    const schemaPath =
-        'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
-    const documentPath = 'test/assets/generic_proposal.json';
+  TestWidgetsFlutterBinding.ensureInitialized();
 
+  group(DocumentDto, () {
     late Map<String, dynamic> schemaJson;
     late Map<String, dynamic> documentJson;
 
-    setUpAll(() {
-      schemaJson = json.decode(readJson(schemaPath)) as Map<String, dynamic>;
-      documentJson =
-          json.decode(readJson(documentPath)) as Map<String, dynamic>;
+    setUpAll(() async {
+      schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
+      documentJson = await VoicesDocumentsTemplates.proposalF14Document;
     });
 
     test(
@@ -31,7 +28,8 @@ void main() {
         final originalJsonString = json.encode(documentJson);
 
         // serialized and deserialized
-        final documentDto = DocumentDto.fromJsonSchema(documentJson, schema);
+        final documentData = DocumentDataDto.fromJson(documentJson);
+        final documentDto = DocumentDto.fromJsonSchema(documentData, schema);
         final documentDtoJson = documentDto.toJson();
         final serializedJsonString = json.encode(documentDtoJson);
 
@@ -46,13 +44,15 @@ void main() {
       final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
 
       // original
-      final originalDocDto = DocumentDto.fromJsonSchema(documentJson, schema);
+      final originalDocData = DocumentDataDto.fromJson(documentJson);
+      final originalDocDto =
+          DocumentDto.fromJsonSchema(originalDocData, schema);
       final originalDoc = originalDocDto.toModel();
 
       // serialized and deserialized
-      final serializedDocJson = DocumentDto.fromModel(originalDoc).toJson();
+      final serializeDocData = DocumentDto.fromModel(originalDoc).toJson();
       final deserializedDocDto =
-          DocumentDto.fromJsonSchema(serializedDocJson, schema);
+          DocumentDto.fromJsonSchema(serializeDocData, schema);
       final deserializedDoc = deserializedDocDto.toModel();
 
       // verify they are the same

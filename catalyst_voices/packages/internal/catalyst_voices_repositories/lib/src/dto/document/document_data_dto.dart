@@ -1,10 +1,22 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Utility structure for traversing a json map using [DocumentNodeId]'s.
-final class DocumentPropertiesDto {
+final class DocumentDataDto {
   final Map<String, dynamic> json;
 
-  const DocumentPropertiesDto.fromJson(this.json);
+  String get schemaUrl => json[r'$schema'] as String;
+
+  const DocumentDataDto.fromJson(this.json);
+
+  factory DocumentDataDto.fromDocument({
+    required String schemaUrl,
+    required Iterable<Map<String, dynamic>> properties,
+  }) {
+    return DocumentDataDto.fromJson({
+      r'$schema': schemaUrl,
+      for (final property in properties) ...property,
+    });
+  }
 
   /// Retrieves the value of a property located at the specified [nodeId].
   ///

@@ -27,6 +27,12 @@ final class Document extends Equatable {
     required this.properties,
   });
 
+  /// Returns the list of segments from filtered [properties].
+  List<DocumentObjectProperty> get segments => properties
+      .whereType<DocumentObjectProperty>()
+      .where((e) => e.schema is DocumentSegmentSchema)
+      .toList();
+
   /// Creates a new [DocumentBuilder] from this document.
   DocumentBuilder toBuilder() {
     return DocumentBuilder.fromDocument(this);
@@ -140,6 +146,12 @@ final class DocumentObjectProperty extends DocumentProperty {
       getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
     return properties.firstWhereOrNull((e) => e.schema is T);
   }
+
+  /// Returns the list of sections from filtered [properties].
+  List<DocumentObjectProperty> get sections => properties
+      .whereType<DocumentObjectProperty>()
+      .where((e) => e.schema is DocumentSectionSchema)
+      .toList();
 
   @override
   DocumentObjectPropertyBuilder toBuilder() {
