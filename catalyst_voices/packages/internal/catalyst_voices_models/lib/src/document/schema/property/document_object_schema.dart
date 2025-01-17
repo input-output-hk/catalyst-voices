@@ -164,7 +164,6 @@ final class DocumentSingleGroupedTagSelectorSchema
     );
   }
 
-  // TODO(dtscalac): this doesn't work
   GroupedTagsSelection? groupedTagsSelection(DocumentObjectProperty property) {
     assert(
       property.schema == this,
