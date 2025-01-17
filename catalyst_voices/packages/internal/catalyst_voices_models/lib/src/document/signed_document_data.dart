@@ -11,11 +11,11 @@ enum SignedDocumentType {
   proposalDocument(uuid: '7808d2ba-d511-40af-84e8-c0d1625fdfdc'),
   proposalTemplate(uuid: '0ce8ab38-9258-4fbc-a62e-7faa6e58318f');
 
+  final String uuid;
+
   const SignedDocumentType({
     required this.uuid,
   });
-
-  final String uuid;
 }
 
 final class SignedDocumentData extends Equatable {

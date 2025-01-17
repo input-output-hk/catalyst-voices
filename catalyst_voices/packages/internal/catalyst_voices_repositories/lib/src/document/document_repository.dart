@@ -3,7 +3,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/signed_document_data_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
@@ -124,22 +123,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final ver = ref.version ?? const Uuid().v7();
     final template = !isSchema ? const SignedDocumentRef(id: 'schema') : null;
 
-    final metadata = SignedDocumentMetadataDto(
+    final metadata = SignedDocumentMetadata(
       type: type,
       id: ref.id,
-      ver: ver,
+      version: ver,
       template: template,
     );
 
     final payload = SignedDocumentDataPayload(signedDocument);
 
-    final dto = SignedDocumentDataDto(
+    return SignedDocumentData(
       metadata: metadata,
       payload: payload,
     );
-
-    final model = dto.toModel();
-
-    return model;
   }
 }
