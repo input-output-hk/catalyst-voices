@@ -7,64 +7,66 @@ import 'package:flutter/material.dart';
 /// attributes that can be used in the Voices application to ensure consistency.
 @immutable
 class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
-  final Color? textPrimary;
-  final Color? textOnPrimary;
-  final Color? textOnPrimaryLevel0;
-  final Color? textOnPrimaryLevel1;
-  final Color? textOnPrimaryWhite;
-  final Color? textOnPrimaryContainer;
-  final Color? textDisabled;
-  final Color? success;
-  final Color? onSuccess;
-  final Color? successContainer;
-  final Color? onSuccessContainer;
-  final Color? warning;
-  final Color? onWarning;
-  final Color? warningContainer;
-  final Color? onWarningContainer;
-  final Color? onSurfaceNeutral08;
-  final Color? onSurfaceNeutral012;
-  final Color? onSurfaceNeutral016;
-  final Color? onSurfaceNeutralOpaqueLv0;
-  final Color? onSurfaceNeutralOpaqueLv1;
-  final Color? onSurfaceNeutralOpaqueLv2;
-  final Color? onSurfacePrimaryContainer;
-  final Color? onSurfacePrimary08;
-  final Color? onSurfacePrimary012;
-  final Color? onSurfacePrimary016;
-  final Color? onSurfaceSecondary08;
-  final Color? onSurfaceSecondary012;
-  final Color? onSurfaceSecondary016;
-  final Color? onSurfaceError08;
-  final Color? onSurfaceError012;
-  final Color? onSurfaceError016;
-  final Color? iconsForeground;
-  final Color? iconsBackground;
-  final Color? iconsBackgroundVariant;
-  final Color? iconsOnImage;
-  final Color? iconsDisabled;
-  final Color? iconsPrimary;
-  final Color? iconsSecondary;
-  final Color? iconsSuccess;
-  final Color? iconsWarning;
-  final Color? iconsError;
-  final Color? avatarsPrimary;
-  final Color? avatarsSecondary;
-  final Color? avatarsSuccess;
-  final Color? avatarsWarning;
-  final Color? avatarsError;
-  final Color? elevationsOnSurfaceNeutralLv0;
-  final Color? elevationsOnSurfaceNeutralLv1Grey;
-  final Color? elevationsOnSurfaceNeutralLv1White;
-  final Color? elevationsOnSurfaceNeutralLv2;
-  final Color? outlineBorder;
-  final Color? outlineBorderVariant;
-  final Color? primary98;
-  final Color? primaryContainer;
-  final Color? onPrimaryContainer;
-  final Color? onErrorVariant;
-  final Color? errorContainer;
-  final Color? onErrorContainer;
+  final Color textPrimary;
+  final Color textOnPrimary;
+  final Color textOnPrimaryLevel0;
+  final Color textOnPrimaryLevel1;
+  final Color textOnPrimaryWhite;
+  final Color textOnPrimaryContainer;
+  final Color textDisabled;
+  final Color success;
+  final Color onSuccess;
+  final Color successContainer;
+  final Color onSuccessContainer;
+  final Color warning;
+  final Color onWarning;
+  final Color warningContainer;
+  final Color onWarningContainer;
+  final Color onSurfaceNeutral08;
+  final Color onSurfaceNeutral012;
+  final Color onSurfaceNeutral016;
+  final Color onSurfaceNeutralOpaqueLv0;
+  final Color onSurfaceNeutralOpaqueLv1;
+  final Color onSurfaceNeutralOpaqueLv2;
+  final Color onSurfacePrimaryContainer;
+  final Color onSurfacePrimary08;
+  final Color onSurfacePrimary012;
+  final Color onSurfacePrimary016;
+  final Color onSurfaceSecondary08;
+  final Color onSurfaceSecondary012;
+  final Color onSurfaceSecondary016;
+  final Color onSurfaceError08;
+  final Color onSurfaceError012;
+  final Color onSurfaceError016;
+  final Color iconsForeground;
+  final Color iconsBackground;
+  final Color iconsBackgroundVariant;
+  final Color iconsOnImage;
+  final Color iconsDisabled;
+  final Color iconsPrimary;
+  final Color iconsSecondary;
+  final Color iconsSuccess;
+  final Color iconsWarning;
+  final Color iconsError;
+  final Color avatarsPrimary;
+  final Color avatarsSecondary;
+  final Color avatarsSuccess;
+  final Color avatarsWarning;
+  final Color avatarsError;
+  final Color elevationsOnSurfaceNeutralLv0;
+  final Color elevationsOnSurfaceNeutralLv1Grey;
+  final Color elevationsOnSurfaceNeutralLv1White;
+  final Color elevationsOnSurfaceNeutralLv2;
+  final Color outlineBorder;
+  final Color outlineBorderVariant;
+  final Color primary98;
+  final Color primaryContainer;
+  final Color onPrimaryContainer;
+  final Color onErrorVariant;
+  final Color errorContainer;
+  final Color onErrorContainer;
+  final Color overlay;
+  final Color dropShadow;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -125,68 +127,72 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.onErrorVariant,
     required this.errorContainer,
     required this.onErrorContainer,
+    required this.overlay,
+    required this.dropShadow,
   });
 
   @visibleForTesting
   const VoicesColorScheme.optional({
-    this.textPrimary,
-    this.textOnPrimary,
-    this.textOnPrimaryLevel0,
-    this.textOnPrimaryLevel1,
-    this.textOnPrimaryWhite,
-    this.textOnPrimaryContainer,
-    this.textDisabled,
-    this.success,
-    this.onSuccess,
-    this.successContainer,
-    this.onSuccessContainer,
-    this.warning,
-    this.onWarning,
-    this.warningContainer,
-    this.onWarningContainer,
-    this.onSurfaceNeutral08,
-    this.onSurfaceNeutral012,
-    this.onSurfaceNeutral016,
-    this.onSurfacePrimaryContainer,
-    this.onSurfacePrimary08,
-    this.onSurfacePrimary012,
-    this.onSurfacePrimary016,
-    this.onSurfaceNeutralOpaqueLv0,
-    this.onSurfaceNeutralOpaqueLv1,
-    this.onSurfaceNeutralOpaqueLv2,
-    this.onSurfaceSecondary08,
-    this.onSurfaceSecondary012,
-    this.onSurfaceSecondary016,
-    this.onSurfaceError08,
-    this.onSurfaceError012,
-    this.onSurfaceError016,
-    this.iconsForeground,
-    this.iconsBackground,
-    this.iconsBackgroundVariant,
-    this.iconsOnImage,
-    this.iconsDisabled,
-    this.iconsPrimary,
-    this.iconsSecondary,
-    this.iconsSuccess,
-    this.iconsWarning,
-    this.iconsError,
-    this.avatarsPrimary,
-    this.avatarsSecondary,
-    this.avatarsSuccess,
-    this.avatarsWarning,
-    this.avatarsError,
-    this.elevationsOnSurfaceNeutralLv0,
-    this.elevationsOnSurfaceNeutralLv1Grey,
-    this.elevationsOnSurfaceNeutralLv1White,
-    this.elevationsOnSurfaceNeutralLv2,
-    this.outlineBorder,
-    this.outlineBorderVariant,
-    this.primary98,
-    this.primaryContainer,
-    this.onPrimaryContainer,
-    this.onErrorVariant,
-    this.errorContainer,
-    this.onErrorContainer,
+    this.textPrimary = Colors.black,
+    this.textOnPrimary = Colors.black,
+    this.textOnPrimaryLevel0 = Colors.black,
+    this.textOnPrimaryLevel1 = Colors.black,
+    this.textOnPrimaryWhite = Colors.black,
+    this.textOnPrimaryContainer = Colors.black,
+    this.textDisabled = Colors.black,
+    this.success = Colors.black,
+    this.onSuccess = Colors.black,
+    this.successContainer = Colors.black,
+    this.onSuccessContainer = Colors.black,
+    this.warning = Colors.black,
+    this.onWarning = Colors.black,
+    this.warningContainer = Colors.black,
+    this.onWarningContainer = Colors.black,
+    this.onSurfaceNeutral08 = Colors.black,
+    this.onSurfaceNeutral012 = Colors.black,
+    this.onSurfaceNeutral016 = Colors.black,
+    this.onSurfacePrimaryContainer = Colors.black,
+    this.onSurfacePrimary08 = Colors.black,
+    this.onSurfacePrimary012 = Colors.black,
+    this.onSurfacePrimary016 = Colors.black,
+    this.onSurfaceNeutralOpaqueLv0 = Colors.black,
+    this.onSurfaceNeutralOpaqueLv1 = Colors.black,
+    this.onSurfaceNeutralOpaqueLv2 = Colors.black,
+    this.onSurfaceSecondary08 = Colors.black,
+    this.onSurfaceSecondary012 = Colors.black,
+    this.onSurfaceSecondary016 = Colors.black,
+    this.onSurfaceError08 = Colors.black,
+    this.onSurfaceError012 = Colors.black,
+    this.onSurfaceError016 = Colors.black,
+    this.iconsForeground = Colors.black,
+    this.iconsBackground = Colors.black,
+    this.iconsBackgroundVariant = Colors.black,
+    this.iconsOnImage = Colors.black,
+    this.iconsDisabled = Colors.black,
+    this.iconsPrimary = Colors.black,
+    this.iconsSecondary = Colors.black,
+    this.iconsSuccess = Colors.black,
+    this.iconsWarning = Colors.black,
+    this.iconsError = Colors.black,
+    this.avatarsPrimary = Colors.black,
+    this.avatarsSecondary = Colors.black,
+    this.avatarsSuccess = Colors.black,
+    this.avatarsWarning = Colors.black,
+    this.avatarsError = Colors.black,
+    this.elevationsOnSurfaceNeutralLv0 = Colors.black,
+    this.elevationsOnSurfaceNeutralLv1Grey = Colors.black,
+    this.elevationsOnSurfaceNeutralLv1White = Colors.black,
+    this.elevationsOnSurfaceNeutralLv2 = Colors.black,
+    this.outlineBorder = Colors.black,
+    this.outlineBorderVariant = Colors.black,
+    this.primary98 = Colors.black,
+    this.primaryContainer = Colors.black,
+    this.onPrimaryContainer = Colors.black,
+    this.onErrorVariant = Colors.black,
+    this.errorContainer = Colors.black,
+    this.onErrorContainer = Colors.black,
+    this.overlay = Colors.black,
+    this.dropShadow = Colors.black,
   });
 
   @override
@@ -249,6 +255,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? onErrorVariant,
     Color? errorContainer,
     Color? onErrorContainer,
+    Color? overlay,
+    Color? dropShadow,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -321,6 +329,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       onErrorVariant: onErrorVariant ?? this.onErrorVariant,
       errorContainer: errorContainer ?? this.errorContainer,
       onErrorContainer: onErrorContainer ?? this.onErrorContainer,
+      overlay: overlay ?? this.overlay,
+      dropShadow: dropShadow ?? this.dropShadow,
     );
   }
 
@@ -333,128 +343,142 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       return this;
     }
     return VoicesColorScheme(
-      textPrimary: Color.lerp(textPrimary, other.textPrimary, t),
-      textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t),
+      textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
+      textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t)!,
       textOnPrimaryLevel0: Color.lerp(
         textOnPrimaryLevel0,
         other.textOnPrimaryLevel0,
         t,
-      ),
+      )!,
       textOnPrimaryLevel1: Color.lerp(
         textOnPrimaryLevel1,
         other.textOnPrimaryLevel1,
         t,
-      ),
+      )!,
       textOnPrimaryWhite: Color.lerp(
         textOnPrimaryWhite,
         other.textOnPrimaryWhite,
         t,
-      ),
+      )!,
       textOnPrimaryContainer: Color.lerp(
         textOnPrimaryContainer,
         other.textOnPrimaryContainer,
         t,
-      ),
-      textDisabled: Color.lerp(textDisabled, other.textDisabled, t),
-      success: Color.lerp(success, other.success, t),
-      onSuccess: Color.lerp(onSuccess, other.onSuccess, t),
-      successContainer: Color.lerp(successContainer, other.successContainer, t),
-      onSuccessContainer:
-          Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
-      warning: Color.lerp(warning, other.warning, t),
-      onWarning: Color.lerp(onWarning, other.onWarning, t),
-      warningContainer: Color.lerp(warningContainer, other.warningContainer, t),
+      )!,
+      textDisabled: Color.lerp(textDisabled, other.textDisabled, t)!,
+      success: Color.lerp(success, other.success, t)!,
+      onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
+      successContainer: Color.lerp(
+        successContainer,
+        other.successContainer,
+        t,
+      )!,
+      onSuccessContainer: Color.lerp(
+        onSuccessContainer,
+        other.onSuccessContainer,
+        t,
+      )!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      onWarning: Color.lerp(onWarning, other.onWarning, t)!,
+      warningContainer:
+          Color.lerp(warningContainer, other.warningContainer, t)!,
       onWarningContainer:
-          Color.lerp(onWarningContainer, other.onWarningContainer, t),
+          Color.lerp(onWarningContainer, other.onWarningContainer, t)!,
       onSurfaceNeutral08:
-          Color.lerp(onSurfaceNeutral08, other.onSurfaceNeutral08, t),
+          Color.lerp(onSurfaceNeutral08, other.onSurfaceNeutral08, t)!,
       onSurfaceNeutral012:
-          Color.lerp(onSurfaceNeutral012, other.onSurfaceNeutral012, t),
+          Color.lerp(onSurfaceNeutral012, other.onSurfaceNeutral012, t)!,
       onSurfaceNeutral016:
-          Color.lerp(onSurfaceNeutral016, other.onSurfaceNeutral016, t),
+          Color.lerp(onSurfaceNeutral016, other.onSurfaceNeutral016, t)!,
       onSurfaceNeutralOpaqueLv0: Color.lerp(
         onSurfaceNeutralOpaqueLv0,
         other.onSurfaceNeutralOpaqueLv0,
         t,
-      ),
+      )!,
       onSurfaceNeutralOpaqueLv1: Color.lerp(
         onSurfaceNeutralOpaqueLv1,
         other.onSurfaceNeutralOpaqueLv1,
         t,
-      ),
+      )!,
       onSurfaceNeutralOpaqueLv2: Color.lerp(
         onSurfaceNeutralOpaqueLv2,
         other.onSurfaceNeutralOpaqueLv2,
         t,
-      ),
+      )!,
       onSurfacePrimaryContainer: Color.lerp(
         onSurfacePrimaryContainer,
         other.onSurfacePrimaryContainer,
         t,
-      ),
+      )!,
       onSurfacePrimary08:
-          Color.lerp(onSurfacePrimary08, other.onSurfacePrimary08, t),
+          Color.lerp(onSurfacePrimary08, other.onSurfacePrimary08, t)!,
       onSurfacePrimary012:
-          Color.lerp(onSurfacePrimary012, other.onSurfacePrimary012, t),
+          Color.lerp(onSurfacePrimary012, other.onSurfacePrimary012, t)!,
       onSurfacePrimary016:
-          Color.lerp(onSurfacePrimary016, other.onSurfacePrimary016, t),
+          Color.lerp(onSurfacePrimary016, other.onSurfacePrimary016, t)!,
       onSurfaceSecondary08:
-          Color.lerp(onSurfaceSecondary08, other.onSurfaceSecondary08, t),
+          Color.lerp(onSurfaceSecondary08, other.onSurfaceSecondary08, t)!,
       onSurfaceSecondary012:
-          Color.lerp(onSurfaceSecondary012, other.onSurfaceSecondary012, t),
+          Color.lerp(onSurfaceSecondary012, other.onSurfaceSecondary012, t)!,
       onSurfaceSecondary016:
-          Color.lerp(onSurfaceSecondary016, other.onSurfaceSecondary016, t),
-      onSurfaceError08: Color.lerp(onSurfaceError08, other.onSurfaceError08, t),
+          Color.lerp(onSurfaceSecondary016, other.onSurfaceSecondary016, t)!,
+      onSurfaceError08:
+          Color.lerp(onSurfaceError08, other.onSurfaceError08, t)!,
       onSurfaceError012:
-          Color.lerp(onSurfaceError012, other.onSurfaceError012, t),
+          Color.lerp(onSurfaceError012, other.onSurfaceError012, t)!,
       onSurfaceError016:
-          Color.lerp(onSurfaceError016, other.onSurfaceError016, t),
-      iconsForeground: Color.lerp(iconsForeground, other.iconsForeground, t),
-      iconsBackground: Color.lerp(iconsBackground, other.iconsBackground, t),
+          Color.lerp(onSurfaceError016, other.onSurfaceError016, t)!,
+      iconsForeground: Color.lerp(iconsForeground, other.iconsForeground, t)!,
+      iconsBackground: Color.lerp(iconsBackground, other.iconsBackground, t)!,
       iconsBackgroundVariant:
-          Color.lerp(iconsBackgroundVariant, other.iconsBackgroundVariant, t),
-      iconsOnImage: Color.lerp(iconsOnImage, other.iconsOnImage, t),
-      iconsDisabled: Color.lerp(iconsDisabled, other.iconsDisabled, t),
-      iconsPrimary: Color.lerp(iconsPrimary, other.iconsPrimary, t),
-      iconsSecondary: Color.lerp(iconsSecondary, other.iconsSecondary, t),
-      iconsSuccess: Color.lerp(iconsSuccess, other.iconsSuccess, t),
-      iconsWarning: Color.lerp(iconsWarning, other.iconsWarning, t),
-      iconsError: Color.lerp(iconsError, other.iconsError, t),
-      avatarsPrimary: Color.lerp(avatarsPrimary, other.avatarsPrimary, t),
-      avatarsSecondary: Color.lerp(avatarsSecondary, other.avatarsSecondary, t),
-      avatarsSuccess: Color.lerp(avatarsSuccess, other.avatarsSuccess, t),
-      avatarsWarning: Color.lerp(avatarsWarning, other.avatarsWarning, t),
-      avatarsError: Color.lerp(avatarsError, other.avatarsError, t),
+          Color.lerp(iconsBackgroundVariant, other.iconsBackgroundVariant, t)!,
+      iconsOnImage: Color.lerp(iconsOnImage, other.iconsOnImage, t)!,
+      iconsDisabled: Color.lerp(iconsDisabled, other.iconsDisabled, t)!,
+      iconsPrimary: Color.lerp(iconsPrimary, other.iconsPrimary, t)!,
+      iconsSecondary: Color.lerp(iconsSecondary, other.iconsSecondary, t)!,
+      iconsSuccess: Color.lerp(iconsSuccess, other.iconsSuccess, t)!,
+      iconsWarning: Color.lerp(iconsWarning, other.iconsWarning, t)!,
+      iconsError: Color.lerp(iconsError, other.iconsError, t)!,
+      avatarsPrimary: Color.lerp(avatarsPrimary, other.avatarsPrimary, t)!,
+      avatarsSecondary:
+          Color.lerp(avatarsSecondary, other.avatarsSecondary, t)!,
+      avatarsSuccess: Color.lerp(avatarsSuccess, other.avatarsSuccess, t)!,
+      avatarsWarning: Color.lerp(avatarsWarning, other.avatarsWarning, t)!,
+      avatarsError: Color.lerp(avatarsError, other.avatarsError, t)!,
       elevationsOnSurfaceNeutralLv0: Color.lerp(
         elevationsOnSurfaceNeutralLv0,
         other.elevationsOnSurfaceNeutralLv0,
         t,
-      ),
+      )!,
       elevationsOnSurfaceNeutralLv1Grey: Color.lerp(
         elevationsOnSurfaceNeutralLv1Grey,
         other.elevationsOnSurfaceNeutralLv1Grey,
         t,
-      ),
+      )!,
       elevationsOnSurfaceNeutralLv1White: Color.lerp(
         elevationsOnSurfaceNeutralLv1White,
         other.elevationsOnSurfaceNeutralLv1White,
         t,
-      ),
+      )!,
       elevationsOnSurfaceNeutralLv2: Color.lerp(
         elevationsOnSurfaceNeutralLv2,
         other.elevationsOnSurfaceNeutralLv2,
         t,
-      ),
-      outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t),
+      )!,
+      outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t)!,
       outlineBorderVariant:
-          Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t),
-      primary98: Color.lerp(primary98, other.primary98, t),
-      primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t),
+          Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t)!,
+      primary98: Color.lerp(primary98, other.primary98, t)!,
+      primaryContainer:
+          Color.lerp(primaryContainer, other.primaryContainer, t)!,
       onPrimaryContainer:
-          Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t),
-      onErrorVariant: Color.lerp(onErrorVariant, other.onErrorVariant, t),
-      errorContainer: Color.lerp(errorContainer, other.errorContainer, t),
-      onErrorContainer: Color.lerp(onErrorContainer, other.onErrorContainer, t),
+          Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
+      onErrorVariant: Color.lerp(onErrorVariant, other.onErrorVariant, t)!,
+      errorContainer: Color.lerp(errorContainer, other.errorContainer, t)!,
+      onErrorContainer:
+          Color.lerp(onErrorContainer, other.onErrorContainer, t)!,
+      overlay: Color.lerp(overlay, other.overlay, t)!,
+      dropShadow: Color.lerp(dropShadow, other.dropShadow, t)!,
     );
   }
 }

@@ -127,7 +127,7 @@ class SingleSelectDropdown<T> extends StatelessWidget {
 
   OutlineInputBorder _border(BuildContext context) => OutlineInputBorder(
         borderSide: BorderSide(
-          color: Theme.of(context).colors.outlineBorderVariant!,
+          color: Theme.of(context).colors.outlineBorderVariant,
         ),
       );
 }

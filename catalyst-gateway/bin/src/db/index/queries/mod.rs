@@ -2,6 +2,7 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod purge;
 pub(crate) mod rbac;
 pub(crate) mod registrations;
 pub(crate) mod staked_ada;
@@ -16,6 +17,7 @@ use rbac::{
     get_role0_chain_root::GetRole0ChainRootQuery,
 };
 use registrations::{
+    get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
     get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
     get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
 };
@@ -96,6 +98,8 @@ pub(crate) enum PreparedSelectQuery {
     RegistrationsByChainRoot,
     /// Get chain root by role0 key
     ChainRootByRole0Key,
+    /// Get all stake and vote keys for snapshot (`stake_pub_key,vote_key`)
+    GetAllStakesAndVoteKeys,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -157,6 +161,8 @@ pub(crate) struct PreparedQueries {
     registrations_by_chain_root_query: PreparedStatement,
     /// Get chain root by role0 key
     chain_root_by_role0_key_query: PreparedStatement,
+    /// Get all stake and vote keys (`stake_key,vote_key`) for snapshot
+    get_all_stakes_and_vote_keys_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -169,6 +175,7 @@ pub(crate) type FallibleQueryTasks = Vec<tokio::task::JoinHandle<FallibleQueryRe
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
+    #[allow(clippy::too_many_lines)]
     pub(crate) async fn new(
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
@@ -193,7 +200,9 @@ impl PreparedQueries {
         let chain_root_by_stake_address = GetChainRootQuery::prepare(session.clone()).await;
         let registrations_by_chain_root =
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
-        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session).await;
+        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
+        let get_all_stakes_and_vote_keys_query =
+            GetAllStakesAndVoteKeysQuery::prepare(session).await;
 
         let (
             txo_insert_queries,
@@ -241,6 +250,7 @@ impl PreparedQueries {
             chain_root_by_stake_address_query: chain_root_by_stake_address?,
             registrations_by_chain_root_query: registrations_by_chain_root?,
             chain_root_by_role0_key_query: chain_root_by_role0_key?,
+            get_all_stakes_and_vote_keys_query: get_all_stakes_and_vote_keys_query?,
         })
     }
 
@@ -331,12 +341,11 @@ impl PreparedQueries {
                 &self.registrations_by_chain_root_query
             },
             PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
+            PreparedSelectQuery::GetAllStakesAndVoteKeys => {
+                &self.get_all_stakes_and_vote_keys_query
+            },
         };
-
-        session
-            .execute_iter(prepared_stmt.clone(), params)
-            .await
-            .map_err(|e| anyhow::anyhow!(e))
+        session_execute_iter(session, prepared_stmt, params).await
     }
 
     /// Execute a Batch query with the given parameters.
@@ -376,35 +385,62 @@ impl PreparedQueries {
                 &self.chain_root_for_stake_address_insert_queries
             },
         };
-
-        let mut results: Vec<QueryResult> = Vec::new();
-
-        let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
-        let mut query_failed = false;
-        let query_str = format!("{query}");
-
-        for chunk in chunks {
-            let chunk_size: u16 = chunk.len().try_into()?;
-            let Some(batch_query) = query_map.get(&chunk_size) else {
-                // This should not actually occur.
-                bail!("No batch query found for size {}", chunk_size);
-            };
-            let batch_query_statements = batch_query.value().clone();
-            match session.batch(&batch_query_statements, chunk).await {
-                Ok(result) => results.push(result),
-                Err(err) => {
-                    let chunk_str = format!("{chunk:?}");
-                    error!(error=%err, query=query_str, chunk=chunk_str, "Query Execution Failed");
-                    query_failed = true;
-                    // Defer failure until all batches have been processed.
-                },
-            }
-        }
-
-        if query_failed {
-            bail!("Query Failed: {query_str}!");
-        }
-
-        Ok(results)
+        session_execute_batch(session, query_map, cfg, query, values).await
     }
+}
+
+/// Execute a Batch query with the given parameters.
+///
+/// Values should be a Vec of values which implement `SerializeRow` and they MUST be
+/// the same, and must match the query being executed.
+///
+/// This will divide the batch into optimal sized chunks and execute them until all
+/// values have been executed or the first error is encountered.
+async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
+    session: Arc<Session>, query_map: &SizedBatch, cfg: Arc<cassandra_db::EnvVars>, query: Q,
+    values: Vec<T>,
+) -> FallibleQueryResults {
+    let mut results: Vec<QueryResult> = Vec::new();
+
+    let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
+    let mut query_failed = false;
+    let query_str = format!("{query}");
+
+    for chunk in chunks {
+        let chunk_size: u16 = chunk.len().try_into()?;
+        let Some(batch_query) = query_map.get(&chunk_size) else {
+            // This should not actually occur.
+            bail!("No batch query found for size {}", chunk_size);
+        };
+        let batch_query_statements = batch_query.value().clone();
+        match session.batch(&batch_query_statements, chunk).await {
+            Ok(result) => results.push(result),
+            Err(err) => {
+                let chunk_str = format!("{chunk:?}");
+                error!(error=%err, query=query_str, chunk=chunk_str, "Query Execution Failed");
+                query_failed = true;
+                // Defer failure until all batches have been processed.
+            },
+        }
+    }
+
+    if query_failed {
+        bail!("Query Failed: {query_str}!");
+    }
+
+    Ok(results)
+}
+
+/// Executes a select query with the given parameters.
+///
+/// Returns an iterator that iterates over all the result pages that the query
+/// returns.
+pub(crate) async fn session_execute_iter<P>(
+    session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
+) -> anyhow::Result<QueryPager>
+where P: SerializeRow {
+    session
+        .execute_iter(prepared_stmt.clone(), params)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))
 }

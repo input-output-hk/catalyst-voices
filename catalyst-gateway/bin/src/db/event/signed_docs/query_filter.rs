@@ -13,7 +13,7 @@ pub(crate) enum DocsQueryFilter {
     DocId(uuid::Uuid),
     /// Select docs with the specific `id` and `ver` field
     DocVer(uuid::Uuid, uuid::Uuid),
-    /// Select docs with the specific `author` field
+    /// Select docs with the specific `authors` field
     Author(String),
 }
 
@@ -26,7 +26,7 @@ impl Display for DocsQueryFilter {
             Self::DocVer(id, ver) => {
                 write!(f, "signed_docs.id = '{id}' AND signed_docs.ver = '{ver}'")
             },
-            Self::Author(author) => write!(f, "signed_docs.author = '{author}'"),
+            Self::Author(author) => write!(f, "signed_docs.authors @> '{{ \"{author}\" }}'"),
         }
     }
 }

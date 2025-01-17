@@ -112,7 +112,7 @@ class _Segment extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: theme.colors.elevationsOnSurfaceNeutralLv1White,
-          border: Border.all(color: theme.colors.outlineBorderVariant!),
+          border: Border.all(color: theme.colors.outlineBorderVariant),
           borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.all(16),

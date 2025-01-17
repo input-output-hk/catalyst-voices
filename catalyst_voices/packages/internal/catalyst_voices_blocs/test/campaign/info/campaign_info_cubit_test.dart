@@ -8,25 +8,28 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(CampaignInfoCubit, () {
-    final campaign = Campaign(
-      id: 'campaign-id',
-      name: 'name',
-      description: 'description',
-      startDate: DateTime.now(),
-      endDate: DateTime.now().plusDays(2),
-      proposalsCount: 0,
-      sections: const [],
-      publish: CampaignPublish.draft,
-      proposalTemplate: const ProposalTemplate(sections: []),
-    );
-
-    final campaignStage = CampaignStage.fromCampaign(
-      campaign,
-      DateTimeExt.now(),
-    );
+    late Campaign campaign;
+    late CampaignStage campaignStage;
 
     late CampaignService campaignService;
     late AdminToolsCubit adminToolsCubit;
+
+    setUpAll(() {
+      campaign = Campaign(
+        id: 'campaign-id',
+        name: 'name',
+        description: 'description',
+        startDate: DateTime.now(),
+        endDate: DateTime.now().plusDays(2),
+        proposalsCount: 0,
+        publish: CampaignPublish.draft,
+      );
+
+      campaignStage = CampaignStage.fromCampaign(
+        campaign,
+        DateTimeExt.now(),
+      );
+    });
 
     setUp(() {
       campaignService = _FakeCampaignService(campaign);

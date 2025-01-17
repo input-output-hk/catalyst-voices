@@ -9,10 +9,10 @@ environment:
 
 dependencies:
   bloc_concurrency: ^0.2.2
-  catalyst_cardano: ^0.4.0+2
-  catalyst_cardano_serialization: ^0.5.0+2
-  catalyst_cardano_web: ^0.4.0+2
-  catalyst_key_derivation: ^0.1.1+1
+  catalyst_cardano: ^0.4.0+3
+  catalyst_cardano_serialization: ^0.5.0+3
+  catalyst_cardano_web: ^0.4.0+3
+  catalyst_key_derivation: ^0.1.2
   catalyst_voices_brands:
     path: ../catalyst_voices_brands
   catalyst_voices_models:
@@ -34,6 +34,7 @@ dependencies:
   formz: ^0.7.0
   meta: ^1.10.0
   result_type: ^0.2.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   bloc_test: ^9.1.4

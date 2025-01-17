@@ -8,8 +8,10 @@ packages:
   - utilities/**
 
 ignore:
-  # ignores flutter_rust_bridge packages that are non-conformant with melos
+  # ignore flutter_rust_bridge packages that are non-conformant with melos
   - packages/libs/catalyst_key_derivation/example/**
+  # ignore temporary packages that are non-conformant with melos
+  - apps/voices/build/**
 
 permittedLicenses:
   - MIT
@@ -108,7 +110,7 @@ command:
       flutter_markdown: ^0.7.4+3
       flutter_quill: ^10.8.2
       flutter_quill_extensions: ^10.8.2
-      flutter_rust_bridge: ^2.5.1
+      flutter_rust_bridge: 2.5.1
       flutter_secure_storage: ^9.2.2
       formz: ^0.7.0
       intl: ^0.19.0
@@ -130,6 +132,7 @@ command:
       scrollable_positioned_list: ^0.3.8
       shared_preferences: ^2.3.3
       shared_preferences_platform_interface: ^2.4.1
+      synchronized: ^3.3.0+3
       # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
       # but here we import it explicitly to make sure the latest version is used which addresses
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263

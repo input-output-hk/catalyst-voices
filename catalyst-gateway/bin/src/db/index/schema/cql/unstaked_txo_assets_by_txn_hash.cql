@@ -1,4 +1,4 @@
--- Transaction Outputs (Native Assets) per stake address.
+-- Transaction Outputs (Native Assets) by their transaction hash.
 CREATE TABLE IF NOT EXISTS unstaked_txo_assets_by_txn_hash (
     -- Primary Key Fields
     txn_hash        blob,     -- 32 byte hash of this transaction.
