@@ -13,6 +13,7 @@ class FinishAccountCreationPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: const Key('FinishAccountCreationPanel'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
@@ -78,6 +79,7 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
+      key: const Key('LinkWalletAndRolesButton'),
       onTap: onTap,
       leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
       child: Text(context.l10n.createKeychainLinkWalletAndRoles),

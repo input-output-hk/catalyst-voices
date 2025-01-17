@@ -5,6 +5,24 @@ sealed class ProposalBuilderEvent extends Equatable {
   const ProposalBuilderEvent();
 }
 
+final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {
+  const LoadDefaultProposalTemplateEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class LoadProposalTemplateEvent extends ProposalBuilderEvent {
+  final String id;
+
+  const LoadProposalTemplateEvent({
+    required this.id,
+  });
+
+  @override
+  List<Object?> get props => [id];
+}
+
 final class LoadProposalEvent extends ProposalBuilderEvent {
   final String id;
 
@@ -16,11 +34,22 @@ final class LoadProposalEvent extends ProposalBuilderEvent {
   List<Object?> get props => [id];
 }
 
-final class ActiveStepChangedEvent extends ProposalBuilderEvent {
+final class ActiveNodeChangedEvent extends ProposalBuilderEvent {
   final NodeId? id;
 
-  const ActiveStepChangedEvent(this.id);
+  const ActiveNodeChangedEvent(this.id);
 
   @override
   List<Object?> get props => [id];
+}
+
+final class SectionChangedEvent extends ProposalBuilderEvent {
+  final List<DocumentChange> changes;
+
+  const SectionChangedEvent({
+    required this.changes,
+  });
+
+  @override
+  List<Object?> get props => [changes];
 }

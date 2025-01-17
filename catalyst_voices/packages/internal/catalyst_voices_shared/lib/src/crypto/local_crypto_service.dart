@@ -224,7 +224,7 @@ final class LocalCryptoService implements CryptoService {
     return future.whenComplete(
       () {
         stopwatch.stop();
-        _logger.finer('Took[$debugLabel] ${stopwatch.elapsed}');
+        _logger.finest('Took[$debugLabel] ${stopwatch.elapsed}');
       },
     );
   }

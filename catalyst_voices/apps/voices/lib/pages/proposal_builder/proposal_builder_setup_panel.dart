@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_guidance_view.dart';
 import 'package:catalyst_voices/widgets/cards/comment_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -55,7 +54,8 @@ class _GuidanceSelector extends StatelessWidget {
         } else if (state.showEmptyState) {
           return Text(context.l10n.noGuidanceForThisSection);
         } else {
-          return ProposalBuilderGuidanceView(state.guidances);
+          // TODO(damian-molinski): not implemented using rich text.
+          return const Text('');
         }
       },
     );

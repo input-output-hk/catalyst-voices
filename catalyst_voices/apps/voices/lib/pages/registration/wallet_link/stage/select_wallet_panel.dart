@@ -60,6 +60,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
+          key: const Key('SeeAllSupportedWalletsButton'),
           trailing: VoicesAssets.icons.externalLink.buildIcon(),
           onTap: () async => _launchSupportedWalletsLink(),
           child: Text(context.l10n.seeAllSupportedWallets),
@@ -101,6 +102,7 @@ class _BlocWallets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<Result<List<WalletMetadata>, Exception>?>(
+      key: const Key('WalletsLinkBuilder'),
       selector: (state) => state.wallets,
       builder: (context, state) {
         return _Wallets(
