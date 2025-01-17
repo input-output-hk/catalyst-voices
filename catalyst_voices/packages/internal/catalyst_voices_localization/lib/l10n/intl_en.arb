@@ -1297,5 +1297,7 @@
   "noUrlAdded": "No URL added",
   "addUrl": "Add URL",
   "clear": "Clear",
-  "errorNoActiveCampaignFound": "Currently there is no active campaign running"
+  "errorNoActiveCampaignFound": "Currently there is no active campaign running",
+  "errorDisplayNameValidationEmpty": "Display name can not be empty",
+  "errorDisplayNameValidationOutOfRange": "Display name invalid length"
 }

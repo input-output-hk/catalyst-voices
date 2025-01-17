@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/registration/cubits/base_profile_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
+import 'package:catalyst_voices_blocs/src/registration/state_data/base_profile_state_data.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -20,6 +22,7 @@ final _logger = Logger('RegistrationCubit');
 /// Manages the registration state.
 final class RegistrationCubit extends Cubit<RegistrationState>
     with BlocErrorEmitterMixin {
+  final BaseProfileCubit _baseProfileCubit;
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
   final RecoverCubit _recoverCubit;
@@ -45,6 +48,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   })  : _registrationService = registrationService,
         _userService = userService,
         _progressNotifier = progressNotifier,
+        _baseProfileCubit = BaseProfileCubit(),
         _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
           progressNotifier: progressNotifier,
@@ -57,10 +61,12 @@ final class RegistrationCubit extends Cubit<RegistrationState>
           registrationService: registrationService,
         ),
         super(const RegistrationState()) {
+    _baseProfileCubit.stream.listen(_onBaseProfileStateDataChanged);
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
     _recoverCubit.stream.listen(_onRecoverStateDataChanged);
 
+    _baseProfileCubit.errorStream.listen(emitError);
     _keychainCreationCubit.errorStream.listen(emitError);
     _walletLinkCubit.errorStream.listen(emitError);
     _recoverCubit.errorStream.listen(emitError);
@@ -68,12 +74,15 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     // Emits initialization state
     emit(
       state.copyWith(
+        baseProfileStateData: _baseProfileCubit.state,
         keychainStateData: _keychainCreationCubit.state,
         walletLinkStateData: _walletLinkCubit.state,
         recoverStateData: _recoverCubit.state,
       ),
     );
   }
+
+  BaseProfileManager get baseProfile => _baseProfileCubit;
 
   KeychainCreationManager get keychainCreation => _keychainCreationCubit;
 
@@ -85,6 +94,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   @override
   Future<void> close() {
+    _baseProfileCubit.close();
     _keychainCreationCubit.close();
     _walletLinkCubit.close();
     _recoverCubit.close();
@@ -431,6 +441,10 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   void _goToStep(RegistrationStep step) {
     emit(state.copyWith(step: step));
+  }
+
+  void _onBaseProfileStateDataChanged(BaseProfileStateData data) {
+    emit(state.copyWith(baseProfileStateData: data));
   }
 
   void _onKeychainStateDataChanged(KeychainStateData data) {

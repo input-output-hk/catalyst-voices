@@ -1,10 +1,12 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/registration/state_data/base_profile_state_data.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class RegistrationState extends Equatable {
   final RegistrationStep step;
+  final BaseProfileStateData baseProfileStateData;
   final KeychainStateData keychainStateData;
   final WalletLinkStateData walletLinkStateData;
   final RegistrationStateData registrationStateData;
@@ -12,6 +14,7 @@ final class RegistrationState extends Equatable {
 
   const RegistrationState({
     this.step = const GetStartedStep(),
+    this.baseProfileStateData = const BaseProfileStateData(),
     this.keychainStateData = const KeychainStateData(),
     this.walletLinkStateData = const WalletLinkStateData(),
     this.registrationStateData = const RegistrationStateData(),
@@ -62,6 +65,7 @@ final class RegistrationState extends Equatable {
 
   RegistrationState copyWith({
     RegistrationStep? step,
+    BaseProfileStateData? baseProfileStateData,
     KeychainStateData? keychainStateData,
     WalletLinkStateData? walletLinkStateData,
     RegistrationStateData? registrationStateData,
@@ -69,6 +73,7 @@ final class RegistrationState extends Equatable {
   }) {
     return RegistrationState(
       step: step ?? this.step,
+      baseProfileStateData: baseProfileStateData ?? this.baseProfileStateData,
       keychainStateData: keychainStateData ?? this.keychainStateData,
       walletLinkStateData: walletLinkStateData ?? this.walletLinkStateData,
       registrationStateData:
@@ -80,6 +85,7 @@ final class RegistrationState extends Equatable {
   @override
   List<Object?> get props => [
         step,
+        baseProfileStateData,
         keychainStateData,
         walletLinkStateData,
         registrationStateData,
