@@ -24,9 +24,9 @@ void main() {
       final encodedSchema = originalSchema.toJson();
       expect(encodedSchema, isNotEmpty);
 
-      final redecodedSchema = DocumentSchemaDto.fromJson(encodedSchema);
-      final redecodedModel = redecodedSchema.toModel();
-      expect(redecodedModel, equals(originalModel));
+      final recodedSchema = DocumentSchemaDto.fromJson(encodedSchema);
+      final recodedModel = recodedSchema.toModel();
+      expect(recodedModel, equals(originalModel));
     });
   });
 }
