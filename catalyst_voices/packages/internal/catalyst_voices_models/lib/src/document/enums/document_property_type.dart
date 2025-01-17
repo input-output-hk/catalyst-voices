@@ -8,15 +8,15 @@ enum DocumentPropertyType {
   /// Equivalent to an object with fields.
   object,
 
-  /// A [String] property type without no children.
+  /// A [String] property type without children.
   string,
 
-  /// A [int] property type without no children.
+  /// A [int] property type without children.
   integer,
 
-  /// A [double] property type without no children.
+  /// A [double] property type without children.
   number,
 
-  /// A [boolean] property type without no children.
+  /// A [boolean] property type without children.
   boolean;
 }
