@@ -1,5 +1,5 @@
--- Index of CIP-36 registrations searchable by Vote Key.
--- Full registration data needs to be queried from the main CIP-36 registration tables.
+-- Index of CIP-36 registrations searchable by Stake Address.
+-- Full registration data needs to be queried from the main cip36 registration tables.
 -- Includes both Valid and Invalid registrations.
 CREATE TABLE IF NOT EXISTS cip36_registration_for_vote_key (
     -- Primary Key Data

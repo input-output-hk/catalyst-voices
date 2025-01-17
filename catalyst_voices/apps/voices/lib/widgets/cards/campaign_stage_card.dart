@@ -22,7 +22,7 @@ class CampaignStageCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colors.elevationsOnSurfaceNeutralLv1White,
         border: Border.all(
-          color: theme.colors.outlineBorderVariant!,
+          color: theme.colors.outlineBorderVariant,
         ),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -63,14 +63,14 @@ class CampaignStageCard extends StatelessWidget {
             if (campaign.stage == CampaignStage.live) ...[
               const SizedBox(height: 16),
               OutlinedButton(
-                // TODO(ryszard-schossler): add logic
+                // TODO(LynxLynxx): add logic
                 onPressed: () {},
                 child: Text(context.l10n.viewProposals),
               ),
             ] else if (campaign.stage == CampaignStage.completed) ...[
               const SizedBox(height: 16),
               OutlinedButton(
-                // TODO(ryszard-schossler): add logic
+                // TODO(LynxLynxx): add logic
                 onPressed: () {},
                 child: Text(context.l10n.viewVotingResults),
               ),

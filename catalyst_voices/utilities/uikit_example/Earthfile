@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../../ AS catalyst-voices
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.27 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.31 AS flutter-ci
 
 # local-build-web - build web version of UIKit example.
 # Prefixed by "local" to make sure it's not auto triggered, the target was

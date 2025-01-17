@@ -52,6 +52,9 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// Default `CHECK_CONFIG_TICK` used in development.
 const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
 
+/// Default `METRICS_MEMORY_INTERVAL`.
+const METRICS_MEMORY_INTERVAL_DEFAULT: &str = "1s";
+
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
@@ -150,6 +153,9 @@ struct EnvVars {
 
     /// Slot buffer used as overlap when purging Live Index data.
     purge_slot_buffer: u64,
+
+    /// Interval for updating and sending memory metrics.
+    metrics_memory_interval: Duration,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -204,6 +210,10 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick,
         purge_slot_buffer,
+        metrics_memory_interval: StringEnvVar::new_as_duration(
+            "METRICS_MEMORY_INTERVAL",
+            METRICS_MEMORY_INTERVAL_DEFAULT,
+        ),
     }
 });
 
@@ -295,6 +305,11 @@ impl Settings {
     /// The Service UUID
     pub(crate) fn service_id() -> &'static str {
         ENV_VARS.service_id.as_str()
+    }
+
+    /// The memory metrics interval
+    pub(crate) fn metrics_memory_interval() -> Duration {
+        ENV_VARS.metrics_memory_interval
     }
 
     /// Get a list of all host names to serve the API on.
