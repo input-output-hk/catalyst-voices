@@ -69,11 +69,11 @@ class VoicesRichText extends FormField<Document> {
 }
 
 class _Title extends StatelessWidget {
+  final String title;
+
   const _Title({
     required this.title,
   });
-
-  final String title;
 
   @override
   Widget build(BuildContext context) {

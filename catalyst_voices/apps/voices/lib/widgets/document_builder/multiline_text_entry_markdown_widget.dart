@@ -44,7 +44,7 @@ class _MultilineTextEntryMarkdownWidgetState
   void initState() {
     super.initState();
 
-    _buildController(value: _value);
+   _controller = _buildController(value: _value);
     _controller.addListener(_onControllerChanged);
 
     _focus = VoicesRichTextFocusNode();
@@ -62,7 +62,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _buildController(value: _value);
+      _controller = _buildController(value: _value);
     }
   }
 
