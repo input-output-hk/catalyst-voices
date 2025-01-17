@@ -31,7 +31,7 @@ void main() {
         final documentData = DocumentDataDto.fromJson(documentJson);
         final documentDto = DocumentDto.fromJsonSchema(documentData, schema);
         final documentDtoJson = documentDto.toJson();
-        final serializedJsonString = json.encode(documentDtoJson);
+        final serializedJsonString = json.encode(documentDtoJson.json);
 
         // verify they are the same
         expect(serializedJsonString, equals(originalJsonString));
