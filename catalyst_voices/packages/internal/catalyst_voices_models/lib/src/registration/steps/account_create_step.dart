@@ -1,7 +1,17 @@
 part of 'registration_step.dart';
 
+enum AccountCreateStepType { baseProfile, keychain, walletLink }
+
 sealed class AccountCreateStep extends RegistrationStep {
-  const AccountCreateStep();
+  final AccountCreateStepType type;
+
+  const AccountCreateStep({
+    required this.type,
+  });
+
+  @override
+  @mustCallSuper
+  List<Object?> get props => [type];
 }
 
 final class CreateBaseProfileStep extends AccountCreateStep {
@@ -9,13 +19,12 @@ final class CreateBaseProfileStep extends AccountCreateStep {
 
   const CreateBaseProfileStep({
     this.stage = CreateBaseProfileStage.instructions,
-  });
+  }) : super(
+          type: AccountCreateStepType.baseProfile,
+        );
 
   @override
-  bool get isRegistrationFlow => true;
-
-  @override
-  List<Object?> get props => [stage];
+  List<Object?> get props => [...super.props, stage];
 }
 
 final class CreateKeychainStep extends AccountCreateStep {
@@ -23,13 +32,12 @@ final class CreateKeychainStep extends AccountCreateStep {
 
   const CreateKeychainStep({
     this.stage = CreateKeychainStage.splash,
-  });
+  }) : super(
+          type: AccountCreateStepType.keychain,
+        );
 
   @override
-  bool get isRegistrationFlow => true;
-
-  @override
-  List<Object?> get props => [stage];
+  List<Object?> get props => [...super.props, stage];
 }
 
 final class WalletLinkStep extends AccountCreateStep {
@@ -37,17 +45,21 @@ final class WalletLinkStep extends AccountCreateStep {
 
   const WalletLinkStep({
     this.stage = WalletLinkStage.intro,
+  }) : super(
+          type: AccountCreateStepType.walletLink,
+        );
+
+  @override
+  List<Object?> get props => [...super.props, stage];
+}
+
+final class AccountCreateProgressStep extends RegistrationStep {
+  final List<AccountCreateStepType> completedSteps;
+
+  const AccountCreateProgressStep({
+    required this.completedSteps,
   });
 
   @override
-  bool get isRegistrationFlow => true;
-
-  @override
-  List<Object?> get props => [stage];
-}
-
-// TODO(damian-molinski): Create Account Step Completed.
-// TODO(damian-molinski): Needs parameter about which step is completed.
-final class FinishAccountCreationStep extends AccountCreateStep {
-  const FinishAccountCreationStep();
+  List<Object?> get props => [completedSteps];
 }

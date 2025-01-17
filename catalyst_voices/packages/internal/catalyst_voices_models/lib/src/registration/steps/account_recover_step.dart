@@ -16,8 +16,5 @@ final class RecoverWithSeedPhraseStep extends AccountRecoverStep {
   });
 
   @override
-  bool get isRecoverFlow => true;
-
-  @override
   List<Object?> get props => [stage];
 }

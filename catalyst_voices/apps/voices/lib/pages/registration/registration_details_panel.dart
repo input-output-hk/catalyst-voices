@@ -33,7 +33,7 @@ class RegistrationDetailsPanel extends StatelessWidget {
               ],
             ),
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),
-          FinishAccountCreationStep() => const FinishAccountCreationPanel(),
+          AccountCreateProgressStep() => const FinishAccountCreationPanel(),
           WalletLinkStep(:final stage) => WalletLinkPanel(stage: stage),
           AccountCompletedStep() => const AccountCompletedPanel(),
         };

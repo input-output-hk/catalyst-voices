@@ -52,7 +52,7 @@ final class RegistrationState extends Equatable {
       // account creation
       CreateBaseProfileStep(:final stage) => createBaseProfileProgress(stage),
       CreateKeychainStep(:final stage) => createKeychainProgress(stage),
-      FinishAccountCreationStep() => 1.0,
+      AccountCreateProgressStep() => 1.0,
       WalletLinkStep(:final stage) => walletLinkProgress(stage),
 
       // ready

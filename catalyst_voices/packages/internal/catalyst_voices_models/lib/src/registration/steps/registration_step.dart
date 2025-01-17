@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 part 'account_create_step.dart';
 part 'account_recover_step.dart';
@@ -8,9 +9,9 @@ part 'account_recover_step.dart';
 sealed class RegistrationStep extends Equatable {
   const RegistrationStep();
 
-  bool get isRegistrationFlow => false;
+  bool get isRegistrationFlow => this is AccountCreateStep;
 
-  bool get isRecoverFlow => false;
+  bool get isRecoverFlow => this is RecoverWithSeedPhraseStep;
 
   @override
   List<Object?> get props => [];

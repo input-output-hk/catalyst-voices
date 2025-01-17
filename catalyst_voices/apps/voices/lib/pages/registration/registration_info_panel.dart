@@ -122,7 +122,7 @@ class RegistrationInfoPanel extends StatelessWidget {
 
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
-      FinishAccountCreationStep() => _HeaderStrings(
+      AccountCreateProgressStep() => _HeaderStrings(
           title: context.l10n.catalystKeychain,
         ),
       RecoverMethodStep() => _HeaderStrings(
@@ -202,7 +202,7 @@ class _RegistrationPicture extends StatelessWidget {
       RecoverWithSeedPhraseStep(:final stage) => buildRecoverSeedPhrase(stage),
       CreateBaseProfileStep() => const KeychainPicture(),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
-      FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
+      AccountCreateProgressStep() => const KeychainWithPasswordPicture(),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
       AccountCompletedStep() => const AccountCompletedPicture(),
     };
