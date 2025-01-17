@@ -2,5 +2,5 @@
 SELECT
     stake_address,
     slot_no,
-    txn,
+    txn
 FROM cip36_registration_invalid

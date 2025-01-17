@@ -3,5 +3,5 @@ SELECT
     txn_hash,
     txo,
     policy_id,
-    policy_name
+    asset_name
 FROM unstaked_txo_assets_by_txn_hash

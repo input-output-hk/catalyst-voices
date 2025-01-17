@@ -5,5 +5,5 @@ SELECT
     txn,
     txo,
     policy_id,
-    policy_name
+    asset_name
 FROM txo_assets_by_stake

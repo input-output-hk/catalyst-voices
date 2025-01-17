@@ -22,7 +22,7 @@ pub(crate) mod result {
     //! Return values for TXO Assets by TXN Hash purge queries.
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16, i16, Vec<u8>, String);
+    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16, i16, Vec<u8>, Vec<u8>);
 }
 
 /// Select primary keys for TXO Assets by TXN Hash.
@@ -42,8 +42,7 @@ pub(crate) struct Params {
     /// Asset Policy Hash - Binary 28 bytes.
     policy_id: Vec<u8>,
     /// Name of the Policy (UTF8)
-    // TODO: https://github.com/input-output-hk/catalyst-voices/issues/1121
-    policy_name: String,
+    asset_name: Vec<u8>,
 }
 
 impl Debug for Params {
@@ -54,7 +53,7 @@ impl Debug for Params {
             .field("txn", &self.txn)
             .field("txo", &self.txo)
             .field("policy_id", &self.policy_id)
-            .field("policy_name", &self.policy_name)
+            .field("asset_name", &self.asset_name)
             .finish()
     }
 }
@@ -67,7 +66,7 @@ impl From<result::PrimaryKey> for Params {
             txn: value.2,
             txo: value.3,
             policy_id: value.4,
-            policy_name: value.5,
+            asset_name: value.5,
         }
     }
 }

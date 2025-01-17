@@ -5,4 +5,4 @@ WHERE stake_address = :stake_address
     AND txn = :txn
     AND txo = :txo
     AND policy_id = :policy_id
-    AND policy_name = :policy_name
+    AND asset_name = :asset_name
