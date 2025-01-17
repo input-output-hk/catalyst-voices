@@ -41,7 +41,7 @@ pub(crate) struct Params {
     pub(crate) txo: i16,
     /// Asset Policy Hash - Binary 28 bytes.
     policy_id: Vec<u8>,
-    /// Name of the Policy (UTF8)
+    /// Name of the asset, within the Policy.
     asset_name: Vec<u8>,
 }
 

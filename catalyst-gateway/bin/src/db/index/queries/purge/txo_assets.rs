@@ -26,7 +26,7 @@ pub(crate) mod result {
 }
 
 /// Select primary keys for TXO Assets by Stake Address.
-const SELECT_QUERY: &str = include_str!("./cql/get_txo_by_stake_address.cql");
+const SELECT_QUERY: &str = include_str!("./cql/get_txo_assets_by_stake_addr.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
@@ -41,7 +41,7 @@ pub(crate) struct Params {
     pub(crate) txo: i16,
     /// Asset Policy Hash - Binary 28 bytes.
     policy_id: Vec<u8>,
-    /// Name of the Policy (UTF8)
+    /// Name of the asset, within the Policy.
     asset_name: Vec<u8>,
 }
 
@@ -105,7 +105,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete TXO Assets by Stake Address
-const DELETE_QUERY: &str = include_str!("./cql/delete_txo_by_stake_address.cql");
+const DELETE_QUERY: &str = include_str!("./cql/delete_txo_assets_by_stake_addr.cql");
 
 /// Delete TXO Assets by Stake Address Query
 pub(crate) struct DeleteQuery;
