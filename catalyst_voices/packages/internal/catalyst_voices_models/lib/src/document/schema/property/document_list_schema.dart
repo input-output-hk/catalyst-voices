@@ -16,8 +16,22 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
           type: DocumentPropertyType.list,
         );
 
+  /// A method that builds typed properties.
+  ///
+  /// Helps to create properties which generic typ
+  /// is synced with the schema's generic type.
+  DocumentListProperty buildProperty({
+    required List<DocumentProperty> properties,
+  }) {
+    return DocumentListProperty(
+      schema: this,
+      properties: properties,
+      validationResult: validate(properties),
+    );
+  }
+
   @override
-  DocumentListProperty createProperty([DocumentNodeId? parentNodeId]) {
+  DocumentListProperty createChildPropertyAt([DocumentNodeId? parentNodeId]) {
     parentNodeId ??= nodeId;
 
     final childId = const Uuid().v4();
@@ -26,10 +40,8 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
     final updatedSchema = withNodeId(childNodeId) as DocumentListSchema;
     const updatedProperties = <DocumentProperty>[];
 
-    return DocumentListProperty(
-      schema: updatedSchema,
-      properties: updatedProperties,
-      validationResult: updatedSchema.validate(updatedProperties),
+    return updatedSchema.buildProperty(
+      properties: List.unmodifiable(updatedProperties),
     );
   }
 

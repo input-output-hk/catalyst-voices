@@ -402,6 +402,7 @@ class _PropertyValueBuilder extends StatelessWidget {
   }
 }
 
+// TODO(dtscalac): remove this widget when all document properties are implemented
 class _UnimplementedWidget extends StatelessWidget {
   final DocumentPropertySchema schema;
 
@@ -413,7 +414,10 @@ class _UnimplementedWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Text('Unimplemented ${schema.runtimeType}'),
+      child: Text(
+        'Unimplemented ${schema.runtimeType}',
+        style: const TextStyle(color: Colors.red),
+      ),
     );
   }
 }

@@ -56,7 +56,9 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   /// Specify the [parentNodeId] if the created property should
   /// be moved to another node. By default it is created under
   /// the same node that this schema points to.
-  DocumentProperty createProperty([DocumentNodeId? parentNodeId]);
+  ///
+  /// This is useful to create new items for the [DocumentListProperty].
+  DocumentProperty createChildPropertyAt([DocumentNodeId? parentNodeId]);
 
   /// Moves the schema and it's children to the [nodeId].
   DocumentPropertySchema withNodeId(DocumentNodeId nodeId);
@@ -90,22 +92,35 @@ sealed class DocumentValueSchema<T extends Object>
     required this.enumValues,
   });
 
-  @override
-  DocumentValueProperty<T> createProperty([DocumentNodeId? parentNodeId]) {
-    parentNodeId ??= nodeId;
-
-    final childId = const Uuid().v4();
-    final value = defaultValue;
-
-    return DocumentValueProperty(
-      schema: withNodeId(parentNodeId.child(childId)) as DocumentValueSchema<T>,
+  /// A method that builds typed properties.
+  ///
+  /// Helps to create properties which generic type [T]
+  /// is synced with the schema's generic type.
+  DocumentValueProperty<T> buildProperty({T? value}) {
+    return DocumentValueProperty<T>(
+      schema: this,
       value: value,
       validationResult: validate(value),
     );
   }
 
+  @override
+  DocumentValueProperty<T> createChildPropertyAt([
+    DocumentNodeId? parentNodeId,
+  ]) {
+    parentNodeId ??= nodeId;
+
+    final childId = const Uuid().v4();
+    final value = defaultValue;
+
+    final updatedSchema =
+        withNodeId(parentNodeId.child(childId)) as DocumentValueSchema<T>;
+
+    return updatedSchema.buildProperty(value: value);
+  }
+
   /// Casts the property linked to this schema so that
-  /// the property type is synced with schema type.
+  /// the property generic value type is synced with schema type.
   DocumentValueProperty<T> castProperty(
     DocumentValueProperty<Object> property,
   ) {

@@ -181,12 +181,10 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   /// Builds an immutable [DocumentListProperty].
   @override
   DocumentListProperty build() {
-    final mappedProperties = _properties.map((e) => e.build()).toList();
+    final mappedProperties = _properties.map((e) => e.build());
 
-    return DocumentListProperty(
-      schema: _schema,
+    return _schema.buildProperty(
       properties: List.unmodifiable(mappedProperties),
-      validationResult: _schema.validate(mappedProperties),
     );
   }
 
@@ -202,7 +200,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   void _handleAddListItemChange(DocumentAddListItemChange change) {
     if (change.nodeId == nodeId) {
       // targets this property
-      final property = _schema.itemsSchema.createProperty();
+      final property = _schema.itemsSchema.createChildPropertyAt();
       _properties.add(DocumentPropertyBuilder.fromProperty(property));
     } else {
       // targets child property
@@ -298,10 +296,8 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
     final mappedProperties = _properties.map((e) => e.build()).toList()
       ..sortByOrder(_schema.order);
 
-    return DocumentObjectProperty(
-      schema: _schema,
+    return _schema.buildProperty(
       properties: List.unmodifiable(mappedProperties),
-      validationResult: _schema.validate(mappedProperties),
     );
   }
 }
@@ -366,10 +362,6 @@ final class DocumentValuePropertyBuilder<T extends Object>
   /// Builds an immutable [DocumentValueProperty].
   @override
   DocumentValueProperty<T> build() {
-    return DocumentValueProperty<T>(
-      schema: _schema,
-      value: _value,
-      validationResult: _schema.validate(_value),
-    );
+    return _schema.buildProperty(value: _value);
   }
 }

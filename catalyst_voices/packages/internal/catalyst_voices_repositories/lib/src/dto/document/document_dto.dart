@@ -145,10 +145,8 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
   DocumentListProperty toModel() {
     final mappedProperties = properties.map((e) => e.toModel()).toList();
 
-    return DocumentListProperty(
-      schema: schema,
-      properties: mappedProperties,
-      validationResult: schema.validate(mappedProperties),
+    return schema.buildProperty(
+      properties: List.unmodifiable(mappedProperties),
     );
   }
 
@@ -196,10 +194,8 @@ final class DocumentPropertyObjectDto extends DocumentPropertyDto {
   DocumentObjectProperty toModel() {
     final mappedProperties = properties.map((e) => e.toModel()).toList();
 
-    return DocumentObjectProperty(
-      schema: schema,
-      properties: mappedProperties,
-      validationResult: schema.validate(mappedProperties),
+    return schema.buildProperty(
+      properties: List.unmodifiable(mappedProperties),
     );
   }
 
@@ -242,11 +238,7 @@ final class DocumentPropertyValueDto<T extends Object>
 
   @override
   DocumentValueProperty<T> toModel() {
-    return DocumentValueProperty<T>(
-      schema: schema,
-      value: value,
-      validationResult: schema.validate(value),
-    );
+    return schema.buildProperty(value: value);
   }
 
   @override

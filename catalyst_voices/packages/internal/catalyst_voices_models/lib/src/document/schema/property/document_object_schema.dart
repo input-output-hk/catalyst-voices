@@ -18,8 +18,22 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
           type: DocumentPropertyType.object,
         );
 
+  /// A method that builds typed properties.
+  ///
+  /// Helps to create properties which generic typ
+  /// is synced with the schema's generic type.
+  DocumentObjectProperty buildProperty({
+    required List<DocumentProperty> properties,
+  }) {
+    return DocumentObjectProperty(
+      schema: this,
+      properties: properties,
+      validationResult: validate(properties),
+    );
+  }
+
   @override
-  DocumentObjectProperty createProperty([DocumentNodeId? parentNodeId]) {
+  DocumentObjectProperty createChildPropertyAt([DocumentNodeId? parentNodeId]) {
     parentNodeId ??= nodeId;
 
     final childId = const Uuid().v4();
@@ -27,12 +41,10 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
 
     final updatedSchema = withNodeId(childNodeId) as DocumentObjectSchema;
     final updatedProperties =
-        properties.map((e) => e.createProperty(parentNodeId)).toList();
+        properties.map((e) => e.createChildPropertyAt(parentNodeId)).toList();
 
-    return DocumentObjectProperty(
-      schema: updatedSchema,
-      properties: updatedProperties,
-      validationResult: updatedSchema.validate(updatedProperties),
+    return updatedSchema.buildProperty(
+      properties: List.unmodifiable(updatedProperties),
     );
   }
 
