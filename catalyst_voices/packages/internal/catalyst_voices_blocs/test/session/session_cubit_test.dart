@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -42,7 +43,12 @@ void main() {
     userService = UserService(
       userRepository: userRepository,
     );
-    registrationService = _MockRegistrationService(keychainProvider);
+    registrationService = _MockRegistrationService(
+      keychainProvider,
+      [
+        _MockCardanoWallet(),
+      ],
+    );
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
   });
@@ -106,7 +112,10 @@ void main() {
       expect(sessionCubit.state, isA<VisitorSessionState>());
       expect(
         sessionCubit.state,
-        const VisitorSessionState(isRegistrationInProgress: false),
+        const VisitorSessionState(
+          isRegistrationInProgress: false,
+          canCreateAccount: true,
+        ),
       );
     });
 
@@ -135,7 +144,10 @@ void main() {
       expect(sessionCubit.state, isA<VisitorSessionState>());
       expect(
         sessionCubit.state,
-        const VisitorSessionState(isRegistrationInProgress: true),
+        const VisitorSessionState(
+          isRegistrationInProgress: true,
+          canCreateAccount: true,
+        ),
       );
     });
 
@@ -206,8 +218,17 @@ void main() {
 
 class _MockRegistrationService extends Mock implements RegistrationService {
   final KeychainProvider keychainProvider;
+  List<CardanoWallet> cardanoWallets;
 
-  _MockRegistrationService(this.keychainProvider);
+  _MockRegistrationService(
+    this.keychainProvider,
+    this.cardanoWallets,
+  );
+
+  @override
+  Future<List<CardanoWallet>> getCardanoWallets() {
+    return Future.value(cardanoWallets);
+  }
 
   @override
   Future<Account> registerTestAccount({
@@ -222,4 +243,8 @@ class _MockRegistrationService extends Mock implements RegistrationService {
 
     return Account.dummy(keychain: keychain);
   }
+}
+
+class _MockCardanoWallet extends Mock implements CardanoWallet {
+  _MockCardanoWallet();
 }
