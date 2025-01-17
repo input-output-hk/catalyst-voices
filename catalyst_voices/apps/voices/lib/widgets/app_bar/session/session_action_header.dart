@@ -64,6 +64,7 @@ class _LockButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIconButton.filled(
+      key: const Key('LockButton'),
       style: const ButtonStyle(shape: WidgetStatePropertyAll(CircleBorder())),
       onTap: () => unawaited(context.read<SessionCubit>().lock()),
       child: VoicesAssets.icons.lockClosed.buildIcon(),
@@ -77,6 +78,7 @@ class _UnlockButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
+      key: const Key('UnlockButton'),
       trailing: VoicesAssets.icons.lockOpen.buildIcon(),
       onTap: () => unawaited(UnlockKeychainDialog.show(context)),
       child: Text(context.l10n.unlock),

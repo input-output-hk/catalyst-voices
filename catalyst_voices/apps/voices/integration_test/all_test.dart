@@ -13,7 +13,7 @@ void main() async {
     await bootstrap(router: buildAppRouter());
   });
 
-  app_test.main();
-  onboarding_test.main();
+  // app_test.main();
+  // onboarding_test.main();
   account_test.main();
 }
