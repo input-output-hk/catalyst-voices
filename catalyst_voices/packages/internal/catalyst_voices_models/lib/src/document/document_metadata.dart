@@ -10,6 +10,11 @@ abstract base class DocumentMetadata extends Equatable {
     required this.version,
   });
 
+  /// When building new document version equals id.
+  const DocumentMetadata.newDocument(
+    this.id,
+  ) : version = id;
+
   @override
   @mustCallSuper
   List<Object?> get props => [
