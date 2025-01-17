@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/registration/get_started/get_started_panel
 import 'package:catalyst_voices/pages/registration/recover/recover_method_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/recover_seed_phrase_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/wallet_link_panel.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +23,14 @@ class RegistrationDetailsPanel extends StatelessWidget {
         return switch (state) {
           GetStartedStep() => const GetStartedPanel(),
           RecoverMethodStep() => const RecoverMethodPanel(),
-          SeedPhraseRecoverStep(:final stage) => RecoverSeedPhrasePanel(
+          RecoverWithSeedPhraseStep(:final stage) => RecoverSeedPhrasePanel(
               stage: stage,
+            ),
+          CreateBaseProfileStep(:final stage) => Column(
+              children: [
+                Expanded(child: Center(child: Text(stage.name))),
+                const RegistrationBackNextNavigation(),
+              ],
             ),
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),
           FinishAccountCreationStep() => const FinishAccountCreationPanel(),

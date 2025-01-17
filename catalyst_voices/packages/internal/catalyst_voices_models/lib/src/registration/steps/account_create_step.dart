@@ -4,6 +4,20 @@ sealed class AccountCreateStep extends RegistrationStep {
   const AccountCreateStep();
 }
 
+final class CreateBaseProfileStep extends AccountCreateStep {
+  final CreateBaseProfileStage stage;
+
+  const CreateBaseProfileStep({
+    this.stage = CreateBaseProfileStage.instructions,
+  });
+
+  @override
+  bool get isRegistrationFlow => true;
+
+  @override
+  List<Object?> get props => [stage];
+}
+
 final class CreateKeychainStep extends AccountCreateStep {
   final CreateKeychainStage stage;
 
@@ -33,14 +47,7 @@ final class WalletLinkStep extends AccountCreateStep {
 }
 
 // TODO(damian-molinski): Create Account Step Completed.
+// TODO(damian-molinski): Needs parameter about which step is completed.
 final class FinishAccountCreationStep extends AccountCreateStep {
   const FinishAccountCreationStep();
-
-  @override
-  bool get isRegistrationFlow => true;
-}
-
-// TODO(damian-molinski): Account Created
-final class AccountCompletedStep extends AccountCreateStep {
-  const AccountCompletedStep();
 }

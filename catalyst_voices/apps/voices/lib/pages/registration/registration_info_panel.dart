@@ -128,8 +128,11 @@ class RegistrationInfoPanel extends StatelessWidget {
       RecoverMethodStep() => _HeaderStrings(
           title: context.l10n.recoverCatalystKeychain,
         ),
-      SeedPhraseRecoverStep() => _HeaderStrings(
+      RecoverWithSeedPhraseStep() => _HeaderStrings(
           title: context.l10n.recoverCatalystKeychain,
+        ),
+      CreateBaseProfileStep() => _HeaderStrings(
+          title: context.l10n.accountCreationGetStartedTitle,
         ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
@@ -179,23 +182,25 @@ class _RegistrationPicture extends StatelessWidget {
       };
     }
 
-    Widget buildRecoverSeedPhrase(RecoverSeedPhraseStage stage) {
+    Widget buildRecoverSeedPhrase(RecoverWithSeedPhraseStage stage) {
       return switch (stage) {
-        RecoverSeedPhraseStage.seedPhraseInstructions ||
-        RecoverSeedPhraseStage.seedPhrase ||
-        RecoverSeedPhraseStage.accountDetails =>
+        RecoverWithSeedPhraseStage.seedPhraseInstructions ||
+        RecoverWithSeedPhraseStage.seedPhrase ||
+        RecoverWithSeedPhraseStage.accountDetails =>
           const KeychainPicture(),
-        RecoverSeedPhraseStage.unlockPasswordInstructions ||
-        RecoverSeedPhraseStage.unlockPassword =>
+        RecoverWithSeedPhraseStage.unlockPasswordInstructions ||
+        RecoverWithSeedPhraseStage.unlockPassword =>
           const _BlocRecoveryPasswordPicture(),
-        RecoverSeedPhraseStage.success => const KeychainWithPasswordPicture(),
+        RecoverWithSeedPhraseStage.success =>
+          const KeychainWithPasswordPicture(),
       };
     }
 
     return switch (step) {
       GetStartedStep() => const KeychainPicture(),
       RecoverMethodStep() => const KeychainPicture(),
-      SeedPhraseRecoverStep(:final stage) => buildRecoverSeedPhrase(stage),
+      RecoverWithSeedPhraseStep(:final stage) => buildRecoverSeedPhrase(stage),
+      CreateBaseProfileStep() => const KeychainPicture(),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
       FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),

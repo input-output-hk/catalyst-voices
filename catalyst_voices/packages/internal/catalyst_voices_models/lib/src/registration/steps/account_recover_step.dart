@@ -8,11 +8,11 @@ final class RecoverMethodStep extends AccountRecoverStep {
   const RecoverMethodStep();
 }
 
-final class SeedPhraseRecoverStep extends AccountRecoverStep {
-  final RecoverSeedPhraseStage stage;
+final class RecoverWithSeedPhraseStep extends AccountRecoverStep {
+  final RecoverWithSeedPhraseStage stage;
 
-  const SeedPhraseRecoverStep({
-    this.stage = RecoverSeedPhraseStage.seedPhraseInstructions,
+  const RecoverWithSeedPhraseStep({
+    this.stage = RecoverWithSeedPhraseStage.seedPhraseInstructions,
   });
 
   @override

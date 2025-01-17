@@ -19,31 +19,43 @@ final class RegistrationState extends Equatable {
   });
 
   double? get progress {
-    double getCreateKeychainProgress(CreateKeychainStage stage) {
+    double createBaseProfileProgress(CreateBaseProfileStage stage) {
+      final current = CreateBaseProfileStage.values.indexOf(stage);
+      final total = CreateBaseProfileStage.values.length;
+      return current / total;
+    }
+
+    double createKeychainProgress(CreateKeychainStage stage) {
       final current = CreateKeychainStage.values.indexOf(stage);
       final total = CreateKeychainStage.values.length;
       return current / total;
     }
 
-    double getWalletLinkProgress(WalletLinkStage stage) {
+    double walletLinkProgress(WalletLinkStage stage) {
       final current = WalletLinkStage.values.indexOf(stage);
       final total = WalletLinkStage.values.length;
       return current / total;
     }
 
-    double getRecoverSeedProgress(RecoverSeedPhraseStage stage) {
-      final current = RecoverSeedPhraseStage.values.indexOf(stage) + 1;
-      final total = RecoverSeedPhraseStage.values.length;
+    double recoverWithSeedProgress(RecoverWithSeedPhraseStage stage) {
+      final current = RecoverWithSeedPhraseStage.values.indexOf(stage) + 1;
+      final total = RecoverWithSeedPhraseStage.values.length;
       return current / total;
     }
 
     return switch (step) {
       GetStartedStep() => null,
+      // recovery
       RecoverMethodStep() => null,
-      SeedPhraseRecoverStep(:final stage) => getRecoverSeedProgress(stage),
-      CreateKeychainStep(:final stage) => getCreateKeychainProgress(stage),
+      RecoverWithSeedPhraseStep(:final stage) => recoverWithSeedProgress(stage),
+
+      // account creation
+      CreateBaseProfileStep(:final stage) => createBaseProfileProgress(stage),
+      CreateKeychainStep(:final stage) => createKeychainProgress(stage),
       FinishAccountCreationStep() => 1.0,
-      WalletLinkStep(:final stage) => getWalletLinkProgress(stage),
+      WalletLinkStep(:final stage) => walletLinkProgress(stage),
+
+      // ready
       AccountCompletedStep() => 1.0,
     };
   }

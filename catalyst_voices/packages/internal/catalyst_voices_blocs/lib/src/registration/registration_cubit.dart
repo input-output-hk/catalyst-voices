@@ -108,10 +108,10 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     }
   }
 
-  void createNewKeychain() {
+  void createNewAccount() {
     _progressNotifier.clear();
 
-    final nextStep = _nextStep(from: const CreateKeychainStep());
+    final nextStep = _nextStep(from: const CreateBaseProfileStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
@@ -126,7 +126,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   }
 
   void recoverWithSeedPhrase() {
-    final nextStep = _nextStep(from: const SeedPhraseRecoverStep());
+    final nextStep = _nextStep(from: const RecoverWithSeedPhraseStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
@@ -263,8 +263,25 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     }
   }
 
+  // TODO(damian-molinski): Try refactoring nested function to be generic.
   RegistrationStep? _nextStep({RegistrationStep? from}) {
     final step = from ?? state.step;
+
+    RegistrationStep nextBaseProfile() {
+      final step = state.step;
+
+      // if current step is not from create base profile just return current one
+      if (step is! CreateBaseProfileStep) {
+        return const CreateBaseProfileStep();
+      }
+
+      // if there is no next step from keychain creation go to finish account.
+      final nextStage = step.stage.next;
+      return nextStage != null
+          ? CreateBaseProfileStep(stage: nextStage)
+          // TODO(damian-molinski): Needs parameter about this step.
+          : const FinishAccountCreationStep();
+    }
 
     RegistrationStep nextKeychainStep() {
       final step = state.step;
@@ -278,6 +295,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final nextStage = step.stage.next;
       return nextStage != null
           ? CreateKeychainStep(stage: nextStage)
+          // TODO(damian-molinski): Needs parameter about this step.
           : const FinishAccountCreationStep();
     }
 
@@ -301,19 +319,21 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       // if current step is not from create SeedPhraseRecoverStep
       // just return current one
-      if (step is! SeedPhraseRecoverStep) {
-        return const SeedPhraseRecoverStep();
+      if (step is! RecoverWithSeedPhraseStep) {
+        return const RecoverWithSeedPhraseStep();
       }
 
       final nextStage = step.stage.next;
-
-      return nextStage != null ? SeedPhraseRecoverStep(stage: nextStage) : null;
+      return nextStage != null
+          ? RecoverWithSeedPhraseStep(stage: nextStage)
+          : null;
     }
 
     return switch (step) {
       GetStartedStep() => null,
       RecoverMethodStep() => null,
-      SeedPhraseRecoverStep() => nextRecoverWithSeedPhraseStep(),
+      RecoverWithSeedPhraseStep() => nextRecoverWithSeedPhraseStep(),
+      CreateBaseProfileStep() => nextBaseProfile(),
       CreateKeychainStep() => nextKeychainStep(),
       FinishAccountCreationStep() => const WalletLinkStep(),
       WalletLinkStep() => nextWalletLinkStep(),
@@ -324,6 +344,18 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   RegistrationStep? _previousStep({RegistrationStep? from}) {
     final step = from ?? state.step;
 
+    /// Nested function. Responsible only for base profile steps logic.
+    RegistrationStep previousBaseProfileStep() {
+      final step = state.step;
+
+      final previousStep =
+          step is CreateBaseProfileStep ? step.stage.previous : null;
+
+      return previousStep != null
+          ? CreateBaseProfileStep(stage: previousStep)
+          : const GetStartedStep();
+    }
+
     /// Nested function. Responsible only for keychain steps logic.
     RegistrationStep previousKeychainStep() {
       final step = state.step;
@@ -333,7 +365,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       return previousStep != null
           ? CreateKeychainStep(stage: previousStep)
-          : const GetStartedStep();
+          // TODO(damian-molinski): Needs parameter about this step.
+          : const FinishAccountCreationStep();
     }
 
     /// Nested function. Responsible only for wallet link steps logic.
@@ -344,6 +377,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       return previousStep != null
           ? WalletLinkStep(stage: previousStep)
+          // TODO(damian-molinski): Needs parameter about this step.
           : const FinishAccountCreationStep();
     }
 
@@ -351,17 +385,18 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final step = state.step;
 
       final previousStep =
-          step is SeedPhraseRecoverStep ? step.stage.previous : null;
+          step is RecoverWithSeedPhraseStep ? step.stage.previous : null;
 
       return previousStep != null
-          ? SeedPhraseRecoverStep(stage: previousStep)
+          ? RecoverWithSeedPhraseStep(stage: previousStep)
           : const RecoverMethodStep();
     }
 
     return switch (step) {
       GetStartedStep() => null,
       RecoverMethodStep() => const GetStartedStep(),
-      SeedPhraseRecoverStep() => previousRecoverWithSeedPhraseStep(),
+      RecoverWithSeedPhraseStep() => previousRecoverWithSeedPhraseStep(),
+      CreateBaseProfileStep() => previousBaseProfileStep(),
       CreateKeychainStep() => previousKeychainStep(),
       FinishAccountCreationStep() => null,
       WalletLinkStep() => previousWalletLinkStep(),
