@@ -35,13 +35,26 @@ pub(crate) fn init_metrics_reporter() {
                     follower_stats.mithril.dl_end < follower_stats.mithril.dl_start;
                 let is_extracting =
                     follower_stats.mithril.extract_end < follower_stats.mithril.extract_start;
+                let is_validating =
+                    follower_stats.mithril.validate_end < follower_stats.mithril.validate_start;
 
                 if is_downloading {
-                    reporter::FOLLOWER_PHYSICAL_USAGE
+                    reporter::FOLLOWER_DL_FAILURES
                         .with_label_values(&[&api_host_names, service_id])
                         .set(i64::try_from(follower_stats.mithril.dl_failures).unwrap_or(-1));
+                    reporter::FOLLOWER_DL_SIZE
+                        .with_label_values(&[&api_host_names, service_id])
+                        .set(i64::try_from(follower_stats.mithril.dl_size).unwrap_or(-1));
                 }
-                if is_extracting {}
+                if is_extracting {
+                    reporter::FOLLOWER_EXTRACT_FAILURES
+                        .with_label_values(&[&api_host_names, service_id])
+                        .set(i64::try_from(follower_stats.mithril.extract_failures).unwrap_or(-1));
+                    reporter::FOLLOWER_EXTRACT_SIZE
+                        .with_label_values(&[&api_host_names, service_id])
+                        .set(i64::try_from(follower_stats.mithril.extract_size).unwrap_or(-1));
+                }
+                if is_validating {}
 
                 // live part
             }
@@ -62,10 +75,40 @@ mod reporter {
     const FOLLOWER_METRIC_LABELS: [&str; 2] = ["api_host_names", "service_id"];
 
     /// The number of times download failed.
-    pub(super) static FOLLOWER_PHYSICAL_USAGE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    pub(super) static FOLLOWER_DL_FAILURES: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "follower_dl_failures",
             "Number of times download failed",
+            &FOLLOWER_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The size of the download archive, in bytes.
+    pub(super) static FOLLOWER_DL_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+        register_int_gauge_vec!(
+            "follower_dl_size",
+            "Size of the download archive",
+            &FOLLOWER_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The number of times extraction failed.
+    pub(super) static FOLLOWER_EXTRACT_FAILURES: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+        register_int_gauge_vec!(
+            "follower_extract_failures",
+            "Number of times extraction failed",
+            &FOLLOWER_METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// The size of last extracted snapshot.
+    pub(super) static FOLLOWER_EXTRACT_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+        register_int_gauge_vec!(
+            "follower_extract_size",
+            "Size of last extracted snapshot",
             &FOLLOWER_METRIC_LABELS
         )
         .unwrap()
