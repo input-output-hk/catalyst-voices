@@ -62,7 +62,9 @@ class _MultilineTextEntryMarkdownWidgetState
     }
 
     if (widget.property.value != oldWidget.property.value) {
+      _controller.removeListener(_onControllerChanged);
       _controller = _buildController(value: _value);
+      _controller.addListener(_onControllerChanged);
     }
   }
 
