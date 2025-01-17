@@ -1,11 +1,12 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_body.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,11 +14,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProposalBuilderPage extends StatefulWidget {
-  final String proposalId;
+  final String? proposalId;
+  final String? templateId;
 
   const ProposalBuilderPage({
     super.key,
-    required this.proposalId,
+    this.proposalId,
+    this.templateId,
   });
 
   @override
@@ -26,9 +29,8 @@ class ProposalBuilderPage extends StatefulWidget {
 
 class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
-  late final ItemScrollController _bodyItemScrollController;
+  late final ItemScrollController _segmentsScrollController;
 
-  NodeId? _activeSegmentId;
   StreamSubscription<List<Segment>>? _segmentsSub;
 
   @override
@@ -38,27 +40,27 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     final bloc = context.read<ProposalBuilderBloc>();
 
     _segmentsController = SegmentsController();
-    _bodyItemScrollController = ItemScrollController();
+    _segmentsScrollController = ItemScrollController();
 
     _segmentsController
-      ..addListener(_handleSectionsControllerChange)
-      ..attachItemsScrollController(_bodyItemScrollController);
+      ..addListener(_handleSegmentsControllerChange)
+      ..attachItemsScrollController(_segmentsScrollController);
 
     _segmentsSub = bloc.stream
         .map((event) => event.segments)
         .distinct(listEquals)
         .listen(_updateSegments);
 
-    bloc.add(LoadProposalEvent(id: widget.proposalId));
+    _updateSource(bloc: bloc);
   }
 
   @override
   void didUpdateWidget(covariant ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.proposalId != oldWidget.proposalId) {
-      final event = LoadProposalEvent(id: widget.proposalId);
-      context.read<ProposalBuilderBloc>().add(event);
+    if (widget.proposalId != oldWidget.proposalId ||
+        widget.templateId != oldWidget.templateId) {
+      _updateSource();
     }
   }
 
@@ -77,8 +79,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
       controller: _segmentsController,
       child: SpaceScaffold(
         left: const ProposalBuilderNavigationPanel(),
-        body: ProposalBuilderBody(
-          itemScrollController: _bodyItemScrollController,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            ProposalBuilderErrorSelector(onRetryTap: _updateSource),
+            ProposalBuilderSegmentsSelector(
+              itemScrollController: _segmentsScrollController,
+            ),
+            const ProposalBuilderLoadingSelector(),
+          ],
         ),
         right: const ProposalBuilderSetupPanel(),
       ),
@@ -95,14 +104,31 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     _segmentsController.value = newState;
   }
 
-  void _handleSectionsControllerChange() {
+  void _handleSegmentsControllerChange() {
     final activeSectionId = _segmentsController.value.activeSectionId;
 
-    if (_activeSegmentId != activeSectionId) {
-      _activeSegmentId = activeSectionId;
+    final event = ActiveNodeChangedEvent(activeSectionId);
+    context.read<ProposalBuilderBloc>().add(event);
+  }
 
-      final event = ActiveStepChangedEvent(activeSectionId);
-      context.read<ProposalBuilderBloc>().add(event);
+  void _updateSource({
+    ProposalBuilderBloc? bloc,
+  }) {
+    bloc ??= context.read<ProposalBuilderBloc>();
+
+    final proposalId = widget.proposalId;
+    final templateId = widget.templateId;
+
+    if (proposalId != null) {
+      bloc.add(LoadProposalEvent(id: proposalId));
+      return;
     }
+
+    if (templateId != null) {
+      bloc.add(LoadProposalTemplateEvent(id: templateId));
+      return;
+    }
+
+    bloc.add(const LoadDefaultProposalTemplateEvent());
   }
 }

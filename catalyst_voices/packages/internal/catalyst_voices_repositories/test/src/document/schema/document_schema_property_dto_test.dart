@@ -1,19 +1,15 @@
-import 'dart:convert';
-
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_property_dto.dart';
-import 'package:test/test.dart';
-
-import '../../../helpers/read_json.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(DocumentSchemaPropertyDto, () {
-    const schemaPath =
-        'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
+  TestWidgetsFlutterBinding.ensureInitialized();
 
+  group(DocumentSchemaPropertyDto, () {
     late Map<String, dynamic> schemaJson;
 
-    setUpAll(() {
-      schemaJson = json.decode(readJson(schemaPath)) as Map<String, dynamic>;
+    setUpAll(() async {
+      schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
     });
 
     test('includeIfNull does not add keys for values that are null', () {
