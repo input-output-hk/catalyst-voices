@@ -27,7 +27,6 @@ pub(crate) enum Responses {
     #[oai(status = 204)]
     NoContent,
     /// Service is possibly not running reliably.
-    #[allow(dead_code)]
     #[oai(status = 503)]
     ServiceUnavailable,
 }
@@ -46,10 +45,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// by an endpoint in a short window.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    // if is_live() {
-    // Responses::NoContent.into()
-    // } else {
-    // Responses::ServiceUnavailable.into()
-    // }
-    Responses::NoContent.into()
+    if is_live() {
+        Responses::NoContent.into()
+    } else {
+        Responses::ServiceUnavailable.into()
+    }
 }
