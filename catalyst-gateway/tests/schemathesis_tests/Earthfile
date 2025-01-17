@@ -15,7 +15,7 @@ package-schemathesis:
 
     ENTRYPOINT st run --exclude-path-regex 'draft' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
-                    $api_spec \
+                    --checks=all $api_spec \
                     --workers=2 \
                     --wait-for-schema=500 \
                     --max-response-time=5000 \
