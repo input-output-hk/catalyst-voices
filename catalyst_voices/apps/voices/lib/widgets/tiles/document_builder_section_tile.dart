@@ -1,4 +1,3 @@
-
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -276,22 +275,24 @@ class _PropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );*/
       case YesNoChoiceDefinition():
-        /*final castProperty = definition.castProperty(property);
+      /*final castProperty = definition.castProperty(property);
         return YesNoChoiceWidget(
           property: castProperty,
           onChanged: onChanged,
           isEditMode: isEditMode,
           isRequired: castProperty.schema.isRequired,
-        );
+        );*/
+
       case MultiLineTextEntryMarkdownDefinition():
+        /*final castProperty = definition.castProperty(property);
         final castProperty = definition.castProperty(property);
         return MultilineTextEntryMarkdownWidget(
           property: castProperty,
           onChanged: onChanged,
           isEditMode: isEditMode,
           isRequired: castProperty.schema.isRequired,
-        );
         );*/
+
         // TODO(dtscalac): uncomment tiles when casting works.
         return Text('${definition.runtimeType} casting problem');
     }

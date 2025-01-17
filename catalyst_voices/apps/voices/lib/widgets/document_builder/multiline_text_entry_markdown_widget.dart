@@ -90,8 +90,8 @@ class _MultilineTextEntryMarkdownWidgetState
       validator: (val) {
         return null;
 
-        // TODO(LynxxLynx): implement validator when we got answer how to validate
-        // formatted document against maxLength
+        // TODO(LynxxLynx): implement validator when we got answer how to
+        // validate formatted document against maxLength
       },
     );
   }
