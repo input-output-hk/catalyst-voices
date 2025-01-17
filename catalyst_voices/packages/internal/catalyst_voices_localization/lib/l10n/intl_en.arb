@@ -1285,6 +1285,14 @@
   "@noTagSelected": {
     "description": "For example in context of document builder"
   },
+  "errorValidationPatternMismatch": "The value does not match the valid pattern.",
+  "@errorValidationPatternMismatch": {
+    "description": "Validation error when the user entered value does not match the pattern"
+  },
   "singleGroupedTagSelectorTitle": "Please choose the most relevant category group and tag related to the outcomes of your proposal",
-  "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag"
+  "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag",
+  "noUrlAdded": "No URL added",
+  "addUrl": "Add URL",
+  "clear": "Clear",
+  "errorNoActiveCampaignFound": "Currently there is no active campaign running"
 }

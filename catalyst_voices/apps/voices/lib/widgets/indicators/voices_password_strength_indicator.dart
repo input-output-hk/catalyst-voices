@@ -37,6 +37,7 @@ class _Label extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: const Key('PasswordStrengthLabel'),
       switch (passwordStrength) {
         PasswordStrength.weak => context.l10n.weakPasswordStrength,
         PasswordStrength.normal => context.l10n.normalPasswordStrength,
@@ -63,6 +64,7 @@ class _Indicator extends StatelessWidget {
     return SizedBox(
       height: _foregroundTrackHeight,
       child: LayoutBuilder(
+        key: const Key('PasswordStrengthIndicator'),
         builder: (context, constraints) {
           final totalWidthOfAllGaps =
               (PasswordStrength.values.length - 1) * _tracksGap;

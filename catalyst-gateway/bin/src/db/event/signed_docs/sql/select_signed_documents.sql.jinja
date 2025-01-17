@@ -1,7 +1,7 @@
 SELECT
   {% if not ver %} signed_docs.ver, {% endif %}
   signed_docs.type,
-  signed_docs.author,
+  signed_docs.authors,
   signed_docs.metadata,
   signed_docs.payload,
   signed_docs.raw

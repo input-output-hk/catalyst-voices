@@ -1,20 +1,16 @@
-import 'dart:convert';
-
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:test/test.dart';
-
-import '../../../helpers/read_json.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(DocumentSchemaDto, () {
-    const schemaPath =
-        'test/assets/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json';
+  TestWidgetsFlutterBinding.ensureInitialized();
 
+  group(DocumentSchemaDto, () {
     late Map<String, dynamic> schemaJson;
 
-    setUpAll(() {
-      schemaJson = json.decode(readJson(schemaPath)) as Map<String, dynamic>;
+    setUpAll(() async {
+      schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
     });
 
     test('X-order of segments is kept in model class', () async {

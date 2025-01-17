@@ -24,6 +24,7 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
         LocalizedDocumentStringOutOfRange(range: result.expectedRange),
       DocumentItemsOutOfRange() =>
         LocalizedDocumentItemsOutOfRange(range: result.expectedRange),
+      DocumentPatternMismatch() => const LocalizedDocumentPatternMismatch(),
     };
   }
 
@@ -141,4 +142,17 @@ final class LocalizedDocumentItemsOutOfRange
 
   @override
   List<Object?> get props => [range];
+}
+
+final class LocalizedDocumentPatternMismatch
+    extends LocalizedDocumentValidationResult {
+  const LocalizedDocumentPatternMismatch();
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationPatternMismatch;
+  }
+
+  @override
+  List<Object?> get props => [];
 }
