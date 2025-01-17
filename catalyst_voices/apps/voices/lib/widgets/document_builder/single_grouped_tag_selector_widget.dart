@@ -81,6 +81,7 @@ class _SingleGroupedTagSelectorWidgetState
     setState(() {
       _selection = value;
 
+      // TODO(dtscalac): this should update children properties, not the parent
       final change = DocumentValueChange(nodeId: widget.id, value: value);
       widget.onChanged(change);
     });
