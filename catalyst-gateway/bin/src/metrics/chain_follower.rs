@@ -1,13 +1,11 @@
 //! Metrics related to Chain Follower analytics.
 
 use std::{
-    clone::CloneToUninit,
     sync::atomic::{AtomicBool, Ordering},
     thread,
 };
 
 use cardano_chain_follower::Statistics;
-use chrono::{TimeZone, Utc};
 
 use crate::settings::Settings;
 
