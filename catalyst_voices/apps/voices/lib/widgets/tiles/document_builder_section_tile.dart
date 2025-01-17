@@ -286,7 +286,6 @@ class _PropertyObjectBuilder extends StatelessWidget {
         );
 
       case DocumentNestedQuestionsSchema():
-        throw UnimplementedError('Unimplemented ${schema.type}');
       case DocumentGenericObjectSchema():
         // TODO(dtscalac): build a property object, similar to a section,
         // below is just dummy implementation
@@ -398,7 +397,23 @@ class _PropertyValueBuilder extends StatelessWidget {
       case DocumentGenericIntegerSchema():
       case DocumentGenericNumberSchema():
       case DocumentGenericBooleanSchema():
-        throw UnimplementedError('Unimplemented ${schema.type}');
+        return _UnimplementedWidget(schema: schema);
     }
+  }
+}
+
+class _UnimplementedWidget extends StatelessWidget {
+  final DocumentPropertySchema schema;
+
+  const _UnimplementedWidget({
+    required this.schema,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Text('Unimplemented ${schema.runtimeType}'),
+    );
   }
 }

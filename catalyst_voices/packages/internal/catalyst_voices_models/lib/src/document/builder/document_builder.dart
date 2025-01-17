@@ -366,7 +366,7 @@ final class DocumentValuePropertyBuilder<T extends Object>
   /// Builds an immutable [DocumentValueProperty].
   @override
   DocumentValueProperty<T> build() {
-    return DocumentValueProperty(
+    return DocumentValueProperty<T>(
       schema: _schema,
       value: _value,
       validationResult: _schema.validate(_value),
