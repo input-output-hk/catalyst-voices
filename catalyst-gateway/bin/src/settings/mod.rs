@@ -11,6 +11,7 @@ use anyhow::anyhow;
 use cardano_chain_follower::Network;
 use clap::Args;
 use dotenvy::dotenv;
+use duration_string::DurationString;
 use str_env_var::StringEnvVar;
 use tracing::error;
 use url::Url;
@@ -57,6 +58,9 @@ const METRICS_MEMORY_INTERVAL_DEFAULT: &str = "1s";
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
+
+/// Default number of slots used as overlap when purging Live Index data.
+const PURGE_SLOT_BUFFER_DEFAULT: u64 = 100;
 
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
@@ -147,6 +151,9 @@ struct EnvVars {
     #[allow(unused)]
     check_config_tick: Duration,
 
+    /// Slot buffer used as overlap when purging Live Index data.
+    purge_slot_buffer: u64,
+
     /// Interval for updating and sending memory metrics.
     metrics_memory_interval: Duration,
 }
@@ -161,6 +168,21 @@ struct EnvVars {
 static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
+
+    let check_interval = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT.into());
+    let check_config_tick = match DurationString::try_from(check_interval.as_string()) {
+        Ok(duration) => duration.into(),
+        Err(error) => {
+            error!(
+                "Invalid Check Config Tick Duration: {} : {}. Defaulting to 5 seconds.",
+                check_interval.as_str(),
+                error
+            );
+            Duration::from_secs(5)
+        },
+    };
+    let purge_slot_buffer =
+        StringEnvVar::new_as("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
 
     EnvVars {
         github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),
@@ -186,10 +208,8 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         ),
         chain_follower: chain_follower::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
-        check_config_tick: StringEnvVar::new_as_duration(
-            "CHECK_CONFIG_TICK",
-            CHECK_CONFIG_TICK_DEFAULT,
-        ),
+        check_config_tick,
+        purge_slot_buffer,
         metrics_memory_interval: StringEnvVar::new_as_duration(
             "METRICS_MEMORY_INTERVAL",
             METRICS_MEMORY_INTERVAL_DEFAULT,
@@ -373,6 +393,11 @@ impl Settings {
         } else {
             false
         }
+    }
+
+    /// Slot buffer used as overlap when purging Live Index data.
+    pub(crate) fn purge_slot_buffer() -> u64 {
+        ENV_VARS.purge_slot_buffer
     }
 }
 
