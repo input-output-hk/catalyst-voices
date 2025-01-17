@@ -55,6 +55,7 @@ class _UnlockPasswordTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesPasswordTextField(
+      key: const Key('PasswordInputField'),
       controller: controller,
       textInputAction: TextInputAction.next,
       decoration: VoicesTextFieldDecoration(
@@ -78,6 +79,7 @@ class _ConfirmUnlockPasswordTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesPasswordTextField(
+      key: const Key('PasswordConfirmInputField'),
       controller: controller,
       decoration: VoicesTextFieldDecoration(
         labelText: context.l10n.confirmPassword,

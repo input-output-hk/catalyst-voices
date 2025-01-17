@@ -5,9 +5,9 @@
 
 use poem_openapi::{types::Example, NewType, Object};
 
-use super::common::types::document::ver::EqOrRangedVerDocumented;
 use crate::service::common::types::document::{
     doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
+    ver::EqOrRangedVerDocumented,
 };
 
 /// Query Filter for the generation of a signed document index.

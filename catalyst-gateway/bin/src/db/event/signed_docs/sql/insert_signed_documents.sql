@@ -3,7 +3,7 @@ INSERT INTO signed_docs
   id,
   ver,
   type,
-  author,
+  authors,
   metadata,
   payload,
   raw
