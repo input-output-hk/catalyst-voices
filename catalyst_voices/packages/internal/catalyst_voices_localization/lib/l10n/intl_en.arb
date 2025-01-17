@@ -1293,5 +1293,6 @@
   "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag",
   "noUrlAdded": "No URL added",
   "addUrl": "Add URL",
-  "clear": "Clear"
+  "clear": "Clear",
+  "errorNoActiveCampaignFound": "Currently there is no active campaign running"
 }
