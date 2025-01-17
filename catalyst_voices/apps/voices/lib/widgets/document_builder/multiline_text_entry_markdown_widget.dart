@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/common/ext/document_property_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
-import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill/flutter_quill.dart';
@@ -89,17 +87,13 @@ class _MultilineTextEntryMarkdownWidgetState
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,
-    );
-  }
+      validator: (val) {
+        return null;
 
-  VoicesTextFieldValidationResult _validate(String? value) {
-    final result = widget.property.schema.validatePropertyValue(value);
-    if (result.isValid) {
-      return const VoicesTextFieldValidationResult.success();
-    } else {
-      final localized = LocalizedDocumentValidationResult.from(result);
-      return VoicesTextFieldValidationResult.error(localized.message(context));
-    }
+        // TODO(LynxxLynx): implement validator when we got answer how to validate
+        // formatted document against maxLength
+      },
+    );
   }
 
   void _handleInitialValue() {
@@ -131,7 +125,6 @@ class _MultilineTextEntryMarkdownWidgetState
   }
 
   void _onDocumentChanged(DocChange change) {
-    _validate(_convertToString());
     if (change.change.last.data != '\n') {
       _notifyChangeListener();
     }
@@ -146,12 +139,6 @@ class _MultilineTextEntryMarkdownWidgetState
         value: markdownData.data,
       ),
     );
-  }
-
-  String _convertToString() {
-    final delta = _controller.document.toDelta();
-    final markdownData = _encoder.convert(delta);
-    return markdownData.data;
   }
 
   void _toggleEditMode() {
@@ -178,6 +165,9 @@ class _MultilineTextEntryMarkdownWidgetState
   }
 }
 
+/// This focus helps to interact with [VoicesRichText] widget
+/// When widget is not in edit mode this focus allows user to interact with
+/// links and other elements that are inside of the textfield..
 class VoicesRichTextFocusNode extends FocusNode {
   bool _disableFocus = true;
 

@@ -14,55 +14,58 @@ final class VoicesRichTextController extends QuillController {
   });
 }
 
-class VoicesRichText extends StatelessWidget {
+class VoicesRichText extends FormField<Document> {
   final VoicesRichTextController controller;
-  final bool enabled;
   final String title;
   final FocusNode focusNode;
   final ScrollController scrollController;
   final int? charsLimit;
-  const VoicesRichText({
+
+  VoicesRichText({
     super.key,
+    super.enabled,
+    super.autovalidateMode = AutovalidateMode.always,
     required this.controller,
-    required this.enabled,
     required this.title,
     required this.focusNode,
     required this.scrollController,
     this.charsLimit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Offstage(
-          offstage: !enabled,
-          child: _Toolbar(
-            controller: controller,
-          ),
-        ),
-        _Title(title: title),
-        _EditorDecoration(
-          isEditMode: enabled,
-          isInvalid: false,
-          child: _Editor(
-            controller: controller,
-            focusNode: focusNode,
-            scrollController: scrollController,
-          ),
-        ),
-        Offstage(
-          offstage: charsLimit == null,
-          child: VoicesRichTextLimit(
-            document: controller.document,
-            charsLimit: charsLimit,
-          ),
-        ),
-      ],
-    );
-  }
+    super.validator,
+  }) : super(
+          builder: (field) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Offstage(
+                  offstage: !enabled,
+                  child: _Toolbar(
+                    controller: controller,
+                  ),
+                ),
+                _Title(title: title),
+                _EditorDecoration(
+                  isEditMode: enabled,
+                  isInvalid: field.hasError,
+                  focusNode: focusNode,
+                  child: _Editor(
+                    controller: controller,
+                    focusNode: focusNode,
+                    scrollController: scrollController,
+                  ),
+                ),
+                Offstage(
+                  offstage: charsLimit == null,
+                  child: VoicesRichTextLimit(
+                    document: controller.document,
+                    charsLimit: charsLimit,
+                    errorMessage: field.errorText,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
 }
 
 class _Title extends StatelessWidget {
@@ -87,11 +90,13 @@ class _Title extends StatelessWidget {
 class _EditorDecoration extends StatelessWidget {
   final bool isEditMode;
   final bool isInvalid;
+  final FocusNode focusNode;
   final Widget child;
 
   const _EditorDecoration({
     required this.isEditMode,
     required this.isInvalid,
+    required this.focusNode,
     required this.child,
   });
 
@@ -124,9 +129,13 @@ class _EditorDecoration extends StatelessWidget {
     if (!isEditMode) {
       return Theme.of(context).colorScheme.outlineVariant;
     } else {
-      return isInvalid
-          ? Theme.of(context).colorScheme.error
-          : Theme.of(context).colorScheme.outlineVariant;
+      if (isInvalid) {
+        return Theme.of(context).colorScheme.error;
+      }
+      if (focusNode.hasFocus) {
+        return Theme.of(context).colorScheme.primary;
+      }
+      return Theme.of(context).colorScheme.outlineVariant;
     }
   }
 }
