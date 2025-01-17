@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/pages/registration/account_completed/account_completed_panel.dart';
+import 'package:catalyst_voices/pages/registration/create_account_progress/account_create_progress_panel.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/create_keychain_panel.dart';
-import 'package:catalyst_voices/pages/registration/finish_account/finish_account_creation_panel.dart';
 import 'package:catalyst_voices/pages/registration/get_started/get_started_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/recover_method_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/recover_seed_phrase_panel.dart';
@@ -33,7 +33,10 @@ class RegistrationDetailsPanel extends StatelessWidget {
               ],
             ),
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),
-          AccountCreateProgressStep() => const FinishAccountCreationPanel(),
+          AccountCreateProgressStep(:final completedSteps) =>
+            AccountCreateProgressPanel(
+              completedSteps: completedSteps,
+            ),
           WalletLinkStep(:final stage) => WalletLinkPanel(stage: stage),
           AccountCompletedStep() => const AccountCompletedPanel(),
         };

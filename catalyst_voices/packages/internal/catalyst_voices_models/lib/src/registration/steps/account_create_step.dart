@@ -1,6 +1,19 @@
 part of 'registration_step.dart';
 
-enum AccountCreateStepType { baseProfile, keychain, walletLink }
+enum AccountCreateStepType {
+  baseProfile,
+  keychain,
+  walletLink;
+
+  AccountCreateStepType? get next {
+    final isLast = index == AccountCreateStepType.values.length - 1;
+    if (isLast) {
+      return null;
+    }
+
+    return AccountCreateStepType.values[index + 1];
+  }
+}
 
 sealed class AccountCreateStep extends RegistrationStep {
   final AccountCreateStepType type;

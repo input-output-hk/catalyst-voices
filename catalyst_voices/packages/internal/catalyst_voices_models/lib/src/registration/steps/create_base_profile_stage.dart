@@ -10,7 +10,6 @@ enum CreateBaseProfileStage {
   acknowledgements;
 
   CreateBaseProfileStage? get next {
-    final index = CreateBaseProfileStage.values.indexOf(this);
     final isLast = index == CreateBaseProfileStage.values.length - 1;
     if (isLast) {
       return null;
@@ -20,7 +19,6 @@ enum CreateBaseProfileStage {
   }
 
   CreateBaseProfileStage? get previous {
-    final index = CreateBaseProfileStage.values.indexOf(this);
     final isFirst = index == 0;
     if (isFirst) {
       return null;
