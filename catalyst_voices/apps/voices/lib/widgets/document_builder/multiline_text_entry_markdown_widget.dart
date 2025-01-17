@@ -28,7 +28,7 @@ class MultilineTextEntryMarkdownWidget extends StatefulWidget {
 
 class _MultilineTextEntryMarkdownWidgetState
     extends State<MultilineTextEntryMarkdownWidget> {
-  late final VoicesRichTextController _controller;
+  late VoicesRichTextController _controller;
   late final VoicesRichTextFocusNode _focus;
   late final ScrollController _scrollController;
 
@@ -44,7 +44,7 @@ class _MultilineTextEntryMarkdownWidgetState
   void initState() {
     super.initState();
 
-   _controller = _buildController(value: _value);
+    _controller = _buildController(value: _value);
     _controller.addListener(_onControllerChanged);
 
     _focus = VoicesRichTextFocusNode();
