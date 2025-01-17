@@ -23,7 +23,7 @@ static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
 /// Starts a background thread to periodically update memory metrics.
 ///
 /// This function spawns a thread that updates the memory metrics
-/// at regular intervals defined by the `METRICS_MEMORY_INTERVAL` envar.
+/// at regular intervals defined by `METRICS_MEMORY_INTERVAL`.
 pub(crate) fn init_metrics_reporter() {
     if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
         return;
