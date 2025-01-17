@@ -20,7 +20,7 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
 
   /// A method that builds typed properties.
   ///
-  /// Helps to create properties which generic typ
+  /// Helps to create properties which generic type
   /// is synced with the schema's generic type.
   DocumentObjectProperty buildProperty({
     required List<DocumentProperty> properties,

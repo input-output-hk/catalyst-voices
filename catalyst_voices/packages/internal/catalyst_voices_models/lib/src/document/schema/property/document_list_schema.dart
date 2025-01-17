@@ -18,7 +18,7 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
 
   /// A method that builds typed properties.
   ///
-  /// Helps to create properties which generic typ
+  /// Helps to create properties which generic type
   /// is synced with the schema's generic type.
   DocumentListProperty buildProperty({
     required List<DocumentProperty> properties,

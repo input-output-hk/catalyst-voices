@@ -61,6 +61,13 @@ void main() {
       expect(parentNode2.value, 'section1');
     });
 
+    test('isChildOf correctly identifies child nodes', () {
+      final parentNode = DocumentNodeId.root.child('section1');
+      final childNode = parentNode.child('paragraph1');
+      expect(childNode.isChildOf(parentNode), isTrue);
+      expect(parentNode.isChildOf(childNode), isFalse);
+    });
+
     test('toString outputs the value', () {
       final node = DocumentNodeId.root.child('section1').child('paragraph1');
       expect(node.toString(), 'section1.paragraph1');
