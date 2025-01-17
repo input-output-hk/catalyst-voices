@@ -15,6 +15,9 @@ final class ProposalBuilderSegment extends BaseSegment<ProposalBuilderSection> {
   String resolveTitle(BuildContext context) {
     return documentSegment.schema.title;
   }
+
+  @override
+  List<Object?> get props => super.props + [documentSegment];
 }
 
 final class ProposalBuilderSection extends BaseSection {
@@ -31,4 +34,7 @@ final class ProposalBuilderSection extends BaseSection {
   String resolveTitle(BuildContext context) {
     return documentSection.schema.title;
   }
+
+  @override
+  List<Object?> get props => super.props + [documentSection];
 }
