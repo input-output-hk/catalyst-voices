@@ -402,7 +402,8 @@ class _PropertyValueBuilder extends StatelessWidget {
   }
 }
 
-// TODO(dtscalac): remove this widget when all document properties are implemented
+// TODO(dtscalac): remove this widget when all document properties
+// are implemented
 class _UnimplementedWidget extends StatelessWidget {
   final DocumentPropertySchema schema;
 

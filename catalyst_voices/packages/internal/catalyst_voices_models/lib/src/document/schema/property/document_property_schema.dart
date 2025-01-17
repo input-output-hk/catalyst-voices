@@ -96,7 +96,7 @@ sealed class DocumentValueSchema<T extends Object>
   ///
   /// Helps to create properties which generic type [T]
   /// is synced with the schema's generic type.
-  DocumentValueProperty<T> buildProperty({T? value}) {
+  DocumentValueProperty<T> buildProperty({required T? value}) {
     return DocumentValueProperty<T>(
       schema: this,
       value: value,
