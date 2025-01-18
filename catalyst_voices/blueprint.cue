@@ -3,17 +3,30 @@ project: {
 	name: "voices"
 	deployment: {
 		on: {
-			merge: {}
-			tag: {}
+			//merge: {}
+			//tag: {}
+			always: {}
 		}
 		environment: "dev"
 		modules: main: {
-			container: "voices-deployment"
-			version:   "0.1.1"
+			name:    "app"
+			version: "0.2.0"
 			values: {
-				environment: name: "dev"
-				frontend: image: {
-					tag: _ @forge(name="GIT_HASH_OR_TAG")
+				deployment: containers: main: {
+					image: {
+						name: _ @forge(name="CONTAINER_IMAGE")
+						tag:  _ @forge(name="GIT_HASH_OR_TAG")
+					}
+					port: 80
+					probes: {
+						liveness: path:  "/"
+						readiness: path: "/"
+					}
+				}
+				ingress: subdomain: "voices"
+				service: {
+					targetPort: 80
+					port:       80
 				}
 			}
 		}
@@ -21,8 +34,9 @@ project: {
 	release: {
 		docker: {
 			on: {
-				merge: {}
-				tag: {}
+				//merge: {}
+				//tag: {}
+				always: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_HASH_OR_TAG")
