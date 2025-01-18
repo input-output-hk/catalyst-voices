@@ -26,8 +26,9 @@ final class Dependencies extends DependencyProvider {
     registerSingleton<AppConfig>(config);
 
     _registerStorages();
-    _registerServices();
+    _registerUtils();
     _registerRepositories();
+    _registerServices();
     _registerBlocsWithDependencies();
 
     _isInitialized = true;
@@ -80,7 +81,7 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerFactory<CampaignDetailsBloc>(() {
         return CampaignDetailsBloc(
-          get<CampaignRepository>(),
+          get<CampaignService>(),
         );
       })
       ..registerLazySingleton<CampaignInfoCubit>(() {
@@ -101,6 +102,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
           get<CampaignService>(),
+          get<ProposalService>(),
         );
       });
   }
@@ -117,6 +119,11 @@ final class Dependencies extends DependencyProvider {
         return UserRepository(
           get<UserStorage>(),
           get<KeychainProvider>(),
+        );
+      })
+      ..registerLazySingleton<DocumentRepository>(() {
+        return DocumentRepository(
+          get<SignedDocumentManager>(),
         );
       });
   }
@@ -157,11 +164,13 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CampaignService>(() {
       return CampaignService(
         get<CampaignRepository>(),
+        get<DocumentRepository>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
       return ProposalService(
         get<ProposalRepository>(),
+        get<DocumentRepository>(),
       );
     });
     registerLazySingleton<ConfigService>(() {
@@ -175,5 +184,9 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
+  }
+
+  void _registerUtils() {
+    registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
   }
 }

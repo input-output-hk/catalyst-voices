@@ -1,10 +1,3 @@
-import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
-import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
-import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -208,33 +201,32 @@ class _PropertyBuilder extends StatelessWidget {
     switch (definition) {
       case SegmentDefinition():
       case SectionDefinition():
+      case TagGroupDefinition():
+      case TagSelectionDefinition():
         throw UnsupportedError(
           '${property.schema.definition} unsupported '
           'by $DocumentBuilderSectionTile',
         );
 
-      case MultiLineTextEntryMarkdownDefinition():
       case MultiSelectDefinition():
       case SingleLineTextEntryListDefinition():
       case MultiLineTextEntryListMarkdownDefinition():
       case SingleLineHttpsURLEntryListDefinition():
       case NestedQuestionsListDefinition():
       case NestedQuestionsDefinition():
-      case TagGroupDefinition():
-      case TagSelectionDefinition():
       case DurationInMonthsDefinition():
       case SPDXLicenceOrUrlDefinition():
       case LanguageCodeDefinition():
-        throw UnimplementedError('${definition.type} not implemented');
+        return Text('${definition.runtimeType} not implemented');
       case SingleLineHttpsURLEntryDefinition():
-        final castProperty = definition.castProperty(property);
+      /*       final castProperty = definition.castProperty(property);
         return SingleLineHttpsUrlWidget(
           property: castProperty,
           isEditMode: isEditMode,
           onChanged: onChanged,
-        );
+        );*/
       case SingleGroupedTagSelectorDefinition():
-        final castProperty = definition.castProperty(property);
+      /* final castProperty = definition.castProperty(property);
         return SingleGroupedTagSelectorWidget(
           id: castProperty.schema.nodeId,
           selection: castProperty.value ?? const GroupedTagsSelection(),
@@ -242,9 +234,9 @@ class _PropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
           isRequired: castProperty.schema.isRequired,
-        );
+        );*/
       case DropDownSingleSelectDefinition():
-        final castProperty = definition.castProperty(property);
+      /* final castProperty = definition.castProperty(property);
         return SingleDropdownSelectionWidget(
           value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
           items: castProperty.schema.enumValues ?? [],
@@ -254,9 +246,9 @@ class _PropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           isRequired: castProperty.schema.isRequired,
           onChanged: onChanged,
-        );
+        );*/
       case AgreementConfirmationDefinition():
-        final castProperty = definition.castProperty(property);
+      /*final castProperty = definition.castProperty(property);
         return AgreementConfirmationWidget(
           value: castProperty.value,
           definition: definition,
@@ -265,31 +257,44 @@ class _PropertyBuilder extends StatelessWidget {
           title: castProperty.schema.title ?? '',
           isEditMode: isEditMode,
           onChanged: onChanged,
-        );
+        );*/
       case TokenValueCardanoADADefinition():
-        final castProperty = definition.castProperty(property);
+      /*final castProperty = definition.castProperty(property);
         return DocumentTokenValueWidget(
-          property: castProperty,
+          property: castProperty as DocumentProperty<int>,
           currency: const Currency.ada(),
           isEditMode: isEditMode,
           onChanged: onChanged,
-        );
+        );*/
       case SingleLineTextEntryDefinition():
       case MultiLineTextEntryDefinition():
-        final castProperty = definition.castProperty(property);
+      /*final castProperty = definition.castProperty(property);
         return SimpleTextEntryWidget(
           property: castProperty as DocumentProperty<String>,
           isEditMode: isEditMode,
           onChanged: onChanged,
-        );
+        );*/
       case YesNoChoiceDefinition():
-        final castProperty = definition.castProperty(property);
+      /*final castProperty = definition.castProperty(property);
         return YesNoChoiceWidget(
           property: castProperty,
           onChanged: onChanged,
           isEditMode: isEditMode,
           isRequired: castProperty.schema.isRequired,
-        );
+        );*/
+
+      case MultiLineTextEntryMarkdownDefinition():
+        /*final castProperty = definition.castProperty(property);
+        final castProperty = definition.castProperty(property);
+        return MultilineTextEntryMarkdownWidget(
+          property: castProperty,
+          onChanged: onChanged,
+          isEditMode: isEditMode,
+          isRequired: castProperty.schema.isRequired,
+        );*/
+
+        // TODO(dtscalac): uncomment tiles when casting works.
+        return Text('${definition.runtimeType} casting problem');
     }
   }
 }
