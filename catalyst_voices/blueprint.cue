@@ -10,7 +10,7 @@ project: {
 		environment: "dev"
 		modules: main: {
 			name:    "app"
-			version: "0.2.0"
+			version: "0.2.1"
 			values: {
 				deployment: containers: main: {
 					image: {
