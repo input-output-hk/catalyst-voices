@@ -8,162 +8,103 @@ project: {
 	}
 	deployment: {
 		on: {
+			// TODO: Remove always before merging
 			always: {}
 		}
 		environment: "dev"
 		modules: main: {
-			container: "blueprint-deployment"
-			version:   "0.2.5"
+			name:    "app"
+			version: "0.2.1"
 			values: {
-				app: {
-					environment: "dev"
-
-					image: {
-						repository: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/gateway"
-						tag:        _ @forge(name="GIT_HASH_OR_TAG")
-					}
-
-					containerPort: 3030
-          servicePort: 80
-					strategy:      "Recreate"
-					ingressHost:   "gateway.dev.projectcatalyst.io"
-
-					persistentVolumeClaims: [
-						{
-							name:             "pvc"
-							storageClassName: "ebs-io1"
-							storage:          "250Gi"
-						},
-					]
-
-					volumes: [
-						{
-							name: "data"
-							persistentVolumeClaim: {
-								claimName: "pvc"
-							}
-						},
-					]
-
-					volumeMounts: [
-						{
-							name:      "data"
-							mountPath: "/root/.local/share/cat-gateway"
-							readOnly:  false
-						},
-					]
-
-					env: [
-						{
-							name:  "RUST_LOG"
-							value: "error,cat_gateway=info,cardano_chain_follower=info"
-						},
-						{
-							name: "CASSANDRA_VOLATILE_URL"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-volatile-url"
-								}
-							}
-						},
-						{
-							name: "CASSANDRA_VOLATILE_USERNAME"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-volatile-username"
-								}
-							}
-						},
-						{
-							name: "CASSANDRA_VOLATILE_PASSWORD"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-volatile-password"
-								}
-							}
-						},
-
-						{
-							name: "CASSANDRA_VOLATILE_DEPLOYMENT"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-volatile-deployment"
-								}
-							}
-						},
-						{
-							name: "CASSANDRA_PERSISTENT_URL"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-persistent-url"
-								}
-							}
-						},
-						{
-							name: "CASSANDRA_PERSISTENT_USERNAME"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-persistent-username"
-								}
-							}
-						},
-						// TODO: Re-enable when we have SSL working
-						// {
-						// 	name:  "CASSANDRA_VOLATILE_TLS_CERT"
-						// 	value: "/tmp/keyspaces.crt"
-						// },
-						// {
-						// 	name:  "CASSANDRA_PERSISTENT_TLS_CERT"
-						// 	value: "/tmp/keyspaces.crt"
-						// },
-						{
-							name: "CASSANDRA_PERSISTENT_PASSWORD"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-persistent-password"
-								}
-							}
-						},
-
-						{
-							name: "CASSANDRA_PERSISTENT_DEPLOYMENT"
-							valueFrom: {
-								secretKeyRef: {
-									key: "cassandra-persistent-deployment"
-								}
-							}
-						},
-					]
-
-					resources: {
-						requests: {
-							cpu:    "1"
-							memory: "8Gi"
+				deployment: {
+					containers: gateway: {
+						image: {
+							name: _ @forge(name="CONTAINER_IMAGE")
+							tag:  _ @forge(name="GIT_HASH_OR_TAG")
 						}
-						limits: {
-							cpu:    "8"
-							memory: "12Gi"
-						}
-					}
 
-					readinessProbe: {
-						httpGet: {
-							path: "/api/v1/health/ready"
-							port: 3030
-						}
-					}
+						env: {
+							"RUST_LOG": {
+								value: "error,cat_gateway=info,cardano_chain_follower=info"
+							}
+							"CASSANDRA_VOLATILE_URL": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-volatile-url"
+								}
+							}
+							"CASSANDRA_VOLATILE_USERNAME": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-volatile-username"
+								}
+							}
+							"CASSANDRA_VOLATILE_PASSWORD": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-volatile-password"
+								}
+							}
 
-					livenessProbe: {
-						httpGet: {
-							path: "/api/v1/health/live"
-							port: 3030
+							"CASSANDRA_VOLATILE_DEPLOYMENT": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-volatile-deployment"
+								}
+							}
+							"CASSANDRA_PERSISTENT_URL": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-persistent-url"
+								}
+							}
+							"CASSANDRA_PERSISTENT_USERNAME": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-persistent-username"
+								}
+							}
+							"CASSANDRA_PERSISTENT_PASSWORD": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-persistent-password"
+								}
+							}
+							"CASSANDRA_PERSISTENT_DEPLOYMENT": {
+								secret: {
+									name: "gateway"
+									key:  "cassandra-persistent-deployment"
+								}
+							}
+						}
+
+						port: 3030
+						probes: {
+							liveness: path:  "/api/v1/health/live"
+							readiness: path: "/api/v1/health/ready"
+						}
+						mounts: data: {
+							ref: volume: name: "data"
+							path:     "/root/.local/share/cat-gateway"
+							readOnly: false
+						}
+						resources: {
+							requests: {
+								cpu:    "1"
+								memory: "8Gi"
+							}
+							limits: {
+								cpu:    "8"
+								memory: "12Gi"
+							}
 						}
 					}
 
 					nodeSelector: {
 						"node-group": "catalyst-gateway"
 					}
-
+					serviceAccount: "catalyst-gateway"
+					strategy:       "Recreate"
 					tolerations: [
 						{
 							key:      "app"
@@ -172,15 +113,22 @@ project: {
 							effect:   "NoSchedule"
 						},
 					]
+				}
 
-					serviceAccount: "catalyst-gateway"
-					replicas:       1
+				ingress: subdomain: "gateway"
 
-					externalSecret: {
-						secretStore:     "cluster-secret-store"
-						refreshInterval: "30m"
-						dataFrom: ["dev/gateway"]
-					}
+				secrets: gateway: {
+					ref: "gateway"
+				}
+
+				service: {
+					port:       80
+					targetPort: 3030
+				}
+
+				volumes: data: {
+					class: "ebs-io1"
+					size:  "250Gi"
 				}
 			}
 		}
@@ -189,6 +137,7 @@ project: {
 	release: {
 		docker: {
 			on: {
+				// TODO: Remove always before merging
 				always: {}
 			}
 			config: {
