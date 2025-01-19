@@ -60,6 +60,12 @@
             "pattern": "^[\\S\\s]*$",
             "x-note": "Use Markdown formatting for rich text. Available formatting:\n- Headers: # for h1, ## for h2, etc.\n- Lists: * or - for bullets, 1. for numbered\n- Emphasis: *italic* or **bold**\n- Links: [text](url)\n- Code: `inline` or ```block```"
         },
+        "radioButtonSelect": {
+            "$comment": "UI - Radio Button Selection",
+            "type": "string",
+            "format": "radioButtonSelect",
+            "x-note": "Select one option from a list of radio buttons"
+        },
         "dropDownSingleSelect": {
             "$comment": "UI - Drop Down Selection of a single entry from the defined enum.",
             "type": "string",
@@ -248,7 +254,7 @@
                             "maxLength": 100
                         },
                         "type": {
-                            "$ref": "#/definitions/dropDownSingleSelect",
+                            "$ref": "#/definitions/radioButtonSelect",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "x-guidance": "Please select from one of the following:\n\n1. Individual\n2. Entity (Incorporated)\n3. Entity (Not Incorporated)",
