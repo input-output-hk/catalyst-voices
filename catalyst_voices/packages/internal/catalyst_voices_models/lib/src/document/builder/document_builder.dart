@@ -12,7 +12,7 @@ import 'package:collection/collection.dart';
 /// copying is not supported for performance reasons.
 ///
 /// Once edits are done convert the builder to a [Document] with [build] method.
-final class DocumentBuilder implements DocumentNode {
+final class DocumentBuilder {
   String _schemaUrl;
   DocumentSchema _schema;
   List<DocumentPropertyBuilder> _properties;
@@ -49,9 +49,6 @@ final class DocumentBuilder implements DocumentNode {
           .toList(),
     );
   }
-
-  @override
-  DocumentNodeId get nodeId => DocumentNodeId.root;
 
   /// Applies [changes] in FIFO manner on this builder.
   void addChanges(List<DocumentChange> changes) {
