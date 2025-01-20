@@ -119,5 +119,5 @@ jobs:
             {
               "text": ":rocket: *Test Report*\n<${{ steps.allure.outputs.report_url }}|Click here to view the Allure report>\n*Passed:* ${{ steps.allure.outputs.test_result_passed }}/ ${{ steps.allure.outputs.test_result_total }}\n*Failed:* ${{ steps.allure.outputs.test_result_failed }}/ ${{ steps.allure.outputs.test_result_total }}"
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
