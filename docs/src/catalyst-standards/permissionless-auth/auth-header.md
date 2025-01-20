@@ -1,5 +1,7 @@
 # Permission-less Authentication for Catalyst
 
+<!-- cspell: words catid Fftx -->
+
 ## Overview
 
 There is a requirement to establish identity with the catalyst backend to provide secure and
@@ -44,14 +46,15 @@ An example token using this [Catalyst ID] is:
 
 The Catalyst ID encoded in this way consists of 3 key fields.
 
-* `nonce : The timestamp the Token was generated (time bounds potential replay attacks).
-* `network` : Allows the ID to support registration on multiple blockchains.
-* `Role 0 Public Key` : Allows the registration on chain to be uniquely identified.
+* `nonce`: The timestamp the Token was generated (time bounds potential replay attacks).
+* `network`: Allows the ID to support registration on multiple blockchains.
+* `Role 0 Public Key`: Allows the registration on chain to be uniquely identified.
 
 The Catalyst ID is used to identify the on chain registration, which supplies the current Role 0 Public Key Certificate.
 This identifies the Public Key used to sign the token.
 
-***NOTE*** The [Catalyst ID] strictly identifies the initial Role 0 public key. However, the token is signed with the latest **ACTIVE** Role 0 Public Key.
+***NOTE*** The [Catalyst ID] strictly identifies the initial Role 0 public key.
+However, the token is signed with the latest **ACTIVE** Role 0 Public Key.
 This May or May not be the same key as encoded in the token.
 The authorizer is required to get the latest Role 0 Key from the identified
 on-chain registration.
@@ -71,7 +74,7 @@ Such as:
 
 #### Nonce
 
-The `nonce` field of the [Catalyst ID] is used to prevent timing based replay attacks.
+The `nonce` field of the [Catalyst ID] is used to prevent time-based replay attacks.
 The backend will validate every `nonce` is within a permitted time windows.
 This allows handling of both Clock Skew, and allows a `nonce` to be re-used for a short duration.
 
@@ -106,8 +109,9 @@ The backend should:
     * This yields the `signature` separate from the token body.
     * Convert the Base64 URL value into binary.
       If this fails, return `401`.
-    * ***NOTE*** It is possible and valid for the [Catalyst ID] to contain any number of `.`.
-      Therefore, the only safe way to extract the signature component, is to use the **LAST** `.` in the token to identify the break.
+    * ***NOTE***, It is possible and valid for the [Catalyst ID] to contain any number of `.`.
+      Therefore, the only safe way to extract the signature component,
+      is to use the **LAST** `.` in the token to identify the break.
 3. Parse the text following `catid.` as a Catalyst ID.
    If this fails, return `401`.
 4. Verify the Catalyst ID, is in `ID` format, and contains a `nonce`.
@@ -129,14 +133,15 @@ The backend should:
         If this fails, return `403`.
 11. Token is valid, provide validated credentials to the endpoint for further processing, as required.
 
-***NOTE*** It is possible to check the `nonce` before checking the identity of the token.
-The check for `nonce` validity is conducted after validating the identity of the token.
+***NOTE***, while it is possible to check the `nonce` before checking the identity of the token,
+the check for `nonce` validity is conducted after validating the identity of the token.
 This ensures that validation can authoritatively return 403 when `nonce` is incorrect,
 which it cannot do before checking the registered identity exists.
 Further, `nonce` is trivial to spoof, and also trivial to check.
 Therefore, no processing time is saved against an attacker if the `nonce` is incorrect.
 It is expected that an attacker would always get the `nonce` correct.
-The only reason the `nonce` will be incorrect under valid circumstances is because it has expired but the identity is correct.
+The only reason the `nonce` will be incorrect under valid circumstances is because it has expired,
+but the identity is correct.
 
 ### Invalid Token Processing
 
