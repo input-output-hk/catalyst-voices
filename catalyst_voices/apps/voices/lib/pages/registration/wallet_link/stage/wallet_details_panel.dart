@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_connection_status.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_summary.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -41,7 +40,7 @@ class _BlocWalletConnectionStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<WalletConnectionData?>(
+    return BlocWalletLinkSelector<WalletConnectionData?>(
       selector: (state) => state.walletConnection,
       builder: (context, state) {
         return WalletConnectionStatus(
@@ -59,7 +58,7 @@ class _BlocWalletDetailsText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<String?>(
+    return BlocWalletLinkSelector<String?>(
       selector: (state) => state.selectedWallet?.metadata.name,
       builder: (context, state) {
         return Text(
@@ -76,7 +75,7 @@ class _BlocWalletSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<WalletSummaryData?>(
+    return BlocWalletLinkSelector<WalletSummaryData?>(
       selector: (state) => state.walletSummary,
       builder: (context, state) {
         if (state != null) {
@@ -99,7 +98,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<bool>(
+    return BlocWalletLinkSelector<bool>(
       selector: (state) => state.hasEnoughBalance,
       builder: (context, state) {
         if (state) {

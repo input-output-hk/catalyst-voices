@@ -1,5 +1,3 @@
-import 'package:catalyst_voices/pages/registration/bloc_unlock_password_builder.dart';
-import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/pictures/account_completed_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_with_password_picture.dart';
@@ -214,7 +212,7 @@ class _BlocSeedPhraseResultPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
         return SeedPhrasePicture(
@@ -231,7 +229,7 @@ class _BlocCreationPasswordPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocUnlockPasswordBuilder<TaskPictureType>(
+    return BlocUnlockPasswordSelector<TaskPictureType>(
       stateSelector: (state) => state.keychainStateData.unlockPasswordState,
       selector: (state) => state.pictureType,
       builder: (context, state) => PasswordPicture(type: state),
@@ -244,7 +242,7 @@ class _BlocRecoveryPasswordPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocUnlockPasswordBuilder<TaskPictureType>(
+    return BlocUnlockPasswordSelector<TaskPictureType>(
       stateSelector: (state) => state.recoverStateData.unlockPasswordState,
       selector: (state) => state.pictureType,
       builder: (context, state) => PasswordPicture(type: state),
