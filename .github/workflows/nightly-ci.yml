@@ -36,7 +36,7 @@ jobs:
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.0
         with:
-          version: 0.8.0
+          version: 0.10.0
         if: always()
 
       - name: Setup CI
