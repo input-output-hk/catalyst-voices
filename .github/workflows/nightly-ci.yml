@@ -28,6 +28,8 @@ jobs:
   generate-test-reports:
     name: Generate test reports
     runs-on: ubuntu-latest
+    if: always()
+    needs: ci_nightly
     steps:
       - uses: actions/checkout@v4
 
