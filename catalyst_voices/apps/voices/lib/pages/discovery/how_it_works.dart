@@ -33,12 +33,12 @@ class HowItWorks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1440 / 532,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
-        ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -50,6 +50,8 @@ class HowItWorks extends StatelessWidget {
             const SizedBox(height: 32),
             Wrap(
               direction: Axis.horizontal,
+              runSpacing: 20,
+              alignment: WrapAlignment.center,
               children:
                   HowItWorksItem.values.map((e) => _Item(item: e)).toList(),
             ),
