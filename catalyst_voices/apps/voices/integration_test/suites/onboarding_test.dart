@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart' as blocs;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -20,6 +21,8 @@ void main() async {
 
   setUpAll(() async {
     router = buildAppRouter();
+
+    blocs.alwaysAllowRegistration = true;
   });
 
   setUp(() async {

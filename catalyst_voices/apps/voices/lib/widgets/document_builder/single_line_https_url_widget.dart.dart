@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_https_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -6,13 +6,15 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SingleLineHttpsUrlWidget extends StatefulWidget {
-  final DocumentProperty<String> property;
+  final DocumentValueProperty<String> property;
+  final DocumentStringSchema schema;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
 
   const SingleLineHttpsUrlWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.isEditMode,
     required this.onChanged,
   });
@@ -26,7 +28,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
-  String get _description => widget.property.formattedDescription;
+  String get _description => widget.schema.formattedDescription;
 
   @override
   void initState() {
@@ -89,8 +91,8 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   void _notifyChangeListener(String? value) {
-    final change = DocumentChange(
-      nodeId: widget.property.schema.nodeId,
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
       value: value,
     );
 
@@ -101,8 +103,8 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     if (value == null || value.isEmpty) {
       return const VoicesTextFieldValidationResult.none();
     }
-    final schema = widget.property.schema;
-    final result = schema.validatePropertyValue(value);
+    final schema = widget.schema;
+    final result = schema.validate(value);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.success();
     } else {

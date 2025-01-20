@@ -10,11 +10,11 @@ final class DocumentDataDto {
 
   factory DocumentDataDto.fromDocument({
     required String schemaUrl,
-    required Iterable<Map<String, dynamic>> segments,
+    required Iterable<Map<String, dynamic>> properties,
   }) {
     return DocumentDataDto.fromJson({
       r'$schema': schemaUrl,
-      for (final segment in segments) ...segment,
+      for (final property in properties) ...property,
     });
   }
 
@@ -29,8 +29,14 @@ final class DocumentDataDto {
     for (final path in nodeId.paths) {
       if (object is Map<String, dynamic>) {
         object = object[path];
+      } else if (object is List) {
+        final index = int.tryParse(path);
+        if (index == null) {
+          // index must be a number
+          return null;
+        }
+        object = object[index];
       } else {
-        // invalid path
         return null;
       }
     }
