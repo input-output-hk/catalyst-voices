@@ -60,17 +60,7 @@ final class DocumentBuilder {
   /// Applies a [change] on this instance of the builder
   /// without creating a copy.
   void addChange(DocumentChange change) {
-    final propertyIndex =
-        _properties.indexWhere((e) => change.targetsDocumentNode(e));
-
-    if (propertyIndex < 0) {
-      throw ArgumentError(
-        'Cannot edit property ${change.nodeId}, '
-        'it does not exist in this document',
-      );
-    }
-
-    _properties[propertyIndex].addChange(change);
+    _properties.findTargetFor(change).addChange(change);
   }
 
   /// Builds an immutable [Document].
@@ -187,12 +177,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   }
 
   void _handleValueChange(DocumentValueChange change) {
-    for (final property in _properties) {
-      if (change.targetsDocumentNode(property)) {
-        property.addChange(change);
-        return;
-      }
-    }
+    _properties.findTargetFor(change).addChange(change);
   }
 
   void _handleAddListItemChange(DocumentAddListItemChange change) {
@@ -202,17 +187,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
       _properties.add(DocumentPropertyBuilder.fromProperty(property));
     } else {
       // targets child property
-      for (final property in _properties) {
-        if (change.targetsDocumentNode(property)) {
-          property.addChange(change);
-          return;
-        }
-      }
-
-      throw ArgumentError(
-        "Couldn't find a suitable node to apply "
-        'a change to ${change.nodeId} in this node: $nodeId',
-      );
+      _properties.findTargetFor(change).addChange(change);
     }
   }
 
@@ -222,18 +197,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
       _properties.removeWhere((e) => e.nodeId == change.nodeId);
     } else {
       // targets child property
-
-      final targetProperty = _properties
-          .firstWhereOrNull((property) => change.targetsDocumentNode(property));
-
-      if (targetProperty == null) {
-        throw ArgumentError(
-          "Couldn't find a suitable node to apply "
-          'a change to ${change.nodeId} in this node: $nodeId',
-        );
-      }
-
-      targetProperty.addChange(change);
+      _properties.findTargetFor(change).addChange(change);
     }
   }
 }
@@ -281,12 +245,7 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
 
   @override
   void addChange(DocumentChange change) {
-    for (final property in _properties) {
-      if (change.targetsDocumentNode(property)) {
-        property.addChange(change);
-        return;
-      }
-    }
+    _properties.findTargetFor(change).addChange(change);
   }
 
   /// Builds an immutable [DocumentObjectProperty].
@@ -362,5 +321,20 @@ final class DocumentValuePropertyBuilder<T extends Object>
   @override
   DocumentValueProperty<T> build() {
     return _schema.buildProperty(value: _value);
+  }
+}
+
+extension _DocumentNodeIterableExt<T extends DocumentNode> on Iterable<T> {
+  T findTargetFor(DocumentChange change) {
+    final targetProperty = firstWhereOrNull(change.targetsDocumentNode);
+
+    if (targetProperty == null) {
+      throw ArgumentError(
+        "Couldn't find a suitable node to apply "
+        'a change to ${change.nodeId} in this node.',
+      );
+    }
+
+    return targetProperty;
   }
 }
