@@ -58,9 +58,8 @@
             }]
         },
         "open_source": {
-            "source_code": "MIT",
-            "documentation": "MIT",
-            "note": "All project outputs will be open source under MIT license"
+            "isOpenSource": true,
+            "licenseInformation": "All source code and documentation will be released under the MIT license."
         }
     },
     "horizons": {
