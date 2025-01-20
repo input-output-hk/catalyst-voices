@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 
 /// A mutable document builder that understands the [DocumentSchema].
 ///
@@ -224,17 +225,18 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
       _properties.removeWhere((e) => e.nodeId == change.nodeId);
     } else {
       // targets child property
-      for (final property in _properties) {
-        if (change.targetsDocumentNode(property)) {
-          property.addChange(change);
-          return;
-        }
+
+      final targetProperty = _properties
+          .firstWhereOrNull((property) => change.targetsDocumentNode(property));
+
+      if (targetProperty == null) {
+        throw ArgumentError(
+          "Couldn't find a suitable node to apply "
+          'a change to ${change.nodeId} in this node: $nodeId',
+        );
       }
 
-      throw ArgumentError(
-        "Couldn't find a suitable node to apply "
-        'a change to ${change.nodeId} in this node: $nodeId',
-      );
+      targetProperty.addChange(change);
     }
   }
 }

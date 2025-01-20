@@ -13,7 +13,7 @@ void main() {
     const proposalTemplate = DocumentSchema(
       jsonSchema: '',
       title: '',
-      description: '',
+      description: MarkdownData.empty,
       properties: [],
       order: [],
       propertiesSchema: '',

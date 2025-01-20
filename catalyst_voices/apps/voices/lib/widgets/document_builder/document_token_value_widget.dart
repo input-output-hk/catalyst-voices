@@ -7,18 +7,18 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DocumentTokenValueWidget extends StatefulWidget {
+  final DocumentValueProperty<int> property;
   final DocumentIntegerSchema schema;
-  final int? value;
   final Currency currency;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
 
   const DocumentTokenValueWidget({
     super.key,
+    required this.property,
     required this.schema,
-    required this.value,
     required this.currency,
-    this.isEditMode = false,
+    required this.isEditMode,
     required this.onChanged,
   });
 
@@ -36,7 +36,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   void initState() {
     super.initState();
 
-    _controller = VoicesIntFieldController(widget.value);
+    _controller = VoicesIntFieldController(widget.property.value);
     _controller.addListener(_handleControllerChange);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
@@ -45,8 +45,8 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   void didUpdateWidget(covariant DocumentTokenValueWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.value != oldWidget.value) {
-      _controller.value = widget.value;
+    if (widget.property.value != oldWidget.property.value) {
+      _controller.value = widget.property.value;
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {

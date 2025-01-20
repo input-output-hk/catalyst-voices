@@ -11,7 +11,7 @@ final class DocumentSchema extends Equatable implements DocumentNode {
   final String jsonSchema;
   final String propertiesSchema;
   final String title;
-  final String description;
+  final MarkdownData description;
   final List<DocumentPropertySchema> properties;
   final List<DocumentNodeId> order;
 

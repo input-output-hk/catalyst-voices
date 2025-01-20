@@ -33,7 +33,7 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   final DocumentPropertyType type;
   final DocumentPropertyFormat? format;
   final String title;
-  final String? description;
+  final MarkdownData? description;
 
   /// True if the property must exist and be non-nullable,
   /// false if the property may not exist or be nullable.
