@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 ///
 /// Uses [OutlineInputBorder] instead of the default [UnderlineInputBorder] one.
 class VoicesTextField extends StatefulWidget {
+  final String? initialText;
+
   /// [TextField.controller]
   final TextEditingController? controller;
 
@@ -93,6 +95,7 @@ class VoicesTextField extends StatefulWidget {
 
   const VoicesTextField({
     super.key,
+    this.initialText,
     this.controller,
     this.statesController,
     this.focusNode,
@@ -489,7 +492,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
 
     var customController = _customController;
     if (customController == null) {
-      customController = TextEditingController();
+      customController = TextEditingController(text: widget.initialText);
       _customController = customController;
     }
 

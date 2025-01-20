@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 final class VoicesEmailTextField extends StatelessWidget {
+  final String? initialText;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onFieldSubmitted;
   final VoidCallback? onEditingComplete;
@@ -13,6 +14,7 @@ final class VoicesEmailTextField extends StatelessWidget {
 
   const VoicesEmailTextField({
     super.key,
+    this.initialText,
     this.onChanged,
     required this.onFieldSubmitted,
     this.onEditingComplete,
@@ -24,6 +26,7 @@ final class VoicesEmailTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesTextField(
+      initialText: initialText,
       keyboardType: TextInputType.emailAddress,
       textInputAction: textInputAction,
       onChanged: onChanged,

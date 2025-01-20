@@ -14,6 +14,7 @@ class SetupPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
         const _Title(),
@@ -81,6 +82,7 @@ class _DisplayNameTextField extends StatelessWidget {
     final l10n = context.l10n;
 
     return VoicesDisplayNameTextField(
+      initialText: displayName.value,
       onChanged: (value) {
         RegistrationCubit.of(context)
             .baseProfile
@@ -122,6 +124,7 @@ class _EmailTextField extends StatelessWidget {
     final l10n = context.l10n;
 
     return VoicesEmailTextField(
+      initialText: email.value,
       onChanged: (value) {
         RegistrationCubit.of(context)
             .baseProfile

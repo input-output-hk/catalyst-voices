@@ -28,18 +28,22 @@ class LabelDecorator extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Flexible(child: child),
+        child,
         if (label != null)
-          DefaultTextStyle(
-            style: (theme.textTheme.bodyLarge ?? const TextStyle())
-                .copyWith(color: theme.colors.textPrimary),
-            child: label,
+          Flexible(
+            child: DefaultTextStyle(
+              style: (theme.textTheme.bodyLarge ?? const TextStyle())
+                  .copyWith(color: theme.colors.textPrimary),
+              child: label,
+            ),
           ),
         if (note != null)
-          DefaultTextStyle(
-            style: (theme.textTheme.bodySmall ?? const TextStyle())
-                .copyWith(color: theme.colors.textOnPrimary),
-            child: note,
+          Flexible(
+            child: DefaultTextStyle(
+              style: (theme.textTheme.bodySmall ?? const TextStyle())
+                  .copyWith(color: theme.colors.textOnPrimary),
+              child: note,
+            ),
           ),
       ].expandIndexed(
         (index, element) {
