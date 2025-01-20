@@ -6,7 +6,16 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+bool _alwaysAllowRegistration = false;
+
+@visibleForTesting
+// ignore: avoid_positional_boolean_parameters
+set alwaysAllowRegistration(bool newValue) {
+  _alwaysAllowRegistration = newValue;
+}
 
 /// Manages the user session.
 final class SessionCubit extends Cubit<SessionState>
@@ -46,7 +55,9 @@ final class SessionCubit extends Cubit<SessionState>
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
 
-    unawaited(_checkAvailableWallets());
+    if (!_alwaysAllowRegistration) {
+      unawaited(_checkAvailableWallets());
+    }
   }
 
   Future<bool> unlock(LockFactor lockFactor) async {
@@ -145,18 +156,18 @@ final class SessionCubit extends Cubit<SessionState>
   SessionState _createSessionState() {
     final account = _account;
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
-    final hasWallets = _hasWallets;
+    final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
 
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
       return VisitorSessionState(
-        canCreateAccount: hasWallets,
+        canCreateAccount: canCreateAccount,
         isRegistrationInProgress: !isEmpty,
       );
     }
 
     if (!isUnlocked) {
-      return GuestSessionState(canCreateAccount: hasWallets);
+      return GuestSessionState(canCreateAccount: canCreateAccount);
     }
 
     final sessionAccount = SessionAccount.fromAccount(account);
@@ -169,7 +180,7 @@ final class SessionCubit extends Cubit<SessionState>
       spaces: spaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
-      canCreateAccount: hasWallets,
+      canCreateAccount: canCreateAccount,
     );
   }
 
