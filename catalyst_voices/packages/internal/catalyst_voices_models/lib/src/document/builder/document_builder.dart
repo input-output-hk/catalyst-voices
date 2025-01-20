@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 
 /// A mutable document builder that understands the [DocumentSchema].
 ///
@@ -11,7 +12,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 /// copying is not supported for performance reasons.
 ///
 /// Once edits are done convert the builder to a [Document] with [build] method.
-final class DocumentBuilder implements DocumentNode {
+final class DocumentBuilder {
   String _schemaUrl;
   DocumentSchema _schema;
   List<DocumentPropertyBuilder> _properties;
@@ -49,9 +50,6 @@ final class DocumentBuilder implements DocumentNode {
     );
   }
 
-  @override
-  DocumentNodeId get nodeId => DocumentNodeId.root;
-
   /// Applies [changes] in FIFO manner on this builder.
   void addChanges(List<DocumentChange> changes) {
     for (final change in changes) {
@@ -62,17 +60,7 @@ final class DocumentBuilder implements DocumentNode {
   /// Applies a [change] on this instance of the builder
   /// without creating a copy.
   void addChange(DocumentChange change) {
-    final propertyIndex =
-        _properties.indexWhere((e) => change.targetsDocumentNode(e));
-
-    if (propertyIndex < 0) {
-      throw ArgumentError(
-        'Cannot edit property ${change.nodeId}, '
-        'it does not exist in this document',
-      );
-    }
-
-    _properties[propertyIndex].addChange(change);
+    _properties.findTargetFor(change).addChange(change);
   }
 
   /// Builds an immutable [Document].
@@ -189,12 +177,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   }
 
   void _handleValueChange(DocumentValueChange change) {
-    for (final property in _properties) {
-      if (change.targetsDocumentNode(property)) {
-        property.addChange(change);
-        return;
-      }
-    }
+    _properties.findTargetFor(change).addChange(change);
   }
 
   void _handleAddListItemChange(DocumentAddListItemChange change) {
@@ -204,17 +187,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
       _properties.add(DocumentPropertyBuilder.fromProperty(property));
     } else {
       // targets child property
-      for (final property in _properties) {
-        if (change.targetsDocumentNode(property)) {
-          property.addChange(change);
-          return;
-        }
-      }
-
-      throw ArgumentError(
-        "Couldn't find a suitable node to apply "
-        'a change to ${change.nodeId} in this node: $nodeId',
-      );
+      _properties.findTargetFor(change).addChange(change);
     }
   }
 
@@ -224,17 +197,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
       _properties.removeWhere((e) => e.nodeId == change.nodeId);
     } else {
       // targets child property
-      for (final property in _properties) {
-        if (change.targetsDocumentNode(property)) {
-          property.addChange(change);
-          return;
-        }
-      }
-
-      throw ArgumentError(
-        "Couldn't find a suitable node to apply "
-        'a change to ${change.nodeId} in this node: $nodeId',
-      );
+      _properties.findTargetFor(change).addChange(change);
     }
   }
 }
@@ -282,12 +245,7 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
 
   @override
   void addChange(DocumentChange change) {
-    for (final property in _properties) {
-      if (change.targetsDocumentNode(property)) {
-        property.addChange(change);
-        return;
-      }
-    }
+    _properties.findTargetFor(change).addChange(change);
   }
 
   /// Builds an immutable [DocumentObjectProperty].
@@ -363,5 +321,20 @@ final class DocumentValuePropertyBuilder<T extends Object>
   @override
   DocumentValueProperty<T> build() {
     return _schema.buildProperty(value: _value);
+  }
+}
+
+extension _DocumentNodeIterableExt<T extends DocumentNode> on Iterable<T> {
+  T findTargetFor(DocumentChange change) {
+    final targetProperty = firstWhereOrNull(change.targetsDocumentNode);
+
+    if (targetProperty == null) {
+      throw ArgumentError(
+        "Couldn't find a suitable node to apply "
+        'a change to ${change.nodeId} in this node.',
+      );
+    }
+
+    return targetProperty;
   }
 }

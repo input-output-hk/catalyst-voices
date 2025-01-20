@@ -6,10 +6,7 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
   final String value;
   final List<String> items;
   final DocumentDropDownSingleSelectSchema schema;
-  final DocumentNodeId nodeId;
-  final String title;
   final bool isEditMode;
-  final bool isRequired;
   final ValueChanged<DocumentChange> onChanged;
 
   const SingleDropdownSelectionWidget({
@@ -17,10 +14,7 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
     required this.value,
     required this.items,
     required this.schema,
-    required this.nodeId,
-    required this.title,
     required this.isEditMode,
-    required this.isRequired,
     required this.onChanged,
   });
 
@@ -76,7 +70,7 @@ class _SingleDropdownSelectionWidgetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          widget.title,
+          widget.schema.title,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
@@ -86,7 +80,7 @@ class _SingleDropdownSelectionWidgetState
           enabled: widget.isEditMode,
           onSelected: (val) {
             final change = DocumentValueChange(
-              nodeId: widget.nodeId,
+              nodeId: widget.schema.nodeId,
               value: val,
             );
             widget.onChanged(change);

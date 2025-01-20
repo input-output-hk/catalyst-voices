@@ -93,11 +93,7 @@ final class DocumentListProperty extends DocumentProperty {
       return false;
     }
 
-    for (final property in properties) {
-      if (!property.isValid) return false;
-    }
-
-    return true;
+    return properties.every((e) => e.isValid);
   }
 
   @override

@@ -38,6 +38,11 @@ global: {
 			}
 
 			github: registry: "ghcr.io"
+
+			kcl: {
+				install: true
+				version: "v0.11.0"
+			}
 		}
 		secrets: [
 			{
@@ -49,7 +54,10 @@ global: {
 		]
 	}
 	deployment: {
-		registry: ci.providers.aws.ecr.registry
+		registries: {
+			containers: ci.providers.aws.ecr.registry
+			modules:    ci.providers.aws.ecr.registry + "/catalyst-deployments"
+		}
 		repo: {
 			url: "https://github.com/input-output-hk/catalyst-world"
 			ref: "master"

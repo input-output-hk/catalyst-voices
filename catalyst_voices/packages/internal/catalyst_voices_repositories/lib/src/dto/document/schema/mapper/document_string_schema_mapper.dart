@@ -42,6 +42,8 @@ final class DocumentStringSchemaMapper {
         DocumentContentMediaType.fromString(schema.contentMediaType ?? '');
     final title = schema.title ?? '';
     final description = schema.description;
+    final descriptionMarkdown =
+        description != null ? MarkdownData(description) : null;
     final defaultValue = schema.defaultValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
     final strLengthRange =
@@ -57,7 +59,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -70,7 +72,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -83,7 +85,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -96,7 +98,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -109,7 +111,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -122,7 +124,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -135,7 +137,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -148,7 +150,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -161,7 +163,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -174,7 +176,7 @@ final class DocumentStringSchemaMapper {
           format: format,
           contentMediaType: contentMediaType,
           title: title,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,

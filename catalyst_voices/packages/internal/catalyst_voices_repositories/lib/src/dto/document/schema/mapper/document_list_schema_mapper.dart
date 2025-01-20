@@ -35,6 +35,9 @@ final class DocumentListSchemaMapper {
   }) {
     final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
+    final description = schema.description;
+    final descriptionMarkdown =
+        description != null ? MarkdownData(description) : null;
     final itemsSchema = schema.items!.toModel(
       definitions: definitions,
       nodeId: nodeId,
@@ -52,7 +55,7 @@ final class DocumentListSchemaMapper {
           nodeId: nodeId,
           format: format,
           title: title,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -62,7 +65,7 @@ final class DocumentListSchemaMapper {
           nodeId: nodeId,
           format: format,
           title: title,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -72,7 +75,7 @@ final class DocumentListSchemaMapper {
           nodeId: nodeId,
           format: format,
           title: title,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -82,7 +85,7 @@ final class DocumentListSchemaMapper {
           nodeId: nodeId,
           format: format,
           title: title,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -92,7 +95,7 @@ final class DocumentListSchemaMapper {
           nodeId: nodeId,
           format: format,
           title: title,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -102,7 +105,7 @@ final class DocumentListSchemaMapper {
           nodeId: nodeId,
           format: format,
           title: title,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,

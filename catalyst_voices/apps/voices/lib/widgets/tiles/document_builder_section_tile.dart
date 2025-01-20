@@ -247,6 +247,7 @@ class _PropertyListBuilder extends StatelessWidget {
     // to add more items into the list
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         for (final property in list.properties)
           _PropertyBuilder(
@@ -291,6 +292,7 @@ class _PropertyObjectBuilder extends StatelessWidget {
         // TODO(dtscalac): build a property object, similar to a section,
         // below is just dummy implementation
         return Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             for (final property in property.properties)
               _PropertyBuilder(
@@ -332,66 +334,57 @@ class _PropertyValueBuilder extends StatelessWidget {
           value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
           items: castProperty.schema.enumValues ?? [],
           schema: schema,
-          nodeId: castProperty.schema.nodeId,
-          title: castProperty.schema.title,
           isEditMode: isEditMode,
-          isRequired: castProperty.schema.isRequired,
           onChanged: onChanged,
         );
       case DocumentAgreementConfirmationSchema():
         final castProperty = schema.castProperty(property);
         return AgreementConfirmationWidget(
+          property: castProperty,
           schema: schema,
-          value: castProperty.value,
-          nodeId: castProperty.schema.nodeId,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
       case DocumentTokenValueCardanoAdaSchema():
-        final castProperty = schema.castProperty(property);
         return DocumentTokenValueWidget(
+          property: schema.castProperty(property),
           schema: schema,
-          value: castProperty.value,
           currency: const Currency.ada(),
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
       case DocumentYesNoChoiceSchema():
-        final castProperty = schema.castProperty(property);
         return YesNoChoiceWidget(
-          property: castProperty,
+          property: schema.castProperty(property),
+          schema: schema,
           onChanged: onChanged,
           isEditMode: isEditMode,
-          isRequired: castProperty.schema.isRequired,
         );
       case DocumentSingleLineHttpsUrlEntrySchema():
-        final castProperty = schema.castProperty(property);
         return SingleLineHttpsUrlWidget(
-          property: castProperty,
+          property: schema.castProperty(property),
+          schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
       case DocumentSingleLineTextEntrySchema():
-        final castProperty = schema.castProperty(property);
         return SimpleTextEntryWidget(
-          property: castProperty,
+          property: schema.castProperty(property),
           schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
       case DocumentMultiLineTextEntrySchema():
-        final castProperty = schema.castProperty(property);
         return SimpleTextEntryWidget(
-          property: castProperty,
+          property: schema.castProperty(property),
           schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
 
       case DocumentMultiLineTextEntryMarkdownSchema():
-        final castProperty = schema.castProperty(property);
         return MultilineTextEntryMarkdownWidget(
-          property: castProperty,
+          property: schema.castProperty(property),
           schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,

@@ -5,17 +5,15 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class AgreementConfirmationWidget extends StatefulWidget {
+  final DocumentValueProperty<bool> property;
   final DocumentAgreementConfirmationSchema schema;
-  final bool? value;
-  final DocumentNodeId nodeId;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
 
   const AgreementConfirmationWidget({
     super.key,
-    required this.value,
+    required this.property,
     required this.schema,
-    required this.nodeId,
     required this.isEditMode,
     required this.onChanged,
   });
@@ -30,10 +28,10 @@ class _DocumentCheckboxBuilderWidgetState
   late bool _initialValue;
   late bool _currentEditValue;
 
-  DocumentNodeId get _nodeId => widget.nodeId;
+  DocumentNodeId get _nodeId => widget.schema.nodeId;
 
   MarkdownData get _description =>
-      MarkdownData(widget.schema.description ?? '');
+      widget.schema.description ?? MarkdownData.empty;
 
   bool get _defaultValue => widget.schema.defaultValue ?? false;
 
@@ -52,7 +50,7 @@ class _DocumentCheckboxBuilderWidgetState
       _currentEditValue = _initialValue;
     }
 
-    if (oldWidget.value != widget.value) {
+    if (oldWidget.property.value != widget.property.value) {
       _setInitialValues();
     }
   }
@@ -101,7 +99,7 @@ class _DocumentCheckboxBuilderWidgetState
   }
 
   void _setInitialValues() {
-    _initialValue = widget.value ?? _defaultValue;
+    _initialValue = widget.property.value ?? _defaultValue;
     _currentEditValue = _initialValue;
   }
 }

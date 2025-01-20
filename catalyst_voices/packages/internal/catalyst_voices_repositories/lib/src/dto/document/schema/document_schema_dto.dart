@@ -65,7 +65,7 @@ final class DocumentSchemaDto {
     return DocumentSchema(
       jsonSchema: jsonSchema,
       title: title,
-      description: description,
+      description: MarkdownData(description),
       properties: mappedProperties,
       order: order.map(nodeId.child).toList(),
       propertiesSchema: propertiesSchema,

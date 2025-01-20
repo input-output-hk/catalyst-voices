@@ -30,6 +30,9 @@ final class DocumentNumberSchemaMapper {
   }) {
     final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
+    final description = schema.description;
+    final descriptionMarkdown =
+        description != null ? MarkdownData(description) : null;
     final defaultValue = schema.defaultValue as double?;
     final enumValues = schema.enumValues?.cast<double>();
     final numRange = Range.optionalRangeOf(
@@ -44,7 +47,7 @@ final class DocumentNumberSchemaMapper {
           nodeId: nodeId,
           title: title,
           format: format,
-          description: schema.description,
+          description: descriptionMarkdown,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
