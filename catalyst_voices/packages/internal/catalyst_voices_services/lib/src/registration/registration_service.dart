@@ -20,19 +20,12 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 final _logger = Logger('RegistrationService');
 
 abstract interface class RegistrationService {
-  factory RegistrationService({
-    required TransactionConfigRepository transactionConfigRepository,
-    required KeychainProvider keychainProvider,
-    required CatalystCardano cardano,
-    required KeyDerivation keyDerivation,
-  }) {
-    return RegistrationServiceImpl(
-      transactionConfigRepository,
-      keychainProvider,
-      cardano,
-      keyDerivation,
-    );
-  }
+  factory RegistrationService(
+    TransactionConfigRepository transactionConfigRepository,
+    KeychainProvider keychainProvider,
+    CatalystCardano cardano,
+    KeyDerivation keyDerivation,
+  ) = RegistrationServiceImpl;
 
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
