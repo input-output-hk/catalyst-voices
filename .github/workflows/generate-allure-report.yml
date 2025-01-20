@@ -87,7 +87,8 @@ jobs:
   generate-allure-report:
     name: Generate allure report
     runs-on: ubuntu-latest
-    needs: [generate-test-reports]
+    needs: generate-test-reports
+    if: always() && needs.generate-test-reports.result == 'success'
     steps:
       - uses: actions/checkout@v4
 
@@ -134,7 +135,7 @@ jobs:
   generate-coverage-report:
     name: Generate coverage report
     runs-on: ubuntu-latest
-    needs: [generate-test-reports]
+    needs: generate-test-reports
     steps:
       - uses: actions/checkout@v4
 
@@ -193,8 +194,8 @@ jobs:
 
   upload-coverage-report:
     name: Upload coverage report
-    needs: [generate-coverage-report]
-    if: ${{ always() }}
+    needs: generate-coverage-report
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
