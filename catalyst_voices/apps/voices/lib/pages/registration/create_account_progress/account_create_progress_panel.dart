@@ -129,7 +129,6 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
 extension _AccountCreateStepType on AccountCreateStepType {
   String? _title(BuildContext context) {
     return switch (this) {
-      // TODO(damian-molinski): this string may be wrong
       AccountCreateStepType.baseProfile =>
         context.l10n.createBaseProfileCreatedTitle,
       AccountCreateStepType.keychain => context.l10n.createKeychainCreatedTitle,

@@ -11,6 +11,7 @@ export 'buttons/voices_logical_keyboard_key_button.dart';
 export 'buttons/voices_outlined_button.dart';
 export 'buttons/voices_segmented_button.dart';
 export 'buttons/voices_text_button.dart';
+export 'cards/action_card.dart';
 export 'cards/funded_proposal_card.dart';
 export 'cards/role_chooser_card.dart';
 export 'chips/voices_chip.dart';

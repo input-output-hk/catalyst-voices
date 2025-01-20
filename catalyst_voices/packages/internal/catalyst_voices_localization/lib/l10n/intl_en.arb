@@ -683,6 +683,13 @@
     "description": "Related to account role"
   },
   "catalystKeychain": "Catalyst Keychain",
+  "createBaseProfileInstructionsTitle": "Introduction",
+  "createBaseProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your base profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.",
+  "createBaseProfileInstructionsNext": "Create your Base profile now",
+  "createBaseProfileInstructionsEmailRequest": "Email request",
+  "createBaseProfileInstructionsEmailReason1": "We store email in a mutable database.",
+  "createBaseProfileInstructionsEmailReason2": "We do not store your email on-chain ever.",
+  "createBaseProfileInstructionsEmailReason3": "We only use email for communication about Catalyst.",
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
   "accountCreationSplashMessage": "Your keychain is your ticket to participate in \u2028distributed innovation on the global stage.  \u2028\u2028Once you have it, you'll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.  \u2028\u2028As you add new keys to your keychain, you'll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.",
   "accountCreationSplashNextButton": "Create your Keychain now",
@@ -881,7 +888,7 @@
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let’s set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password \u2028for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.  \u2028\u2028But it can be a bit tedious to enter every single time you want to use the app.  \u2028\u2028In this next step, you'll set your Unlock Password for your current device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
-  "createBaseProfileCreatedTitle": "Congratulations your Catalyst \u2028Base profile is created!",
+  "createBaseProfileCreatedTitle": "Congratulations your Base profile is setup!",
   "createKeychainCreatedTitle": "Congratulations your Catalyst \u2028Keychain is created!",
   "createBaseProfileNextStep": "In the next step you Create your Catalyst Keychain",
   "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \u2028account to the Cardano Mainnet.",
@@ -1299,5 +1306,9 @@
   "clear": "Clear",
   "errorNoActiveCampaignFound": "Currently there is no active campaign running",
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
-  "errorDisplayNameValidationOutOfRange": "Display name invalid length"
+  "errorDisplayNameValidationOutOfRange": "Display name invalid length",
+  "headsUp": "Heads up",
+  "@headsUp": {
+    "description": "In context for important information below"
+  }
 }
