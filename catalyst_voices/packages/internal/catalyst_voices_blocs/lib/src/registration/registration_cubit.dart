@@ -47,7 +47,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   })  : _registrationService = registrationService,
         _userService = userService,
         _progressNotifier = progressNotifier,
-        _baseProfileCubit = BaseProfileCubit(),
+        _baseProfileCubit = BaseProfileCubit(
+          progressNotifier: progressNotifier,
+        ),
         _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
           progressNotifier: progressNotifier,
@@ -89,6 +91,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   RecoverManager get recover => _recoverCubit;
 
+  bool get hasProgress => !_progressNotifier.value.isEmpty;
+
   RegistrationStateData get _registrationState => state.registrationStateData;
 
   @override
@@ -104,24 +108,33 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _goToStep(step);
   }
 
-  // TODO(damian-molinski): this needs changing because there are more steps to recover.
   void recoverProgress() {
     final progress = _progressNotifier.value;
+    final baseProfileProgress = progress.baseProfileProgress;
     final keychainProgress = progress.keychainProgress;
+
+    if (baseProfileProgress != null) {
+      _baseProfileCubit
+        ..updateDisplayName(DisplayName.dirty(baseProfileProgress.displayName))
+        ..updateEmail(Email.dirty(baseProfileProgress.email))
+        ..updateToS(isAccepted: true)
+        ..updatePrivacyPolicy(isAccepted: true)
+        ..updateDataUsage(isAccepted: true);
+    }
 
     if (keychainProgress != null) {
       _keychainCreationCubit
         ..recoverSeedPhrase(keychainProgress.seedPhrase)
         ..recoverPassword(keychainProgress.password);
-
-      const step = AccountCreateProgressStep(
-        completedSteps: [
-          AccountCreateStepType.baseProfile,
-          AccountCreateStepType.keychain,
-        ],
-      );
-      _goToStep(step);
     }
+
+    final step = AccountCreateProgressStep(
+      completedSteps: [
+        if (baseProfileProgress != null) AccountCreateStepType.baseProfile,
+        if (keychainProgress != null) AccountCreateStepType.keychain,
+      ],
+    );
+    _goToStep(step);
   }
 
   void createNewAccount() {
@@ -295,7 +308,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final nextStage = step.stage.next;
       return nextStage != null
           ? CreateBaseProfileStep(stage: nextStage)
-          // TODO(damian-molinski): Needs parameter about this step.
           : const AccountCreateProgressStep(
               completedSteps: [
                 AccountCreateStepType.baseProfile,
@@ -315,7 +327,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final nextStage = step.stage.next;
       return nextStage != null
           ? CreateKeychainStep(stage: nextStage)
-          // TODO(damian-molinski): Needs parameter about this step.
           : const AccountCreateProgressStep(
               completedSteps: [
                 AccountCreateStepType.baseProfile,

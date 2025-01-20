@@ -198,6 +198,7 @@ class _RegistrationPicture extends StatelessWidget {
       GetStartedStep() => const KeychainPicture(),
       RecoverMethodStep() => const KeychainPicture(),
       RecoverWithSeedPhraseStep(:final stage) => buildRecoverSeedPhrase(stage),
+      // TODO(damian-molinski): this icon will probably change. Not ready yet
       CreateBaseProfileStep() => const KeychainPicture(),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
       AccountCreateProgressStep() => const KeychainWithPasswordPicture(),
