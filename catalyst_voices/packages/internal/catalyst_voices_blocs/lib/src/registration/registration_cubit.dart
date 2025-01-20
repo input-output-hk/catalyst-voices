@@ -7,7 +7,6 @@ import 'package:catalyst_voices_blocs/src/registration/cubits/base_profile_cubit
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
-import 'package:catalyst_voices_blocs/src/registration/state_data/base_profile_state_data.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -355,13 +354,32 @@ final class RegistrationCubit extends Cubit<RegistrationState>
           : null;
     }
 
+    RegistrationStep? nextRegistrationStep(
+      List<AccountCreateStepType> completedSteps,
+    ) {
+      if (!completedSteps.contains(AccountCreateStepType.baseProfile)) {
+        return const CreateBaseProfileStep();
+      }
+
+      if (!completedSteps.contains(AccountCreateStepType.keychain)) {
+        return const CreateKeychainStep();
+      }
+
+      if (!completedSteps.contains(AccountCreateStepType.walletLink)) {
+        return const WalletLinkStep();
+      }
+
+      return null;
+    }
+
     return switch (step) {
       GetStartedStep() => null,
       RecoverMethodStep() => null,
       RecoverWithSeedPhraseStep() => nextRecoverWithSeedPhraseStep(),
       CreateBaseProfileStep() => nextBaseProfile(),
       CreateKeychainStep() => nextKeychainStep(),
-      AccountCreateProgressStep() => const WalletLinkStep(),
+      AccountCreateProgressStep(:final completedSteps) =>
+        nextRegistrationStep(completedSteps),
       WalletLinkStep() => nextWalletLinkStep(),
       AccountCompletedStep() => null,
     };
