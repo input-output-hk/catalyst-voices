@@ -12,10 +12,15 @@ use put_document::{bad_put_request::PutDocumentBadRequest, MAXIMUM_DOCUMENT_SIZE
 
 use crate::service::{
     common::{
-        self,
-        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
+        auth::rbac::scheme::CatalystRBACSecurityScheme,
         tags::ApiTags,
-        types::{generic::uuidv7::UUIDv7, payload::cbor::Cbor},
+        types::{
+            generic::{
+                query::pagination::{Limit, Page},
+                uuidv7::UUIDv7,
+            },
+            payload::cbor::Cbor,
+        },
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };
@@ -46,7 +51,7 @@ impl DocumentApi {
         /// version.
         version: Query<Option<UUIDv7>>,
         /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
+        _auth: CatalystRBACSecurityScheme,
     ) -> get_document::AllResponses {
         let Ok(doc_id) = document_id.0.try_into() else {
             let err = anyhow!("Invalid UUIDv7"); // Should not happen as UUIDv7 is validating.
@@ -76,9 +81,9 @@ impl DocumentApi {
         _auth: CatalystRBACSecurityScheme,
     ) -> put_document::AllResponses {
         match document.0.into_bytes_limit(MAXIMUM_DOCUMENT_SIZE).await {
-            Ok(document) => put_document::endpoint(document).await,
+            Ok(doc_bytes) => put_document::endpoint(doc_bytes.to_vec()).await,
             Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
-            Err(_err) => {
+            Err(_) => {
                 put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(
                     "Failed to read document from the request",
                 )))
@@ -103,8 +108,7 @@ impl DocumentApi {
     async fn post_document(
         &self, /// The Query Filter Specification
         query: Json<DocumentIndexQueryFilterBody>,
-        page: Query<Option<common::types::generic::query::pagination::Page>>,
-        limit: Query<Option<common::types::generic::query::pagination::Limit>>,
+        page: Query<Option<Page>>, limit: Query<Option<Limit>>,
         /// Authorization required.
         _auth: CatalystRBACSecurityScheme,
     ) -> post_document_index_query::AllResponses {

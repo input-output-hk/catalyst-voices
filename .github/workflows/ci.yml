@@ -14,9 +14,9 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.5.1
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.0
     with:
-      forge_version: 0.8.0
+      forge_version: 0.10.0
 
   test_reporting:
     if: always()

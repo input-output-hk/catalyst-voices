@@ -38,7 +38,7 @@ class VoicesDateTimeTextField extends StatelessWidget {
 
     final borderSide = !dimBorder
         ? BorderSide(
-            color: theme.colors.outlineBorderVariant!,
+            color: theme.colors.outlineBorderVariant,
             width: 0.75,
           )
         : BorderSide(
@@ -52,6 +52,7 @@ class VoicesDateTimeTextField extends StatelessWidget {
       validator: validator,
       decoration: VoicesTextFieldDecoration(
         suffixIcon: ExcludeFocus(child: suffixIcon),
+        showStatusSuffixIcon: false,
         fillColor: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
         filled: true,
         enabledBorder: OutlineInputBorder(

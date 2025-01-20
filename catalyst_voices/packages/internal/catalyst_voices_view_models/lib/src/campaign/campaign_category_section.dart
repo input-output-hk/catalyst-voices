@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/src/campaign/campaign_category.dart';
 import 'package:catalyst_voices_view_models/src/menu/menu_item.dart';
 import 'package:equatable/equatable.dart';
 
@@ -18,14 +18,6 @@ final class CampaignCategorySection extends Equatable implements MenuItem {
     required this.body,
     this.isEnabled = true,
   });
-
-  CampaignCategorySection.fromCategory(CampaignSection section)
-      : this(
-          id: section.id,
-          category: section.category,
-          title: section.title,
-          body: section.body,
-        );
 
   @override
   String get label => category.name;

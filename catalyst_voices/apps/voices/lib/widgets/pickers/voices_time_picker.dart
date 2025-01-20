@@ -119,7 +119,7 @@ class _TimeText extends StatelessWidget {
         child: ColoredBox(
           color: !isSelected
               ? Colors.transparent
-              : Theme.of(context).colors.onSurfaceNeutral08!,
+              : Theme.of(context).colors.onSurfaceNeutral08,
           child: Padding(
             key: key,
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),

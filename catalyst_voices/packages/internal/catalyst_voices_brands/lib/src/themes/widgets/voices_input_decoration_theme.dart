@@ -32,7 +32,7 @@ class _Border extends MaterialStateOutlineInputBorder {
     if (states.contains(WidgetState.disabled)) {
       return OutlineInputBorder(
         borderSide: BorderSide(
-          color: colors.outlineBorder!,
+          color: colors.outlineBorder,
           width: 1,
         ),
         borderRadius: BorderRadius.circular(4),
@@ -42,7 +42,7 @@ class _Border extends MaterialStateOutlineInputBorder {
     if (states.contains(WidgetState.error)) {
       return OutlineInputBorder(
         borderSide: BorderSide(
-          color: colors.iconsError!,
+          color: colors.iconsError,
           width: 2,
         ),
         borderRadius: BorderRadius.circular(4),
@@ -61,7 +61,7 @@ class _Border extends MaterialStateOutlineInputBorder {
 
     return OutlineInputBorder(
       borderSide: BorderSide(
-        color: colors.outlineBorderVariant!,
+        color: colors.outlineBorderVariant,
         width: 1,
       ),
       borderRadius: BorderRadius.circular(4),

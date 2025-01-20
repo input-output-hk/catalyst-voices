@@ -174,7 +174,7 @@ class _InfoContainer extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colors.iconsPrimary!,
+          color: Theme.of(context).colors.iconsPrimary,
         ),
       ),
       child: Row(
@@ -243,7 +243,7 @@ class _UploadContainerState extends State<_UploadContainer> {
           borderType: BorderType.RRect,
           radius: const Radius.circular(12),
           dashPattern: const [8, 6],
-          color: Theme.of(context).colors.iconsPrimary!,
+          color: Theme.of(context).colors.iconsPrimary,
           child: Stack(
             children: [
               // We allow drag&drop only on web
@@ -303,7 +303,7 @@ class _UploadContainerState extends State<_UploadContainer> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Theme.of(context).colors.iconsPrimary!,
+                            color: Theme.of(context).colors.iconsPrimary,
                             width: 3,
                           ),
                         ),
