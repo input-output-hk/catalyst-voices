@@ -1310,5 +1310,8 @@
   "@howItWorksFollow": {
     "description": "Used in discovery page in how it works section"
   },
-  "howItWorksFollowDescription": "Receive regular updates on all the funded ideas, so you can follow along and see how things are progressing."
+  "howItWorksFollowDescription": "Receive regular updates on all the funded ideas, so you can follow along and see how things are progressing.",
+  "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
+  "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
+  "viewCurrentCampaign": "View Current Campaign"
 }
