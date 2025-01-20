@@ -34,17 +34,19 @@ integration-test-web:
             --web-browser-flag=--disable-gpu \
             --web-browser-flag=--headless \
             --web-browser-flag=--disable-search-engine-choice-screen \
-            --profile || echo fail > fail
+            --profile
+# TODO(oldgreg): make tests run without failing workflow until issue #2407 is released
+#           --profile || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
 
-    IF [ -f fail ]
-        RUN --no-cache echo ""$browser" integration test failed" && \
-            echo "Printing "$driver" logs..." && \
-            cat $driver.log && \
-            exit 1
-    END
+#    IF [ -f fail ]
+#        RUN --no-cache echo ""$browser" integration test failed" && \
+#            echo "Printing "$driver" logs..." && \
+#            cat $driver.log && \
+#            exit 1
+#    END
 
 # TODO(dtscalac): disabled integration tests due to them being flaky,
 # reenable when enable-threads.js workaround is removed

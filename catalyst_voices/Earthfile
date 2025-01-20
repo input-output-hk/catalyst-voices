@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.31 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:flutter-using-updated-browsers AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -32,17 +32,17 @@ filter-openapi:
 
     RUN rm openapi/cat-gateway-api.json
 
-    SAVE ARTIFACT openapi/filtered-openapi.json 
+    SAVE ARTIFACT openapi/filtered-openapi.json
 
 # Generates flutter code.
 # Generates codes for Catalyst Gateway OpenAPI, Voices Localization and
 # VoicesAssets and other packages that depend on code-generator.
 # It accepts [save_locally] ARG that when true place the artifacts in the
-# proper folders 
+# proper folders
 # It accepts [filter_openapi] ARG that when true filter the openapi spec
 # using filters from /packages/internal/catalyst_voices_repositories/openapi-filters.json
 code-generator:
-    ARG save_locally=false 
+    ARG save_locally=false
     ARG filter_openapi=true
     FROM +builder
     LET gen_code_path  = lib/generated/api
@@ -57,7 +57,7 @@ code-generator:
         FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway_api.*.swagger.*" \))
             SAVE ARTIFACT $generated_file AS LOCAL $generated_file
         END
-    ELSE 
+    ELSE
         SAVE ARTIFACT .
     END
     WORKDIR packages/internal/catalyst_voices_repositories
@@ -75,12 +75,12 @@ code-generator:
 
     # restore current working directory to the root of the project
     WORKDIR /frontend
-   
+
 
 # Runs static analysis on the code.
 check-static-analysis:
     FROM +code-generator
-    DO flutter-ci+ANALYZE 
+    DO flutter-ci+ANALYZE
 
 # Runs code formatting checks.
 check-code-formatting:
