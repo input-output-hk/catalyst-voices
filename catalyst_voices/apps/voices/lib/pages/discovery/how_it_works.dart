@@ -64,6 +64,7 @@ class HowItWorks extends StatelessWidget {
 
 class _Item extends StatelessWidget {
   final HowItWorksItem item;
+
   const _Item({
     required this.item,
   });
