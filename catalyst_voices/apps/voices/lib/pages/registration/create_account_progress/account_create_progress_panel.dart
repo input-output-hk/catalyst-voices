@@ -24,7 +24,7 @@ class AccountCreateProgressPanel extends StatelessWidget {
     final title = lastCompletedStep?._title(context);
 
     final nextStep = lastCompletedStep?.next;
-    final nextStepText = nextStep?._nextStepText(context);
+    final nextStepText = lastCompletedStep?._nextStepText(context);
 
     return Column(
       key: const Key('AccountCreateProgressPanel'),
