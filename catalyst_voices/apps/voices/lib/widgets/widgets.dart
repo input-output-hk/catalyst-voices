@@ -76,6 +76,7 @@ export 'text_field/seed_phrase_field.dart';
 export 'text_field/token_field.dart';
 export 'text_field/voices_autocomplete.dart';
 export 'text_field/voices_date_time_field.dart';
+export 'text_field/voices_display_name_text_field.dart';
 export 'text_field/voices_email_text_field.dart';
 export 'text_field/voices_int_field.dart';
 export 'text_field/voices_password_text_field.dart';

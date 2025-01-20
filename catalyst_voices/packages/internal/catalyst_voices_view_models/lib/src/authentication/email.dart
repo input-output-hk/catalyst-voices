@@ -1,6 +1,10 @@
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 
-final class Email extends FormzInput<String, EmailValidationError> {
+final class Email extends FormzInput<String, EmailValidationException> {
   static final _emailRegExp = RegExp(
     r'^[a-zA-Z\d.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z\d-]+(?:\.[a-zA-Z\d-]+)*$',
   );
@@ -9,19 +13,40 @@ final class Email extends FormzInput<String, EmailValidationError> {
 
   const Email.pure([super.value = '']) : super.pure();
 
+  static const Range<int> lengthRange = Range(min: 1, max: 100);
+
   @override
-  EmailValidationError? validator(String value) {
-    return _emailRegExp.hasMatch(value) ? null : EmailValidationError.invalid;
+  EmailValidationException? validator(String value) {
+    if (!lengthRange.contains(value.length)) {
+      return const OutOfRangeEmailException();
+    }
+
+    if (!_emailRegExp.hasMatch(value)) {
+      return const EmailPatternInvalidException();
+    }
+
+    return null;
   }
 }
 
-enum EmailValidationError {
-  invalid;
+sealed class EmailValidationException extends LocalizedException {
+  const EmailValidationException();
+}
 
-  String description(String text) {
-    switch (this) {
-      case EmailValidationError.invalid:
-        return text;
-    }
+final class EmailPatternInvalidException extends EmailValidationException {
+  const EmailPatternInvalidException();
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.errorEmailValidationPattern;
+  }
+}
+
+final class OutOfRangeEmailException extends EmailValidationException {
+  const OutOfRangeEmailException();
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.errorEmailValidationOutOfRange;
   }
 }

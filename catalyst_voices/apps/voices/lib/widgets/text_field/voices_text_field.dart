@@ -74,6 +74,9 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.onSubmitted]
   final ValueChanged<String>? onFieldSubmitted;
 
+  /// [TextField.onEditingComplete]
+  final VoidCallback? onEditingComplete;
+
   /// [FormField.onSaved]
   final FormFieldSetter<String>? onSaved;
 
@@ -113,6 +116,7 @@ class VoicesTextField extends StatefulWidget {
     // to make some action when user taps enter. Focus next field or anything
     // else.
     required this.onFieldSubmitted,
+    this.onEditingComplete,
     this.onSaved,
     this.inputFormatters,
     this.autovalidateMode,
@@ -224,6 +228,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             statesController: widget.statesController,
             focusNode: widget.focusNode,
             onFieldSubmitted: widget.onFieldSubmitted,
+            onEditingComplete: widget.onEditingComplete,
             onSaved: widget.onSaved,
             inputFormatters: widget.inputFormatters,
             autovalidateMode: widget.autovalidateMode,

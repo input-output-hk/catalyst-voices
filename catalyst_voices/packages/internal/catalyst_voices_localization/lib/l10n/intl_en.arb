@@ -690,6 +690,15 @@
   "createBaseProfileInstructionsEmailReason1": "We store email in a mutable database.",
   "createBaseProfileInstructionsEmailReason2": "We do not store your email on-chain ever.",
   "createBaseProfileInstructionsEmailReason3": "We only use email for communication about Catalyst.",
+  "createBaseProfileSetupTitle": "Setup your base profile",
+  "createBaseProfileSetupDisplayNameLabel": "What should we call you?",
+  "createBaseProfileSetupDisplayNameHint": "Display name",
+  "createBaseProfileSetupDisplayNameHelper": "Please provide a nickname or real name.",
+  "createBaseProfileSetupEmailLabel": "Your e-mail",
+  "createBaseProfileSetupEmailHint": "E-mail",
+  "createBaseProfileSetupEmailHelper": "Please provide e-mail used for your Ideascale.",
+  "createBaseProfileSetupIdeascaleAccount": "Ideascale account",
+  "createBaseProfileSetupIdeascaleReason1": "Please use the e-mail you use on cardano.ideascale.com",
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
   "accountCreationSplashMessage": "Your keychain is your ticket to participate in \u2028distributed innovation on the global stage.  \u2028\u2028Once you have it, you'll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.  \u2028\u2028As you add new keys to your keychain, you'll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.",
   "accountCreationSplashNextButton": "Create your Keychain now",
@@ -1306,9 +1315,11 @@
   "clear": "Clear",
   "errorNoActiveCampaignFound": "Currently there is no active campaign running",
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
-  "errorDisplayNameValidationOutOfRange": "Display name invalid length",
+  "errorDisplayNameValidationOutOfRange": "Invalid length",
   "headsUp": "Heads up",
   "@headsUp": {
     "description": "In context for important information below"
-  }
+  },
+  "errorEmailValidationPattern": "Incorrect email pattern",
+  "errorEmailValidationOutOfRange": "Invalid length"
 }

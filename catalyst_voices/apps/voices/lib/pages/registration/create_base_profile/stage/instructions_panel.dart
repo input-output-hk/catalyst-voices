@@ -78,6 +78,7 @@ class _EmailRequestCard extends StatelessWidget {
           context.l10n.createBaseProfileInstructionsEmailReason2,
           context.l10n.createBaseProfileInstructionsEmailReason3,
         ],
+        spacing: 0,
       ),
       statusIcon: VoicesAssets.icons.informationCircle.buildIcon(),
     );
