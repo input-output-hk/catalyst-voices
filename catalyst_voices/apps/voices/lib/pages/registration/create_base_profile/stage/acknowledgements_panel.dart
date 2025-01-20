@@ -81,7 +81,9 @@ class _TosCheckbox extends StatelessWidget {
     return VoicesCheckbox(
       value: isChecked,
       label: const TosRichText(),
-      onChanged: (value) {},
+      onChanged: (value) {
+        RegistrationCubit.of(context).baseProfile.updateToS(isAccepted: value);
+      },
     );
   }
 }
@@ -110,7 +112,11 @@ class _PrivacyPolicyCheckBox extends StatelessWidget {
     return VoicesCheckbox(
       value: isChecked,
       label: const PrivacyPolicyRichText(),
-      onChanged: (value) {},
+      onChanged: (value) {
+        RegistrationCubit.of(context)
+            .baseProfile
+            .updatePrivacyPolicy(isAccepted: value);
+      },
     );
   }
 }
@@ -139,7 +145,11 @@ class _DataUsageCheckBox extends StatelessWidget {
     return VoicesCheckbox(
       value: isChecked,
       label: Text(context.l10n.createBaseProfileAcknowledgementsDataUsage),
-      onChanged: (value) {},
+      onChanged: (value) {
+        RegistrationCubit.of(context)
+            .baseProfile
+            .updateDataUsage(isAccepted: value);
+      },
     );
   }
 }
