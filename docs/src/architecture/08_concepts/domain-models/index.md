@@ -58,5 +58,5 @@
 ## Entity Relationship (Work In Progress)
 
 ```d2
-{{ include_file('diagrams/entity_fund14.d2') }}
+{{ include_file('src/architecture/08_concepts/domain-models/diagrams/entity_fund14.d2') }}
 ```
