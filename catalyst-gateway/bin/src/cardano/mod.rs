@@ -12,7 +12,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::{
     db::index::{
-        block::index_block,
+        block::{index_block, roll_forward},
         queries::sync_status::{
             get::{get_sync_status, SyncStatus},
             update::update_sync_status,
@@ -453,7 +453,7 @@ impl SyncTask {
                 },
             }
 
-            // TODO: IF there is only 1 chain follower left in sync_tasks, then all
+            // IF there is only 1 chain follower left in sync_tasks, then all
             // immutable followers have finished.
             // When this happens we need to purge the live index of any records that exist
             // before the current immutable tip.
@@ -461,6 +461,11 @@ impl SyncTask {
             // want to put a gap in this, so that there are X slots of overlap
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
+            if self.sync_tasks.len() == 1 {
+                if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
+                    error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
+                }
+            }
         }
 
         error!(chain=%self.cfg.chain,"BUG: Sync tasks have all stopped.  This is an unexpected error!");

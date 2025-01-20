@@ -4,6 +4,7 @@
 pub(crate) mod certs;
 pub(crate) mod cip36;
 pub(crate) mod rbac509;
+pub(crate) mod roll_forward;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
