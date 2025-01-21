@@ -18,17 +18,15 @@ class AcknowledgementsPanel extends StatelessWidget {
         const SizedBox(height: 24),
         const _Title(),
         Expanded(
-          child: FocusScope(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              children: const [
-                _TosCheckboxSelector(key: ValueKey('TosCheckbox')),
-                SizedBox(height: 24),
-                _PrivacyPolicySelector(key: ValueKey('PrivacyPolicyCheckbox')),
-                SizedBox(height: 24),
-                _DataUsageSelector(key: ValueKey('DataUsageCheckbox')),
-              ],
-            ),
+          child: ListView(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            children: const [
+              _TosCheckboxSelector(key: ValueKey('TosCheckbox')),
+              SizedBox(height: 24),
+              _PrivacyPolicySelector(key: ValueKey('PrivacyPolicyCheckbox')),
+              SizedBox(height: 24),
+              _DataUsageSelector(key: ValueKey('DataUsageCheckbox')),
+            ],
           ),
         ),
         const SizedBox(height: 24),

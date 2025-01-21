@@ -324,7 +324,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         return const CreateBaseProfileStep();
       }
 
-      // if there is no next step from keychain creation go to finish account.
       final nextStage = step.stage.next;
       return nextStage != null
           ? CreateBaseProfileStep(stage: nextStage)
@@ -440,7 +439,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       return previousStep != null
           ? CreateKeychainStep(stage: previousStep)
-          // TODO(damian-molinski): Needs parameter about this step.
           : const AccountCreateProgressStep(
               completedSteps: [
                 AccountCreateStepType.baseProfile,
@@ -456,7 +454,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       return previousStep != null
           ? WalletLinkStep(stage: previousStep)
-          // TODO(damian-molinski): Needs parameter about this step.
           : const AccountCreateProgressStep(
               completedSteps: [
                 AccountCreateStepType.baseProfile,
