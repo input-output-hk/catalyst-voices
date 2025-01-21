@@ -20,7 +20,7 @@ impl EqOrRangedUuid {
     #[allow(dead_code)]
     pub(crate) fn conditional_stmt(&self, table_field: &str) -> String {
         match self {
-            Self::Eq(id) => format!("{table_field} == '{id}'"),
+            Self::Eq(id) => format!("{table_field} = '{id}'"),
             Self::Range { min, max } => {
                 format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
             },
