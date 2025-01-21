@@ -31,16 +31,17 @@ pub(crate) fn init_metrics_reporter() {
         Network::Preview => 2,
     };
 
-    thread::spawn(move || loop {
-        #[allow(clippy::indexing_slicing)]
-        {
-            let follower_stats = Statistics::new(chain);
+    thread::spawn(move || {
+        loop {
+            {
+                let follower_stats = Statistics::new(chain);
 
-            report_mithril(&follower_stats, &api_host_names, service_id, network_idx);
-            report_live(&follower_stats, &api_host_names, service_id, network_idx);
+                report_mithril(&follower_stats, &api_host_names, service_id, network_idx);
+                report_live(&follower_stats, &api_host_names, service_id, network_idx);
+            }
+
+            thread::sleep(Settings::metrics_follower_interval());
         }
-
-        thread::sleep(Settings::metrics_follower_interval());
     });
 }
 
@@ -141,22 +142,22 @@ fn report_live(stats: &Statistics, api_host_names: &str, service_id: &str, net: 
         .set(stats.sync_start.timestamp());
     reporter::LIVE_SYNC_END[net]
         .with_label_values(&[api_host_names, service_id])
-        .set(stats.sync_end.map(|s| s.timestamp()).unwrap_or(0));
+        .set(stats.sync_end.map_or(0, |s| s.timestamp()));
     reporter::LIVE_BACKFILL_START[net]
         .with_label_values(&[api_host_names, service_id])
-        .set(stats.backfill_start.map(|s| s.timestamp()).unwrap_or(0));
+        .set(stats.backfill_start.map_or(0, |s| s.timestamp()));
     reporter::LIVE_BACKFILL_SIZE[net]
         .with_label_values(&[api_host_names, service_id])
         .set(i64::try_from(stats.backfill_size).unwrap_or(-1));
     reporter::LIVE_BACKFILL_END[net]
         .with_label_values(&[api_host_names, service_id])
-        .set(stats.backfill_end.map(|s| s.timestamp()).unwrap_or(0));
+        .set(stats.backfill_end.map_or(0, |s| s.timestamp()));
     reporter::LIVE_BACKFILL_FAILURES[net]
         .with_label_values(&[api_host_names, service_id])
         .set(i64::try_from(stats.backfill_failures).unwrap_or(-1));
     reporter::LIVE_BACKFILL_FAILURE_TIME[net]
         .with_label_values(&[api_host_names, service_id])
-        .set(stats.backfill_failure_time.map(|s| s.timestamp()).unwrap_or(0));
+        .set(stats.backfill_failure_time.map_or(0, |s| s.timestamp()));
     reporter::LIVE_BLOCKS[net]
         .with_label_values(&[api_host_names, service_id])
         .set(i64::try_from(stats.blocks).unwrap_or(-1));
@@ -177,15 +178,25 @@ fn report_live(stats: &Statistics, api_host_names: &str, service_id: &str, net: 
         .set(stats.last_disconnect.timestamp());
     reporter::LIVE_CONNECTED[net]
         .with_label_values(&[api_host_names, service_id])
-        .set(if stats.connected { 1 } else { 0 });
-    // TODO: rollback
+        .set(i64::from(stats.connected));
+    reporter::LIVE_ROLLBACKS_LIVE_COUNT[net]
+        .with_label_values(&[api_host_names, service_id])
+        .set(i64::try_from(stats.rollbacks.live.len()).unwrap_or(-1));
+    reporter::LIVE_ROLLBACKS_PEER_COUNT[net]
+        .with_label_values(&[api_host_names, service_id])
+        .set(i64::try_from(stats.rollbacks.peer.len()).unwrap_or(-1));
+    reporter::LIVE_ROLLBACKS_FOLLOWER_COUNT[net]
+        .with_label_values(&[api_host_names, service_id])
+        .set(i64::try_from(stats.rollbacks.follower.len()).unwrap_or(-1));
     reporter::LIVE_NEW_BLOCKS[net]
         .with_label_values(&[api_host_names, service_id])
         .set(i64::try_from(stats.new_blocks).unwrap_or(-1));
     reporter::LIVE_INVALID_BLOCKS[net]
         .with_label_values(&[api_host_names, service_id])
         .set(i64::try_from(stats.invalid_blocks).unwrap_or(-1));
-    // TODO: follower
+    reporter::LIVE_FOLLOWER_COUNT[net]
+        .with_label_values(&[api_host_names, service_id])
+        .set(i64::try_from(stats.follower.len()).unwrap_or(-1));
 }
 
 /// All the related Chain Follower reporting metrics to the Prometheus service are inside
@@ -509,7 +520,8 @@ mod reporter {
         })
     });
 
-    /// The Time that synchronization to this blockchain was complete up-to-tip. None = Not yet synchronized.
+    /// The Time that synchronization to this blockchain was complete up-to-tip. None =
+    /// Not yet synchronized.
     pub(super) static LIVE_SYNC_END: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
         FOLLOWER_METRIC_NETWORKS.map(|network| {
             register_int_gauge_vec!(
@@ -642,18 +654,6 @@ mod reporter {
         })
     });
 
-    /// Last connected peer
-    pub(super) static LIVE_LAST_CONNECTED_PEER: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
-        FOLLOWER_METRIC_NETWORKS.map(|network| {
-            register_int_gauge_vec!(
-                format!("{network}_follower_live_last_connected_peer"),
-                "Last connected peer",
-                &FOLLOWER_METRIC_LABELS
-            )
-            .unwrap()
-        })
-    });
-
     /// Last disconnect time
     pub(super) static LIVE_LAST_DISCONNECT: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
         FOLLOWER_METRIC_NETWORKS.map(|network| {
@@ -665,19 +665,6 @@ mod reporter {
             .unwrap()
         })
     });
-
-    /// Last disconnected peer
-    pub(super) static LIVE_LAST_DISCONNECTED_PEER: LazyLock<[IntGaugeVec; 3]> =
-        LazyLock::new(|| {
-            FOLLOWER_METRIC_NETWORKS.map(|network| {
-                register_int_gauge_vec!(
-                    format!("{network}_follower_live_last_disconnected_peer"),
-                    "Last disconnected peer",
-                    &FOLLOWER_METRIC_LABELS
-                )
-                .unwrap()
-            })
-        });
 
     /// Is there an active connection to the node
     pub(super) static LIVE_CONNECTED: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
@@ -691,17 +678,42 @@ mod reporter {
         })
     });
 
-    /// Rollback statistics.
-    pub(super) static LIVE_ROLLBACKS: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
+    /// Rollbacks we did on our live-chain in memory.
+    pub(super) static LIVE_ROLLBACKS_LIVE_COUNT: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
         FOLLOWER_METRIC_NETWORKS.map(|network| {
             register_int_gauge_vec!(
-                format!("{network}_follower_live_rollbacks"),
-                "Rollback statistics",
+                format!("{network}_follower_live_rollbacks_live_count"),
+                "Number of live chain rollback",
                 &FOLLOWER_METRIC_LABELS
             )
             .unwrap()
         })
     });
+
+    /// Rollbacks reported by the Peer Node.
+    pub(super) static LIVE_ROLLBACKS_PEER_COUNT: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
+        FOLLOWER_METRIC_NETWORKS.map(|network| {
+            register_int_gauge_vec!(
+                format!("{network}_follower_live_rollbacks_peer_count"),
+                "Number of rollbacks reported by the peer node",
+                &FOLLOWER_METRIC_LABELS
+            )
+            .unwrap()
+        })
+    });
+
+    /// Rollbacks synthesized for followers.
+    pub(super) static LIVE_ROLLBACKS_FOLLOWER_COUNT: LazyLock<[IntGaugeVec; 3]> =
+        LazyLock::new(|| {
+            FOLLOWER_METRIC_NETWORKS.map(|network| {
+                register_int_gauge_vec!(
+                    format!("{network}_follower_live_rollbacks_follower_count"),
+                    "Number of rollbacks synthesized for followers",
+                    &FOLLOWER_METRIC_LABELS
+                )
+                .unwrap()
+            })
+        });
 
     /// New blocks read from blockchain.
     pub(super) static LIVE_NEW_BLOCKS: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
@@ -727,12 +739,12 @@ mod reporter {
         })
     });
 
-    /// Active Followers (range and current depth)
-    pub(super) static LIVE_MITHRIL: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
+    /// Number of active Followers
+    pub(super) static LIVE_FOLLOWER_COUNT: LazyLock<[IntGaugeVec; 3]> = LazyLock::new(|| {
         FOLLOWER_METRIC_NETWORKS.map(|network| {
             register_int_gauge_vec!(
-                format!("{network}_follower_live_follower"),
-                "Active Followers (range and current depth)",
+                format!("{network}_follower_live_follower_count"),
+                "Number of active Followers",
                 &FOLLOWER_METRIC_LABELS
             )
             .unwrap()
