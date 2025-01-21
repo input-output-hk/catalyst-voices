@@ -32,13 +32,6 @@ pub(crate) enum Responses {
 /// All responses.
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
-/// Update user schema
-#[derive(Debug, Object, Clone, Eq, PartialEq)]
-pub(crate) struct QueryDocumentIndex {
-    /// Name
-    name: Option<String>,
-}
-
 /// # POST `/document/index`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(

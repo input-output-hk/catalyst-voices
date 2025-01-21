@@ -5,7 +5,7 @@ use std::fmt::Display;
 use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 
 /// A `select_signed_docs` query filtering argument.
-/// If all fields would be `None` the query will search for all entiries from the db.
+/// If all fields would be `None` the query will search for all entries from the db.
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub(crate) struct DocsQueryFilter {
