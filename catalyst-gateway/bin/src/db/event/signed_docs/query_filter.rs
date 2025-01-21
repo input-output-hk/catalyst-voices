@@ -6,7 +6,6 @@ use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 
 /// A `select_signed_docs` query filtering argument.
 /// If all fields would be `None` the query will search for all entries from the db.
-#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub(crate) struct DocsQueryFilter {
     /// `type` field
@@ -23,7 +22,7 @@ impl Display for DocsQueryFilter {
         let mut query = "TRUE".to_string();
 
         if let Some(doc_type) = &self.doc_type {
-            write!(&mut query, " AND signed_docs.type == '{doc_type}'")?;
+            write!(&mut query, " AND signed_docs.type = '{doc_type}'")?;
         }
 
         if let Some(id) = &self.id {

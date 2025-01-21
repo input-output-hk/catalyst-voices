@@ -1,6 +1,6 @@
 //! Document Index Query
 
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
 use response::DocumentIndexListDocumented;
 
