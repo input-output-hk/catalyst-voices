@@ -1,14 +1,11 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 
 final class Email extends FormzInput<String, EmailValidationException> {
-  static final _emailRegExp = RegExp(
-    r'^[a-zA-Z\d.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z\d-]+(?:\.[a-zA-Z\d-]+)*$',
-  );
-
   const Email.dirty([super.value = '']) : super.dirty();
 
   const Email.pure([super.value = '']) : super.pure();
@@ -21,7 +18,7 @@ final class Email extends FormzInput<String, EmailValidationException> {
       return const OutOfRangeEmailException();
     }
 
-    if (!_emailRegExp.hasMatch(value)) {
+    if (!EmailValidator.validate(value)) {
       return const EmailPatternInvalidException();
     }
 
