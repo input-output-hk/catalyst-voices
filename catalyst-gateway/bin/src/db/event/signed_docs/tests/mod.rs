@@ -96,7 +96,7 @@ async fn filter_by_id(doc: &FullSignedDoc) {
 }
 
 async fn filter_by_ver(doc: &FullSignedDoc) {
-    let filter = DocsQueryFilter::all().with_ver(EqOrRangedUuid::Eq(*doc.id()));
+    let filter = DocsQueryFilter::all().with_ver(EqOrRangedUuid::Eq(*doc.ver()));
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
@@ -105,8 +105,8 @@ async fn filter_by_ver(doc: &FullSignedDoc) {
     assert!(res_docs.try_next().await.unwrap().is_none());
 
     let filter = DocsQueryFilter::all().with_ver(EqOrRangedUuid::Range {
-        min: *doc.id(),
-        max: *doc.id(),
+        min: *doc.ver(),
+        max: *doc.ver(),
     });
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
