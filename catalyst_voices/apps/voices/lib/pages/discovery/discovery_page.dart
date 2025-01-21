@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
-import 'package:catalyst_voices/widgets/heros/section_hero.dart';
+import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
