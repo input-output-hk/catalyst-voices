@@ -42,7 +42,6 @@ impl Display for DocsQueryFilter {
 
 impl DocsQueryFilter {
     /// Creates an empty filter stmt, so the query will retrieve all entries from the db.
-    #[allow(dead_code)]
     pub fn all() -> Self {
         DocsQueryFilter {
             doc_type: None,
@@ -52,7 +51,6 @@ impl DocsQueryFilter {
     }
 
     /// Set the `type` field filter condition
-    #[allow(dead_code)]
     pub fn with_type(self, doc_type: uuid::Uuid) -> Self {
         DocsQueryFilter {
             doc_type: Some(doc_type),
@@ -61,7 +59,6 @@ impl DocsQueryFilter {
     }
 
     /// Set the `type` field filter condition
-    #[allow(dead_code)]
     pub fn with_id(self, id: EqOrRangedUuid) -> Self {
         DocsQueryFilter {
             id: Some(id),
@@ -70,7 +67,6 @@ impl DocsQueryFilter {
     }
 
     /// Set the `ver` field filter condition
-    #[allow(dead_code)]
     pub fn with_ver(self, ver: EqOrRangedUuid) -> Self {
         DocsQueryFilter {
             ver: Some(ver),

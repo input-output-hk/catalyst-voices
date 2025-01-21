@@ -17,7 +17,10 @@ use poem_openapi::{
 use serde_json::Value;
 
 use self::generic::uuidv7;
-use crate::service::common::types::{generic, string_types::impl_string_types};
+use crate::{
+    db::event::common::eq_or_ranged_uuid::EqOrRangedUuid,
+    service::common::types::{generic, string_types::impl_string_types},
+};
 
 /// Title.
 const TITLE: &str = "Signed Document ID";
@@ -202,6 +205,22 @@ pub(crate) enum EqOrRangedId {
 impl Example for EqOrRangedId {
     fn example() -> Self {
         Self::Eq(IdEqDocumented::example())
+    }
+}
+
+impl TryFrom<EqOrRangedId> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedId) -> Result<Self, Self::Error> {
+        match value {
+            EqOrRangedId::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedId::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
     }
 }
 

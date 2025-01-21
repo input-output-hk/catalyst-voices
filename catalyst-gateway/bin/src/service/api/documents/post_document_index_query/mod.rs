@@ -6,7 +6,8 @@ use response::DocumentIndexListDocumented;
 
 use super::{Limit, Page};
 use crate::{
-    db::event::common::query_limits::QueryLimits, service::common::responses::WithErrorResponses,
+    db::event::{common::query_limits::QueryLimits, signed_docs::SignedDocBody},
+    service::common::responses::WithErrorResponses,
 };
 
 pub(crate) mod query_filter;
@@ -43,13 +44,19 @@ pub(crate) struct QueryDocumentIndex {
 pub(crate) async fn endpoint(
     filter: DocumentIndexQueryFilter, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
-    let _filter = filter;
-
-    let _query_limits = match QueryLimits::new(limit, page) {
+    let query_limits = match QueryLimits::new(limit, page) {
         Ok(query_limits) => query_limits,
         Err(_e) => return AllResponses::unauthorized(),
     };
 
-    // We return this when the filter results in no documents found.
-    Responses::NotFound.into()
+    let conditions = match filter.try_into() {
+        Ok(db_filter) => db_filter,
+        Err(e) => return AllResponses::handle_error(&e),
+    };
+
+    match SignedDocBody::retrieve(&conditions, &query_limits).await {
+        // We return this when the filter results in no documents found.
+        Ok(_) => Responses::NotFound.into(),
+        Err(e) => AllResponses::handle_error(&e),
+    }
 }

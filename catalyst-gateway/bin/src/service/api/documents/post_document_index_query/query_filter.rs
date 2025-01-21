@@ -5,9 +5,12 @@
 
 use poem_openapi::{types::Example, NewType, Object};
 
-use crate::service::common::types::document::{
-    doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
-    ver::EqOrRangedVerDocumented,
+use crate::{
+    db::event::signed_docs::DocsQueryFilter,
+    service::common::types::document::{
+        doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
+        ver::EqOrRangedVerDocumented,
+    },
 };
 
 /// Query Filter for the generation of a signed document index.
@@ -152,3 +155,21 @@ impl Example for DocumentIndexQueryFilter {
 /// fields. This is equivalent to returning documents where those metadata fields either
 /// do not exist, or do exist, but have any value.
 pub(crate) struct DocumentIndexQueryFilterBody(pub(crate) DocumentIndexQueryFilter);
+
+impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
+    type Error = anyhow::Error;
+
+    fn try_from(value: DocumentIndexQueryFilter) -> Result<Self, Self::Error> {
+        let mut db_filter = DocsQueryFilter::all();
+        if let Some(doc_type) = value.doc_type {
+            db_filter = db_filter.with_type(doc_type.parse()?);
+        }
+        if let Some(id) = value.id {
+            db_filter = db_filter.with_id(id.0.try_into()?);
+        }
+        if let Some(ver) = value.ver {
+            db_filter = db_filter.with_ver(ver.0.try_into()?);
+        }
+        Ok(db_filter)
+    }
+}
