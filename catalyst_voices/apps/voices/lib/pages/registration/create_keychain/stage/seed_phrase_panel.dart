@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
+import 'package:catalyst_voices/pages/registration/widgets/export_catalyst_key_confirm_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -101,7 +102,11 @@ class _SeedPhraseWords extends StatelessWidget {
   }
 
   Future<void> _exportSeedPhrase(BuildContext context) async {
-    await RegistrationCubit.of(context).keychainCreation.exportSeedPhrase();
+    final confirmed = await ExportCatalystKeyConfirmDialog.show(context);
+
+    if (confirmed && context.mounted) {
+      await RegistrationCubit.of(context).keychainCreation.exportSeedPhrase();
+    }
   }
 }
 
