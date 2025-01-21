@@ -17,9 +17,9 @@ pub(crate) struct DocumentIndexList {
     ///
     /// Documents are listed in ascending order.
     #[oai(validator(max_items = "100"))]
-    pub docs: Vec<IndexedDocumentDocumented>,
+    pub(crate) docs: Vec<IndexedDocumentDocumented>,
     /// Current Page
-    pub page: Option<common::objects::generic::pagination::CurrentPage>,
+    pub(crate) page: Option<common::objects::generic::pagination::CurrentPage>,
 }
 
 impl Example for DocumentIndexList {

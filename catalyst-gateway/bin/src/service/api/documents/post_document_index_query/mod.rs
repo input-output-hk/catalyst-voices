@@ -1,12 +1,18 @@
 //! Document Index Query
 
+use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
-use response::DocumentIndexListDocumented;
+use response::{
+    DocumentIndexList, DocumentIndexListDocumented, IndexedDocument, IndexedDocumentDocumented,
+};
 
 use super::{Limit, Page};
 use crate::{
-    db::event::{common::query_limits::QueryLimits, signed_docs::SignedDocBody},
+    db::event::{
+        common::query_limits::QueryLimits,
+        signed_docs::{DocsQueryFilter, SignedDocBody},
+    },
     service::common::responses::WithErrorResponses,
 };
 
@@ -47,9 +53,27 @@ pub(crate) async fn endpoint(
         Err(e) => return AllResponses::handle_error(&e),
     };
 
-    match SignedDocBody::retrieve(&conditions, &query_limits).await {
-        // We return this when the filter results in no documents found.
-        Ok(_) => Responses::NotFound.into(),
+    match fetch_docs(&conditions, &query_limits).await {
+        Ok(docs) if docs.is_empty() => Responses::NotFound.into(),
+        Ok(docs) => {
+            Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
+                docs: docs.into_iter().map(IndexedDocumentDocumented).collect(),
+                page: None,
+            })))
+            .into()
+        },
         Err(e) => AllResponses::handle_error(&e),
     }
+}
+
+/// Fetch documents from the event db
+async fn fetch_docs(
+    conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+) -> anyhow::Result<Vec<IndexedDocument>> {
+    let mut docs_iter = SignedDocBody::retrieve(conditions, query_limits).await?;
+
+    while let Some(_doc) = docs_iter.try_next().await? {}
+
+    let docs = Vec::new();
+    Ok(docs)
 }
