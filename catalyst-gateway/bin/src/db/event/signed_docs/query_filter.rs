@@ -2,43 +2,19 @@
 
 use std::fmt::Display;
 
-/// Search either by a singe UUID, or a Range of UUIDs
-#[derive(Clone, Debug, PartialEq)]
-#[allow(dead_code)]
-pub(crate) enum EqOrRangedUuid {
-    /// Search by the exact UUID
-    Eq(uuid::Uuid),
-    /// Search in this UUID's range
-    Range {
-        /// Minimum UUID to find (inclusive)
-        min: uuid::Uuid,
-        /// Maximum UUID to find (inclusive)
-        max: uuid::Uuid,
-    },
-}
-
-impl EqOrRangedUuid {
-    /// Return a sql conditional statement by the provided `table_field`
-    pub(crate) fn conditional_stmt(&self, table_field: &str) -> String {
-        match self {
-            Self::Eq(id) => format!("{table_field} == '{id}'"),
-            Self::Range { min, max } => {
-                format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
-            },
-        }
-    }
-}
+use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 
 /// A `select_signed_docs` query filtering argument.
 /// If all fields would be `None` the query will search for all entiries from the db.
 #[allow(dead_code)]
+#[derive(Clone, Debug)]
 pub(crate) struct DocsQueryFilter {
     /// `type` field
-    pub(crate) doc_type: Option<uuid::Uuid>,
+    doc_type: Option<uuid::Uuid>,
     /// `id` field
-    pub(crate) id: Option<EqOrRangedUuid>,
+    id: Option<EqOrRangedUuid>,
     /// `ver` field
-    pub(crate) ver: Option<EqOrRangedUuid>,
+    ver: Option<EqOrRangedUuid>,
 }
 
 impl Display for DocsQueryFilter {
@@ -61,5 +37,44 @@ impl Display for DocsQueryFilter {
             )?;
         }
         write!(f, "{query}")
+    }
+}
+
+impl DocsQueryFilter {
+    /// Creates an empty filter stmt, so the query will retrieve all entries from the db.
+    #[allow(dead_code)]
+    pub fn all() -> Self {
+        DocsQueryFilter {
+            doc_type: None,
+            id: None,
+            ver: None,
+        }
+    }
+
+    /// Set the `type` field filter condition
+    #[allow(dead_code)]
+    pub fn with_type(self, doc_type: uuid::Uuid) -> Self {
+        DocsQueryFilter {
+            doc_type: Some(doc_type),
+            ..self
+        }
+    }
+
+    /// Set the `type` field filter condition
+    #[allow(dead_code)]
+    pub fn with_id(self, id: EqOrRangedUuid) -> Self {
+        DocsQueryFilter {
+            id: Some(id),
+            ..self
+        }
+    }
+
+    /// Set the `ver` field filter condition
+    #[allow(dead_code)]
+    pub fn with_ver(self, ver: EqOrRangedUuid) -> Self {
+        DocsQueryFilter {
+            ver: Some(ver),
+            ..self
+        }
     }
 }
