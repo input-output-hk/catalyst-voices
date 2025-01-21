@@ -23,7 +23,7 @@ final class SessionAccount extends Equatable {
 
   factory SessionAccount.fromAccount(Account account) {
     return SessionAccount(
-      displayName: account.acronym,
+      displayName: account.displayName,
       isAdmin: account.isAdmin,
       isProposer: account.roles.contains(AccountRole.proposer),
       isDrep: account.roles.contains(AccountRole.drep),

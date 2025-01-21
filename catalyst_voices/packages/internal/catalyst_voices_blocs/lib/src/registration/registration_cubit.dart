@@ -251,6 +251,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
       );
 
+      final displayName = _baseProfileCubit.state.displayName;
+      final email = _baseProfileCubit.state.email;
+
       final masterKey = _masterKey!;
       final transaction = _transaction!;
 
@@ -261,6 +264,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final roles = _walletLinkCubit.roles;
 
       final account = await _registrationService.register(
+        displayName: displayName.value,
+        email: email.value,
         wallet: wallet,
         unsignedTx: transaction,
         roles: roles,
