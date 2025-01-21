@@ -70,7 +70,6 @@ async fn retrieve_full_signed_doc(doc: &FullSignedDoc) {
         .await
         .unwrap();
     assert_eq!(doc, &res_doc);
-
     let res_doc = FullSignedDoc::retrieve(doc.id(), None).await.unwrap();
     assert_eq!(doc, &res_doc);
 }
@@ -83,6 +82,61 @@ async fn filter_by_id(doc: &FullSignedDoc) {
     let res_doc = res_docs.try_next().await.unwrap().unwrap();
     assert_eq!(doc.body(), &res_doc);
     assert!(res_docs.try_next().await.unwrap().is_none());
+
+    let filter = DocsQueryFilter::all().with_id(EqOrRangedUuid::Range {
+        min: *doc.id(),
+        max: *doc.id(),
+    });
+    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+        .await
+        .unwrap();
+    let res_doc = res_docs.try_next().await.unwrap().unwrap();
+    assert_eq!(doc.body(), &res_doc);
+    assert!(res_docs.try_next().await.unwrap().is_none());
+}
+
+async fn filter_by_ver(doc: &FullSignedDoc) {
+    let filter = DocsQueryFilter::all().with_ver(EqOrRangedUuid::Eq(*doc.id()));
+    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+        .await
+        .unwrap();
+    let res_doc = res_docs.try_next().await.unwrap().unwrap();
+    assert_eq!(doc.body(), &res_doc);
+    assert!(res_docs.try_next().await.unwrap().is_none());
+
+    let filter = DocsQueryFilter::all().with_ver(EqOrRangedUuid::Range {
+        min: *doc.id(),
+        max: *doc.id(),
+    });
+    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+        .await
+        .unwrap();
+    let res_doc = res_docs.try_next().await.unwrap().unwrap();
+    assert_eq!(doc.body(), &res_doc);
+    assert!(res_docs.try_next().await.unwrap().is_none());
+}
+
+async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
+    let filter = DocsQueryFilter::all()
+        .with_id(EqOrRangedUuid::Eq(*doc.id()))
+        .with_ver(EqOrRangedUuid::Eq(*doc.ver()));
+    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+        .await
+        .unwrap();
+    let res_doc = res_docs.try_next().await.unwrap().unwrap();
+    assert_eq!(doc.body(), &res_doc);
+    assert!(res_docs.try_next().await.unwrap().is_none());
+}
+
+async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
+    let filter = DocsQueryFilter::all().with_type(doc_type);
+    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+        .await
+        .unwrap();
+    for exp_doc in docs.iter().rev() {
+        let res_doc = res_docs.try_next().await.unwrap().unwrap();
+        assert_eq!(exp_doc.body(), &res_doc);
+    }
 }
 
 async fn filter_all(docs: &[FullSignedDoc]) {
@@ -106,10 +160,10 @@ async fn queries_test() {
 
     for doc in &docs {
         store_full_signed_doc(doc, doc_type).await;
-
         retrieve_full_signed_doc(doc).await;
-
         filter_by_id(doc).await;
+        filter_by_ver(doc).await;
+        filter_by_id_and_ver(doc).await;
 
         // let mut res_docs = SignedDocBody::retrieve(
         //     &DocsQueryFilter::DocVer(*doc.id(), *doc.ver()),
@@ -141,5 +195,6 @@ async fn queries_test() {
     //     assert_eq!(exp_doc.body(), &res_doc);
     // }
 
+    filter_by_type(&docs, doc_type).await;
     filter_all(&docs).await;
 }
