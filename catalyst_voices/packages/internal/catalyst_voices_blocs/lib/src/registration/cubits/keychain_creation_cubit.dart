@@ -33,15 +33,12 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
   final Downloader _downloader;
-  final RegistrationProgressNotifier _progressNotifier;
 
   SeedPhrase? _seedPhrase;
 
   KeychainCreationCubit({
     required Downloader downloader,
-    required RegistrationProgressNotifier progressNotifier,
   })  : _downloader = downloader,
-        _progressNotifier = progressNotifier,
         super(const KeychainStateData());
 
   SeedPhrase? get seedPhrase => _seedPhrase;
@@ -139,19 +136,14 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   @override
   void onUnlockPasswordStateChanged(UnlockPasswordState data) {
-    final isPasswordCorrect = data.isNextEnabled;
-    final keychainProgress = isPasswordCorrect
-        ? KeychainProgress(
-            seedPhrase: _seedPhrase!,
-            password: password.value,
-          )
-        : null;
-
-    _progressNotifier.value = _progressNotifier.value.copyWith(
-      keychainProgress: Optional(keychainProgress),
-    );
-
     emit(state.copyWith(unlockPasswordState: data));
+  }
+
+  KeychainProgress createRecoverProgress() {
+    return KeychainProgress(
+      seedPhrase: _seedPhrase!,
+      password: password.value,
+    );
   }
 
   void _buildSeedPhrase() {

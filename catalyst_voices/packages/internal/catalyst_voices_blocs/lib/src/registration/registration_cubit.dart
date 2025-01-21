@@ -47,12 +47,9 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   })  : _registrationService = registrationService,
         _userService = userService,
         _progressNotifier = progressNotifier,
-        _baseProfileCubit = BaseProfileCubit(
-          progressNotifier: progressNotifier,
-        ),
+        _baseProfileCubit = BaseProfileCubit(),
         _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
-          progressNotifier: progressNotifier,
         ),
         _walletLinkCubit = WalletLinkCubit(
           registrationService: registrationService,
@@ -171,6 +168,11 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   void nextStep() {
     final nextStep = _nextStep();
+    if (nextStep is AccountCreateProgressStep) {
+      if (nextStep.completedSteps.isNotEmpty) {
+        _saveRegistrationProgress(nextStep.completedSteps.last);
+      }
+    }
     if (nextStep != null) {
       _goToStep(nextStep);
     }
@@ -289,6 +291,24 @@ final class RegistrationCubit extends Cubit<RegistrationState>
           isSubmittingTx: false,
         ),
       );
+    }
+  }
+
+  void _saveRegistrationProgress(AccountCreateStepType stepType) {
+    switch (stepType) {
+      case AccountCreateStepType.baseProfile:
+        final data = _baseProfileCubit.createRecoverProgress();
+        _progressNotifier.value = _progressNotifier.value.copyWith(
+          baseProfileProgress: Optional(data),
+          keychainProgress: const Optional.empty(),
+        );
+      case AccountCreateStepType.keychain:
+        final data = _keychainCreationCubit.createRecoverProgress();
+        _progressNotifier.value = _progressNotifier.value.copyWith(
+          keychainProgress: Optional(data),
+        );
+      case AccountCreateStepType.walletLink:
+      // no-op
     }
   }
 
