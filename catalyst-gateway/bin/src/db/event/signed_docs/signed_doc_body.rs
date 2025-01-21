@@ -50,6 +50,11 @@ impl SignedDocBody {
         &self.authors
     }
 
+    /// Returns the document metadata.
+    pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
+        self.metadata.as_ref()
+    }
+
     /// Returns all signed document fields for the event db queries
     pub(crate) fn postgres_db_fields(&self) -> [&(dyn tokio_postgres::types::ToSql + Sync); 5] {
         [

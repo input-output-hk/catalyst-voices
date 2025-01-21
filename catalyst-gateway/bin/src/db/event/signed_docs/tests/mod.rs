@@ -16,7 +16,12 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 uuid::Uuid::now_v7(),
                 doc_type,
                 vec!["Alex".to_string()],
-                Some(serde_json::Value::Null),
+                Some(serde_json::json!(
+                    {
+                        "name": "Alex",
+                        "amount": 105,
+                    }
+                )),
             ),
             Some(serde_json::Value::Null),
             vec![1, 2, 3, 4],
@@ -27,7 +32,12 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 uuid::Uuid::now_v7(),
                 doc_type,
                 vec!["Steven".to_string()],
-                Some(serde_json::Value::Null),
+                Some(serde_json::json!(
+                    {
+                        "name": "Steven",
+                        "amount": 15,
+                    }
+                )),
             ),
             Some(serde_json::Value::Null),
             vec![5, 6, 7, 8],
@@ -128,6 +138,17 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     assert!(res_docs.try_next().await.unwrap().is_none());
 }
 
+async fn filter_by_metadata(doc: &FullSignedDoc) {
+    let meta = doc.metadata().unwrap_or(&serde_json::Value::Null);
+    let filter = DocsQueryFilter::all().with_metadata(meta.clone());
+    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+        .await
+        .unwrap();
+    let res_doc = res_docs.try_next().await.unwrap().unwrap();
+    assert_eq!(doc.body(), &res_doc);
+    assert!(res_docs.try_next().await.unwrap().is_none());
+}
+
 async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
     let filter = DocsQueryFilter::all().with_type(doc_type);
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
@@ -164,36 +185,8 @@ async fn queries_test() {
         filter_by_id(doc).await;
         filter_by_ver(doc).await;
         filter_by_id_and_ver(doc).await;
-
-        // let mut res_docs = SignedDocBody::retrieve(
-        //     &DocsQueryFilter::DocVer(*doc.id(), *doc.ver()),
-        //     &QueryLimits::ALL,
-        // )
-        // .await
-        // .unwrap();
-        // let res_doc = res_docs.try_next().await.unwrap().unwrap();
-        // assert_eq!(doc.body(), &res_doc);
-        // assert!(res_docs.try_next().await.unwrap().is_none());
-
-        // let mut res_docs = SignedDocBody::retrieve(
-        //     &DocsQueryFilter::Author(doc.authors().first().unwrap().clone()),
-        //     &QueryLimits::ALL,
-        // )
-        // .await
-        // .unwrap();
-        // let res_doc = res_docs.try_next().await.unwrap().unwrap();
-        // assert_eq!(doc.body(), &res_doc);
-        // assert!(res_docs.try_next().await.unwrap().is_none());
+        filter_by_metadata(doc).await;
     }
-
-    // let mut res_docs =
-    //     SignedDocBody::retrieve(&DocsQueryFilter::DocType(doc_type), &QueryLimits::ALL)
-    //         .await
-    //         .unwrap();
-    // for exp_doc in docs.iter().rev() {
-    //     let res_doc = res_docs.try_next().await.unwrap().unwrap();
-    //     assert_eq!(exp_doc.body(), &res_doc);
-    // }
 
     filter_by_type(&docs, doc_type).await;
     filter_all(&docs).await;
