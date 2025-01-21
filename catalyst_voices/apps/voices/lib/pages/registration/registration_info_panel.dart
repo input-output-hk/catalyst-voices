@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/registration/pictures/account_completed_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/base_profile_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_with_password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/password_picture.dart';
@@ -194,14 +195,27 @@ class _RegistrationPicture extends StatelessWidget {
       };
     }
 
+    Widget buildRegistrationProgress(
+      List<AccountCreateStepType> completedSteps,
+    ) {
+      if (completedSteps.lastOrNull == AccountCreateStepType.baseProfile) {
+        return const BaseProfilePicture(type: TaskPictureType.success);
+      }
+      if (completedSteps.lastOrNull == AccountCreateStepType.keychain) {
+        return const KeychainWithPasswordPicture();
+      }
+
+      return const SizedBox.shrink();
+    }
+
     return switch (step) {
       GetStartedStep() => const KeychainPicture(),
       RecoverMethodStep() => const KeychainPicture(),
       RecoverWithSeedPhraseStep(:final stage) => buildRecoverSeedPhrase(stage),
-      // TODO(damian-molinski): this icon will probably change. Not ready yet
-      CreateBaseProfileStep() => const KeychainPicture(),
+      CreateBaseProfileStep() => const BaseProfilePicture(),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
-      AccountCreateProgressStep() => const KeychainWithPasswordPicture(),
+      AccountCreateProgressStep(:final completedSteps) =>
+        buildRegistrationProgress(completedSteps),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
       AccountCompletedStep() => const AccountCompletedPicture(),
     };
