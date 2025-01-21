@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/funded_projects/funded_projects_page.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder.dart';
+import 'package:catalyst_voices/pages/proposals/proposals_page.dart';
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
 import 'package:catalyst_voices/pages/voting/voting_page.dart';
@@ -21,7 +22,14 @@ const _prefix = Routes.currentMilestone;
 
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
-    TypedGoRoute<DiscoveryRoute>(path: '/$_prefix/discovery'),
+    TypedGoRoute<DiscoveryRoute>(
+      path: '/$_prefix/discovery',
+      routes: [
+        TypedGoRoute<ProposalsRoute>(
+          path: 'proposals',
+        ),
+      ],
+    ),
     TypedGoRoute<WorkspaceRoute>(
       path: '/$_prefix/workspace',
       routes: [
@@ -96,6 +104,17 @@ final class WorkspaceRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const WorkspacePage();
+  }
+}
+
+final class ProposalsRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  @override
+  List<RouteGuard> get routeGuards => [];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ProposalsPage();
   }
 }
 
