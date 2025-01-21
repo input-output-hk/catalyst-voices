@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/discovery/current_campaign.dart';
 import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
@@ -53,7 +54,7 @@ class _GuestVisitorBody extends StatelessWidget {
               [
                 const _CampaignHeroSection(),
                 const HowItWorks(),
-                const _CurrentCampaign(),
+                const CurrentCampaign(),
                 const _CampaignCategories(),
                 const _LatestProposals(),
               ],
@@ -144,18 +145,6 @@ class _CampaignCategories extends StatelessWidget {
     return const Placeholder(
       fallbackHeight: 1440,
       child: Text('Campaign Categories'),
-    );
-  }
-}
-
-class _CurrentCampaign extends StatelessWidget {
-  const _CurrentCampaign();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder(
-      fallbackHeight: 900,
-      child: Text('Current Campaign'),
     );
   }
 }
