@@ -6,14 +6,8 @@ use query_filter::EqOrRangedUuid;
 use super::*;
 use crate::db::event::{common::query_limits::QueryLimits, establish_connection};
 
-#[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
-#[tokio::test]
-async fn queries_test() {
-    establish_connection();
-
-    let doc_type = uuid::Uuid::new_v4();
-
-    let docs = vec![
+fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
+    vec![
         FullSignedDoc::new(
             SignedDocBody::new(
                 uuid::Uuid::now_v7(),
@@ -47,7 +41,16 @@ async fn queries_test() {
             None,
             vec![9, 10, 11, 12],
         ),
-    ];
+    ]
+}
+
+#[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn queries_test() {
+    establish_connection();
+
+    let doc_type = uuid::Uuid::new_v4();
+    let docs = test_docs(doc_type);
 
     for doc in &docs {
         assert!(doc.store().await.unwrap());
@@ -77,6 +80,8 @@ async fn queries_test() {
 
         let filter = DocsQueryFilter {
             id: Some(EqOrRangedUuid::Eq(*doc.id())),
+            ver: None,
+            doc_type: None,
         };
         let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
             .await
