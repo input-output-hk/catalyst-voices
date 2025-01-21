@@ -1,5 +1,3 @@
-export 'app_bar/session/session_action_header.dart';
-export 'app_bar/session/session_state_header.dart';
 export 'app_bar/voices_app_bar.dart';
 export 'avatars/space_avatar.dart';
 export 'avatars/voices_avatar.dart';

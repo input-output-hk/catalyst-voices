@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -6,17 +6,17 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class YesNoChoiceWidget extends StatefulWidget {
-  final DocumentProperty<bool> property;
+  final DocumentValueProperty<bool> property;
+  final DocumentYesNoChoiceSchema schema;
   final ValueChanged<DocumentChange> onChanged;
   final bool isEditMode;
-  final bool isRequired;
 
   const YesNoChoiceWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.onChanged,
     required this.isEditMode,
-    required this.isRequired,
   });
 
   @override
@@ -26,7 +26,7 @@ class YesNoChoiceWidget extends StatefulWidget {
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   late bool? selectedValue;
 
-  String get _description => widget.property.formattedDescription;
+  String get _description => widget.schema.formattedDescription;
 
   @override
   void initState() {
@@ -68,8 +68,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
           validator: (value) {
-            // TODO(dtscalac): add validation
-            final result = widget.property.schema.validatePropertyValue(value);
+            final result = widget.schema.validate(value);
 
             return LocalizedDocumentValidationResult.from(result)
                 .message(context);
@@ -94,8 +93,8 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
 
   void _notifyChangeListener(bool? value) {
     widget.onChanged(
-      DocumentChange(
-        nodeId: widget.property.schema.nodeId,
+      DocumentValueChange(
+        nodeId: widget.schema.nodeId,
         value: value,
       ),
     );

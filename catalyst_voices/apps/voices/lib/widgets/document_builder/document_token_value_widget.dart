@@ -7,7 +7,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DocumentTokenValueWidget extends StatefulWidget {
-  final DocumentProperty<int> property;
+  final DocumentValueProperty<int> property;
+  final DocumentIntegerSchema schema;
   final Currency currency;
   final bool isEditMode;
   final ValueChanged<DocumentChange> onChanged;
@@ -15,8 +16,9 @@ class DocumentTokenValueWidget extends StatefulWidget {
   const DocumentTokenValueWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.currency,
-    this.isEditMode = false,
+    required this.isEditMode,
     required this.onChanged,
   });
 
@@ -61,8 +63,8 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final schema = widget.property.schema;
-    final label = schema.title ?? '';
+    final schema = widget.schema;
+    final label = schema.title;
 
     return TokenField(
       controller: _controller,
@@ -94,8 +96,8 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   void _notifyChangeListener(int? value) {
-    final change = DocumentChange(
-      nodeId: widget.property.schema.nodeId,
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
       value: value,
     );
 
@@ -103,8 +105,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   VoicesTextFieldValidationResult _validate(int? value, String text) {
-    final schema = widget.property.schema;
-    final result = schema.validatePropertyValue(value);
+    final result = widget.schema.validate(value);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {

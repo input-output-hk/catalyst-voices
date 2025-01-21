@@ -65,14 +65,14 @@ final class LocalizedMissingRequiredDocumentValue
 
 final class LocalizedDocumentNumOutOfRange
     extends LocalizedDocumentValidationResult {
-  final Range<int> range;
+  final Range<num> range;
 
   const LocalizedDocumentNumOutOfRange({required this.range});
 
   @override
   String? message(BuildContext context) {
-    final min = range.min;
-    final max = range.max;
+    final min = range.min?.toInt();
+    final max = range.max?.toInt();
 
     if (min != null && max != null) {
       return context.l10n.errorValidationNumFieldOutOfRange(min, max);
