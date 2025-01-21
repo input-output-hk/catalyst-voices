@@ -864,12 +864,12 @@
   "registrationCompletedAccountButton": "Review my account",
   "createKeychainSeedPhraseSubtitle": "Write down your 12 Catalyst \u2028security words",
   "createKeychainSeedPhraseBody": "Make sure you create an offline backup of your recovery phrase as well.",
-  "createKeychainSeedPhraseDownload": "Download Catalyst key",
+  "createKeychainSeedPhraseExport": "Export Security Words",
   "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words",
   "createKeychainSeedPhraseCheckInstructionsTitle": "Check your Catalyst security keys",
   "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your words correctly.   \u2028\u2028We don't save your seed phrase, so it's important \u2028to make sure you have it right. That's why we do this confirmation before continuing.   \u2028\u2028It's also good practice to get familiar with using a seed phrase if you're new to crypto.",
-  "createKeychainSeedPhraseCheckSubtitle": "Input your Catalyst security keys",
-  "createKeychainSeedPhraseCheckBody": "Select your 12 written down words in \u2028the correct order.",
+  "createKeychainSeedPhraseCheckSubtitle": "Write down your Catalyst seed phrase",
+  "createKeychainSeedPhraseCheckBody": "Make sure you write down your 12-words in \u2028a safe place as well.",
   "uploadCatalystKey": "Upload Catalyst Key",
   "@uploadCatalystKey": {
     "description": "When user checks correct seed phrase words order he can upload it too"

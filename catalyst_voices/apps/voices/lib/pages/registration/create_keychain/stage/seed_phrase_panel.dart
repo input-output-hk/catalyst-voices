@@ -92,16 +92,16 @@ class _SeedPhraseWords extends StatelessWidget {
           const SizedBox(height: 10),
           VoicesTextButton(
             key: const Key('DownloadSeedPhraseButton'),
-            onTap: () => unawaited(_downloadSeedPhrase(context)),
-            child: Text(context.l10n.createKeychainSeedPhraseDownload),
+            onTap: () => unawaited(_exportSeedPhrase(context)),
+            child: Text(context.l10n.createKeychainSeedPhraseExport),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _downloadSeedPhrase(BuildContext context) async {
-    await RegistrationCubit.of(context).keychainCreation.downloadSeedPhrase();
+  Future<void> _exportSeedPhrase(BuildContext context) async {
+    await RegistrationCubit.of(context).keychainCreation.exportSeedPhrase();
   }
 }
 
