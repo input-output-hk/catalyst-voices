@@ -2,31 +2,47 @@
 
 use std::fmt::Display;
 
+/// Search either by a singe UUID, or a Range of UUIDs
+#[derive(Clone, Debug, PartialEq)]
+#[allow(dead_code)]
+pub(crate) enum EqOrRangedUuid {
+    /// Search by the exact UUID
+    Eq(uuid::Uuid),
+    /// Search in this UUID's range
+    Range {
+        /// Minimum UUID to find (inclusive)
+        min: uuid::Uuid,
+        /// Maximum UUID to find (inclusive)
+        max: uuid::Uuid,
+    },
+}
+
+impl EqOrRangedUuid {
+    /// Return a sql conditional statement by the provided `table_field`
+    pub(crate) fn conditional_stmt(&self, table_field: &str) -> String {
+        match self {
+            Self::Eq(id) => format!("{table_field} == {id}"),
+            Self::Range { min, max } => {
+                format!("{table_field} >= {min} AND {table_field} <= {max}")
+            },
+        }
+    }
+}
+
 /// A `select_signed_docs` query filtering argument.
 #[allow(dead_code)]
-pub(crate) enum DocsQueryFilter {
-    /// All entries
-    All,
-    /// Select docs with the specific `type` field
-    DocType(uuid::Uuid),
-    /// Select docs with the specific `id` field
-    DocId(uuid::Uuid),
-    /// Select docs with the specific `id` and `ver` field
-    DocVer(uuid::Uuid, uuid::Uuid),
-    /// Select docs with the specific `authors` field
-    Author(String),
+pub(crate) struct DocsQueryFilter {
+    /// document id
+    pub(crate) id: Option<EqOrRangedUuid>,
 }
 
 impl Display for DocsQueryFilter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::All => write!(f, "TRUE"),
-            Self::DocType(doc_type) => write!(f, "signed_docs.type = '{doc_type}'"),
-            Self::DocId(id) => write!(f, "signed_docs.id = '{id}'"),
-            Self::DocVer(id, ver) => {
-                write!(f, "signed_docs.id = '{id}' AND signed_docs.ver = '{ver}'")
-            },
-            Self::Author(author) => write!(f, "signed_docs.authors @> '{{ \"{author}\" }}'"),
+        use std::fmt::Write;
+        let mut query = "TRUE".to_string();
+        if let Some(id) = &self.id {
+            write!(&mut query, " AND {}", id.conditional_stmt("signed_doc.id"))?;
         }
+        write!(f, "{query}")
     }
 }
