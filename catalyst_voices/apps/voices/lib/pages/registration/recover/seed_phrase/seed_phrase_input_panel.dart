@@ -61,7 +61,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
         ),
         const SizedBox(height: 12),
         SeedPhraseActions(
-          onUploadKeyTap: _uploadSeedPhrase,
+          onImportKeyTap: _uploadSeedPhrase,
           onResetTap: _resetControllerWords,
         ),
         const SizedBox(height: 12),
