@@ -25,6 +25,14 @@ build:
     DO postgresql-ci+BUILD --image_name=event-db
     DO postgresql-ci+DOCS
 
+docker:
+   FROM +build
+
+   ARG container="event-db"
+   ARG tag="latest"
+
+   SAVE IMAGE ${container}:${tag}
+
 # local : Make a locally run-able container that can serve the db.
 #   --push will cause this image to be pushed to the local development cluster
 #   --local_registry : Set this to the hostname of your local registry or "" to inhibit.
