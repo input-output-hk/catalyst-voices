@@ -906,7 +906,7 @@
   "warning": "Warning",
   "alert": "Alert",
   "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
-  "registrationExitConfirmDialogContent": "If attempt to leave without creating your keychain - account creation will be incomplete. \u2028\u2028You are not able to login without \u2028completing your keychain.",
+  "registrationExitConfirmDialogContent": "Leaving before creating your keychain means account creation is incomplete. \u2028\u2028You cannot login without \u2028completing your key chain.",
   "registrationExitConfirmDialogContinue": "Continue keychain creation",
   "cancelAnyways": "Cancel anyway",
   "recoverCatalystKeychain": "Restore Catalyst keychain",
