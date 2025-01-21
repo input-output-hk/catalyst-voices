@@ -2,13 +2,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class SessionAccount extends Equatable {
-  final String displayName;
+  final String initials;
   final bool isAdmin;
   final bool isProposer;
   final bool isDrep;
 
   const SessionAccount({
-    this.displayName = '',
+    this.initials = '',
     this.isAdmin = false,
     this.isProposer = false,
     this.isDrep = false,
@@ -16,14 +16,16 @@ final class SessionAccount extends Equatable {
 
   const SessionAccount.mocked()
       : this(
-          displayName: 'Catalyst',
+          initials: 'C',
           isAdmin: true,
           isProposer: true,
         );
 
   factory SessionAccount.fromAccount(Account account) {
     return SessionAccount(
-      displayName: account.displayName,
+      initials: account.displayName.isNotEmpty
+          ? account.displayName.substring(0, 1)
+          : '',
       isAdmin: account.isAdmin,
       isProposer: account.roles.contains(AccountRole.proposer),
       isDrep: account.roles.contains(AccountRole.drep),
@@ -32,7 +34,7 @@ final class SessionAccount extends Equatable {
 
   @override
   List<Object?> get props => [
-        displayName,
+        initials,
         isAdmin,
         isProposer,
         isDrep,
