@@ -8,8 +8,12 @@
             "applicant": "John Smith",
             "type": "Individual",
             "coproposers": [
-                "Jane Doe",
-                "Bob Wilson"
+                {
+                    "name": "Jane Doe"
+                },
+                {
+                    "name": "Bob Wilson"
+                }
             ]
         }
     },

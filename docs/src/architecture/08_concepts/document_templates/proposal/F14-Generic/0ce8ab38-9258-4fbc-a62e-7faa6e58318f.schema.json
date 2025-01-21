@@ -117,6 +117,14 @@
             },
             "x-note": "Enter multiple HTTPS URLs. Each URL should be unique and under 1024 characters."
         },
+        "tagInput": {
+            "$comment": "UI - A tag-style input field for adding/removing items with visual tags",
+            "type": "array",
+            "format": "tag-input",
+            "uniqueItems": true,
+            "default": [],
+            "x-note": "Add or remove items that will be displayed as tags with remove buttons"
+        },
         "nestedQuestionsList": {
             "$comment": "UI - A Growable List of Questions.  The contents are an object, that can have any UI elements within.",
             "type": "array",
@@ -267,12 +275,25 @@
                             "default": "Individual"
                         },
                         "coproposers": {
-                            "$ref": "#/definitions/singleLineTextEntryList",
+                            "$ref": "#/definitions/tagInput",
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
                             "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. **IMPORTANT** A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 14 rules for added detail.",
                             "maxItems": 5,
-                            "minItems": 0
+                            "minItems": 0,
+                            "items": {
+                                "type": "object",
+                                "required": ["name"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "title": "Co-proposer Name", 
+                                        "description": "Full name of the co-proposer",
+                                        "minLength": 2,
+                                        "maxLength": 100
+                                    }
+                                }
+                            }
                         }
                     },
                     "required": [
@@ -412,7 +433,7 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Does the project have any dependency",
                             "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
-                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project’s delivery. If NO, please write “No dependencies"
+                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\""
                         },
                         "dependencyDetail": {
                             "$ref": "#/definitions/singleLineTextEntry",
