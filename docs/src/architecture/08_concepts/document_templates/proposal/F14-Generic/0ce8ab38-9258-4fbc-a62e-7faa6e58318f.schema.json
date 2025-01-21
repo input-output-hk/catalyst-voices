@@ -366,7 +366,7 @@
                         }
                     },
                     "required": [
-                        "impact"
+                        "statement"
                     ]
                 },
                 "solution": {
