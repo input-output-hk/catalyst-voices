@@ -223,6 +223,7 @@
             "$ref": "#/definitions/segment",
             "title": "proposal setup",
             "description": "Proposal title",
+            "x-icon": "/path_to_assets_dir/view-grid.svg",
             "properties": {
                 "title": {
                     "$ref": "#/definitions/section",
@@ -290,6 +291,7 @@
         "summary": {
             "$ref": "#/definitions/segment",
             "title": "Proposal Summary",
+            "x-icon": "/path_to_assets_dir/light-bulb.svg",
             "description": "Key information about your proposal",
             "properties": {
                 "budget": {
@@ -720,6 +722,7 @@
         "details": {
             "$ref": "#/definitions/segment",
             "title": "Your Project and Solution",
+            "x-icon": "/path_to_assets_dir/chart-pie.svg",
             "properties": {
                 "solution": {
                     "$ref": "#/definitions/section",
@@ -764,6 +767,7 @@
         "milestones": {
             "$ref": "#/definitions/segment",
             "title": "Milestones",
+            "x-icon": "/path_to_assets_dir/flag.svg",
             "properties": {
                 "milestones": {
                     "$ref": "#/definitions/section",
@@ -836,6 +840,7 @@
         "pitch": {
             "$ref": "#/definitions/segment",
             "title": "Final Pitch",
+            "x-icon": "/path_to_assets_dir/presentation-chart-line.svg",
             "properties": {
                 "team": {
                     "$ref": "#/definitions/section",
