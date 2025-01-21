@@ -19,7 +19,7 @@ class SeedPhraseActions extends StatelessWidget {
         VoicesTextButton(
           key: const Key('UploadKeyButton'),
           onTap: onImportKeyTap,
-          child: Text(context.l10n.uploadCatalystKey),
+          child: Text(context.l10n.importCatalystKey),
         ),
         const Spacer(),
         if (onResetTap != null)
