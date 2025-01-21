@@ -1,10 +1,14 @@
 //! Document Index Query
 
+use std::future;
+
+use dashmap::DashMap;
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
 use response::{
     DocumentIndexList, DocumentIndexListDocumented, IndexedDocument, IndexedDocumentDocumented,
+    IndexedDocumentVersion, IndexedDocumentVersionDocumented,
 };
 
 use super::{Limit, Page};
@@ -39,7 +43,6 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # POST `/document/index`
-#[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
     filter: DocumentIndexQueryFilter, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
@@ -70,10 +73,41 @@ pub(crate) async fn endpoint(
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
 ) -> anyhow::Result<Vec<IndexedDocument>> {
-    let mut docs_iter = SignedDocBody::retrieve(conditions, query_limits).await?;
+    let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
+    let indexed_docs = DashMap::new();
 
-    while let Some(_doc) = docs_iter.try_next().await? {}
+    docs_stream
+        .try_for_each(|doc: SignedDocBody| {
+            let id = *doc.id();
+            indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
+            future::ready(Ok(()))
+        })
+        .await?;
 
-    let docs = Vec::new();
+    let docs = indexed_docs
+        .into_iter()
+        .map(|(id, docs)| -> anyhow::Result<_> {
+            let ver = docs
+                .into_iter()
+                .map(|doc| -> anyhow::Result<_> {
+                    Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
+                        ver: doc.ver().to_string().try_into()?,
+                        doc_type: doc.doc_type().to_string().try_into()?,
+                        doc_ref: None,
+                        reply: None,
+                        template: None,
+                        brand: None,
+                        campaign: None,
+                        category: None,
+                    }))
+                })
+                .collect::<Result<_, _>>()?;
+
+            Ok(IndexedDocument {
+                doc_id: id.to_string().try_into()?,
+                ver,
+            })
+        })
+        .collect::<Result<_, _>>()?;
     Ok(docs)
 }

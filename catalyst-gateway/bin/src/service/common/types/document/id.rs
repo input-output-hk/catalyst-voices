@@ -105,7 +105,7 @@ impl TryFrom<String> for DocumentId {
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if !is_valid(&value) {
-            bail!("Invalid DocumentID, must be a valid UUIDv7")
+            bail!("Invalid DocumentID [{value}], must be a valid UUIDv7")
         }
         Ok(Self(value))
     }

@@ -89,7 +89,7 @@ impl TryFrom<String> for DocumentType {
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if !is_valid(&value) {
-            bail!("Invalid DocumentID, must be a valid UUIDv4")
+            bail!("Invalid DocumentType [{value}], must be a valid UUIDv4")
         }
         Ok(Self(value))
     }

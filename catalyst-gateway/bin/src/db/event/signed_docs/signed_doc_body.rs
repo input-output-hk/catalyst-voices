@@ -40,6 +40,11 @@ impl SignedDocBody {
         &self.ver
     }
 
+    /// Returns the document type.
+    pub(crate) fn doc_type(&self) -> &uuid::Uuid {
+        &self.doc_type
+    }
+
     /// Returns the document authors.
     pub(crate) fn authors(&self) -> &Vec<String> {
         &self.authors
@@ -80,6 +85,7 @@ impl SignedDocBody {
             "conditions": conditions.to_string(),
             "query_limits": query_limits.to_string(),
         }))?;
+        println!("{query}");
         let rows = EventDB::query_stream(&query, &[]).await?;
         let docs = rows.map(|res_row| res_row.and_then(|row| SignedDocBody::from_row(&row)));
         Ok(docs)
