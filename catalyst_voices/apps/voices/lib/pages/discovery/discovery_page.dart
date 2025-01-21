@@ -61,7 +61,7 @@ class _GuestVisitorBody extends StatelessWidget {
 }
 
 class _HeroSection extends StatelessWidget {
-  const _HeroSection({super.key});
+  const _HeroSection();
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _HeroSection extends StatelessWidget {
 }
 
 class _CampaignCategories extends StatelessWidget {
-  const _CampaignCategories({super.key});
+  const _CampaignCategories();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,7 @@ class _CampaignCategories extends StatelessWidget {
 }
 
 class _CurrentCampaign extends StatelessWidget {
-  const _CurrentCampaign({super.key});
+  const _CurrentCampaign();
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +94,7 @@ class _CurrentCampaign extends StatelessWidget {
 }
 
 class _LatestProposals extends StatelessWidget {
-  const _LatestProposals({super.key});
+  const _LatestProposals();
 
   @override
   Widget build(BuildContext context) {
