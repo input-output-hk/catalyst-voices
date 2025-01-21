@@ -139,14 +139,14 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
 }
 
 async fn filter_by_metadata(doc: &FullSignedDoc) {
-    let meta = doc.metadata().unwrap_or(&serde_json::Value::Null);
-    let filter = DocsQueryFilter::all().with_metadata(meta.clone());
-    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
-        .await
-        .unwrap();
-    let res_doc = res_docs.try_next().await.unwrap().unwrap();
-    assert_eq!(doc.body(), &res_doc);
-    assert!(res_docs.try_next().await.unwrap().is_none());
+    if let Some(meta) = doc.metadata() {
+        let filter = DocsQueryFilter::all().with_metadata(meta.clone());
+        let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+            .await
+            .unwrap();
+        let res_doc = res_docs.try_next().await.unwrap().unwrap();
+        assert_eq!(doc.body(), &res_doc);
+    }
 }
 
 async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {

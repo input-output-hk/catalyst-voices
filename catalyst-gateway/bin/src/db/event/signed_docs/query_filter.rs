@@ -15,7 +15,7 @@ pub(crate) struct DocsQueryFilter {
     /// `ver` field
     ver: Option<EqOrRangedUuid>,
     /// `metadata` field
-    metadata: serde_json::Value,
+    metadata: Option<serde_json::Value>,
 }
 
 impl Display for DocsQueryFilter {
@@ -37,8 +37,8 @@ impl Display for DocsQueryFilter {
                 ver.conditional_stmt("signed_docs.ver")
             )?;
         }
-        if !self.metadata.is_null() {
-            write!(&mut query, " AND signed_docs.metadata @> {}", self.metadata)?;
+        if let Some(metadata) = &self.metadata {
+            write!(&mut query, " AND signed_docs.metadata @> '{metadata}'",)?;
         }
 
         write!(f, "{query}")
@@ -52,7 +52,7 @@ impl DocsQueryFilter {
             doc_type: None,
             id: None,
             ver: None,
-            metadata: serde_json::Value::Null,
+            metadata: None,
         }
     }
 
@@ -83,6 +83,9 @@ impl DocsQueryFilter {
     /// Set the `metadata` field filter condition
     #[allow(dead_code)]
     pub fn with_metadata(self, metadata: serde_json::Value) -> Self {
-        DocsQueryFilter { metadata, ..self }
+        DocsQueryFilter {
+            metadata: Some(metadata),
+            ..self
+        }
     }
 }

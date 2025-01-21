@@ -1,9 +1,6 @@
-//! CIP36 object
+//! Catalyst Singed Document Request Filter Query Object
 
-// TODO: This is NOT common, remove it once the rationalized endpoint is implemented.
-// Retained to keep the existing code from breaking only.
-
-use poem_openapi::{types::Example, NewType, Object};
+use poem_openapi::{payload::Json, types::Example, NewType, Object};
 
 use crate::{
     db::event::signed_docs::DocsQueryFilter,
@@ -42,6 +39,15 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     #[oai(skip_serializing_if_is_none)]
     ver: Option<EqOrRangedVerDocumented>,
+    /// Additional metadata fields
+    #[oai(flatten)]
+    add_meta: AdditionalMetadataFields,
+}
+
+/// Additional metadata fields struct.
+#[allow(clippy::doc_markdown)]
+#[derive(Object, Default)]
+pub(crate) struct AdditionalMetadataFields {
     /// ## Document Reference
     ///
     /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
@@ -134,10 +140,12 @@ impl Example for DocumentIndexQueryFilter {
             doc_type: Some(DocumentType::example()),
             id: Some(EqOrRangedIdDocumented::example()),
             ver: Some(EqOrRangedVerDocumented::example()),
-            doc_ref: Some(IdAndVerRefDocumented::example_id_ref()),
-            template: Some(IdAndVerRefDocumented::example_id_and_ver_ref()),
-            reply: Some(IdAndVerRefDocumented::example()),
-            ..Default::default()
+            add_meta: AdditionalMetadataFields {
+                doc_ref: Some(IdAndVerRefDocumented::example_id_ref()),
+                template: Some(IdAndVerRefDocumented::example_id_and_ver_ref()),
+                reply: Some(IdAndVerRefDocumented::example()),
+                ..Default::default()
+            },
         }
     }
 }
@@ -160,6 +168,7 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
     type Error = anyhow::Error;
 
     fn try_from(value: DocumentIndexQueryFilter) -> Result<Self, Self::Error> {
+        use poem_openapi::types::ToJSON;
         let mut db_filter = DocsQueryFilter::all();
         if let Some(doc_type) = value.doc_type {
             db_filter = db_filter.with_type(doc_type.parse()?);
@@ -169,6 +178,9 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
         }
         if let Some(ver) = value.ver {
             db_filter = db_filter.with_ver(ver.0.try_into()?);
+        }
+        if let Some(meta) = Json(value.add_meta).to_json() {
+            db_filter = db_filter.with_metadata(meta);
         }
         Ok(db_filter)
     }
