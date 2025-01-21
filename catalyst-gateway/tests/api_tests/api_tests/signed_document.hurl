@@ -18,4 +18,4 @@ POST http://localhost:3030/api/draft/document/index
 {
     "id": { "eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e" }
 }
-HTTP 404
+HTTP 200
