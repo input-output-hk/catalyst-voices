@@ -1,6 +1,4 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/registration/state_data/base_profile_state_data.dart';
-import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 

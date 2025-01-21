@@ -7,7 +7,6 @@ import 'package:catalyst_voices_blocs/src/registration/cubits/base_profile_cubit
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
-import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';

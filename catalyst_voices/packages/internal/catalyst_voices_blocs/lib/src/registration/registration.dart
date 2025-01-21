@@ -9,6 +9,7 @@ export 'selectors/bloc_seed_phrase_selector.dart';
 export 'selectors/bloc_unlock_password_selector.dart';
 export 'selectors/bloc_wallet_link_selector.dart';
 export 'state_data/base_profile_state_data.dart';
+export 'state_data/keychain_state_data.dart';
 export 'state_data/recover_state_data.dart';
 export 'state_data/registration_state_data.dart';
 export 'state_data/seed_phrase_state_data.dart';
