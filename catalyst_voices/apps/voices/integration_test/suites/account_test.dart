@@ -9,6 +9,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../pageobject/account_dropdown_page.dart';
 import '../pageobject/app_bar_page.dart';
 import '../pageobject/overall_spaces_page.dart';
+import '../pageobject/unlock_modal_page.dart';
 import '../utils/constants.dart';
 
 void main() async {
@@ -41,6 +42,25 @@ void main() async {
           await AccountDropdownPage.accountDropdownContainsSpecificData($);
         },
       );
+
+      patrolWidgetTest('user - locking account', (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(OverallSpacesPage.userShortcutBtn)
+            .tap(settleTimeout: const Duration(seconds: 10));
+        await $(AppBarPage.lockBtn).tap();
+        expect($(AppBarPage.unlockBtn), findsOneWidget);
+      });
+      patrolWidgetTest('user - locking and unlocking account',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(OverallSpacesPage.userShortcutBtn)
+            .tap(settleTimeout: const Duration(seconds: 10));
+        await $(AppBarPage.lockBtn).tap();
+        await $(AppBarPage.unlockBtn).tap();
+        await $(UnlockModalPage.unlockPasswordTextField).enterText('Test1234');
+        await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
+        expect($(AppBarPage.lockBtn), findsOneWidget);
+      });
     },
   );
 }
