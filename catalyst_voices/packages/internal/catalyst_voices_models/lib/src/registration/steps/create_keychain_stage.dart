@@ -27,7 +27,7 @@ enum CreateKeychainStage {
   unlockPasswordCreate;
 
   CreateKeychainStage? get next {
-    final isLast = index == CreateKeychainStage.values.length - 1;
+    final isLast = this == CreateKeychainStage.values.last;
     if (isLast) {
       return null;
     }

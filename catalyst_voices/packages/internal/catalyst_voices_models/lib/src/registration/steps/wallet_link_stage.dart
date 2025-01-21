@@ -19,7 +19,7 @@ enum WalletLinkStage {
   rbacTransaction;
 
   WalletLinkStage? get next {
-    final isLast = index == WalletLinkStage.values.length - 1;
+    final isLast = this == WalletLinkStage.values.last;
     if (isLast) {
       return null;
     }

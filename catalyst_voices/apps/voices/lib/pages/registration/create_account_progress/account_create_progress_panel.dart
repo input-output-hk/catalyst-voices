@@ -43,7 +43,7 @@ class AccountCreateProgressPanel extends StatelessWidget {
                 ],
                 RegistrationProgressStepper(
                   completed: completedSteps.toSet(),
-                  current: [...AccountCreateStepType.values]
+                  current: AccountCreateStepType.values
                       .whereNot(completedSteps.contains)
                       .firstOrNull,
                 ),

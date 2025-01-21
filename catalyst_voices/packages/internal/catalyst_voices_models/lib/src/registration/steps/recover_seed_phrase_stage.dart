@@ -20,8 +20,7 @@ enum RecoverWithSeedPhraseStage {
   success;
 
   RecoverWithSeedPhraseStage? get next {
-    final index = RecoverWithSeedPhraseStage.values.indexOf(this);
-    final isLast = index == RecoverWithSeedPhraseStage.values.length - 1;
+    final isLast = this == RecoverWithSeedPhraseStage.values.last;
     if (isLast) {
       return null;
     }
@@ -30,7 +29,6 @@ enum RecoverWithSeedPhraseStage {
   }
 
   RecoverWithSeedPhraseStage? get previous {
-    final index = RecoverWithSeedPhraseStage.values.indexOf(this);
     final isFirst = index == 0;
     if (isFirst) {
       return null;

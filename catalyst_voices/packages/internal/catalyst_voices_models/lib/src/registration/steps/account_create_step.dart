@@ -6,7 +6,7 @@ enum AccountCreateStepType {
   walletLink;
 
   AccountCreateStepType? get next {
-    final isLast = index == AccountCreateStepType.values.length - 1;
+    final isLast = this == AccountCreateStepType.values.last;
     if (isLast) {
       return null;
     }

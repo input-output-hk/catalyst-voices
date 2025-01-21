@@ -85,6 +85,9 @@ final class AccountDto {
   }
 
   static void _jsonMigration(Map<String, dynamic> json) {
+    /// displayName and email were added later and some existing accounts
+    /// are already stored without them but we still don't want to make
+    /// those fields optional.
     void baseProfileMigration() {
       if (!json.containsKey(_$AccountDtoJsonKeys.displayName)) {
         json[_$AccountDtoJsonKeys.displayName] = 'Migrated';
