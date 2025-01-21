@@ -1,3 +1,4 @@
+export 'account/session_account.dart';
 export 'authentication/authentication.dart';
 export 'campaign/campaign_category.dart';
 export 'campaign/campaign_category_section.dart';

@@ -1320,6 +1320,22 @@
   "addUrl": "Add URL",
   "clear": "Clear",
   "errorNoActiveCampaignFound": "Currently there is no active campaign running",
+  "howItWorksCollaborate": "Innovate together",
+  "@howItWorksCollaborate": {
+    "description": "Used in discovery page in how it works section"
+  },
+  "howItWorks": "Here’s how it works",
+  "howItWorksCollaborateDescription": "Got an Idea? Create an impactful proposal and collaborate with the community to develop and refine it.",
+  "howItWorksVote": "Vote for your favorite ideas",
+  "@howItWorksVote": {
+    "description": "Used in discovery page in how it works section"
+  },
+  "howItWorksVoteDescription": "Use a voting app to choose ideas with impact worth funding. Get rewarded in ada for taking part.",
+  "howItWorksFollow": "Stay up to date",
+  "@howItWorksFollow": {
+    "description": "Used in discovery page in how it works section"
+  },
+  "howItWorksFollowDescription": "Receive regular updates on all the funded ideas, so you can follow along and see how things are progressing.",
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
   "errorDisplayNameValidationOutOfRange": "Invalid length",
   "headsUp": "Heads up",

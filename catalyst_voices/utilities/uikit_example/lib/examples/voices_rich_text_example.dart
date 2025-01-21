@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +40,9 @@ class _VoicesRichTextExampleState extends State<VoicesRichTextExample> {
           title: 'Rich text',
           controller: _controller,
           charsLimit: 800,
-          onSaved: (document) => log('Saved document: $document'),
+          enabled: true,
+          focusNode: FocusNode(),
+          scrollController: ScrollController(),
         ),
       ),
     );

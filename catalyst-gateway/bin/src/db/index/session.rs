@@ -17,15 +17,13 @@ use tracing::{error, info};
 
 use super::{
     queries::{
+        purge::{self, PreparedDeleteQuery},
         FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
         PreparedUpsertQuery,
     },
     schema::create_schema,
 };
-use crate::{
-    db::index::queries,
-    settings::{cassandra_db, Settings},
-};
+use crate::settings::{cassandra_db, Settings};
 
 /// Configuration Choices for compression
 #[derive(Clone, strum::EnumString, strum::Display, strum::VariantNames)]
@@ -63,6 +61,8 @@ pub(crate) struct CassandraSession {
     session: Arc<Session>,
     /// All prepared queries we can use on this session.
     queries: Arc<PreparedQueries>,
+    /// All prepared purge queries we can use on this session.
+    purge_queries: Arc<purge::PreparedQueries>,
 }
 
 /// Persistent DB Session.
@@ -76,8 +76,10 @@ impl CassandraSession {
     pub(crate) fn init() {
         let (persistent, volatile) = Settings::cassandra_db_cfg();
 
-        let _join_handle = tokio::task::spawn(async move { retry_init(persistent, true).await });
-        let _join_handle = tokio::task::spawn(async move { retry_init(volatile, false).await });
+        let _join_handle =
+            tokio::task::spawn(async move { Box::pin(retry_init(persistent, true)).await });
+        let _join_handle =
+            tokio::task::spawn(async move { Box::pin(retry_init(volatile, false)).await });
     }
 
     /// Check to see if the Cassandra Indexing DB is ready for use
@@ -145,6 +147,48 @@ impl CassandraSession {
         let queries = self.queries.clone();
 
         queries.execute_upsert(session, query, value).await
+    }
+
+    /// Execute a purge query with the given parameters.
+    ///
+    /// Values should be a Vec of values which implement `SerializeRow` and they MUST be
+    /// the same, and must match the query being executed.
+    ///
+    /// This will divide the batch into optimal sized chunks and execute them until all
+    /// values have been executed or the first error is encountered.
+    ///
+    /// NOTE: This is currently only used to purge volatile data.
+    pub(crate) async fn purge_execute_batch<T: SerializeRow + Debug>(
+        &self, query: PreparedDeleteQuery, values: Vec<T>,
+    ) -> FallibleQueryResults {
+        // Only execute purge queries on the volatile session
+        let persistent = false;
+        let Some(volatile_db) = Self::get(persistent) else {
+            // This should never happen
+            anyhow::bail!("Volatile DB Session not found");
+        };
+        let cfg = self.cfg.clone();
+        let queries = self.purge_queries.clone();
+        let session = volatile_db.session.clone();
+
+        queries.execute_batch(session, cfg, query, values).await
+    }
+
+    /// Execute a select query to gather primary keys for purging.
+    pub(crate) async fn purge_execute_iter(
+        &self, query: purge::PreparedSelectQuery,
+    ) -> anyhow::Result<QueryPager> {
+        // Only execute purge queries on the volatile session
+        let persistent = false;
+        let Some(volatile_db) = Self::get(persistent) else {
+            // This should never happen
+            anyhow::bail!("Volatile DB Session not found");
+        };
+        let queries = self.purge_queries.clone();
+
+        queries
+            .execute_iter(volatile_db.session.clone(), query)
+            .await
     }
 
     /// Get underlying Raw Cassandra Session.
@@ -269,7 +313,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             continue;
         }
 
-        let queries = match queries::PreparedQueries::new(session.clone(), &cfg).await {
+        let queries = match PreparedQueries::new(session.clone(), &cfg).await {
             Ok(queries) => Arc::new(queries),
             Err(error) => {
                 error!(
@@ -281,11 +325,25 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
             },
         };
 
+        let purge_queries = match Box::pin(purge::PreparedQueries::new(session.clone(), &cfg)).await
+        {
+            Ok(queries) => Arc::new(queries),
+            Err(error) => {
+                error!(
+                    db_type = db_type,
+                    error = %error,
+                    "Failed to Create Cassandra Prepared Purge Queries"
+                );
+                continue;
+            },
+        };
+
         let cassandra_session = CassandraSession {
             persistent,
             cfg: Arc::new(cfg),
             session,
             queries,
+            purge_queries,
         };
 
         // Save the session so we can execute queries on the DB
