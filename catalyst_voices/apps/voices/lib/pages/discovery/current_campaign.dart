@@ -4,6 +4,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CurrentCampaign extends StatelessWidget {
@@ -11,17 +12,18 @@ class CurrentCampaign extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(left: 120, top: 64, right: 120),
+    return Padding(
+      padding: const EdgeInsets.only(left: 120, top: 64, right: 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          _Header(),
-          SizedBox(height: 32),
-          _CurrentCampaignDetails(),
-          SizedBox(height: 80),
-          _SubTitle(),
+          const _Header(),
+          const SizedBox(height: 32),
+          const _CurrentCampaignDetails(),
+          const SizedBox(height: 80),
+          const _SubTitle(),
+          _CampaignTimeline(mockCampaignTimeline),
         ],
       ),
     );
@@ -243,6 +245,67 @@ class _SubTitle extends StatelessWidget {
             style: context.textTheme.bodyLarge,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CampaignTimeline extends StatelessWidget {
+  final List<CampaignTimeline> timelineItem;
+  const _CampaignTimeline(this.timelineItem);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 209,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: timelineItem.length,
+        itemBuilder: (context, index) => _CampaignTimelineCard(
+          timelineItem[index],
+        ),
+        // prototypeItem: _CampaignTimelineCard(CampaignTimeline.dummy()),
+        itemExtent: 288,
+      ),
+    );
+  }
+}
+
+class _CampaignTimelineCard extends StatelessWidget {
+  final CampaignTimeline timelineItem;
+  const _CampaignTimelineCard(this.timelineItem);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                VoicesAssets.icons.calendar.buildIcon(),
+                VoicesAssets.icons.chevronRight.buildIcon(),
+              ],
+            ),
+            Text(
+              timelineItem.title,
+              style: context.textTheme.titleMedium,
+            ),
+            Text(
+              '${timelineItem.timeline.from?.year}-${timelineItem.timeline.to?.year}',
+            ),
+            const SizedBox(height: 8),
+            Text(
+              timelineItem.description,
+              style: context.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }

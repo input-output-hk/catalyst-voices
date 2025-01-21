@@ -44,3 +44,37 @@ class Range<T extends num> extends Equatable {
   @override
   List<Object?> get props => [min, max];
 }
+
+class DateRange extends Equatable {
+  final DateTime? from;
+  final DateTime? to;
+
+  const DateRange({
+    required this.from,
+    required this.to,
+  });
+
+  bool isInRange(DateTime value) {
+    if (from == null && to != null) {
+      return value.isBefore(to!) || value.isAtSameMomentAs(to!);
+    }
+
+    if (from != null && to == null) {
+      return value.isAfter(from!) || value.isAtSameMomentAs(from!);
+    }
+
+    if (from != null && to != null) {
+      return (value.isAtSameMomentAs(from!) || value.isAfter(from!)) &&
+          (value.isAtSameMomentAs(to!) || value.isBefore(to!));
+    }
+
+    return true;
+  }
+
+  bool isTodayInRange() {
+    return isInRange(DateTime.now());
+  }
+
+  @override
+  List<Object?> get props => [from, to];
+}
