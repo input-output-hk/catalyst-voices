@@ -1,7 +1,5 @@
 //! `QueryLimits` query argument object.
 
-#![allow(dead_code)]
-
 use std::fmt::Display;
 
 use crate::service::common::types::generic::query::pagination::{Limit, Page};
@@ -33,14 +31,15 @@ impl Display for QueryLimits {
 
 impl QueryLimits {
     /// Create a `QueryLimits` object without the any limits.
+    #[allow(dead_code)]
     pub(crate) const ALL: QueryLimits = Self(QueryLimitsInner::All);
     /// Create a `QueryLimits` object with the limit equals to `1`.
+    #[allow(dead_code)]
     pub(crate) const ONE: QueryLimits = Self(QueryLimitsInner::Limit(1));
 
     /// Create a `QueryLimits` object from the service `Limit` and `Page` values.
     ///
     /// # Errors
-    ///  - Invalid `limit` value, must be more than `0`.
     ///  - Invalid arguments, `limit` must be provided when `page` is not None.
     pub(crate) fn new(limit: Option<Limit>, page: Option<Page>) -> anyhow::Result<Self> {
         match (limit, page) {
