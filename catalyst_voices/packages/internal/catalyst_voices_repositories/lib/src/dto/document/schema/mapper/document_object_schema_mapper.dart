@@ -33,6 +33,7 @@ final class DocumentObjectSchemaMapper {
   }) {
     final format = DocumentPropertyFormat.fromString(schema.format ?? '');
     final title = schema.title ?? '';
+    final icon = schema.icon;
     final description = schema.description;
     final descriptionMarkdown =
         description != null ? MarkdownData(description) : null;
@@ -74,6 +75,7 @@ final class DocumentObjectSchemaMapper {
           properties: mappedProperties,
           oneOf: mappedOneOf,
           order: mappedOrder,
+          icon: icon,
         );
 
       case _DocumentObjectDefinition.section:
