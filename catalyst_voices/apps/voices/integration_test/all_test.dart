@@ -5,7 +5,8 @@ import 'package:integration_test/integration_test.dart';
 import 'suites/account_test.dart' as account_test;
 
 void main() async {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  binding.testTextInput.register();
 
   setUpAll(() async {
     await bootstrap(router: buildAppRouter());

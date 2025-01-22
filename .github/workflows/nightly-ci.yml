@@ -5,7 +5,6 @@ on:
     - cron: '0 0 * * *' # Runs every day at 00:00
   workflow_dispatch:
 
-
 permissions:
   id-token: write
   contents: write
@@ -16,63 +15,55 @@ concurrency:
   cancel-in-progress: true
 
 env:
-    AWS_REGION: eu-central-1
-    AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
-    EARTHLY_TARGET: docker
-    ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
     REPORT_EXT: .junit-report.xml
     ALLURE_REPORT_PATH: nightly-allure-report
 
 jobs:
   ci_nightly:
-    uses: input-output-hk/catalyst-ci/.github/workflows/ci.yml@master
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.0
     with:
-      aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
-      aws_role_arn: arn:aws:iam::332405224602:role/ci
-      aws_region: eu-central-1
+      forge_version: 0.10.0
       nightly: true
-    secrets:
-      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
-      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
   generate-test-reports:
     name: Generate test reports
     runs-on: ubuntu-latest
+    if: always()
+    needs: ci_nightly
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.0
         with:
-            aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-            aws_region: ${{ env.AWS_REGION }}
-            earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+          version: 0.10.0
+
+      - name: Setup CI
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.0
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst-gateway/tests/api_tests/
-            flags: --allow-privileged
-            targets: nightly-test
-            target_flags:
-            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "false"
+            command: run
+            args: ./catalyst-gateway/tests/api_tests+nightly-test
 
       - name: Get cardano wallet integration test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/wallet-automation/
-            flags: --allow-privileged
-            targets: nightly-test
-            target_flags:
-            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "false"
+            command: run
+            args: ./catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/wallet-automation+nightly-test
+
+      - name: Get schemathesis test report
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
+        if: always()
+        continue-on-error: true
+        with:
+            command: run
+            args: ./catalyst-gateway/tests/schemathesis_tests+nightly-test-fuzzer-api
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
@@ -85,7 +76,8 @@ jobs:
   generate-allure-report:
     name: Generate allure report
     runs-on: ubuntu-latest
-    needs: [generate-test-reports]
+    needs: generate-test-reports
+    if: always() && needs.generate-test-reports.result == 'success'
     steps:
       - uses: actions/checkout@v4
 
@@ -118,7 +110,7 @@ jobs:
           repository: gh-pages-dir
           branch: gh-pages
           pull_args: --rebase -X ours
-      
+
       - name: Send Slack notification
         if: ${{ always() && steps.allure.outputs.report_url }}
         uses: slackapi/slack-github-action@v2.0.0
@@ -127,5 +119,5 @@ jobs:
             {
               "text": ":rocket: *Test Report*\n<${{ steps.allure.outputs.report_url }}|Click here to view the Allure report>\n*Passed:* ${{ steps.allure.outputs.test_result_passed }}/ ${{ steps.allure.outputs.test_result_total }}\n*Failed:* ${{ steps.allure.outputs.test_result_failed }}/ ${{ steps.allure.outputs.test_result_total }}"
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger

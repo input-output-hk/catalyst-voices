@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AccountPopup extends StatelessWidget {
-  final String displayName;
+  final String initials;
   final VoidCallback? onProfileKeychainTap;
   final VoidCallback? onLockAccountTap;
 
   const AccountPopup({
     super.key,
-    required this.displayName,
+    required this.initials,
     this.onProfileKeychainTap,
     this.onLockAccountTap,
   });
@@ -40,7 +40,7 @@ class AccountPopup extends StatelessWidget {
             value: null,
             key: const Key('PopUpMenuAccountHeader'),
             child: _Header(
-              displayName: displayName,
+              initials: initials,
               walletName: 'Wallet name',
               walletBalance: '₳ 1,750,000',
               accountType: 'Basis',
@@ -84,7 +84,7 @@ class AccountPopup extends StatelessWidget {
       offset: const Offset(0, kToolbarHeight),
       child: IgnorePointer(
         child: VoicesAvatar(
-          icon: Text(displayName),
+          icon: Text(initials),
         ),
       ),
     );
@@ -92,14 +92,14 @@ class AccountPopup extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  final String displayName;
+  final String initials;
   final String walletName;
   final String walletBalance;
   final String accountType;
   final ShelleyAddress walletAddress;
 
   const _Header({
-    required this.displayName,
+    required this.initials,
     required this.walletName,
     required this.walletBalance,
     required this.accountType,
@@ -115,11 +115,7 @@ class _Header extends StatelessWidget {
           child: Row(
             children: [
               VoicesAvatar(
-                icon: Text(
-                  displayName.isNotEmpty
-                      ? displayName.substring(0, 1).toUpperCase()
-                      : '',
-                ),
+                icon: Text(initials),
               ),
               Expanded(
                 child: Padding(

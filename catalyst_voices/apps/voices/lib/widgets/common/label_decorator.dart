@@ -9,6 +9,10 @@ class LabelDecorator extends StatelessWidget {
   /// An optional widget to display the note text next to the child.
   final Widget? note;
 
+  /// List of spacings to be. Index 0 is between child and next widget [label]
+  /// or [note].
+  final List<double> spacings;
+
   /// The main content of the decorator.
   final Widget child;
 
@@ -16,6 +20,7 @@ class LabelDecorator extends StatelessWidget {
     super.key,
     this.label,
     this.note,
+    this.spacings = const [4, 8],
     required this.child,
   });
 
@@ -28,24 +33,28 @@ class LabelDecorator extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Flexible(child: child),
+        child,
         if (label != null)
-          DefaultTextStyle(
-            style: (theme.textTheme.bodyLarge ?? const TextStyle())
-                .copyWith(color: theme.colors.textPrimary),
-            child: label,
+          Flexible(
+            child: DefaultTextStyle(
+              style: (theme.textTheme.bodyLarge ?? const TextStyle())
+                  .copyWith(color: theme.colors.textPrimary),
+              child: label,
+            ),
           ),
         if (note != null)
-          DefaultTextStyle(
-            style: (theme.textTheme.bodySmall ?? const TextStyle())
-                .copyWith(color: theme.colors.textOnPrimary),
-            child: note,
+          Flexible(
+            child: DefaultTextStyle(
+              style: (theme.textTheme.bodySmall ?? const TextStyle())
+                  .copyWith(color: theme.colors.textOnPrimary),
+              child: note,
+            ),
           ),
       ].expandIndexed(
         (index, element) {
           return [
-            if (index == 1) const SizedBox(width: 4),
-            if (index == 2) const SizedBox(width: 8),
+            if (index != 0)
+              SizedBox(width: spacings.elementAtOrNull(index - 1)),
             element,
           ];
         },
