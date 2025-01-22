@@ -51,6 +51,7 @@ class VoicesCheckbox extends StatelessWidget {
         child: LabelDecorator(
           label: label,
           note: note,
+          spacings: const [12, 8],
           child: Checkbox(
             value: value,
             // forcing null unwrapping because we're not allowing null value

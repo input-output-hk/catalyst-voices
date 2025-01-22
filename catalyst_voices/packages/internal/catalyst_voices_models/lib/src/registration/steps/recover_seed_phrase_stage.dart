@@ -1,5 +1,5 @@
 /// Describes the seed phrase recovery method flow.
-enum RecoverSeedPhraseStage {
+enum RecoverWithSeedPhraseStage {
   /// Provides user with brief information's about seed phrase words.
   seedPhraseInstructions,
 
@@ -19,23 +19,21 @@ enum RecoverSeedPhraseStage {
   /// Confirmation screen.
   success;
 
-  RecoverSeedPhraseStage? get next {
-    final index = RecoverSeedPhraseStage.values.indexOf(this);
-    final isLast = index == RecoverSeedPhraseStage.values.length - 1;
+  RecoverWithSeedPhraseStage? get next {
+    final isLast = this == RecoverWithSeedPhraseStage.values.last;
     if (isLast) {
       return null;
     }
 
-    return RecoverSeedPhraseStage.values[index + 1];
+    return RecoverWithSeedPhraseStage.values[index + 1];
   }
 
-  RecoverSeedPhraseStage? get previous {
-    final index = RecoverSeedPhraseStage.values.indexOf(this);
+  RecoverWithSeedPhraseStage? get previous {
     final isFirst = index == 0;
     if (isFirst) {
       return null;
     }
 
-    return RecoverSeedPhraseStage.values[index - 1];
+    return RecoverWithSeedPhraseStage.values[index - 1];
   }
 }

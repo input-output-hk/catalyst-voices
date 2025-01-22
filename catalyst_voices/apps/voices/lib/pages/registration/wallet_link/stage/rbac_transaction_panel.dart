@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
-import 'package:catalyst_voices/pages/registration/bloc_registration_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -58,7 +57,7 @@ class _BlocTransactionDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRegistrationBuilder(
+    return BlocRegistrationSelector(
       selector: (state) => state.canSubmitTx,
       builder: (context, result) {
         return switch (result) {
@@ -250,7 +249,7 @@ class _BlocTxSubmitError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRegistrationBuilder(
+    return BlocRegistrationSelector(
       selector: (state) => state.canSubmitTx,
       builder: (context, result) {
         return switch (result) {
@@ -329,7 +328,7 @@ class _BlocSubmitTxButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRegistrationBuilder<
+    return BlocRegistrationSelector<
         ({
           bool isLoading,
           bool canSubmitTx,
