@@ -88,6 +88,7 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   onErrorContainer: VoicesColors.darkOnErrorContainer,
   overlay: Color(0xA610141C),
   dropShadow: Color(0xA610141C),
+  sysColorsNeutralN60: Color(0xFF7F90B3)
 );
 
 const ColorScheme lightColorScheme = ColorScheme.light(
@@ -172,6 +173,7 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   onErrorContainer: VoicesColors.lightOnErrorContainer,
   overlay: Color(0x9904080F),
   dropShadow: Color(0x9904080F),
+  sysColorsNeutralN60: Color(0xFF7F90B3)
 );
 
 /// [ThemeData] for the `catalyst` brand.

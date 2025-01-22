@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/amount_formatter.dart';
+import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -8,24 +10,44 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CurrentCampaign extends StatelessWidget {
-  const CurrentCampaign({super.key});
+  final int allFunds;
+  final int totalAsk;
+  final Range<int> askRange;
+  const CurrentCampaign({
+    super.key,
+    required this.allFunds,
+    required this.totalAsk,
+    required this.askRange,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 120, top: 64, right: 120),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const _Header(),
-          const SizedBox(height: 32),
-          const _CurrentCampaignDetails(),
-          const SizedBox(height: 80),
-          const _SubTitle(),
-          _CampaignTimeline(mockCampaignTimeline),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 120, top: 64, right: 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const _Header(),
+              const SizedBox(height: 32),
+              _CurrentCampaignDetails(
+                allFunds: allFunds,
+                totalAsk: totalAsk,
+                askRange: askRange,
+              ),
+              const SizedBox(height: 80),
+              const _SubTitle(),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 120, top: 32),
+          child: _CampaignTimeline(mockCampaignTimeline),
+        ),
+      ],
     );
   }
 }
@@ -64,7 +86,14 @@ class _Header extends StatelessWidget {
 }
 
 class _CurrentCampaignDetails extends StatelessWidget {
-  const _CurrentCampaignDetails();
+  final int allFunds;
+  final int totalAsk;
+  final Range<int> askRange;
+  const _CurrentCampaignDetails({
+    required this.allFunds,
+    required this.totalAsk,
+    required this.askRange,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,23 +112,23 @@ class _CurrentCampaignDetails extends StatelessWidget {
         children: [
           VoicesAssets.icons.library.buildIcon(),
           const SizedBox(height: 32),
-          const Row(
+          Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _CampaignFundsDetail(
-                title: 'Campaign Treasury',
-                description: 'Total budget, including ecosystem incentives',
-                funds: 50000000,
+                title: context.l10n.campaignTreasury,
+                description: context.l10n.campaignTreasuryDescription,
+                funds: allFunds,
               ),
               _CampaignFundsDetail(
-                title: 'Current Total Ask',
-                description: 'Funds requested by all submitted projects',
-                funds: 4020000,
+                title: context.l10n.campaignTotalAsk,
+                description: context.l10n.campaignTotalAskDescription,
+                funds: totalAsk,
                 largeFundsText: false,
               ),
-              _RangeAsk(range: Range(min: 1500000, max: 30000)),
+              _RangeAsk(range: askRange),
             ],
           ),
         ],
@@ -137,7 +166,7 @@ class _CampaignFundsDetail extends StatelessWidget {
           Text(
             description,
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.voicesColors.textDisabled,
+              color: context.voicesColors.sysColorsNeutralN60,
             ),
           ),
           const SizedBox(height: 16),
@@ -185,12 +214,12 @@ class _RangeAsk extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _RangeValue(
-              title: 'Maximum Ask',
+              title: context.l10n.maximumAsk,
               value: range.max ?? 0,
             ),
             const SizedBox(height: 19),
             _RangeValue(
-              title: 'Minimum Ask',
+              title: context.l10n.minimumAsk,
               value: range.min ?? 0,
             ),
           ],
@@ -215,8 +244,18 @@ class _RangeValue extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(title),
-        Text('${const Currency.ada().symbol} $_formattedValue'),
+        Text(
+          title,
+          style: context.textTheme.titleSmall?.copyWith(
+            color: context.voicesColors.sysColorsNeutralN60,
+          ),
+        ),
+        Text(
+          '${const Currency.ada().symbol} $_formattedValue',
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.voicesColors.sysColorsNeutralN60,
+          ),
+        ),
       ],
     );
   }
@@ -225,7 +264,7 @@ class _RangeValue extends StatelessWidget {
 }
 
 class _SubTitle extends StatelessWidget {
-  const _SubTitle({super.key});
+  const _SubTitle();
 
   @override
   Widget build(BuildContext context) {
@@ -236,77 +275,157 @@ class _SubTitle extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Idea Journey',
+            context.l10n.ideaJourney,
             style: context.textTheme.headlineMedium,
           ),
           const SizedBox(height: 12),
-          Text(
-            'Ideas comes to life in Catalyst through its key stages below. For the full timeline, deadlines and latest updates, visit the fund timeline Gitbook page.',
-            style: context.textTheme.bodyLarge,
-          ),
+          MarkdownText(MarkdownData(context.l10n.ideaJourneyDescription)),
         ],
       ),
     );
   }
 }
 
-class _CampaignTimeline extends StatelessWidget {
+class _CampaignTimeline extends StatefulWidget {
   final List<CampaignTimeline> timelineItem;
+
   const _CampaignTimeline(this.timelineItem);
 
   @override
+  State<_CampaignTimeline> createState() => _CampaignTimelineState();
+}
+
+class _CampaignTimelineState extends State<_CampaignTimeline> {
+  final ScrollController _scrollController = ScrollController();
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 209,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: timelineItem.length,
-        itemBuilder: (context, index) => _CampaignTimelineCard(
-          timelineItem[index],
+      height: 300,
+      child: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          _scrollController.jumpTo(
+            _scrollController.offset - details.delta.dx,
+          );
+        },
+        //When using ListView, child were expanding
+        // in full height of the parent
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:
+                widget.timelineItem.map(_CampaignTimelineCard.new).toList(),
+          ),
         ),
-        // prototypeItem: _CampaignTimelineCard(CampaignTimeline.dummy()),
-        itemExtent: 288,
       ),
     );
   }
 }
 
-class _CampaignTimelineCard extends StatelessWidget {
+class _CampaignTimelineCard extends StatefulWidget {
   final CampaignTimeline timelineItem;
   const _CampaignTimelineCard(this.timelineItem);
 
   @override
+  State<_CampaignTimelineCard> createState() => _CampaignTimelineCardState();
+}
+
+class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
+  bool isExpanded = false;
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onTap: _toggleExpanded,
+      child: SizedBox(
+        width: 280,
+        child: Card(
+          shape: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: isOngoing ? context.colorScheme.primary : Colors.white,
+              width: isOngoing ? 2 : 1,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                VoicesAssets.icons.calendar.buildIcon(),
-                VoicesAssets.icons.chevronRight.buildIcon(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    VoicesAssets.icons.calendar.buildIcon(
+                      color: context.colorScheme.primary,
+                    ),
+                    _expandedIcon.buildIcon(
+                      color: context.colorScheme.primaryContainer,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.timelineItem.title,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: context.voicesColors.textOnPrimaryLevel1,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormatter.formatDateRange(
+                        context.l10n,
+                        widget.timelineItem.timeline,
+                      ),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.voicesColors.sysColorsNeutralN60,
+                      ),
+                    ),
+                    Offstage(
+                      offstage: !isOngoing,
+                      child: VoicesChip.round(
+                        content: Text(
+                          context.l10n.ongoing,
+                          style: context.textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        backgroundColor: context.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                AnimatedSwitcher(
+                  duration: Durations.medium4,
+                  child: isExpanded
+                      ? Text(
+                          widget.timelineItem.description,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.voicesColors.sysColorsNeutralN60,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
-            Text(
-              timelineItem.title,
-              style: context.textTheme.titleMedium,
-            ),
-            Text(
-              '${timelineItem.timeline.from?.year}-${timelineItem.timeline.to?.year}',
-            ),
-            const SizedBox(height: 8),
-            Text(
-              timelineItem.description,
-              style: context.textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  SvgGenImage get _expandedIcon => isExpanded
+      ? VoicesAssets.icons.chevronDown
+      : VoicesAssets.icons.chevronRight;
+
+  bool get isOngoing => widget.timelineItem.timeline.isTodayInRange();
+  void _toggleExpanded() {
+    setState(() {
+      isExpanded = !isExpanded;
+    });
   }
 }

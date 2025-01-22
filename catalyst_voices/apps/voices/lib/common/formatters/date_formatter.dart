@@ -95,4 +95,24 @@ abstract class DateFormatter {
 
     return '${nf.format(hours)}:${nf.format(minutes)}';
   }
+
+  static String formatDateRange(VoicesLocalizations l10n, DateRange range) {
+    final from = range.from;
+    final to = range.to;
+    if (from != null && to != null) {
+      if (range.areDatesInSameWeek()) {
+        return '${l10n.weekOf} ${DateFormat.MMMd().format(from)}';
+      }
+
+      // ignore: lines_longer_than_80_chars
+      return '${DateFormat.MMMd().format(from)} - ${DateFormat.MMMd().format(to)}';
+    }
+    if (to == null && from != null) {
+      return '${l10n.from} ${DateFormat.MMMd().format(from)}';
+    } else if (to != null && from == null) {
+      return '${l10n.to} ${DateFormat.MMMd().format(to)}';
+    }
+
+    return '';
+  }
 }

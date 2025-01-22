@@ -1319,5 +1319,17 @@
     "description": "Used in discovery page in hero section"
   },
   "currentCampaign": "Current Campaign",
-  "currentCampaignDescription": "Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas."
+  "currentCampaignDescription": "Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.",
+  "campaignTreasury": "Campaign Treasury",
+  "campaignTreasuryDescription": "Total budget, including ecosystem incentives",
+  "campaignTotalAsk": "Campaign Total Ask",
+  "campaignTotalAskDescription": "Funds requested by all submitted projects",
+  "maximumAsk": "Maximum Ask",
+  "minimumAsk": "Minimum Ask",
+  "ideaJourney": "Idea Journey",
+  "ideaJourneyDescription": "#### Ideas comes to life in Catalyst through its key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-timeline) Gitbook page.",
+  "ongoing": "Ongoing",
+  "from": "From",
+  "to": "To",
+  "weekOf": "Week of"
 }

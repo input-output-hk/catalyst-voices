@@ -15,7 +15,7 @@ class CampaignTimeline extends Equatable {
   factory CampaignTimeline.dummy() => CampaignTimeline(
         title: 'Proposal Submission',
         description:
-            '''Participants submit initial proposals for ideas to solve challenges. A set amount of ada is allocated to the new funding round.''',
+            '''Community members share ideas and insights to refine the proposals. This stage consists of two distinct parts: reviews by LV0 & LV1s reviewers, as well as moderation by LV2s moderators.''',
         timeline: DateRange(
           from: DateTime(2024, 9, 26),
           to: DateTime(2024, 10, 10),
@@ -59,8 +59,8 @@ final mockCampaignTimeline = [
     description:
         '''Votes are tallied and the results revealed. Voters and community reviewers receive their rewards.''',
     timeline: DateRange(
-      from: DateTime(2025, 2, 1),
-      to: DateTime(2025, 2, 18),
+      from: DateTime(2025, 2, 3),
+      to: DateTime(2025, 2, 9),
     ),
   ),
   CampaignTimeline(
@@ -69,7 +69,7 @@ final mockCampaignTimeline = [
         '''Votes are tallied and the results revealed. Voters and community reviewers receive their rewards.''',
     timeline: DateRange(
       from: DateTime(2025, 2, 19),
-      to: DateTime(2025, 3, 18),
+      to: null,
     ),
   ),
 ];
