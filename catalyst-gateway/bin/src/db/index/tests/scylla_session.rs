@@ -7,3 +7,11 @@ use super::*;
 async fn test_session() {
     get_shared_session().await.unwrap();
 }
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn test_migrate_schema() {}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn test_prepare_queires() {}

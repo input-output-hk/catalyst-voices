@@ -12,6 +12,7 @@ use scylla::{
     frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
     ExecutionProfile, Session, SessionBuilder,
 };
+use thiserror::Error;
 use tokio::fs;
 use tracing::{error, info};
 
@@ -49,6 +50,20 @@ pub(crate) enum TlsChoice {
     Unverified,
 }
 
+#[derive(Debug, Error)]
+pub(crate) enum CassandraSessionError {
+    #[error("Creating session failed")]
+    CreatingSessionFailed,
+    #[error("Schema migration failed")]
+    SchemaMigrationFailed,
+    #[error("Preparing queries failed")]
+    PreparingQuriesFailed,
+    #[error("Preparing purge queries failed")]
+    PreparingPurgeQuriesFailed,
+    #[error("Session already set")]
+    SessionAlreadySet,
+}
+
 /// All interaction with cassandra goes through this struct.
 #[derive(Clone)]
 pub(crate) struct CassandraSession {
@@ -64,6 +79,9 @@ pub(crate) struct CassandraSession {
     /// All prepared purge queries we can use on this session.
     purge_queries: Arc<purge::PreparedQueries>,
 }
+
+/// Session error while initialization.
+static SESSION_ERR: OnceLock<Arc<CassandraSessionError>> = OnceLock::new();
 
 /// Persistent DB Session.
 static PERSISTENT_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
@@ -97,6 +115,20 @@ impl CassandraSession {
             tokio::time::sleep(interval).await;
         }
     }
+
+    /// Wait for the Cassandra Indexing DB to be ready or error before continuing
+    // pub(crate) async fn wait_is_ready_or_error(interval: Duration) -> Result<(),
+    // Arc<CassandraSessionError>> {     loop {
+    //         if let Some(err) = SESSION_ERR.get() {
+    //             return Err(err.clone());
+    //         }
+    //         if Self::is_ready() {
+    //             return Ok(());
+    //         }
+
+    //         tokio::time::sleep(interval).await;
+    //     }
+    // }
 
     /// Get the session needed to perform a query.
     pub(crate) fn get(persistent: bool) -> Option<Arc<CassandraSession>> {
@@ -298,6 +330,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                     error = error,
                     "Failed to Create Cassandra DB Session"
                 );
+                drop(SESSION_ERR.set(Arc::new(CassandraSessionError::CreatingSessionFailed)));
                 continue;
             },
         };
@@ -310,6 +343,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                 error = error,
                 "Failed to Create Cassandra DB Schema"
             );
+            drop(SESSION_ERR.set(Arc::new(CassandraSessionError::SchemaMigrationFailed)));
             continue;
         }
 
@@ -321,6 +355,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                     error = %error,
                     "Failed to Create Cassandra Prepared Queries"
                 );
+                drop(SESSION_ERR.set(Arc::new(CassandraSessionError::PreparingQuriesFailed)));
                 continue;
             },
         };
@@ -334,6 +369,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                     error = %error,
                     "Failed to Create Cassandra Prepared Purge Queries"
                 );
+                drop(SESSION_ERR.set(Arc::new(CassandraSessionError::PreparingPurgeQuriesFailed)));
                 continue;
             },
         };
@@ -350,9 +386,11 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         if persistent {
             if PERSISTENT_SESSION.set(Arc::new(cassandra_session)).is_err() {
                 error!("Persistent Session already set.  This should not happen.");
+                drop(SESSION_ERR.set(Arc::new(CassandraSessionError::SessionAlreadySet)));
             };
         } else if VOLATILE_SESSION.set(Arc::new(cassandra_session)).is_err() {
             error!("Volatile Session already set.  This should not happen.");
+            drop(SESSION_ERR.set(Arc::new(CassandraSessionError::SessionAlreadySet)));
         };
 
         // IF we get here, then everything seems to have worked, so finish init.
