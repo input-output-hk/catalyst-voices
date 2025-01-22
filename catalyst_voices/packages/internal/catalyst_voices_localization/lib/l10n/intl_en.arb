@@ -525,7 +525,7 @@
   "@walletLinkTransactionAccountCompletion": {
     "description": "A subtitle in link wallet flow on transaction screen."
   },
-  "walletLinkTransactionLinkItem": "1 Link {wallet} to Catalyst Keychain",
+  "walletLinkTransactionLinkItem": "1 {wallet} wallet",
   "@walletLinkTransactionLinkItem": {
     "description": "An item in the transaction summary for the wallet link.",
     "placeholders": {
@@ -558,7 +558,7 @@
   "@walletLinkTransactionChangeRoles": {
     "description": "The secondary button label to change the roles on transaction summary screen."
   },
-  "walletLinkTransactionRoleItem": "1 {role} registration to Catalyst Keychain",
+  "walletLinkTransactionRoleItem": "1 {role} registration",
   "@walletLinkTransactionRoleItem": {
     "description": "An item in the transaction summary for the role registration",
     "placeholders": {
