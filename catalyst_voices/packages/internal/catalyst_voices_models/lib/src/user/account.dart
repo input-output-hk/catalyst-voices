@@ -6,6 +6,8 @@ import 'package:equatable/equatable.dart';
 /// Defines singular account used by [User] (physical person).
 /// One [User] may have multiple [Account]'s.
 final class Account extends Equatable {
+  final String displayName;
+  final String email;
   final Keychain keychain;
   final Set<AccountRole> roles;
   final WalletInfo walletInfo;
@@ -26,6 +28,8 @@ final class Account extends Equatable {
   );
 
   const Account({
+    required this.displayName,
+    required this.email,
     required this.keychain,
     required this.roles,
     required this.walletInfo,
@@ -38,6 +42,8 @@ final class Account extends Equatable {
     bool isActive = false,
   }) {
     return Account(
+      displayName: 'Dummy',
+      email: 'dummy@iohk.com',
       keychain: keychain,
       roles: const {
         AccountRole.voter,
@@ -60,14 +66,13 @@ final class Account extends Equatable {
 
   String get id => keychain.id;
 
-  // Note. this is not defined yet what we will show here.
-  String get acronym => 'A';
-
   bool get isAdmin => true;
 
   bool get isDummy => keychain.id == dummyKeychainId;
 
   Account copyWith({
+    String? displayName,
+    String? email,
     Keychain? keychain,
     Set<AccountRole>? roles,
     WalletInfo? walletInfo,
@@ -75,6 +80,8 @@ final class Account extends Equatable {
     bool? isProvisional,
   }) {
     return Account(
+      displayName: displayName ?? this.displayName,
+      email: email ?? this.email,
       keychain: keychain ?? this.keychain,
       roles: roles ?? this.roles,
       walletInfo: walletInfo ?? this.walletInfo,
@@ -85,6 +92,8 @@ final class Account extends Equatable {
 
   @override
   List<Object?> get props => [
+        displayName,
+        email,
         keychain.id,
         roles,
         walletInfo,

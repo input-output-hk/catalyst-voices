@@ -24,11 +24,14 @@ class BulletList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         for (final item in items)
           _BulletItem(
             text: item,
-            style: style ?? Theme.of(context).textTheme.bodySmall,
+            style: style ??
+                Theme.of(context).textTheme.bodySmall ??
+                const TextStyle(),
           ),
       ].separatedBy(SizedBox(height: spacing)).toList(),
     );
@@ -37,11 +40,11 @@ class BulletList extends StatelessWidget {
 
 class _BulletItem extends StatelessWidget {
   final String text;
-  final TextStyle? style;
+  final TextStyle style;
 
   const _BulletItem({
     required this.text,
-    this.style,
+    required this.style,
   });
 
   @override
@@ -54,9 +57,9 @@ class _BulletItem extends StatelessWidget {
           style: style,
         ),
         Flexible(
-          child: Text(
-            text,
+          child: DefaultTextStyle.merge(
             style: style,
+            child: Text(text),
           ),
         ),
       ],

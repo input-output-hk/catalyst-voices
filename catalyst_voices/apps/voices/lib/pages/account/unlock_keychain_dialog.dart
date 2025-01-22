@@ -154,6 +154,7 @@ class _UnlockPassword extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesPasswordTextField(
+      key: const Key('UnlockPasswordTextField'),
       controller: controller,
       autofocus: true,
       decoration: VoicesTextFieldDecoration(
@@ -181,6 +182,7 @@ class _Navigation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         VoicesFilledButton(
+          key: const Key('UnlockConfirmPasswordButton'),
           onTap: onUnlock,
           child: Text(context.l10n.confirmPassword),
         ),
@@ -189,6 +191,7 @@ class _Navigation extends StatelessWidget {
           children: [
             Expanded(
               child: VoicesOutlinedButton(
+                key: const Key('UnlockRecoverButton'),
                 onTap: onRecover,
                 child: Text(context.l10n.recoverAccount),
               ),
@@ -196,6 +199,7 @@ class _Navigation extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: VoicesTextButton(
+                key: const Key('UnlockContinueAsGuestButton'),
                 onTap: () => Navigator.of(context).pop(),
                 child: Text(context.l10n.continueAsGuest),
               ),
