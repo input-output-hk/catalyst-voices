@@ -106,29 +106,23 @@ impl CassandraSession {
     }
 
     /// Wait for the Cassandra Indexing DB to be ready before continuing
-    pub(crate) async fn wait_is_ready(interval: Duration) {
+    pub(crate) async fn wait_until_ready(
+        interval: Duration, ignore_err: bool,
+    ) -> Result<(), Arc<CassandraSessionError>> {
         loop {
+            if !ignore_err {
+                if let Some(err) = SESSION_ERR.get() {
+                    return Err(err.clone());
+                }
+            }
+
             if Self::is_ready() {
-                break;
+                return Ok(());
             }
 
             tokio::time::sleep(interval).await;
         }
     }
-
-    /// Wait for the Cassandra Indexing DB to be ready or error before continuing
-    // pub(crate) async fn wait_is_ready_or_error(interval: Duration) -> Result<(),
-    // Arc<CassandraSessionError>> {     loop {
-    //         if let Some(err) = SESSION_ERR.get() {
-    //             return Err(err.clone());
-    //         }
-    //         if Self::is_ready() {
-    //             return Ok(());
-    //         }
-
-    //         tokio::time::sleep(interval).await;
-    //     }
-    // }
 
     /// Get the session needed to perform a query.
     pub(crate) fn get(persistent: bool) -> Option<Arc<CassandraSession>> {
