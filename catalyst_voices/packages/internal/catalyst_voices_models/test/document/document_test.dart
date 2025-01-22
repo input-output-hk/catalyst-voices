@@ -179,7 +179,7 @@ void main() {
       });
     });
 
-    group('getProperty', () {
+    group(('getProperty()', () {
       final titleProperty = DocumentValueProperty(
         schema: DocumentGenericStringSchema.optional(
           nodeId: DocumentNodeId.root.child('setup').child('items').child('0'),
