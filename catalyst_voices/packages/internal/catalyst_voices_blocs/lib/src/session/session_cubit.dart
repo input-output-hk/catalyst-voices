@@ -9,7 +9,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-bool _alwaysAllowRegistration = false;
+bool _alwaysAllowRegistration = kDebugMode;
 
 @visibleForTesting
 // ignore: avoid_positional_boolean_parameters

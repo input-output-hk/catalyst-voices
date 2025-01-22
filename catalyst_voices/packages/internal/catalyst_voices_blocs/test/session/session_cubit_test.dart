@@ -25,6 +25,8 @@ void main() {
   late SessionCubit sessionCubit;
 
   setUpAll(() {
+    alwaysAllowRegistration = false;
+
     FlutterSecureStorage.setMockInitialValues({});
 
     final store = InMemorySharedPreferencesAsync.empty();

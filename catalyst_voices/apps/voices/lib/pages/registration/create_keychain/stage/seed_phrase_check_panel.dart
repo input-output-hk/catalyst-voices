@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/upload_seed_phrase_confirmation_dialog.dart';
 import 'package:catalyst_voices/pages/registration/upload_seed_phrase_dialog.dart';
@@ -90,7 +89,7 @@ class _BlocLoadable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.isLoading,
       builder: (context, state) {
         return VoicesLoadable(
@@ -115,7 +114,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<
+    return BlocSeedPhraseSelector<
         ({
           List<SeedPhraseWord> shuffledWords,
           List<SeedPhraseWord> words,
@@ -184,7 +183,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
