@@ -65,7 +65,6 @@ class _GuestVisitorBody extends StatelessWidget {
   }
 }
 
-
 class _CampaignHeroSection extends StatelessWidget {
   const _CampaignHeroSection();
 
