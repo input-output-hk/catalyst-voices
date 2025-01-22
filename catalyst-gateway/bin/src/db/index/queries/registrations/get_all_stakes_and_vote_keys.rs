@@ -42,9 +42,11 @@ impl GetAllStakesAndVoteKeysQuery {
         )
         .await;
 
-        get_all_stake_and_vote_keys.inspect_err(
-            |error| error!(error=%error, "Failed to prepare get all (stake addrs, vote_keys)"),
-        )
+        get_all_stake_and_vote_keys
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare get all (stake addrs, vote_keys)"),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_ALL_STAKES_AND_VOTE_KEYS}"))
     }
 
     /// Executes get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)]

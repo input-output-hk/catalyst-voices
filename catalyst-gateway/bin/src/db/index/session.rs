@@ -52,14 +52,14 @@ pub(crate) enum TlsChoice {
 
 #[derive(Debug, Error)]
 pub(crate) enum CassandraSessionError {
-    #[error("Creating session failed")]
-    CreatingSessionFailed,
-    #[error("Schema migration failed")]
-    SchemaMigrationFailed,
-    #[error("Preparing queries failed")]
-    PreparingQuriesFailed,
-    #[error("Preparing purge queries failed")]
-    PreparingPurgeQuriesFailed,
+    #[error("Creating session failed: {source}")]
+    CreatingSessionFailed { source: anyhow::Error },
+    #[error("Schema migration failed: {source}")]
+    SchemaMigrationFailed { source: anyhow::Error },
+    #[error("Preparing queries failed: {source}")]
+    PreparingQuriesFailed { source: anyhow::Error },
+    #[error("Preparing purge queries failed: {source}")]
+    PreparingPurgeQuriesFailed { source: anyhow::Error },
     #[error("Session already set")]
     SessionAlreadySet,
 }
@@ -318,26 +318,32 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
         let session = match make_session(&cfg).await {
             Ok(session) => session,
             Err(error) => {
-                let error = format!("{error:?}");
                 error!(
                     db_type = db_type,
-                    error = error,
+                    error = format!("{error:?}"),
                     "Failed to Create Cassandra DB Session"
                 );
-                drop(SESSION_ERR.set(Arc::new(CassandraSessionError::CreatingSessionFailed)));
+                drop(
+                    SESSION_ERR.set(Arc::new(CassandraSessionError::CreatingSessionFailed {
+                        source: error,
+                    })),
+                );
                 continue;
             },
         };
 
         // Set up the Schema for it.
         if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
-            let error = format!("{error:?}");
             error!(
                 db_type = db_type,
-                error = error,
+                error = format!("{error:?}"),
                 "Failed to Create Cassandra DB Schema"
             );
-            drop(SESSION_ERR.set(Arc::new(CassandraSessionError::SchemaMigrationFailed)));
+            drop(
+                SESSION_ERR.set(Arc::new(CassandraSessionError::SchemaMigrationFailed {
+                    source: error,
+                })),
+            );
             continue;
         }
 
@@ -349,7 +355,11 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                     error = %error,
                     "Failed to Create Cassandra Prepared Queries"
                 );
-                drop(SESSION_ERR.set(Arc::new(CassandraSessionError::PreparingQuriesFailed)));
+                drop(
+                    SESSION_ERR.set(Arc::new(CassandraSessionError::PreparingQuriesFailed {
+                        source: error,
+                    })),
+                );
                 continue;
             },
         };
@@ -363,7 +373,9 @@ async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
                     error = %error,
                     "Failed to Create Cassandra Prepared Purge Queries"
                 );
-                drop(SESSION_ERR.set(Arc::new(CassandraSessionError::PreparingPurgeQuriesFailed)));
+                drop(SESSION_ERR.set(Arc::new(
+                    CassandraSessionError::PreparingPurgeQuriesFailed { source: error },
+                )));
                 continue;
             },
         };

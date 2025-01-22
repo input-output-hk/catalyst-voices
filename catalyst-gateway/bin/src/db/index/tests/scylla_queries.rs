@@ -32,8 +32,7 @@ async fn test_get_assets_by_stake_addr() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -49,8 +48,7 @@ async fn test_get_chain_root() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -67,8 +65,7 @@ async fn test_get_invalid_registration_w_stake_addr() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -85,8 +82,7 @@ async fn test_get_registrations_by_chain_root() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -102,8 +98,7 @@ async fn test_get_registrations_w_stake_addr() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -119,8 +114,7 @@ async fn test_get_role0_key_chain_root() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -135,8 +129,7 @@ async fn test_get_stake_addr_w_stake_key_hash() {
             .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -153,8 +146,7 @@ async fn test_get_stake_addr_w_vote_key() {
         .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -179,8 +171,7 @@ async fn test_get_txi_by_txn_hashes() {
             .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 
@@ -197,8 +188,7 @@ async fn test_get_txo_by_stake_address() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        let row = row_res.unwrap();
-        drop(row);
+        drop(row_res.unwrap());
     }
 }
 

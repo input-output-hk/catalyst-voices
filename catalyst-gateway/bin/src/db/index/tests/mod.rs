@@ -18,7 +18,7 @@ async fn setup_test_database() -> Result<(), String> {
     if let Err(err) =
         CassandraSession::wait_until_ready(core::time::Duration::from_secs(1), false).await
     {
-        return Err(format!("{:?}", err));
+        return Err(format!("{err}"));
     }
 
     if !CassandraSession::is_ready() {
@@ -43,7 +43,7 @@ async fn get_shared_session() -> Result<(Arc<CassandraSession>, Arc<CassandraSes
     SHARED_SESSION.get_or_init(setup_test_database).await;
 
     if let Some(Err(err)) = SHARED_SESSION.get() {
-        println!("{:?}", err);
+        println!("{err}");
         process::exit(1);
     }
 
