@@ -1,6 +1,4 @@
-import 'package:catalyst_voices_models/src/document/document.dart';
-import 'package:catalyst_voices_models/src/document/document_node_id.dart';
-import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -178,6 +176,92 @@ void main() {
         );
 
         expect(property.isValid, isFalse);
+      });
+    });
+
+    group('getProperty', () {
+      final titleProperty = DocumentValueProperty(
+        schema: DocumentGenericStringSchema.optional(
+          nodeId: DocumentNodeId.root.child('setup').child('items').child('0'),
+        ),
+        value: 'Test title',
+        validationResult: const SuccessfulDocumentValidation(),
+      );
+
+      final listProperty = DocumentListProperty(
+        schema: DocumentGenericListSchema.optional(
+          nodeId: DocumentNodeId.root.child('setup').child('items'),
+        ),
+        properties: [titleProperty],
+        validationResult: const SuccessfulDocumentValidation(),
+      );
+
+      final objectProperty = DocumentObjectProperty(
+        schema: DocumentGenericObjectSchema.optional(
+          nodeId: DocumentNodeId.root.child('setup'),
+        ),
+        properties: [listProperty],
+        validationResult: const SuccessfulDocumentValidation(),
+      );
+
+      final document = Document(
+        schemaUrl: '',
+        schema: const DocumentSchema.optional(),
+        properties: [
+          objectProperty,
+        ],
+      );
+
+      test('top level property is found', () {
+        final nodeId = DocumentNodeId.root.child('setup');
+
+        expect(
+          document.getProperty(nodeId),
+          isA<DocumentObjectProperty>(),
+        );
+      });
+
+      test('property nested in object is found', () {
+        final nodeId = DocumentNodeId.root.child('setup').child('items');
+        expect(
+          document.getProperty(nodeId),
+          isA<DocumentListProperty>(),
+        );
+      });
+
+      test('property nested in list is found', () {
+        final nodeId =
+            DocumentNodeId.root.child('setup').child('items').child('0');
+        expect(
+          document.getProperty(nodeId),
+          isA<DocumentValueProperty>(),
+        );
+      });
+
+      test('not existing top-level property is not found', () {
+        final nodeId = DocumentNodeId.root.child('not-existing');
+
+        expect(
+          document.getProperty(nodeId),
+          isNull,
+        );
+      });
+
+      test('not existing object property is not found', () {
+        final nodeId = DocumentNodeId.root.child('setup').child('not-existing');
+        expect(
+          document.getProperty(nodeId),
+          isNull,
+        );
+      });
+
+      test('not existing list property is not found', () {
+        final nodeId =
+            DocumentNodeId.root.child('setup').child('items').child('1');
+        expect(
+          document.getProperty(nodeId),
+          isNull,
+        );
       });
     });
   });
