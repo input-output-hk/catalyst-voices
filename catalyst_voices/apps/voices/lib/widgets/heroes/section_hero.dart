@@ -23,7 +23,7 @@ class HeroSection extends StatefulWidget {
 
 class _HeroSectionState extends State<HeroSection>
     with AutomaticKeepAliveClientMixin {
-  late final VideoPlayerController _controller;
+  late VideoPlayerController _controller;
 
   @override
   bool get wantKeepAlive => true;
@@ -35,6 +35,20 @@ class _HeroSectionState extends State<HeroSection>
       widget.asset,
       package: widget.assetPackageName,
     );
+  }
+
+  @override
+  Future<void> didUpdateWidget(covariant HeroSection oldWidget) async {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.asset != widget.asset ||
+        oldWidget.assetPackageName != widget.assetPackageName) {
+      await _controller.dispose();
+      _controller = VideoPlayerController.asset(
+        widget.asset,
+        package: widget.assetPackageName,
+      );
+    }
   }
 
   @override
