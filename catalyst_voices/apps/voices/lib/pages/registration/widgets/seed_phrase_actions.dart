@@ -3,12 +3,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhraseActions extends StatelessWidget {
-  final VoidCallback? onUploadKeyTap;
+  final VoidCallback? onImportKeyTap;
   final VoidCallback? onResetTap;
 
   const SeedPhraseActions({
     super.key,
-    this.onUploadKeyTap,
+    this.onImportKeyTap,
     this.onResetTap,
   });
 
@@ -18,8 +18,8 @@ class SeedPhraseActions extends StatelessWidget {
       children: [
         VoicesTextButton(
           key: const Key('UploadKeyButton'),
-          onTap: onUploadKeyTap,
-          child: Text(context.l10n.uploadCatalystKey),
+          onTap: onImportKeyTap,
+          child: Text(context.l10n.importCatalystKey),
         ),
         const Spacer(),
         if (onResetTap != null)

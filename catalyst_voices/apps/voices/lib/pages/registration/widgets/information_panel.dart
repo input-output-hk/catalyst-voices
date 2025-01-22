@@ -104,7 +104,7 @@ class _Footer extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Visibility.maintain(
-          visible: progress != null,
+          visible: progress != null || progress == 0.0,
           child: AnimatedVoicesLinearProgressIndicator(
             key: const Key('ProgressBar'),
             value: progress ?? 0,
