@@ -80,6 +80,7 @@ class _BlocWalletSummary extends StatelessWidget {
       builder: (context, state) {
         if (state != null) {
           return WalletSummary(
+            walletName: state.walletName,
             balance: state.balance,
             address: state.address,
             clipboardAddress: state.clipboardAddress,
@@ -132,8 +133,10 @@ class _RegistrationTextBackNextNavigation extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        VoicesNextButton(
+        VoicesFilledButton(
           onTap: () => RegistrationCubit.of(context).nextStep(),
+          leading: VoicesAssets.icons.users.buildIcon(),
+          child: Text(context.l10n.walletLinkRolesSubheader),
         ),
         const SizedBox(height: 10),
         VoicesOutlinedButton(

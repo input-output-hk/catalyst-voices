@@ -617,6 +617,7 @@
   "@walletLinkRoleSummaryContent3": {
     "description": "The last part of the message on the role summary screen in registration."
   },
+  "nameOfWallet": "Name of the wallet",
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."

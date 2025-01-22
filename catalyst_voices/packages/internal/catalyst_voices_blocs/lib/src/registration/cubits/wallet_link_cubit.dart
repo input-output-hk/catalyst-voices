@@ -83,6 +83,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
         isConnected: true,
       );
       final walletSummary = WalletSummaryData(
+        walletName: walletInfo.metadata.name,
         balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
         address: WalletAddressFormatter.formatShort(walletInfo.address),
         clipboardAddress: walletInfo.address.toBech32(),
