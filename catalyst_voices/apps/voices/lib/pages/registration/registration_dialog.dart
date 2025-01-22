@@ -45,7 +45,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     final step = widget.step;
     if (step != null) {
       _cubit.goToStep(step);
-    } else {
+    } else if (_cubit.hasProgress) {
       _cubit.recoverProgress();
     }
   }
