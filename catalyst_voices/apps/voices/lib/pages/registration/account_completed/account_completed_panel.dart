@@ -30,42 +30,10 @@ class AccountCompletedPanel extends StatelessWidget {
                 const _TitleText(),
                 const SizedBox(height: 10),
                 Column(
-                  children: <Widget>[
-                    _SummaryItem(
-                      image: VoicesAssets.images.registrationSummaryKeychain,
-                      title: context.l10n.registrationCompletedKeychainTitle,
-                      info: context.l10n.registrationCompletedKeychainInfo,
-                    ),
-                    BlocSelector<RegistrationCubit, RegistrationState, String>(
-                      selector: (state) {
-                        final wallet = state.walletLinkStateData.selectedWallet;
-                        final name = wallet?.metadata.name ?? '';
-                        return name.capitalize();
-                      },
-                      builder: (context, walletName) {
-                        return _SummaryItem(
-                          image: VoicesAssets.images.registrationSummaryWallet,
-                          title: context.l10n
-                              .registrationCompletedWalletTitle(walletName),
-                          info: context.l10n
-                              .registrationCompletedWalletInfo(walletName),
-                        );
-                      },
-                    ),
-                    BlocSelector<RegistrationCubit, RegistrationState,
-                        List<AccountRole>>(
-                      selector: (state) =>
-                          state.walletLinkStateData.selectedRoles?.toList() ??
-                          state.walletLinkStateData.defaultRoles.toList(),
-                      builder: (context, roles) {
-                        return _SummaryItem(
-                          image: VoicesAssets.images.registrationSummaryRoles,
-                          title: context.l10n.registrationCompletedRolesTitle,
-                          info: context.l10n.registrationCompletedRolesInfo,
-                          footer: _RolesFooter(roles),
-                        );
-                      },
-                    ),
+                  children: const <Widget>[
+                    _CatalystKeychainCreatedCard(),
+                    _WalletConnectedCardSelector(),
+                    _RolesSelectedCardSelector(),
                   ].separatedBy(const SizedBox(height: 10)).toList(),
                 ),
               ],
@@ -92,6 +60,98 @@ class AccountCompletedPanel extends StatelessWidget {
   }
 }
 
+class _CatalystKeychainCreatedCard extends StatelessWidget {
+  const _CatalystKeychainCreatedCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionCard(
+      icon: VoicesAssets.icons.key.buildIcon(),
+      title: Text(context.l10n.registrationCompletedKeychainTitle),
+      desc: Text(context.l10n.registrationCompletedKeychainInfo),
+      statusIcon: VoicesAssets.icons.check.buildIcon(),
+    );
+  }
+}
+
+class _WalletConnectedCardSelector extends StatelessWidget {
+  const _WalletConnectedCardSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<RegistrationCubit, RegistrationState, String>(
+      selector: (state) {
+        final wallet = state.walletLinkStateData.selectedWallet;
+        final name = wallet?.metadata.name ?? '';
+        return name.capitalize();
+      },
+      builder: (context, walletName) {
+        return _WalletConnectedCard(walletName: walletName);
+      },
+    );
+  }
+}
+
+class _WalletConnectedCard extends StatelessWidget {
+  final String walletName;
+
+  const _WalletConnectedCard({
+    required this.walletName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionCard(
+      icon: VoicesAssets.icons.wallet.buildIcon(),
+      title: Text(
+        context.l10n.registrationCompletedWalletTitle(walletName),
+      ),
+      desc: Text(
+        context.l10n.registrationCompletedWalletInfo(walletName),
+      ),
+      statusIcon: VoicesAssets.icons.check.buildIcon(),
+    );
+  }
+}
+
+class _RolesSelectedCardSelector extends StatelessWidget {
+  const _RolesSelectedCardSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<RegistrationCubit, RegistrationState,
+        List<AccountRole>>(
+      selector: (state) {
+        return state.walletLinkStateData.selectedRoles?.toList() ??
+            state.walletLinkStateData.defaultRoles.toList();
+      },
+      builder: (context, roles) {
+        return _RolesSelectedCard(roles: roles);
+      },
+    );
+  }
+}
+
+class _RolesSelectedCard extends StatelessWidget {
+  final List<AccountRole> roles;
+
+  const _RolesSelectedCard({
+    required this.roles,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionCard(
+      icon: VoicesAssets.icons.summary.buildIcon(),
+      title: Text(context.l10n.registrationCompletedRolesTitle),
+      desc: Text(context.l10n.registrationCompletedRolesInfo),
+      statusIcon: VoicesAssets.icons.check.buildIcon(),
+      isExpanded: true,
+      body: _RolesFooter(roles),
+    );
+  }
+}
+
 class _RolesFooter extends StatelessWidget {
   final List<AccountRole> roles;
 
@@ -101,6 +161,7 @@ class _RolesFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         ...roles.map(
           (role) => Row(
@@ -141,80 +202,6 @@ class _RolesFooter extends StatelessWidget {
             const SizedBox(height: 6),
           )
           .toList(),
-    );
-  }
-}
-
-class _SummaryItem extends StatelessWidget {
-  final AssetGenImage image;
-  final String title;
-  final String info;
-  final Widget? footer;
-
-  const _SummaryItem({
-    required this.image,
-    required this.title,
-    required this.info,
-    this.footer,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CatalystImage.asset(
-                image.path,
-                width: 52,
-                height: 52,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    Text(
-                      info,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              VoicesAvatar(
-                icon: VoicesAssets.icons.check.buildIcon(),
-                radius: 14,
-                padding: EdgeInsets.zero,
-                foregroundColor: Theme.of(context).colors.iconsPrimary,
-                backgroundColor:
-                    Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-              ),
-            ],
-          ),
-          if (footer != null) ...[
-            const VoicesDivider(
-              indent: 70,
-              endIndent: 0,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 70),
-              child: footer,
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
