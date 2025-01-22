@@ -167,6 +167,7 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
         if let Some(ver) = value.ver {
             db_filter = db_filter.with_ver(ver.0.try_into()?);
         }
+        // TODO process also the rest of the fields like `ref`, `template` etc.
         Ok(db_filter)
     }
 }

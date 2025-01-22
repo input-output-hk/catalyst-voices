@@ -57,6 +57,7 @@ pub(crate) async fn endpoint(
         Ok(docs) => {
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
                 docs: docs.into_iter().map(IndexedDocumentDocumented).collect(),
+                // TODO implement proper `page` field instantiation
                 page: None,
             })))
             .into()
@@ -89,6 +90,8 @@ async fn fetch_docs(
                     Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
                         ver: doc.ver().to_string().try_into()?,
                         doc_type: doc.doc_type().to_string().try_into()?,
+                        // TODO get all necessary metadata fields from the document and fill these
+                        // fields
                         doc_ref: None,
                         reply: None,
                         template: None,
