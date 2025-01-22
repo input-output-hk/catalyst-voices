@@ -30,6 +30,9 @@ class _ExportCatalystKeyConfirmDialogState
     super.initState();
 
     _recognizer = TapGestureRecognizer();
+    _recognizer.onTap = () {
+      // TODO(damian-molinski): open url when available
+    };
   }
 
   @override
