@@ -476,11 +476,11 @@
   "@walletLinkTransactionSubheader": {
     "description": "A subheader in link wallet flow in registration for RBAC transaction."
   },
-  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.",
+  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles \u2028to you Catalyst Keychain.",
   "@walletLinkIntroTitle": {
     "description": "A title in link wallet flow on intro screen."
   },
-  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup.\n\nWe're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe'll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.",
+  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup. \u2028\u2028We're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.  \u2028\u2028We'll start with your Voter/Commenter Key by default. You can decide to add a Proposer Key if you want.",
   "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
   },
@@ -1032,6 +1032,10 @@
     "description": "Error message for the date picker when the selected day is greater than the maximum days for the selected month."
   },
   "saveBeforeEditingErrorText": "Please save before editing something else",
+  "errorWalletLinkInvalidRequest": "Wallet authorisation invalid request",
+  "errorWalletLinkInternalError": "Wallet authorisation internal error",
+  "errorWalletLinkRefused": "Wallet authorisation failed",
+  "errorWalletLinkAccountChange": "Wallet account change",
   "mandatoryGuidanceType": "Mandatory",
   "@mandatoryGuidanceType": {
     "description": "Guidance type label for mandatory guidance"

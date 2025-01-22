@@ -101,6 +101,27 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       emit(newState);
 
       return true;
+    } on WalletApiException catch (error, stackTrace) {
+      _logger.log(
+        error.code != WalletApiErrorCode.refused ? Level.SEVERE : Level.FINER,
+        'select wallet',
+        error,
+        stackTrace,
+      );
+
+      _selectedWallet = null;
+
+      emit(
+        state.copyWith(
+          selectedWallet: const Optional.empty(),
+          walletConnection: const Optional.empty(),
+          walletSummary: const Optional.empty(),
+        ),
+      );
+
+      emitError(LocalizedWalletLinkException(code: error.code));
+
+      return false;
     } catch (error, stackTrace) {
       _logger.severe('selectWallet', error, stackTrace);
 
