@@ -20,7 +20,14 @@
 
 -- Cleanup if we already ran this before.
 DROP DATABASE IF EXISTS :"dbName"; -- noqa: PRS
-DROP USER IF EXISTS :"dbUser"; -- noqa: PRS
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'gateway') THEN
+        ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM gateway;
+        DROP ROLE gateway;
+    END IF;
+END;
+$$;
 
 -- Create the test user we will use with the local dev database.
 CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw'; -- noqa: PRS
@@ -29,8 +36,6 @@ CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw'; -- noqa: PRS
 ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO public;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO :"dbUser"; -- noqa: PRS
-
-GRANT EXECUTE ON FUNCTION PG_READ_FILE(TEXT, BIGINT, BIGINT, BOOLEAN) TO :"dbUser"; -- noqa: PRS
 
 -- Create the database.
 CREATE DATABASE :"dbName" WITH OWNER :"dbUser"; -- noqa: PRS

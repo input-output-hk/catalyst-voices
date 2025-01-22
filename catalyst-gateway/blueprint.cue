@@ -14,7 +14,7 @@ project: {
 		environment: "dev"
 		modules: main: {
 			name:    "app"
-			version: "0.2.2"
+			version: "0.3.0"
 			values: {
 				deployment: {
 					containers: gateway: {
@@ -76,6 +76,12 @@ project: {
 									key:  "cassandra-persistent-deployment"
 								}
 							}
+							"EVENT_DB_URL": {
+								secret: {
+									name: "db-url"
+									key:  "url"
+								}
+							}
 						}
 
 						port: 3030
@@ -124,16 +130,14 @@ project: {
 					env: {
 						DB_HOST: {
 							secret: {
-								name:     "eventdb-root-creds"
-								key:      "host"
-								existing: true
+								name: "db"
+								key:  "host"
 							}
 						}
 						DB_PORT: {
 							secret: {
-								name:     "eventdb-root-creds"
-								key:      "port"
-								existing: true
+								name: "db"
+								key:  "port"
 							}
 						}
 						DB_NAME: {
@@ -144,16 +148,14 @@ project: {
 						}
 						DB_SUPERUSER: {
 							secret: {
-								name:     "eventdb-root-creds"
-								key:      "username"
-								existing: true
+								name: "db-root"
+								key:  "username"
 							}
 						}
 						DB_SUPERUSER_PASSWORD: {
 							secret: {
-								name:     "eventdb-root-creds"
-								key:      "password"
-								existing: true
+								name: "db-root"
+								key:  "password"
 							}
 						}
 						DB_USER: {
@@ -182,6 +184,13 @@ project: {
 				secrets: {
 					db: {
 						ref: "db/gateway"
+					}
+					"db-root": {
+						ref: "db/root_account"
+					}
+					"db-url": {
+						ref: "db/gateway"
+						template: url: "postgres://{{ .username }}:{{ .password }}@{{ .host }}:{{ .port }}/gateway"
 					}
 					gateway: {
 						ref: "gateway"
