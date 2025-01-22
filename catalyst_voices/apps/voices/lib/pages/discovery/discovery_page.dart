@@ -67,8 +67,7 @@ class _GuestVisitorBody extends StatelessWidget {
 }
 
 class _CampaignHeroSection extends StatelessWidget {
-  const _CampaignHeroSection();
-
+  const _CampaignHeroSection()
   @override
   Widget build(BuildContext context) {
     return HeroSection(
