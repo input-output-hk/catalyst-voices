@@ -79,7 +79,7 @@ class DateRange extends Equatable {
     if (from == null || to == null) {
       return false;
     }
-    
+
     final daysDifference = from!.difference(to!).inDays;
 
     if (daysDifference.abs() < 7) {

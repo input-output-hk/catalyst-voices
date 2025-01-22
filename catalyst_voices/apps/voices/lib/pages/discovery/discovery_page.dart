@@ -6,6 +6,7 @@ import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -54,7 +55,11 @@ class _GuestVisitorBody extends StatelessWidget {
               [
                 const _CampaignHeroSection(),
                 const HowItWorks(),
-                const CurrentCampaign(),
+                const CurrentCampaign(
+                  allFunds: 50000000,
+                  totalAsk: 4020000,
+                  askRange: Range(min: 30000, max: 150000),
+                ),
                 const _CampaignCategories(),
                 const _LatestProposals(),
               ],
@@ -67,7 +72,8 @@ class _GuestVisitorBody extends StatelessWidget {
 }
 
 class _CampaignHeroSection extends StatelessWidget {
-  const _CampaignHeroSection()
+  const _CampaignHeroSection();
+
   @override
   Widget build(BuildContext context) {
     return HeroSection(
