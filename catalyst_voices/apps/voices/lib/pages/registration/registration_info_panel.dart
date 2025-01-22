@@ -1,6 +1,5 @@
-import 'package:catalyst_voices/pages/registration/bloc_unlock_password_builder.dart';
-import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/pictures/account_completed_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/base_profile_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_with_password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/password_picture.dart';
@@ -122,14 +121,17 @@ class RegistrationInfoPanel extends StatelessWidget {
 
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
-      FinishAccountCreationStep() => _HeaderStrings(
+      AccountCreateProgressStep() => _HeaderStrings(
           title: context.l10n.catalystKeychain,
         ),
       RecoverMethodStep() => _HeaderStrings(
           title: context.l10n.recoverCatalystKeychain,
         ),
-      SeedPhraseRecoverStep() => _HeaderStrings(
+      RecoverWithSeedPhraseStep() => _HeaderStrings(
           title: context.l10n.recoverCatalystKeychain,
+        ),
+      CreateBaseProfileStep() => _HeaderStrings(
+          title: context.l10n.accountCreationGetStartedTitle,
         ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
@@ -179,25 +181,41 @@ class _RegistrationPicture extends StatelessWidget {
       };
     }
 
-    Widget buildRecoverSeedPhrase(RecoverSeedPhraseStage stage) {
+    Widget buildRecoverSeedPhrase(RecoverWithSeedPhraseStage stage) {
       return switch (stage) {
-        RecoverSeedPhraseStage.seedPhraseInstructions ||
-        RecoverSeedPhraseStage.seedPhrase ||
-        RecoverSeedPhraseStage.accountDetails =>
+        RecoverWithSeedPhraseStage.seedPhraseInstructions ||
+        RecoverWithSeedPhraseStage.seedPhrase ||
+        RecoverWithSeedPhraseStage.accountDetails =>
           const KeychainPicture(),
-        RecoverSeedPhraseStage.unlockPasswordInstructions ||
-        RecoverSeedPhraseStage.unlockPassword =>
+        RecoverWithSeedPhraseStage.unlockPasswordInstructions ||
+        RecoverWithSeedPhraseStage.unlockPassword =>
           const _BlocRecoveryPasswordPicture(),
-        RecoverSeedPhraseStage.success => const KeychainWithPasswordPicture(),
+        RecoverWithSeedPhraseStage.success =>
+          const KeychainWithPasswordPicture(),
       };
+    }
+
+    Widget buildRegistrationProgress(
+      List<AccountCreateStepType> completedSteps,
+    ) {
+      if (completedSteps.lastOrNull == AccountCreateStepType.baseProfile) {
+        return const BaseProfilePicture(type: TaskPictureType.success);
+      }
+      if (completedSteps.lastOrNull == AccountCreateStepType.keychain) {
+        return const KeychainWithPasswordPicture();
+      }
+
+      return const SizedBox.shrink();
     }
 
     return switch (step) {
       GetStartedStep() => const KeychainPicture(),
       RecoverMethodStep() => const KeychainPicture(),
-      SeedPhraseRecoverStep(:final stage) => buildRecoverSeedPhrase(stage),
+      RecoverWithSeedPhraseStep(:final stage) => buildRecoverSeedPhrase(stage),
+      CreateBaseProfileStep() => const BaseProfilePicture(),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
-      FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
+      AccountCreateProgressStep(:final completedSteps) =>
+        buildRegistrationProgress(completedSteps),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
       AccountCompletedStep() => const AccountCompletedPicture(),
     };
@@ -209,7 +227,7 @@ class _BlocSeedPhraseResultPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
         return SeedPhrasePicture(
@@ -226,7 +244,7 @@ class _BlocCreationPasswordPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocUnlockPasswordBuilder<TaskPictureType>(
+    return BlocUnlockPasswordSelector<TaskPictureType>(
       stateSelector: (state) => state.keychainStateData.unlockPasswordState,
       selector: (state) => state.pictureType,
       builder: (context, state) => PasswordPicture(type: state),
@@ -239,7 +257,7 @@ class _BlocRecoveryPasswordPicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocUnlockPasswordBuilder<TaskPictureType>(
+    return BlocUnlockPasswordSelector<TaskPictureType>(
       stateSelector: (state) => state.recoverStateData.unlockPasswordState,
       selector: (state) => state.pictureType,
       builder: (context, state) => PasswordPicture(type: state),

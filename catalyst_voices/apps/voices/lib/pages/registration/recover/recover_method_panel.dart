@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -91,7 +90,7 @@ class _BlocOnDeviceKeychains extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<bool>(
+    return BlocRecoverSelector<bool>(
       key: const Key('BlocOnDeviceKeychains'),
       selector: (state) => state.foundKeychain,
       builder: (context, state) {

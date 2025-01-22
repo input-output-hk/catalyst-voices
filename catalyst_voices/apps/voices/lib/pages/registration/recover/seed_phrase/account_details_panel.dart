@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_connection_status.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_summary.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -48,7 +47,7 @@ class _BlocAccountSummery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<Result<AccountSummaryData, LocalizedException>?>(
+    return BlocRecoverSelector<Result<AccountSummaryData, LocalizedException>?>(
       selector: (state) => state.accountDetails,
       builder: (context, state) {
         return switch (state) {
@@ -138,7 +137,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<bool>(
+    return BlocRecoverSelector<bool>(
       selector: (state) => state.isAccountSummaryNextEnabled,
       builder: (context, state) {
         return _Navigation(

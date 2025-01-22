@@ -48,14 +48,18 @@ final class UserDto {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(createJsonKeys: true)
 final class AccountDto {
+  final String displayName;
+  final String email;
   final String keychainId;
   final Set<AccountRole> roles;
   final AccountWalletInfoDto walletInfo;
   final bool isProvisional;
 
   AccountDto({
+    required this.displayName,
+    required this.email,
     required this.keychainId,
     required this.roles,
     required this.walletInfo,
@@ -64,6 +68,8 @@ final class AccountDto {
 
   AccountDto.fromModel(Account data)
       : this(
+          displayName: data.displayName,
+          email: data.email,
           keychainId: data.keychain.id,
           roles: data.roles,
           walletInfo: AccountWalletInfoDto.fromModel(data.walletInfo),
@@ -71,7 +77,27 @@ final class AccountDto {
         );
 
   factory AccountDto.fromJson(Map<String, dynamic> json) {
-    return _$AccountDtoFromJson(json);
+    final modifiableJson = Map.of(json);
+
+    _jsonMigration(modifiableJson);
+
+    return _$AccountDtoFromJson(modifiableJson);
+  }
+
+  static void _jsonMigration(Map<String, dynamic> json) {
+    /// displayName and email were added later and some existing accounts
+    /// are already stored without them but we still don't want to make
+    /// those fields optional.
+    void baseProfileMigration() {
+      if (!json.containsKey(_$AccountDtoJsonKeys.displayName)) {
+        json[_$AccountDtoJsonKeys.displayName] = 'Migrated';
+      }
+      if (!json.containsKey(_$AccountDtoJsonKeys.email)) {
+        json[_$AccountDtoJsonKeys.email] = 'migrated@iohk.com';
+      }
+    }
+
+    baseProfileMigration();
   }
 
   Map<String, dynamic> toJson() => _$AccountDtoToJson(this);
@@ -83,6 +109,8 @@ final class AccountDto {
     final keychain = await keychainProvider.get(keychainId);
 
     return Account(
+      displayName: displayName,
+      email: email,
       keychain: keychain,
       roles: roles,
       walletInfo: walletInfo.toModel(),

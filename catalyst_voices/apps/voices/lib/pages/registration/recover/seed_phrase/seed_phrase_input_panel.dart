@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
-import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/upload_seed_phrase_confirmation_dialog.dart';
 import 'package:catalyst_voices/pages/registration/upload_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
@@ -130,7 +129,7 @@ class _BlocSeedPhraseField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<List<String>>(
+    return BlocRecoverSelector<List<String>>(
       selector: (state) => state.seedPhraseWords,
       builder: (context, state) {
         return SeedPhraseField(
@@ -152,7 +151,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder(
+    return BlocRecoverSelector(
       selector: (state) => state.isSeedPhraseValid,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
