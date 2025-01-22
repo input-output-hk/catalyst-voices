@@ -26,6 +26,8 @@ final class DocumentPropertySchemaDto {
   final Object? defaultValue;
   @JsonKey(name: 'x-guidance')
   final String? guidance;
+  @JsonKey(name: 'x-icon')
+  final String? icon;
   @JsonKey(name: 'const')
   final Object? constValue;
   @JsonKey(name: 'enum')
@@ -59,6 +61,7 @@ final class DocumentPropertySchemaDto {
     required this.description,
     required this.defaultValue,
     required this.guidance,
+    required this.icon,
     required this.constValue,
     required this.enumValues,
     required this.properties,
@@ -84,6 +87,7 @@ final class DocumentPropertySchemaDto {
     this.description,
     this.defaultValue,
     this.guidance,
+    this.icon,
     this.constValue,
     this.enumValues,
     this.properties,
@@ -234,6 +238,7 @@ final class DocumentPropertySchemaDto {
       description: description ?? other.description,
       defaultValue: defaultValue ?? other.defaultValue,
       guidance: guidance ?? other.guidance,
+      icon: icon ?? other.icon,
       constValue: constValue ?? other.constValue,
       enumValues: enumValues ?? other.enumValues,
       properties: mergedProperties,
