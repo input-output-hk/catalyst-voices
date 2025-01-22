@@ -41,18 +41,28 @@ impl QueryLimits {
     ///
     /// # Errors
     ///  - Invalid arguments, `limit` must be provided when `page` is not None.
-    pub(crate) fn new(limit: Option<Limit>, page: Option<Page>) -> anyhow::Result<Self> {
+    pub(crate) fn new(limit: Option<Limit>, page: Option<Page>) -> Self {
         match (limit, page) {
             (Some(limit), Some(page)) => {
-                Ok(Self(QueryLimitsInner::LimitAndOffset(
-                    limit.into(),
-                    page.into(),
-                )))
+                Self(QueryLimitsInner::LimitAndOffset(limit.into(), page.into()))
             },
-            (Some(limit), None) => Ok(Self(QueryLimitsInner::Limit(limit.into()))),
-            (None, None) => Ok(Self(QueryLimitsInner::All)),
-            (None, Some(_)) => {
-                anyhow::bail!("Invalid arguments, `limit` must be provided when `page` is not None")
+            (Some(limit), None) => {
+                Self(QueryLimitsInner::LimitAndOffset(
+                    limit.into(),
+                    Page::default().into(),
+                ))
+            },
+            (None, Some(page)) => {
+                Self(QueryLimitsInner::LimitAndOffset(
+                    Limit::default().into(),
+                    page.into(),
+                ))
+            },
+            (None, None) => {
+                Self(QueryLimitsInner::LimitAndOffset(
+                    Limit::default().into(),
+                    Page::default().into(),
+                ))
             },
         }
     }

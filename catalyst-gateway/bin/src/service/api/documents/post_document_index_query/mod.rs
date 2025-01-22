@@ -46,11 +46,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(
     filter: DocumentIndexQueryFilter, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
-    let query_limits = match QueryLimits::new(limit, page) {
-        Ok(query_limits) => query_limits,
-        Err(_e) => return AllResponses::unauthorized(),
-    };
-
+    let query_limits = QueryLimits::new(limit, page);
     let conditions = match filter.try_into() {
         Ok(db_filter) => db_filter,
         Err(e) => return AllResponses::handle_error(&e),
