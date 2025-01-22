@@ -6,7 +6,16 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+bool _alwaysAllowRegistration = kDebugMode;
+
+@visibleForTesting
+// ignore: avoid_positional_boolean_parameters
+set alwaysAllowRegistration(bool newValue) {
+  _alwaysAllowRegistration = newValue;
+}
 
 /// Manages the user session.
 final class SessionCubit extends Cubit<SessionState>
@@ -21,6 +30,7 @@ final class SessionCubit extends Cubit<SessionState>
 
   Account? _account;
   AdminToolsState _adminToolsState;
+  bool _hasWallets = false;
 
   StreamSubscription<bool>? _keychainUnlockedSub;
   StreamSubscription<Account?>? _accountSub;
@@ -44,6 +54,10 @@ final class SessionCubit extends Cubit<SessionState>
     _accountSub = _userService.watchAccount.listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
+
+    if (!_alwaysAllowRegistration) {
+      unawaited(_checkAvailableWallets());
+    }
   }
 
   Future<bool> unlock(LockFactor lockFactor) async {
@@ -119,15 +133,21 @@ final class SessionCubit extends Cubit<SessionState>
     _updateState();
   }
 
+  Future<void> _checkAvailableWallets() async {
+    final wallets = await _registrationService
+        .getCardanoWallets()
+        .onError((_, __) => const []);
+
+    _hasWallets = wallets.isNotEmpty;
+
+    if (!isClosed) {
+      _updateState();
+    }
+  }
+
   void _updateState() {
     if (_adminToolsState.enabled) {
-      unawaited(
-        _createMockedSessionState().then((value) {
-          if (!isClosed) {
-            emit(value);
-          }
-        }),
-      );
+      emit(_createMockedSessionState());
     } else {
       emit(_createSessionState());
     }
@@ -136,44 +156,51 @@ final class SessionCubit extends Cubit<SessionState>
   SessionState _createSessionState() {
     final account = _account;
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
+    final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
 
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
-      return VisitorSessionState(isRegistrationInProgress: !isEmpty);
+      return VisitorSessionState(
+        canCreateAccount: canCreateAccount,
+        isRegistrationInProgress: !isEmpty,
+      );
     }
 
     if (!isUnlocked) {
-      return const GuestSessionState();
+      return GuestSessionState(canCreateAccount: canCreateAccount);
     }
 
+    final sessionAccount = SessionAccount.fromAccount(account);
     final spaces = _accessControl.spacesAccess(account);
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
     return ActiveAccountSessionState(
-      account: account,
+      account: sessionAccount,
       spaces: spaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
+      canCreateAccount: canCreateAccount,
     );
   }
 
-  Future<SessionState> _createMockedSessionState() async {
+  SessionState _createMockedSessionState() {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
-        // TODO(damian-molinski): Limiting exposed Account so its not future.
-        final dummyAccount = await _getDummyAccount();
-
         return ActiveAccountSessionState(
-          account: dummyAccount,
+          account: const SessionAccount.mocked(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
+          canCreateAccount: true,
         );
       case SessionStatus.guest:
-        return const GuestSessionState();
+        return const GuestSessionState(canCreateAccount: true);
       case SessionStatus.visitor:
-        return const VisitorSessionState(isRegistrationInProgress: false);
+        return const VisitorSessionState(
+          isRegistrationInProgress: false,
+          canCreateAccount: true,
+        );
     }
   }
 

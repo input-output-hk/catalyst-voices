@@ -13,8 +13,8 @@ void main() {
     const proposalTemplate = DocumentSchema(
       jsonSchema: '',
       title: '',
-      description: '',
-      segments: [],
+      description: MarkdownData.empty,
+      properties: [],
       order: [],
       propertiesSchema: '',
     );
@@ -27,7 +27,7 @@ void main() {
       document: const Document(
         schemaUrl: '',
         schema: proposalTemplate,
-        segments: [],
+        properties: [],
       ),
     );
 

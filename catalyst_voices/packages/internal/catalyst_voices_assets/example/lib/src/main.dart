@@ -23,12 +23,9 @@ final class Example extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                height: 200,
-                width: 200,
-                child: CatalystImage.asset(
-                  VoicesAssets.images.dummyCatalystVoices.path,
-                ),
+              VoicesAssets.images.roleVoter.buildIcon(
+                size: 200,
+                allowColorFilter: false,
               ),
             ],
           ),
