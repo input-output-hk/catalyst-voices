@@ -33,7 +33,6 @@ abstract base class BaseSegment<T extends Section2> extends Equatable
     implements Segment {
   @override
   final NodeId id;
-
   @override
   final List<T> sections;
 

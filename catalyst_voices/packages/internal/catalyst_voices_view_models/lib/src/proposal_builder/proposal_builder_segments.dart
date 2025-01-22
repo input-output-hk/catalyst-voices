@@ -17,10 +17,10 @@ final class ProposalBuilderSegment extends BaseSegment<ProposalBuilderSection> {
   @override
   SvgGenImage get icon {
     final iconAsset = schema.icon;
-    if (iconAsset == null) {
-      return VoicesAssets.icons.viewGrid;
-    } else {
+    if (iconAsset != null) {
       return VoicesAssets.icons.getIcon(iconAsset);
+    } else {
+      return VoicesAssets.icons.viewGrid;
     }
   }
 
