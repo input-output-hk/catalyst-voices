@@ -12,7 +12,7 @@ use put_document::{bad_put_request::PutDocumentBadRequest, MAXIMUM_DOCUMENT_SIZE
 
 use crate::service::{
     common::{
-        auth::none_or_rbac::NoneOrRBAC,
+        auth::rbac::scheme::CatalystRBACSecurityScheme,
         tags::ApiTags,
         types::{
             generic::{
@@ -51,7 +51,7 @@ impl DocumentApi {
         /// version.
         version: Query<Option<UUIDv7>>,
         /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
+        _auth: CatalystRBACSecurityScheme,
     ) -> get_document::AllResponses {
         let Ok(doc_id) = document_id.0.try_into() else {
             let err = anyhow!("Invalid UUIDv7"); // Should not happen as UUIDv7 is validating.
@@ -78,7 +78,7 @@ impl DocumentApi {
         &self, /// The document to PUT
         document: Cbor<Body>,
         /// Authorization required.
-        _auth: NoneOrRBAC,
+        _auth: CatalystRBACSecurityScheme,
     ) -> put_document::AllResponses {
         match document.0.into_bytes_limit(MAXIMUM_DOCUMENT_SIZE).await {
             Ok(doc_bytes) => put_document::endpoint(doc_bytes.to_vec()).await,
@@ -110,7 +110,7 @@ impl DocumentApi {
         query: Json<DocumentIndexQueryFilterBody>,
         page: Query<Option<Page>>, limit: Query<Option<Limit>>,
         /// Authorization required.
-        _auth: NoneOrRBAC,
+        _auth: CatalystRBACSecurityScheme,
     ) -> post_document_index_query::AllResponses {
         post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
     }
