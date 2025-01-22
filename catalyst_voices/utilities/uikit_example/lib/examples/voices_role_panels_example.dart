@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -32,7 +33,10 @@ class _VoicesRoleContainersExampleState
         children: [
           const Text('Role Chooser Card (State #1)'),
           RoleChooserCard(
-            imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+            icon: AccountRole.voter.icon.buildIcon(
+              size: 28,
+              allowColorFilter: false,
+            ),
             value: _roleChooserCardState1,
             label: 'label',
             onChanged: (changedValue) => {
@@ -44,7 +48,10 @@ class _VoicesRoleContainersExampleState
           const SizedBox(height: 16),
           const Text('Role Chooser Card (Locked Value, Hidden View More)'),
           RoleChooserCard(
-            imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+            icon: AccountRole.drep.icon.buildIcon(
+              size: 28,
+              allowColorFilter: false,
+            ),
             value: true,
             label: 'very long label, ' * 20,
             isLearnMoreHidden: true,
@@ -53,7 +60,10 @@ class _VoicesRoleContainersExampleState
           const SizedBox(height: 16),
           const Text('Role Chooser Card (State #1, View Only)'),
           RoleChooserCard(
-            imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+            icon: AccountRole.proposer.icon.buildIcon(
+              size: 28,
+              allowColorFilter: false,
+            ),
             value: _roleChooserCardState1,
             label: 'label',
             isViewOnly: true,
@@ -66,7 +76,10 @@ class _VoicesRoleContainersExampleState
           const SizedBox(height: 16),
           const Text('Role Chooser Card (Locked Value, View Only)'),
           RoleChooserCard(
-            imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+            icon: AccountRole.proposer.icon.buildIcon(
+              size: 28,
+              allowColorFilter: false,
+            ),
             value: true,
             label: 'very long label, ' * 20,
             lockValueAsDefault: true,

@@ -98,6 +98,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
           icon: walletInfo.metadata.icon,
         ),
         walletSummary: WalletSummaryData(
+          walletName: walletInfo.metadata.name,
           balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
           address: WalletAddressFormatter.formatShort(walletInfo.address),
           clipboardAddress: walletInfo.address.toBech32(),

@@ -1,0 +1,125 @@
+{
+    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+    "setup": {
+        "title": {
+            "title": "Example Catalyst Proposal"
+        },
+        "proposer": {
+            "applicant": "John Smith",
+            "type": "Individual",
+            "coproposers": [
+                {
+                    "name": "Jane Doe"
+                },
+                {
+                    "name": "Bob Wilson"
+                }
+            ]
+        }
+    },
+    "summary": {
+        "budget": {
+            "requestedFunds": 150000
+        },
+        "time": {
+            "duration": 6
+        },
+        "translation": {
+            "isTranslated": true,
+            "originalLanguage": "de",
+            "originalDocumentLink": "https://example.com/original-doc"
+        },
+        "problem": {
+            "statement": "Current challenge in the Cardano ecosystem..."
+        },
+        "solution": {
+            "summary": "Our solution provides a comprehensive toolkit..."
+        },
+        "supportingLinks": {
+            "links": [
+                "https://github.com/example/project",
+                "https://docs.example.com",
+                "https://example.com/whitepaper",
+                "https://example.com/roadmap"
+            ]
+        },
+        "dependencies": {
+            "hasDependency": true,
+            "dependencyDetail": "Integration with third-party API service requires external dependencies..."
+        },
+        "open_source": {
+            "isOpenSource": true,
+            "licenseInformation": "All source code and documentation will be released under the MIT license."
+        }
+    },
+    "horizons": {
+        "theme": {
+            "grouped_tag": {
+                "group": "DeFi",
+                "tag": "Staking"
+            }
+        }
+    },
+    "details": {
+        "solution": {
+            "solution": "Our solution involves developing a comprehensive toolkit that will enhance the Cardano developer experience..."
+        },
+        "impact": {
+            "impact": "The project will significantly impact developer productivity by reducing development time and improving code quality..."
+        },
+        "feasibility": {
+            "feasibility": "Our team has extensive experience in blockchain development and has successfully delivered similar projects..."
+        }
+    },
+    "milestones": {
+        "milestones": {
+            "milestone_list": [
+                {
+                    "title": "Initial Setup and Planning",
+                    "outputs": "Project infrastructure setup and detailed planning documents",
+                    "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
+                    "evidence": "- GitHub repository setup\n- Documentation of infrastructure\n- Project planning documents",
+                    "delivery_month": 1,
+                    "cost": 30000,
+                    "progress": "Not Started"
+                },
+                {
+                    "title": "Core Development",
+                    "outputs": "Implementation of main features",
+                    "acceptance_criteria": "- Core features implemented\n- Unit tests passing",
+                    "evidence": "- Code repository\n- Test results\n- Technical documentation",
+                    "delivery_month": 3,
+                    "cost": 60000,
+                    "progress": "Not Started"
+                },
+                {
+                    "title": "Final Release and Documentation",
+                    "outputs": "Project completion, documentation, and Project Close-out Report and Video",
+                    "acceptance_criteria": "- All features implemented and tested\n- Documentation complete\n- Close-out report and video delivered",
+                    "evidence": "- Final release\n- Complete documentation\n- Close-out report and video",
+                    "delivery_month": 6,
+                    "cost": 60000,
+                    "progress": "Not Started"
+                }
+            ]
+        }
+    },
+    "pitch": {
+        "team": {
+            "who": "Our team consists of experienced blockchain developers with proven track records..."
+        },
+        "budget": {
+            "costs": "Budget breakdown:\n- Development (70%): 105,000 ADA\n- Testing (15%): 22,500 ADA\n- Documentation (15%): 22,500 ADA"
+        },
+        "value": {
+            "note": "This project provides excellent value for money by delivering essential developer tools..."
+        }
+    },
+    "agreements": {
+        "mandatory": {
+            "fund_rules": true,
+            "terms_and_conditions": true,
+            "privacy_policy": true
+        }
+    }
+}

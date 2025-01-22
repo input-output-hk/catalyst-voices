@@ -1,17 +1,18 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
 class VoicesRichTextLimit extends StatefulWidget {
   final Document document;
   final int? charsLimit;
+  final String? errorMessage;
 
   const VoicesRichTextLimit({
     super.key,
     required this.document,
     this.charsLimit,
+    this.errorMessage,
   });
 
   @override
@@ -52,7 +53,7 @@ class _VoicesRichTextLimitState extends State<VoicesRichTextLimit> {
         children: [
           Expanded(
             child: Text(
-              context.l10n.supportingTextLabelText,
+              widget.errorMessage ?? '',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

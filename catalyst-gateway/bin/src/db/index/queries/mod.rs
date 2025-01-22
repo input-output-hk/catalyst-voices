@@ -2,6 +2,7 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod purge;
 pub(crate) mod rbac;
 pub(crate) mod registrations;
 pub(crate) mod staked_ada;
@@ -179,6 +180,7 @@ pub(crate) type FallibleQueryTasks = Vec<tokio::task::JoinHandle<FallibleQueryRe
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
+    #[allow(clippy::too_many_lines)]
     pub(crate) async fn new(
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
@@ -357,11 +359,7 @@ impl PreparedQueries {
                 &self.get_all_stakes_and_vote_keys_query
             },
         };
-
-        session
-            .execute_iter(prepared_stmt.clone(), params)
-            .await
-            .map_err(|e| anyhow::anyhow!(e))
+        session_execute_iter(session, prepared_stmt, params).await
     }
 
     /// Execute a Batch query with the given parameters.
@@ -401,35 +399,62 @@ impl PreparedQueries {
                 &self.chain_root_for_stake_address_insert_queries
             },
         };
-
-        let mut results: Vec<QueryResult> = Vec::new();
-
-        let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
-        let mut query_failed = false;
-        let query_str = format!("{query}");
-
-        for chunk in chunks {
-            let chunk_size: u16 = chunk.len().try_into()?;
-            let Some(batch_query) = query_map.get(&chunk_size) else {
-                // This should not actually occur.
-                bail!("No batch query found for size {}", chunk_size);
-            };
-            let batch_query_statements = batch_query.value().clone();
-            match session.batch(&batch_query_statements, chunk).await {
-                Ok(result) => results.push(result),
-                Err(err) => {
-                    let chunk_str = format!("{chunk:?}");
-                    error!(error=%err, query=query_str, chunk=chunk_str, "Query Execution Failed");
-                    query_failed = true;
-                    // Defer failure until all batches have been processed.
-                },
-            }
-        }
-
-        if query_failed {
-            bail!("Query Failed: {query_str}!");
-        }
-
-        Ok(results)
+        session_execute_batch(session, query_map, cfg, query, values).await
     }
+}
+
+/// Execute a Batch query with the given parameters.
+///
+/// Values should be a Vec of values which implement `SerializeRow` and they MUST be
+/// the same, and must match the query being executed.
+///
+/// This will divide the batch into optimal sized chunks and execute them until all
+/// values have been executed or the first error is encountered.
+async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
+    session: Arc<Session>, query_map: &SizedBatch, cfg: Arc<cassandra_db::EnvVars>, query: Q,
+    values: Vec<T>,
+) -> FallibleQueryResults {
+    let mut results: Vec<QueryResult> = Vec::new();
+
+    let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
+    let mut query_failed = false;
+    let query_str = format!("{query}");
+
+    for chunk in chunks {
+        let chunk_size: u16 = chunk.len().try_into()?;
+        let Some(batch_query) = query_map.get(&chunk_size) else {
+            // This should not actually occur.
+            bail!("No batch query found for size {}", chunk_size);
+        };
+        let batch_query_statements = batch_query.value().clone();
+        match session.batch(&batch_query_statements, chunk).await {
+            Ok(result) => results.push(result),
+            Err(err) => {
+                let chunk_str = format!("{chunk:?}");
+                error!(error=%err, query=query_str, chunk=chunk_str, "Query Execution Failed");
+                query_failed = true;
+                // Defer failure until all batches have been processed.
+            },
+        }
+    }
+
+    if query_failed {
+        bail!("Query Failed: {query_str}!");
+    }
+
+    Ok(results)
+}
+
+/// Executes a select query with the given parameters.
+///
+/// Returns an iterator that iterates over all the result pages that the query
+/// returns.
+pub(crate) async fn session_execute_iter<P>(
+    session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
+) -> anyhow::Result<QueryPager>
+where P: SerializeRow {
+    session
+        .execute_iter(prepared_stmt.clone(), params)
+        .await
+        .map_err(|e| anyhow::anyhow!(e))
 }

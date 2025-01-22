@@ -19,11 +19,13 @@ dependencies:
     path: ../catalyst_voices_models
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
+  email_validator: ^3.0.0
   equatable: ^2.0.7
   flutter:
     sdk: flutter
   formz: ^0.7.0
   intl: ^0.19.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   catalyst_analysis: ^2.0.1

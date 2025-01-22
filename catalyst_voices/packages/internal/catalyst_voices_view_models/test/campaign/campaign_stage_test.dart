@@ -13,9 +13,7 @@ void main() {
       startDate: date,
       endDate: date,
       proposalsCount: 0,
-      sections: const [],
       publish: CampaignPublish.draft,
-      proposalTemplate: const ProposalTemplate(sections: []),
     );
 
     test('draft campaign resolves to draft stage', () {

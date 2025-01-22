@@ -22,8 +22,17 @@ const _prefix = Routes.currentMilestone;
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(path: '/$_prefix/discovery'),
-    TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
-    TypedGoRoute<ProposalBuilderRoute>(path: '/$_prefix/workspace/:proposalId'),
+    TypedGoRoute<WorkspaceRoute>(
+      path: '/$_prefix/workspace',
+      routes: [
+        TypedGoRoute<ProposalBuilderDraftRoute>(
+          path: 'proposal_builder/draft',
+        ),
+        TypedGoRoute<ProposalBuilderRoute>(
+          path: 'proposal_builder/:proposalId',
+        ),
+      ],
+    ),
     TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
     TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
     TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
@@ -79,14 +88,34 @@ final class WorkspaceRoute extends GoRouteData
   const WorkspaceRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const WorkspacePage();
+  }
+}
+
+final class ProposalBuilderDraftRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  final String? templateId;
+
+  const ProposalBuilderDraftRoute({
+    this.templateId,
+  });
+
+  @override
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
+      ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProposalBuilderPage(templateId: templateId);
   }
 }
 
@@ -99,9 +128,9 @@ final class ProposalBuilderRoute extends GoRouteData
   });
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -115,9 +144,9 @@ final class VotingRoute extends GoRouteData
   const VotingRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -131,9 +160,9 @@ final class FundedProjectsRoute extends GoRouteData
   const FundedProjectsRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
@@ -147,9 +176,9 @@ final class TreasuryRoute extends GoRouteData
   const TreasuryRoute();
 
   @override
-  List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const AdminAccessGuard(),
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        AdminAccessGuard(),
       ];
 
   @override
