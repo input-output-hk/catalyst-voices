@@ -4,7 +4,7 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/registration/registration_details_panel.dart';
 import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
-import 'package:catalyst_voices/pages/registration/widgets/exit_confirm_dialog.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_confirm_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -45,7 +45,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     final step = widget.step;
     if (step != null) {
       _cubit.goToStep(step);
-    } else {
+    } else if (_cubit.hasProgress) {
       _cubit.recoverProgress();
     }
   }
