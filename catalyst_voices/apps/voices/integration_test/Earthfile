@@ -46,7 +46,7 @@ integration-test-web:
             echo "Printing "$driver" logs..." && \
             cat $driver.log && \
 #            exit 1
-#    END
+    END
 
 # TODO(dtscalac): disabled integration tests due to them being flaky,
 # reenable when enable-threads.js workaround is removed
