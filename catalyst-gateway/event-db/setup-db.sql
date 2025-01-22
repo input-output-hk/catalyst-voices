@@ -16,7 +16,7 @@
 \echo -> dbDescription .......... = :dbDescription
 \echo -> dbUser ................. = :dbUser
 \echo -> dbUserPw ............... = xxxx
-\echo test test
+\echo -> dbSuperUser ............ = :dbSuperUser
 
 -- Cleanup if we already ran this before.
 DROP DATABASE IF EXISTS :"dbName"; -- noqa: PRS
@@ -34,6 +34,9 @@ GRANT EXECUTE ON FUNCTION PG_READ_FILE(TEXT, BIGINT, BIGINT, BOOLEAN) TO :"dbUse
 
 -- Create the database.
 CREATE DATABASE :"dbName" WITH OWNER :"dbUser"; -- noqa: PRS
+
+-- This is necessary for RDS to work.
+GRANT :"dbUser" TO :"dbSuperUser";
 
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO :"dbUser"; -- noqa: PRS
 

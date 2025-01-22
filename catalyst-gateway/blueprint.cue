@@ -14,7 +14,7 @@ project: {
 		environment: "dev"
 		modules: main: {
 			name:    "app"
-			version: "0.2.1"
+			version: "0.2.2"
 			values: {
 				deployment: {
 					containers: gateway: {
@@ -115,10 +115,77 @@ project: {
 					]
 				}
 
+				jobs: migration: containers: main: {
+					image: {
+						name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
+						tag:  _ @forge(name="GIT_HASH_OR_TAG")
+					}
+
+					env: {
+						DB_HOST: {
+							secret: {
+								name:     "eventdb-root-creds"
+								key:      "host"
+								existing: true
+							}
+						}
+						DB_PORT: {
+							secret: {
+								name:     "eventdb-root-creds"
+								key:      "port"
+								existing: true
+							}
+						}
+						DB_NAME: {
+							value: "gateway"
+						}
+						DB_DESCRIPTION: {
+							value: "Gateway Event Database"
+						}
+						DB_SUPERUSER: {
+							secret: {
+								name:     "eventdb-root-creds"
+								key:      "username"
+								existing: true
+							}
+						}
+						DB_SUPERUSER_PASSWORD: {
+							secret: {
+								name:     "eventdb-root-creds"
+								key:      "password"
+								existing: true
+							}
+						}
+						DB_USER: {
+							secret: {
+								name: "db"
+								key:  "username"
+							}
+						}
+						DB_USER_PASSWORD: {
+							secret: {
+								name: "db"
+								key:  "password"
+							}
+						}
+						INIT_AND_DROP_DB: {
+							value: "true"
+						}
+						WITH_MIGRATIONS: {
+							value: "true"
+						}
+					}
+				}
+
 				ingress: subdomain: "gateway"
 
-				secrets: gateway: {
-					ref: "gateway"
+				secrets: {
+					db: {
+						ref: "db/gateway"
+					}
+					gateway: {
+						ref: "gateway"
+					}
 				}
 
 				service: {
