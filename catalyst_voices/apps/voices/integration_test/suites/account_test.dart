@@ -50,6 +50,7 @@ void main() async {
         await $(AppBarPage.lockBtn).tap();
         expect($(AppBarPage.unlockBtn), findsOneWidget);
       });
+
       patrolWidgetTest('user - locking and unlocking account',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));

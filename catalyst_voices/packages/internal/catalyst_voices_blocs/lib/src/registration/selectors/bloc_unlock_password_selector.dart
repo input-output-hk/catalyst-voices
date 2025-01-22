@@ -1,16 +1,18 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class BlocSeedPhraseBuilder<T>
+class BlocUnlockPasswordSelector<T>
     extends BlocSelector<RegistrationCubit, RegistrationState, T> {
-  BlocSeedPhraseBuilder({
+  BlocUnlockPasswordSelector({
     super.key,
-    required BlocWidgetSelector<SeedPhraseStateData, T> selector,
+    required BlocWidgetSelector<RegistrationState, UnlockPasswordState>
+        stateSelector,
+    required BlocWidgetSelector<UnlockPasswordState, T> selector,
     required super.builder,
     super.bloc,
   }) : super(
           selector: (state) {
-            return selector(state.keychainStateData.seedPhraseStateData);
+            return selector(stateSelector(state));
           },
         );
 }
