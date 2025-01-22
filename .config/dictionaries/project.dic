@@ -101,6 +101,7 @@ endfunction
 Eternl
 EUTXO
 extn
+eventdb
 fetchval
 fmtchk
 fmtfix
