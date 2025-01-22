@@ -89,6 +89,7 @@ class _RecoveredAccountSummary extends StatelessWidget {
         const _RecoverStatusText(),
         const SizedBox(height: 24),
         WalletSummary(
+          walletName: walletSummary.walletName,
           balance: walletSummary.balance,
           address: walletSummary.address,
           clipboardAddress: walletSummary.clipboardAddress,
