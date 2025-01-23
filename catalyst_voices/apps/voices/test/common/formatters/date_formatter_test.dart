@@ -15,13 +15,10 @@ class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   @override
   String get twoDaysAgo => '2 days ago';
   @override
-  // TODO: implement weekOf
   String get weekOf => 'Week of';
   @override
-  // TODO: implement from
   String get from => 'From';
   @override
-  // TODO: implement to
   String get to => 'To';
 }
 
@@ -74,7 +71,7 @@ void main() {
     test(
         'Dates are in the same week for Local when Sunday is first day of week',
         () {
-      //Set Sunday as first day of week
+      // Set Sunday as first day of week
       mockLocalizations.firstDayOfWeekIndex = 0;
       final dateRangeWhenSundayFirst = DateRange(
         from: DateTime(2025, 1, 19),
@@ -103,7 +100,7 @@ void main() {
     test(
         'Dates are in the same week for Local when Monday is first day of week',
         () {
-      //Set Monday as first day of week
+      // Set Monday as first day of week
       mockLocalizations.firstDayOfWeekIndex = 1;
       final dateRangeWhenSundayFirst = DateRange(
         from: DateTime(2025, 1, 19),
