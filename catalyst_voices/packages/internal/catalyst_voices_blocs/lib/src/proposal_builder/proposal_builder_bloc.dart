@@ -173,7 +173,8 @@ final class ProposalBuilderBloc
       return ProposalBuilderSegment(
         id: segment.schema.nodeId,
         sections: sections,
-        documentSegment: segment,
+        property: segment,
+        schema: segment.schema as DocumentSegmentSchema,
       );
     }).toList();
   }

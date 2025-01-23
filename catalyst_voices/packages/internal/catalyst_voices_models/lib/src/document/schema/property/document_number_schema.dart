@@ -41,6 +41,17 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
     required super.numRange,
   });
 
+  const DocumentGenericNumberSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.title = '',
+    super.description,
+    super.isRequired = false,
+    super.defaultValue,
+    super.enumValues,
+    super.numRange,
+  });
+
   @override
   DocumentGenericNumberSchema withNodeId(DocumentNodeId nodeId) {
     return DocumentGenericNumberSchema(
