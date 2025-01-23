@@ -24,9 +24,9 @@ class Range<T extends num> extends Equatable {
     required this.max,
   });
 
-  /// Creates an [int] [Range] which assumes if
+  /// Creates a [Range] which assumes if
   /// [min] or [max] are null then they are unconstrained.
-  static Range<int>? optionalIntRangeOf({int? min, int? max}) {
+  static Range<T>? optionalRangeOf<T extends num>({T? min, T? max}) {
     if (min == null && max == null) {
       return null;
     }

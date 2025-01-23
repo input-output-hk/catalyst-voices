@@ -29,6 +29,11 @@ final class DocumentNodeId extends NodeId {
           paths: paths,
         );
 
+  /// The most nested path id.
+  ///
+  /// Effectively the string after the last dot.
+  String get lastPath => paths.isNotEmpty ? paths.last : '';
+
   /// Returns a parent node.
   ///
   /// For [root] node it returns [root] node as it doesn't have any parent.

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/string_ext.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_result_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -101,7 +100,7 @@ class _BlocWallets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<Result<List<WalletMetadata>, Exception>?>(
+    return BlocWalletLinkSelector<Result<List<WalletMetadata>, Exception>?>(
       key: const Key('WalletsLinkBuilder'),
       selector: (state) => state.wallets,
       builder: (context, state) {

@@ -95,7 +95,7 @@ nightly-package-schemathesis:
 # nightly-test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
 nightly-test-fuzzer-api:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
-    RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
+    RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG seed
@@ -111,11 +111,13 @@ nightly-test-fuzzer-api:
 
         RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
-            docker cp st:/results/cassette.yaml cassette.yaml
+            docker cp st:/results/cassette.yaml cassette.yaml && \
+            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly.junit-report.xml
         SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+        SAVE ARTIFACT cat-gateway.log.zst AS LOCAL cat-gateway.log.zst
     END
     IF [ -f fail ]
         RUN --no-cache echo "Nightly schemathesis test failed. Check the logs for more details" && \

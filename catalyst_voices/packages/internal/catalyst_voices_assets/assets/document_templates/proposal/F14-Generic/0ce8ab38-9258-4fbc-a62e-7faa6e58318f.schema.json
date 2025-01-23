@@ -3,6 +3,19 @@
     "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
+    "maintainers": [
+        {
+            "name": "Catalyst Team",
+            "url": "https://projectcatalyst.io/"
+        }
+    ],
+    "x-changelog": {
+        "2025-01-14": [
+            "Updated schema to include new fields for proposal details.",
+            "Fixed validation issues with the URL pattern.",
+            "Improved documentation for open source requirements."
+        ]
+    },
     "definitions": {
         "schemaReferenceNonUI": {
             "$comment": "NOT UI: used to identify the kind of template document used.",
@@ -33,8 +46,8 @@
             "$comment": "UI - Single Line text entry for HTTPS Urls.",
             "type": "string",
             "format": "uri",
-            "pattern": "^https:.*",
-            "x-note": "Enter a valid HTTPS URL. Must start with 'https://' and be a complete, working web address."
+            "pattern": "^https://[^\\s]+$",
+            "x-note": "Must start with 'https://' and is followed by one or more non-whitespace characters, ending at the end of the string."
         },
         "multiLineTextEntry": {
             "$comment": "UI - Multiline text entry without any markup or rich text capability.",
@@ -42,7 +55,6 @@
             "contentMediaType": "text/plain",
             "pattern": "^[\\S\\s]*$",
             "x-note": "Enter multiple lines of plain text. You can use line breaks but no special formatting."
-
         },
         "multiLineTextEntryMarkdown": {
             "$comment": "UI - Multiline text entry with Markdown content.",
@@ -50,6 +62,12 @@
             "contentMediaType": "text/markdown",
             "pattern": "^[\\S\\s]*$",
             "x-note": "Use Markdown formatting for rich text. Available formatting:\n- Headers: # for h1, ## for h2, etc.\n- Lists: * or - for bullets, 1. for numbered\n- Emphasis: *italic* or **bold**\n- Links: [text](url)\n- Code: `inline` or ```block```"
+        },
+        "radioButtonSelect": {
+            "$comment": "UI - Radio Button Selection",
+            "type": "string",
+            "format": "radioButtonSelect",
+            "x-note": "Select one option from a list of radio buttons"
         },
         "dropDownSingleSelect": {
             "$comment": "UI - Drop Down Selection of a single entry from the defined enum.",
@@ -101,6 +119,14 @@
                 "maxLength": 1024
             },
             "x-note": "Enter multiple HTTPS URLs. Each URL should be unique and under 1024 characters."
+        },
+        "tagInput": {
+            "$comment": "UI - A tag-style input field for adding/removing items with visual tags",
+            "type": "array",
+            "format": "tag-input",
+            "uniqueItems": true,
+            "default": [],
+            "x-note": "Add or remove items that will be displayed as tags with remove buttons"
         },
         "nestedQuestionsList": {
             "$comment": "UI - A Growable List of Questions.  The contents are an object, that can have any UI elements within.",
@@ -208,6 +234,7 @@
             "$ref": "#/definitions/segment",
             "title": "proposal setup",
             "description": "Proposal title",
+            "x-icon": "view-grid",
             "properties": {
                 "title": {
                     "$ref": "#/definitions/section",
@@ -239,7 +266,7 @@
                             "maxLength": 100
                         },
                         "type": {
-                            "$ref": "#/definitions/dropDownSingleSelect",
+                            "$ref": "#/definitions/radioButtonSelect",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "x-guidance": "Please select from one of the following:\n\n1. Individual\n2. Entity (Incorporated)\n3. Entity (Not Incorporated)",
@@ -251,30 +278,53 @@
                             "default": "Individual"
                         },
                         "coproposers": {
-                            "$ref": "#/definitions/singleLineTextEntryList",
+                            "$ref": "#/definitions/tagInput",
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
                             "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. **IMPORTANT** A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 14 rules for added detail.",
                             "maxItems": 5,
-                            "minItems": 0
+                            "minItems": 0,
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "title": "Co-proposer Name",
+                                        "description": "Full name of the co-proposer",
+                                        "minLength": 2,
+                                        "maxLength": 100
+                                    }
+                                }
+                            }
                         }
                     },
                     "required": [
                         "applicant",
                         "type"
                     ],
-                    "x-order": ["applicant", "type", "coproposers"]
+                    "x-order": [
+                        "applicant",
+                        "type",
+                        "coproposers"
+                    ]
                 }
             },
             "required": [
                 "title",
                 "proposer"
             ],
-            "x-order": ["title", "proposer"]
+            "x-order": [
+                "title",
+                "proposer"
+            ]
         },
         "summary": {
             "$ref": "#/definitions/segment",
             "title": "Proposal Summary",
+            "x-icon": "light-bulb",
             "description": "Key information about your proposal",
             "properties": {
                 "budget": {
@@ -293,7 +343,9 @@
                     "required": [
                         "requestedFunds"
                     ],
-                    "x-order": ["requestedFunds"]
+                    "x-order": [
+                        "requestedFunds"
+                    ]
                 },
                 "time": {
                     "$ref": "#/definitions/section",
@@ -346,33 +398,10 @@
                             "minLength": 10,
                             "maxLength": 200,
                             "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail."
-                        },
-                        "impact": {
-                            "$ref": "#/definitions/multiSelect",
-                            "title": "Impact Areas",
-                            "description": "Select the areas that will be most impacted by solving this problem",
-                            "items": {
-                                "$ref": "#/definitions/singleLineTextEntry",
-                                "enum": [
-                                    "Technical Infrastructure",
-                                    "User Experience",
-                                    "Developer Tooling",
-                                    "Community Growth",
-                                    "Economic Sustainability",
-                                    "Interoperability",
-                                    "Security",
-                                    "Scalability",
-                                    "Education",
-                                    "Adoption"
-                                ]
-                            },
-                            "minItems": 1,
-                            "maxItems": 3
                         }
                     },
                     "required": [
-                        "statement",
-                        "impact"
+                        "statement"
                     ]
                 },
                 "solution": {
@@ -387,29 +416,10 @@
                             "minLength": 10,
                             "maxLength": 200,
                             "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...' Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'. This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail."
-                        },
-                        "approach": {
-                            "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "Technical Approach",
-                            "description": "Outline the technical approach or methodology you will use",
-                            "maxLength": 500,
-                            "minLength": 10
-                        },
-                        "innovationAspects": {
-                            "$ref": "#/definitions/singleLineTextEntryList",
-                            "title": "Innovation Aspects",
-                            "description": "Key innovative aspects of your solution",
-                            "minItems": 1,
-                            "maxItems": 5,
-                            "items": {
-                                "maxLength": 200,
-                                "minLength": 10
-                            }
                         }
                     },
                     "required": [
-                        "summary",
-                        "approach"
+                        "summary"
                     ]
                 },
                 "supportingLinks": {
@@ -418,20 +428,10 @@
                     "description": "Additional resources and documentation for your proposal",
                     "x-guidance": "Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your proposal. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any of the questions in this form because you feel the answers can be found elsewhere. If any links are specified make sure these are added in good order (first link must be present before specifying second). Also ensure all links include https. Without these steps, the form will not be submittable and show errors",
                     "properties": {
-                        "mainRepository": {
-                            "$ref": "#/definitions/singleLineHttpsURLEntry",
-                            "title": "Main Code Repository",
-                            "description": "Primary repository where the project's code will be hosted"
-                        },
-                        "documentation": {
-                            "$ref": "#/definitions/singleLineHttpsURLEntry",
-                            "title": "Documentation URL",
-                            "description": "Main documentation site or resource for the project"
-                        },
-                        "other": {
+                        "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
                             "title": "Resource Links",
-                            "description": "Links to any other relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
                             "minItems": 0,
                             "maxItems": 5
                         }
@@ -443,52 +443,16 @@
                     "description": "External dependencies and requirements for project success",
                     "x-guidance": "If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                     "properties": {
-                        "details": {
-                            "$ref": "#/definitions/nestedQuestionsList",
-                            "title": "Dependency Details",
-                            "description": "List and describe each dependency",
-                            "items": {
-                                "$ref": "#/definitions/nestedQuestions",
-                                "properties": {
-                                    "name": {
-                                        "$ref": "#/definitions/singleLineTextEntry",
-                                        "title": "Dependency Name",
-                                        "description": "Name of the organization, technology, or resource",
-                                        "maxLength": 100
-                                    },
-                                    "type": {
-                                        "$ref": "#/definitions/dropDownSingleSelect",
-                                        "title": "Dependency Type",
-                                        "description": "Type of dependency",
-                                        "enum": [
-                                            "Technical",
-                                            "Organizational",
-                                            "Legal",
-                                            "Financial",
-                                            "Other"
-                                        ]
-                                    },
-                                    "description": {
-                                        "$ref": "#/definitions/multiLineTextEntry",
-                                        "title": "Description",
-                                        "description": "Explain why this dependency is essential and how it affects your project",
-                                        "maxLength": 500
-                                    },
-                                    "mitigationPlan": {
-                                        "$ref": "#/definitions/multiLineTextEntry",
-                                        "title": "Mitigation Plan",
-                                        "description": "How will you handle potential issues with this dependency",
-                                        "maxLength": 300
-                                    }
-                                },
-                                "required": [
-                                    "name",
-                                    "type",
-                                    "description"
-                                ]
-                            },
-                            "minItems": 0,
-                            "maxItems": 10
+                        "hasDependency": {
+                            "$ref": "#/definitions/yesNoChoice",
+                            "title": "Does the project have any dependency",
+                            "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
+                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\""
+                        },
+                        "dependencyDetail": {
+                            "$ref": "#/definitions/singleLineTextEntry",
+                            "title": "Dependency description",
+                            "description": "Here you should list any dependencies and prerequisites for your project’s success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software."
                         }
                     }
                 },
@@ -498,28 +462,25 @@
                     "description": "Will your project's output be fully open source? Open source refers to something people can modify and share because its design is publicly accessible.",
                     "x-guidance": "Open source software is software with source code that anyone can inspect, modify, and enhance. Conversely, only the original authors of proprietary software can legally copy, inspect, and alter that software",
                     "properties": {
-                        "source_code": {
-                            "$ref": "#/definitions/spdxLicenseOrURL"
+                        "isOpenSource": {
+                            "$ref": "#/definitions/yesNoChoice",
+                            "title": "Is the project open source?",
+                            "description": "Select Yes if the project is open source, No if it is not."
                         },
-                        "documentation": {
-                            "$ref": "#/definitions/spdxLicenseOrURL"
-                        },
-                        "note": {
+                        "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "More Information",
-                            "description": "Please provide here more information on the open source status of your project outputs",
-                            "maxLength": 500,
-                            "x-guidance": "<p>If you did not answer PROPRIETARY to the above questions, the project should be open source available throughout the entire lifecycle of the project with a declared open-source repository. Please indicate here the type of license you intend to use for open source and provide any further information you feel is relevant to the open source status of your project outputs If only certain elements of your code will be open source please clarify which elements will be open source here. If you answered NO to the above question, please give further details as to why your projects outputs will not be open source METADATA</p>"
+                            "title": "License and Additional Information",
+                            "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "maxLength": 500
                         }
                     },
                     "required": [
-                        "source_code",
-                        "documentation"
+                        "isOpenSource",
+                        "licenseInformation"
                     ],
                     "x-order": [
-                        "source_code",
-                        "documentation",
-                        "note"
+                        "isOpenSource",
+                        "licenseInformation"
                     ]
                 }
             },
@@ -545,7 +506,8 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "oneOf": [{
+                            "oneOf": [
+                                {
                                     "properties": {
                                         "group": {
                                             "$ref": "#/definitions/tagGroup",
@@ -788,14 +750,19 @@
                             ]
                         }
                     },
-                    "x-order": ["theme"]
+                    "x-order": [
+                        "theme"
+                    ]
                 }
             },
-            "x-order": ["theme"]
+            "x-order": [
+                "theme"
+            ]
         },
         "details": {
             "$ref": "#/definitions/segment",
             "title": "Your Project and Solution",
+            "x-icon": "chart-pie",
             "properties": {
                 "solution": {
                     "$ref": "#/definitions/section",
@@ -835,11 +802,16 @@
                     }
                 }
             },
-            "x-order": ["solution", "impact", "feasibility"]
+            "x-order": [
+                "solution",
+                "impact",
+                "feasibility"
+            ]
         },
         "milestones": {
             "$ref": "#/definitions/segment",
             "title": "Milestones",
+            "x-icon": "flag",
             "properties": {
                 "milestones": {
                     "$ref": "#/definitions/section",
@@ -855,7 +827,15 @@
                             "maxItems": 6,
                             "items": {
                                 "type": "object",
-                                "required": ["title", "outputs", "acceptance_criteria", "evidence", "delivery_month", "cost"],
+                                "required": [
+                                    "title",
+                                    "outputs",
+                                    "acceptance_criteria",
+                                    "evidence",
+                                    "delivery_month",
+                                    "cost",
+                                    "progress"
+                                ],
                                 "properties": {
                                     "title": {
                                         "$ref": "#/definitions/singleLineTextEntry",
@@ -897,21 +877,31 @@
                                         "$ref": "#/definitions/dropDownSingleSelect",
                                         "title": "Progress Status",
                                         "description": "Current status of the milestone",
-                                        "enum": ["Not Started", "In Progress", "Completed", "Delayed"],
+                                        "enum": [
+                                            "Not Started",
+                                            "In Progress",
+                                            "Completed",
+                                            "Delayed"
+                                        ],
                                         "default": "Not Started"
                                     }
                                 }
                             }
                         }
                     },
-                    "required": ["milestone_list"]
+                    "required": [
+                        "milestone_list"
+                    ]
                 }
             },
-            "x-order": ["milestones"]
+            "x-order": [
+                "milestones"
+            ]
         },
         "pitch": {
             "$ref": "#/definitions/segment",
             "title": "Final Pitch",
+            "x-icon": "presentation-chart-line",
             "properties": {
                 "team": {
                     "$ref": "#/definitions/section",
@@ -953,7 +943,11 @@
                     }
                 }
             },
-            "x-order": ["team", "budget", "value"]
+            "x-order": [
+                "team",
+                "budget",
+                "value"
+            ]
         },
         "agreements": {
             "$ref": "#/definitions/segment",
@@ -991,7 +985,9 @@
                     ]
                 }
             },
-            "x-order": ["mandatory"]
+            "x-order": [
+                "mandatory"
+            ]
         }
     },
     "x-order": [
