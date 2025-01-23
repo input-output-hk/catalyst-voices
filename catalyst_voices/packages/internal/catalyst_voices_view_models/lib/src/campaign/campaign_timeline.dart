@@ -59,8 +59,8 @@ final mockCampaignTimeline = [
     description:
         '''Votes are tallied and the results revealed. Voters and community reviewers receive their rewards.''',
     timeline: DateRange(
-      from: DateTime(2025, 2, 3),
-      to: DateTime(2025, 2, 9),
+      from: DateTime(2025, 2, 2),
+      to: DateTime(2025, 2, 8),
     ),
   ),
   CampaignTimeline(

@@ -10,14 +10,11 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CurrentCampaign extends StatelessWidget {
-  final int allFunds;
-  final int totalAsk;
-  final Range<int> askRange;
+  final CurrentCampaignInfoViewModel currentCampaignInfo;
+
   const CurrentCampaign({
     super.key,
-    required this.allFunds,
-    required this.totalAsk,
-    required this.askRange,
+    required this.currentCampaignInfo,
   });
 
   @override
@@ -34,9 +31,9 @@ class CurrentCampaign extends StatelessWidget {
               const _Header(),
               const SizedBox(height: 32),
               _CurrentCampaignDetails(
-                allFunds: allFunds,
-                totalAsk: totalAsk,
-                askRange: askRange,
+                allFunds: currentCampaignInfo.allFunds,
+                totalAsk: currentCampaignInfo.totalAsk,
+                askRange: currentCampaignInfo.askRange,
               ),
               const SizedBox(height: 80),
               const _SubTitle(),
@@ -89,6 +86,7 @@ class _CurrentCampaignDetails extends StatelessWidget {
   final int allFunds;
   final int totalAsk;
   final Range<int> askRange;
+
   const _CurrentCampaignDetails({
     required this.allFunds,
     required this.totalAsk,
@@ -100,10 +98,10 @@ class _CurrentCampaignDetails extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
-        color: context.voicesColors.elevationsOnSurfaceNeutralLv2,
+        color: context.colors.elevationsOnSurfaceNeutralLv2,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.voicesColors.outlineBorder,
+          color: context.colors.outlineBorder,
         ),
       ),
       child: Column(
@@ -142,12 +140,15 @@ class _CampaignFundsDetail extends StatelessWidget {
   final String description;
   final int funds;
   final bool largeFundsText;
+
   const _CampaignFundsDetail({
     required this.title,
     required this.description,
     required this.funds,
     this.largeFundsText = true,
   });
+
+  String get _formattedFunds => AmountFormatter.decimalFormat(funds);
 
   @override
   Widget build(BuildContext context) {
@@ -160,28 +161,26 @@ class _CampaignFundsDetail extends StatelessWidget {
           Text(
             title,
             style: context.textTheme.titleMedium?.copyWith(
-              color: context.voicesColors.textOnPrimaryLevel1,
+              color: context.colors.textOnPrimaryLevel1,
             ),
           ),
           Text(
             description,
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.voicesColors.sysColorsNeutralN60,
+              color: context.colors.sysColorsNeutralN60,
             ),
           ),
           const SizedBox(height: 16),
           Text(
             '${const Currency.ada().symbol} $_formattedFunds',
             style: _foundsTextStyle(context)?.copyWith(
-              color: context.voicesColors.textOnPrimaryLevel1,
+              color: context.colors.textOnPrimaryLevel1,
             ),
           ),
         ],
       ),
     );
   }
-
-  String get _formattedFunds => AmountFormatter.decimalFormat(funds);
 
   TextStyle? _foundsTextStyle(BuildContext context) {
     if (largeFundsText) {
@@ -194,6 +193,7 @@ class _CampaignFundsDetail extends StatelessWidget {
 
 class _RangeAsk extends StatelessWidget {
   final Range<int> range;
+
   const _RangeAsk({
     required this.range,
   });
@@ -205,7 +205,7 @@ class _RangeAsk extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             left: BorderSide(
-              color: context.voicesColors.outlineBorder,
+              color: context.colors.outlineBorder,
               width: 1,
             ),
           ),
@@ -232,10 +232,13 @@ class _RangeAsk extends StatelessWidget {
 class _RangeValue extends StatelessWidget {
   final String title;
   final int value;
+
   const _RangeValue({
     required this.title,
     required this.value,
   });
+
+  String get _formattedValue => AmountFormatter.decimalFormat(value);
 
   @override
   Widget build(BuildContext context) {
@@ -247,20 +250,18 @@ class _RangeValue extends StatelessWidget {
         Text(
           title,
           style: context.textTheme.titleSmall?.copyWith(
-            color: context.voicesColors.sysColorsNeutralN60,
+            color: context.colors.sysColorsNeutralN60,
           ),
         ),
         Text(
           '${const Currency.ada().symbol} $_formattedValue',
           style: context.textTheme.bodyMedium?.copyWith(
-            color: context.voicesColors.sysColorsNeutralN60,
+            color: context.colors.sysColorsNeutralN60,
           ),
         ),
       ],
     );
   }
-
-  String get _formattedValue => AmountFormatter.decimalFormat(value);
 }
 
 class _SubTitle extends StatelessWidget {
@@ -297,6 +298,13 @@ class _CampaignTimeline extends StatefulWidget {
 
 class _CampaignTimelineState extends State<_CampaignTimeline> {
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -326,6 +334,7 @@ class _CampaignTimelineState extends State<_CampaignTimeline> {
 
 class _CampaignTimelineCard extends StatefulWidget {
   final CampaignTimeline timelineItem;
+
   const _CampaignTimelineCard(this.timelineItem);
 
   @override
@@ -334,6 +343,12 @@ class _CampaignTimelineCard extends StatefulWidget {
 
 class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
   bool isExpanded = false;
+
+  bool get isOngoing => widget.timelineItem.timeline.isTodayInRange();
+  SvgGenImage get _expandedIcon => isExpanded
+      ? VoicesAssets.icons.chevronDown
+      : VoicesAssets.icons.chevronRight;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -369,7 +384,7 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
                 Text(
                   widget.timelineItem.title,
                   style: context.textTheme.titleSmall?.copyWith(
-                    color: context.voicesColors.textOnPrimaryLevel1,
+                    color: context.colors.textOnPrimaryLevel1,
                   ),
                 ),
                 Row(
@@ -377,11 +392,12 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
                   children: [
                     Text(
                       DateFormatter.formatDateRange(
+                        MaterialLocalizations.of(context),
                         context.l10n,
                         widget.timelineItem.timeline,
                       ),
                       style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.voicesColors.sysColorsNeutralN60,
+                        color: context.colors.sysColorsNeutralN60,
                       ),
                     ),
                     Offstage(
@@ -405,7 +421,7 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
                       ? Text(
                           widget.timelineItem.description,
                           style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.voicesColors.sysColorsNeutralN60,
+                            color: context.colors.sysColorsNeutralN60,
                           ),
                         )
                       : const SizedBox.shrink(),
@@ -418,11 +434,6 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
     );
   }
 
-  SvgGenImage get _expandedIcon => isExpanded
-      ? VoicesAssets.icons.chevronDown
-      : VoicesAssets.icons.chevronRight;
-
-  bool get isOngoing => widget.timelineItem.timeline.isTodayInRange();
   void _toggleExpanded() {
     setState(() {
       isExpanded = !isExpanded;
