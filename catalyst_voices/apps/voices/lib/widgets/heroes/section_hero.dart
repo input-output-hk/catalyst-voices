@@ -23,7 +23,15 @@ class HeroSection extends StatefulWidget {
 
 class _HeroSectionState extends State<HeroSection>
     with AutomaticKeepAliveClientMixin {
-  late VideoPlayerController _controller;
+  VideoPlayerController? _controller;
+
+  VideoPlayerController get _effectiveController {
+    return _controller ??
+        (_controller ??= VideoPlayerController.asset(
+          widget.asset,
+          package: widget.assetPackageName,
+        ));
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -46,7 +54,7 @@ class _HeroSectionState extends State<HeroSection>
 
     if (oldWidget.asset != widget.asset ||
         oldWidget.assetPackageName != widget.assetPackageName) {
-      await _controller.dispose();
+      await _controller?.dispose();
       _controller = VideoPlayerController.asset(
         widget.asset,
         package: widget.assetPackageName,
@@ -56,8 +64,9 @@ class _HeroSectionState extends State<HeroSection>
   }
 
   @override
-  void dispose() {
-    unawaited(_controller.dispose());
+  Future<void> dispose() async {
+    await _controller?.dispose();
+    _controller = null;
     super.dispose();
   }
 
@@ -70,7 +79,7 @@ class _HeroSectionState extends State<HeroSection>
       alignment: widget.alignment,
       children: [
         _Background(
-          controller: _controller,
+          controller: _effectiveController,
         ),
         Align(
           alignment: widget.alignment,
@@ -82,13 +91,12 @@ class _HeroSectionState extends State<HeroSection>
 
   Future<void> _initalizedVideoPlayer() async {
     if (mounted) {
-      await _controller.initialize().then((_) async {
-        await _controller.setVolume(0);
-        await _controller.play();
-        await _controller.setLooping(true);
+      await _controller?.initialize().then((_) async {
+        await _controller?.setVolume(0);
+        await _controller?.play();
+        await _controller?.setLooping(true);
+        setState(() {});
       });
-
-      setState(() {});
     }
   }
 }
