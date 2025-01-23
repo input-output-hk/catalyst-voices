@@ -7,7 +7,8 @@ import 'suites/app_test.dart' as app_test;
 import 'suites/onboarding_test.dart' as onboarding_test;
 
 void main() async {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  binding.testTextInput.register();
 
   setUpAll(() async {
     await bootstrap(router: buildAppRouter());

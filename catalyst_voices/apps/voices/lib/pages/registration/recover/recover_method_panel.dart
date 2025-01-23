@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -91,7 +90,7 @@ class _BlocOnDeviceKeychains extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<bool>(
+    return BlocRecoverSelector<bool>(
       key: const Key('BlocOnDeviceKeychains'),
       selector: (state) => state.foundKeychain,
       builder: (context, state) {
@@ -172,7 +171,8 @@ extension _RegistrationRecoverMethodExt on RegistrationRecoverMethod {
       };
 
   String _getTitle(VoicesLocalizations l10n) => switch (this) {
-        RegistrationRecoverMethod.seedPhrase => l10n.seedPhrase12Words,
+        RegistrationRecoverMethod.seedPhrase =>
+          l10n.recoverWithSeedPhrase12Words,
       };
 
   String? _getSubtitle(VoicesLocalizations l10n) => switch (this) {

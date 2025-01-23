@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/bloc_unlock_password_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/unlock_password_form.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -107,7 +106,7 @@ class _BlocUnlockPasswordForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocUnlockPasswordBuilder<
+    return BlocUnlockPasswordSelector<
         ({
           bool showError,
           PasswordStrength passwordStrength,
@@ -145,7 +144,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocUnlockPasswordBuilder<bool>(
+    return BlocUnlockPasswordSelector<bool>(
       stateSelector: (state) => state.recoverStateData.unlockPasswordState,
       selector: (state) => state.isNextEnabled,
       builder: (context, state) {

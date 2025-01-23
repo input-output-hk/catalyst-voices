@@ -17,13 +17,11 @@ final class LoadingProposalsState extends ProposalsState {
 /// The loaded proposals.
 final class LoadedProposalsState extends ProposalsState {
   final List<ProposalViewModel> proposals;
-  final List<ProposalViewModel> favoriteProposals;
 
   const LoadedProposalsState({
     this.proposals = const [],
-    this.favoriteProposals = const [],
   });
 
   @override
-  List<Object?> get props => [proposals, favoriteProposals];
+  List<Object?> get props => [proposals];
 }

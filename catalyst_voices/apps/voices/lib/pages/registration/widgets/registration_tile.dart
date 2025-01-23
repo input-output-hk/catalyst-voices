@@ -65,6 +65,10 @@ class RegistrationTile extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(width: 10),
+                VoicesAssets.icons.chevronRight.buildIcon(
+                  color: foregroundColor,
+                ),
               ],
             ),
           ),
