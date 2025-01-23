@@ -1,6 +1,4 @@
-import 'package:catalyst_voices/widgets/common/grayscale_filter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +10,8 @@ class RoleChooserCard extends StatelessWidget {
   /// The current displaying value.
   final bool value;
 
-  /// Needs to be a rasterized image.
-  final String imageUrl;
+  /// Icon image.
+  final Widget icon;
 
   /// The text label displaying on the card.
   final String label;
@@ -36,7 +34,7 @@ class RoleChooserCard extends StatelessWidget {
   const RoleChooserCard({
     super.key,
     required this.value,
-    required this.imageUrl,
+    required this.icon,
     required this.label,
     this.lockValueAsDefault = false,
     this.isLearnMoreHidden = false,
@@ -63,14 +61,7 @@ class RoleChooserCard extends StatelessWidget {
         children: [
           Column(
             children: [
-              GrayscaleFilter(
-                image: CatalystImage.asset(
-                  imageUrl,
-                  width: 70,
-                  height: 70,
-                  fit: BoxFit.cover,
-                ),
-              ),
+              icon,
             ],
           ),
           const SizedBox(width: 12),

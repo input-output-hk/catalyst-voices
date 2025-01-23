@@ -23,7 +23,7 @@ abstract interface class KeychainCreationManager
 
   void setUserSeedPhraseWords(List<SeedPhraseWord> words);
 
-  Future<void> downloadSeedPhrase();
+  Future<void> exportSeedPhrase();
 
   bool areWordsMatching(List<SeedPhraseWord> words);
 }
@@ -100,7 +100,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   @override
-  Future<void> downloadSeedPhrase() async {
+  Future<void> exportSeedPhrase() async {
     final mnemonic = _seedPhrase?.mnemonic;
     if (mnemonic == null) {
       emitError(const LocalizedRegistrationSeedPhraseNotFoundException());

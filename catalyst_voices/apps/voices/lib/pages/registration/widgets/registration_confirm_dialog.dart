@@ -9,10 +9,10 @@ class RecoveryExitConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExitConfirmDialog(
+    return RegistrationConfirmDialog(
       title: context.l10n.warning,
       subtitle: context.l10n.recoveryExitConfirmDialogSubtitle,
-      content: context.l10n.recoveryExitConfirmDialogContent,
+      content: Text(context.l10n.recoveryExitConfirmDialogContent),
       positive: context.l10n.recoveryExitConfirmDialogContinue,
       negative: context.l10n.cancelAnyways,
     );
@@ -24,24 +24,24 @@ class RegistrationExitConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExitConfirmDialog(
+    return RegistrationConfirmDialog(
       title: context.l10n.warning,
       subtitle: context.l10n.registrationExitConfirmDialogSubtitle,
-      content: context.l10n.registrationExitConfirmDialogContent,
+      content: Text(context.l10n.registrationExitConfirmDialogContent),
       positive: context.l10n.registrationExitConfirmDialogContinue,
       negative: context.l10n.cancelAnyways,
     );
   }
 }
 
-class ExitConfirmDialog extends StatelessWidget {
+class RegistrationConfirmDialog extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String content;
+  final Widget content;
   final String positive;
   final String negative;
 
-  const ExitConfirmDialog({
+  const RegistrationConfirmDialog({
     super.key,
     required this.title,
     required this.subtitle,
@@ -58,7 +58,7 @@ class ExitConfirmDialog extends StatelessWidget {
       subtitle: Text(subtitle.toUpperCase()),
       content: Padding(
         padding: const EdgeInsets.only(bottom: 30),
-        child: Text(content),
+        child: content,
       ),
       actions: [
         VoicesQuestionActionItem.negative(

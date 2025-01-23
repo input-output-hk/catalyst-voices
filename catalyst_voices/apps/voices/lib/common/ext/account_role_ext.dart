@@ -63,20 +63,11 @@ extension AccountRoleExt on AccountRole {
     }
   }
 
-  String get avatarPath {
-    switch (this) {
-      case AccountRole.voter:
-        return VoicesAssets.images.roleInfoVoter.path;
-      case AccountRole.proposer:
-        return VoicesAssets.images.roleInfoProposer.path;
-      case AccountRole.drep:
-        return VoicesAssets.images.roleInfoDrep.path;
-    }
+  SvgGenImage get icon {
+    return switch (this) {
+      AccountRole.voter => VoicesAssets.images.roleVoter,
+      AccountRole.drep => VoicesAssets.images.roleDrep,
+      AccountRole.proposer => VoicesAssets.images.roleProposer,
+    };
   }
-
-  String get icon => switch (this) {
-        AccountRole.voter => VoicesAssets.images.roleVoter.path,
-        AccountRole.proposer => VoicesAssets.images.roleProposer.path,
-        AccountRole.drep => VoicesAssets.images.roleDrep.path,
-      };
 }
