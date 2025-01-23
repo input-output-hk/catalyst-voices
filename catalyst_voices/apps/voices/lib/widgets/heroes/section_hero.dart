@@ -71,7 +71,6 @@ class _HeroSectionState extends State<HeroSection>
   Future<void> dispose() async {
     await _controller?.dispose();
     _controller = null;
-    super.dispose();
   }
 
   @override
@@ -110,8 +109,6 @@ class _Background extends StatelessWidget {
   const _Background({
     required this.controller,
   });
-
-  @override
   Widget build(BuildContext context) {
     return controller.value.isInitialized
         ? ConstrainedBox(
@@ -119,6 +116,7 @@ class _Background extends StatelessWidget {
             child: FittedBox(
               fit: BoxFit.cover,
               child: SizedBox(
+
                 width: controller.value.size.width,
                 height: controller.value.size.height,
                 child: VideoPlayer(controller),

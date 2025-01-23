@@ -1,7 +1,9 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 /// A panel that displays a series of [RoleChooserCard] widgets for selecting
@@ -34,9 +36,14 @@ class RolesSummaryContainer extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          children: AccountRole.values.map<Widget>((role) {
+          children: AccountRole.values
+              .whereNot((role) => role.isHidden)
+              .map<Widget>((role) {
             return RoleChooserCard(
-              imageUrl: role.icon,
+              icon: role.icon.buildIcon(
+                size: 66,
+                allowColorFilter: false,
+              ),
               value: selected.contains(role),
               label: role.getName(context),
               lockValueAsDefault:

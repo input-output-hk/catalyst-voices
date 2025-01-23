@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
@@ -114,20 +115,22 @@ class _CampaignDetailsButton extends StatelessWidget {
     return BlocSelector<CampaignInfoCubit, CampaignInfoState, String?>(
       selector: (state) => state.campaign?.id,
       builder: (context, campaignId) {
-        if (campaignId == null) {
-          return const Offstage();
-        }
-
-        return Padding(
-          padding: const EdgeInsets.only(top: 32),
-          child: OutlinedButton.icon(
-            onPressed: () {
-              unawaited(
-                CampaignDetailsDialog.show(context, id: campaignId),
-              );
-            },
-            label: Text(context.l10n.campaignDetails),
-            icon: VoicesAssets.icons.arrowsExpand.buildIcon(),
+        return Offstage(
+          offstage: campaignId == null,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 32),
+            child: OutlinedButton.icon(
+              onPressed: () {
+                if (campaignId == null) {
+                  throw ArgumentError('Campaign ID is null');
+                }
+                unawaited(
+                  CampaignDetailsDialog.show(context, id: campaignId),
+                );
+              },
+              label: Text(context.l10n.campaignDetails),
+              icon: VoicesAssets.icons.arrowsExpand.buildIcon(),
+            ),
           ),
         );
       },
@@ -200,12 +203,10 @@ class _TabBar extends StatelessWidget {
               text: context.l10n.noOfAllProposals(proposalsCount),
             ),
             Tab(
-              child: Row(
-                children: [
-                  VoicesAssets.icons.starOutlined.buildIcon(),
-                  const SizedBox(width: 8),
-                  Text(context.l10n.favorites),
-                ],
+              child: AffixDecorator(
+                gap: 8,
+                prefix: VoicesAssets.icons.starOutlined.buildIcon(),
+                child: Text(context.l10n.favorites),
               ),
             ),
           ],
@@ -224,13 +225,11 @@ class _AllProposals extends StatelessWidget {
       builder: (context, state) {
         return switch (state) {
           LoadingProposalsState() => const _LoadingProposals(),
-          LoadedProposalsState(:final proposals, :final favoriteProposals) =>
-            proposals.isEmpty
-                ? const _EmptyProposals()
-                : _AllProposalsList(
-                    proposals: proposals,
-                    favoriteProposals: favoriteProposals,
-                  ),
+          LoadedProposalsState(:final proposals) => proposals.isEmpty
+              ? const _EmptyProposals()
+              : _AllProposalsList(
+                  proposals: proposals,
+                ),
         };
       },
     );
@@ -239,11 +238,9 @@ class _AllProposals extends StatelessWidget {
 
 class _AllProposalsList extends StatelessWidget {
   final List<ProposalViewModel> proposals;
-  final List<ProposalViewModel> favoriteProposals;
 
   const _AllProposalsList({
     required this.proposals,
-    required this.favoriteProposals,
   });
 
   @override
@@ -260,17 +257,12 @@ class _AllProposalsList extends StatelessWidget {
             showLastUpdate: false,
             showComments: false,
             showSegments: false,
-            isFavorite: favoriteProposals.contains(proposal),
+            isFavorite: proposal.isFavorite,
             onFavoriteChanged: (isFavorite) async {
-              if (isFavorite) {
-                await context
-                    .read<ProposalsCubit>()
-                    .onFavoriteProposal(proposal.id);
-              } else {
-                await context
-                    .read<ProposalsCubit>()
-                    .onUnfavoriteProposal(proposal.id);
-              }
+              await context.read<ProposalsCubit>().onChangeFavoriteProposal(
+                    proposal.id,
+                    isFavorite: isFavorite,
+                  );
             },
           ),
       ],
@@ -287,12 +279,11 @@ class _FavoriteProposals extends StatelessWidget {
       builder: (context, state) {
         return switch (state) {
           LoadingProposalsState() => const _LoadingProposals(),
-          LoadedProposalsState(:final favoriteProposals) =>
-            favoriteProposals.isEmpty
-                ? const _EmptyProposals()
-                : _FavoriteProposalsList(
-                    proposals: favoriteProposals,
-                  ),
+          LoadedProposalsState(:final proposals) => proposals.favorites.isEmpty
+              ? const _EmptyProposals()
+              : _FavoriteProposalsList(
+                  proposals: proposals.favorites,
+                ),
         };
       },
     );
@@ -320,15 +311,10 @@ class _FavoriteProposalsList extends StatelessWidget {
             showSegments: false,
             isFavorite: true,
             onFavoriteChanged: (isFavorite) async {
-              if (isFavorite) {
-                await context
-                    .read<ProposalsCubit>()
-                    .onFavoriteProposal(proposal.id);
-              } else {
-                await context
-                    .read<ProposalsCubit>()
-                    .onUnfavoriteProposal(proposal.id);
-              }
+              await context.read<ProposalsCubit>().onChangeFavoriteProposal(
+                    proposal.id,
+                    isFavorite: isFavorite,
+                  );
             },
           ),
       ],

@@ -20,7 +20,7 @@ class MarkdownText extends StatelessWidget with LaunchUrlMixin {
       selectable: selectable,
       onTapLink: (text, href, title) async {
         if (href != null) {
-          await launchHrefUrl(href.getUri());
+          await launchUri(href.getUri());
         }
       },
     );

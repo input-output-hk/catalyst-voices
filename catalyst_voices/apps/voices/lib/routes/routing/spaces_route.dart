@@ -107,11 +107,7 @@ final class WorkspaceRoute extends GoRouteData
   }
 }
 
-final class ProposalsRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  @override
-  List<RouteGuard> get routeGuards => [];
-
+final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ProposalsPage();

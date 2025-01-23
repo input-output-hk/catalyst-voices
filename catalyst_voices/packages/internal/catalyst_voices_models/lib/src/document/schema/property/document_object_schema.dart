@@ -61,6 +61,8 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
 
 /// A top-level grouping object of the document.
 final class DocumentSegmentSchema extends DocumentObjectSchema {
+  final String? icon;
+
   const DocumentSegmentSchema({
     required super.nodeId,
     required super.format,
@@ -70,6 +72,7 @@ final class DocumentSegmentSchema extends DocumentObjectSchema {
     required super.properties,
     required super.oneOf,
     required super.order,
+    required this.icon,
   });
 
   List<DocumentSectionSchema> get sections =>
@@ -87,8 +90,13 @@ final class DocumentSegmentSchema extends DocumentObjectSchema {
           properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
       oneOf: oneOf,
       order: order,
+      icon: icon,
     );
   }
+
+  @override
+  @mustCallSuper
+  List<Object?> get props => super.props + [icon];
 }
 
 /// A grouping object in a document on a section level.
@@ -220,6 +228,17 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
     required super.properties,
     required super.oneOf,
     required super.order,
+  });
+
+  const DocumentGenericObjectSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.title = '',
+    super.description,
+    super.isRequired = false,
+    super.properties = const [],
+    super.oneOf,
+    super.order = const [],
   });
 
   @override

@@ -1,34 +1,46 @@
+import 'package:catalyst_voices/common/formatters/input_formatters.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 final class VoicesEmailTextField extends StatelessWidget {
-  /// Emits new value when widget input changes
+  final String? initialText;
   final ValueChanged<String>? onChanged;
-  final ValueChanged<String> onFieldSubmitted;
+  final ValueChanged<String>? onFieldSubmitted;
+  final VoidCallback? onEditingComplete;
+  final TextInputAction textInputAction;
+  final VoicesTextFieldDecoration? decoration;
+  final int? maxLength;
 
   const VoicesEmailTextField({
     super.key,
+    this.initialText,
     this.onChanged,
     required this.onFieldSubmitted,
+    this.onEditingComplete,
+    this.textInputAction = TextInputAction.next,
+    this.decoration,
+    this.maxLength,
   });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return VoicesTextField(
+      initialText: initialText,
       keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
+      textInputAction: textInputAction,
       onChanged: onChanged,
       onFieldSubmitted: onFieldSubmitted,
-      decoration: VoicesTextFieldDecoration(
-        labelText: l10n.emailLabelText,
-        hintText: l10n.emailHintText,
-        errorText: l10n.emailErrorText,
-      ),
+      onEditingComplete: onEditingComplete,
+      decoration: decoration,
       style: const TextStyle(
         fontWeight: FontWeight.w500,
       ),
+      maxLength: maxLength,
+      inputFormatters: [
+        FilteringTextInputFormatter.singleLineFormatter,
+        NoWhitespacesFormatter(),
+      ],
     );
   }
 }

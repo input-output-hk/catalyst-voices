@@ -18,7 +18,7 @@ class RegistrationStageMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textColor = this.textColor ?? theme.colors.textOnPrimaryLevel0;
+    final textColor = this.textColor ?? theme.colors.textOnPrimaryLevel1;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
