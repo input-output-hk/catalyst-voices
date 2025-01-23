@@ -1,7 +1,7 @@
 //! Integration tests of the `IndexDB` queries
 //! This module contains utility functions used with different testing modules.
 
-use std::{process, sync::Arc};
+use std::sync::Arc;
 
 use tokio::sync::OnceCell;
 
@@ -43,8 +43,7 @@ async fn get_shared_session() -> Result<(Arc<CassandraSession>, Arc<CassandraSes
     SHARED_SESSION.get_or_init(setup_test_database).await;
 
     if let Some(Err(err)) = SHARED_SESSION.get() {
-        println!("{err}");
-        process::exit(1);
+        panic!("{err}");
     }
 
     get_session()

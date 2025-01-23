@@ -34,19 +34,17 @@ pub(crate) struct GetAllStakesAndVoteKeysQuery {
 impl GetAllStakesAndVoteKeysQuery {
     /// Prepares get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)]
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_all_stake_and_vote_keys = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session,
             GET_ALL_STAKES_AND_VOTE_KEYS,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        get_all_stake_and_vote_keys
-            .inspect_err(
-                |error| error!(error=%error, "Failed to prepare get all (stake addrs, vote_keys)"),
-            )
-            .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_ALL_STAKES_AND_VOTE_KEYS}"))
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get all (stake addrs, vote_keys)"),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_ALL_STAKES_AND_VOTE_KEYS}"))
     }
 
     /// Executes get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)]
