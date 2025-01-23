@@ -44,4 +44,3 @@ class Range<T extends num> extends Equatable {
   @override
   List<Object?> get props => [min, max];
 }
-
