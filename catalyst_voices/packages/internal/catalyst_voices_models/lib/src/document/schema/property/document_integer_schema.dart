@@ -95,6 +95,17 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
     required super.numRange,
   });
 
+  const DocumentGenericIntegerSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.title = '',
+    super.description,
+    super.isRequired = false,
+    super.defaultValue,
+    super.enumValues,
+    super.numRange,
+  });
+
   @override
   DocumentGenericIntegerSchema withNodeId(DocumentNodeId nodeId) {
     return DocumentGenericIntegerSchema(

@@ -24,6 +24,15 @@ final class DocumentSchema extends Equatable implements DocumentNode {
     required this.order,
   });
 
+  const DocumentSchema.optional({
+    this.jsonSchema = '',
+    this.propertiesSchema = '',
+    this.title = '',
+    this.description = MarkdownData.empty,
+    this.properties = const [],
+    this.order = const [],
+  });
+
   @override
   DocumentNodeId get nodeId => DocumentNodeId.root;
 
