@@ -71,7 +71,7 @@ jobs:
         continue-on-error: true
         with:
           command: run
-          args: ./catalyst-voices/apps/voices/integration_test+nightly-test-web-all
+          args: ./catalyst_voices/apps/voices/integration_test+nightly-test-web-all
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
