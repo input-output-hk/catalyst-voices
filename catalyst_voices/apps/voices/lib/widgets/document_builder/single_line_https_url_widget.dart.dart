@@ -28,7 +28,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
-  String get _description => widget.schema.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
 
   @override
   void initState() {
@@ -64,9 +64,9 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

@@ -26,7 +26,7 @@ class YesNoChoiceWidget extends StatefulWidget {
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   late bool? selectedValue;
 
-  String get _description => widget.schema.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
 
   @override
   void initState() {
@@ -55,9 +55,9 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

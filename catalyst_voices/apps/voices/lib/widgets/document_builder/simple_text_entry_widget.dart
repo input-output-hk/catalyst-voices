@@ -27,7 +27,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
 
-  String get _description => widget.schema.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
   int? get _maxLength => widget.schema.strLengthRange?.max;
   bool get _resizable => widget.schema is DocumentMultiLineTextEntrySchema;
 
@@ -68,9 +68,9 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
