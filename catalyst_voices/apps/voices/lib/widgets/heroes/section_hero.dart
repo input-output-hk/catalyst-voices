@@ -44,7 +44,9 @@ class _HeroSectionState extends State<HeroSection>
       package: widget.assetPackageName,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _initalizedVideoPlayer();
+      if (mounted) {
+        await _initalizedVideoPlayer();
+      }
     });
   }
 
@@ -59,7 +61,9 @@ class _HeroSectionState extends State<HeroSection>
         widget.asset,
         package: widget.assetPackageName,
       );
-      await _initalizedVideoPlayer();
+      if (mounted) {
+        await _initalizedVideoPlayer();
+      }
     }
   }
 
@@ -90,13 +94,13 @@ class _HeroSectionState extends State<HeroSection>
   }
 
   Future<void> _initalizedVideoPlayer() async {
+    await _controller?.initialize().then((_) async {
+      await _controller?.setVolume(0);
+      await _controller?.play();
+      await _controller?.setLooping(true);
+    });
     if (mounted) {
-      await _controller?.initialize().then((_) async {
-        await _controller?.setVolume(0);
-        await _controller?.play();
-        await _controller?.setLooping(true);
-        setState(() {});
-      });
+      setState(() {});
     }
   }
 }
