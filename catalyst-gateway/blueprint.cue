@@ -14,7 +14,7 @@ project: {
 		environment: "dev"
 		modules: main: {
 			name:    "app"
-			version: "0.3.0"
+			version: "0.3.1"
 			values: {
 				deployment: {
 					containers: gateway: {
@@ -198,8 +198,8 @@ project: {
 				}
 
 				service: {
-					port:       80
-					targetPort: 3030
+					port:   80
+					scrape: true
 				}
 
 				volumes: data: {
