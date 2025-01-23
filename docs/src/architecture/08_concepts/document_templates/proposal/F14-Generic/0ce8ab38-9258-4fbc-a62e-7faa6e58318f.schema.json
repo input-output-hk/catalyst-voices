@@ -807,6 +807,7 @@
                             "maxItems": 6,
                             "items": {
                                 "type": "object",
+                                "title": "Milestone",
                                 "required": ["title", "outputs", "acceptance_criteria", "evidence", "delivery_month", "cost", "progress"],
                                 "properties": {
                                     "title": {
