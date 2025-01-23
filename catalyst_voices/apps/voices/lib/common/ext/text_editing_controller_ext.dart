@@ -12,6 +12,7 @@ extension TextEditingControllerExt on TextEditingController {
           // if the text is already set no need to update the selection
           ? TextSelection.collapsed(offset: newText.length)
           : null,
+      composing: TextRange.empty,
     );
   }
 }
