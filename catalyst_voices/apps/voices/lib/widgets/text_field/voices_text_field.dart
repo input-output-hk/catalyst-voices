@@ -66,7 +66,13 @@ class VoicesTextField extends StatefulWidget {
   /// in HTML's text area fashion.
   ///
   /// Defaults to true on web and desktop, false otherwise.
-  final bool? resizable;
+  final bool? resizableVertically;
+
+  /// Whether the text field can be resized by the user
+  /// in HTML's text area fashion.
+  ///
+  /// Defaults to false on all platforms.
+  final bool resizableHorizontally;
 
   /// [TextFormField.validator]
   final VoicesTextFieldValidator? validator;
@@ -115,7 +121,8 @@ class VoicesTextField extends StatefulWidget {
     this.ignorePointers,
     this.validator,
     this.onChanged,
-    this.resizable,
+    this.resizableVertically,
+    this.resizableHorizontally = false,
     // Making it required but nullable because default behaviour is
     // to make some action when user taps enter. Focus next field or anything
     // else.
@@ -138,9 +145,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   VoicesTextFieldValidationResult _validation =
       const VoicesTextFieldValidationResult.none();
 
-  bool get _isResizable {
-    final resizable = widget.resizable ??
-        (CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop);
+  bool get _isResizableVertically {
+    final resizable = widget.resizableVertically ?? _isResizableByDefault;
 
     // expands property is not supported if any of these are specified,
     // both must be null
@@ -148,6 +154,14 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         widget.maxLines == null && widget.minLines == null;
 
     return resizable && hasNoLineConstraints;
+  }
+
+  bool get _isResizableHorizontally {
+    return widget.resizableHorizontally;
+  }
+
+  bool get _isResizableByDefault {
+    return CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop;
   }
 
   @override
@@ -203,7 +217,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final textTheme = theme.textTheme;
 
     final labelText = widget.decoration?.labelText ?? '';
-    final resizable = _isResizable;
+    final resizableVertically = _isResizableVertically;
+    final resizableHorizontally = _isResizableHorizontally;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,15 +234,15 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           const SizedBox(height: 4),
         ],
         ResizableBoxParent(
-          resizableHorizontally: resizable,
-          resizableVertically: resizable,
+          resizableHorizontally: resizableHorizontally,
+          resizableVertically: resizableVertically,
           minHeight: widget.maxLines == null ? 65 : 48,
           iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
             key: const Key('VoicesTextField'),
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
-            expands: resizable,
+            expands: resizableVertically,
             controller: _obtainController(),
             statesController: widget.statesController,
             focusNode: widget.focusNode,
