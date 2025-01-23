@@ -22,7 +22,9 @@ use crate::{
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_assets_by_stake_addr() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
@@ -39,7 +41,9 @@ async fn test_get_assets_by_stake_addr() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_chain_root() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
         stake_address: vec![],
@@ -55,7 +59,9 @@ async fn test_get_chain_root() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_invalid_registration_w_stake_addr() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream = GetInvalidRegistrationQuery::execute(
         &session,
@@ -72,7 +78,9 @@ async fn test_get_invalid_registration_w_stake_addr() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_registrations_by_chain_root() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream = GetRegistrationsByChainRootQuery::execute(
         &session,
@@ -89,7 +97,9 @@ async fn test_get_registrations_by_chain_root() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_registrations_w_stake_addr() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream = GetRegistrationQuery::execute(&session, GetRegistrationParams {
         stake_address: vec![],
@@ -105,7 +115,9 @@ async fn test_get_registrations_w_stake_addr() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_role0_key_chain_root() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
         role0_key: vec![],
@@ -121,7 +133,9 @@ async fn test_get_role0_key_chain_root() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_stake_addr_w_stake_key_hash() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream =
         GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
@@ -136,7 +150,9 @@ async fn test_get_stake_addr_w_stake_key_hash() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_stake_addr_w_vote_key() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream =
         GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
@@ -155,7 +171,7 @@ async fn test_get_stake_addr_w_vote_key() {
 // from `testunit` CI run"] #[tokio::test]
 // async fn test_get_sync_status() {
 //     let (session, _) =
-// get_shared_session().await.unwrap();
+// get_shared_session().await
 
 //     Ok(())
 // }
@@ -163,7 +179,9 @@ async fn test_get_stake_addr_w_vote_key() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_txi_by_txn_hashes() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream =
         GetTxiByTxnHashesQuery::execute(&session, GetTxiByTxnHashesQueryParams::new(vec![]))
@@ -178,7 +196,9 @@ async fn test_get_txi_by_txn_hashes() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_get_txo_by_stake_address() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     let mut row_stream = GetTxoByStakeAddressQuery::execute(
         &session,
@@ -195,7 +215,9 @@ async fn test_get_txo_by_stake_address() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_insert_sync_status() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     SyncStatusInsertQuery::execute(
         &session,
@@ -208,7 +230,9 @@ async fn test_insert_sync_status() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_update_txo_spent() {
-    let (session, _) = get_shared_session().await.unwrap();
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
     UpdateTxoSpentQuery::execute(&session, vec![])
         .await
