@@ -50,6 +50,6 @@ integration-test-web:
 # reenable when enable-threads.js workaround is removed
 # and https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407 closed
 # Enable but do not fail the build for now
-test-web-all:
+nightly-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome
