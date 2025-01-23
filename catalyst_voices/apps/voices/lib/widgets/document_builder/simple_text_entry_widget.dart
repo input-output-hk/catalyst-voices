@@ -47,7 +47,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
     if (oldWidget.isEditMode != widget.isEditMode) {
       _handleEditModeChanged();
       if (!widget.isEditMode) {
-        _controller.textWithSelection = (widget.property.value ?? '');
+        _controller.textWithSelection = widget.property.value ?? '';
       }
     }
 
