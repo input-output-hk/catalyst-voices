@@ -140,52 +140,6 @@ class _CampaignBrief extends StatelessWidget {
   }
 }
 
-class _CampaignBrief extends StatelessWidget {
-  const _CampaignBrief();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.heroSectionTitle,
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-        ),
-        const SizedBox(height: 32),
-        Text(
-          context.l10n.projectCatalystDescription,
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 32),
-        Row(
-          children: [
-            VoicesFilledButton(
-              onTap: () {
-                // TODO(LynxxLynx): implement redirect to current campaign
-              },
-              child: Text(context.l10n.viewCurrentCampaign),
-            ),
-            const SizedBox(width: 8),
-            Offstage(
-              offstage: true,
-              child: VoicesOutlinedButton(
-                onTap: () {
-                  // TODO(LynxxLynx): implement redirect to my proposals
-                },
-                child: Text(context.l10n.myProposals),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 class _CampaignCategories extends StatelessWidget {
   const _CampaignCategories();
 
