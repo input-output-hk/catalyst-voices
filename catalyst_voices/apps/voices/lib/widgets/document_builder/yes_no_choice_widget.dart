@@ -186,6 +186,7 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
 
 class _YesNoChoiceSegmentButtonState extends FormFieldState<bool?> {
   bool? _internalValue;
+  
   @override
   void initState() {
     super.initState();
