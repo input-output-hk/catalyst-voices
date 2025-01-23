@@ -219,24 +219,24 @@ pub(crate) async fn create_schema(
         .await
         .context("Creating Namespace")?;
 
-    let mut failed = false;
-
     for (schema, schema_name) in SCHEMAS {
         match session.prepare(*schema).await {
             Ok(stmt) => {
                 if let Err(err) = session.execute_unpaged(&stmt, ()).await {
-                    failed = true;
                     error!(schema=schema_name, error=%err, "Failed to Execute Create Schema Query");
+                    return Err(anyhow::anyhow!(
+                        "Failed to Execute Create Schema Query: {err}\n--\nSchema: {schema_name}\n--\n{schema}"
+                    ));
                 };
             },
             Err(err) => {
-                failed = true;
                 error!(schema=schema_name, error=%err, "Failed to Prepare Create Schema Query");
+                return Err(anyhow::anyhow!(
+                    "Failed to Prepare Create Schema Query: {err}\n--\nSchema: {schema_name}\n--\n{schema}"
+                ));
             },
         }
     }
-
-    anyhow::ensure!(!failed, "Failed to Create Schema");
 
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
