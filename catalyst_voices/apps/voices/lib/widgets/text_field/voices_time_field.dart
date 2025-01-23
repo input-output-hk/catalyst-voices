@@ -54,8 +54,9 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
     final initialTime = _effectiveController.value;
     final initialText = _convertTimeToText(initialTime);
 
-    _textEditingController = TextEditingController(text: initialText);
-    _textEditingController.addListener(_handleTextChanged);
+    _textEditingController = TextEditingController()
+      ..textWithSelection = initialText
+      ..addListener(_handleTextChanged);
 
     _effectiveController.addListener(_handleDateChanged);
 

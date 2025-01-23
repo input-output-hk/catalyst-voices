@@ -50,8 +50,9 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
     final initialDate = _effectiveController.value;
     final initialText = _convertDateToText(initialDate);
 
-    _textEditingController = TextEditingController(text: initialText);
-    _textEditingController.addListener(_handleTextChanged);
+    _textEditingController = TextEditingController()
+      ..textWithSelection = initialText
+      ..addListener(_handleTextChanged);
 
     _effectiveController.addListener(_handleDateChanged);
 

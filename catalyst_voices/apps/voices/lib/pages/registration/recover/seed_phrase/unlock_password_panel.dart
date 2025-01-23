@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/unlock_password_form.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -27,9 +28,12 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
     final password = unlockPasswordState.password.value;
     final confirmPassword = unlockPasswordState.confirmPassword.value;
 
-    _passwordController = TextEditingController(text: password)
+    _passwordController = TextEditingController()
+      ..textWithSelection = password
       ..addListener(_onPasswordChanged);
-    _confirmPasswordController = TextEditingController(text: confirmPassword)
+
+    _confirmPasswordController = TextEditingController()
+      ..textWithSelection = confirmPassword
       ..addListener(_onConfirmPasswordChanged);
   }
 

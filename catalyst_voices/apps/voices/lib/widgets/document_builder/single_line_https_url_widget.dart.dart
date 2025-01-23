@@ -34,8 +34,10 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController(text: widget.property.value);
-    _textEditingController.addListener(_handleControllerChange);
+    _textEditingController = TextEditingController()
+      ..textWithSelection = widget.property.value ?? ''
+      ..addListener(_handleControllerChange);
+
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 

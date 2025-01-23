@@ -68,8 +68,9 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
     final num = _effectiveController.value;
     final text = _toText(num);
 
-    _textEditingController = TextEditingController(text: text);
-    _textEditingController.addListener(_handleTextChange);
+    _textEditingController = TextEditingController()
+      ..textWithSelection = text ?? ''
+      ..addListener(_handleTextChange);
 
     _effectiveController.addListener(_handleNumChange);
   }
