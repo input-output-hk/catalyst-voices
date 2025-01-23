@@ -24,7 +24,7 @@ class YesNoChoiceWidget extends StatefulWidget {
 }
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
-  late bool? selectedValue;
+  late bool? _selectedValue;
 
   String get _title => widget.schema.formattedTitle;
 
@@ -64,7 +64,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
         ],
         _YesNoChoiceSegmentButton(
           context,
-          value: selectedValue,
+          value: _selectedValue,
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
           validator: (value) {
@@ -79,14 +79,15 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   }
 
   void _handleInitialValue() {
-    selectedValue = widget.property.value;
+    _selectedValue = widget.property.value;
   }
 
   void _handleValueChanged(bool? value) {
     setState(() {
-      selectedValue = value;
+      _selectedValue = value;
     });
-    if (value == null && widget.property.value != value) {
+
+    if (widget.property.value != value) {
       _notifyChangeListener(value);
     }
   }
