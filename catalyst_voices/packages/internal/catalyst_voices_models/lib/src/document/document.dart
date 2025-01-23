@@ -33,6 +33,17 @@ final class Document extends Equatable {
       .where((e) => e.schema is DocumentSegmentSchema)
       .toList();
 
+  /// Queries the whole document for the property with [nodeId].
+  DocumentProperty? getProperty(DocumentNodeId nodeId) {
+    for (final property in properties) {
+      final foundProperty = property.getProperty(nodeId);
+      if (foundProperty != null) {
+        return foundProperty;
+      }
+    }
+    return null;
+  }
+
   /// Creates a new [DocumentBuilder] from this document.
   DocumentBuilder toBuilder() {
     return DocumentBuilder.fromDocument(this);
@@ -61,6 +72,9 @@ sealed class DocumentProperty extends Equatable implements DocumentNode {
   /// Returns true if the property (including children properties) are valid,
   /// false otherwise.
   bool get isValid;
+
+  /// Queries this property and it's children for a property with [nodeId].
+  DocumentProperty? getProperty(DocumentNodeId nodeId);
 
   /// Returns a builder that can update the property state.
   DocumentPropertyBuilder toBuilder();
@@ -94,6 +108,26 @@ final class DocumentListProperty extends DocumentProperty {
     }
 
     return properties.every((e) => e.isValid);
+  }
+
+  @override
+  DocumentProperty? getProperty(DocumentNodeId nodeId) {
+    if (nodeId == this.nodeId) {
+      return this;
+    }
+
+    if (!nodeId.isChildOf(this.nodeId)) {
+      return null;
+    }
+
+    for (final property in properties) {
+      final foundProperty = property.getProperty(nodeId);
+      if (foundProperty != null) {
+        return foundProperty;
+      }
+    }
+
+    return null;
   }
 
   @override
@@ -138,6 +172,26 @@ final class DocumentObjectProperty extends DocumentProperty {
     return true;
   }
 
+  @override
+  DocumentProperty? getProperty(DocumentNodeId nodeId) {
+    if (nodeId == this.nodeId) {
+      return this;
+    }
+
+    if (!nodeId.isChildOf(this.nodeId)) {
+      return null;
+    }
+
+    for (final property in properties) {
+      final foundProperty = property.getProperty(nodeId);
+      if (foundProperty != null) {
+        return foundProperty;
+      }
+    }
+
+    return null;
+  }
+
   DocumentProperty?
       getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
     return properties.firstWhereOrNull((e) => e.schema is T);
@@ -180,6 +234,11 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
   @override
   bool get isValid {
     return validationResult.isValid;
+  }
+
+  @override
+  DocumentProperty? getProperty(DocumentNodeId nodeId) {
+    return nodeId == this.nodeId ? this : null;
   }
 
   /// Creates a new [DocumentValuePropertyBuilder] from this property.
