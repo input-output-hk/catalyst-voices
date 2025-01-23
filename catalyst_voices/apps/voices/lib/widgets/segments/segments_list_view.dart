@@ -8,12 +8,12 @@ typedef SegmentHeaderWidgetBuilder<T extends Segment> = Widget Function(
   T data,
 );
 
-typedef SectionWidgetBuilder<T extends Section2> = Widget Function(
+typedef SectionWidgetBuilder<T extends Section> = Widget Function(
   BuildContext context,
   T data,
 );
 
-class SegmentsListView<TSegment extends Segment, TSection extends Section2>
+class SegmentsListView<TSegment extends Segment, TSection extends Section>
     extends StatelessWidget {
   final List<SegmentsListViewItem> items;
   final SegmentHeaderWidgetBuilder<TSegment> headerBuilder;
