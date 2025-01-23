@@ -64,7 +64,7 @@ impl DocsQueryFilter {
         }
     }
 
-    /// Set the `type` field filter condition
+    /// Set the `id` field filter condition
     pub fn with_id(self, id: EqOrRangedUuid) -> Self {
         DocsQueryFilter {
             id: Some(id),
