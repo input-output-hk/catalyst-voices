@@ -39,9 +39,8 @@ class _SingleDropdownSelectionWidgetState
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController();
-    _textEditingController.textWithSelection = widget.value;
-
+    final textValue = TextEditingValueExt.collapsedAtEndOf(widget.value);
+    _textEditingController = TextEditingController.fromValue(textValue);
     _dropdownMenuEntries = _mapItems;
   }
 

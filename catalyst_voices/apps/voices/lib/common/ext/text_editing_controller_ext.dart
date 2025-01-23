@@ -5,13 +5,22 @@ extension TextEditingControllerExt on TextEditingController {
   /// the cursor position to last index if the text did change.
   set textWithSelection(String newText) {
     final textChanged = text != newText;
-    // if the text is already set no need to update the selection
-    text = newText;
 
-    if (textChanged) {
-      // deliberately using text since newText might be
-      // truncated by the text field if there are too many characters
-      selection = TextSelection.fromPosition(TextPosition(offset: text.length));
-    }
+    value = value.copyWith(
+      text: newText,
+      selection: textChanged
+          // if the text is already set no need to update the selection
+          ? TextSelection.collapsed(offset: newText.length)
+          : null,
+    );
+  }
+}
+
+extension TextEditingValueExt on TextEditingValue {
+  static TextEditingValue collapsedAtEndOf(String text) {
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
   }
 }

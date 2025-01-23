@@ -30,13 +30,16 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
     final password = unlockPasswordState.password.value;
     final confirmPassword = unlockPasswordState.confirmPassword.value;
 
-    _passwordController = TextEditingController()
-      ..textWithSelection = password
+    final passwordValue = TextEditingValueExt.collapsedAtEndOf(password);
+    final confirmPasswordValue =
+        TextEditingValueExt.collapsedAtEndOf(confirmPassword);
+
+    _passwordController = TextEditingController.fromValue(passwordValue)
       ..addListener(_onPasswordChanged);
 
-    _confirmPasswordController = TextEditingController()
-      ..textWithSelection = confirmPassword
-      ..addListener(_onConfirmPasswordChanged);
+    _confirmPasswordController =
+        TextEditingController.fromValue(confirmPasswordValue)
+          ..addListener(_onConfirmPasswordChanged);
   }
 
   @override

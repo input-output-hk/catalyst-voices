@@ -508,9 +508,10 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
 
     var customController = _customController;
     if (customController == null) {
-      customController = TextEditingController()
-        ..textWithSelection = widget.initialText ?? '';
+      final textValue =
+          TextEditingValueExt.collapsedAtEndOf(widget.initialText ?? '');
 
+      customController = TextEditingController.fromValue(textValue);
       _customController = customController;
     }
 

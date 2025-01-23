@@ -35,8 +35,11 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController()
-      ..textWithSelection = widget.property.value ?? ''
+
+    final textValue =
+        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+
+    _controller = TextEditingController.fromValue(textValue)
       ..addListener(_handleValueChange);
 
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
