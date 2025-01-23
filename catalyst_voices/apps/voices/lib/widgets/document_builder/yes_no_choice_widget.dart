@@ -149,12 +149,14 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                   ),
                 ),
                 if (field.hasError)
-                  Text(
-                    field.errorText ?? context.l10n.snackbarErrorLabelText,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      field.errorText ?? context.l10n.snackbarErrorLabelText,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                    ),
                   ),
               ],
             );
