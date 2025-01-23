@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class WalletSummary extends StatelessWidget {
+  final String walletName;
   final String balance;
   final String address;
   final String clipboardAddress;
@@ -13,6 +14,7 @@ class WalletSummary extends StatelessWidget {
 
   const WalletSummary({
     super.key,
+    required this.walletName,
     required this.balance,
     required this.address,
     required this.clipboardAddress,
@@ -36,6 +38,10 @@ class WalletSummary extends StatelessWidget {
           Text(
             context.l10n.walletDetectionSummary,
             style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 12),
+          _WalletSummaryName(
+            walletName: walletName,
           ),
           const SizedBox(height: 12),
           _WalletSummaryBalance(
@@ -77,6 +83,22 @@ class WalletSummary extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _WalletSummaryName extends StatelessWidget {
+  final String walletName;
+
+  const _WalletSummaryName({
+    required this.walletName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _WalletSummaryItem(
+      label: Text(context.l10n.nameOfWallet),
+      value: Text(walletName),
     );
   }
 }
