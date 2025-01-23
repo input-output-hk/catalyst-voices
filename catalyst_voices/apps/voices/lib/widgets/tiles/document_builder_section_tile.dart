@@ -9,6 +9,7 @@ import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.da
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a [DocumentSectionSchema] as list tile in edit / view mode.
@@ -82,7 +83,7 @@ class _DocumentBuilderSectionTileState
               onToggleEditMode: _toggleEditMode,
             ),
             for (final property in widget.section.properties) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               _PropertyBuilder(
                 key: ValueKey(property.schema.nodeId),
                 property: property,
@@ -248,7 +249,7 @@ class _PropertyListBuilder extends StatelessWidget {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [
+      children: <Widget>[
         for (final property in list.properties)
           _PropertyBuilder(
             key: key,
@@ -256,7 +257,7 @@ class _PropertyListBuilder extends StatelessWidget {
             isEditMode: isEditMode,
             onChanged: onChanged,
           ),
-      ],
+      ].separatedBy(const SizedBox(height: 24)).toList(),
     );
   }
 }
@@ -289,11 +290,9 @@ class _PropertyObjectBuilder extends StatelessWidget {
 
       case DocumentNestedQuestionsSchema():
       case DocumentGenericObjectSchema():
-        // TODO(dtscalac): build a property object, similar to a section,
-        // below is just dummy implementation
         return Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             for (final property in property.properties)
               _PropertyBuilder(
                 key: key,
@@ -301,7 +300,7 @@ class _PropertyObjectBuilder extends StatelessWidget {
                 isEditMode: isEditMode,
                 onChanged: onChanged,
               ),
-          ],
+          ].separatedBy(const SizedBox(height: 24)).toList(),
         );
 
       case DocumentSegmentSchema():
