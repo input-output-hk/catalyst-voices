@@ -39,16 +39,18 @@ integration-test-web:
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
 
-#    IF [ -f fail ]
-#        RUN --no-cache echo ""$browser" integration test failed" && \
-#            echo "Printing "$driver" logs..." && \
-#            cat $driver.log && \
+    IF [ -f fail ]
+        RUN --no-cache echo ""$browser" integration test failed" && \
+            echo "Printing "$driver" logs..." && \
+            cat $driver.log
 #            exit 1
-#    END
+    END
 
 # TODO(dtscalac): disabled integration tests due to them being flaky,
 # reenable when enable-threads.js workaround is removed
 # and https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407 closed
+# Enable but do not fail the build for now
 test-web-all:
     BUILD +integration-test-web \
-            --browser=chrome
+            --browser=chrome \
+            --browser=firefox
