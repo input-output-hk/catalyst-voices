@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_https_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -44,7 +45,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
 
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
-      _textEditingController.text = widget.property.value ?? '';
+      _textEditingController.textWithSelection = widget.property.value ?? '';
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {

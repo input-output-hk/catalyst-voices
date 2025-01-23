@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -46,12 +47,12 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
     if (oldWidget.isEditMode != widget.isEditMode) {
       _handleEditModeChanged();
       if (!widget.isEditMode) {
-        _controller.text = widget.property.value ?? '';
+        _controller.textWithSelection = (widget.property.value ?? '');
       }
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _controller.text = widget.property.value ?? '';
+      _controller.textWithSelection = widget.property.value ?? '';
     }
   }
 

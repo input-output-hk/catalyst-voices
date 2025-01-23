@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class _SingleDropdownSelectionWidgetState
   void initState() {
     super.initState();
     _textEditingController = TextEditingController();
-    _textEditingController.text = widget.value;
+    _textEditingController.textWithSelection = widget.value;
 
     _dropdownMenuEntries = _mapItems;
   }
@@ -54,7 +55,7 @@ class _SingleDropdownSelectionWidgetState
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
       final value = widget.value;
-      _textEditingController.text = value;
+      _textEditingController.textWithSelection = value;
     }
   }
 

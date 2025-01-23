@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -137,7 +138,7 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
     final text = _toText(num) ?? _textEditingController.text;
 
     if (_textEditingController.text != text) {
-      _textEditingController.text = text;
+      _textEditingController.textWithSelection = text;
     }
   }
 
