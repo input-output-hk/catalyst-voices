@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -50,7 +49,7 @@ class _BlocSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<Set<AccountRole>>(
+    return BlocWalletLinkSelector<Set<AccountRole>>(
       selector: (state) => state.selectedRoles ?? state.defaultRoles,
       builder: (context, state) {
         return _Subtitle(selectedRoles: state);
@@ -91,7 +90,7 @@ class _BlocRolesSummaryContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<
+    return BlocWalletLinkSelector<
         ({
           Set<AccountRole> selected,
           Set<AccountRole> defaultRoles,

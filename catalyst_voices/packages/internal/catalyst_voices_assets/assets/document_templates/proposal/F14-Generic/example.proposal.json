@@ -8,8 +8,12 @@
             "applicant": "John Smith",
             "type": "Individual",
             "coproposers": [
-                "Jane Doe",
-                "Bob Wilson"
+                {
+                    "name": "Jane Doe"
+                },
+                {
+                    "name": "Bob Wilson"
+                }
             ]
         }
     },
@@ -26,41 +30,26 @@
             "originalDocumentLink": "https://example.com/original-doc"
         },
         "problem": {
-            "statement": "Current challenge in the Cardano ecosystem...",
-            "impact": [
-                "Technical Infrastructure",
-                "Developer Tooling",
-                "Adoption"
-            ]
+            "statement": "Current challenge in the Cardano ecosystem..."
         },
         "solution": {
-            "summary": "Our solution provides a comprehensive toolkit...",
-            "approach": "We will implement this solution using...",
-            "innovationAspects": [
-                "Novel testing framework",
-                "Automated integration tools"
-            ]
+            "summary": "Our solution provides a comprehensive toolkit..."
         },
         "supportingLinks": {
-            "mainRepository": "https://github.com/example/project",
-            "documentation": "https://docs.example.com",
-            "other": [
+            "links": [
+                "https://github.com/example/project",
+                "https://docs.example.com",
                 "https://example.com/whitepaper",
                 "https://example.com/roadmap"
             ]
         },
         "dependencies": {
-            "details": [{
-                "name": "External API Service",
-                "type": "Technical",
-                "description": "Integration with third-party API service",
-                "mitigationPlan": "Build fallback mechanisms and maintain alternative providers"
-            }]
+            "hasDependency": true,
+            "dependencyDetail": "Integration with third-party API service requires external dependencies..."
         },
         "open_source": {
-            "source_code": "MIT",
-            "documentation": "MIT",
-            "note": "All project outputs will be open source under MIT license"
+            "isOpenSource": true,
+            "licenseInformation": "All source code and documentation will be released under the MIT license."
         }
     },
     "horizons": {
@@ -84,7 +73,8 @@
     },
     "milestones": {
         "milestones": {
-            "milestone_list": [{
+            "milestone_list": [
+                {
                     "title": "Initial Setup and Planning",
                     "outputs": "Project infrastructure setup and detailed planning documents",
                     "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
