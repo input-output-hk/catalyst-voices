@@ -60,6 +60,12 @@
             "pattern": "^[\\S\\s]*$",
             "x-note": "Use Markdown formatting for rich text. Available formatting:\n- Headers: # for h1, ## for h2, etc.\n- Lists: * or - for bullets, 1. for numbered\n- Emphasis: *italic* or **bold**\n- Links: [text](url)\n- Code: `inline` or ```block```"
         },
+        "radioButtonSelect": {
+            "$comment": "UI - Radio Button Selection",
+            "type": "string",
+            "format": "radioButtonSelect",
+            "x-note": "Select one option from a list of radio buttons"
+        },
         "dropDownSingleSelect": {
             "$comment": "UI - Drop Down Selection of a single entry from the defined enum.",
             "type": "string",
@@ -110,6 +116,14 @@
                 "maxLength": 1024
             },
             "x-note": "Enter multiple HTTPS URLs. Each URL should be unique and under 1024 characters."
+        },
+        "tagInput": {
+            "$comment": "UI - A tag-style input field for adding/removing items with visual tags",
+            "type": "array",
+            "format": "tag-input",
+            "uniqueItems": true,
+            "default": [],
+            "x-note": "Add or remove items that will be displayed as tags with remove buttons"
         },
         "nestedQuestionsList": {
             "$comment": "UI - A Growable List of Questions.  The contents are an object, that can have any UI elements within.",
@@ -217,10 +231,11 @@
             "$ref": "#/definitions/segment",
             "title": "proposal setup",
             "description": "Proposal title",
+            "x-icon": "view-grid",
             "properties": {
                 "title": {
                     "$ref": "#/definitions/section",
-                    "title": "proposal setup",
+                    "title": "proposal title",
                     "description": "Proposal title",
                     "properties": {
                         "title": {
@@ -238,6 +253,8 @@
                 },
                 "proposer": {
                     "$ref": "#/definitions/section",
+                    "title": "Proposer",
+                    "description": "Proposer Information",
                     "properties": {
                         "applicant": {
                             "$ref": "#/definitions/singleLineTextEntry",
@@ -248,7 +265,7 @@
                             "maxLength": 100
                         },
                         "type": {
-                            "$ref": "#/definitions/dropDownSingleSelect",
+                            "$ref": "#/definitions/radioButtonSelect",
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "x-guidance": "Please select from one of the following:\n\n1. Individual\n2. Entity (Incorporated)\n3. Entity (Not Incorporated)",
@@ -260,12 +277,25 @@
                             "default": "Individual"
                         },
                         "coproposers": {
-                            "$ref": "#/definitions/singleLineTextEntryList",
+                            "$ref": "#/definitions/tagInput",
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
                             "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. **IMPORTANT** A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 14 rules for added detail.",
                             "maxItems": 5,
-                            "minItems": 0
+                            "minItems": 0,
+                            "items": {
+                                "type": "object",
+                                "required": ["name"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "title": "Co-proposer Name", 
+                                        "description": "Full name of the co-proposer",
+                                        "minLength": 2,
+                                        "maxLength": 100
+                                    }
+                                }
+                            }
                         }
                     },
                     "required": [
@@ -284,6 +314,7 @@
         "summary": {
             "$ref": "#/definitions/segment",
             "title": "Proposal Summary",
+            "x-icon": "light-bulb",
             "description": "Key information about your proposal",
             "properties": {
                 "budget": {
@@ -306,6 +337,7 @@
                 },
                 "time": {
                     "$ref": "#/definitions/section",
+                    "title": "Time",
                     "properties": {
                         "duration": {
                             "$ref": "#/definitions/durationInMonths",
@@ -355,33 +387,10 @@
                             "minLength": 10,
                             "maxLength": 200,
                             "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail."
-                        },
-                        "impact": {
-                            "$ref": "#/definitions/multiSelect",
-                            "title": "Impact Areas",
-                            "description": "Select the areas that will be most impacted by solving this problem",
-                            "items": {
-                                "$ref": "#/definitions/singleLineTextEntry",
-                                "enum": [
-                                    "Technical Infrastructure",
-                                    "User Experience",
-                                    "Developer Tooling",
-                                    "Community Growth",
-                                    "Economic Sustainability",
-                                    "Interoperability",
-                                    "Security",
-                                    "Scalability",
-                                    "Education",
-                                    "Adoption"
-                                ]
-                            },
-                            "minItems": 1,
-                            "maxItems": 3
                         }
                     },
                     "required": [
-                        "statement",
-                        "impact"
+                        "statement"
                     ]
                 },
                 "solution": {
@@ -396,29 +405,10 @@
                             "minLength": 10,
                             "maxLength": 200,
                             "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...' Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'. This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail."
-                        },
-                        "approach": {
-                            "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "Technical Approach",
-                            "description": "Outline the technical approach or methodology you will use",
-                            "maxLength": 500,
-                            "minLength": 10
-                        },
-                        "innovationAspects": {
-                            "$ref": "#/definitions/singleLineTextEntryList",
-                            "title": "Innovation Aspects",
-                            "description": "Key innovative aspects of your solution",
-                            "minItems": 1,
-                            "maxItems": 5,
-                            "items": {
-                                "maxLength": 200,
-                                "minLength": 10
-                            }
                         }
                     },
                     "required": [
-                        "summary",
-                        "approach"
+                        "summary"
                     ]
                 },
                 "supportingLinks": {
@@ -427,20 +417,10 @@
                     "description": "Additional resources and documentation for your proposal",
                     "x-guidance": "Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your proposal. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any of the questions in this form because you feel the answers can be found elsewhere. If any links are specified make sure these are added in good order (first link must be present before specifying second). Also ensure all links include https. Without these steps, the form will not be submittable and show errors",
                     "properties": {
-                        "mainRepository": {
-                            "$ref": "#/definitions/singleLineHttpsURLEntry",
-                            "title": "Main Code Repository",
-                            "description": "Primary repository where the project's code will be hosted"
-                        },
-                        "documentation": {
-                            "$ref": "#/definitions/singleLineHttpsURLEntry",
-                            "title": "Documentation URL",
-                            "description": "Main documentation site or resource for the project"
-                        },
-                        "other": {
+                        "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
                             "title": "Resource Links",
-                            "description": "Links to any other relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
                             "minItems": 0,
                             "maxItems": 5
                         }
@@ -452,52 +432,16 @@
                     "description": "External dependencies and requirements for project success",
                     "x-guidance": "If your project has any dependencies and prerequisites for your project's success, list them here. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
                     "properties": {
-                        "details": {
-                            "$ref": "#/definitions/nestedQuestionsList",
-                            "title": "Dependency Details",
-                            "description": "List and describe each dependency",
-                            "items": {
-                                "$ref": "#/definitions/nestedQuestions",
-                                "properties": {
-                                    "name": {
-                                        "$ref": "#/definitions/singleLineTextEntry",
-                                        "title": "Dependency Name",
-                                        "description": "Name of the organization, technology, or resource",
-                                        "maxLength": 100
-                                    },
-                                    "type": {
-                                        "$ref": "#/definitions/dropDownSingleSelect",
-                                        "title": "Dependency Type",
-                                        "description": "Type of dependency",
-                                        "enum": [
-                                            "Technical",
-                                            "Organizational",
-                                            "Legal",
-                                            "Financial",
-                                            "Other"
-                                        ]
-                                    },
-                                    "description": {
-                                        "$ref": "#/definitions/multiLineTextEntry",
-                                        "title": "Description",
-                                        "description": "Explain why this dependency is essential and how it affects your project",
-                                        "maxLength": 500
-                                    },
-                                    "mitigationPlan": {
-                                        "$ref": "#/definitions/multiLineTextEntry",
-                                        "title": "Mitigation Plan",
-                                        "description": "How will you handle potential issues with this dependency",
-                                        "maxLength": 300
-                                    }
-                                },
-                                "required": [
-                                    "name",
-                                    "type",
-                                    "description"
-                                ]
-                            },
-                            "minItems": 0,
-                            "maxItems": 10
+                        "hasDependency": {
+                            "$ref": "#/definitions/yesNoChoice",
+                            "title": "Does the project have any dependency",
+                            "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
+                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\""
+                        },
+                        "dependencyDetail": {
+                            "$ref": "#/definitions/singleLineTextEntry",
+                            "title": "Dependency description",
+                            "description": "Here you should list any dependencies and prerequisites for your project’s success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software."
                         }
                     }
                 },
@@ -802,6 +746,7 @@
         "details": {
             "$ref": "#/definitions/segment",
             "title": "Your Project and Solution",
+            "x-icon": "chart-pie",
             "properties": {
                 "solution": {
                     "$ref": "#/definitions/section",
@@ -846,6 +791,7 @@
         "milestones": {
             "$ref": "#/definitions/segment",
             "title": "Milestones",
+            "x-icon": "flag",
             "properties": {
                 "milestones": {
                     "$ref": "#/definitions/section",
@@ -861,7 +807,8 @@
                             "maxItems": 6,
                             "items": {
                                 "type": "object",
-                                "required": ["title", "outputs", "acceptance_criteria", "evidence", "delivery_month", "cost"],
+                                "title": "Milestone",
+                                "required": ["title", "outputs", "acceptance_criteria", "evidence", "delivery_month", "cost", "progress"],
                                 "properties": {
                                     "title": {
                                         "$ref": "#/definitions/singleLineTextEntry",
@@ -918,6 +865,7 @@
         "pitch": {
             "$ref": "#/definitions/segment",
             "title": "Final Pitch",
+            "x-icon": "presentation-chart-line",
             "properties": {
                 "team": {
                     "$ref": "#/definitions/section",
@@ -926,7 +874,8 @@
                         "who": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "title": "Who is in the project team and what are their roles?",
-                            "description": "List your team, their Linkedin profiles (or similar) and state what aspect of the proposal's work each team member will undertake.\n\nIf you are planning to recruit additional team members, please state what specific skills you will be looking for in the people you recruit, so readers can see that you understand what skills will be needed to complete the project.\n\nYou are expected to have already engaged the relevant members of the organizations referenced so you understand if they are willing and/or have capacity to support the project. If you have not taken any steps to engage with your team yet, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun. The Catalyst team cannot help with this, meaning you are expected to have understood the requirements and engaged the necessary people before submitting a proposal.\n\nHave you engaged anyone on any of the technical group channels (eg Discord or Telegram), or do you have a direct line of communications with the people and resources required?\n\nImportant: Catalyst funding is not anonymous, and some level of 'proof of life' verifications will take place before initial funding is released. Also remember that your proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.\n\nAll Project Participants must disclose their role and scope of services across any submitted proposals, even if they are not in the lead or co-proposer role, such as an implementer, vendor, service provider, etc. Failure to disclose this information may lead to disqualification from the current grant round.",
+                            "description": "Who is in the project team and what are their roles?",
+                            "x-guidance": "List your team, their Linkedin profiles (or similar) and state what aspect of the proposal's work each team member will undertake.\n\nIf you are planning to recruit additional team members, please state what specific skills you will be looking for in the people you recruit, so readers can see that you understand what skills will be needed to complete the project.\n\nYou are expected to have already engaged the relevant members of the organizations referenced so you understand if they are willing and/or have capacity to support the project. If you have not taken any steps to engage with your team yet, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun. The Catalyst team cannot help with this, meaning you are expected to have understood the requirements and engaged the necessary people before submitting a proposal.\n\nHave you engaged anyone on any of the technical group channels (eg Discord or Telegram), or do you have a direct line of communications with the people and resources required?\n\nImportant: Catalyst funding is not anonymous, and some level of 'proof of life' verifications will take place before initial funding is released. Also remember that your proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.\n\nAll Project Participants must disclose their role and scope of services across any submitted proposals, even if they are not in the lead or co-proposer role, such as an implementer, vendor, service provider, etc. Failure to disclose this information may lead to disqualification from the current grant round.",
                             "minLength": 1,
                             "maxLength": 10240
                         }
@@ -939,7 +888,8 @@
                         "costs": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "title": "Please provide a cost breakdown of the proposed work and resources",
-                            "description": "Make sure every element mentioned in your plan reflects its cost. It may be helpful to refer to your plan and timeline, list all the resources you will need at each stage, and what they cost.\n\nHere, provide a clear description of any third party product or service you will be using. This could be hardware, software licenses, professional services (legal, accounting, code auditing, etc) but does not need to include the use of contracted programmers and developers.\n\nThe exact budget elements you include will depend on what type of work you are doing, and you might need to give less detail for a small, low-budget proposal. If the cost of the project will exceed the funding request, please provide information about alternative sources of funding.\n\nConsider including budget elements for publicity / marketing / promotion / community engagement; project management; documentation; and reporting back to the community. Most proposals need these, but many proposers forget to include them.\n\nIt is the project team's responsibility to properly manage the funds provided. Make sure to reference [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) to understand eligibility around costs.",
+                            "description": "Please provide a cost breakdown of the proposed work and resources",
+                            "x-guidance": "Make sure every element mentioned in your plan reflects its cost. It may be helpful to refer to your plan and timeline, list all the resources you will need at each stage, and what they cost.\n\nHere, provide a clear description of any third party product or service you will be using. This could be hardware, software licenses, professional services (legal, accounting, code auditing, etc) but does not need to include the use of contracted programmers and developers.\n\nThe exact budget elements you include will depend on what type of work you are doing, and you might need to give less detail for a small, low-budget proposal. If the cost of the project will exceed the funding request, please provide information about alternative sources of funding.\n\nConsider including budget elements for publicity / marketing / promotion / community engagement; project management; documentation; and reporting back to the community. Most proposals need these, but many proposers forget to include them.\n\nIt is the project team's responsibility to properly manage the funds provided. Make sure to reference [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) to understand eligibility around costs.",
                             "minLength": 1,
                             "maxLength": 10240
                         }
@@ -952,7 +902,8 @@
                         "note": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "title": "How does the cost of the project represent value for money for the Cardano ecosystem?",
-                            "description": "Use the response to provide the context about the costs you listed previously, particularly if they are high.\n\nIt may be helpful to include some brief information on how you have decided on the costs of the project.\n\nFor instance, can you justify with supporting evidence that costs are proportional to the average wage in your country, or typical freelance rates in your industry? Is there anything else that helps to support how the project represents value for money?",
+                            "description": "How does the cost of the project represent value for money for the Cardano ecosystem?",
+                            "x-guidance": "Use the response to provide the context about the costs you listed previously, particularly if they are high.\n\nIt may be helpful to include some brief information on how you have decided on the costs of the project.\n\nFor instance, can you justify with supporting evidence that costs are proportional to the average wage in your country, or typical freelance rates in your industry? Is there anything else that helps to support how the project represents value for money?",
                             "minLength": 1,
                             "maxLength": 10240
                         }
