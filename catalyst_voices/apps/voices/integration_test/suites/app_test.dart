@@ -2,16 +2,13 @@ import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/app_bar_page.dart';
 import '../pageobject/overall_spaces_page.dart';
-import '../pageobject/spaces_drawer_page.dart';
 import '../utils/constants.dart';
-import '../utils/selector_utils.dart';
 
 void main() async {
   late final GoRouter router;
@@ -146,7 +143,7 @@ void main() async {
   //         await $(SpacesDrawerPage.chooserIcon(space)).longPress();
   //         await Future<void>.delayed(const Duration(seconds: 1));
   //         final expectedText = spaceToTooltipText[space];
-  //         final chooserItem = find.byKey(SpacesDrawerPage.chooserItem(space));
+  //        final chooserItem = find.byKey(SpacesDrawerPage.chooserItem(space));
   //         final tooltipElement = find.descendant(
   //           of: chooserItem,
   //           matching: find.byKey(SpacesDrawerPage.tooltipElement),
