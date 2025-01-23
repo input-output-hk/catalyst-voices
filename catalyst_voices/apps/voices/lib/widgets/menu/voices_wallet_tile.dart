@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 /// A replacement for the [ListTile] with customized
@@ -48,7 +49,10 @@ class VoicesWalletTile extends StatelessWidget {
               height: 24,
               child: VoicesCircularProgressIndicator(),
             )
-          : VoicesAssets.icons.chevronRight.buildIcon(size: 24),
+          : VoicesAssets.icons.chevronRight.buildIcon(
+              size: 24,
+              color: Theme.of(context).colors.iconsForeground,
+            ),
       onTap: onTap,
     );
   }
