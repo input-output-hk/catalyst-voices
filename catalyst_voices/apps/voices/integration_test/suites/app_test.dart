@@ -165,7 +165,7 @@ void main() async {
 
   patrolWidgetTest(
     'visitor - no drawer button',
-        (PatrolTester $) async {
+    (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
       await $(OverallSpacesPage.visitorShortcutBtn)
           .tap(settleTimeout: Time.long.duration);
