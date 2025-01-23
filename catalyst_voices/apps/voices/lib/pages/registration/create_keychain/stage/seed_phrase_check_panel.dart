@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/upload_seed_phrase_confirmation_dialog.dart';
 import 'package:catalyst_voices/pages/registration/upload_seed_phrase_dialog.dart';
@@ -28,7 +27,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
             builder: (context) {
               return _BlocSeedPhraseWords(
                 onUserWordsChanged: _onWordsSequenceChanged,
-                onUploadTap: _uploadSeedPhrase,
+                onImportTap: _importSeedPhrase,
                 onResetTap: _clearUserWords,
               );
             },
@@ -40,7 +39,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     );
   }
 
-  Future<void> _uploadSeedPhrase() async {
+  Future<void> _importSeedPhrase() async {
     final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
     if (showUpload) {
       await _showUploadDialog();
@@ -90,7 +89,7 @@ class _BlocLoadable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.isLoading,
       builder: (context, state) {
         return VoicesLoadable(
@@ -105,17 +104,17 @@ class _BlocLoadable extends StatelessWidget {
 class _BlocSeedPhraseWords extends StatelessWidget {
   const _BlocSeedPhraseWords({
     required this.onUserWordsChanged,
-    this.onUploadTap,
+    this.onImportTap,
     this.onResetTap,
   });
 
   final ValueChanged<List<SeedPhraseWord>> onUserWordsChanged;
-  final VoidCallback? onUploadTap;
+  final VoidCallback? onImportTap;
   final VoidCallback? onResetTap;
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<
+    return BlocSeedPhraseSelector<
         ({
           List<SeedPhraseWord> shuffledWords,
           List<SeedPhraseWord> words,
@@ -131,7 +130,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
           words: state.shuffledWords,
           userWords: state.words,
           onUserWordsChanged: onUserWordsChanged,
-          onUploadTap: onUploadTap,
+          onImportTap: onImportTap,
           onResetTap: onResetTap,
           isResetEnabled: state.isResetWordsEnabled,
         );
@@ -144,7 +143,7 @@ class _SeedPhraseWords extends StatelessWidget {
   final List<SeedPhraseWord> words;
   final List<SeedPhraseWord> userWords;
   final ValueChanged<List<SeedPhraseWord>> onUserWordsChanged;
-  final VoidCallback? onUploadTap;
+  final VoidCallback? onImportTap;
   final VoidCallback? onResetTap;
   final bool isResetEnabled;
 
@@ -152,7 +151,7 @@ class _SeedPhraseWords extends StatelessWidget {
     required this.words,
     required this.userWords,
     required this.onUserWordsChanged,
-    required this.onUploadTap,
+    required this.onImportTap,
     required this.onResetTap,
     required this.isResetEnabled,
   });
@@ -170,7 +169,7 @@ class _SeedPhraseWords extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           SeedPhraseActions(
-            onUploadKeyTap: onUploadTap,
+            onImportKeyTap: onImportTap,
             onResetTap: isResetEnabled ? onResetTap : null,
           ),
         ],
@@ -184,7 +183,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
         return RegistrationBackNextNavigation(

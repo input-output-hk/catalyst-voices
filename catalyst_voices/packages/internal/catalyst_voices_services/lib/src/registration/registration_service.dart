@@ -66,6 +66,8 @@ abstract interface class RegistrationService {
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Account> register({
+    required String displayName,
+    required String email,
     required CardanoWallet wallet,
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
@@ -134,6 +136,10 @@ final class RegistrationServiceImpl implements RegistrationService {
       throw const RegistrationUnknownException();
     }
 
+    // TODO(damian-molinski): should come from backend
+    const displayName = 'Recovered';
+    const email = 'recovered@iohk.com';
+
     // TODO(dtscalac): derive a key from the seed phrase and fetch
     // from the backend info about the registration (roles, wallet, etc).
     final roles = {AccountRole.root};
@@ -143,6 +149,8 @@ final class RegistrationServiceImpl implements RegistrationService {
 
     // Note. with rootKey query backend for account details.
     return Account(
+      displayName: displayName,
+      email: email,
       keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
@@ -193,6 +201,8 @@ final class RegistrationServiceImpl implements RegistrationService {
 
   @override
   Future<Account> register({
+    required String displayName,
+    required String email,
     required CardanoWallet wallet,
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
@@ -224,6 +234,8 @@ final class RegistrationServiceImpl implements RegistrationService {
       final address = await enabledWallet.getChangeAddress();
 
       return Account(
+        displayName: displayName,
+        email: email,
         keychain: keychain,
         roles: roles,
         walletInfo: WalletInfo(
@@ -254,6 +266,8 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.setMasterKey(masterKey);
 
     return Account(
+      displayName: 'Dummy',
+      email: 'dummy@iohk.com',
       keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(

@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -81,4 +82,26 @@ final class LocalizedRegistrationUnknownException
 
   @override
   String message(BuildContext context) => context.l10n.somethingWentWrong;
+}
+
+final class LocalizedWalletLinkException
+    extends LocalizedRegistrationException {
+  final WalletApiErrorCode code;
+
+  LocalizedWalletLinkException({
+    required this.code,
+  });
+
+  @override
+  String message(BuildContext context) {
+    return switch (code) {
+      WalletApiErrorCode.invalidRequest =>
+        context.l10n.errorWalletLinkInvalidRequest,
+      WalletApiErrorCode.internalError =>
+        context.l10n.errorWalletLinkInternalError,
+      WalletApiErrorCode.refused => context.l10n.errorWalletLinkRefused,
+      WalletApiErrorCode.accountChange =>
+        context.l10n.errorWalletLinkAccountChange,
+    };
+  }
 }

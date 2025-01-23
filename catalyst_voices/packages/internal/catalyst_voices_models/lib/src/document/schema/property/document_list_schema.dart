@@ -195,6 +195,17 @@ final class DocumentGenericListSchema extends DocumentListSchema {
     required super.itemsRange,
   });
 
+  const DocumentGenericListSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.title = '',
+    super.description,
+    super.isRequired = false,
+    super.itemsSchema =
+        const DocumentGenericStringSchema.optional(nodeId: DocumentNodeId.root),
+    super.itemsRange,
+  });
+
   @override
   DocumentGenericListSchema withNodeId(DocumentNodeId nodeId) {
     return DocumentGenericListSchema(
