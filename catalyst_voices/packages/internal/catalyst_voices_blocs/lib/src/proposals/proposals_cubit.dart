@@ -5,7 +5,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the proposals.
@@ -40,45 +39,25 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     emit(
       LoadedProposalsState(
         proposals: proposals,
-        favoriteProposals: const [],
       ),
     );
   }
 
-  /// Marks the proposal with [proposalId] as favorite.
-  Future<void> onFavoriteProposal(String proposalId) async {
+  /// Changes the favorite status of the proposal with [proposalId].
+  Future<void> onChangeFavoriteProposal(
+    String proposalId, {
+    required bool isFavorite,
+  }) async {
     final loadedState = state;
     if (loadedState is! LoadedProposalsState) return;
 
-    final proposals = loadedState.proposals;
-    final favoriteProposal =
-        proposals.firstWhereOrNull((e) => e.id == proposalId);
-    if (favoriteProposal == null) return;
+    final proposals = List<ProposalViewModel>.of(loadedState.proposals);
+    final favoriteProposal = proposals.indexWhere((e) => e.id == proposalId);
+    if (favoriteProposal == -1) return;
+    proposals[favoriteProposal] =
+        proposals[favoriteProposal].copyWith(isFavorite: isFavorite);
 
-    emit(
-      LoadedProposalsState(
-        proposals: loadedState.proposals,
-        favoriteProposals: [
-          ...loadedState.favoriteProposals,
-          favoriteProposal,
-        ],
-      ),
-    );
-  }
-
-  /// Unmarks the proposal with [proposalId] as favorite.
-  Future<void> onUnfavoriteProposal(String proposalId) async {
-    final loadedState = state;
-    if (loadedState is! LoadedProposalsState) return;
-
-    emit(
-      LoadedProposalsState(
-        proposals: loadedState.proposals,
-        favoriteProposals: loadedState.favoriteProposals
-            .whereNot((e) => e.id == proposalId)
-            .toList(),
-      ),
-    );
+    emit(LoadedProposalsState(proposals: proposals));
   }
 
   @override
