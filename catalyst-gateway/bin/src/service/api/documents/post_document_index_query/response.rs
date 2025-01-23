@@ -4,6 +4,7 @@ use poem_openapi::{types::Example, NewType, Object};
 use self::common::types::document::{
     doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
 };
+use super::SignedDocBody;
 use crate::service::common;
 
 /// A single page of documents.
@@ -164,5 +165,29 @@ pub(crate) struct IndexedDocumentVersionDocumented(pub(crate) IndexedDocumentVer
 impl Example for IndexedDocumentVersionDocumented {
     fn example() -> Self {
         Self(IndexedDocumentVersion::example())
+    }
+}
+
+impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
+    type Error = anyhow::Error;
+
+    fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
+        if let Some(json_meta) = doc.metadata() {
+            let _meta: catalyst_signed_doc::ExtraFields =
+                serde_json::from_value(json_meta.clone())?;
+        }
+
+        Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
+            ver: doc.ver().to_string().try_into()?,
+            doc_type: doc.doc_type().to_string().try_into()?,
+            // TODO get all necessary metadata fields from the document and fill these
+            // fields
+            doc_ref: None,
+            reply: None,
+            template: None,
+            brand: None,
+            campaign: None,
+            category: None,
+        }))
     }
 }
