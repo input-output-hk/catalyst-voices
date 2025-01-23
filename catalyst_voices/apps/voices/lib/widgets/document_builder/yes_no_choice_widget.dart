@@ -64,7 +64,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
         ],
         _YesNoChoiceSegmentButton(
           context,
-          value: _selectedValue,
+          val: _selectedValue,
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
           validator: (value) {
@@ -103,21 +103,22 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
 }
 
 class _YesNoChoiceSegmentButton extends FormField<bool?> {
-  final bool? value;
+  final bool? val;
   final ValueChanged<bool?>? onChanged;
 
   _YesNoChoiceSegmentButton(
     BuildContext context, {
     super.key,
-    required this.value,
+    required this.val,
     required this.onChanged,
     super.validator,
     super.enabled,
     AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
-          initialValue: value,
+          initialValue: val,
           autovalidateMode: autovalidateMode,
           builder: (field) {
+            final state = field as _YesNoChoiceSegmentButtonState;
             void onChangedHandler(Set<bool> selected) {
               final newValue = selected.isEmpty ? null : selected.first;
               field.didChange(newValue);
@@ -142,7 +143,9 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                         label: Text(context.l10n.no),
                       ),
                     ],
-                    selected: value != null ? {value} : {},
+                    selected: state._internalValue != null
+                        ? {state._internalValue!}
+                        : {},
                     onChanged: onChangedHandler,
                     emptySelectionAllowed: true,
                     style: _getButtonStyle(field),
@@ -173,5 +176,29 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
         ),
       ),
     );
+  }
+
+  @override
+  FormFieldState<bool?> createState() => _YesNoChoiceSegmentButtonState();
+}
+
+class _YesNoChoiceSegmentButtonState extends FormFieldState<bool?> {
+  bool? _internalValue;
+  @override
+  void initState() {
+    super.initState();
+    _internalValue = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(_YesNoChoiceSegmentButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != _internalValue) {
+      _internalValue = widget.initialValue;
+    }
+    if (_internalValue != value) {
+      setValue(_internalValue);
+      validate();
+    }
   }
 }
