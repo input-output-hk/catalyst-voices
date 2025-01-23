@@ -38,7 +38,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
     _controller = TextEditingController()
       ..textWithSelection = widget.property.value ?? ''
       ..addListener(_handleValueChange);
-      
+
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
