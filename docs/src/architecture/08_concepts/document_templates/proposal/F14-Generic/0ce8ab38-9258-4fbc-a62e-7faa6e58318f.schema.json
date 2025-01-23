@@ -253,6 +253,8 @@
                 },
                 "proposer": {
                     "$ref": "#/definitions/section",
+                    "title": "Proposer",
+                    "description": "Proposer Information",
                     "properties": {
                         "applicant": {
                             "$ref": "#/definitions/singleLineTextEntry",
@@ -335,6 +337,7 @@
                 },
                 "time": {
                     "$ref": "#/definitions/section",
+                    "title": "Time",
                     "properties": {
                         "duration": {
                             "$ref": "#/definitions/durationInMonths",
