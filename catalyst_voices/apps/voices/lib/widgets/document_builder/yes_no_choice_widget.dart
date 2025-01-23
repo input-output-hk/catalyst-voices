@@ -63,8 +63,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
-          context,
-          val: _selectedValue,
+          value: _selectedValue,
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
           validator: (value) {
@@ -103,19 +102,18 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
 }
 
 class _YesNoChoiceSegmentButton extends FormField<bool?> {
-  final bool? val;
+  final bool? value;
   final ValueChanged<bool?>? onChanged;
 
-  _YesNoChoiceSegmentButton(
-    BuildContext context, {
+  _YesNoChoiceSegmentButton({
     super.key,
-    required this.val,
+    required this.value,
     required this.onChanged,
     super.validator,
     super.enabled,
     AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
-          initialValue: val,
+          initialValue: value,
           autovalidateMode: autovalidateMode,
           builder: (field) {
             final state = field as _YesNoChoiceSegmentButtonState;
@@ -136,11 +134,11 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                     segments: [
                       ButtonSegment(
                         value: true,
-                        label: Text(context.l10n.yes),
+                        label: Text(field.context.l10n.yes),
                       ),
                       ButtonSegment(
                         value: false,
-                        label: Text(context.l10n.no),
+                        label: Text(field.context.l10n.no),
                       ),
                     ],
                     selected: state._internalValue != null
@@ -155,9 +153,13 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      field.errorText ?? context.l10n.snackbarErrorLabelText,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.error,
+                      field.errorText ??
+                          field.context.l10n.snackbarErrorLabelText,
+                      style: Theme.of(field.context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(
+                            color: Theme.of(field.context).colorScheme.error,
                           ),
                     ),
                   ),
