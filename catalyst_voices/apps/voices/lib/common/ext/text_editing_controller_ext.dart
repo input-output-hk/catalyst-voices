@@ -17,6 +17,8 @@ extension TextEditingControllerExt on TextEditingController {
 }
 
 extension TextEditingValueExt on TextEditingValue {
+  /// Creates a new [TextEditingValue] with [text]
+  /// and cursor at the end of the [text].
   static TextEditingValue collapsedAtEndOf(String text) {
     return TextEditingValue(
       text: text,
