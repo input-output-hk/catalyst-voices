@@ -417,7 +417,7 @@ class _UnimplementedWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Text(
-        'Unimplemented ${schema.runtimeType}',
+        'Unimplemented ${schema.runtimeType}: ${schema.nodeId}',
         style: const TextStyle(color: Colors.red),
       ),
     );
