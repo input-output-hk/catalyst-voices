@@ -1,5 +1,7 @@
 //! Integration tests of the `signed docs` queries
 
+use std::str::FromStr;
+
 use futures::TryStreamExt;
 
 use super::*;
@@ -7,6 +9,27 @@ use crate::db::event::{
     common::{eq_or_ranged_uuid::EqOrRangedUuid, query_limits::QueryLimits},
     establish_connection,
 };
+
+#[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn queries_test() {
+    establish_connection();
+
+    let doc_type = uuid::Uuid::new_v4();
+    let docs = test_docs(doc_type);
+
+    for doc in &docs {
+        store_full_signed_doc(doc, doc_type).await;
+        retrieve_full_signed_doc(doc).await;
+        filter_by_id(doc).await;
+        filter_by_ver(doc).await;
+        filter_by_id_and_ver(doc).await;
+        filter_by_ref(doc).await;
+    }
+
+    filter_by_type(&docs, doc_type).await;
+    filter_all(&docs).await;
+}
 
 fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
     vec![
@@ -18,8 +41,7 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Alex".to_string()],
                 Some(serde_json::json!(
                     {
-                        "name": "Alex",
-                        "amount": 105,
+                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),
@@ -34,8 +56,7 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Steven".to_string()],
                 Some(serde_json::json!(
                     {
-                        "name": "Steven",
-                        "amount": 15,
+                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),
@@ -138,9 +159,40 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     assert!(res_docs.try_next().await.unwrap().is_none());
 }
 
-async fn filter_by_metadata(doc: &FullSignedDoc) {
+#[allow(clippy::indexing_slicing)]
+async fn filter_by_ref(doc: &FullSignedDoc) {
     if let Some(meta) = doc.metadata() {
-        let filter = DocsQueryFilter::all().with_metadata(meta.clone());
+        let doc_ref_id = uuid::Uuid::from_str(meta["ref"]["id"].clone().as_str().unwrap()).unwrap();
+        let doc_ref_ver =
+            uuid::Uuid::from_str(meta["ref"]["ver"].clone().as_str().unwrap()).unwrap();
+
+        // With id
+        let filter = DocsQueryFilter::all().with_ref(DocumentRef {
+            id: Some(EqOrRangedUuid::Eq(doc_ref_id)),
+            ver: None,
+        });
+        let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+            .await
+            .unwrap();
+        let res_doc = res_docs.try_next().await.unwrap().unwrap();
+        assert_eq!(doc.body(), &res_doc);
+
+        // with ver
+        let filter = DocsQueryFilter::all().with_ref(DocumentRef {
+            id: None,
+            ver: Some(EqOrRangedUuid::Eq(doc_ref_ver)),
+        });
+        let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+            .await
+            .unwrap();
+        let res_doc = res_docs.try_next().await.unwrap().unwrap();
+        assert_eq!(doc.body(), &res_doc);
+
+        // with both id and ver
+        let filter = DocsQueryFilter::all().with_ref(DocumentRef {
+            id: Some(EqOrRangedUuid::Eq(doc_ref_id)),
+            ver: Some(EqOrRangedUuid::Eq(doc_ref_ver)),
+        });
         let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
             .await
             .unwrap();
@@ -169,25 +221,4 @@ async fn filter_all(docs: &[FullSignedDoc]) {
         let res_doc = res_docs.try_next().await.unwrap().unwrap();
         assert_eq!(exp_doc.body(), &res_doc);
     }
-}
-
-#[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
-#[tokio::test]
-async fn queries_test() {
-    establish_connection();
-
-    let doc_type = uuid::Uuid::new_v4();
-    let docs = test_docs(doc_type);
-
-    for doc in &docs {
-        store_full_signed_doc(doc, doc_type).await;
-        retrieve_full_signed_doc(doc).await;
-        filter_by_id(doc).await;
-        filter_by_ver(doc).await;
-        filter_by_id_and_ver(doc).await;
-        filter_by_metadata(doc).await;
-    }
-
-    filter_by_type(&docs, doc_type).await;
-    filter_all(&docs).await;
 }
