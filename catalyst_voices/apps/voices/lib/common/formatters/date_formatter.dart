@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// A [DateTime] formatter.
@@ -94,5 +95,28 @@ abstract class DateFormatter {
     final minutes = offset.inMinutes - hours * Duration.minutesPerHour;
 
     return '${nf.format(hours)}:${nf.format(minutes)}';
+  }
+
+  static String formatDateRange(
+    MaterialLocalizations localizations,
+    VoicesLocalizations l10n,
+    DateRange range,
+  ) {
+    final from = range.from;
+    final to = range.to;
+    if (from != null && to != null) {
+      if (range.areDatesInSameWeek(localizations.firstDayOfWeekIndex)) {
+        return '${l10n.weekOf} ${DateFormat.MMMd().format(from)}';
+      }
+
+      // ignore: lines_longer_than_80_chars
+      return '${DateFormat.MMMd().format(from)} - ${DateFormat.MMMd().format(to)}';
+    } else if (to == null && from != null) {
+      return '${l10n.from} ${DateFormat.MMMd().format(from)}';
+    } else if (to != null && from == null) {
+      return '${l10n.to} ${DateFormat.MMMd().format(to)}';
+    }
+
+    return '';
   }
 }
