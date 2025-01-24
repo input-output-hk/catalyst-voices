@@ -48,10 +48,10 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
-        return switch (state) {
-          VisitorSessionState() => const _GuestVisitorBody(),
-          GuestSessionState() => const _GuestVisitorBody(),
-          ActiveAccountSessionState() => const _ActiveAccountBody(),
+        return switch (state.status) {
+          SessionStatus.visitor => const _GuestVisitorBody(),
+          SessionStatus.guest => const _GuestVisitorBody(),
+          SessionStatus.actor => const _ActiveAccountBody(),
         };
       },
     );

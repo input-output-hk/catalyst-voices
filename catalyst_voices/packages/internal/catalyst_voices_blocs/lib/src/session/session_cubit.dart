@@ -43,7 +43,7 @@ final class SessionCubit extends Cubit<SessionState>
     this._accessControl,
     this._adminTools,
   )   : _adminToolsState = _adminTools.state,
-        super(const VisitorSessionState(isRegistrationInProgress: false)) {
+        super(const SessionState.initial()) {
     _keychainUnlockedSub = _userService.watchAccount
         .transform(AccountToKeychainUnlockTransformer())
         .distinct()
@@ -158,16 +158,26 @@ final class SessionCubit extends Cubit<SessionState>
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
     final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
 
+    // TODO(damian): this will need to be updated.
+    const settings = SessionSettings(
+      timezone: TimezonePreferences.local,
+      theme: ThemePreferences.light,
+    );
+
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
-      return VisitorSessionState(
+      return SessionState.visitor(
         canCreateAccount: canCreateAccount,
         isRegistrationInProgress: !isEmpty,
+        settings: settings,
       );
     }
 
     if (!isUnlocked) {
-      return GuestSessionState(canCreateAccount: canCreateAccount);
+      return SessionState.guest(
+        canCreateAccount: canCreateAccount,
+        settings: settings,
+      );
     }
 
     final sessionAccount = SessionAccount.fromAccount(account);
@@ -175,29 +185,37 @@ final class SessionCubit extends Cubit<SessionState>
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
-    return ActiveAccountSessionState(
+    return SessionState(
+      status: SessionStatus.actor,
       account: sessionAccount,
       spaces: spaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,
+      settings: settings,
     );
   }
 
   SessionState _createMockedSessionState() {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
-        return ActiveAccountSessionState(
+        return SessionState(
+          status: SessionStatus.actor,
           account: const SessionAccount.mocked(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
           canCreateAccount: true,
+          settings: const SessionSettings.fallback(),
         );
       case SessionStatus.guest:
-        return const GuestSessionState(canCreateAccount: true);
+        return const SessionState.guest(
+          canCreateAccount: true,
+          settings: SessionSettings.fallback(),
+        );
       case SessionStatus.visitor:
-        return const VisitorSessionState(
+        return const SessionState.visitor(
+          settings: SessionSettings.fallback(),
           isRegistrationInProgress: false,
           canCreateAccount: true,
         );
