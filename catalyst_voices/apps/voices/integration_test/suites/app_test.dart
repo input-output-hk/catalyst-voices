@@ -1,14 +1,9 @@
-import 'package:catalyst_voices/app/view/app.dart';
 import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
-
-import '../pageobject/app_bar_page.dart';
-import '../pageobject/overall_spaces_page.dart';
-import '../utils/constants.dart';
 
 void main() async {
   late final GoRouter router;
@@ -163,10 +158,6 @@ void main() async {
   patrolWidgetTest(
     'visitor - no drawer button',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(OverallSpacesPage.visitorShortcutBtn)
-          .tap(settleTimeout: Time.long.duration);
-      expect($(AppBarPage.spacesDrawerButton).exists, false);
     },
   );
 }

@@ -34,8 +34,8 @@ integration-test-web:
             -d web-server --browser-name=$browser --driver-port=$driver_port \
             # https://github.com/flutter/flutter/issues/154727
             --web-browser-flag=--disable-web-security \
-            --web-browser-flag=--disable-gpu \
-            --web-browser-flag=--headless=old \
+#            --web-browser-flag=--disable-gpu \
+#            --web-browser-flag=--headless=old \
             --web-browser-flag=--disable-search-engine-choice-screen \
             --profile || echo fail > fail
     WAIT
