@@ -108,9 +108,7 @@ final class DocumentValidator {
     // ignore: avoid_positional_boolean_parameters
     bool? value,
   ) {
-    if (value == null) {
-      return MissingRequiredDocumentValue(invalidNodeId: schema.nodeId);
-    }
+    // TODO(dtscalac): validate against "const" or "enumValues" or "oneOf"
     return const SuccessfulDocumentValidation();
   }
 }

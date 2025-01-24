@@ -238,7 +238,7 @@
             "properties": {
                 "title": {
                     "$ref": "#/definitions/section",
-                    "title": "proposal title",
+                    "title": "Proposal title",
                     "description": "Proposal title",
                     "properties": {
                         "title": {
@@ -256,6 +256,8 @@
                 },
                 "proposer": {
                     "$ref": "#/definitions/section",
+                    "title": "Proposer",
+                    "description": "Proposer Information",
                     "properties": {
                         "applicant": {
                             "$ref": "#/definitions/singleLineTextEntry",
@@ -349,6 +351,7 @@
                 },
                 "time": {
                     "$ref": "#/definitions/section",
+                    "title": "Time",
                     "properties": {
                         "duration": {
                             "$ref": "#/definitions/durationInMonths",
