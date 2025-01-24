@@ -138,27 +138,6 @@ impl IdAndVerRef {
     }
 }
 
-impl TryFrom<IdAndVerRef> for DocumentRef {
-    type Error = anyhow::Error;
-
-    fn try_from(value: IdAndVerRef) -> Result<Self, Self::Error> {
-        match value {
-            IdAndVerRef::IdRefOnly(val) => {
-                Ok(DocumentRef {
-                    id: Some(val.0.id.try_into()?),
-                    ver: None,
-                })
-            },
-            IdAndVerRef::IdAndVerRef(val) => {
-                Ok(DocumentRef {
-                    id: val.0.id.map(TryInto::try_into).transpose()?,
-                    ver: Some(val.0.ver.try_into()?),
-                })
-            },
-        }
-    }
-}
-
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
 #[derive(NewType, Debug, PartialEq)]
@@ -180,6 +159,27 @@ pub(crate) struct IdAndVerRefDocumented(pub(crate) IdAndVerRef);
 impl Example for IdAndVerRefDocumented {
     fn example() -> Self {
         Self(IdAndVerRef::example())
+    }
+}
+
+impl TryFrom<IdAndVerRefDocumented> for DocumentRef {
+    type Error = anyhow::Error;
+
+    fn try_from(value: IdAndVerRefDocumented) -> Result<Self, Self::Error> {
+        match value.0 {
+            IdAndVerRef::IdRefOnly(val) => {
+                Ok(DocumentRef {
+                    id: Some(val.0.id.try_into()?),
+                    ver: None,
+                })
+            },
+            IdAndVerRef::IdAndVerRef(val) => {
+                Ok(DocumentRef {
+                    id: val.0.id.map(TryInto::try_into).transpose()?,
+                    ver: Some(val.0.ver.try_into()?),
+                })
+            },
+        }
     }
 }
 

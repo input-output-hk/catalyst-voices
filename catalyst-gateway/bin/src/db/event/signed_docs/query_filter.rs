@@ -17,6 +17,10 @@ pub(crate) struct DocsQueryFilter {
     ver: Option<EqOrRangedUuid>,
     /// `metadata->'ref'` field
     doc_ref: Option<DocumentRef>,
+    /// `metadata->'template'` field
+    template: Option<DocumentRef>,
+    /// `metadata->'reply'` field
+    reply: Option<DocumentRef>,
 }
 
 impl Display for DocsQueryFilter {
@@ -43,6 +47,20 @@ impl Display for DocsQueryFilter {
                 &mut query,
                 " AND {}",
                 doc_ref.conditional_stmt("metadata->'ref'")
+            )?;
+        }
+        if let Some(template) = &self.template {
+            write!(
+                &mut query,
+                " AND {}",
+                template.conditional_stmt("metadata->'template'")
+            )?;
+        }
+        if let Some(reply) = &self.reply {
+            write!(
+                &mut query,
+                " AND {}",
+                reply.conditional_stmt("metadata->'reply'")
             )?;
         }
 
@@ -84,6 +102,22 @@ impl DocsQueryFilter {
     pub fn with_ref(self, doc_ref: DocumentRef) -> Self {
         DocsQueryFilter {
             doc_ref: Some(doc_ref),
+            ..self
+        }
+    }
+
+    /// Set the `metadata->'template'` field filter condition
+    pub fn with_template(self, template: DocumentRef) -> Self {
+        DocsQueryFilter {
+            template: Some(template),
+            ..self
+        }
+    }
+
+    /// Set the `metadata->'reply'` field filter condition
+    pub fn with_reply(self, reply: DocumentRef) -> Self {
+        DocsQueryFilter {
+            reply: Some(reply),
             ..self
         }
     }

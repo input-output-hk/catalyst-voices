@@ -168,7 +168,13 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
             db_filter = db_filter.with_ver(ver.try_into()?);
         }
         if let Some(doc_ref) = value.doc_ref {
-            db_filter = db_filter.with_ref(doc_ref.0.try_into()?);
+            db_filter = db_filter.with_ref(doc_ref.try_into()?);
+        }
+        if let Some(template) = value.template {
+            db_filter = db_filter.with_template(template.try_into()?);
+        }
+        if let Some(reply) = value.reply {
+            db_filter = db_filter.with_reply(reply.try_into()?);
         }
         // TODO process also the rest of the fields like `ref`, `template` etc.
         Ok(db_filter)

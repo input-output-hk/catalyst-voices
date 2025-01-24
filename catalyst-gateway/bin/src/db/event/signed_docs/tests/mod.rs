@@ -10,6 +10,8 @@ use crate::db::event::{
     establish_connection,
 };
 
+mod filter_by_field;
+
 #[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn queries_test() {
@@ -24,7 +26,10 @@ async fn queries_test() {
         filter_by_id(doc).await;
         filter_by_ver(doc).await;
         filter_by_id_and_ver(doc).await;
-        filter_by_ref(doc).await;
+
+        filter_by_field::filter_by_field!(doc, "ref", with_ref);
+        filter_by_field::filter_by_field!(doc, "template", with_template);
+        filter_by_field::filter_by_field!(doc, "reply", with_reply);
     }
 
     filter_by_type(&docs, doc_type).await;
@@ -42,6 +47,8 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 Some(serde_json::json!(
                     {
                         "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),
@@ -57,6 +64,8 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 Some(serde_json::json!(
                     {
                         "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),
@@ -157,48 +166,6 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     let res_doc = res_docs.try_next().await.unwrap().unwrap();
     assert_eq!(doc.body(), &res_doc);
     assert!(res_docs.try_next().await.unwrap().is_none());
-}
-
-#[allow(clippy::indexing_slicing)]
-async fn filter_by_ref(doc: &FullSignedDoc) {
-    if let Some(meta) = doc.metadata() {
-        let doc_ref_id = uuid::Uuid::from_str(meta["ref"]["id"].clone().as_str().unwrap()).unwrap();
-        let doc_ref_ver =
-            uuid::Uuid::from_str(meta["ref"]["ver"].clone().as_str().unwrap()).unwrap();
-
-        // With id
-        let filter = DocsQueryFilter::all().with_ref(DocumentRef {
-            id: Some(EqOrRangedUuid::Eq(doc_ref_id)),
-            ver: None,
-        });
-        let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
-            .await
-            .unwrap();
-        let res_doc = res_docs.try_next().await.unwrap().unwrap();
-        assert_eq!(doc.body(), &res_doc);
-
-        // with ver
-        let filter = DocsQueryFilter::all().with_ref(DocumentRef {
-            id: None,
-            ver: Some(EqOrRangedUuid::Eq(doc_ref_ver)),
-        });
-        let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
-            .await
-            .unwrap();
-        let res_doc = res_docs.try_next().await.unwrap().unwrap();
-        assert_eq!(doc.body(), &res_doc);
-
-        // with both id and ver
-        let filter = DocsQueryFilter::all().with_ref(DocumentRef {
-            id: Some(EqOrRangedUuid::Eq(doc_ref_id)),
-            ver: Some(EqOrRangedUuid::Eq(doc_ref_ver)),
-        });
-        let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
-            .await
-            .unwrap();
-        let res_doc = res_docs.try_next().await.unwrap().unwrap();
-        assert_eq!(doc.body(), &res_doc);
-    }
 }
 
 async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
