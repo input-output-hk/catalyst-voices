@@ -367,16 +367,12 @@ class _PropertyValueBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case DocumentSingleLineTextEntrySchema():
-        return SimpleTextEntryWidget(
-          property: schema.castProperty(property),
-          schema: schema,
-          isEditMode: isEditMode,
-          onChanged: onChanged,
-        );
       case DocumentMultiLineTextEntrySchema():
+      case DocumentGenericStringSchema():
+        final castSchema = schema as DocumentStringSchema;
         return SimpleTextEntryWidget(
-          property: schema.castProperty(property),
-          schema: schema,
+          property: castSchema.castProperty(property),
+          schema: castSchema,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
@@ -389,15 +385,19 @@ class _PropertyValueBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
 
-      case DocumentTagGroupSchema():
-      case DocumentTagSelectionSchema():
       case DocumentSpdxLicenseOrUrlSchema():
       case DocumentLanguageCodeSchema():
-      case DocumentGenericStringSchema():
       case DocumentDurationInMonthsSchema():
       case DocumentGenericIntegerSchema():
       case DocumentGenericNumberSchema():
       case DocumentGenericBooleanSchema():
+        return _UnimplementedWidget(schema: schema);
+
+      case DocumentTagGroupSchema():
+      case DocumentTagSelectionSchema():
+        // DocumentTagGroupSchema and DocumentTagSelectionSchema should
+        // be handled by their parent (DocumentSingleGroupedTagSelectorSchema)
+        // so the code here should never be executed
         return _UnimplementedWidget(schema: schema);
     }
   }
