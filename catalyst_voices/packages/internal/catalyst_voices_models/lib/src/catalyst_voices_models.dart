@@ -34,6 +34,7 @@ export 'seed_phrase.dart';
 export 'space.dart';
 export 'user/account.dart';
 export 'user/account_role.dart';
+export 'user/preferences.dart';
 export 'user/user.dart';
 export 'wallet/cardano_wallet_details.dart';
 export 'wallet/wallet_info.dart';
