@@ -28,7 +28,7 @@ code-lint:
 # Synchronize Rust Configs
 sync-cfg:
     cd .. && \
-        earthly ./catalyst-gateway+sync-cfg 
+        earthly ./catalyst-gateway+sync-cfg
 
 # Pre Push Checks
 pre-push: sync-cfg code-format code-lint license-check
@@ -41,13 +41,14 @@ pre-push: sync-cfg code-format code-lint license-check
 # Build Local release build of catalyst gateway
 build-cat-gateway: code-format code-lint
     cargo update
-    cargo build -r 
+    cargo build -r
 
 # Run cat-gateway natively on preprod
 run-cat-gateway: build-cat-gateway
     CHAIN_FOLLOWER_SYNC_TASKS="16" \
     RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
     CHAIN_NETWORK="Preprod" \
+    INTERNAL_API_KEY=123 \
     ./target/release/cat-gateway run --log-level debug
 
 # Run cat-gateway natively on mainnet
@@ -55,6 +56,7 @@ run-cat-gateway-mainnet: build-cat-gateway
     CHAIN_FOLLOWER_SYNC_TASKS="32" \
     CHAIN_FOLLOWER_DL_CONNECTIONS="64" \
     CHAIN_FOLLOWER_DL_CHUNK_SIZE="4" \
+    INTERNAL_API_KEY=123 \
     RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
     ./target/release/cat-gateway run --log-level debug
 
@@ -67,7 +69,7 @@ generate-openapi-schema: build-cat-gateway
     ./target/release/cat-gateway docs cat-gateway-api.json
 
 # Lint an openapi schema that has already been generated
-lint-generated-schema: 
+lint-generated-schema:
     docker run --rm -it -v $(pwd):/tmp stoplight/spectral:latest lint --ruleset "/tmp/tests/openapi-v3.0-lints/.spectral.yml" "/tmp/cat-gateway-api.json"
 
 # Lint an openapi schema that has already been generated locally.

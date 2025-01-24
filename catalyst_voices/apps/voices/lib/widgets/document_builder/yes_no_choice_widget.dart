@@ -24,9 +24,9 @@ class YesNoChoiceWidget extends StatefulWidget {
 }
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
-  late bool? selectedValue;
+  late bool? _selectedValue;
 
-  String get _description => widget.schema.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
 
   @override
   void initState() {
@@ -55,16 +55,16 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
           context,
-          value: selectedValue,
+          value: _selectedValue,
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
           validator: (value) {
@@ -79,14 +79,15 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   }
 
   void _handleInitialValue() {
-    selectedValue = widget.property.value;
+    _selectedValue = widget.property.value;
   }
 
   void _handleValueChanged(bool? value) {
     setState(() {
-      selectedValue = value;
+      _selectedValue = value;
     });
-    if (value == null && widget.property.value != value) {
+
+    if (widget.property.value != value) {
       _notifyChangeListener(value);
     }
   }
@@ -148,12 +149,14 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                   ),
                 ),
                 if (field.hasError)
-                  Text(
-                    field.errorText ?? context.l10n.snackbarErrorLabelText,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      field.errorText ?? context.l10n.snackbarErrorLabelText,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                    ),
                   ),
               ],
             );
