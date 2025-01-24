@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -27,15 +28,20 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
 
-  String get _description => widget.schema.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
   int? get _maxLength => widget.schema.strLengthRange?.max;
   bool get _resizable => widget.schema is DocumentMultiLineTextEntrySchema;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.property.value);
-    _controller.addListener(_handleValueChange);
+
+    final textValue =
+        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+
+    _controller = TextEditingController.fromValue(textValue)
+      ..addListener(_handleValueChange);
+
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
@@ -46,12 +52,12 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
     if (oldWidget.isEditMode != widget.isEditMode) {
       _handleEditModeChanged();
       if (!widget.isEditMode) {
-        _controller.text = widget.property.value ?? '';
+        _controller.textWithSelection = widget.property.value ?? '';
       }
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _controller.text = widget.property.value ?? '';
+      _controller.textWithSelection = widget.property.value ?? '';
     }
   }
 
@@ -68,9 +74,9 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
@@ -164,7 +170,8 @@ class _SimpleDocumentTextField extends StatelessWidget {
         hintText: hintText,
       ),
       enabled: enabled,
-      resizable: resizable,
+      resizableVertically: resizable,
+      resizableHorizontally: false,
       maxLengthEnforcement: MaxLengthEnforcement.none,
       autovalidateMode: AutovalidateMode.disabled,
       maxLines: resizable ? null : 1,

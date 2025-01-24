@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_https_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -28,13 +29,18 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
-  String get _description => widget.schema.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
 
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController(text: widget.property.value);
-    _textEditingController.addListener(_handleControllerChange);
+
+    final textValue =
+        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+
+    _textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleControllerChange);
+
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
@@ -44,7 +50,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
 
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
-      _textEditingController.text = widget.property.value ?? '';
+      _textEditingController.textWithSelection = widget.property.value ?? '';
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -64,9 +70,9 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
