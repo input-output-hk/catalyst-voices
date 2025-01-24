@@ -11,7 +11,8 @@ final class Account extends Equatable {
   /// ```md
   /// kid.catalyst-rbac://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE/0/0
   /// ```
-  /// kid.catalyst-rbac:// part is common so it can be skipped while building
+  ///
+  /// 'kid.catalyst-rbac://' part is common so it can be skipped while building
   /// catalystId.
   final String catalystId;
   final String displayName;
