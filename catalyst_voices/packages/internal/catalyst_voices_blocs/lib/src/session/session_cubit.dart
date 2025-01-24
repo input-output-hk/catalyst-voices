@@ -98,6 +98,22 @@ final class SessionCubit extends Cubit<SessionState>
     await _userService.useAccount(dummyAccount);
   }
 
+  void updateTimezonePreferences(TimezonePreferences value) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings = settings.copyWith(timezone: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
+  void updateTheme(ThemePreferences value) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings = settings.copyWith(theme: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
   @override
   Future<void> close() async {
     await _userSettingsSub?.cancel();
@@ -127,8 +143,6 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   void _handleUserSettings(UserSettings settings) {
-    _logger.fine('User settings changed [$settings]');
-
     _userSettings = settings;
 
     _updateState();
