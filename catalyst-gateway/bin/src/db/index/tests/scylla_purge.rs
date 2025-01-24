@@ -8,7 +8,7 @@ use crate::db::index::queries::purge::chain_root_for_role0_key::*;
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_assets_by_stake_addr() {
+async fn test_chain_root_for_role0_key() {
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
