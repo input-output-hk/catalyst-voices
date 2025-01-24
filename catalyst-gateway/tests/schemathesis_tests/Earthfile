@@ -4,6 +4,9 @@ VERSION 0.8
 package-schemathesis:
     FROM python:3.12-alpine3.20
     ARG api_spec
+    ARG wait_for_schema=500
+    ARG max_response_time=5000
+    ARG hypothesis_max_examples=1000
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG version=3.39.5
     ARG tag="latest"
@@ -17,9 +20,9 @@ package-schemathesis:
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     $api_spec \
                     --workers=2 \
-                    --wait-for-schema=500 \
-                    --max-response-time=5000 \
-                    --hypothesis-max-examples=1000 \
+                    --wait-for-schema=$wait_for_schema \
+                    --max-response-time=$max_response_time \
+                    --hypothesis-max-examples=$hypothesis_max_examples \
                     --data-generation-method=all \
                     --exclude-deprecated \
                     --force-schema-version=30 \
@@ -31,14 +34,17 @@ package-schemathesis:
 
     SAVE IMAGE schemathesis:$tag
 
-# schemathesis image that target all the endpoints (draft ones too)
+# schemathesis image that targets all the endpoints (draft ones too)
 package-draft-schemathesis:
     FROM python:3.12-alpine3.20
     ARG api_spec
-    # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
-    ARG seed
+    ARG wait_for_schema=120
+    ARG max_response_time=300
+    ARG hypothesis_max_examples=1000
+    ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG version=3.39.5
     ARG tag="draft-latest"
+
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
     RUN mkdir /results
@@ -46,9 +52,9 @@ package-draft-schemathesis:
     VOLUME /results
     ENTRYPOINT st run --checks=all $api_spec \
                     --workers=2 \
-                    --wait-for-schema=120 \
-                    --max-response-time=300 \
-                    --hypothesis-max-examples=1000 \
+                    --wait-for-schema=$wait_for_schema \
+                    --max-response-time=$max_response_time \
+                    --hypothesis-max-examples=$hypothesis_max_examples \
                     --data-generation-method=all \
                     --exclude-deprecated \
                     --force-schema-version=30 \
@@ -90,7 +96,7 @@ test-ci-schemathesis:
             exit 1
     END
 
-# nightly-test-draft-schemathesis - Fuzzy test cat-gateway using openapi specs.
+# nightly-test-draft-schemathesis - Testing all the endpoints in the api doc
 nightly-test-draft-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
@@ -122,24 +128,29 @@ nightly-test-draft-schemathesis:
             exit 1
     END
 
-# nightly-test-draft-schemathesis - Fuzzy test cat-gateway using openapi specs.
+# nightly-test-dev-schemathesis - Testing the prod endpoints on dev envrionment
 nightly-test-dev-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
     LET api_spec="https://gateway.dev.projectcatalyst.io/docs/cat-gateway.json"
+    ARG wait_for_schema=15
+    ARG max_response_time=300
+    ARG hypothesis_max_examples=1000
     ARG seed
 
     WITH DOCKER \
-        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
-        --allow-privileged
+        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed \
+                                    --wait-for-schema=$wait_for_schema --max-response-time=$max_response_time \
+                                    --hypothesis-max-examples=$hypothesis_max_examples) \
+                                    --allow-privileged
 
         RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
     WAIT
-        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly.junit-report.xml
+        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly-dev.junit-report.xml
         SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
     END
     IF [ -f fail ]
