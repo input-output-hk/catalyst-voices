@@ -157,7 +157,6 @@ void main() async {
 
   patrolWidgetTest(
     'visitor - no drawer button',
-    (PatrolTester $) async {
-    },
+    (PatrolTester $) async {},
   );
 }
