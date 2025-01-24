@@ -3,8 +3,9 @@ project: {
 	name: "gateway-schema-tests"
 	ci: {
     targets: {
-      "test-fuzzer-api": privileged: true
-      "nightly-test-fuzzer-api": privileged: true
+      "test-schemathesis": privileged: true
+      "nightly-test-schemathesis": privileged: true
+      "nightly-test-dev-schemathesis": privileged: true
     }
   }
 }

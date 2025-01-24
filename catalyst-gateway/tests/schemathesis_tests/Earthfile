@@ -32,8 +32,8 @@ package-schemathesis:
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
-# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
-test-fuzzer-api:
+# test-schemathesis - Fuzzy test cat-gateway using openapi specs.
+test-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
@@ -92,8 +92,8 @@ nightly-package-schemathesis:
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
-# nightly-test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
-nightly-test-fuzzer-api:
+# nightly-test-schemathesis - Fuzzy test cat-gateway using openapi specs.
+nightly-test-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
@@ -121,5 +121,30 @@ nightly-test-fuzzer-api:
     END
     IF [ -f fail ]
         RUN --no-cache echo "Nightly schemathesis test failed. Check the logs for more details" && \
+            exit 1
+    END
+
+# nightly-test-schemathesis - Fuzzy test cat-gateway using openapi specs.
+nightly-test-dev-schemathesis:
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
+    RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
+    COPY schemathesis-docker-compose.yml .
+    LET api_spec="https://gateway.dev.projectcatalyst.io/docs/cat-gateway.json"
+    ARG seed
+
+    WITH DOCKER \
+        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
+        --allow-privileged
+
+        RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+            docker cp st:/results/junit-report.xml junit-report.xml && \
+            docker cp st:/results/cassette.yaml cassette.yaml
+    END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly.junit-report.xml
+        SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+    END
+    IF [ -f fail ]
+        RUN --no-cache echo "Nightly dev schemathesis test failed. Check the logs for more details" && \
             exit 1
     END
