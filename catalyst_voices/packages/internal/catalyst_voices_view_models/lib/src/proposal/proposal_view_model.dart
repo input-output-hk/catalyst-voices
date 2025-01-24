@@ -7,8 +7,12 @@ import 'package:equatable/equatable.dart';
 /// A proposal view model spanning proposals in different stages.
 abstract base class ProposalViewModel extends Equatable {
   final String id;
+  final bool isFavorite;
 
-  const ProposalViewModel({required this.id});
+  const ProposalViewModel({
+    required this.id,
+    required this.isFavorite,
+  });
 
   factory ProposalViewModel.fromProposalAtStage({
     required Proposal proposal,
@@ -34,8 +38,12 @@ abstract base class ProposalViewModel extends Equatable {
     }
   }
 
+  ProposalViewModel copyWith({
+    bool? isFavorite,
+  });
+
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, isFavorite];
 }
 
 /// Defines the pending proposal that is not funded yet.
@@ -52,6 +60,7 @@ final class PendingProposal extends ProposalViewModel {
 
   const PendingProposal({
     required super.id,
+    super.isFavorite = false,
     required this.campaignName,
     required this.category,
     required this.title,
@@ -84,6 +93,34 @@ final class PendingProposal extends ProposalViewModel {
   }
 
   @override
+  PendingProposal copyWith({
+    bool? isFavorite,
+    String? campaignName,
+    String? category,
+    String? title,
+    DateTime? lastUpdateDate,
+    Coin? fundsRequested,
+    int? commentsCount,
+    String? description,
+    int? completedSegments,
+    int? totalSegments,
+  }) {
+    return PendingProposal(
+      id: id,
+      isFavorite: isFavorite ?? this.isFavorite,
+      campaignName: campaignName ?? this.campaignName,
+      category: category ?? this.category,
+      title: title ?? this.title,
+      lastUpdateDate: lastUpdateDate ?? this.lastUpdateDate,
+      fundsRequested: fundsRequested ?? _fundsRequested,
+      commentsCount: commentsCount ?? this.commentsCount,
+      description: description ?? this.description,
+      completedSegments: completedSegments ?? this.completedSegments,
+      totalSegments: totalSegments ?? this.totalSegments,
+    );
+  }
+
+  @override
   List<Object?> get props => [
         ...super.props,
         campaignName,
@@ -110,6 +147,7 @@ final class FundedProposal extends ProposalViewModel {
 
   const FundedProposal({
     required super.id,
+    super.isFavorite = false,
     required this.campaignName,
     required this.category,
     required this.title,
@@ -138,6 +176,30 @@ final class FundedProposal extends ProposalViewModel {
   }
 
   @override
+  FundedProposal copyWith({
+    bool? isFavorite,
+    String? campaignName,
+    String? category,
+    String? title,
+    DateTime? fundedDate,
+    Coin? fundsRequested,
+    int? commentsCount,
+    String? description,
+  }) {
+    return FundedProposal(
+      id: id,
+      isFavorite: isFavorite ?? this.isFavorite,
+      campaignName: campaignName ?? this.campaignName,
+      category: category ?? this.category,
+      title: title ?? this.title,
+      fundedDate: fundedDate ?? this.fundedDate,
+      fundsRequested: fundsRequested ?? _fundsRequested,
+      commentsCount: commentsCount ?? this.commentsCount,
+      description: description ?? this.description,
+    );
+  }
+
+  @override
   List<Object?> get props => [
         ...super.props,
         campaignName,
@@ -148,4 +210,10 @@ final class FundedProposal extends ProposalViewModel {
         commentsCount,
         description,
       ];
+}
+
+extension ListProposalViewModelExt on List<ProposalViewModel> {
+  List<ProposalViewModel> get favorites {
+    return where((proposal) => proposal.isFavorite).toList();
+  }
 }
