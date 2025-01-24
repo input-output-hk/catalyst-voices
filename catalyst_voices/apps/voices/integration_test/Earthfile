@@ -24,11 +24,11 @@ integration-test-web:
 
     WORKDIR /frontend/apps/voices
 
+    RUN ($driver --port=$driver_port > $driver.log &)
     RUN useradd -ms /bin/bash newuser
     USER newuser
 
-    RUN ($driver --port=$driver_port > $driver.log &) && \
-        sleep 5 && \
+    RUN sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
             --target=integration_test/all_test.dart \
             -d web-server --browser-name=$browser --driver-port=$driver_port \
