@@ -63,7 +63,6 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
-          context,
           value: _selectedValue,
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
@@ -106,8 +105,7 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
   final bool? value;
   final ValueChanged<bool?>? onChanged;
 
-  _YesNoChoiceSegmentButton(
-    BuildContext context, {
+  _YesNoChoiceSegmentButton({
     super.key,
     required this.value,
     required this.onChanged,
@@ -118,6 +116,7 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
           initialValue: value,
           autovalidateMode: autovalidateMode,
           builder: (field) {
+            final state = field as _YesNoChoiceSegmentButtonState;
             void onChangedHandler(Set<bool> selected) {
               final newValue = selected.isEmpty ? null : selected.first;
               field.didChange(newValue);
@@ -135,14 +134,16 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                     segments: [
                       ButtonSegment(
                         value: true,
-                        label: Text(context.l10n.yes),
+                        label: Text(field.context.l10n.yes),
                       ),
                       ButtonSegment(
                         value: false,
-                        label: Text(context.l10n.no),
+                        label: Text(field.context.l10n.no),
                       ),
                     ],
-                    selected: value != null ? {value} : {},
+                    selected: state._internalValue != null
+                        ? {state._internalValue!}
+                        : {},
                     onChanged: onChangedHandler,
                     emptySelectionAllowed: true,
                     style: _getButtonStyle(field),
@@ -152,9 +153,13 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      field.errorText ?? context.l10n.snackbarErrorLabelText,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.error,
+                      field.errorText ??
+                          field.context.l10n.snackbarErrorLabelText,
+                      style: Theme.of(field.context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(
+                            color: Theme.of(field.context).colorScheme.error,
                           ),
                     ),
                   ),
@@ -173,5 +178,30 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
         ),
       ),
     );
+  }
+
+  @override
+  FormFieldState<bool?> createState() => _YesNoChoiceSegmentButtonState();
+}
+
+class _YesNoChoiceSegmentButtonState extends FormFieldState<bool?> {
+  bool? _internalValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _internalValue = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(_YesNoChoiceSegmentButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != _internalValue) {
+      _internalValue = widget.initialValue;
+    }
+    if (_internalValue != value) {
+      setValue(_internalValue);
+      validate();
+    }
   }
 }
