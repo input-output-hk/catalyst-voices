@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
+import 'package:catalyst_voices/pages/registration/widgets/export_catalyst_key_confirm_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -51,7 +51,7 @@ class _BlocLoadable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.isLoading,
       builder: (context, state) {
         return VoicesLoadable(
@@ -68,7 +68,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<List<SeedPhraseWord>>(
+    return BlocSeedPhraseSelector<List<SeedPhraseWord>>(
       selector: (state) => state.seedPhraseWords,
       builder: (context, state) => _SeedPhraseWords(state),
     );
@@ -92,16 +92,20 @@ class _SeedPhraseWords extends StatelessWidget {
           const SizedBox(height: 10),
           VoicesTextButton(
             key: const Key('DownloadSeedPhraseButton'),
-            onTap: () => unawaited(_downloadSeedPhrase(context)),
-            child: Text(context.l10n.createKeychainSeedPhraseDownload),
+            onTap: () => unawaited(_exportSeedPhrase(context)),
+            child: Text(context.l10n.createKeychainSeedPhraseExport),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _downloadSeedPhrase(BuildContext context) async {
-    await RegistrationCubit.of(context).keychainCreation.downloadSeedPhrase();
+  Future<void> _exportSeedPhrase(BuildContext context) async {
+    final confirmed = await ExportCatalystKeyConfirmDialog.show(context);
+
+    if (confirmed && context.mounted) {
+      await RegistrationCubit.of(context).keychainCreation.exportSeedPhrase();
+    }
   }
 }
 
@@ -110,7 +114,7 @@ class _BlocStoredCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.isStoredConfirmed,
       builder: (context, state) {
         return _StoredCheckbox(
@@ -148,7 +152,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.isStoredConfirmed,
       builder: (context, state) {
         return RegistrationBackNextNavigation(

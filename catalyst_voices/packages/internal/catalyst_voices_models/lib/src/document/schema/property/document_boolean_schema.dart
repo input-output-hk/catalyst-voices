@@ -83,6 +83,16 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
     required super.enumValues,
   });
 
+  const DocumentGenericBooleanSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.title = '',
+    super.description,
+    super.isRequired = false,
+    super.defaultValue,
+    super.enumValues,
+  });
+
   @override
   DocumentGenericBooleanSchema withNodeId(DocumentNodeId nodeId) {
     return DocumentGenericBooleanSchema(
