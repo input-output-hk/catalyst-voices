@@ -28,10 +28,12 @@ final class SessionCubit extends Cubit<SessionState>
 
   final _logger = Logger('SessionCubit');
 
+  UserSettings? _userSettings;
   Account? _account;
   AdminToolsState _adminToolsState;
   bool _hasWallets = false;
 
+  StreamSubscription<UserSettings>? _userSettingsSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
   StreamSubscription<Account?>? _accountSub;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
@@ -44,6 +46,11 @@ final class SessionCubit extends Cubit<SessionState>
     this._adminTools,
   )   : _adminToolsState = _adminTools.state,
         super(const SessionState.initial()) {
+    _userSettingsSub = _userService.watchUser
+        .map((user) => user.settings)
+        .distinct()
+        .listen(_handleUserSettings);
+
     _keychainUnlockedSub = _userService.watchAccount
         .transform(AccountToKeychainUnlockTransformer())
         .distinct()
@@ -93,6 +100,9 @@ final class SessionCubit extends Cubit<SessionState>
 
   @override
   Future<void> close() async {
+    await _userSettingsSub?.cancel();
+    _userSettingsSub = null;
+
     await _keychainUnlockedSub?.cancel();
     _keychainUnlockedSub = null;
 
@@ -112,6 +122,14 @@ final class SessionCubit extends Cubit<SessionState>
     _logger.fine('Active account changed [$account]');
 
     _account = account;
+
+    _updateState();
+  }
+
+  void _handleUserSettings(UserSettings settings) {
+    _logger.fine('User settings changed [$settings]');
+
+    _userSettings = settings;
 
     _updateState();
   }
@@ -155,28 +173,27 @@ final class SessionCubit extends Cubit<SessionState>
 
   SessionState _createSessionState() {
     final account = _account;
+    final userSettings = _userSettings;
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
     final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
 
-    // TODO(damian): this will need to be updated.
-    const settings = SessionSettings(
-      timezone: TimezonePreferences.local,
-      theme: ThemePreferences.light,
-    );
+    final sessionSettings = userSettings != null
+        ? SessionSettings.fromUser(userSettings)
+        : const SessionSettings.fallback();
 
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
       return SessionState.visitor(
         canCreateAccount: canCreateAccount,
         isRegistrationInProgress: !isEmpty,
-        settings: settings,
+        settings: sessionSettings,
       );
     }
 
     if (!isUnlocked) {
       return SessionState.guest(
         canCreateAccount: canCreateAccount,
-        settings: settings,
+        settings: sessionSettings,
       );
     }
 
@@ -192,7 +209,7 @@ final class SessionCubit extends Cubit<SessionState>
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,
-      settings: settings,
+      settings: sessionSettings,
     );
   }
 

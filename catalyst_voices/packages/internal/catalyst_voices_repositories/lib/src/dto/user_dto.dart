@@ -9,16 +9,19 @@ part 'user_dto.g.dart';
 @JsonSerializable()
 final class UserDto {
   final List<AccountDto> accounts;
+  final UserSettingsDto settings;
   final String? activeKeychainId;
 
   UserDto({
     this.accounts = const [],
+    this.settings = const UserSettingsDto(),
     this.activeKeychainId,
   });
 
   UserDto.fromModel(User data)
       : this(
           accounts: data.accounts.map(AccountDto.fromModel).toList(),
+          settings: UserSettingsDto.fromModel(data.settings),
           activeKeychainId: data.activeAccount?.keychain.id,
         );
 
@@ -44,6 +47,39 @@ final class UserDto {
 
     return User(
       accounts: accounts,
+      settings: settings.toModel(),
+    );
+  }
+}
+
+@JsonSerializable()
+final class UserSettingsDto {
+  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final TimezonePreferences? timezone;
+  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final ThemePreferences? theme;
+
+  const UserSettingsDto({
+    this.timezone,
+    this.theme,
+  });
+
+  UserSettingsDto.fromModel(UserSettings data)
+      : this(
+          timezone: data.timezone,
+          theme: data.theme,
+        );
+
+  factory UserSettingsDto.fromJson(Map<String, dynamic> json) {
+    return _$UserSettingsDtoFromJson(json);
+  }
+
+  Map<String, dynamic> toJson() => _$UserSettingsDtoToJson(this);
+
+  UserSettings toModel() {
+    return UserSettings(
+      timezone: timezone,
+      theme: theme,
     );
   }
 }
@@ -56,7 +92,6 @@ final class AccountDto {
   final Set<AccountRole> roles;
   final AccountWalletInfoDto walletInfo;
   final bool isProvisional;
-  final AccountSettingsDto settings;
 
   AccountDto({
     required this.displayName,
@@ -65,7 +100,6 @@ final class AccountDto {
     required this.roles,
     required this.walletInfo,
     this.isProvisional = true,
-    this.settings = const AccountSettingsDto(),
   });
 
   AccountDto.fromModel(Account data)
@@ -76,7 +110,6 @@ final class AccountDto {
           roles: data.roles,
           walletInfo: AccountWalletInfoDto.fromModel(data.walletInfo),
           isProvisional: data.isProvisional,
-          settings: AccountSettingsDto.fromModel(data.settings),
         );
 
   factory AccountDto.fromJson(Map<String, dynamic> json) {
@@ -119,39 +152,6 @@ final class AccountDto {
       walletInfo: walletInfo.toModel(),
       isActive: keychainId == activeKeychainId,
       isProvisional: isProvisional,
-      settings: settings.toModel(),
-    );
-  }
-}
-
-@JsonSerializable()
-final class AccountSettingsDto {
-  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
-  final TimezonePreferences? timezone;
-  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
-  final ThemePreferences? theme;
-
-  const AccountSettingsDto({
-    this.timezone,
-    this.theme,
-  });
-
-  AccountSettingsDto.fromModel(AccountSettings data)
-      : this(
-          timezone: data.timezone,
-          theme: data.theme,
-        );
-
-  factory AccountSettingsDto.fromJson(Map<String, dynamic> json) {
-    return _$AccountSettingsDtoFromJson(json);
-  }
-
-  Map<String, dynamic> toJson() => _$AccountSettingsDtoToJson(this);
-
-  AccountSettings toModel() {
-    return AccountSettings(
-      timezone: timezone,
-      theme: theme,
     );
   }
 }

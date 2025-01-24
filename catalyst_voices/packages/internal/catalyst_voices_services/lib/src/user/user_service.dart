@@ -13,6 +13,10 @@ abstract interface class UserService implements ActiveAware {
     );
   }
 
+  User get user;
+
+  Stream<User> get watchUser;
+
   Account? get account;
 
   List<Account> get accounts;
@@ -35,7 +39,7 @@ final class UserServiceImpl implements UserService {
 
   final _logger = Logger('UserService');
 
-  User _user = const User(accounts: []);
+  User _user = const User.empty();
   final _userSC = StreamController<User>.broadcast();
 
   bool _isActive = true;
@@ -43,6 +47,15 @@ final class UserServiceImpl implements UserService {
   UserServiceImpl(
     this._userRepository,
   );
+
+  @override
+  User get user => _user;
+
+  @override
+  Stream<User> get watchUser async* {
+    yield user;
+    yield* _userSC.stream;
+  }
 
   @override
   Account? get account => _user.activeAccount;

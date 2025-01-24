@@ -19,10 +19,10 @@ final class SessionSettings extends Equatable {
           theme: _defaultTheme,
         );
 
-  SessionSettings.fromAccount(Account account)
+  SessionSettings.fromUser(UserSettings settings)
       : this(
-          timezone: account.settings.timezone ?? _defaultTimezone,
-          theme: account.settings.theme ?? _defaultTheme,
+          timezone: settings.timezone ?? _defaultTimezone,
+          theme: settings.theme ?? _defaultTheme,
         );
 
   @override

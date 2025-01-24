@@ -34,7 +34,7 @@ final class UserRepositoryImpl implements UserRepository {
 
     final user = await dto?.toModel(keychainProvider: _keychainProvider);
 
-    return user ?? const User(accounts: []);
+    return user ?? const User.empty();
   }
 
   @override

@@ -36,6 +36,7 @@ export 'user/account.dart';
 export 'user/account_role.dart';
 export 'user/preferences.dart';
 export 'user/user.dart';
+export 'user/user_settings.dart';
 export 'wallet/cardano_wallet_details.dart';
 export 'wallet/wallet_info.dart';
 export 'wallet/wallet_metadata.dart';

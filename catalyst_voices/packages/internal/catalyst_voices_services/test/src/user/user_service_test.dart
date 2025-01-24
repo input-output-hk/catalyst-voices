@@ -106,7 +106,7 @@ void main() {
         accounts.add(account);
       }
 
-      await userRepository.saveUser(User(accounts: accounts));
+      await userRepository.saveUser(User.optional(accounts: accounts));
 
       // Then
       final user = await service.getUser();
@@ -125,7 +125,7 @@ void main() {
         isActive: true,
       );
 
-      final user = User(accounts: [lastAccount]);
+      final user = User.optional(accounts: [lastAccount]);
       await userRepository.saveUser(user);
 
       await service.useLastAccount();
@@ -155,7 +155,7 @@ void main() {
         isActive: true,
       );
 
-      final user = User(accounts: [account]);
+      final user = User.optional(accounts: [account]);
       await userRepository.saveUser(user);
 
       await service.useLastAccount();

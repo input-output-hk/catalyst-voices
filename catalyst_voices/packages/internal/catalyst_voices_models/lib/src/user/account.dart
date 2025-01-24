@@ -20,9 +20,6 @@ final class Account extends Equatable {
   /// transaction was not yet read.
   final bool isProvisional;
 
-  /// Groups user defined settings.
-  final AccountSettings settings;
-
   static const dummyKeychainId = 'TestUserKeychainID';
   static const dummyUnlockFactor = PasswordLockFactor('Test1234');
   static final dummySeedPhrase = SeedPhrase.fromMnemonic(
@@ -38,7 +35,6 @@ final class Account extends Equatable {
     required this.walletInfo,
     this.isActive = false,
     this.isProvisional = true,
-    this.settings = const AccountSettings(),
   });
 
   factory Account.dummy({
@@ -65,7 +61,6 @@ final class Account extends Equatable {
       ),
       isActive: isActive,
       isProvisional: true,
-      settings: const AccountSettings(),
     );
   }
 
@@ -83,7 +78,6 @@ final class Account extends Equatable {
     WalletInfo? walletInfo,
     bool? isActive,
     bool? isProvisional,
-    AccountSettings? settings,
   }) {
     return Account(
       displayName: displayName ?? this.displayName,
@@ -93,7 +87,6 @@ final class Account extends Equatable {
       walletInfo: walletInfo ?? this.walletInfo,
       isActive: isActive ?? this.isActive,
       isProvisional: isProvisional ?? this.isProvisional,
-      settings: settings ?? this.settings,
     );
   }
 
@@ -106,32 +99,5 @@ final class Account extends Equatable {
         walletInfo,
         isActive,
         isProvisional,
-        settings,
-      ];
-}
-
-final class AccountSettings extends Equatable {
-  final TimezonePreferences? timezone;
-  final ThemePreferences? theme;
-
-  const AccountSettings({
-    this.timezone,
-    this.theme,
-  });
-
-  AccountSettings copyWith({
-    Optional<TimezonePreferences>? timezone,
-    Optional<ThemePreferences>? theme,
-  }) {
-    return AccountSettings(
-      timezone: timezone.dataOr(this.timezone),
-      theme: theme.dataOr(this.theme),
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        timezone,
-        theme,
       ];
 }
