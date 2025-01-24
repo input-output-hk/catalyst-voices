@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/common/ext/time_of_day_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_date_time_text_field.dart';
@@ -52,9 +53,10 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
   void initState() {
     final initialTime = _effectiveController.value;
     final initialText = _convertTimeToText(initialTime);
+    final textValue = TextEditingValueExt.collapsedAtEndOf(initialText);
 
-    _textEditingController = TextEditingController(text: initialText);
-    _textEditingController.addListener(_handleTextChanged);
+    _textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleTextChanged);
 
     _effectiveController.addListener(_handleDateChanged);
 
@@ -78,7 +80,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
       (widget.controller ?? _controller)?.addListener(_handleDateChanged);
 
       final time = _effectiveController.value;
-      _textEditingController.text = _convertTimeToText(time);
+      _textEditingController.textWithSelection = _convertTimeToText(time);
     }
   }
 
@@ -131,7 +133,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
     final time = _effectiveController.value;
     final text = _convertTimeToText(time);
     if (_textEditingController.text != text) {
-      _textEditingController.text = text;
+      _textEditingController.textWithSelection = text;
     }
   }
 
