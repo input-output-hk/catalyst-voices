@@ -193,3 +193,22 @@ impl Example for DocumentReference {
         }
     }
 }
+
+impl From<catalyst_signed_doc::DocumentRef> for DocumentReference {
+    fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
+        match value {
+            catalyst_signed_doc::DocumentRef::Latest { id } => {
+                Self {
+                    doc_id: id.into(),
+                    ver: None,
+                }
+            },
+            catalyst_signed_doc::DocumentRef::WithVer { id, ver } => {
+                Self {
+                    doc_id: id.into(),
+                    ver: Some(ver.into()),
+                }
+            },
+        }
+    }
+}

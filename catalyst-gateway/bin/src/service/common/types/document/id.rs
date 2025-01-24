@@ -73,6 +73,15 @@ fn is_valid(uuid: &str) -> bool {
 
 impl_string_types!(DocumentId, "string", FORMAT, Some(SCHEMA.clone()), is_valid);
 
+impl DocumentId {
+    /// Creates a new `DocumentId` intance without validation.
+    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
+    /// valid `DocumentId`
+    pub(crate) fn new_unchecked(uuid: String) -> Self {
+        Self(uuid)
+    }
+}
+
 impl Example for DocumentId {
     /// An example.
     fn example() -> Self {
@@ -113,6 +122,12 @@ impl TryFrom<String> for DocumentId {
 
 impl From<uuidv7::UUIDv7> for DocumentId {
     fn from(value: uuidv7::UUIDv7) -> Self {
+        Self(value.to_string())
+    }
+}
+
+impl From<catalyst_signed_doc::UuidV7> for DocumentId {
+    fn from(value: catalyst_signed_doc::UuidV7) -> Self {
         Self(value.to_string())
     }
 }

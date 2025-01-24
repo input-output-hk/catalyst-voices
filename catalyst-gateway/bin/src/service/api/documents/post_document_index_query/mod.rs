@@ -16,7 +16,7 @@ use crate::{
         common::query_limits::QueryLimits,
         signed_docs::{DocsQueryFilter, SignedDocBody},
     },
-    service::common::responses::WithErrorResponses,
+    service::common::{responses::WithErrorResponses, types::document::id::DocumentId},
 };
 
 pub(crate) mod query_filter;
@@ -89,7 +89,7 @@ async fn fetch_docs(
                 .collect::<Result<_, _>>()?;
 
             Ok(IndexedDocumentDocumented(IndexedDocument {
-                doc_id: id.to_string().try_into()?,
+                doc_id: DocumentId::new_unchecked(id.to_string()),
                 ver,
             }))
         })

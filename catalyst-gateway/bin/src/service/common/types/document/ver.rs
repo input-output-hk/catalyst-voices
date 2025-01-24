@@ -79,6 +79,15 @@ impl_string_types!(
     is_valid
 );
 
+impl DocumentVer {
+    /// Creates a new `DocumentVer` intance without validation.
+    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
+    /// valid `DocumentVer`
+    pub(crate) fn new_unchecked(uuid: String) -> Self {
+        Self(uuid)
+    }
+}
+
 impl Example for DocumentVer {
     /// An example.
     fn example() -> Self {
@@ -119,6 +128,12 @@ impl TryFrom<String> for DocumentVer {
 
 impl From<uuidv7::UUIDv7> for DocumentVer {
     fn from(value: uuidv7::UUIDv7) -> Self {
+        Self(value.to_string())
+    }
+}
+
+impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
+    fn from(value: catalyst_signed_doc::UuidV7) -> Self {
         Self(value.to_string())
     }
 }

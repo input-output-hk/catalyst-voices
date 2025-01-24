@@ -1,11 +1,16 @@
 //! Catalyst Signed Document Endpoint Response Objects.
 use poem_openapi::{types::Example, NewType, Object};
 
-use self::common::types::document::{
-    doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
-};
 use super::SignedDocBody;
-use crate::service::common;
+use crate::service::common::{
+    self,
+    types::{
+        document::{
+            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+        },
+        generic::uuidv4::UUIDv4,
+    },
+};
 
 /// A single page of documents.
 ///
@@ -119,13 +124,13 @@ pub(crate) struct IndexedDocumentVersion {
     pub template: Option<DocumentReference>,
     /// Document Brand Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub brand: Option<DocumentReference>,
+    pub brand: Option<UUIDv4>,
     /// Document Campaign Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub campaign: Option<DocumentReference>,
+    pub campaign: Option<UUIDv4>,
     /// Document Category Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub category: Option<DocumentReference>,
+    pub category: Option<UUIDv4>,
 }
 
 impl Example for IndexedDocumentVersion {
@@ -172,22 +177,31 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
     type Error = anyhow::Error;
 
     fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
+        let mut doc_ref = None;
+        let mut reply = None;
+        let mut template = None;
+        let mut brand = None;
+        let mut campaign = None;
+        let mut category = None;
         if let Some(json_meta) = doc.metadata() {
-            let _meta: catalyst_signed_doc::ExtraFields =
-                serde_json::from_value(json_meta.clone())?;
+            let meta: catalyst_signed_doc::ExtraFields = serde_json::from_value(json_meta.clone())?;
+            doc_ref = meta.doc_ref().map(Into::into);
+            reply = meta.reply().map(Into::into);
+            template = meta.template().map(Into::into);
+            brand = meta.brand_id().map(Into::into);
+            campaign = meta.campaign_id().map(Into::into);
+            category = meta.campaign_id().map(Into::into);
         }
 
         Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
-            ver: doc.ver().to_string().try_into()?,
-            doc_type: doc.doc_type().to_string().try_into()?,
-            // TODO get all necessary metadata fields from the document and fill these
-            // fields
-            doc_ref: None,
-            reply: None,
-            template: None,
-            brand: None,
-            campaign: None,
-            category: None,
+            ver: DocumentVer::new_unchecked(doc.ver().to_string()),
+            doc_type: DocumentType::new_unchecked(doc.doc_type().to_string()),
+            doc_ref,
+            reply,
+            template,
+            brand,
+            campaign,
+            category,
         }))
     }
 }
