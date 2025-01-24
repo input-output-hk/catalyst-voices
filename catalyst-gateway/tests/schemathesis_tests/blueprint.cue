@@ -3,8 +3,8 @@ project: {
 	name: "gateway-schema-tests"
 	ci: {
     targets: {
-      "test-schemathesis": privileged: true
-      "nightly-test-schemathesis": privileged: true
+      "test-ci-schemathesis": privileged: true
+      "nightly-test-draft-schemathesis": privileged: true
       "nightly-test-dev-schemathesis": privileged: true
     }
   }
