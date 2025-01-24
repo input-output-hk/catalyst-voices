@@ -179,7 +179,7 @@ void main() {
 
       // Then
       expect(userService.account, isNotNull);
-      expect(userService.account?.id, account.id);
+      expect(userService.account?.keychain.id, account.keychain.id);
       expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
       expect(sessionCubit.state, isA<GuestSessionState>());
     });

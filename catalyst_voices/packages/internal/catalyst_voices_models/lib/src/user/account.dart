@@ -6,6 +6,14 @@ import 'package:equatable/equatable.dart';
 /// Defines singular account used by [User] (physical person).
 /// One [User] may have multiple [Account]'s.
 final class Account extends Equatable {
+  /// base64 role0 key looks like
+  ///
+  /// ```md
+  /// kid.catalyst-rbac://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE/0/0
+  /// ```
+  /// kid.catalyst-rbac:// part is common so it can be skipped while building
+  /// catalystId.
+  final String catalystId;
   final String displayName;
   final String email;
   final Keychain keychain;
@@ -28,6 +36,7 @@ final class Account extends Equatable {
   );
 
   const Account({
+    required this.catalystId,
     required this.displayName,
     required this.email,
     required this.keychain,
@@ -42,6 +51,7 @@ final class Account extends Equatable {
     bool isActive = false,
   }) {
     return Account(
+      catalystId: 'cardano/${keychain.id}',
       displayName: 'Dummy',
       email: 'dummy@iohk.com',
       keychain: keychain,
@@ -64,13 +74,12 @@ final class Account extends Equatable {
     );
   }
 
-  String get id => keychain.id;
-
   bool get isAdmin => true;
 
   bool get isDummy => keychain.id == dummyKeychainId;
 
   Account copyWith({
+    String? catalystId,
     String? displayName,
     String? email,
     Keychain? keychain,
@@ -80,6 +89,7 @@ final class Account extends Equatable {
     bool? isProvisional,
   }) {
     return Account(
+      catalystId: catalystId ?? this.catalystId,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       keychain: keychain ?? this.keychain,
@@ -92,6 +102,7 @@ final class Account extends Equatable {
 
   @override
   List<Object?> get props => [
+        catalystId,
         displayName,
         email,
         keychain.id,

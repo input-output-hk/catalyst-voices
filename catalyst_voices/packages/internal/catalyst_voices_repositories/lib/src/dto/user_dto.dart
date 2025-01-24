@@ -50,6 +50,7 @@ final class UserDto {
 
 @JsonSerializable(createJsonKeys: true)
 final class AccountDto {
+  final String catalystId;
   final String displayName;
   final String email;
   final String keychainId;
@@ -58,6 +59,7 @@ final class AccountDto {
   final bool isProvisional;
 
   AccountDto({
+    required this.catalystId,
     required this.displayName,
     required this.email,
     required this.keychainId,
@@ -68,6 +70,7 @@ final class AccountDto {
 
   AccountDto.fromModel(Account data)
       : this(
+          catalystId: data.catalystId,
           displayName: data.displayName,
           email: data.email,
           keychainId: data.keychain.id,
@@ -109,6 +112,7 @@ final class AccountDto {
     final keychain = await keychainProvider.get(keychainId);
 
     return Account(
+      catalystId: catalystId,
       displayName: displayName,
       email: email,
       keychain: keychain,
