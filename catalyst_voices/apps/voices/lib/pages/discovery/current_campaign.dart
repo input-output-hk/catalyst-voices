@@ -307,24 +307,27 @@ class _CampaignTimelineState extends State<_CampaignTimeline> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 300,
-      child: GestureDetector(
-        onHorizontalDragUpdate: (details) {
-          _scrollController.jumpTo(
-            _scrollController.offset - details.delta.dx,
-          );
-        },
-        //When using ListView, child were expanding
-        // in full height of the parent
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children:
-                widget.timelineItem.map(_CampaignTimelineCard.new).toList(),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: SizedBox(
+        height: 300,
+        child: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            _scrollController.jumpTo(
+              _scrollController.offset - details.delta.dx,
+            );
+          },
+          //When using ListView, child were expanding
+          // in full height of the parent
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children:
+                  widget.timelineItem.map(_CampaignTimelineCard.new).toList(),
+            ),
           ),
         ),
       ),
