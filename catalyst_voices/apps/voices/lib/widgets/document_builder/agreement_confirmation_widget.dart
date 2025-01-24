@@ -74,7 +74,7 @@ class _DocumentCheckboxBuilderWidgetState
           label: Text(
             context.l10n.agree,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: !widget.isEditMode
+                  color: !widget.isEditMode && !_currentEditValue
                       ? Theme.of(context).colors.textDisabled
                       : null,
                 ),
