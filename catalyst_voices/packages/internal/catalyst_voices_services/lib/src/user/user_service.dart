@@ -31,6 +31,8 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> removeAccount(Account account);
 
+  Future<void> updateSettings(UserSettings newValue);
+
   Future<void> dispose();
 }
 
@@ -123,6 +125,15 @@ final class UserServiceImpl implements UserService {
     await account.keychain.erase();
   }
 
+  @override
+  Future<void> updateSettings(UserSettings newValue) async {
+    final user = await getUser();
+
+    final updatedUser = user.copyWith(settings: newValue);
+
+    await _updateUser(updatedUser);
+  }
+
   Future<void> _updateUser(User user) async {
     if (_user != user) {
       _logger.info('Changing user to [$user]');
@@ -140,5 +151,7 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> dispose() async {}
+  Future<void> dispose() async {
+    await _userSC.close();
+  }
 }
