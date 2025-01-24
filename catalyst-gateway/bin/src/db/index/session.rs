@@ -50,16 +50,34 @@ pub(crate) enum TlsChoice {
     Unverified,
 }
 
+/// Represents errors that can occur while interacting with a Cassandra session.
 #[derive(Debug, Error)]
 pub(crate) enum CassandraSessionError {
+    /// Error when creating a session fails.
     #[error("Creating session failed: {source}")]
-    CreatingSessionFailed { source: anyhow::Error },
+    CreatingSessionFailed {
+        /// The underlying error that caused the session creation to fail.
+        source: anyhow::Error,
+    },
+    /// Error when schema migration fails.
     #[error("Schema migration failed: {source}")]
-    SchemaMigrationFailed { source: anyhow::Error },
+    SchemaMigrationFailed {
+        /// The underlying error that caused the schema migration to fail.
+        source: anyhow::Error,
+    },
+    /// Error when preparing queries fails.
     #[error("Preparing queries failed: {source}")]
-    PreparingQuriesFailed { source: anyhow::Error },
+    PreparingQuriesFailed {
+        /// The underlying error that caused query preparation to fail.
+        source: anyhow::Error,
+    },
+    /// Error when preparing purge queries fails.
     #[error("Preparing purge queries failed: {source}")]
-    PreparingPurgeQuriesFailed { source: anyhow::Error },
+    PreparingPurgeQuriesFailed {
+        /// The underlying error that caused purge query preparation to fail.
+        source: anyhow::Error,
+    },
+    /// Error indicating that the session has already been set.
     #[error("Session already set")]
     SessionAlreadySet,
 }
