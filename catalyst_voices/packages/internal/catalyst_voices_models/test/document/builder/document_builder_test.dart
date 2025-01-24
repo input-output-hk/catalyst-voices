@@ -10,8 +10,6 @@ import 'package:test/test.dart';
 
 void main() {
   group(DocumentBuilder, () {
-    const schemaUrl = 'test-schema-url';
-
     final titleNodeId = DocumentNodeId.root.child('title');
     final objectNodeId = DocumentNodeId.root.child('object');
     final budgetNodeId = objectNodeId.child('budget');
@@ -39,12 +37,8 @@ void main() {
     );
 
     test('should create an empty builder from schema', () {
-      final document = DocumentBuilder.fromSchema(
-        schemaUrl: schemaUrl,
-        schema: schema,
-      ).build();
+      final document = DocumentBuilder.fromSchema(schema: schema).build();
 
-      expect(document.schemaUrl, schemaUrl);
       expect(document.schema, schema);
       expect(
         document.properties,
@@ -78,7 +72,6 @@ void main() {
 
     test('should create a builder from an existing document', () {
       final document = Document(
-        schemaUrl: schemaUrl,
         schema: schema,
         properties: [
           DocumentObjectProperty(
@@ -111,16 +104,12 @@ void main() {
       final sortedProperties = List.of(document.properties)
         ..sortByOrder(document.schema.order);
 
-      expect(builtDocument.schemaUrl, document.schemaUrl);
       expect(builtDocument.schema, document.schema);
       expect(builtDocument.properties, sortedProperties);
     });
 
     test('should add a single change to the builder', () {
-      final builder = DocumentBuilder.fromSchema(
-        schemaUrl: schemaUrl,
-        schema: schema,
-      );
+      final builder = DocumentBuilder.fromSchema(schema: schema);
 
       final change = DocumentValueChange(
         nodeId: titleNodeId,
@@ -136,10 +125,7 @@ void main() {
     });
 
     test('should add multiple changes to the builder', () {
-      final builder = DocumentBuilder.fromSchema(
-        schemaUrl: schemaUrl,
-        schema: schema,
-      );
+      final builder = DocumentBuilder.fromSchema(schema: schema);
 
       final changes = [
         DocumentValueChange(

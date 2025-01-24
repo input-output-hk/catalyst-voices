@@ -205,7 +205,6 @@ void main() {
       );
 
       final document = Document(
-        schemaUrl: '',
         schema: const DocumentSchema.optional(),
         properties: [
           objectProperty,

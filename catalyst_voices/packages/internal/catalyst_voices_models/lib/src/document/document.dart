@@ -11,9 +11,6 @@ import 'package:equatable/equatable.dart';
 /// The document is immutable, in order to edit it make use
 /// of [toBuilder] method and act on [DocumentBuilder] instance.
 final class Document extends Equatable {
-  /// The url of the [schema].
-  final String schemaUrl;
-
   /// The schema which explains how to interpret this document.
   final DocumentSchema schema;
 
@@ -22,7 +19,6 @@ final class Document extends Equatable {
 
   /// The default constructor for the [Document].
   const Document({
-    required this.schemaUrl,
     required this.schema,
     required this.properties,
   });
@@ -50,7 +46,7 @@ final class Document extends Equatable {
   }
 
   @override
-  List<Object?> get props => [schemaUrl, schema, properties];
+  List<Object?> get props => [schema, properties];
 }
 
 /// A property of the [Document].

@@ -78,11 +78,7 @@ final class ProposalBuilderBloc
           ref: proposalTemplateRef,
         );
 
-        return DocumentBuilder.fromSchema(
-          // TODO(damian-molinski): not sure what should go here.
-          schemaUrl: proposalTemplate.schema.propertiesSchema,
-          schema: proposalTemplate.schema,
-        );
+        return DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
       },
       emit: emit,
     );
@@ -101,11 +97,7 @@ final class ProposalBuilderBloc
           ref: ref,
         );
 
-        return DocumentBuilder.fromSchema(
-          // TODO(damian-molinski): not sure what should go here.
-          schemaUrl: proposalTemplate.schema.propertiesSchema,
-          schema: proposalTemplate.schema,
-        );
+        return DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
       },
       emit: emit,
     );
