@@ -74,7 +74,7 @@ fn is_valid(uuid: &str) -> bool {
 impl_string_types!(DocumentId, "string", FORMAT, Some(SCHEMA.clone()), is_valid);
 
 impl DocumentId {
-    /// Creates a new `DocumentId` intance without validation.
+    /// Creates a new `DocumentId` instance without validation.
     /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
     /// valid `DocumentId`
     pub(crate) fn new_unchecked(uuid: String) -> Self {

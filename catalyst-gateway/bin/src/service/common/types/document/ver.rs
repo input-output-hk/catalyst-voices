@@ -80,7 +80,7 @@ impl_string_types!(
 );
 
 impl DocumentVer {
-    /// Creates a new `DocumentVer` intance without validation.
+    /// Creates a new `DocumentVer` instance without validation.
     /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
     /// valid `DocumentVer`
     pub(crate) fn new_unchecked(uuid: String) -> Self {
