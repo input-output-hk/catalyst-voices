@@ -189,3 +189,35 @@ async fn filter_all(docs: &[FullSignedDoc]) {
         assert_eq!(exp_doc.body(), &res_doc);
     }
 }
+
+async fn filter_all(docs: &[FullSignedDoc]) {
+    let filter = DocsQueryFilter::all();
+    let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
+        .await
+        .unwrap();
+    for exp_doc in docs.iter().rev() {
+        let res_doc = res_docs.try_next().await.unwrap().unwrap();
+        assert_eq!(exp_doc.body(), &res_doc);
+    }
+}
+
+#[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn queries_test() {
+    establish_connection();
+
+    let doc_type = uuid::Uuid::new_v4();
+    let docs = test_docs(doc_type);
+
+    for doc in &docs {
+        store_full_signed_doc(doc, doc_type).await;
+        retrieve_full_signed_doc(doc).await;
+        filter_by_id(doc).await;
+        filter_by_ver(doc).await;
+        filter_by_id_and_ver(doc).await;
+        filter_by_metadata(doc).await;
+    }
+
+    filter_by_type(&docs, doc_type).await;
+    filter_all(&docs).await;
+}

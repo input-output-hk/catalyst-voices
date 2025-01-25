@@ -38,9 +38,6 @@ impl QueryLimits {
     pub(crate) const ONE: QueryLimits = Self(QueryLimitsInner::Limit(1));
 
     /// Create a `QueryLimits` object from the service `Limit` and `Page` values.
-    ///
-    /// # Errors
-    ///  - Invalid arguments, `limit` must be provided when `page` is not None.
     pub(crate) fn new(limit: Option<Limit>, page: Option<Page>) -> Self {
         match (limit, page) {
             (Some(limit), Some(page)) => {

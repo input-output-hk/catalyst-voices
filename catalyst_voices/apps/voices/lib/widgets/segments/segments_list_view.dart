@@ -8,16 +8,16 @@ typedef SegmentHeaderWidgetBuilder<T extends Segment> = Widget Function(
   T data,
 );
 
-typedef SectionWidgetBuilder<T extends Section2> = Widget Function(
+typedef SectionWidgetBuilder<T extends Section> = Widget Function(
   BuildContext context,
   T data,
 );
 
-class SegmentsListView<T extends Segment, T2 extends Section2>
+class SegmentsListView<TSegment extends Segment, TSection extends Section>
     extends StatelessWidget {
   final List<SegmentsListViewItem> items;
-  final SegmentHeaderWidgetBuilder<T> headerBuilder;
-  final SectionWidgetBuilder<T2> sectionBuilder;
+  final SegmentHeaderWidgetBuilder<TSegment> headerBuilder;
+  final SectionWidgetBuilder<TSection> sectionBuilder;
   final EdgeInsetsGeometry? padding;
   final ItemScrollController? itemScrollController;
 
@@ -45,14 +45,14 @@ class SegmentsListView<T extends Segment, T2 extends Section2>
         itemBuilder: (context, index) {
           final item = items[index];
 
-          if (item is T) {
+          if (item is TSegment) {
             return KeyedSubtree(
               key: ValueKey(item.id),
               child: headerBuilder(context, item),
             );
           }
 
-          if (item is T2) {
+          if (item is TSection) {
             return KeyedSubtree(
               key: ValueKey(item.id),
               child: sectionBuilder(context, item),
@@ -64,11 +64,11 @@ class SegmentsListView<T extends Segment, T2 extends Section2>
         separatorBuilder: (context, index) {
           final item = items[index];
 
-          if (item is T) {
-            return const SizedBox(height: 24);
+          if (item is TSegment) {
+            return const SizedBox(height: 12);
           }
 
-          if (item is T2) {
+          if (item is TSection) {
             return const SizedBox(height: 12);
           }
 

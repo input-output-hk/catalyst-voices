@@ -234,6 +234,22 @@ impl Example for EqOrRangedVer {
     }
 }
 
+impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedVer) -> Result<Self, Self::Error> {
+        match value {
+            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedVer::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
+    }
+}
+
 #[derive(NewType, Debug, PartialEq)]
 #[oai(
     from_multipart = false,
