@@ -188,14 +188,6 @@
             "const": true,
             "x-note": "Select Yes or No."
         },
-        "spdxLicenseOrURL": {
-            "$comment": "UI - Drop Down Selection of any valid SPDX Identifier.  This is a complex type, it should let the user select one of the valid SPDX licenses, or enter a URL of the license if its proprietary. In the form its just a string.",
-            "type": "string",
-            "contentMediaType": "text/plain",
-            "pattern": "^.*$",
-            "format": "spdxLicenseOrURL",
-            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
-        },
         "languageCode": {
             "$comment": "UI - ISO 639-1 language code selection",
             "type": "string",
@@ -229,13 +221,13 @@
         },
         "setup": {
             "$ref": "#/definitions/segment",
-            "title": "proposal setup",
+            "title": "Proposal setup",
             "description": "Proposal title",
             "x-icon": "view-grid",
             "properties": {
                 "title": {
                     "$ref": "#/definitions/section",
-                    "title": "proposal title",
+                    "title": "Proposal title",
                     "description": "Proposal title",
                     "properties": {
                         "title": {
