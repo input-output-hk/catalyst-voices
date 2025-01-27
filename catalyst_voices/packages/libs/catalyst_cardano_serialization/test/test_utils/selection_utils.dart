@@ -96,6 +96,7 @@ sealed class SelectionUtils {
   /// - A list of random [Balance] objects.
   static List<Balance> randomBalances({
     required int count,
+    Coin minimumCoin = const Coin(0),
     bool withTokens = false,
   }) {
     final pids = List.generate(10, (int index) {
@@ -131,8 +132,9 @@ sealed class SelectionUtils {
             )
           : null;
 
-      final balance =
-          Balance(coin: Coin(distr[i].toInt()), multiAsset: multiAsset);
+      final coin = Coin(distr[i].toInt());
+      final lovelace = coin < minimumCoin ? minimumCoin + coin : coin;
+      final balance = Balance(coin: lovelace, multiAsset: multiAsset);
       balances.add(balance);
     }
     return balances;
@@ -162,9 +164,19 @@ sealed class SelectionUtils {
   ///
   /// Returns:
   /// - A set of random [TransactionUnspentOutput] objects.
-  static Set<TransactionUnspentOutput> generateUtxos(int count) {
-    final balances = randomBalances(count: count, withTokens: true);
-    final addresses = randomAddresses(count: (count / 2).floor());
+  static Set<TransactionUnspentOutput> generateUtxos(
+    int count, {
+    Coin minimumCoin = const Coin(0),
+    bool withTokens = true,
+  }) {
+    final balances = randomBalances(
+      count: count,
+      minimumCoin: minimumCoin,
+      withTokens: withTokens,
+    );
+    final addressCount = count >= 2 ? (count / 2).floor() : 1;
+    final addresses = randomAddresses(count: addressCount);
+
     return List.generate(
       count,
       (i) => TransactionUnspentOutput(
@@ -225,30 +237,51 @@ sealed class SelectionUtils {
     return weibullNumbers;
   }
 
+  /// Generates a random amount of a balance between minPercentage and
+  /// maxPercentage.
+  static Coin calculateRandomAmount(
+    Coin balance, {
+    int minPercentage = 0,
+    int maxPercentage = 80,
+  }) {
+    final randomPercentage =
+        minPercentage + _kRandom.nextDouble() * (maxPercentage - minPercentage);
+
+    final randomAmount = (balance.value * (randomPercentage / 100)).toInt();
+
+    final adjustedAmount = randomAmount == 0 ? 1 : randomAmount;
+
+    return Coin(adjustedAmount);
+  }
+
   /// Generates a list of transaction outputs from a set of UTxOs.
   ///
   /// - [inputs]: The set of [TransactionUnspentOutput] objects to use as
   ///   inputs.
-  /// - [count]: The number of outputs to generate.
+  /// - [maxOutputs]: The number of outputs to generate.
   /// - [maxTokens]: The maximum number of tokens to include in each output.
   ///
   /// Returns:
   /// - A list of [TransactionOutput] objects.
-  static List<TransactionOutput> outputFromUTxos({
+  static List<TransactionOutput> outputsFromUTxos({
     required Set<TransactionUnspentOutput> inputs,
-    int count = 1,
+    int maxOutputs = 1,
     int maxTokens = 3,
+    int minCoinPct = 20,
+    int maxCoinPct = 40,
+    int maxTokenPct = 80,
   }) {
     final iLen = inputs.length;
-    final maxUtxos = iLen > 10 ? (iLen * 0.3).floor() : 2;
+    final maxUtxos = iLen > 10 ? (iLen * 0.1).floor() : 1;
 
-    return List<TransactionOutput>.generate(count, (int index) {
+    // A set to track unique indices
+    final usedIndices = <int>{};
+
+    return List<TransactionOutput>.generate(_kRandom.nextInt(maxOutputs) + 1,
+        (int index) {
       final nrUtxos = _kRandom.nextInt(maxUtxos) + 1;
       final nrTokens = _kRandom.nextInt(maxTokens) + 1;
       var balance = const Balance.zero();
-
-      // A set to track unique indices
-      final usedIndices = <int>{};
 
       for (var i = 0; i < nrUtxos; i++) {
         // Find a unique index
@@ -261,22 +294,41 @@ sealed class SelectionUtils {
 
         final quantity = inputs.toList()[utxoIndex].output.amount;
 
-        final newBalance = selectTokens(balance: quantity, count: nrTokens);
+        final newBalance = selectTokens(
+          balance: quantity,
+          outputsCount: maxOutputs,
+          maxTokens: nrTokens,
+          maxTokenPct: maxTokenPct,
+        );
 
         balance += newBalance;
       }
-      return TransactionOutput(address: randomAddress(), amount: balance);
+
+      final coin = calculateRandomAmount(
+        balance.coin,
+        minPercentage: minCoinPct,
+        maxPercentage: maxCoinPct,
+      );
+      return TransactionOutput(
+        address: randomAddress(),
+        amount: Balance(coin: coin, multiAsset: balance.multiAsset),
+      );
     });
   }
 
   /// Selects a specified number of tokens from a balance.
   ///
   /// - [balance]: The [Balance] from which to select tokens.
-  /// - [count]: The number of tokens to select.
+  /// - [maxTokens]: The number of tokens to select.
   ///
   /// Returns:
   /// - A new [Balance] containing the selected tokens.
-  static Balance selectTokens({required Balance balance, int count = 3}) {
+  static Balance selectTokens({
+    required Balance balance,
+    required int outputsCount,
+    int maxTokens = 5,
+    int maxTokenPct = 80,
+  }) {
     final bundle = balance.multiAsset?.bundle ?? {};
 
     final tokens = <(PolicyId, AssetName, Coin)>[];
@@ -286,13 +338,20 @@ sealed class SelectionUtils {
       final assets = entry.value.entries;
       for (final asset in assets) {
         final assetName = asset.key;
-        final quantity = asset.value;
-        tokens.add((policyId, assetName, quantity));
+        final quantity =
+            calculateRandomAmount(asset.value, maxPercentage: maxTokenPct);
+        Coin(
+          (((asset.value.value / outputsCount) * maxTokenPct) / 100).floor(),
+        );
+        if (quantity > const Coin(0)) {
+          tokens.add((policyId, assetName, quantity));
+        }
       }
     }
 
     tokens.shuffle(_kRandom);
-    final result = tokens.take(count).fold(const Balance.zero(), (prev, token) {
+    final result =
+        tokens.take(maxTokens).fold(const Balance.zero(), (prev, token) {
       final (policyId, tokenName, quantity) = token;
       return prev +
           Balance(
@@ -327,7 +386,8 @@ sealed class SelectionUtils {
       config.coinsPerUtxoByte,
     );
 
-    final outputFee = TransactionOutputBuilder.feeForOutput(config, output);
+    final outputFee =
+        TransactionOutputBuilder.feeForOutput(config, output, numOutputs: 1);
     final totalFee = minAda + outputFee;
 
     return coin < totalFee

@@ -33,63 +33,70 @@ final class InputBuilder implements CoinSelector {
     final availableInputs = builder.inputs.toSet();
     final selectedInputs = <TransactionUnspentOutput>{};
 
-    final inputTotal = builder.inputs.fold<Balance>(
-      const Balance.zero(),
-      (sum, input) => sum + input.output.amount,
+    final inputTotal = CoinSelector.sumAmounts(
+      builder.inputs,
+      (input) => input.output.amount,
+    );
+    final targetTotal = CoinSelector.sumAmounts(
+      builder.outputs,
+      (output) => output.amount,
     );
 
-    final targetTotal = builder.outputs.fold<Balance>(
-      const Balance.zero(),
-      (sum, output) => sum + output.amount,
-    );
-
+    // Exit early if the available inputs cannot cover the required outputs.
     if (inputTotal.lessThan(targetTotal)) {
-      // TODO(ilap): Create proper exception class for multiassets
       throw InsufficientUtxoBalanceException(
-        actualAmount: targetTotal.coin,
-        requiredAmount: inputTotal.coin,
+        actualAmount: inputTotal,
+        requiredAmount: targetTotal,
       );
     }
 
-    /// Build the asset group
-    final tokenGroups = buildAssetGroup(targetTotal, availableInputs);
-    // Apply the selection strategy on the built group.
+    // Group UTXOs by asset ID for coin selection.
+    final tokenGroups = buildAssetGroups(targetTotal, availableInputs);
+
+    // Apply the coin selection strategy to prioritise UTXOs within each group.
     selectionStrategy.apply(tokenGroups);
 
+    final groupCount = tokenGroups.length;
     var selectedTotal = const Balance.zero();
 
+    // Iterate through each asset group (native tokens + ADA as the last group).
     for (final entry in tokenGroups) {
       final assetId = entry.key;
       final tokenUtxos = entry.value;
 
-      while (true) {
-        if (tokenUtxos.isEmpty || availableInputs.isEmpty) {
-          // TODO(ilap): Create proper exception class.
-          throw Exception('Insufficient UTxO balance.');
+      // Determine if change should be calculated for the current asset group.
+      final shouldCalculateChange = assetId == CoinSelector.adaAssetId ||
+          tokenGroups[groupCount - 2].key == assetId;
+
+      while (tokenUtxos.isNotEmpty) {
+        // Check if there are no more available inputs or if the maximum number
+        // of inputs has been exceeded.
+        if (availableInputs.isEmpty || selectedInputs.length > maxInputs) {
+          throw InsufficientUtxoBalanceException(
+            actualAmount: selectedTotal,
+            requiredAmount: targetTotal,
+          );
         }
 
+        // Select the first available UTXO from the list of token UTXOs.
         final utxo = tokenUtxos.removeAt(0);
+
+        // Check if the UTXO is still available for selection.
         if (!availableInputs.remove(utxo)) continue;
 
+        // Add the UTXO to the selected inputs and update the selected total.
         selectedInputs.add(utxo);
-
-        if (selectedInputs.length > maxInputs) {
-          // TODO(ilap): Create proper exception class.
-          throw Exception('Exceeded maximum input count: $maxInputs');
-        }
-
         selectedTotal += utxo.output.amount;
 
-        /// If a native token requirements have met then we break out to process
-        /// the other token.
-        if (assetId != CoinSelector.adaAssetId &&
-            _getTokenAmount(assetId, selectedTotal) >=
-                _getTokenAmount(assetId, targetTotal)) {
-          break;
+        // Check if the requirements have met.
+        if (_getTokenAmount(assetId, selectedTotal) <
+                _getTokenAmount(assetId, targetTotal) ||
+            (assetId == CoinSelector.adaAssetId &&
+                selectedInputs.length < minInputs)) {
+          continue;
+        }
 
-          /// All native tokens have been processed, therefore we can build
-          /// change outputs and calculate transaction fee.
-        } else {
+        if (shouldCalculateChange) {
           final changeAndFee = _getChangeAndFee(
             assetId,
             builder,
@@ -98,23 +105,27 @@ final class InputBuilder implements CoinSelector {
             targetTotal,
           );
 
-          if (changeAndFee == null || selectedInputs.length < minInputs) {
-            continue;
+          // Return the selection result if change and fees are successfully
+          // calculated.
+          if (changeAndFee != null) {
+            final (changeOutputs, totalFee) = changeAndFee;
+            return (selectedInputs, changeOutputs, totalFee);
           }
-          final (changeOutputs, totalFee) = changeAndFee;
-
-          return (selectedInputs, changeOutputs, totalFee);
         }
       }
     }
 
-    // TODO(ilap): Create proper exception class.
-    throw Exception('Insufficient UTxO balance.');
+    // Throw an exception if the selection process fails to meet the
+    // requirements.
+    throw InsufficientUtxoBalanceException(
+      actualAmount: selectedTotal,
+      requiredAmount: targetTotal,
+    );
   }
 
   /// Groups UTxOs by token, mapping each token to its corresponding UTxOs.
   @override
-  AssetsGroup buildAssetGroup(
+  AssetsGroup buildAssetGroups(
     Balance requiredBalance,
     Set<TransactionUnspentOutput> inputs,
   ) {
@@ -151,7 +162,7 @@ final class InputBuilder implements CoinSelector {
   /// change outputs and the total transaction fee.
   ///
   /// - Parameters:
-  ///   - [assetId]: The token identifier for which the change is being 
+  ///   - [assetId]: The token identifier for which the change is being
   ///     calculated.
   ///   - [builder]: The transaction builder used to create the transaction.
   ///   - [selectedInputs]: The set of selected UTxOs to fund the transaction.
@@ -169,7 +180,7 @@ final class InputBuilder implements CoinSelector {
   ///
   /// - Notes:
   ///   - This method ensures the transaction remains valid by confirming that
-  ///     the accumulated balance exceeds or equals the required amount plus 
+  ///     the accumulated balance exceeds or equals the required amount plus
   ///     fees.
   (List<TransactionOutput>, Coin)? _getChangeAndFee(
     AssetId assetId,
@@ -180,12 +191,14 @@ final class InputBuilder implements CoinSelector {
   ) {
     final minFee =
         builder.copyWith(inputs: selectedInputs).minFee(useWitnesses: true);
-    
     final minimumRequired = targetTotal + Balance(coin: minFee);
 
     if (selectedTotal.lessThan(minimumRequired)) return null;
 
+    // Calculate the change to be returned, as the selected total is guaranteed
+    // to be larger.
     final changeTotal = selectedTotal - minimumRequired;
+
     final (changeOutputs, changeFee) = _buildChangeOutputs(
       builder,
       changeTotal,
@@ -193,8 +206,7 @@ final class InputBuilder implements CoinSelector {
     );
 
     final requiredFee = minFee + changeFee;
-    if (selectedTotal
-        .lessThan(targetTotal + Balance(coin: requiredFee))) {
+    if (selectedTotal.lessThan(targetTotal + Balance(coin: requiredFee))) {
       return null;
     }
 
@@ -211,7 +223,7 @@ final class InputBuilder implements CoinSelector {
   ///   - [builder]: The transaction builder used to create the transaction.
   ///   - [remainingBalance]: The balance remaining after deducting the required
   ///     amount and initial fees.
-  ///   - [minFee]: The minimum fee for the transaction before considering 
+  ///   - [minFee]: The minimum fee for the transaction before considering
   ///     change outputs.
   ///
   /// - Returns:
@@ -243,6 +255,7 @@ final class InputBuilder implements CoinSelector {
     final changeFee = TransactionOutputBuilder.feeForOutput(
       builder.config,
       output,
+      numOutputs: builder.outputs.length,
     );
     final minAda = TransactionOutputBuilder.minimumAdaForOutput(
       output,

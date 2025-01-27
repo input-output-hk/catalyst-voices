@@ -3,7 +3,6 @@ import 'package:catalyst_cardano_serialization/src/builders/input_builder.dart';
 import 'package:catalyst_cardano_serialization/src/builders/strategies/selection_strategies.dart';
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
-import 'package:catalyst_cardano_serialization/src/utils/numbers.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
@@ -153,8 +152,8 @@ final class TransactionBuilder extends Equatable {
       return this;
     } else if (outputTotalPlusFee.coin > inputTotal.coin) {
       throw InsufficientUtxoBalanceException(
-        actualAmount: inputTotal.coin,
-        requiredAmount: outputTotalPlusFee.coin,
+        actualAmount: inputTotal,
+        requiredAmount: outputTotalPlusFee,
       );
     } else {
       final changeEstimator = inputTotal - outputTotal;
@@ -253,7 +252,7 @@ final class TransactionBuilder extends Equatable {
 
   /// Selects UTXO inputs for the transaction based on the given strategy.
   ///
-  /// This method uses the provided [CoinSelectionStrategy] to select the 
+  /// This method uses the provided [CoinSelectionStrategy] to select the
   /// optimal set of inputs for the transaction. It also allows specifying the
   /// minimum and maximum number of inputs to be considered during selection.
   ///
@@ -376,7 +375,7 @@ final class TransactionBuilder extends Equatable {
   /// Returns:
   /// - A [Coin] representing the minimum fee required for the transaction.
   Coin minFee({bool useWitnesses = false}) {
-    final txBody = copyWith(fee: const Coin(Numbers.intMaxValue)).buildBody();
+    final txBody = copyWith(fee: Coin(config.feeAlgo.constant)).buildBody();
     final fullTx = buildFakeTransaction(txBody, useWitnesses: useWitnesses);
 
     return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
@@ -428,6 +427,7 @@ final class TransactionBuilder extends Equatable {
         final feeForChange = TransactionOutputBuilder.feeForOutput(
           config,
           changeOutput,
+          numOutputs: outputs.length,
         );
 
         newFee = newFee + feeForChange;
@@ -481,6 +481,7 @@ final class TransactionBuilder extends Equatable {
             address: address,
             amount: changeEstimator,
           ),
+          numOutputs: outputs.length,
         );
 
         final newFee = fee + feeForChange;
@@ -769,10 +770,17 @@ final class TransactionOutputBuilder {
   /// output (in bytes) by the fee coefficient from the builder's configuration.
   static Coin feeForOutput(
     TransactionBuilderConfig config,
-    ShelleyMultiAssetTransactionOutput output,
-  ) =>
+    ShelleyMultiAssetTransactionOutput output, {
+    required int numOutputs,
+  }) =>
       Coin(
-        cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient,
+        cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient +
+                    // Switch from 1 lentgh array to 3 length representation in
+                    // CBOR.
+                    numOutputs ==
+                255
+            ? 2
+            : 0,
       );
 
   /// Calculates the minimum amount of extra [Coin] for UTXO input.
@@ -833,7 +841,7 @@ final class TransactionOutputBuilder {
   ///   - The value is a positive uint64 (1 to 2^64 - 1).
   ///   - Since this range exceeds Dart's `int` limits on the web, `BigInt`
   ///     should be used.
-  // TODO(ilap): Consider usiing BigInt for multiassets' values.
+  // TODO(ilap): Consider using BigInt for multiassets' values.
   static bool isOutputValueValid(TransactionOutput output) {
     final balance = output.amount;
     final coin = balance.coin;

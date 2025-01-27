@@ -106,10 +106,39 @@ abstract interface class CoinSelector {
   /// Returns:
   /// - An [AssetsGroup] where each entry maps an asset to its corresponding
   ///   UTxOs.
-  AssetsGroup buildAssetGroup(
+  AssetsGroup buildAssetGroups(
     Balance requiredBalance,
     Set<TransactionUnspentOutput> inputs,
   );
+
+  /// A helper function to calculate the total balance from a collection of
+  /// items.
+  ///
+  /// This function takes an iterable of items (`items`) and a callback
+  /// (`getAmount`) that extracts the `Balance` from each item. It iterates
+  /// through the collection, summing up the balances and returning the total.
+  ///
+  /// Example usage:
+  /// ```dart
+  ///   final inputTotal =
+  ///      calculateTotal(builder.inputs, (input) => input.output.amount);
+  ///  final targetTotal =
+  ///      calculateTotal(builder.outputs, (output) => output.amount);
+  /// ```
+  ///
+  /// - `items`: The iterable collection to process.
+  /// - `getAmount`: A function that maps each item in the collection to its
+  ///    `Balance`.
+  /// - Returns: The total `Balance` of the collection.
+  static Balance sumAmounts<T>(
+    Iterable<T> items,
+    Balance Function(T) getAmount,
+  ) {
+    return items.fold<Balance>(
+      const Balance.zero(),
+      (sum, item) => sum + getAmount(item),
+    );
+  }
 }
 
 /// Extension on [Balance] to provide comparison methods.
