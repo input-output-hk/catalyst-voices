@@ -76,6 +76,7 @@ const getWalletPopup = async (
 ): Promise<Page> => {
   if (browser.pages().length > 1) {
     await triggerLocatorCLick.click();
+    await browser.pages()[0].waitForTimeout(2000);
     await browser
       .pages()
       [browser.pages().length - 1].waitForLoadState("domcontentloaded");
@@ -85,6 +86,7 @@ const getWalletPopup = async (
       browser.waitForEvent("page"),
       triggerLocatorCLick.click(),
     ]);
+    await page.waitForLoadState("domcontentloaded");
     return page;
   }
 };
