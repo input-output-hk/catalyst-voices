@@ -72,7 +72,7 @@ final class InputBuilder implements CoinSelector {
         // Check if there are no more available inputs or if the maximum number
         // of inputs has been exceeded.
         if (availableInputs.isEmpty ||
-            assetUtxos.isNotEmpty ||
+            assetUtxos.isEmpty ||
             selectedInputs.length > maxInputs) {
           throw InsufficientUtxoBalanceException(
             actualAmount: selectedTotal,
