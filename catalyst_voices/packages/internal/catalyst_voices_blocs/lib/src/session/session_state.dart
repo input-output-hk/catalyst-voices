@@ -4,9 +4,14 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// Determines the state of the user session.
-sealed class SessionState extends Equatable {
+final class SessionState extends Equatable {
+  final SessionStatus status;
+
   /// Currently used account by this session. Null when not active.
   final SessionAccount? account;
+
+  /// Whether has unfinished registration.
+  final bool isRegistrationInProgress;
 
   /// Returns a list of all available spaces
   /// corresponding to the current session state.
@@ -15,68 +20,69 @@ sealed class SessionState extends Equatable {
   /// Returns a list of [spaces] that should be shown in overall spaces menu.
   final List<Space> overallSpaces;
 
+  /// Drawer shortcuts available.
+  final Map<Space, ShortcutActivator> spacesShortcuts;
+
   /// On Web it can mean that user don't have valid extensions installed.
   final bool canCreateAccount;
 
+  /// Hold current session settings.
+  final SessionSettings settings;
+
   const SessionState({
+    required this.status,
     this.account,
+    this.isRegistrationInProgress = false,
     required this.spaces,
     this.overallSpaces = const [],
+    this.spacesShortcuts = const {},
     this.canCreateAccount = false,
+    this.settings = const SessionSettings.fallback(),
   });
 
+  bool get isVisitor => status == SessionStatus.visitor;
+
+  bool get isGuest => status == SessionStatus.guest;
+
+  bool get isActive => status == SessionStatus.actor;
+
+  const SessionState.initial()
+      : this(
+          status: SessionStatus.visitor,
+          spaces: const [Space.discovery],
+        );
+
+  const SessionState.visitor({
+    required bool canCreateAccount,
+    required bool isRegistrationInProgress,
+    SessionSettings settings = const SessionSettings.fallback(),
+  }) : this(
+          status: SessionStatus.visitor,
+          canCreateAccount: canCreateAccount,
+          isRegistrationInProgress: isRegistrationInProgress,
+          spaces: const [Space.discovery],
+          settings: settings,
+        );
+
+  const SessionState.guest({
+    required bool canCreateAccount,
+    SessionSettings settings = const SessionSettings.fallback(),
+  }) : this(
+          status: SessionStatus.guest,
+          canCreateAccount: canCreateAccount,
+          spaces: const [Space.discovery],
+          settings: settings,
+        );
+
   @override
-  @mustCallSuper
   List<Object?> get props => [
+        status,
         account,
+        isRegistrationInProgress,
         spaces,
         overallSpaces,
-        canCreateAccount,
-      ];
-}
-
-/// The user hasn't registered yet nor setup the keychain.
-final class VisitorSessionState extends SessionState {
-  final bool isRegistrationInProgress;
-
-  const VisitorSessionState({
-    required this.isRegistrationInProgress,
-    super.canCreateAccount,
-  }) : super(
-          spaces: const [Space.discovery],
-        );
-
-  @override
-  List<Object?> get props => [
-        ...super.props,
-        isRegistrationInProgress,
-      ];
-}
-
-/// The user has registered the keychain but it's locked.
-final class GuestSessionState extends SessionState {
-  const GuestSessionState({
-    super.canCreateAccount,
-  }) : super(
-          spaces: const [Space.discovery],
-        );
-}
-
-/// The user has registered and unlocked the keychain.
-final class ActiveAccountSessionState extends SessionState {
-  final Map<Space, ShortcutActivator> spacesShortcuts;
-
-  const ActiveAccountSessionState({
-    required SessionAccount super.account,
-    required super.spaces,
-    required super.overallSpaces,
-    super.canCreateAccount,
-    required this.spacesShortcuts,
-  });
-
-  @override
-  List<Object?> get props => [
-        ...super.props,
         spacesShortcuts,
+        canCreateAccount,
+        settings,
       ];
 }
