@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 const _compactMaxLength = 6;
 
@@ -22,6 +25,9 @@ class CatalystIdText extends StatefulWidget {
 class _CatalystIdTextState extends State<CatalystIdText> {
   String _effectiveData = '';
   bool _tooltipVisible = false;
+  bool _highlightCopied = false;
+
+  Timer? _highlightCopiedFadeoutTimer;
 
   @override
   void initState() {
@@ -43,11 +49,20 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   @override
+  void dispose() {
+    _highlightCopiedFadeoutTimer?.cancel();
+    _highlightCopiedFadeoutTimer = null;
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Offstage(
       offstage: _effectiveData.isEmpty,
       child: _TapDetector(
         onTap: _copyDataToClipboard,
+        onHoverExit: _handleHoverExit,
         child: TooltipVisibility(
           visible: _tooltipVisible,
           child: Row(
@@ -57,13 +72,15 @@ class _CatalystIdTextState extends State<CatalystIdText> {
                 message: widget.data,
                 // Do not constraint width.
                 constraints: const BoxConstraints(),
-                child: _Text(
+                child: _Chip(
                   _effectiveData,
                   onTap: _copyDataToClipboard,
                 ),
               ),
               const SizedBox(width: 6),
-              const _Copy(),
+              _Copy(
+                showCheck: _highlightCopied,
+              ),
             ],
           ),
         ),
@@ -72,8 +89,41 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   Future<void> _copyDataToClipboard() async {
-    print('Go');
-    //
+    final data = ClipboardData(text: widget.data);
+    await Clipboard.setData(data);
+
+    if (mounted) {
+      setState(_doHighlightCopied);
+    }
+  }
+
+  void _handleHoverExit() {
+    if (_highlightCopied && _highlightCopiedFadeoutTimer == null) {
+      _scheduleRemoveHighlight();
+    }
+  }
+
+  void _doHighlightCopied() {
+    _highlightCopied = true;
+
+    _highlightCopiedFadeoutTimer?.cancel();
+    _highlightCopiedFadeoutTimer = null;
+  }
+
+  void _scheduleRemoveHighlight() {
+    _highlightCopiedFadeoutTimer = Timer(
+      const Duration(seconds: 1),
+      () => setState(_removeHighlight),
+    );
+  }
+
+  void _removeHighlight() {
+    _highlightCopied = false;
+
+    if (_highlightCopiedFadeoutTimer?.isActive ?? false) {
+      _highlightCopiedFadeoutTimer?.cancel();
+    }
+    _highlightCopiedFadeoutTimer = null;
   }
 
   String _buildTextData() {
@@ -96,10 +146,12 @@ class _CatalystIdTextState extends State<CatalystIdText> {
 
 class _TapDetector extends StatelessWidget {
   final VoidCallback onTap;
+  final VoidCallback onHoverExit;
   final Widget child;
 
   const _TapDetector({
     required this.onTap,
+    required this.onHoverExit,
     required this.child,
   });
 
@@ -107,6 +159,7 @@ class _TapDetector extends StatelessWidget {
   Widget build(BuildContext context) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
+      onExit: (event) => onHoverExit(),
       child: GestureDetector(
         onTap: onTap,
         // there is a gap between text and copy
@@ -117,11 +170,11 @@ class _TapDetector extends StatelessWidget {
   }
 }
 
-class _Text extends StatelessWidget {
+class _Chip extends StatelessWidget {
   final String data;
   final VoidCallback onTap;
 
-  const _Text(
+  const _Chip(
     this.data, {
     required this.onTap,
   });
@@ -159,16 +212,23 @@ class _Text extends StatelessWidget {
 }
 
 class _Copy extends StatelessWidget {
-  const _Copy();
+  final bool showCheck;
+
+  const _Copy({
+    this.showCheck = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final color = theme.colorScheme.primary;
+    final color = showCheck ? theme.colors.success : theme.colorScheme.primary;
+    final asset = showCheck
+        ? VoicesAssets.icons.clipboardCheck
+        : VoicesAssets.icons.clipboardCopy;
 
-    return VoicesAssets.icons.clipboardCopy.buildIcon(
-      size: 18,
+    return CatalystSvgIcon.asset(
+      asset.path,
       color: color,
     );
   }
