@@ -34,20 +34,20 @@ final class ProposalBuilderSegment extends BaseSegment<ProposalBuilderSection> {
 }
 
 final class ProposalBuilderSection extends BaseSection {
-  final DocumentObjectProperty documentSection;
+  final DocumentObjectProperty property;
 
   const ProposalBuilderSection({
     required super.id,
-    required this.documentSection,
+    required this.property,
     super.isEnabled,
     super.isEditable,
   });
 
   @override
   String resolveTitle(BuildContext context) {
-    return documentSection.schema.title;
+    return property.schema.title;
   }
 
   @override
-  List<Object?> get props => super.props + [documentSection];
+  List<Object?> get props => super.props + [property];
 }

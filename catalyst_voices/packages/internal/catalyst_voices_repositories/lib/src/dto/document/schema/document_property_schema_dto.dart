@@ -24,6 +24,8 @@ final class DocumentPropertySchemaDto {
   final String? description;
   @JsonKey(name: 'default')
   final Object? defaultValue;
+      @JsonKey(name: 'x-placeholder')
+  final String? placeholder;
   @JsonKey(name: 'x-guidance')
   final String? guidance;
   @JsonKey(name: 'x-icon')
@@ -60,6 +62,7 @@ final class DocumentPropertySchemaDto {
     required this.title,
     required this.description,
     required this.defaultValue,
+    required this.placeholder,
     required this.guidance,
     required this.icon,
     required this.constValue,
@@ -86,6 +89,7 @@ final class DocumentPropertySchemaDto {
     this.title,
     this.description,
     this.defaultValue,
+    this.placeholder,
     this.guidance,
     this.icon,
     this.constValue,
@@ -237,6 +241,7 @@ final class DocumentPropertySchemaDto {
       title: title ?? other.title,
       description: description ?? other.description,
       defaultValue: defaultValue ?? other.defaultValue,
+      placeholder: placeholder ?? other.placeholder,
       guidance: guidance ?? other.guidance,
       icon: icon ?? other.icon,
       constValue: constValue ?? other.constValue,

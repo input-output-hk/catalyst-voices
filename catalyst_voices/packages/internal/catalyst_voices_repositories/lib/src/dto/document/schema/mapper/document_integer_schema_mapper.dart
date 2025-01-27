@@ -35,6 +35,8 @@ final class DocumentIntegerSchemaMapper {
     final description = schema.description;
     final descriptionMarkdown =
         description != null ? MarkdownData(description) : null;
+    final placeholder = schema.placeholder;
+    final guidance = schema.guidance;
     final defaultValue = schema.defaultValue as int?;
     final enumValues = schema.enumValues?.cast<int>();
     final numRange =
@@ -48,6 +50,8 @@ final class DocumentIntegerSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -59,6 +63,8 @@ final class DocumentIntegerSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -70,6 +76,8 @@ final class DocumentIntegerSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,

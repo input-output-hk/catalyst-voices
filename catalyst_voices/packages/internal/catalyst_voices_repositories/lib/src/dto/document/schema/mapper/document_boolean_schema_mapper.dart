@@ -34,6 +34,8 @@ final class DocumentBooleanSchemaMapper {
     final description = schema.description;
     final descriptionMarkdown =
         description != null ? MarkdownData(description) : null;
+    final placeholder = schema.placeholder;
+    final guidance = schema.guidance;
     final defaultValue = schema.defaultValue as bool?;
     final enumValues = schema.enumValues?.cast<bool>();
     final definition = _DocumentBooleanDefinition.fromDef(schema.definition());
@@ -45,6 +47,8 @@ final class DocumentBooleanSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -55,6 +59,8 @@ final class DocumentBooleanSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -65,6 +71,8 @@ final class DocumentBooleanSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,

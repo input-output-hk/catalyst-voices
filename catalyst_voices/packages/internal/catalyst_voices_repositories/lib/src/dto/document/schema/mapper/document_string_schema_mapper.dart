@@ -44,6 +44,8 @@ final class DocumentStringSchemaMapper {
     final description = schema.description;
     final descriptionMarkdown =
         description != null ? MarkdownData(description) : null;
+    final placeholder = schema.placeholder;
+    final guidance = schema.guidance;
     final defaultValue = schema.defaultValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
     final strLengthRange =
@@ -60,6 +62,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -73,6 +77,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -86,6 +92,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -99,6 +107,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -112,6 +122,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -125,6 +137,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -138,6 +152,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -151,6 +167,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -164,6 +182,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,
@@ -177,6 +197,8 @@ final class DocumentStringSchemaMapper {
           contentMediaType: contentMediaType,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
           enumValues: enumValues,

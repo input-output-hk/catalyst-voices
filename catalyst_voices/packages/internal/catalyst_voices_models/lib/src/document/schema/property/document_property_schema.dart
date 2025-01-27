@@ -34,6 +34,8 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   final DocumentPropertyFormat? format;
   final String title;
   final MarkdownData? description;
+  final String? placeholder;
+  final String? guidance;
 
   /// True if the property must exist and be non-nullable,
   /// false if the property may not exist or be nullable.
@@ -45,6 +47,8 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
     required this.format,
     required this.title,
     required this.description,
+    required this.placeholder,
+    required this.guidance,
     required this.isRequired,
   });
 
@@ -71,6 +75,8 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
         format,
         title,
         description,
+        placeholder,
+        guidance,
         isRequired,
       ];
 }
@@ -87,6 +93,8 @@ sealed class DocumentValueSchema<T extends Object>
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
     required super.isRequired,
     required this.defaultValue,
     required this.enumValues,

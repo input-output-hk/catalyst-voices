@@ -155,7 +155,7 @@ final class ProposalBuilderBloc
         (section) {
           return ProposalBuilderSection(
             id: section.schema.nodeId,
-            documentSection: section,
+            property: section,
             isEnabled: true,
             isEditable: true,
           );
