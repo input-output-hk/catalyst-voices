@@ -5,6 +5,7 @@ import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,10 +17,10 @@ class SessionStateHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
-        return switch (state) {
-          VisitorSessionState() => const SessionAccountPopupMenu(),
-          GuestSessionState() => const SessionAccountPopupMenu(),
-          ActiveAccountSessionState() => const SessionAccountPopupMenu(),
+        return switch (state.status) {
+          SessionStatus.visitor => const SessionAccountPopupMenu(),
+          SessionStatus.guest => const SessionAccountPopupMenu(),
+          SessionStatus.actor => const SessionAccountPopupMenu()
         };
       },
     );

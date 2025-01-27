@@ -1,14 +1,29 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 /// Defines user or the app.
 final class User extends Equatable {
   final List<Account> accounts;
+  final UserSettings settings;
 
   const User({
     required this.accounts,
+    required this.settings,
   });
+
+  @visibleForTesting
+  const User.optional({
+    this.accounts = const [],
+    this.settings = const UserSettings(),
+  });
+
+  const User.empty()
+      : this(
+          accounts: const [],
+          settings: const UserSettings(),
+        );
 
   Account? get activeAccount {
     return accounts.singleWhereOrNull((account) => account.isActive);
@@ -45,14 +60,17 @@ final class User extends Equatable {
 
   User copyWith({
     List<Account>? accounts,
+    UserSettings? settings,
   }) {
     return User(
       accounts: accounts ?? this.accounts,
+      settings: settings ?? this.settings,
     );
   }
 
   @override
   List<Object?> get props => [
         accounts,
+        settings,
       ];
 }

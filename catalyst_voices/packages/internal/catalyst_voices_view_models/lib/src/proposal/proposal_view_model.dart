@@ -55,8 +55,10 @@ final class PendingProposal extends ProposalViewModel {
   final Coin _fundsRequested;
   final int commentsCount;
   final String description;
-  final int completedSegments;
-  final int totalSegments;
+  final ProposalPublish publishStage;
+  final int version;
+  final int duration;
+  final String author;
 
   const PendingProposal({
     required super.id,
@@ -68,8 +70,10 @@ final class PendingProposal extends ProposalViewModel {
     required Coin fundsRequested,
     required this.commentsCount,
     required this.description,
-    required this.completedSegments,
-    required this.totalSegments,
+    required this.publishStage,
+    required this.version,
+    required this.duration,
+    required this.author,
   }) : _fundsRequested = fundsRequested;
 
   PendingProposal.fromProposal(
@@ -84,12 +88,14 @@ final class PendingProposal extends ProposalViewModel {
           fundsRequested: proposal.fundsRequested,
           commentsCount: proposal.commentsCount,
           description: proposal.description,
-          completedSegments: proposal.completedSegments,
-          totalSegments: proposal.totalSegments,
+          publishStage: proposal.publish,
+          version: proposal.version,
+          duration: proposal.duration,
+          author: proposal.author,
         );
 
   String get fundsRequested {
-    return CryptocurrencyFormatter.formatAmount(_fundsRequested);
+    return CryptocurrencyFormatter.decimalFormat(_fundsRequested);
   }
 
   @override
@@ -102,8 +108,10 @@ final class PendingProposal extends ProposalViewModel {
     Coin? fundsRequested,
     int? commentsCount,
     String? description,
-    int? completedSegments,
-    int? totalSegments,
+    ProposalPublish? publishStage,
+    int? version,
+    int? duration,
+    String? author,
   }) {
     return PendingProposal(
       id: id,
@@ -115,8 +123,33 @@ final class PendingProposal extends ProposalViewModel {
       fundsRequested: fundsRequested ?? _fundsRequested,
       commentsCount: commentsCount ?? this.commentsCount,
       description: description ?? this.description,
-      completedSegments: completedSegments ?? this.completedSegments,
-      totalSegments: totalSegments ?? this.totalSegments,
+      publishStage: publishStage ?? this.publishStage,
+      version: version ?? this.version,
+      duration: duration ?? this.duration,
+      author: author ?? this.author,
+    );
+  }
+
+  factory PendingProposal.dummy() {
+    return PendingProposal(
+      id: 'f14/2',
+      campaignName: 'F14',
+      category: 'Cardano Use Cases: Concept',
+      title: 'Proposal Title that rocks the world',
+      lastUpdateDate: DateTime.now().minusDays(2),
+      fundsRequested: const Coin(55000),
+      commentsCount: 0,
+      description: """
+Zanzibar is becoming one of the hotspots for DID's through
+World Mobile and PRISM, but its potential is only barely exploited.
+Zanzibar is becoming one of the hotspots for DID's through World Mobile
+and PRISM, but its potential is only barely exploited.
+"""
+          .replaceAll('\n', ' '),
+      publishStage: ProposalPublish.published,
+      version: 1,
+      duration: 6,
+      author: 'Alex Wells',
     );
   }
 
@@ -130,8 +163,10 @@ final class PendingProposal extends ProposalViewModel {
         _fundsRequested.value,
         commentsCount,
         description,
-        completedSegments,
-        totalSegments,
+        publishStage,
+        version,
+        duration,
+        author,
       ];
 }
 
