@@ -1,4 +1,3 @@
-export 'account/session_account.dart';
 export 'authentication/authentication.dart';
 export 'campaign/campaign_category.dart';
 export 'campaign/campaign_category_section.dart';
@@ -19,6 +18,8 @@ export 'proposal_builder/proposal_builder_segments.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
 export 'segments/segments_navigation.dart';
+export 'session/session_account.dart';
+export 'session/session_settings.dart';
 export 'session/session_status.dart';
 export 'treasury/treasury_segments.dart';
 export 'workspace/workspace_proposal_list_item.dart';

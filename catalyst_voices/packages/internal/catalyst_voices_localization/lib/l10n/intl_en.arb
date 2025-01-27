@@ -1,5 +1,6 @@
 {
   "@@locale": "en",
+  "local": "Local",
   "emailLabelText": "Email",
   "@emailLabelText": {
     "description": "Text shown in email field"
