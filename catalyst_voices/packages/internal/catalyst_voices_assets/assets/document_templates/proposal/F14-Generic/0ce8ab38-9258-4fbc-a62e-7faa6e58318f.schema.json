@@ -502,13 +502,14 @@
                 "open_source"
             ]
         },
-        "horizons": {
+        "theme": {
             "$ref": "#/definitions/segment",
-            "title": "Horizons",
+            "title": "Theme Selection",
+            "x-icon": "tag",
             "properties": {
                 "theme": {
                     "$ref": "#/definitions/section",
-                    "title": "Horizons",
+                    "title": "Theme",
                     "description": "Long-term vision and categorization of your project",
                     "properties": {
                         "grouped_tag": {
@@ -1020,7 +1021,7 @@
     "x-order": [
         "setup",
         "summary",
-        "horizons",
+        "theme",
         "details",
         "milestones",
         "pitch",
