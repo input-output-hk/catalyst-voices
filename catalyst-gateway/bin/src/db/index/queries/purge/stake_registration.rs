@@ -45,6 +45,7 @@ impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("stake_hash", &self.stake_hash)
+            .field("script", &self.script)
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .finish()

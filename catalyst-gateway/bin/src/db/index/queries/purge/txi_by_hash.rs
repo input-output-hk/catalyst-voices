@@ -44,6 +44,7 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("txn_hash", &hex::encode(&self.txn_hash))
             .field("txo", &self.txo)
+            .field("slot_no", &self.slot_no)
             .finish()
     }
 }
