@@ -39,8 +39,6 @@ pub(crate) struct Params {
     pub(crate) policy_id: Vec<u8>,
     /// Name of the asset, within the Policy.
     pub(crate) asset_name: Vec<u8>,
-    /// Slot number the txo was created in.
-    pub(crate) slot_no: num_bigint::BigInt,
 }
 
 impl Debug for Params {
@@ -50,7 +48,6 @@ impl Debug for Params {
             .field("txo", &self.txo)
             .field("policy_id", &self.policy_id)
             .field("asset_name", &self.asset_name)
-            .field("slot_no", &self.slot_no)
             .finish()
     }
 }
@@ -61,8 +58,7 @@ impl From<result::PrimaryKey> for Params {
             txn_hash: value.0,
             txo: value.1,
             policy_id: value.2,
-            asset_name: value.3,
-            slot_no: value.4,
+            asset_name: value.3
         }
     }
 }
