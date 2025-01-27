@@ -51,6 +51,7 @@ class AppContentState extends State<AppContent> {
         brand: Brand.catalyst,
         brightness: Brightness.dark,
       ),
+      debugShowCheckedModeBanner: false,
       builder: (context, child) {
         return Scaffold(
           primary: false,
