@@ -38,6 +38,7 @@ final class DocumentIntegerSchemaMapper {
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
     final defaultValue = schema.defaultValue as int?;
+    final constValue = schema.constValue as int?;
     final enumValues = schema.enumValues?.cast<int>();
     final numRange =
         Range.optionalRangeOf(min: schema.minimum, max: schema.maximum);
@@ -54,6 +55,7 @@ final class DocumentIntegerSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
         );
@@ -67,6 +69,7 @@ final class DocumentIntegerSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
         );
@@ -80,6 +83,7 @@ final class DocumentIntegerSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
         );

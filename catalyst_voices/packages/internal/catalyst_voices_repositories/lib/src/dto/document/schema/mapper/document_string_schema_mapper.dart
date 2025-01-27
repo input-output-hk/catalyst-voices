@@ -47,6 +47,7 @@ final class DocumentStringSchemaMapper {
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
     final defaultValue = schema.defaultValue as String?;
+    final constValue = schema.constValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
     final strLengthRange =
         Range.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
@@ -66,6 +67,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -81,6 +83,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -96,6 +99,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -111,6 +115,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -126,6 +131,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -141,6 +147,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -156,6 +163,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -171,6 +179,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -186,6 +195,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
@@ -201,6 +211,7 @@ final class DocumentStringSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           strLengthRange: strLengthRange,
           pattern: patternRegExp,

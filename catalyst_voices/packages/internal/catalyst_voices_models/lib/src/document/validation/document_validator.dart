@@ -108,8 +108,8 @@ final class DocumentValidator {
     List<dynamic>? value,
   ) {
     if (schema.uniqueItems && value != null) {
-      final isUnique = value.length == value.toSet().length;
-      if (!isUnique) {
+      final unique = value.length == value.toSet().length;
+      if (!unique) {
         return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
       }
     }
@@ -117,12 +117,21 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateBool(
-    DocumentBooleanSchema schema,
-    // ignore: avoid_positional_boolean_parameters
-    bool? value,
+  static DocumentValidationResult validateConstValue(
+    DocumentValueSchema schema,
+    Object? value,
   ) {
-    // TODO(dtscalac): validate against "const" or "enumValues" or "oneOf"
+    final constValue = schema.constValue;
+    if (constValue != null && value != null) {
+      final isValid = value == constValue;
+      if (!isValid) {
+        return DocumentConstValueMismatch(
+          invalidNodeId: schema.nodeId,
+          constValue: constValue,
+        );
+      }
+    }
+
     return const SuccessfulDocumentValidation();
   }
 }

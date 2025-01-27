@@ -9,8 +9,9 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
     required super.placeholder,
     required super.guidance,
     required super.isRequired,
-    required super.enumValues,
     required super.defaultValue,
+    required super.constValue,
+    required super.enumValues,
   }) : super(
           type: DocumentPropertyType.boolean,
         );
@@ -19,7 +20,7 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
   DocumentValidationResult validate(bool? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
-      DocumentValidator.validateBool(this, value),
+      DocumentValidator.validateConstValue(this, value),
     ]);
   }
 }
@@ -34,6 +35,7 @@ final class DocumentYesNoChoiceSchema extends DocumentBooleanSchema {
     required super.guidance,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
   });
 
@@ -48,6 +50,7 @@ final class DocumentYesNoChoiceSchema extends DocumentBooleanSchema {
       guidance: guidance,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
     );
   }
@@ -63,6 +66,7 @@ final class DocumentAgreementConfirmationSchema extends DocumentBooleanSchema {
     required super.guidance,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
   });
 
@@ -77,6 +81,7 @@ final class DocumentAgreementConfirmationSchema extends DocumentBooleanSchema {
       guidance: guidance,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
     );
   }
@@ -92,6 +97,7 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
     required super.guidance,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
   });
 
@@ -104,6 +110,7 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
     super.guidance,
     super.isRequired = false,
     super.defaultValue,
+    super.constValue,
     super.enumValues,
   });
 
@@ -118,6 +125,7 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
       guidance: guidance,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
     );
   }

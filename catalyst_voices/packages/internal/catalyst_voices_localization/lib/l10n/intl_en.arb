@@ -1323,6 +1323,15 @@
   "@noTagSelected": {
     "description": "For example in context of document builder"
   },
+  "errorValidationConstValueMismatch": "The value must be \"{constValue}\".",
+  "@errorValidationConstValueMismatch": {
+    "description": "Validation error when the user entered value does not match the const value",
+    "placeholders": {
+      "constValue": {
+        "type": "String"
+      }
+    }
+  },
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"

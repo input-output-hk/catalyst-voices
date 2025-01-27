@@ -36,6 +36,7 @@ final class DocumentNumberSchemaMapper {
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
     final defaultValue = schema.defaultValue as double?;
+    final constValue = schema.constValue as double?;
     final enumValues = schema.enumValues?.cast<double>();
     final numRange = Range.optionalRangeOf(
       min: schema.minimum?.toDouble(),
@@ -54,6 +55,7 @@ final class DocumentNumberSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
         );

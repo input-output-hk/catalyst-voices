@@ -85,7 +85,14 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
 /// A schema property that can have a value.
 sealed class DocumentValueSchema<T extends Object>
     extends DocumentPropertySchema {
+  /// The default value this property should have
+  /// if not assigned any custom value.
   final T? defaultValue;
+
+  /// The "const" value for validation. The only allowed value is this one.
+  final T? constValue;
+
+  /// A list of allowed values.
   final List<T>? enumValues;
 
   const DocumentValueSchema({
@@ -98,6 +105,7 @@ sealed class DocumentValueSchema<T extends Object>
     required super.guidance,
     required super.isRequired,
     required this.defaultValue,
+    required this.constValue,
     required this.enumValues,
   });
 
@@ -152,5 +160,6 @@ sealed class DocumentValueSchema<T extends Object>
 
   @override
   @mustCallSuper
-  List<Object?> get props => super.props + [defaultValue, enumValues];
+  List<Object?> get props =>
+      super.props + [defaultValue, constValue, enumValues];
 }

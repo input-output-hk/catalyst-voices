@@ -12,6 +12,7 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
     required super.guidance,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required this.numRange,
   }) : super(
@@ -23,6 +24,7 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateIntegerRange(this, value),
+      DocumentValidator.validateConstValue(this, value),
     ]);
   }
 
@@ -41,6 +43,7 @@ final class DocumentTokenValueCardanoAdaSchema extends DocumentIntegerSchema {
     required super.guidance,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.numRange,
   });
@@ -56,6 +59,7 @@ final class DocumentTokenValueCardanoAdaSchema extends DocumentIntegerSchema {
       guidance: guidance,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
     );
@@ -72,6 +76,7 @@ final class DocumentDurationInMonthsSchema extends DocumentIntegerSchema {
     required super.guidance,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.numRange,
   });
@@ -87,6 +92,7 @@ final class DocumentDurationInMonthsSchema extends DocumentIntegerSchema {
       guidance: guidance,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
     );
@@ -103,6 +109,7 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
     required super.guidance,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.numRange,
   });
@@ -116,6 +123,7 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
     super.guidance,
     super.isRequired = false,
     super.defaultValue,
+    super.constValue,
     super.enumValues,
     super.numRange,
   });
@@ -131,6 +139,7 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
       guidance: guidance,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
     );

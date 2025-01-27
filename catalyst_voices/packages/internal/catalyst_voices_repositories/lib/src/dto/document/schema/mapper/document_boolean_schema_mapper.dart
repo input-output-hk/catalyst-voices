@@ -37,6 +37,7 @@ final class DocumentBooleanSchemaMapper {
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
     final defaultValue = schema.defaultValue as bool?;
+    final constValue = schema.constValue as bool?;
     final enumValues = schema.enumValues?.cast<bool>();
     final definition = _DocumentBooleanDefinition.fromDef(schema.definition());
 
@@ -51,6 +52,7 @@ final class DocumentBooleanSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
         );
       case _DocumentBooleanDefinition.agreementConfirmation:
@@ -63,6 +65,7 @@ final class DocumentBooleanSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
         );
       case _DocumentBooleanDefinition.unknown:
@@ -75,6 +78,7 @@ final class DocumentBooleanSchemaMapper {
           guidance: guidance,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
         );
     }

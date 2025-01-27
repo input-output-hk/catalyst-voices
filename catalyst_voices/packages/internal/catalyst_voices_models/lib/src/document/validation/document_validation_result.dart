@@ -106,6 +106,21 @@ final class DocumentItemsNotUnique extends DocumentValidationResult {
   List<Object?> get props => [invalidNodeId];
 }
 
+/// A value of the property doesn't match against the const value.
+final class DocumentConstValueMismatch extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final Object constValue;
+
+  const DocumentConstValueMismatch({
+    required this.invalidNodeId,
+    required this.constValue,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, constValue];
+}
+
+/// A string doesn't match the pattern.
 final class DocumentPatternMismatch extends DocumentValidationResult {
   final RegExp pattern;
   final String? value;
