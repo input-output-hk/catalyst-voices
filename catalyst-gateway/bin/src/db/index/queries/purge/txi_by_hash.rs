@@ -35,6 +35,8 @@ pub(crate) struct Params {
     pub(crate) txn_hash: Vec<u8>,
     /// Transaction Output Offset inside the transaction.
     pub(crate) txo: i16,
+    /// Slot number the txo was created in.
+    pub(crate) slot_no: num_bigint::BigInt,
 }
 
 impl Debug for Params {
@@ -51,6 +53,7 @@ impl From<result::PrimaryKey> for Params {
         Self {
             txn_hash: value.0,
             txo: value.1,
+            slot_no: value.2,
         }
     }
 }

@@ -22,7 +22,7 @@ pub(crate) mod result {
     //! Return values for Stake Registration purge queries.
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16);
+    pub(crate) type PrimaryKey = (Vec<u8>, bool, num_bigint::BigInt, i16);
 }
 
 /// Select primary keys for Stake Registration.
@@ -33,6 +33,8 @@ const SELECT_QUERY: &str = include_str!("./cql/get_stake_registration.cql");
 pub(crate) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     pub(crate) stake_hash: Vec<u8>,
+    /// Is the address a script address.
+    pub(crate) script: bool,
     /// Block Slot Number
     pub(crate) slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
@@ -53,8 +55,9 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             stake_hash: value.0,
-            slot_no: value.1,
-            txn: value.2,
+            script: value.1,
+            slot_no: value.2,
+            txn: value.3,
         }
     }
 }
