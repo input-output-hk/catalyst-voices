@@ -63,13 +63,6 @@ final _proposals = [
   ),
 ];
 
-final _proposalImages = {
-  for (final (index, proposal) in _proposals.indexed)
-    proposal.id: index.isEven
-        ? VoicesAssets.images.proposalBackground1
-        : VoicesAssets.images.proposalBackground2,
-};
-
 final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
 
 class VotingPage extends StatelessWidget {

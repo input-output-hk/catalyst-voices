@@ -59,7 +59,7 @@ class _GuestVisitorBody extends StatelessWidget {
               CurrentCampaign(
                 currentCampaignInfo: CurrentCampaignInfoViewModel.dummy(),
               ),
-              // const _CampaignCategories(),
+              const _CampaignCategories(),
               _LatestProposals(
                 List.filled(
                   7,
@@ -270,12 +270,10 @@ class _LatestProposalsState extends State<_LatestProposals>
   }
 
   void _onScroll() {
+    final scrollPosition = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
     setState(() {
-      final scrollPosition = _scrollController.position.pixels;
-      final maxScroll = _scrollController.position.maxScrollExtent;
-      setState(() {
-        _scrollPercentage = scrollPosition / maxScroll;
-      });
+      _scrollPercentage = scrollPosition / maxScroll;
     });
   }
 
