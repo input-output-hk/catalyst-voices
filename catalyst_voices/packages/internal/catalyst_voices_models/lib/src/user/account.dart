@@ -6,6 +6,8 @@ import 'package:equatable/equatable.dart';
 /// Defines singular account used by [User] (physical person).
 /// One [User] may have multiple [Account]'s.
 final class Account extends Equatable {
+  /* cSpell:disable */
+
   /// base64 role0 key looks like
   ///
   /// ```md
@@ -22,6 +24,7 @@ final class Account extends Equatable {
   /// preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
   /// testnet.midnight/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
   /// ```
+  /* cSpell:enable */
   final String catalystId;
   final String displayName;
   final String email;
