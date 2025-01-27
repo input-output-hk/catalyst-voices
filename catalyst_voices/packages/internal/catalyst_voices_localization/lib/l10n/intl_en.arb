@@ -1376,5 +1376,18 @@
   "errorEmailValidationPattern": "Incorrect email pattern",
   "errorEmailValidationOutOfRange": "Invalid length",
   "categoryDetails": "Category Details",
-  "fundsAvailable": "Funds Available"
+  "fundsAvailable": "Funds Available",
+  "duration": "Duration",
+  "valueMonths": "{value} {value, plural, =0{Month} other{Months}}",
+  "@valueMonths": {
+    "description": "Used in proposal card",
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "finalProposal": "Final",
+  "mostRecent": "Most Recent",
+  "viewAllProposals": "View All Proposals"
 }

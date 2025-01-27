@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -52,8 +53,10 @@ class VoicesProposalCardExample extends StatelessWidget {
                 fundsRequested: Coin.fromAda(100000),
                 commentsCount: 0,
                 description: _description,
-                completedSegments: 7,
-                totalSegments: 13,
+                publishStage: ProposalPublish.draft,
+                version: 1,
+                duration: 6,
+                author: 'Alex Wells',
               ),
             ),
           ],
