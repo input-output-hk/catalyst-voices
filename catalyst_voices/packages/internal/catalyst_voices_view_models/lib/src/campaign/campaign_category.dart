@@ -50,7 +50,7 @@ final class CampaignCategoryCardViewModel extends CampaignCategory {
 
   @override
   List<Object?> get props => [
-        super.props,
+        ...super.props,
         subname,
         description,
         proposalsCount,
