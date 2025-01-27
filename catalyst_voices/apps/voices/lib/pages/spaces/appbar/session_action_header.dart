@@ -7,6 +7,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,16 +21,12 @@ class SessionActionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
-        return switch (state) {
-          VisitorSessionState(
-            :final isRegistrationInProgress,
-            :final canCreateAccount,
-          ) =>
-            isRegistrationInProgress
-                ? const _FinishRegistrationButton()
-                : _GetStartedButton(isEnabled: canCreateAccount),
-          GuestSessionState() => const _UnlockButton(),
-          ActiveAccountSessionState() => const _LockButton(),
+        return switch (state.status) {
+          SessionStatus.visitor => state.isRegistrationInProgress
+              ? const _FinishRegistrationButton()
+              : _GetStartedButton(isEnabled: state.canCreateAccount),
+          SessionStatus.guest => const _UnlockButton(),
+          SessionStatus.actor => const _LockButton(),
         };
       },
     );
