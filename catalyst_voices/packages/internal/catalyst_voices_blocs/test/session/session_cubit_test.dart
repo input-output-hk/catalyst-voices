@@ -181,8 +181,7 @@ void main() {
       expect(userService.account, isNotNull);
 
       expect(userService.account?.keychain.id, account.keychain.id);
-      expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
-      expect(sessionCubit.state, isA<GuestSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.guest);
     });
 
     test('when keychain is unlocked session is in Active state', () async {
