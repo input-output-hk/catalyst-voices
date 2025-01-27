@@ -33,7 +33,6 @@ class VoicesFilledButton extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
     required this.child,
-    this.foregroundColor,
   });
 
   @override
