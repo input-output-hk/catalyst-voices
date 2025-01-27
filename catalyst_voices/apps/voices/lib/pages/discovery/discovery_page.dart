@@ -223,8 +223,10 @@ class _LatestProposalsState extends State<_LatestProposals>
                   scrollDirection: Axis.horizontal,
                   itemCount: widget.proposals.length,
                   itemBuilder: (context, index) {
+                    final proposal = widget.proposals[index];
                     return PendingProposalCard(
-                      proposal: widget.proposals[index],
+                      key: Key('PendingProposalCard_${proposal.id}'),
+                      proposal: proposal,
                       onFavoriteChanged: (value) {},
                     );
                   },
