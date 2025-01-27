@@ -49,6 +49,7 @@ base class ProposalBase extends Equatable {
     required this.access,
     required this.category,
     required this.commentsCount,
+    // Most likely this will be inside the document class and not in this class
     required this.version,
     required this.duration,
     required this.author,
