@@ -10,7 +10,7 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-disabled-test:
+test:
     FROM +builder
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
