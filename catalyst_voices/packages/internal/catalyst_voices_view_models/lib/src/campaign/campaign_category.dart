@@ -47,4 +47,14 @@ final class CampaignCategoryCardViewModel extends CampaignCategory {
   String get availableFundsText {
     return CryptocurrencyFormatter.decimalFormat(availableFunds);
   }
+
+  @override
+  List<Object?> get props => [
+        super.props,
+        subname,
+        description,
+        proposalsCount,
+        availableFunds,
+        imageUrl,
+      ];
 }
