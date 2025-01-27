@@ -46,7 +46,6 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
-#[allow(clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
     match CatalystSignedDocument::decode(&mut Decoder::new(&doc_bytes), &mut ()) {
         Ok(doc) => {
@@ -75,7 +74,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
             );
 
             let payload = if doc.doc_content().is_json() {
-                match serde_json::from_slice(doc.doc_content().bytes()) {
+                match serde_json::from_slice(doc.doc_content().decoded_bytes()) {
                     Ok(payload) => Some(payload),
                     Err(e) => {
                         return AllResponses::internal_error(&anyhow!(

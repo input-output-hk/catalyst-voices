@@ -21,14 +21,7 @@ use chain_root::ChainRoot;
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use rbac_registration::cardano::cip509::{
-    self,
-    rbac::{
-        certs::{C509Cert, X509DerCert},
-        pub_key::SimplePublicKeyType,
-        role_data::{KeyLocalRef, LocalRefInt},
-        Cip509RbacMetadata,
-    },
-    utils::cip19::extract_cip19_hash,
+    C509Cert, Cip509RbacMetadata, KeyLocalRef, LocalRefInt, X509DerCert,
 };
 use scylla::Session;
 use tracing::error;
@@ -43,6 +36,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
+    service::common::auth::rbac::role0_kid::Role0Kid,
     settings::cassandra_db::EnvVars,
     utils::blake2b_hash::blake2b_128,
 };
@@ -172,27 +166,27 @@ impl Rbac509InsertQuery {
                         .and_then(|key_reference| extract_role0_data(key_reference, rbac_metadata))
                     {
                         CHAIN_ROOT_BY_ROLE0_KEY_CACHE
-                            .insert(role0_key.clone(), (chain_root.clone(), slot_no, txn_index));
+                            .insert(role0_key.clone(), (chain_root.clone(), slot_no, txn_idx));
                         self.chain_root_for_role0_key.push(
                             insert_chain_root_for_role0_kid::Params::new(
                                 &role0_key,
                                 &chain_root,
                                 slot_no,
-                                txn_index,
+                                txn_idx,
                             ),
                         );
                         if let Some(stake_addresses) = stake_addresses {
                             for stake_address in stake_addresses {
                                 CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(
                                     stake_address.clone(),
-                                    (chain_root.clone(), slot_no, txn_index),
+                                    (chain_root.clone(), slot_no, txn_idx),
                                 );
                                 self.chain_root_for_stake_address.push(
                                     insert_chain_root_for_stake_address::Params::new(
                                         &stake_address,
                                         &chain_root,
                                         slot_no,
-                                        txn_index,
+                                        txn_idx,
                                     ),
                                 );
                             }
@@ -272,16 +266,18 @@ fn get_role0_x509_certs_from_reference(
 ) -> Option<(Role0Kid, x509_cert::Certificate)> {
     x509_certs.and_then(|certs| {
         key_offset.and_then(|pk_idx| {
-            certs.get(pk_idx).and_then(|cert| match cert {
-                X509DerCert::X509Cert(der_cert) => {
-                    match x509_cert::Certificate::from_der(der_cert) {
-                        Ok(decoded_cert) => {
-                            let x = blake2b_128(&der_cert);
-                        },
-                        Err(err) => error!(err=%err,"Failed to decode Role0 certificate."),
-                    }
-                },
-                X509DerCert::Deleted | X509DerCert::Undefined => None,
+            certs.get(pk_idx).and_then(|cert| {
+                match cert {
+                    X509DerCert::X509Cert(der_cert) => {
+                        match x509_cert::Certificate::from_der(der_cert) {
+                            Ok(decoded_cert) => {
+                                let x = blake2b_128(&der_cert);
+                            },
+                            Err(err) => error!(err=%err,"Failed to decode Role0 certificate."),
+                        }
+                    },
+                    X509DerCert::Deleted | X509DerCert::Undefined => None,
+                }
             })
         })
     })
@@ -421,7 +417,7 @@ async fn rbac_metadata(
     session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: usize, slot_no: u64,
     block: &MultiEraBlock,
 ) -> Option<(Arc<Cip509>, ChainRoot)> {
-    if let Some(decoded_metadata) = block.txn_metadata(txn_idx, cip509::LABEL) {
+    if let Some(decoded_metadata) = block.txn_metadata(txn_idx, MetadatumLabel::CIP509_RBAC) {
         if let Metadata::DecodedMetadataValues::Cip509(rbac) = &decoded_metadata.value {
             if let Some(chain_root) =
                 ChainRoot::get(session, txn_hash, txn_idx, slot_no, rbac).await

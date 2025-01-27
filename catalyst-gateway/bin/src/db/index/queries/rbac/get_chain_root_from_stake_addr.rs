@@ -78,7 +78,7 @@ impl Query {
 
     /// Executes a get chain root by stake address query.
     /// Don't call directly, use one of the methods instead.
-    async fn execute(
+    pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         let iter = session
@@ -90,7 +90,7 @@ impl Query {
     }
 
     /// Get latest Chain Root for a given stake address, uncached.
-    /// 
+    ///
     /// Unless you really know you need an uncached result, use the cached version.
     pub(crate) async fn get_latest_uncached(
         session: &CassandraSession, stake_addr: &StakeAddress,

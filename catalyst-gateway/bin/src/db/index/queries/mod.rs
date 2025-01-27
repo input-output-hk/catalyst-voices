@@ -15,7 +15,7 @@ use crossbeam_skiplist::SkipMap;
 use rbac::{
     get_chain_root, get_chain_root_from_stake_addr,
     get_registrations::GetRegistrationsByChainRootQuery,
-    get_role0_chain_root::GetRole0ChainRootQuery,
+    get_role0_chain_root::Query as GetRole0ChainRootQuery,
 };
 use registrations::{
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
@@ -207,7 +207,7 @@ impl PreparedQueries {
         let registrations_by_chain_root =
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
         let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
-        let chain_root_by_transaction_id = get_chain_root::Query::prepare(session).await;
+        let chain_root_by_transaction_id = get_chain_root::Query::prepare(session.clone()).await;
         let get_all_stakes_and_vote_keys_query =
             GetAllStakesAndVoteKeysQuery::prepare(session).await;
 
@@ -355,6 +355,7 @@ impl PreparedQueries {
             PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
             PreparedSelectQuery::ChainRootByTransactionId => {
                 &self.chain_root_by_transaction_id_query
+            },
             PreparedSelectQuery::GetAllStakesAndVoteKeys => {
                 &self.get_all_stakes_and_vote_keys_query
             },
@@ -452,7 +453,9 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
 pub(crate) async fn session_execute_iter<P>(
     session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
 ) -> anyhow::Result<QueryPager>
-where P: SerializeRow {
+where
+    P: SerializeRow,
+{
     session
         .execute_iter(prepared_stmt.clone(), params)
         .await

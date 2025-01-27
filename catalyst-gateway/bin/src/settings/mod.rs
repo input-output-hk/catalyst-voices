@@ -8,7 +8,7 @@ use std::{
 };
 
 use anyhow::anyhow;
-use cardano_chain_follower::Network;
+use cardano_blockchain_types::Network;
 use clap::Args;
 use dotenvy::dotenv;
 use duration_string::DurationString;

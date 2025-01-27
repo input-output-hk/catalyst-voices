@@ -17,7 +17,10 @@ use crate::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    service::{common::auth::rbac::role0_kid::Role0Kid, utilities::convert::{big_uint_to_u64, from_saturating}},
+    service::{
+        common::auth::rbac::role0_kid::Role0Kid,
+        utilities::convert::{big_uint_to_u64, from_saturating},
+    },
 };
 
 /// Cached Chain Root By Role 0 Kid.
@@ -80,7 +83,7 @@ impl Query {
     /// Executes a get chain root role0 key query.
     ///
     /// Do not use directly, use an exposed method instead.
-    async fn execute(
+    pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         let iter = session

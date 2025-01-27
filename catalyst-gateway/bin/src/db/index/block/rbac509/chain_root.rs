@@ -9,20 +9,17 @@ use pallas::ledger::addresses::StakeAddress;
 use pallas_crypto::hash::Hash;
 use tracing::{error, warn};
 
+use self::rbac::{
+    get_chain_root_from_stake_addr::cache_for_stake_addr, get_role0_chain_root::cache_for_role0_kid,
+};
+use super::CassandraSession;
 use crate::{
-    cardano::types::TransactionHash,
     db::index::{
         block::from_saturating,
         queries::rbac::{self, get_chain_root},
     },
     service::{common::auth::rbac::role0_kid::Role0Kid, utilities::convert::big_uint_to_u64},
 };
-
-use self::rbac::{
-    get_chain_root_from_stake_addr::cache_for_stake_addr, get_role0_chain_root::cache_for_role0_kid,
-};
-
-use super::CassandraSession;
 
 /// Chain Root Id - Hash of the first transaction in an RBAC Chain.
 pub(crate) type ChainRootId = TransactionHash;
@@ -66,7 +63,8 @@ impl ChainRoot {
 
     /// Gets a new `ChainRoot` from the given Transaction and its metadata.
     ///
-    /// Will try and get it from the cache first, and fall back to the Index DB if not found.
+    /// Will try and get it from the cache first, and fall back to the Index DB if not
+    /// found.
     pub(crate) async fn get(
         session: &Arc<CassandraSession>, txn_hash: Hash<32>, txn_index: usize, slot_no: u64,
         cip509: &Cip509,
@@ -76,13 +74,11 @@ impl ChainRoot {
                 Some(chain_root) => Some(chain_root), // Cached
                 None => {
                     // Not cached, need to see if its in the DB.
-                    if let Ok(mut result) = get_chain_root::Query::execute(
-                        session,
-                        get_chain_root::QueryParams {
+                    if let Ok(mut result) =
+                        get_chain_root::Query::execute(session, get_chain_root::QueryParams {
                             transaction_id: prv_tx_id.to_vec(),
-                        },
-                    )
-                    .await
+                        })
+                        .await
                     {
                         if let Some(row_res) = result.next().await {
                             let row = match row_res {

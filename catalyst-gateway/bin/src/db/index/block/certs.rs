@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::MultiEraBlock;
+use cardano_blockchain_types::MultiEraBlock;
 use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
@@ -160,7 +160,7 @@ impl CertInsertQuery {
     ) {
         let default_addr = Vec::new();
         let (key_hash, pubkey, script) = match cred {
-            pallas::ledger::primitives::conway::StakeCredential::AddrKeyhash(cred) => {
+            conway::StakeCredential::AddrKeyhash(cred) => {
                 let addr = block
                     .witness_for_tx(cred, from_saturating(txn))
                     .unwrap_or(default_addr);
@@ -168,9 +168,7 @@ impl CertInsertQuery {
                 // witnessed.
                 (cred.to_vec(), addr.clone(), false)
             },
-            pallas::ledger::primitives::conway::StakeCredential::Scripthash(script) => {
-                (script.to_vec(), default_addr, true)
-            },
+            conway::StakeCredential::Scripthash(script) => (script.to_vec(), default_addr, true),
         };
 
         if pubkey.is_empty() && !script && deregister {
