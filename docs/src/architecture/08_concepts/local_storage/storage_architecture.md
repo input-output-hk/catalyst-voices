@@ -461,6 +461,7 @@ id_lo BIGINT NOT NULL, -- Lower 64 bits
 PRIMARY KEY (id_hi, id_lo)
 
 );
+```
 
 **Advantages**:
 
@@ -472,8 +473,9 @@ PRIMARY KEY (id_hi, id_lo)
 
 * Better indexing performance
 
-The following approach should be taken for handling UUIDv7 Id and Version fields. Both Id and Version fields should use **two `INT8`
-columns (IDHI and IDLO)** rather than storing them as a BLOB or TEXT field, splitting them into two 64-bit integers (`INT8`) has 
+The following approach should be taken for handling UUIDv7 Id and Version fields.
+Both Id and Version fields should use **two `INT8`
+columns (IDHI and IDLO)** rather than storing them as a BLOB or TEXT field, splitting them into two 64-bit integers (`INT8`) has
 following advantages:
 
 * **Better Indexing**
@@ -500,7 +502,6 @@ Spliting the UUIDv7 will align with the following approach:
 * `IDHI`: Stores the first 64 bits (timestamp + version/variant).
 * `IDLO`: Stores the last 64 bits (random/entropy).
 
-
 ## **6 Implementation**
 
 ### **6.1 JSON Document Handling**
@@ -508,8 +509,11 @@ Spliting the UUIDv7 will align with the following approach:
 #### **6.1.1 Indexes**
 
 For front-end queries where fields are frequently used in a `WHERE` clause, it is recommended to create indexes to improve query
-performance. The overhead of creating these indexes should be evaluated over time based on the volume of data stored in the local 
-database. Index creation is most beneficial for tables that store large amounts of data. The specific fields to index should be 
+performance.
+The overhead of creating these indexes should be evaluated over time based on the volume of data stored in the local
+database.
+Index creation is most beneficial for tables that store large amounts of data.
+The specific fields to index should be
 determined based on access patterns and usage, in alignment with UI/UX design.
 
 Front-end engineers may decide to extract certain phrases from the JSON documents on insertion and store these fields in a metadata
@@ -973,7 +977,7 @@ performed intelligently to maintain data consistency without compromising offlin
 * **Fallback Retrieval:** If a document isn’t cached locally during offline mode, display an error or notify the user of the need
   to reconnect.
 
-### 8.5. Client metadata bootstrap
+### 8.8. Client metadata bootstrap
 
 * **Fixed document definitions**
   * Catalyst defines fixed document types and identifiers, these type ids will not change and can be used to identify the
@@ -1163,16 +1167,13 @@ class Documents extends Table {
 
 To manage metadata inflation and optimize storage, a cleanup process should periodically remove expired documents and their
 associated metadata from the database.
-Documents with an `expiresAt` timestamp should be prioritized, with entries deleted once the
-current time exceeds their expiration.
-However, some documents may not have an `expiresAt` value, meaning they are not explicitly
-set to expire.
-For such documents, the application should define a retention policy based on the `createdAt` timestamp to ensure
-old, unused data is removed.
-This policy might involve keeping documents for a specific duration (e.g., 60 days) and deleting
-entries older than that threshold.
-This approach ensures efficient storage management, prevents bloating from obsolete entries, and
-allows the system to balance document retention and resource constraints effectively.
+Documents with an `expiresAt` timestamp should be prioritized, with entries deleted once the current time exceeds their expiration.
+However, some documents may not have an `expiresAt` value, meaning they are not explicitly set to expire.
+For such documents, the application should define a retention policy based on the `createdAt` timestamp to ensure old, unused
+data is removed.
+This policy might involve keeping documents for a specific duration (e.g., 60 days) and deleting entries older than that threshold.
+This approach ensures efficient storage management, prevents bloating from obsolete entries, and allows the system to balance
+document retention and resource constraints effectively.
 
 ## **10 API Integration Details**
 
@@ -1263,3 +1264,34 @@ For the latest and most detailed API specification, refer to the following locat
 * Draft Security
   * Session key must be re-derived after app restart.
   * Metadata remains unencrypted, risking partial data leaks however owner should be notified when saving drafts.
+
+## **13 References**
+
+* **RFC 9111 (Caching HTTP Requests and Responses)**  
+  * [RFC 9111 Specification](https://datatracker.ietf.org/doc/rfc9111/)
+
+* **RFC 9110 (HTTP Semantics)**  
+  * [RFC 9110 Specification](https://datatracker.ietf.org/doc/rfc9110/)
+* **SQLite**
+  * [SQLite Official Website](https://sqlite.org/index.html)
+  * [SQLite JSON1 Extension](https://sqlite.org/json1.html)
+  * [SQLite UUIDv7 Proposal](https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-00.html) (for UUIDv7-related details).
+* **Drift ORM**
+  * [Drift Documentation](https://drift.simonbinder.eu/)
+  * A type-safe database library for Flutter that supports SQLite.
+* **Flutter**
+  * [Flutter Official Documentation](https://flutter.dev/docs)
+  * [sqlite3_flutter_libs Plugin](https://pub.dev/packages/sqlite3_flutter_libs)
+* **Dart**
+  * [Dart Official Documentation](https://dart.dev/)
+* **HKDF (HMAC-based Key Derivation Function)**
+  * [RFC 5869: HKDF](https://datatracker.ietf.org/doc/rfc5869/)
+* **UUIDv7 Specification**
+  * [UUID Revision Specification (IETF Draft)](https://datatracker.ietf.org/doc/draft-ietf-uuidrev-rfc4122bis/)
+* **Catalyst Signed Document Types**
+  * [Catalyst Document Types Reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+
+* **Catalyst API**
+  * [Catalyst API Swagger Documentation](https://input-output-hk.github.io/catalyst-voices/api/cat-gateway/openapi-swagger/)
+* **CBOR Encoding**
+  * [CBOR Specification (RFC 8949)](https://datatracker.ietf.org/doc/rfc8949/)
