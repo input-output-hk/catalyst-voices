@@ -51,35 +51,37 @@ final class InputBuilder implements CoinSelector {
     }
 
     // Group UTXOs by asset ID for coin selection.
-    final tokenGroups = buildAssetGroups(targetTotal, availableInputs);
+    final assetGroups = buildAssetGroups(targetTotal, availableInputs);
 
     // Apply the coin selection strategy to prioritise UTXOs within each group.
-    selectionStrategy.apply(tokenGroups);
+    selectionStrategy.apply(assetGroups);
 
-    final groupCount = tokenGroups.length;
+    final groupCount = assetGroups.length;
     var selectedTotal = const Balance.zero();
 
     // Iterate through each asset group (native tokens + ADA as the last group).
-    for (final entry in tokenGroups) {
+    for (final entry in assetGroups) {
       final assetId = entry.key;
-      final tokenUtxos = entry.value;
+      final assetUtxos = entry.value;
 
       // Determine if change should be calculated for the current asset group.
       final shouldCalculateChange = assetId == CoinSelector.adaAssetId ||
-          tokenGroups[groupCount - 2].key == assetId;
+          assetGroups[groupCount - 2].key == assetId;
 
-      while (tokenUtxos.isNotEmpty) {
+      while (true) {
         // Check if there are no more available inputs or if the maximum number
         // of inputs has been exceeded.
-        if (availableInputs.isEmpty || selectedInputs.length > maxInputs) {
+        if (availableInputs.isEmpty ||
+            assetUtxos.isNotEmpty ||
+            selectedInputs.length > maxInputs) {
           throw InsufficientUtxoBalanceException(
             actualAmount: selectedTotal,
             requiredAmount: targetTotal,
           );
         }
 
-        // Select the first available UTXO from the list of token UTXOs.
-        final utxo = tokenUtxos.removeAt(0);
+        // Select the first available UTXO from the list of asset UTXOs.
+        final utxo = assetUtxos.removeAt(0);
 
         // Check if the UTXO is still available for selection.
         if (!availableInputs.remove(utxo)) continue;
@@ -89,8 +91,8 @@ final class InputBuilder implements CoinSelector {
         selectedTotal += utxo.output.amount;
 
         // Check if the requirements have met.
-        if (_getTokenAmount(assetId, selectedTotal) <
-                _getTokenAmount(assetId, targetTotal) ||
+        if (_getAssetAmount(assetId, selectedTotal) <
+                _getAssetAmount(assetId, targetTotal) ||
             (assetId == CoinSelector.adaAssetId &&
                 selectedInputs.length < minInputs)) {
           continue;
@@ -129,7 +131,7 @@ final class InputBuilder implements CoinSelector {
     Balance requiredBalance,
     Set<TransactionUnspentOutput> inputs,
   ) {
-    final tokenMap = <AssetId, List<TransactionUnspentOutput>>{};
+    final assetMap = <AssetId, List<TransactionUnspentOutput>>{};
     final requiredAssets = requiredBalance.multiAsset?.bundle ?? {};
 
     for (final input in inputs) {
@@ -143,15 +145,15 @@ final class InputBuilder implements CoinSelector {
 
           for (final asset in assets) {
             final assetId = (policy, asset.key);
-            tokenMap.putIfAbsent(assetId, () => []).add(input);
+            assetMap.putIfAbsent(assetId, () => []).add(input);
           }
         } else {
-          tokenMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
+          assetMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
         }
       }
     }
 
-    return tokenMap.entries.toList()
+    return assetMap.entries.toList()
       ..sort((a, b) => b.key.$1.hash.compareTo(a.key.$1.hash));
   }
 
@@ -162,8 +164,7 @@ final class InputBuilder implements CoinSelector {
   /// change outputs and the total transaction fee.
   ///
   /// - Parameters:
-  ///   - [assetId]: The token identifier for which the change is being
-  ///     calculated.
+  ///   - [assetId]: The identifier for which the change is being calculated.
   ///   - [builder]: The transaction builder used to create the transaction.
   ///   - [selectedInputs]: The set of selected UTxOs to fund the transaction.
   ///   - [selectedTotal]: The total balance accumulated from selected inputs.
@@ -272,8 +273,8 @@ final class InputBuilder implements CoinSelector {
     }
   }
 
-  /// Retrieves the amount of a specific token in a balance or zero amount.
-  Coin _getTokenAmount(AssetId assetId, Balance balance) {
+  /// Retrieves the amount of a specific asset in a balance or zero amount.
+  Coin _getAssetAmount(AssetId assetId, Balance balance) {
     final (policy, assetName) = assetId;
     return assetId == CoinSelector.adaAssetId
         ? balance.coin

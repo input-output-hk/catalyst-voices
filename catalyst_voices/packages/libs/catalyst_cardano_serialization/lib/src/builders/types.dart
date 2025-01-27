@@ -23,7 +23,7 @@ typedef SelectionResult = (
   Coin,
 );
 
-/// Interface for coin selection strategies applied to token maps.
+/// Interface for coin selection strategies applied to asset maps.
 // ignore: one_member_abstracts
 abstract class CoinSelectionStrategy {
   /// Apply the coin selection strategy to the UTxOs in the given [assetsGroup].
