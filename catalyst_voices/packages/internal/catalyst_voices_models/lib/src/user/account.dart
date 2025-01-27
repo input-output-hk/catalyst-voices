@@ -14,6 +14,14 @@ final class Account extends Equatable {
   ///
   /// 'kid.catalyst-rbac://' part is common so it can be skipped while building
   /// catalystId.
+  ///
+  /// Examples:
+  /// ```md
+  /// username@cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
+  /// cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
+  /// preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
+  /// testnet.midnight/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
+  /// ```
   final String catalystId;
   final String displayName;
   final String email;
