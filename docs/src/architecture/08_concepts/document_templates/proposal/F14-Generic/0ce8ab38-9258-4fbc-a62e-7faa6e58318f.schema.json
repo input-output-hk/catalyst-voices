@@ -277,6 +277,7 @@
                             "description": "Co-proposers and additional applicants",
                             "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. **IMPORTANT** A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 14 rules for added detail.",
                             "x-placeholder": "Enter the names of co-proposers or additional applicants",
+                            "x-subsection": true,
                             "maxItems": 5,
                             "minItems": 0,
                             "items": {
@@ -820,6 +821,7 @@
                                 "type": "object",
                                 "title": "Milestone",
                                 "required": ["title", "outputs", "acceptance_criteria", "evidence", "delivery_month", "cost", "progress"],
+                                "x-subsection": true,
                                 "properties": {
                                     "title": {
                                         "$ref": "#/definitions/singleLineTextEntry",
