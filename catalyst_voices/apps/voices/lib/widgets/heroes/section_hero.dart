@@ -100,6 +100,8 @@ class _HeroSectionState extends State<HeroSection>
   Future<void> _disposeAndReinitializeVideoPlayer() async {
     if (mounted) {
       await _controller?.dispose();
+    }
+    if (mounted) {
       _controller = VideoPlayerController.asset(
         widget.asset,
         package: widget.assetPackageName,
