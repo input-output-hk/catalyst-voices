@@ -18,10 +18,6 @@ walletConfigs.forEach((walletConfig) => {
       "https://github.com/input-output-hk/catalyst-voices/issues/753"
     );
     test.skip(
-      walletConfig.extension.Name === "Lace",
-      "https://github.com/input-output-hk/catalyst-voices/issues/1190"
-    );
-    test.skip(
       walletConfig.extension.Name === "Nufi",
       "https://github.com/input-output-hk/catalyst-voices/issues/1190"
     );

@@ -42,4 +42,9 @@ abstract class CryptocurrencyFormatter {
     final symbol = const Currency.ada().symbol;
     return numberFormat.format(amount.ada) + symbol;
   }
+
+  static String decimalFormat(Coin amount) {
+    final value = NumberFormat.decimalPattern().format(amount.value);
+    return '${const Currency.ada().symbol} $value';
+  }
 }
