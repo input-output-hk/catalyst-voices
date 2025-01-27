@@ -17,7 +17,10 @@ use poem_openapi::{
 use serde_json::Value;
 
 use self::generic::uuidv7;
-use crate::service::common::types::{generic, string_types::impl_string_types};
+use crate::{
+    db::event::common::eq_or_ranged_uuid::EqOrRangedUuid,
+    service::common::types::{generic, string_types::impl_string_types},
+};
 
 /// Title.
 const TITLE: &str = "Signed Document Version";
@@ -108,7 +111,7 @@ impl TryFrom<String> for DocumentVer {
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if !is_valid(&value) {
-            bail!("Invalid DocumentID, must be a valid UUIDv7")
+            bail!("Invalid DocumentVer '{value}', must be a valid UUIDv7")
         }
         Ok(Self(value))
     }
@@ -216,6 +219,22 @@ impl Example for EqOrRangedVer {
     }
 }
 
+impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedVer) -> Result<Self, Self::Error> {
+        match value {
+            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedVer::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
+    }
+}
+
 #[derive(NewType, Debug, PartialEq)]
 #[oai(
     from_multipart = false,
@@ -226,7 +245,7 @@ impl Example for EqOrRangedVer {
 /// Document Version Selector
 ///
 /// Either a absolute single Document Version or a range of Document Versions
-pub(crate) struct EqOrRangedVerDocumented(EqOrRangedVer);
+pub(crate) struct EqOrRangedVerDocumented(pub(crate) EqOrRangedVer);
 
 impl Example for EqOrRangedVerDocumented {
     fn example() -> Self {
