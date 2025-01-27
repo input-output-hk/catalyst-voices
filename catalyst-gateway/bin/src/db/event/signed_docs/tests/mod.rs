@@ -30,6 +30,9 @@ async fn queries_test() {
         filter_by_field::filter_by_field!(doc, "ref", with_ref);
         filter_by_field::filter_by_field!(doc, "template", with_template);
         filter_by_field::filter_by_field!(doc, "reply", with_reply);
+        filter_by_field::filter_by_field!(doc, "brand_id", with_brand_id);
+        filter_by_field::filter_by_field!(doc, "campaign_id", with_campaign_id);
+        filter_by_field::filter_by_field!(doc, "category_id", with_category_id);
     }
 
     filter_by_type(&docs, doc_type).await;
@@ -49,6 +52,9 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                         "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                         "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                         "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),
@@ -66,6 +72,9 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                         "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                         "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                         "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),

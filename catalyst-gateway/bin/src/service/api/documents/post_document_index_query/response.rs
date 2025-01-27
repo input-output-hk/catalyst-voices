@@ -4,11 +4,8 @@ use poem_openapi::{types::Example, NewType, Object};
 use super::SignedDocBody;
 use crate::service::common::{
     self,
-    types::{
-        document::{
-            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
-        },
-        generic::uuidv4::UUIDv4,
+    types::document::{
+        doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
     },
 };
 
@@ -124,13 +121,13 @@ pub(crate) struct IndexedDocumentVersion {
     pub template: Option<DocumentReference>,
     /// Document Brand Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub brand: Option<UUIDv4>,
+    pub brand: Option<DocumentReference>,
     /// Document Campaign Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub campaign: Option<UUIDv4>,
+    pub campaign: Option<DocumentReference>,
     /// Document Category Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub category: Option<UUIDv4>,
+    pub category: Option<DocumentReference>,
 }
 
 impl Example for IndexedDocumentVersion {
