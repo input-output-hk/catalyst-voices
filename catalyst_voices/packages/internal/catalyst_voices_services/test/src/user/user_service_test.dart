@@ -106,7 +106,7 @@ void main() {
         accounts.add(account);
       }
 
-      await userRepository.saveUser(User(accounts: accounts));
+      await userRepository.saveUser(User.optional(accounts: accounts));
 
       // Then
       final user = await service.getUser();
@@ -128,7 +128,7 @@ void main() {
         isActive: true,
       );
 
-      final user = User(accounts: [lastAccount]);
+      final user = User.optional(accounts: [lastAccount]);
       await userRepository.saveUser(user);
 
       await service.useLastAccount();
@@ -158,7 +158,7 @@ void main() {
         isActive: true,
       );
 
-      final user = User(accounts: [account]);
+      final user = User.optional(accounts: [account]);
       await userRepository.saveUser(user);
 
       await service.useLastAccount();
@@ -171,6 +171,62 @@ void main() {
       expect(service.account, isNull);
       expect(await keychain.isEmpty, isTrue);
       expect(await keychainProvider.exists(keychainId), isFalse);
+    });
+
+    group('updateSettings', () {
+      test('value is different user is updated correctly', () async {
+        // Given
+        const initialUser = User.empty();
+        const settings = UserSettings(
+          theme: ThemePreferences.dark,
+          timezone: TimezonePreferences.utc,
+        );
+
+        const expectedUser = User(accounts: [], settings: settings);
+
+        // When
+        await userRepository.saveUser(initialUser);
+
+        await service.useLastAccount();
+
+        await service.updateSettings(settings);
+
+        // Then
+        final user = service.user;
+
+        expect(user, expectedUser);
+      });
+
+      test('value is different new user is emitted by stream', () async {
+        // Given
+        const initialUser = User.empty();
+        const settings = UserSettings(
+          theme: ThemePreferences.dark,
+          timezone: TimezonePreferences.utc,
+        );
+
+        const expectedUser = User(accounts: [], settings: settings);
+
+        // When
+        await userRepository.saveUser(initialUser);
+
+        final userStream = service.watchUser;
+
+        expect(
+          userStream,
+          emitsInOrder([
+            initialUser,
+            expectedUser,
+          ]),
+        );
+
+        // Then
+        await service.useLastAccount();
+
+        await service.updateSettings(settings);
+
+        await service.dispose();
+      });
     });
   });
 }

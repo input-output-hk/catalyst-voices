@@ -13,6 +13,10 @@ abstract interface class UserService implements ActiveAware {
     );
   }
 
+  User get user;
+
+  Stream<User> get watchUser;
+
   Account? get account;
 
   List<Account> get accounts;
@@ -27,6 +31,8 @@ abstract interface class UserService implements ActiveAware {
 
   Future<void> removeAccount(Account account);
 
+  Future<void> updateSettings(UserSettings newValue);
+
   Future<void> dispose();
 }
 
@@ -35,7 +41,7 @@ final class UserServiceImpl implements UserService {
 
   final _logger = Logger('UserService');
 
-  User _user = const User(accounts: []);
+  User _user = const User.empty();
   final _userSC = StreamController<User>.broadcast();
 
   bool _isActive = true;
@@ -43,6 +49,15 @@ final class UserServiceImpl implements UserService {
   UserServiceImpl(
     this._userRepository,
   );
+
+  @override
+  User get user => _user;
+
+  @override
+  Stream<User> get watchUser async* {
+    yield user;
+    yield* _userSC.stream;
+  }
 
   @override
   Account? get account => _user.activeAccount;
@@ -110,6 +125,15 @@ final class UserServiceImpl implements UserService {
     await account.keychain.erase();
   }
 
+  @override
+  Future<void> updateSettings(UserSettings newValue) async {
+    final user = await getUser();
+
+    final updatedUser = user.copyWith(settings: newValue);
+
+    await _updateUser(updatedUser);
+  }
+
   Future<void> _updateUser(User user) async {
     if (_user != user) {
       _logger.info('Changing user to [$user]');
@@ -127,5 +151,7 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> dispose() async {}
+  Future<void> dispose() async {
+    await _userSC.close();
+  }
 }
