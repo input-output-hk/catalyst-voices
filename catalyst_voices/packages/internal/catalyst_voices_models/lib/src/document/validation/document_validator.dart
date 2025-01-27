@@ -85,7 +85,7 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateListItems(
+  static DocumentValidationResult validateListItemsRange(
     DocumentListSchema schema,
     List<dynamic>? value,
   ) {
@@ -97,6 +97,20 @@ final class DocumentValidator {
           expectedRange: itemsRange,
           actualItems: value.length,
         );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateListItemsUnique(
+    DocumentListSchema schema,
+    List<dynamic>? value,
+  ) {
+    if (schema.uniqueItems && value != null) {
+      final isUnique = value.length == value.toSet().length;
+      if (!isUnique) {
+        return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
       }
     }
 

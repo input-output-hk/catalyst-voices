@@ -49,6 +49,7 @@ final class DocumentListSchemaMapper {
       min: schema.minItems,
       max: schema.maxItems,
     );
+    final uniqueItems = schema.uniqueItems ?? false;
     final definition = _DocumentArrayDefinition.fromDef(schema.definition());
 
     switch (definition) {
@@ -63,6 +64,7 @@ final class DocumentListSchemaMapper {
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.singleLineTextEntryList:
         return DocumentSingleLineTextEntryListSchema(
@@ -75,6 +77,7 @@ final class DocumentListSchemaMapper {
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.multiLineTextEntryListMarkdown:
         return DocumentMultiLineTextEntryListMarkdownSchema(
@@ -87,6 +90,7 @@ final class DocumentListSchemaMapper {
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.singleLineHttpsURLEntryList:
         return DocumentSingleLineHttpsUrlEntryListSchema(
@@ -99,6 +103,7 @@ final class DocumentListSchemaMapper {
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.nestedQuestionsList:
         return DocumentNestedQuestionsListSchema(
@@ -111,6 +116,7 @@ final class DocumentListSchemaMapper {
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.unknown:
         return DocumentGenericListSchema(
@@ -123,6 +129,7 @@ final class DocumentListSchemaMapper {
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
     }
   }

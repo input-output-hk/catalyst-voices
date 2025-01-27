@@ -69,6 +69,13 @@ sealed class DocumentProperty extends Equatable implements DocumentNode {
   /// false otherwise.
   bool get isValid;
 
+  /// Returns the value related to this property.
+  ///
+  /// [DocumentListProperty] - returns a list of values (the same type).
+  /// [DocumentObjectProperty] - returns a list of values (different types).
+  /// [DocumentValueProperty] - returns a singular value.
+  Object? get value;
+
   /// Queries this property and it's children for a property with [nodeId].
   DocumentProperty? getProperty(DocumentNodeId nodeId);
 
@@ -104,6 +111,13 @@ final class DocumentListProperty extends DocumentProperty {
     }
 
     return properties.every((e) => e.isValid);
+  }
+
+  @override
+  Object? get value {
+    if (properties.isEmpty) return null;
+
+    return properties.map((e) => e.value).toList();
   }
 
   @override
@@ -169,6 +183,13 @@ final class DocumentObjectProperty extends DocumentProperty {
   }
 
   @override
+  Object? get value {
+    if (properties.isEmpty) return null;
+
+    return properties.map((e) => e.value).toList();
+  }
+
+  @override
   DocumentProperty? getProperty(DocumentNodeId nodeId) {
     if (nodeId == this.nodeId) {
       return this;
@@ -215,6 +236,7 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
   final DocumentValueSchema<T> schema;
 
   /// The current value this property holds.
+  @override
   final T? value;
 
   /// The validation result against the [schema].

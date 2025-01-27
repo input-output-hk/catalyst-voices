@@ -23,7 +23,8 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       DocumentStringOutOfRange() =>
         LocalizedDocumentStringOutOfRange(range: result.expectedRange),
       DocumentItemsOutOfRange() =>
-        LocalizedDocumentItemsOutOfRange(range: result.expectedRange),
+        LocalizedDocumentListItemsOutOfRange(range: result.expectedRange),
+      DocumentItemsNotUnique() => const LocalizedDocumentListItemsNotUnique(),
       DocumentPatternMismatch() => const LocalizedDocumentPatternMismatch(),
     };
   }
@@ -117,11 +118,11 @@ final class LocalizedDocumentStringOutOfRange
   List<Object?> get props => [range];
 }
 
-final class LocalizedDocumentItemsOutOfRange
+final class LocalizedDocumentListItemsOutOfRange
     extends LocalizedDocumentValidationResult {
   final Range<int> range;
 
-  const LocalizedDocumentItemsOutOfRange({required this.range});
+  const LocalizedDocumentListItemsOutOfRange({required this.range});
 
   @override
   String? message(BuildContext context) {
@@ -142,6 +143,19 @@ final class LocalizedDocumentItemsOutOfRange
 
   @override
   List<Object?> get props => [range];
+}
+
+final class LocalizedDocumentListItemsNotUnique
+    extends LocalizedDocumentValidationResult {
+  const LocalizedDocumentListItemsNotUnique();
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationListItemsNotUnique;
+  }
+
+  @override
+  List<Object?> get props => [];
 }
 
 final class LocalizedDocumentPatternMismatch

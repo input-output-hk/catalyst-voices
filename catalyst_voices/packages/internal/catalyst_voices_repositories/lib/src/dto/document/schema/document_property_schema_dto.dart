@@ -24,7 +24,7 @@ final class DocumentPropertySchemaDto {
   final String? description;
   @JsonKey(name: 'default')
   final Object? defaultValue;
-      @JsonKey(name: 'x-placeholder')
+  @JsonKey(name: 'x-placeholder')
   final String? placeholder;
   @JsonKey(name: 'x-guidance')
   final String? guidance;
@@ -34,6 +34,7 @@ final class DocumentPropertySchemaDto {
   final Object? constValue;
   @JsonKey(name: 'enum')
   final List<Object>? enumValues;
+  final bool? uniqueItems;
   final Map<String, DocumentPropertySchemaDto>? properties;
   final DocumentPropertySchemaDto? items;
   final int? minimum;
@@ -67,6 +68,7 @@ final class DocumentPropertySchemaDto {
     required this.icon,
     required this.constValue,
     required this.enumValues,
+    required this.uniqueItems,
     required this.properties,
     required this.items,
     required this.minimum,
@@ -94,6 +96,7 @@ final class DocumentPropertySchemaDto {
     this.icon,
     this.constValue,
     this.enumValues,
+    this.uniqueItems,
     this.properties,
     this.items,
     this.minimum,
@@ -246,6 +249,7 @@ final class DocumentPropertySchemaDto {
       icon: icon ?? other.icon,
       constValue: constValue ?? other.constValue,
       enumValues: enumValues ?? other.enumValues,
+      uniqueItems: uniqueItems ?? other.uniqueItems,
       properties: mergedProperties,
       items: mergedItems,
       minimum: minimum ?? other.minimum,

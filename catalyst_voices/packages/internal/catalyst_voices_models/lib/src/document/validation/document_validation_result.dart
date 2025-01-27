@@ -94,6 +94,18 @@ final class DocumentItemsOutOfRange<T extends num>
   List<Object?> get props => [invalidNodeId, expectedRange, actualItems];
 }
 
+/// The [List]'s items are not unique.
+final class DocumentItemsNotUnique extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+
+  const DocumentItemsNotUnique({
+    required this.invalidNodeId,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId];
+}
+
 final class DocumentPatternMismatch extends DocumentValidationResult {
   final RegExp pattern;
   final String? value;

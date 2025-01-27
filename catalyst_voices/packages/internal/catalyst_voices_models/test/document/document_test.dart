@@ -71,6 +71,7 @@ void main() {
 
         expect(objectProperty.isValid, isFalse);
       });
+
       test('$DocumentObjectProperty is valid when all children are valid', () {
         final nodeId = DocumentNodeId.root.child('object');
         final childSchema = DocumentGenericStringSchema.optional(
@@ -261,6 +262,37 @@ void main() {
           document.getProperty(nodeId),
           isNull,
         );
+      });
+    });
+
+    group('value', () {
+      test('getting value from a nested property works', () {
+        final titleProperty = DocumentValueProperty(
+          schema: DocumentGenericStringSchema.optional(
+            nodeId:
+                DocumentNodeId.root.child('setup').child('items').child('0'),
+          ),
+          value: 'Test title',
+          validationResult: const SuccessfulDocumentValidation(),
+        );
+
+        final listProperty = DocumentListProperty(
+          schema: DocumentGenericListSchema.optional(
+            nodeId: DocumentNodeId.root.child('setup').child('items'),
+          ),
+          properties: [titleProperty],
+          validationResult: const SuccessfulDocumentValidation(),
+        );
+
+        final objectProperty = DocumentObjectProperty(
+          schema: DocumentGenericObjectSchema.optional(
+            nodeId: DocumentNodeId.root.child('setup'),
+          ),
+          properties: [listProperty],
+          validationResult: const SuccessfulDocumentValidation(),
+        );
+
+        expect(objectProperty.value, isA<List<dynamic>>());
       });
     });
   });
