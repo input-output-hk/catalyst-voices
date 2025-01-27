@@ -55,6 +55,8 @@ class _CatalystIdTextState extends State<CatalystIdText> {
             children: [
               VoicesPlainTooltip(
                 message: widget.data,
+                // Do not constraint width.
+                constraints: const BoxConstraints(),
                 child: _Text(
                   _effectiveData,
                   onTap: _copyDataToClipboard,
