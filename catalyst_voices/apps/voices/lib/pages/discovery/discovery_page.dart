@@ -179,8 +179,10 @@ class _CampaignCategories extends StatelessWidget {
                 mainAxisExtent: 651,
               ),
               itemBuilder: (context, index) {
+                final category = categories[index];
                 return CampaignCategoryCard(
-                  category: categories[index],
+                  key: Key('CampaignCategoryCard${category.id}'),
+                  category: category,
                 );
               },
               itemCount: categories.length,
