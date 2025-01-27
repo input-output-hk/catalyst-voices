@@ -53,6 +53,9 @@ void main() {
       access: ProposalAccess.private,
       commentsCount: 0,
       document: proposalDocument,
+      version: 1,
+      duration: 6,
+      author: 'Alex Wells',
     );
 
     final pendingProposal = PendingProposal.fromProposal(
@@ -94,7 +97,6 @@ void main() {
         const LoadingProposalsState(),
         LoadedProposalsState(
           proposals: [pendingProposal],
-          favoriteProposals: const [],
         ),
       ],
     );
@@ -121,7 +123,6 @@ void main() {
         const LoadingProposalsState(),
         const LoadedProposalsState(
           proposals: [],
-          favoriteProposals: [],
         ),
       ],
     );
@@ -148,7 +149,6 @@ void main() {
         const LoadingProposalsState(),
         LoadedProposalsState(
           proposals: [pendingProposal],
-          favoriteProposals: const [],
         ),
       ],
     );
@@ -164,22 +164,19 @@ void main() {
       },
       act: (cubit) async {
         await cubit.load();
-        await cubit.onFavoriteProposal(proposal.id);
-        await cubit.onUnfavoriteProposal(proposal.id);
+        await cubit.onChangeFavoriteProposal(proposal.id, isFavorite: true);
+        await cubit.onChangeFavoriteProposal(proposal.id, isFavorite: false);
       },
       expect: () => [
         const LoadingProposalsState(),
         LoadedProposalsState(
           proposals: [pendingProposal],
-          favoriteProposals: const [],
+        ),
+        LoadedProposalsState(
+          proposals: [pendingProposal.copyWith(isFavorite: true)],
         ),
         LoadedProposalsState(
           proposals: [pendingProposal],
-          favoriteProposals: [pendingProposal],
-        ),
-        LoadedProposalsState(
-          proposals: [pendingProposal],
-          favoriteProposals: const [],
         ),
       ],
     );

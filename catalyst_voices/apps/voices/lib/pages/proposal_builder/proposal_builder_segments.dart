@@ -43,6 +43,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
         return SegmentsListView<ProposalBuilderSegment, ProposalBuilderSection>(
           itemScrollController: itemScrollController,
           items: value,
+          padding: const EdgeInsets.only(top: 16, bottom: 64),
           sectionBuilder: (context, data) {
             return DocumentBuilderSectionTile(
               key: key,

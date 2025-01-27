@@ -66,9 +66,9 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
             };
 
             let doc_body = SignedDocBody::new(
-                doc.doc_id(),
-                doc.doc_ver(),
-                doc.doc_type(),
+                doc.doc_id().into(),
+                doc.doc_ver().into(),
+                doc.doc_type().into(),
                 authors,
                 Some(doc_meta_json),
             );

@@ -7,8 +7,12 @@ import 'package:equatable/equatable.dart';
 /// A proposal view model spanning proposals in different stages.
 abstract base class ProposalViewModel extends Equatable {
   final String id;
+  final bool isFavorite;
 
-  const ProposalViewModel({required this.id});
+  const ProposalViewModel({
+    required this.id,
+    required this.isFavorite,
+  });
 
   factory ProposalViewModel.fromProposalAtStage({
     required Proposal proposal,
@@ -34,8 +38,12 @@ abstract base class ProposalViewModel extends Equatable {
     }
   }
 
+  ProposalViewModel copyWith({
+    bool? isFavorite,
+  });
+
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, isFavorite];
 }
 
 /// Defines the pending proposal that is not funded yet.
@@ -47,11 +55,14 @@ final class PendingProposal extends ProposalViewModel {
   final Coin _fundsRequested;
   final int commentsCount;
   final String description;
-  final int completedSegments;
-  final int totalSegments;
+  final ProposalPublish publishStage;
+  final int version;
+  final int duration;
+  final String author;
 
   const PendingProposal({
     required super.id,
+    super.isFavorite = false,
     required this.campaignName,
     required this.category,
     required this.title,
@@ -59,8 +70,10 @@ final class PendingProposal extends ProposalViewModel {
     required Coin fundsRequested,
     required this.commentsCount,
     required this.description,
-    required this.completedSegments,
-    required this.totalSegments,
+    required this.publishStage,
+    required this.version,
+    required this.duration,
+    required this.author,
   }) : _fundsRequested = fundsRequested;
 
   PendingProposal.fromProposal(
@@ -75,12 +88,69 @@ final class PendingProposal extends ProposalViewModel {
           fundsRequested: proposal.fundsRequested,
           commentsCount: proposal.commentsCount,
           description: proposal.description,
-          completedSegments: proposal.completedSegments,
-          totalSegments: proposal.totalSegments,
+          publishStage: proposal.publish,
+          version: proposal.version,
+          duration: proposal.duration,
+          author: proposal.author,
         );
 
   String get fundsRequested {
-    return CryptocurrencyFormatter.formatAmount(_fundsRequested);
+    return CryptocurrencyFormatter.decimalFormat(_fundsRequested);
+  }
+
+  @override
+  PendingProposal copyWith({
+    bool? isFavorite,
+    String? campaignName,
+    String? category,
+    String? title,
+    DateTime? lastUpdateDate,
+    Coin? fundsRequested,
+    int? commentsCount,
+    String? description,
+    ProposalPublish? publishStage,
+    int? version,
+    int? duration,
+    String? author,
+  }) {
+    return PendingProposal(
+      id: id,
+      isFavorite: isFavorite ?? this.isFavorite,
+      campaignName: campaignName ?? this.campaignName,
+      category: category ?? this.category,
+      title: title ?? this.title,
+      lastUpdateDate: lastUpdateDate ?? this.lastUpdateDate,
+      fundsRequested: fundsRequested ?? _fundsRequested,
+      commentsCount: commentsCount ?? this.commentsCount,
+      description: description ?? this.description,
+      publishStage: publishStage ?? this.publishStage,
+      version: version ?? this.version,
+      duration: duration ?? this.duration,
+      author: author ?? this.author,
+    );
+  }
+
+  factory PendingProposal.dummy() {
+    return PendingProposal(
+      id: 'f14/2',
+      campaignName: 'F14',
+      category: 'Cardano Use Cases: Concept',
+      title: 'Proposal Title that rocks the world',
+      lastUpdateDate: DateTime.now().minusDays(2),
+      fundsRequested: const Coin(55000),
+      commentsCount: 0,
+      description: """
+Zanzibar is becoming one of the hotspots for DID's through
+World Mobile and PRISM, but its potential is only barely exploited.
+Zanzibar is becoming one of the hotspots for DID's through World Mobile
+and PRISM, but its potential is only barely exploited.
+"""
+          .replaceAll('\n', ' '),
+      publishStage: ProposalPublish.published,
+      version: 1,
+      duration: 6,
+      author: 'Alex Wells',
+    );
   }
 
   @override
@@ -93,8 +163,10 @@ final class PendingProposal extends ProposalViewModel {
         _fundsRequested.value,
         commentsCount,
         description,
-        completedSegments,
-        totalSegments,
+        publishStage,
+        version,
+        duration,
+        author,
       ];
 }
 
@@ -110,6 +182,7 @@ final class FundedProposal extends ProposalViewModel {
 
   const FundedProposal({
     required super.id,
+    super.isFavorite = false,
     required this.campaignName,
     required this.category,
     required this.title,
@@ -138,6 +211,30 @@ final class FundedProposal extends ProposalViewModel {
   }
 
   @override
+  FundedProposal copyWith({
+    bool? isFavorite,
+    String? campaignName,
+    String? category,
+    String? title,
+    DateTime? fundedDate,
+    Coin? fundsRequested,
+    int? commentsCount,
+    String? description,
+  }) {
+    return FundedProposal(
+      id: id,
+      isFavorite: isFavorite ?? this.isFavorite,
+      campaignName: campaignName ?? this.campaignName,
+      category: category ?? this.category,
+      title: title ?? this.title,
+      fundedDate: fundedDate ?? this.fundedDate,
+      fundsRequested: fundsRequested ?? _fundsRequested,
+      commentsCount: commentsCount ?? this.commentsCount,
+      description: description ?? this.description,
+    );
+  }
+
+  @override
   List<Object?> get props => [
         ...super.props,
         campaignName,
@@ -148,4 +245,10 @@ final class FundedProposal extends ProposalViewModel {
         commentsCount,
         description,
       ];
+}
+
+extension ListProposalViewModelExt on List<ProposalViewModel> {
+  List<ProposalViewModel> get favorites {
+    return where((proposal) => proposal.isFavorite).toList();
+  }
 }

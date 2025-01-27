@@ -329,6 +329,19 @@ final class DocumentGenericStringSchema extends DocumentStringSchema {
     required super.pattern,
   });
 
+  const DocumentGenericStringSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.contentMediaType,
+    super.title = '',
+    super.description,
+    super.isRequired = false,
+    super.defaultValue,
+    super.enumValues,
+    super.strLengthRange,
+    super.pattern,
+  });
+
   @override
   DocumentGenericStringSchema withNodeId(DocumentNodeId nodeId) {
     return DocumentGenericStringSchema(
