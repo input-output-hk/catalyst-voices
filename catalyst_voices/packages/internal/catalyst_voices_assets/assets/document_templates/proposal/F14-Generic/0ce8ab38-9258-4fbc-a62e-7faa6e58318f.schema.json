@@ -191,14 +191,6 @@
             "const": true,
             "x-note": "Select Yes or No."
         },
-        "spdxLicenseOrURL": {
-            "$comment": "UI - Drop Down Selection of any valid SPDX Identifier.  This is a complex type, it should let the user select one of the valid SPDX licenses, or enter a URL of the license if its proprietary. In the form its just a string.",
-            "type": "string",
-            "contentMediaType": "text/plain",
-            "pattern": "^.*$",
-            "format": "spdxLicenseOrURL",
-            "x-note": "Select one option from the dropdown menu. Only one choice is allowed."
-        },
         "languageCode": {
             "$comment": "UI - ISO 639-1 language code selection",
             "type": "string",
@@ -232,7 +224,7 @@
         },
         "setup": {
             "$ref": "#/definitions/segment",
-            "title": "proposal setup",
+            "title": "Proposal setup",
             "description": "Proposal title",
             "x-icon": "view-grid",
             "properties": {
@@ -247,7 +239,8 @@
                             "description": "**Proposal title**\n\nPlease note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app.",
                             "minLength": 1,
                             "maxLength": 60,
-                            "x-guidance": "The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important."
+                            "x-guidance": "The title should clearly express what the proposal is about. Voters can see the title in the voting app, even without opening the proposal, so a clear, unambiguous, and concise title is very important.",
+                            "x-placeholder": "Summarize your proposal in 60 characters or less"
                         }
                     },
                     "required": [
@@ -264,6 +257,7 @@
                             "title": "Name and surname of main applicant",
                             "description": "Name and surname of main applicant",
                             "x-guidance": "Please provide the name and surname of the main applicant. The main applicant is considered as the individual responsible for the project and the person authorized to act on behalf of other applicants (where applicable).",
+                            "x-placeholder": "Enter the full name of the primary applicant",
                             "minLength": 2,
                             "maxLength": 100
                         },
@@ -272,6 +266,7 @@
                             "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
                             "x-guidance": "Please select from one of the following:\n\n1. Individual\n2. Entity (Incorporated)\n3. Entity (Not Incorporated)",
+                            "x-placeholder": "Select whether you're applying as an individual or entity",
                             "enum": [
                                 "Individual",
                                 "Entity (Incorporated)",
@@ -284,6 +279,7 @@
                             "title": "Co-proposers and additional applicants",
                             "description": "Co-proposers and additional applicants",
                             "x-guidance": "List any persons who are submitting the proposal jointly with the main applicant. Make sure you have confirmed approval/awareness with these individuals/accounts before adding them. If there is more than one proposer, identify the lead person who is authorized to act on behalf of other co-proposers. **IMPORTANT** A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise. Please, reference Fund 14 rules for added detail.",
+                            "x-placeholder": "Enter the names of co-proposers or additional applicants",
                             "maxItems": 5,
                             "minItems": 0,
                             "items": {
@@ -338,6 +334,7 @@
                             "title": "Requested funds in ADA",
                             "description": "The amount of funding requested for your proposal",
                             "x-guidance": "There is a minimum and a maximum amount of funding that can be requested in a single Catalyst proposal. These are outlined below per each category:\n\nMinimum Funding Amount per proposal:\n\nCardano Open: A15,000\nCardano Uses Cases: A15,000\nCardano Partners: A500,000\n\nMaximum Funding Amount per proposal:\n\nCardano Open:\n- Developers (technical): A200,000\n- Ecosystem (non-technical): A100,000\n\nCardano Uses Cases:\n- Concept A150,000\n- Product: A500,000\n\nCardano Partners:\n- Enterprise R&D A2,000,000\n- Growth & Acceleration: A2,000,000",
+                            "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
                             "maximum": 2000000
                         }
@@ -358,6 +355,7 @@
                             "title": "Project Duration in Months",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
                             "x-guidance": "Minimum 2 months-Maximum 12 months. The scope of your funding request and this project is expected to produce the deliverables you specify in the proposal within 2-12 months. If you believe your project will take longer than 12 months, consider reducing the project's scope so that it becomes achievable within 12 months. If your project completes earlier than scheduled so long as you have submitted your PoAs and Project Close-out report and video then your project can be closed out.",
+                            "x-placeholder": "Enter the expected duration of your project (2-12 months)",
                             "minimum": 2,
                             "maximum": 12
                         }
@@ -375,7 +373,8 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Auto-translated Status",
                             "description": "Indicate if your proposal has been auto-translated into English from another language",
-                            "x-guidance": "Tick YES if your proposal has been auto-translated into English from another language so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections. Tick NO if your proposal has not been auto-translated into English from another language"
+                            "x-guidance": "Tick YES if your proposal has been auto-translated into English from another language so readers are reminded that your proposal has been translated, and that they should be tolerant of any language imperfections. Tick NO if your proposal has not been auto-translated into English from another language",
+                            "x-placeholder": "Select if your proposal has been auto-translated into English"
                         },
                         "originalLanguage": {
                             "$ref": "#/definitions/languageCode",
@@ -400,7 +399,8 @@
                             "description": "Clearly define the problem you aim to solve. This will be visible in the Catalyst voting app.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail."
+                            "x-guidance": "Ensure you present a well-defined problem. What is the core issue that you hope to fix? Remember: the reader might not recognize the problem unless you state it clearly. This answer will be displayed on the Catalyst voting app, so voters will see it even if they don't open your proposal to read it in detail.",
+                            "x-placeholder": "Describe the problem you aim to solve"
                         }
                     },
                     "required": [
@@ -418,7 +418,8 @@
                             "description": "Briefly describe your solution. Focus on what you will do or create to solve the problem.",
                             "minLength": 10,
                             "maxLength": 200,
-                            "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...' Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'. This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail."
+                            "x-guidance": "Focus on what you are going to do, or make, or change, to solve the problem. So not 'There should be a way to....' but 'We will make a...' Clearly state how the solution addresses the specific problem you have identified - connect the 'why' and the 'how'. This answer will be displayed on the Catalyst voting app, so voters will see it even if they do not open your proposal and read it in detail.",
+                            "x-placeholder": "Describe how you'll solve the problem"
                         }
                     },
                     "required": [
@@ -430,6 +431,7 @@
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
                     "x-guidance": "Here, provide links to yours or your partner organization's website, repository, or marketing. Alternatively, provide links to any whitepaper or other publication relevant to your proposal. Note however that this is extra information that voters and Community Reviewers might choose not to read. You should not fail to include any of the questions in this form because you feel the answers can be found elsewhere. If any links are specified make sure these are added in good order (first link must be present before specifying second). Also ensure all links include https. Without these steps, the form will not be submittable and show errors",
+                    "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)",
                     "properties": {
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
@@ -455,7 +457,8 @@
                         "dependencyDetail": {
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Dependency description",
-                            "description": "Here you should list any dependencies and prerequisites for your project’s success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software."
+                            "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
+                            "x-placeholder": "Describe any dependencies or write 'No dependencies'."
                         }
                     }
                 },
@@ -474,6 +477,7 @@
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "License and Additional Information",
                             "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500
                         }
                     },
@@ -770,23 +774,26 @@
                 "solution": {
                     "$ref": "#/definitions/section",
                     "title": "Solution",
-                    "description": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n- How will you demonstrate or prove your impact?\n\nExplain what is unique about your solution, who will benefit, and why this is important to Cardano.",
+                    "x-guidance": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n- How will you demonstrate or prove your impact?\n\nExplain what is unique about your solution, who will benefit, and why this is important to Cardano.",
                     "properties": {
                         "solution": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "minLength": 1,
                             "maxLength": 10240,
-                            "x-guidance": "Our solution involves developing a decentralized education platform that will..."
+                            "description": "Please describe your proposed solution",
+                            "x-placeholder": "Describe your proposed solution and how it addresses the problem"
                         }
                     }
                 },
                 "impact": {
                     "$ref": "#/definitions/section",
                     "title": "Impact",
-                    "description": "Please include here a description of how you intend to measure impact (whether quantitative or qualitative) and how and with whom you will share your outputs:\n\n- In what way will the success of your project bring value to the Cardano Community?\n- How will you measure this impact?\n- How will you share the outputs and opportunities that result from your project?",
+                    "x-guidance": "Please include here a description of how you intend to measure impact (whether quantitative or qualitative) and how and with whom you will share your outputs:\n\n- In what way will the success of your project bring value to the Cardano Community?\n- How will you measure this impact?\n- How will you share the outputs and opportunities that result from your project?",
                     "properties": {
                         "impact": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "description": "Please define the positive impact your project will have on the wider Cardano community",
+                            "x-placeholder": "Define the positive impact your project will have on the Cardano community",
                             "minLength": 1,
                             "maxLength": 10240
                         }
@@ -795,10 +802,12 @@
                 "feasibility": {
                     "$ref": "#/definitions/section",
                     "title": "Capabilities & Feasibility",
-                    "description": "Please describe your existing capabilities that demonstrate how and why you believe you're best suited to deliver this project?\n\nPlease include the steps or processes that demonstrate that you can be trusted to manage funds properly.",
+                    "x-guidance": "Please describe your existing capabilities that demonstrate how and why you believe you're best suited to deliver this project?\n\nPlease include the steps or processes that demonstrate that you can be trusted to manage funds properly.",
                     "properties": {
                         "feasibility": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "description": "What is your capability to deliver your project with high levels of trust and accountability? How do you intend to validate if your approach is feasible?",
+                            "x-placeholder": "Describe your capability to deliver the project with trust and accountability",
                             "minLength": 1,
                             "maxLength": 10240
                         }
@@ -819,7 +828,8 @@
                 "milestones": {
                     "$ref": "#/definitions/section",
                     "title": "Project Milestones",
-                    "description": "Each milestone must declare:\n\n- A: Milestone outputs\n- B: Acceptance criteria\n- C: Evidence of completion\n\n**Requirements:**\n\n- For Grant Amounts up to 75k ada: minimum 3 milestones (2 + final)\n- For Grant Amounts 75k-150k ada: minimum 4 milestones (3 + final)\n- The final milestone must include Project Close-out Report and Video",
+                    "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                    "x-guidance": "Please follow these guidelines to build your individual milestones. Each milestone must include:\n\n1. **Milestone Outputs**\n   - What will be delivered\n\n2. **Acceptance Criteria**\n   - What conditions must be met\n\n3. **Evidence of Completion**\n   - How you will prove the milestone is complete.",
                     "properties": {
                         "milestone_list": {
                             "type": "array",
@@ -830,6 +840,7 @@
                             "maxItems": 6,
                             "items": {
                                 "type": "object",
+                                "title": "Milestone",
                                 "required": [
                                     "title",
                                     "outputs",
@@ -844,42 +855,49 @@
                                         "$ref": "#/definitions/singleLineTextEntry",
                                         "title": "Milestone Title",
                                         "description": "A clear, concise title for this milestone",
+                                        "x-placeholder": "Enter the title for this milestone",
                                         "maxLength": 100
                                     },
                                     "outputs": {
                                         "$ref": "#/definitions/multiLineTextEntryMarkdown",
                                         "title": "Milestone Outputs",
                                         "description": "What will be delivered in this milestone",
+                                        "x-placeholder": "Describe the deliverables or outcomes for this milestone",
                                         "maxLength": 1000
                                     },
                                     "acceptance_criteria": {
                                         "$ref": "#/definitions/multiLineTextEntryMarkdown",
                                         "title": "Acceptance Criteria",
                                         "description": "Specific conditions that must be met",
+                                        "x-placeholder": "Define the criteria for success in this milestone",
                                         "maxLength": 1000
                                     },
                                     "evidence": {
                                         "$ref": "#/definitions/multiLineTextEntryMarkdown",
                                         "title": "Evidence of Completion",
                                         "description": "How you will demonstrate achievement",
+                                        "x-placeholder": "Specify the evidence that will demonstrate this milestone is complete",
                                         "maxLength": 1000
                                     },
                                     "delivery_month": {
                                         "$ref": "#/definitions/durationInMonths",
                                         "title": "Delivery Month",
                                         "description": "The month when this milestone will be delivered",
+                                        "x-placeholder": "Enter the month when this milestone is expected to be delivered",
                                         "minimum": 1,
                                         "maximum": 12
                                     },
                                     "cost": {
                                         "$ref": "#/definitions/tokenValueCardanoADA",
                                         "title": "Cost in ADA",
-                                        "description": "The cost of this milestone in ADA"
+                                        "description": "The cost of this milestone in ADA",
+                                        "x-placeholder": "Enter the cost associated with this milestone"
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",
                                         "title": "Progress Status",
                                         "description": "Current status of the milestone",
+                                        "x-placeholder": "Enter the percentage of overall project  completion progress for this milestone (0-100%)",
                                         "enum": [
                                             "Not Started",
                                             "In Progress",
@@ -915,6 +933,7 @@
                             "title": "Who is in the project team and what are their roles?",
                             "description": "Who is in the project team and what are their roles?",
                             "x-guidance": "List your team, their Linkedin profiles (or similar) and state what aspect of the proposal's work each team member will undertake.\n\nIf you are planning to recruit additional team members, please state what specific skills you will be looking for in the people you recruit, so readers can see that you understand what skills will be needed to complete the project.\n\nYou are expected to have already engaged the relevant members of the organizations referenced so you understand if they are willing and/or have capacity to support the project. If you have not taken any steps to engage with your team yet, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun. The Catalyst team cannot help with this, meaning you are expected to have understood the requirements and engaged the necessary people before submitting a proposal.\n\nHave you engaged anyone on any of the technical group channels (eg Discord or Telegram), or do you have a direct line of communications with the people and resources required?\n\nImportant: Catalyst funding is not anonymous, and some level of 'proof of life' verifications will take place before initial funding is released. Also remember that your proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.\n\nAll Project Participants must disclose their role and scope of services across any submitted proposals, even if they are not in the lead or co-proposer role, such as an implementer, vendor, service provider, etc. Failure to disclose this information may lead to disqualification from the current grant round.",
+                            "x-placeholder": "List your project team members, their roles, and relevant profiles (e.g., LinkedIn)",
                             "minLength": 1,
                             "maxLength": 10240
                         }
@@ -929,6 +948,7 @@
                             "title": "Please provide a cost breakdown of the proposed work and resources",
                             "description": "Please provide a cost breakdown of the proposed work and resources",
                             "x-guidance": "Make sure every element mentioned in your plan reflects its cost. It may be helpful to refer to your plan and timeline, list all the resources you will need at each stage, and what they cost.\n\nHere, provide a clear description of any third party product or service you will be using. This could be hardware, software licenses, professional services (legal, accounting, code auditing, etc) but does not need to include the use of contracted programmers and developers.\n\nThe exact budget elements you include will depend on what type of work you are doing, and you might need to give less detail for a small, low-budget proposal. If the cost of the project will exceed the funding request, please provide information about alternative sources of funding.\n\nConsider including budget elements for publicity / marketing / promotion / community engagement; project management; documentation; and reporting back to the community. Most proposals need these, but many proposers forget to include them.\n\nIt is the project team's responsibility to properly manage the funds provided. Make sure to reference [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) to understand eligibility around costs.",
+                            "x-placeholder": "Provide a detailed cost breakdown, including resources needed at each stage and their costs",
                             "minLength": 1,
                             "maxLength": 10240
                         }
@@ -943,6 +963,7 @@
                             "title": "How does the cost of the project represent value for money for the Cardano ecosystem?",
                             "description": "How does the cost of the project represent value for money for the Cardano ecosystem?",
                             "x-guidance": "Use the response to provide the context about the costs you listed previously, particularly if they are high.\n\nIt may be helpful to include some brief information on how you have decided on the costs of the project.\n\nFor instance, can you justify with supporting evidence that costs are proportional to the average wage in your country, or typical freelance rates in your industry? Is there anything else that helps to support how the project represents value for money?",
+                            "x-placeholder": "Explain how the costs listed reflect value for money for the Cardano ecosystem",
                             "minLength": 1,
                             "maxLength": 10240
                         }
