@@ -21,12 +21,14 @@ class CatalystIdText extends StatefulWidget {
 
 class _CatalystIdTextState extends State<CatalystIdText> {
   String _effectiveData = '';
+  bool _tooltipVisible = false;
 
   @override
   void initState() {
     super.initState();
 
     _effectiveData = _buildTextData();
+    _tooltipVisible = _isTooltipVisible();
   }
 
   @override
@@ -36,6 +38,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
     if (widget.data != oldWidget.data ||
         widget.isCompact != oldWidget.isCompact) {
       _effectiveData = _buildTextData();
+      _tooltipVisible = _isTooltipVisible();
     }
   }
 
@@ -45,19 +48,22 @@ class _CatalystIdTextState extends State<CatalystIdText> {
       offstage: _effectiveData.isEmpty,
       child: _TapDetector(
         onTap: _copyDataToClipboard,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            VoicesPlainTooltip(
-              message: widget.data,
-              child: _Text(
-                _effectiveData,
-                onTap: _copyDataToClipboard,
+        child: TooltipVisibility(
+          visible: _tooltipVisible,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              VoicesPlainTooltip(
+                message: widget.data,
+                child: _Text(
+                  _effectiveData,
+                  onTap: _copyDataToClipboard,
+                ),
               ),
-            ),
-            const SizedBox(width: 6),
-            const _Copy(),
-          ],
+              const SizedBox(width: 6),
+              const _Copy(),
+            ],
+          ),
         ),
       ),
     );
@@ -79,6 +85,10 @@ class _CatalystIdTextState extends State<CatalystIdText> {
     }
 
     return data;
+  }
+
+  bool _isTooltipVisible() {
+    return widget.isCompact && _effectiveData.length < widget.data.length;
   }
 }
 
