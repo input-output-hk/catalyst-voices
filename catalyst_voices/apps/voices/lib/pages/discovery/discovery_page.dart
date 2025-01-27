@@ -1,7 +1,9 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/current_campaign.dart';
 import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
+import 'package:catalyst_voices/widgets/cards/campaign_category_card.dart';
 import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -58,7 +60,12 @@ class _GuestVisitorBody extends StatelessWidget {
                 CurrentCampaign(
                   currentCampaignInfo: CurrentCampaignInfoViewModel.dummy(),
                 ),
-                const _CampaignCategories(),
+                _CampaignCategories(
+                  List.filled(
+                    6,
+                    CampaignCategoryCardViewModel.dummy(),
+                  ),
+                ),
                 const _LatestProposals(),
               ],
             ),
@@ -141,13 +148,48 @@ class _CampaignBrief extends StatelessWidget {
 }
 
 class _CampaignCategories extends StatelessWidget {
-  const _CampaignCategories();
+  final List<CampaignCategoryCardViewModel> categories;
+
+  const _CampaignCategories(this.categories);
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder(
-      fallbackHeight: 1440,
-      child: Text('Campaign Categories'),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 120),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.campaignCategories,
+            style: context.textTheme.titleLarge,
+          ),
+          const SizedBox(height: 24),
+          ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxHeight: 1480,
+            ),
+            child: GridView.builder(
+              scrollDirection: Axis.vertical,
+              physics: const ClampingScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 390,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                mainAxisExtent: 651,
+              ),
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return CampaignCategoryCard(
+                  key: Key('CampaignCategoryCard${category.id}'),
+                  category: category,
+                );
+              },
+              itemCount: categories.length,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
