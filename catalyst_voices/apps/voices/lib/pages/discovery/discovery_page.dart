@@ -61,9 +61,9 @@ class _GuestVisitorBody extends StatelessWidget {
                   currentCampaignInfo: CurrentCampaignInfoViewModel.dummy(),
                 ),
                 _CampaignCategories(
-                  List.generate(
+                  List.filled(
                     6,
-                    (index) => CampaignCategoryCardViewModel.dummy(),
+                    CampaignCategoryCardViewModel.dummy(),
                   ),
                 ),
                 const _LatestProposals(),

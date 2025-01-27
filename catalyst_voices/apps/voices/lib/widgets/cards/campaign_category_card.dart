@@ -1,9 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/amount_formatter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +47,7 @@ class CampaignCategoryCard extends StatelessWidget {
                 _Title(category.subname),
                 const SizedBox(height: 16),
                 _CampaignStats(
-                  availableFunds: category.availableFunds,
+                  availableFunds: category.availableFundsText,
                   proposalsCount: category.proposalsCount,
                 ),
                 const SizedBox(height: 16),
@@ -82,7 +80,7 @@ class _Buttons extends StatelessWidget {
       children: [
         VoicesFilledButton(
           onTap: () {
-            // TOOD(LynxxLynx): implement redirect to category details
+            // TODO(LynxxLynx): implement redirect to category details
           },
           child: Text(context.l10n.categoryDetails),
         ),
@@ -134,22 +132,13 @@ class _Description extends StatelessWidget {
 }
 
 class _CampaignStats extends StatelessWidget {
-  final int availableFunds;
+  final String availableFunds;
   final int proposalsCount;
 
   const _CampaignStats({
     required this.availableFunds,
     required this.proposalsCount,
   });
-
-  String get _availableFundsText {
-    // ignore: lines_longer_than_80_chars
-    return '${const Currency.ada().symbol} ${AmountFormatter.decimalFormat(availableFunds)}';
-  }
-
-  String get _proposalsCountText {
-    return '$proposalsCount';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +153,7 @@ class _CampaignStats extends StatelessWidget {
           children: [
             _TextStats(
               text: context.l10n.fundsAvailable,
-              value: _availableFundsText,
+              value: availableFunds,
             ),
             const Spacer(),
             SizedBox(
@@ -177,7 +166,7 @@ class _CampaignStats extends StatelessWidget {
             const SizedBox(width: 16),
             _TextStats(
               text: context.l10n.proposals,
-              value: _proposalsCountText,
+              value: proposalsCount.toString(),
             ),
           ],
         ),

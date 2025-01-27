@@ -1,3 +1,5 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class CampaignCategory extends Equatable {
@@ -17,7 +19,7 @@ final class CampaignCategoryCardViewModel extends CampaignCategory {
   final String subname;
   final String description;
   final int proposalsCount;
-  final int availableFunds;
+  final Coin availableFunds;
   final String imageUrl;
 
   const CampaignCategoryCardViewModel({
@@ -38,7 +40,11 @@ final class CampaignCategoryCardViewModel extends CampaignCategory {
         description:
             '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
         proposalsCount: 263,
-        availableFunds: 8000000,
+        availableFunds: Coin(8000000),
         imageUrl: 'https://picsum.photos/id/10/200/300',
       );
+
+  String get availableFundsText {
+    return CryptocurrencyFormatter.decimalFormat(availableFunds);
+  }
 }
