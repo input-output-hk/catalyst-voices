@@ -88,8 +88,8 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         child: BlocSelector<SessionCubit, SessionState,
             ({bool isUnlocked, bool isVisitor})>(
           selector: (state) => (
-            isUnlocked: state is ActiveAccountSessionState,
-            isVisitor: state is VisitorSessionState
+            isUnlocked: state.isActive,
+            isVisitor: state.isVisitor,
           ),
           builder: (context, state) {
             return Scaffold(
@@ -197,12 +197,7 @@ class _Shortcuts extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState,
         Map<Space, ShortcutActivator>>(
-      selector: (state) {
-        return switch (state) {
-          ActiveAccountSessionState(:final spacesShortcuts) => spacesShortcuts,
-          _ => {},
-        };
-      },
+      selector: (state) => state.spacesShortcuts,
       builder: (context, shortcuts) {
         return CallbackShortcuts(
           bindings: <ShortcutActivator, VoidCallback>{

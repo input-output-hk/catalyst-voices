@@ -27,6 +27,7 @@ base class ProposalBase extends Equatable {
   final ProposalStatus status;
   final ProposalPublish publish;
   final ProposalAccess access;
+  // Most likely this will be inside the document class and not in this class
   final int version;
   final int duration;
   final String author;
@@ -49,7 +50,6 @@ base class ProposalBase extends Equatable {
     required this.access,
     required this.category,
     required this.commentsCount,
-    // Most likely this will be inside the document class and not in this class
     required this.version,
     required this.duration,
     required this.author,
