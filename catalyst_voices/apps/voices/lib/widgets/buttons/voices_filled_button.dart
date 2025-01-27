@@ -31,6 +31,7 @@ class VoicesFilledButton extends StatelessWidget {
     this.leading,
     this.trailing,
     this.backgroundColor,
+    this.foregroundColor,
     required this.child,
     this.foregroundColor,
   });

@@ -1375,6 +1375,8 @@
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
   "errorEmailValidationOutOfRange": "Invalid length",
+  "categoryDetails": "Category Details",
+  "fundsAvailable": "Funds Available",
   "duration": "Duration",
   "valueMonths": "{value} {value, plural, =0{Month} other{Months}}",
   "@valueMonths": {
