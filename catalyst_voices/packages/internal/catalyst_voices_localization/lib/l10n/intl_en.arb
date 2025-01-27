@@ -1349,7 +1349,6 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-
   "catalystF14": "Catalyst Found 14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
@@ -1375,5 +1374,7 @@
     "description": "In context for important information below"
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
-  "errorEmailValidationOutOfRange": "Invalid length"
+  "errorEmailValidationOutOfRange": "Invalid length",
+  "categoryDetails": "Category Details",
+  "fundsAvailable": "Funds Available"
 }
