@@ -6,7 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef DateTimeFormatBuilder = String Function(
+typedef TimezoneDateTimeTextFormatter = String Function(
   BuildContext context,
   DateTime dateTime,
 );
@@ -21,7 +21,7 @@ typedef DateTimeFormatBuilder = String Function(
 /// ```dart
 ///   TimezoneDateTimeText(
 ///     DateTime.now(),
-///     formatBuilder: (context, dateTime) {
+///     formatter: (context, dateTime) {
 ///       return DateFormatter.formatFullDateTime(dateTime);
 ///     },
 ///   ),
@@ -43,7 +43,7 @@ typedef DateTimeFormatBuilder = String Function(
 ///     Widget build(BuildContext context) {
 ///       return TimezoneDateTimeText(
 ///         data,
-///         formatBuilder: (context, dateTime) {
+///         formatter: (context, dateTime) {
 ///           return DateFormatter.formatFullDateTime(dateTime);
 ///         },
 ///       );
@@ -58,13 +58,13 @@ typedef DateTimeFormatBuilder = String Function(
 /// ```
 class TimezoneDateTimeText extends StatelessWidget {
   final DateTime data;
-  final DateTimeFormatBuilder formatBuilder;
+  final TimezoneDateTimeTextFormatter formatter;
   final TextStyle? style;
 
   const TimezoneDateTimeText(
     this.data, {
     super.key,
-    required this.formatBuilder,
+    required this.formatter,
     this.style,
   });
 
@@ -80,7 +80,7 @@ class TimezoneDateTimeText extends StatelessWidget {
       TimezonePreferences.utc => data.toUtc(),
       TimezonePreferences.local => data.toLocal(),
     };
-    final string = formatBuilder(context, effectiveData);
+    final string = formatter(context, effectiveData);
 
     final baseStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
       color: theme.colors.textOnPrimaryLevel1,
