@@ -124,11 +124,13 @@ class _DocumentBuilderSectionTileState
     });
   }
 
-  void _handlePropertyChange(DocumentChange change) {
+  void _handlePropertyChange(List<DocumentChange> changes) {
     setState(() {
-      _builder.addChange(change);
+      for (final change in changes) {
+        _builder.addChange(change);
+      }
       _editedSection = _builder.build();
-      _pendingChanges.add(change);
+      _pendingChanges.addAll(changes);
     });
   }
 }
@@ -193,7 +195,7 @@ class _Footer extends StatelessWidget {
 class _PropertyBuilder extends StatelessWidget {
   final DocumentProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyBuilder({
     required super.key,
@@ -231,7 +233,7 @@ class _PropertyBuilder extends StatelessWidget {
 class _PropertyListBuilder extends StatelessWidget {
   final DocumentListProperty list;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyListBuilder({
     required this.list,
@@ -265,7 +267,7 @@ class _PropertyListBuilder extends StatelessWidget {
 class _PropertyObjectBuilder extends StatelessWidget {
   final DocumentObjectProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyObjectBuilder({
     required this.property,
@@ -279,13 +281,10 @@ class _PropertyObjectBuilder extends StatelessWidget {
     switch (schema) {
       case DocumentSingleGroupedTagSelectorSchema():
         return SingleGroupedTagSelectorWidget(
-          id: property.schema.nodeId,
-          selection: schema.groupedTagsSelection(property) ??
-              const GroupedTagsSelection(),
-          groupedTags: schema.groupedTags(),
+          schema: schema,
+          property: property,
           isEditMode: isEditMode,
           onChanged: onChanged,
-          isRequired: schema.isRequired,
         );
 
       case DocumentNestedQuestionsSchema():
@@ -315,7 +314,7 @@ class _PropertyObjectBuilder extends StatelessWidget {
 class _PropertyValueBuilder extends StatelessWidget {
   final DocumentValueProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyValueBuilder({
     required this.property,

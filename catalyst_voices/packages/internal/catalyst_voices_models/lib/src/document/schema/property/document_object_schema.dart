@@ -56,6 +56,11 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
     return const SuccessfulDocumentValidation();
   }
 
+  DocumentPropertySchema?
+      getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
+    return properties.firstWhereOrNull((e) => e is T);
+  }
+
   @override
   @mustCallSuper
   List<Object?> get props => super.props + [properties, oneOf, order];
@@ -228,6 +233,24 @@ final class DocumentSingleGroupedTagSelectorSchema
       group: group,
       tag: tag,
     );
+  }
+
+  List<DocumentChange> buildDocumentChanges(GroupedTagsSelection selection) {
+    final groupProperty = getPropertyWithSchemaType<DocumentTagGroupSchema>()!;
+
+    final tagProperty =
+        getPropertyWithSchemaType<DocumentTagSelectionSchema>()!;
+
+    return [
+      DocumentValueChange(
+        nodeId: groupProperty.nodeId,
+        value: selection.group,
+      ),
+      DocumentValueChange(
+        nodeId: tagProperty.nodeId,
+        value: selection.tag,
+      ),
+    ];
   }
 
   List<GroupedTags> groupedTags() {
