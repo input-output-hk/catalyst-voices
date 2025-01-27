@@ -96,8 +96,7 @@ class _Header extends StatelessWidget {
               context.l10n.activeVotingRound,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
-            if (state is ActiveAccountSessionState)
-              const _UnlockedHeaderActions(),
+            if (state.isActive) const _UnlockedHeaderActions(),
           ],
         );
       },
