@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -27,8 +28,10 @@ final _proposals = [
     fundsRequested: Coin.fromAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    completedSegments: 0,
-    totalSegments: 13,
+    publishStage: ProposalPublish.draft,
+    version: 1,
+    duration: 6,
+    author: 'Alex Wells',
   ),
   PendingProposal(
     id: 'f14/1',
@@ -39,8 +42,10 @@ final _proposals = [
     fundsRequested: Coin.fromAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    completedSegments: 7,
-    totalSegments: 13,
+    publishStage: ProposalPublish.published,
+    version: 1,
+    duration: 6,
+    author: 'Alex Wells',
   ),
   PendingProposal(
     id: 'f14/2',
@@ -51,8 +56,10 @@ final _proposals = [
     fundsRequested: Coin.fromAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    completedSegments: 13,
-    totalSegments: 13,
+    publishStage: ProposalPublish.draft,
+    version: 1,
+    duration: 6,
+    author: 'Alex Wells',
   ),
 ];
 
@@ -202,7 +209,6 @@ class _AllProposals extends StatelessWidget {
           children: [
             for (final proposal in _proposals)
               PendingProposalCard(
-                image: _proposalImages[proposal.id]!,
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
                 onFavoriteChanged: (isFavorite) =>
@@ -229,7 +235,6 @@ class _FavoriteProposals extends StatelessWidget {
           children: [
             for (final proposal in favoriteProposals)
               PendingProposalCard(
-                image: _proposalImages[proposal.id]!,
                 proposal: proposal,
                 isFavorite: true,
                 onFavoriteChanged: (isFavorite) =>

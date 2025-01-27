@@ -53,6 +53,9 @@ void main() {
       access: ProposalAccess.private,
       commentsCount: 0,
       document: proposalDocument,
+      version: 1,
+      duration: 6,
+      author: 'Alex Wells',
     );
 
     final pendingProposal = PendingProposal.fromProposal(
