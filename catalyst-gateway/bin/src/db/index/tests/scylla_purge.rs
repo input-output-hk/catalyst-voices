@@ -18,10 +18,14 @@ async fn test_chain_root_for_role0_key() {
     };
 
     // insert
-    let data = rbac509::insert_chain_root_for_role0_key::Params::new(&[0], &[0], 0, 0);
+    let data = vec![
+        rbac509::insert_chain_root_for_role0_key::Params::new(&[0], &[0], 0, 0),
+        rbac509::insert_chain_root_for_role0_key::Params::new(&[1], &[1], 1, 1),
+    ];
+    let data_len = data.len();
 
     session
-        .execute_batch(PreparedQuery::ChainRootForRole0KeyInsertQuery, vec![data])
+        .execute_batch(PreparedQuery::ChainRootForRole0KeyInsertQuery, data)
         .await
         .unwrap();
 
@@ -35,25 +39,21 @@ async fn test_chain_root_for_role0_key() {
         read_rows.push(row_res.unwrap());
     }
 
-    assert_eq!(read_rows.len(), 1);
+    assert_eq!(read_rows.len(), data_len);
 
     // delete
     let delete_params = read_rows
         .into_iter()
         .map(chain_root_for_role0_key::Params::from)
         .collect();
-    let row_stream = chain_root_for_role0_key::DeleteQuery::execute(&session, delete_params)
+    let row_results = chain_root_for_role0_key::DeleteQuery::execute(&session, delete_params)
         .await
-        .unwrap();
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
 
-    let mut deleted_row_count = 0;
-    for _ in row_stream {
-        // drop(row.into_rows_result().unwrap());
-        deleted_row_count += 1;
-    }
+    assert!(row_results);
 
-    assert_eq!(deleted_row_count, 1);
-    
     // re-read
     let mut row_stream = chain_root_for_role0_key::PrimaryKeyQuery::execute(&session)
         .await
