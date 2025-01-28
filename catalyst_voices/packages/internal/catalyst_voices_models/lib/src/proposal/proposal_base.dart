@@ -6,7 +6,12 @@ import 'package:flutter/foundation.dart';
 // Note. This enum may be deleted later. Its here for backwards compatibility.
 enum ProposalStatus { ready, draft, inProgress, private, open, live, completed }
 
-enum ProposalPublish { draft, published }
+enum ProposalPublish {
+  draft,
+  published;
+
+  bool get isDraft => this == draft;
+}
 
 enum ProposalAccess { private, public }
 
@@ -22,6 +27,10 @@ base class ProposalBase extends Equatable {
   final ProposalStatus status;
   final ProposalPublish publish;
   final ProposalAccess access;
+  // Most likely this will be inside the document class and not in this class
+  final int version;
+  final int duration;
+  final String author;
 
   // This may be a reference to class
   final String category;
@@ -41,6 +50,9 @@ base class ProposalBase extends Equatable {
     required this.access,
     required this.category,
     required this.commentsCount,
+    required this.version,
+    required this.duration,
+    required this.author,
   });
 
   Proposal toProposal({
@@ -58,6 +70,9 @@ base class ProposalBase extends Equatable {
       category: category,
       commentsCount: commentsCount,
       document: document,
+      version: version,
+      duration: duration,
+      author: author,
     );
   }
 
