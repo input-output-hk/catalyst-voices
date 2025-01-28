@@ -59,6 +59,9 @@ pub(crate) struct EnvVars {
 
     /// Maximum Configured Batch size.
     pub(crate) max_batch_size: i64,
+
+    /// Config options for deployment i.e replication strategy
+    pub(crate) deployment: StringEnvVar,
 }
 
 impl EnvVars {
@@ -90,6 +93,10 @@ impl EnvVars {
                 MAX_BATCH_SIZE_DEFAULT,
                 MIN_BATCH_SIZE,
                 MAX_BATCH_SIZE,
+            ),
+            deployment: StringEnvVar::new(
+                &format!("CASSANDRA_{name}_DEPLOYMENT"),
+                "{'class': 'NetworkTopologyStrategy','replication_factor': 1}".into(),
             ),
         }
     }

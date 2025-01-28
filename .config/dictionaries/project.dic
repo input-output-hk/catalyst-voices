@@ -102,6 +102,7 @@ endfunction
 Eternl
 EUTXO
 extn
+eventdb
 fetchval
 Filecoin
 fmtchk
@@ -152,6 +153,7 @@ keychains
 Keyhash
 keyserver
 keyspace
+keyspaces
 KUBECONFIG
 kubernetescrd
 kubetail
@@ -254,6 +256,7 @@ ripgrep
 ristretto
 rlib
 rngs
+rolname
 RPATH
 ruleset
 rustc
@@ -305,6 +308,7 @@ Toastify
 todos
 toggleable
 tojunit
+tolerations
 tomjs
 topbar
 Traceback
