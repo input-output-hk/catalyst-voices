@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/discovery/most_recent_proposals.dart';
+import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -68,7 +68,7 @@ class _MostRecentProposalsData extends StatelessWidget {
 }
 
 class _MostRecentProposalsError extends StatelessWidget {
-  const _MostRecentProposalsError({super.key});
+  const _MostRecentProposalsError();
 
   @override
   Widget build(BuildContext context) {
