@@ -357,10 +357,7 @@ class _ProposalInfo extends StatelessWidget {
         if (showLastUpdate) ...[
           const SizedBox(width: 4),
           VoicesPlainTooltip(
-            message: DateFormatter.formatFullDateWithoutDayname(
-              context.l10n,
-              lastUpdate,
-            ),
+            message: _tooltipMessage(context),
             child: DayMonthTimeText(
               dateTime: lastUpdate,
             ),
@@ -387,5 +384,11 @@ class _ProposalInfo extends StatelessWidget {
       ProposalPublish.draft => l10n.draft,
       ProposalPublish.published => l10n.finalProposal,
     };
+  }
+
+  String _tooltipMessage(BuildContext context) {
+    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
+
+    return context.l10n.publishedOn(dt.date, dt.time);
   }
 }

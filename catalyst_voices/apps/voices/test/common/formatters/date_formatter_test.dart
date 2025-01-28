@@ -190,15 +190,6 @@ void main() {
       expect(result, '');
     });
 
-    test('should return translation for publishedOn', () {
-      final date = DateTime(2025, 1, 28, 14);
-      const expectedValue = 'Published on 28 January 2025 at 14:00';
-
-      final result = DateFormatter.formatFullDateWithoutDayname(l10n, date);
-
-      expect(result, expectedValue);
-    });
-
     test('should return formatted day month time string', () {
       final date = DateTime(2025, 1, 28, 14);
       const expectedValue = '28 Jan 14:00';
@@ -206,6 +197,23 @@ void main() {
       final result = DateFormatter.formatDayMonthTime(date);
 
       expect(result, expectedValue);
+    });
+
+    test('should format date without year when includeYear is false', () {
+      final date = DateTime(2023, 10, 25, 14, 30); // 25th October 2023, 14:30
+      final result =
+          DateFormatter.formatDateTimeParts(date, includeYear: false);
+
+      expect(result.date, '25 October');
+      expect(result.time, '14:30');
+    });
+
+    test('should format date with year when includeYear is true', () {
+      final date = DateTime(2025, 10, 25, 14, 30); // 25th October 2023, 14:30
+      final result = DateFormatter.formatDateTimeParts(date, includeYear: true);
+
+      expect(result.date, '25 October 2025');
+      expect(result.time, '14:30');
     });
   });
 }
