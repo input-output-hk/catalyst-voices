@@ -15,7 +15,7 @@ const INSERT_CHAIN_ROOT_FOR_ROLE0_KEY_QUERY: &str =
 
 /// Insert Chain Root For Role 0 Key Query Parameters
 #[derive(SerializeRow)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Role 0 Key Hash. 32 bytes.
     role0_key: Vec<u8>,
     /// Block Slot Number
@@ -39,7 +39,7 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(role0_key: &[u8], chain_root: &[u8], slot_no: u64, txn: i16) -> Self {
+    pub(crate) fn new(role0_key: &[u8], chain_root: &[u8], slot_no: u64, txn: i16) -> Self {
         Params {
             role0_key: role0_key.to_vec(),
             slot_no: num_bigint::BigInt::from(slot_no),
@@ -49,7 +49,7 @@ impl Params {
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let insert_queries = PreparedQueries::prepare_batch(

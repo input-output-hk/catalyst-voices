@@ -61,19 +61,17 @@ pub(crate) struct PrimaryKeyQuery;
 impl PrimaryKeyQuery {
     /// Prepares a query to get all Unstaked TXO ADA primary keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let select_primary_key = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session.clone(),
             SELECT_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = select_primary_key {
-            error!(error=%error, "Failed to prepare get Unstaked TXO ADA primary key query");
-        };
-
-        select_primary_key
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get Unstaked TXO ADA primary key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
     /// Executes a query to get all Unstaked TXO ADA primary keys.
@@ -100,7 +98,7 @@ impl DeleteQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let delete_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             DELETE_QUERY,
             cfg,
@@ -108,8 +106,11 @@ impl DeleteQuery {
             true,
             false,
         )
-        .await?;
-        Ok(delete_queries)
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare delete Unstaked TXO ADA primary key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query

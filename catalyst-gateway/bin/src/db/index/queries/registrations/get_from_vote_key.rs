@@ -39,19 +39,17 @@ pub(crate) struct GetStakeAddrFromVoteKeyQuery {
 impl GetStakeAddrFromVoteKeyQuery {
     /// Prepares a get stake addr from vote key query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_stake_addr_query = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session,
             GET_STAKE_ADDR_FROM_VOTE_KEY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = get_stake_addr_query {
-            error!(error=%error, "Failed to prepare get stake addr from vote key query.");
-        };
-
-        get_stake_addr_query
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get stake addr from vote key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_STAKE_ADDR_FROM_VOTE_KEY}"))
     }
 
     /// Executes a get txi by transaction hashes query.

@@ -22,7 +22,7 @@ pub(crate) mod result {
     //! Return values for TXO Assets by TXN Hash purge queries.
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16, i16, Vec<u8>, Vec<u8>);
+    pub(crate) type PrimaryKey = (Vec<u8>, i16, Vec<u8>, Vec<u8>, num_bigint::BigInt);
 }
 
 /// Select primary keys for TXO Assets by TXN Hash.
@@ -31,26 +31,20 @@ const SELECT_QUERY: &str = include_str!("./cql/get_unstaked_txo_assets_by_txn_ha
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_address: Vec<u8>,
-    /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
-    /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
-    /// Transaction Output Offset inside the transaction.
+    /// 32 byte hash of this transaction.
+    pub(crate) txn_hash: Vec<u8>,
+    /// Offset in the txo list of the transaction the txo is in.
     pub(crate) txo: i16,
     /// Asset Policy Hash - Binary 28 bytes.
-    policy_id: Vec<u8>,
+    pub(crate) policy_id: Vec<u8>,
     /// Name of the asset, within the Policy.
-    asset_name: Vec<u8>,
+    pub(crate) asset_name: Vec<u8>,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
-            .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_hash", &self.txn_hash)
             .field("txo", &self.txo)
             .field("policy_id", &self.policy_id)
             .field("asset_name", &self.asset_name)
@@ -61,12 +55,10 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_address: value.0,
-            slot_no: value.1,
-            txn: value.2,
-            txo: value.3,
-            policy_id: value.4,
-            asset_name: value.5,
+            txn_hash: value.0,
+            txo: value.1,
+            policy_id: value.2,
+            asset_name: value.3,
         }
     }
 }
@@ -76,19 +68,17 @@ pub(crate) struct PrimaryKeyQuery;
 impl PrimaryKeyQuery {
     /// Prepares a query to get all TXO Assets by TXN Hash primary keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let select_primary_key = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session.clone(),
             SELECT_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = select_primary_key {
-            error!(error=%error, "Failed to prepare get TXO Assets by TXN Hash primary key query");
-        };
-
-        select_primary_key
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get TXO Assets by TXN Hash primary key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
     /// Executes a query to get all TXO Assets by TXN Hash primary keys.
@@ -115,7 +105,7 @@ impl DeleteQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let delete_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             DELETE_QUERY,
             cfg,
@@ -123,8 +113,11 @@ impl DeleteQuery {
             true,
             false,
         )
-        .await?;
-        Ok(delete_queries)
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare delete TXO Assets by TXN Hash primary key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query
