@@ -10,7 +10,7 @@ use code_403_forbidden::Forbidden;
 use code_422_unprocessable_content::UnprocessableContent;
 use code_429_too_many_requests::TooManyRequests;
 use code_503_service_unavailable::ServiceUnavailable;
-use poem::IntoResponse;
+use poem::{http::StatusCode, IntoResponse};
 use poem_openapi::{
     payload::Json,
     registry::{MetaHeader, MetaResponse, MetaResponses, Registry},
@@ -265,7 +265,11 @@ impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
     }
 
     fn from_parse_request_error(err: poem_openapi::__private::poem::Error) -> Self {
-        WithErrorResponses::unprocessable_content(vec![err])
+        if err.status() == StatusCode::UNAUTHORIZED {
+            WithErrorResponses::unauthorized()
+        } else {
+            WithErrorResponses::unprocessable_content(vec![err])
+        }
     }
 }
 
