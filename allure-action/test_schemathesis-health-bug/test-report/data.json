@@ -1,0 +1,98 @@
+[
+  {
+    "runId": 13008118801,
+    "runUniqueId": "13008118801_1738060295673",
+    "testResult": "FAIL",
+    "timestamp": 1738059897000,
+    "summary": {
+      "statistic": {
+        "failed": 3,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 442,
+        "unknown": 0,
+        "total": 445
+      },
+      "time": {
+        "start": 1738059897000,
+        "stop": 1738060038022,
+        "duration": 141022,
+        "minDuration": 1,
+        "maxDuration": 4190,
+        "sumDuration": 37299
+      }
+    }
+  },
+  {
+    "runId": 12924675497,
+    "runUniqueId": "12924675497_1737620338942",
+    "testResult": "FAIL",
+    "timestamp": 1737619917000,
+    "summary": {
+      "statistic": {
+        "failed": 3,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 409,
+        "unknown": 0,
+        "total": 412
+      },
+      "time": {
+        "start": 1737619917000,
+        "stop": 1737620082011,
+        "duration": 165011,
+        "minDuration": 1,
+        "maxDuration": 5569,
+        "sumDuration": 43866
+      }
+    }
+  },
+  {
+    "runId": 12827468961,
+    "runUniqueId": "12827468961_1737125980344",
+    "testResult": "FAIL",
+    "timestamp": 1737106202000,
+    "summary": {
+      "statistic": {
+        "failed": 3,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 389,
+        "unknown": 0,
+        "total": 392
+      },
+      "time": {
+        "start": 1737106202000,
+        "stop": 1737106311012,
+        "duration": 109012,
+        "minDuration": 0,
+        "maxDuration": 4180,
+        "sumDuration": 34417
+      }
+    }
+  },
+  {
+    "runId": 12827468961,
+    "runUniqueId": "12827468961_1737111354984",
+    "testResult": "FAIL",
+    "timestamp": 1737106202000,
+    "summary": {
+      "statistic": {
+        "failed": 3,
+        "broken": 0,
+        "skipped": 0,
+        "passed": 389,
+        "unknown": 0,
+        "total": 392
+      },
+      "time": {
+        "start": 1737106202000,
+        "stop": 1737106311012,
+        "duration": 109012,
+        "minDuration": 0,
+        "maxDuration": 4180,
+        "sumDuration": 34582
+      }
+    }
+  }
+]
