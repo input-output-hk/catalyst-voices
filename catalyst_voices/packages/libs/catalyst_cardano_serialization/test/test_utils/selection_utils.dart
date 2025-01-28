@@ -1,5 +1,7 @@
 import 'dart:math';
+import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:convert/convert.dart';
 
 /// A utility class for generating random data and performing selection-related
@@ -12,6 +14,12 @@ sealed class SelectionUtils {
   static const String _chars = 'abcdefghijklmnopqrstuvwxyz'
       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       '0123456789';
+
+  List<Ed25519PrivateKey> generateMockPrivateKeys(int count) =>
+      List<Ed25519PrivateKey>.generate(
+        count,
+        (int index) => Ed25519PrivateKey.seeded(count),
+      );
 
   /// The default configuration for transaction building.
   ///
@@ -53,10 +61,16 @@ sealed class SelectionUtils {
   }) =>
       ShelleyAddress(
         [
-          if (isMainnet) 01 else 00,
+          _getMockAddressHrp(isBase: isBase, isMainnet: isMainnet),
           ...randomBytes(isBase ? 56 : 28),
         ],
       );
+
+  static int _getMockAddressHrp({
+    bool isBase = true,
+    bool isMainnet = false,
+  }) =>
+      0 | (isBase ? 0x00 : 0x20) | (isMainnet ? 0x01 : 0x00);
 
   /// Generates a list of random Shelley addresses.
   ///
@@ -77,6 +91,31 @@ sealed class SelectionUtils {
         count,
         (_) => randomAddress(isBase: isBase, isMainnet: isMainnet),
       );
+
+  static List<ShelleyAddress> mockAddresses({
+    required int count,
+    bool isBase = true,
+    bool isMainnet = false,
+  }) {
+    return List<ShelleyAddress>.generate(
+      count,
+      (int index) {
+        final prv = Bip32SigningKey.normalizeBytes(
+          Uint8List.fromList(List.filled(96, count)),
+        );
+
+        final pub = prv.publicKey;
+        final hrp = _getMockAddressHrp(isBase: isBase, isMainnet: isMainnet);
+
+        final addrBytes = isBase
+            ? <int>[...pub.prefix, ...List<int>.filled(28, count)]
+            : pub.prefix.toList();
+        final addr = ShelleyAddress([hrp, ...addrBytes]);
+
+        return addr;
+      },
+    );
+  }
 
   /// Generates a random balance.
   ///
@@ -168,6 +207,7 @@ sealed class SelectionUtils {
     int count, {
     Coin minimumCoin = const Coin(0),
     bool withTokens = true,
+    bool isSeeded = false,
   }) {
     final balances = randomBalances(
       count: count,
@@ -175,7 +215,9 @@ sealed class SelectionUtils {
       withTokens: withTokens,
     );
     final addressCount = count >= 2 ? (count / 2).floor() : 1;
-    final addresses = randomAddresses(count: addressCount);
+    final addresses = isSeeded
+        ? mockAddresses(count: addressCount)
+        : randomAddresses(count: addressCount);
 
     return List.generate(
       count,
@@ -271,32 +313,26 @@ sealed class SelectionUtils {
     int maxCoinPct = 40,
     int maxTokenPct = 80,
   }) {
-    final iLen = inputs.length;
-    final maxUtxos = iLen > 10 ? (iLen * 0.1).floor() : 1;
+    final inputCount = inputs.length;
+    final maxUtxos = inputCount > 10 ? (inputCount * 0.1).floor() : 1;
 
-    // A set to track unique indices
-    final usedIndices = <int>{};
+    final normalizedOutputs = (inputCount / maxUtxos).floor();
+    final outputsCount = normalizedOutputs.clamp(1, maxUtxos);
 
-    return List<TransactionOutput>.generate(_kRandom.nextInt(maxOutputs) + 1,
+    var lastUsedIndex = 0;
+
+    return List<TransactionOutput>.generate(_kRandom.nextInt(outputsCount) + 1,
         (int index) {
       final nrUtxos = _kRandom.nextInt(maxUtxos) + 1;
       final nrTokens = _kRandom.nextInt(maxTokens) + 1;
       var balance = const Balance.zero();
 
       for (var i = 0; i < nrUtxos; i++) {
-        // Find a unique index
-        int utxoIndex;
-        do {
-          utxoIndex = _kRandom.nextInt(iLen);
-        } while (usedIndices.contains(utxoIndex));
-
-        usedIndices.add(utxoIndex); // Mark the index as used
-
-        final quantity = inputs.toList()[utxoIndex].output.amount;
+        final quantity = inputs.toList()[lastUsedIndex++].output.amount;
 
         final newBalance = selectTokens(
           balance: quantity,
-          outputsCount: maxOutputs,
+          outputsCount: outputsCount,
           maxTokens: nrTokens,
           maxTokenPct: maxTokenPct,
         );

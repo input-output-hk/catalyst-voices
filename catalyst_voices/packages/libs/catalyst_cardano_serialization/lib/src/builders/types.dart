@@ -61,10 +61,11 @@ abstract interface class CoinSelector {
   /// The maximum number of inputs that can be used for coin selection.
   ///
   /// This constant defines the upper limit on the number of UTxOs that can be
-  /// selected for inclusion in a transaction. It defaults to 500.
+  /// selected for inclusion in a transaction. It defaults to 5000.
+  /// selected for inclusion in a transaction. It defaults to 5000.
   ///
   /// If needed, this value can be adjusted depending on the specific use case.
-  static const maxInputs = 500;
+  static const maxInputs = 5000;
 
   /// The minimum number of inputs that must be selected for coin selection.
   ///

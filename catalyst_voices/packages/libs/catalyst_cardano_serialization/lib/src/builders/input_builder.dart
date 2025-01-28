@@ -68,12 +68,10 @@ final class InputBuilder implements CoinSelector {
       final shouldCalculateChange = assetId == CoinSelector.adaAssetId ||
           assetGroups[groupCount - 2].key == assetId;
 
-      while (true) {
+      while (assetUtxos.isNotEmpty) {
         // Check if there are no more available inputs or if the maximum number
         // of inputs has been exceeded.
-        if (availableInputs.isEmpty ||
-            assetUtxos.isEmpty ||
-            selectedInputs.length > maxInputs) {
+        if (availableInputs.isEmpty || selectedInputs.length > maxInputs) {
           throw InsufficientUtxoBalanceException(
             actualAmount: selectedTotal,
             requiredAmount: targetTotal,
@@ -92,10 +90,15 @@ final class InputBuilder implements CoinSelector {
 
         // Check if the requirements have met.
         if (_getAssetAmount(assetId, selectedTotal) <
-                _getAssetAmount(assetId, targetTotal) ||
-            (assetId == CoinSelector.adaAssetId &&
-                selectedInputs.length < minInputs)) {
-          continue;
+            _getAssetAmount(assetId, targetTotal)) {
+          if (assetUtxos.isEmpty) {
+            throw InsufficientUtxoBalanceException(
+              actualAmount: selectedTotal,
+              requiredAmount: targetTotal,
+            );
+          } else {
+            continue;
+          }
         }
 
         if (shouldCalculateChange) {
