@@ -15,7 +15,7 @@ const INSERT_UNSTAKED_TXO_QUERY: &str = include_str!("./cql/insert_unstaked_txo.
 /// Insert TXO Unstaked Query Parameters
 /// (Superset of data to support both Staked and Unstaked TXO records.)
 #[derive(SerializeRow, Debug)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Transactions hash.
     txn_hash: Vec<u8>,
     /// Transaction Output Offset inside the transaction.
@@ -32,7 +32,7 @@ pub(super) struct Params {
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(
+    pub(crate) fn new(
         txn_hash: &[u8], txo: i16, slot_no: u64, txn: i16, address: &str, value: u64,
     ) -> Self {
         Self {
@@ -46,7 +46,7 @@ impl Params {
     }
 
     /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let txo_insert_queries = PreparedQueries::prepare_batch(

@@ -401,25 +401,61 @@ async fn test_cip36_registration() {
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_rbac509_registration() {
+    use rbac_registration::cardano::cip509::Cip509;
+
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        rbac509::insert_rbac509::Params::new(&[0], &[0], 0, 0, &Cip509::default()),
+        rbac509::insert_rbac509::Params::new(&[1], &[1], 1, 1, &Cip509::default()),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::Rbac509InsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = rbac509_registration::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = rbac509_registration::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(rbac509_registration::Params::from)
+        .collect();
+    let row_results = rbac509_registration::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = rbac509_registration::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -429,21 +465,55 @@ async fn test_stake_registration() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        certs::StakeRegistrationInsertQuery::new(vec![0], 0, 0, vec![0], false, false, false, None),
+        certs::StakeRegistrationInsertQuery::new(vec![1], 1, 1, vec![1], true, true, true, None),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::StakeRegistrationInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = stake_registration::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = stake_registration::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(stake_registration::Params::from)
+        .collect();
+    let row_results = stake_registration::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = stake_registration::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -453,21 +523,55 @@ async fn test_txi_by_hash() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        txi::TxiInsertParams::new(&[0], 0, 0),
+        txi::TxiInsertParams::new(&[1], 1, 1),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::TxiInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = txi_by_hash::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = txi_by_hash::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(txi_by_hash::Params::from)
+        .collect();
+    let row_results = txi_by_hash::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = txi_by_hash::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -477,19 +581,48 @@ async fn test_txo_ada() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = txo_ada::PrimaryKeyQuery::execute(&session).await.unwrap();
+    // data
+    let data = vec![
+        txo::insert_txo::Params::new(&[0], 0, 0, 0, "addr0", 0, &[0]),
+        txo::insert_txo::Params::new(&[1], 1, 1, 1, "addr1", 1, &[1]),
+    ];
+    let data_len = data.len();
 
-    while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
-    }
-
-    let row_stream = txo_ada::DeleteQuery::execute(&session, vec![])
+    // insert
+    session
+        .execute_batch(PreparedQuery::TxoAdaInsertQuery, data)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    // read
+    let mut row_stream = txo_ada::PrimaryKeyQuery::execute(&session).await.unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows.into_iter().map(txo_ada::Params::from).collect();
+    let row_results = txo_ada::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = txo_ada::PrimaryKeyQuery::execute(&session).await.unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -499,21 +632,55 @@ async fn test_txo_assets() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        txo::insert_txo_asset::Params::new(&[0], 0, 0, 0, &[0], &[0], 0),
+        txo::insert_txo_asset::Params::new(&[1], 1, 1, 1, &[1], &[1], 1),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::TxoAssetInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = txo_assets::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = txo_assets::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(txo_assets::Params::from)
+        .collect();
+    let row_results = txo_assets::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = txo_assets::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -523,21 +690,55 @@ async fn test_unstaked_txo_ada() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        txo::insert_unstaked_txo::Params::new(&[0], 0, 0, 0, "addr0", 0),
+        txo::insert_unstaked_txo::Params::new(&[1], 1, 1, 1, "addr1", 1),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::UnstakedTxoAdaInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = unstaked_txo_ada::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = unstaked_txo_ada::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(unstaked_txo_ada::Params::from)
+        .collect();
+    let row_results = unstaked_txo_ada::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = unstaked_txo_ada::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -547,19 +748,53 @@ async fn test_unstaked_txo_assets() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        txo::insert_unstaked_txo_asset::Params::new(&[0], 0, &[0], &[0], 0, 0, 0),
+        txo::insert_unstaked_txo_asset::Params::new(&[1], 1, &[1], &[1], 1, 1, 1),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::UnstakedTxoAssetInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = unstaked_txo_assets::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = unstaked_txo_assets::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(unstaked_txo_assets::Params::from)
+        .collect();
+    let row_results = unstaked_txo_assets::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = unstaked_txo_assets::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }

@@ -16,7 +16,7 @@ const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
 
 /// Insert RBAC Registration Query Parameters
 #[derive(SerializeRow)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Chain Root Hash. 32 bytes.
     chain_root: Vec<u8>,
     /// Transaction ID Hash. 32 bytes.
@@ -50,7 +50,7 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(
+    pub(crate) fn new(
         chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn: i16, cip509: &Cip509,
     ) -> Self {
         Params {
@@ -68,7 +68,7 @@ impl Params {
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let insert_queries = PreparedQueries::prepare_batch(
