@@ -8,13 +8,16 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class CurrentCampaign extends StatelessWidget {
   final CurrentCampaignInfoViewModel currentCampaignInfo;
+  final bool isLoading;
 
   const CurrentCampaign({
     super.key,
     required this.currentCampaignInfo,
+    this.isLoading = false,
   });
 
   @override
@@ -30,20 +33,21 @@ class CurrentCampaign extends StatelessWidget {
             children: [
               const _Header(),
               const SizedBox(height: 32),
-              _CurrentCampaignDetails(
-                allFunds: currentCampaignInfo.allFunds,
-                totalAsk: currentCampaignInfo.totalAsk,
-                askRange: currentCampaignInfo.askRange,
+              Skeletonizer(
+                enabled: isLoading,
+                child: _CurrentCampaignDetails(
+                  allFunds: currentCampaignInfo.allFunds,
+                  totalAsk: currentCampaignInfo.totalAsk,
+                  askRange: currentCampaignInfo.askRange,
+                ),
               ),
               const SizedBox(height: 80),
               const _SubTitle(),
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 120, top: 32),
-          child: _CampaignTimeline(mockCampaignTimeline),
-        ),
+        const SizedBox(height: 32),
+        _CampaignTimeline(mockCampaignTimeline),
       ],
     );
   }
@@ -158,16 +162,20 @@ class _CampaignFundsDetail extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            title,
-            style: context.textTheme.titleMedium?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+          Skeleton.keep(
+            child: Text(
+              title,
+              style: context.textTheme.titleMedium?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
             ),
           ),
-          Text(
-            description,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.sysColorsNeutralN60,
+          Skeleton.keep(
+            child: Text(
+              description,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.sysColorsNeutralN60,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -247,10 +255,12 @@ class _RangeValue extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: context.textTheme.titleSmall?.copyWith(
-            color: context.colors.sysColorsNeutralN60,
+        Skeleton.keep(
+          child: Text(
+            title,
+            style: context.textTheme.titleSmall?.copyWith(
+              color: context.colors.sysColorsNeutralN60,
+            ),
           ),
         ),
         Text(
@@ -325,8 +335,11 @@ class _CampaignTimelineState extends State<_CampaignTimeline> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children:
-                  widget.timelineItem.map(_CampaignTimelineCard.new).toList(),
+              children: [
+                const SizedBox(width: 120),
+                ...widget.timelineItem.map(_CampaignTimelineCard.new),
+                const SizedBox(width: 120),
+              ],
             ),
           ),
         ),

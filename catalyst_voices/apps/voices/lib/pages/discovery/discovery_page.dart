@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/discovery/current_campaign.dart';
 import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
+import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_category_card.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
-import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -30,7 +29,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   void initState() {
     super.initState();
 
-    unawaited(context.read<MostRecentCubit>().loadMostRecentProposals());
+    unawaited(context.read<DiscoveryCubit>().getAllData());
   }
 
   @override
@@ -71,18 +70,23 @@ class _GuestVisitorBody extends StatelessWidget {
         SliverList(
           delegate: SliverChildListDelegate(
             [
-              const _CampaignHeroSection(),
-              const HowItWorks(),
-              CurrentCampaign(
-                currentCampaignInfo: CurrentCampaignInfoViewModel.dummy(),
+              _CampaignHeroSection(
+                isProposer: isProposer,
               ),
+              const HowItWorks(),
+              const CurrentCampaignSelector(),
               _CampaignCategories(
                 List.filled(
                   6,
                   CampaignCategoryCardViewModel.dummy(),
                 ),
               ),
-              const _BuildLatestProposals(),
+              _LatestProposals(
+                proposals: List.filled(
+                  7,
+                  PendingProposal.dummy(),
+                ),
+              ),
             ],
           ),
         ),
@@ -92,7 +96,8 @@ class _GuestVisitorBody extends StatelessWidget {
 }
 
 class _CampaignHeroSection extends StatelessWidget {
-  const _CampaignHeroSection();
+  final bool isProposer;
+  const _CampaignHeroSection({required this.isProposer});
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +114,9 @@ class _CampaignHeroSection extends StatelessWidget {
           constraints: const BoxConstraints(
             maxWidth: 450,
           ),
-          child: const _CampaignBrief(),
+          child: _CampaignBrief(
+            isProposer: isProposer,
+          ),
         ),
       ),
     );
@@ -117,7 +124,8 @@ class _CampaignHeroSection extends StatelessWidget {
 }
 
 class _CampaignBrief extends StatelessWidget {
-  const _CampaignBrief();
+  final bool isProposer;
+  const _CampaignBrief({required this.isProposer});
 
   @override
   Widget build(BuildContext context) {
@@ -143,11 +151,11 @@ class _CampaignBrief extends StatelessWidget {
               onTap: () {
                 // TODO(LynxxLynx): implement redirect to current campaign
               },
-              child: Text(context.l10n.viewCurrentCampaign),
+              child: Text(context.l10n.viewProposals),
             ),
             const SizedBox(width: 8),
             Offstage(
-              offstage: true,
+              offstage: !isProposer,
               child: VoicesOutlinedButton(
                 onTap: () {
                   // TODO(LynxxLynx): implement redirect to my proposals
@@ -205,43 +213,6 @@ class _CampaignCategories extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BuildLatestProposals extends StatelessWidget {
-  const _BuildLatestProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<MostRecentCubit, MostRecentState>(
-      builder: (context, state) {
-        return switch (state) {
-          LoadingMostRecent() => _LatestProposals(
-              proposals: List.filled(
-                7,
-                PendingProposal.dummy(),
-              ),
-              isLoading: true,
-            ),
-          LoadedMostRecent(:final proposals) => Offstage(
-              offstage: proposals.length < 7,
-              child: _LatestProposals(
-                proposals: proposals,
-              ),
-            ),
-          ErrorMostRecent(:final exception) => Center(
-              child: VoicesErrorIndicator(
-                message: exception.message(context),
-                onRetry: () {
-                  unawaited(
-                    context.read<MostRecentCubit>().loadMostRecentProposals(),
-                  );
-                },
-              ),
-            ),
-        };
-      },
     );
   }
 }
