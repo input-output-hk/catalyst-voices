@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/discovery/current_campaign.dart';
 import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
+import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_category_card.dart';
@@ -13,9 +15,22 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-class DiscoveryPage extends StatelessWidget {
+class DiscoveryPage extends StatefulWidget {
   const DiscoveryPage({super.key});
+
+  @override
+  State<DiscoveryPage> createState() => _DiscoveryPageState();
+}
+
+class _DiscoveryPageState extends State<DiscoveryPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    unawaited(context.read<DiscoveryCubit>().getAllData());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,19 +70,19 @@ class _GuestVisitorBody extends StatelessWidget {
         SliverList(
           delegate: SliverChildListDelegate(
             [
-              const _CampaignHeroSection(),
-              const HowItWorks(),
-              CurrentCampaign(
-                currentCampaignInfo: CurrentCampaignInfoViewModel.dummy(),
+              _CampaignHeroSection(
+                isProposer: isProposer,
               ),
+              const HowItWorks(),
+              const CurrentCampaignSelector(),
               _CampaignCategories(
                 List.filled(
-                  7,
+                  6,
                   CampaignCategoryCardViewModel.dummy(),
                 ),
               ),
               _LatestProposals(
-                List.filled(
+                proposals: List.filled(
                   7,
                   PendingProposal.dummy(),
                 ),
@@ -81,7 +96,8 @@ class _GuestVisitorBody extends StatelessWidget {
 }
 
 class _CampaignHeroSection extends StatelessWidget {
-  const _CampaignHeroSection();
+  final bool isProposer;
+  const _CampaignHeroSection({required this.isProposer});
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +114,9 @@ class _CampaignHeroSection extends StatelessWidget {
           constraints: const BoxConstraints(
             maxWidth: 450,
           ),
-          child: const _CampaignBrief(),
+          child: _CampaignBrief(
+            isProposer: isProposer,
+          ),
         ),
       ),
     );
@@ -106,7 +124,8 @@ class _CampaignHeroSection extends StatelessWidget {
 }
 
 class _CampaignBrief extends StatelessWidget {
-  const _CampaignBrief();
+  final bool isProposer;
+  const _CampaignBrief({required this.isProposer});
 
   @override
   Widget build(BuildContext context) {
@@ -132,11 +151,11 @@ class _CampaignBrief extends StatelessWidget {
               onTap: () {
                 // TODO(LynxxLynx): implement redirect to current campaign
               },
-              child: Text(context.l10n.viewCurrentCampaign),
+              child: Text(context.l10n.viewProposals),
             ),
             const SizedBox(width: 8),
             Offstage(
-              offstage: true,
+              offstage: !isProposer,
               child: VoicesOutlinedButton(
                 onTap: () {
                   // TODO(LynxxLynx): implement redirect to my proposals
@@ -200,10 +219,12 @@ class _CampaignCategories extends StatelessWidget {
 
 class _LatestProposals extends StatefulWidget {
   final List<PendingProposal> proposals;
+  final bool isLoading;
 
-  const _LatestProposals(
-    this.proposals,
-  );
+  const _LatestProposals({
+    required this.proposals,
+    this.isLoading = false,
+  });
 
   @override
   State<_LatestProposals> createState() => _LatestProposalsState();
@@ -265,10 +286,13 @@ class _LatestProposalsState extends State<_LatestProposals>
                   itemCount: widget.proposals.length,
                   itemBuilder: (context, index) {
                     final proposal = widget.proposals[index];
-                    return PendingProposalCard(
-                      key: Key('PendingProposalCard_${proposal.id}'),
-                      proposal: proposal,
-                      onFavoriteChanged: (value) {},
+                    return Skeletonizer(
+                      enabled: widget.isLoading,
+                      child: PendingProposalCard(
+                        key: Key('PendingProposalCard_${proposal.id}'),
+                        proposal: proposal,
+                        onFavoriteChanged: (value) {},
+                      ),
                     );
                   },
                   separatorBuilder: (context, index) =>
