@@ -74,60 +74,128 @@ class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
       );
 }
 
-class SingleSelectDropdown<T> extends StatelessWidget {
-  final TextEditingController? textEditingController;
+class SingleSelectDropdown<T> extends FormField<T> {
+  final TextEditingController? controller;
+  final ValueChanged<T?>? onChanged;
   final List<DropdownMenuEntry<T>> items;
-  final T? initialValue;
-  final bool enabled;
-  final ValueChanged<T?>? onSelected;
   final String? hintText;
-
-  const SingleSelectDropdown({
+  SingleSelectDropdown({
     super.key,
-    this.textEditingController,
-    this.initialValue,
+    this.controller,
+    super.initialValue,
+    super.validator,
+    super.enabled,
+    required this.onChanged,
     required this.items,
-    this.enabled = true,
-    required this.onSelected,
     this.hintText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownMenu(
-      width: double.infinity,
-      controller: textEditingController,
-      initialSelection: initialValue,
-      enabled: enabled,
-      hintText: hintText,
-      dropdownMenuEntries: items,
-      onSelected: onSelected,
-      inputDecorationTheme: InputDecorationTheme(
-        hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Theme.of(context).colors.textDisabled,
-            ),
-        fillColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
-        filled: true,
-        enabledBorder: _border(context),
-        disabledBorder: _border(context),
-        focusedBorder: _border(context),
-      ),
-      trailingIcon: Offstage(
-        offstage: !enabled,
-        child: VoicesAssets.icons.chevronDown.buildIcon(),
-      ),
-      selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
-      menuStyle: MenuStyle(
-        backgroundColor: WidgetStatePropertyAll(
-          Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
+    AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
+  })  : assert(
+          initialValue == null || controller == null,
+          'initialValue and controller cannot be both set',
         ),
-      ),
-    );
-  }
+        super(
+          autovalidateMode: autovalidateMode,
+          builder: (field) {
+            final state = field as _SelectDropdownState;
+            void onChangedHandler(T? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
 
-  OutlineInputBorder _border(BuildContext context) => OutlineInputBorder(
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(),
+                  child: DropdownMenu(
+                    expandedInsets: EdgeInsets.zero,
+                    initialSelection: state._internalValue as T?,
+                    enabled: enabled,
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    hintText: hintText,
+                    dropdownMenuEntries: items,
+                    onSelected: onChangedHandler,
+                    inputDecorationTheme: InputDecorationTheme(
+                      hintStyle: Theme.of(field.context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(
+                            color: Theme.of(field.context).colors.textDisabled,
+                          ),
+                      fillColor: Theme.of(field.context)
+                          .colors
+                          .elevationsOnSurfaceNeutralLv1Grey,
+                      filled: true,
+                      enabledBorder: _border(field.context),
+                      disabledBorder: _border(field.context),
+                      focusedBorder: _border(field.context),
+                    ),
+                    trailingIcon: Offstage(
+                      offstage: !enabled,
+                      child: VoicesAssets.icons.chevronDown.buildIcon(),
+                    ),
+                    selectedTrailingIcon:
+                        VoicesAssets.icons.chevronUp.buildIcon(),
+                    menuStyle: MenuStyle(
+                      backgroundColor: WidgetStatePropertyAll(
+                        Theme.of(field.context)
+                            .colors
+                            .elevationsOnSurfaceNeutralLv1Grey,
+                      ),
+                      maximumSize:
+                          const WidgetStatePropertyAll(Size.fromHeight(350)),
+                    ),
+                  ),
+                ),
+                if (field.hasError)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      field.errorText ??
+                          field.context.l10n.snackbarErrorLabelText,
+                      style: Theme.of(field.context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(
+                            color: Theme.of(field.context).colorScheme.error,
+                          ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        );
+
+  static OutlineInputBorder _border(BuildContext context) => OutlineInputBorder(
         borderSide: BorderSide(
           color: Theme.of(context).colors.outlineBorderVariant,
         ),
       );
+
+  @override
+  FormFieldState<T> createState() => _SelectDropdownState<T>();
+}
+
+class _SelectDropdownState<T> extends FormFieldState<T> {
+  T? _internalValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _internalValue = widget.initialValue;
+  }
+
+  @override
+  void didUpdateWidget(covariant SingleSelectDropdown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != _internalValue) {
+      _internalValue = widget.initialValue;
+    }
+    if (_internalValue != value) {
+      setValue(_internalValue);
+      validate();
+    }
+  }
 }
