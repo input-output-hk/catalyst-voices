@@ -34,7 +34,7 @@ final class ProposalBuilderSegment extends BaseSegment<ProposalBuilderSection> {
 }
 
 final class ProposalBuilderSection extends BaseSection {
-  final DocumentObjectProperty property;
+  final DocumentProperty property;
 
   const ProposalBuilderSection({
     required super.id,

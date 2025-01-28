@@ -151,7 +151,13 @@ final class ProposalBuilderBloc
 
   List<Segment> _mapDocumentToSegments(Document document) {
     return document.segments.map((segment) {
-      final sections = segment.sections.map(
+      final sectionCandidates = <DocumentProperty>[];
+
+      for (final section in segment.sections) {
+        sectionCandidates.addAll(_findSectionsAndSubsections(section));
+      }
+
+      final sections = sectionCandidates.map(
         (section) {
           return ProposalBuilderSection(
             id: section.schema.nodeId,
@@ -169,5 +175,30 @@ final class ProposalBuilderBloc
         schema: segment.schema as DocumentSegmentSchema,
       );
     }).toList();
+  }
+
+  Iterable<DocumentProperty> _findSectionsAndSubsections(
+    DocumentProperty property,
+  ) sync* {
+    if (property.schema is DocumentSectionSchema) {
+      yield property;
+    }
+
+    if (property.schema.isSubsection) {
+      yield property;
+    }
+
+    switch (property) {
+      case DocumentListProperty():
+        for (final childProperty in property.properties) {
+          yield* _findSectionsAndSubsections(childProperty);
+        }
+      case DocumentObjectProperty():
+        for (final childProperty in property.properties) {
+          yield* _findSectionsAndSubsections(childProperty);
+        }
+      case DocumentValueProperty():
+      // value property doesn't have children
+    }
   }
 }
