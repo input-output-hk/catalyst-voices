@@ -67,11 +67,14 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
   });
 
   @override
-  DocumentGenericNumberSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericNumberSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentGenericNumberSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,

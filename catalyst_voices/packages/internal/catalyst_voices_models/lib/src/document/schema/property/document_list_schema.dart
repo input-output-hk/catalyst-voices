@@ -36,17 +36,17 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
   }
 
   @override
-  DocumentListProperty createChildPropertyAt([DocumentNodeId? parentNodeId]) {
-    parentNodeId ??= nodeId;
-
-    final childId = const Uuid().v4();
-    final childNodeId = parentNodeId.child(childId);
-
-    final updatedSchema = withNodeId(childNodeId) as DocumentListSchema;
-    const updatedProperties = <DocumentProperty>[];
+  DocumentListProperty createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  }) {
+    final updatedSchema = copyWith(
+      nodeId: nodeId,
+      title: title,
+    ) as DocumentListSchema;
 
     return updatedSchema.buildProperty(
-      properties: List.unmodifiable(updatedProperties),
+      properties: List.unmodifiable(<DocumentProperty>[]),
     );
   }
 
@@ -58,6 +58,11 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
       DocumentValidator.validateListItemsRange(this, values),
       DocumentValidator.validateListItemsUnique(this, values),
     ]);
+  }
+
+  /// The title of the child created from [itemsSchema].
+  String getChildItemTitle(int index) {
+    return '${itemsSchema.title} ${index + 1}';
   }
 
   @override
@@ -82,17 +87,23 @@ final class DocumentMultiSelectSchema extends DocumentListSchema {
   });
 
   @override
-  DocumentMultiSelectSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentMultiSelectSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentMultiSelectSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
       isSubsection: isSubsection,
       isRequired: isRequired,
-      itemsSchema: itemsSchema.withNodeId(nodeId),
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
       itemsRange: itemsRange,
       uniqueItems: uniqueItems,
     );
@@ -115,17 +126,23 @@ final class DocumentSingleLineTextEntryListSchema extends DocumentListSchema {
   });
 
   @override
-  DocumentSingleLineTextEntryListSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSingleLineTextEntryListSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentSingleLineTextEntryListSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
       isSubsection: isSubsection,
       isRequired: isRequired,
-      itemsSchema: itemsSchema.withNodeId(nodeId),
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
       itemsRange: itemsRange,
       uniqueItems: uniqueItems,
     );
@@ -149,19 +166,23 @@ final class DocumentMultiLineTextEntryListMarkdownSchema
   });
 
   @override
-  DocumentMultiLineTextEntryListMarkdownSchema withNodeId(
-    DocumentNodeId nodeId,
-  ) {
+  DocumentMultiLineTextEntryListMarkdownSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentMultiLineTextEntryListMarkdownSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
       isSubsection: isSubsection,
       isRequired: isRequired,
-      itemsSchema: itemsSchema.withNodeId(nodeId),
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
       itemsRange: itemsRange,
       uniqueItems: uniqueItems,
     );
@@ -185,17 +206,23 @@ final class DocumentSingleLineHttpsUrlEntryListSchema
   });
 
   @override
-  DocumentSingleLineHttpsUrlEntryListSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSingleLineHttpsUrlEntryListSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentSingleLineHttpsUrlEntryListSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
       isSubsection: isSubsection,
       isRequired: isRequired,
-      itemsSchema: itemsSchema.withNodeId(nodeId),
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
       itemsRange: itemsRange,
       uniqueItems: uniqueItems,
     );
@@ -218,17 +245,23 @@ final class DocumentNestedQuestionsListSchema extends DocumentListSchema {
   });
 
   @override
-  DocumentNestedQuestionsListSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentNestedQuestionsListSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentNestedQuestionsListSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
       isSubsection: isSubsection,
       isRequired: isRequired,
-      itemsSchema: itemsSchema.withNodeId(nodeId),
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
       itemsRange: itemsRange,
       uniqueItems: uniqueItems,
     );
@@ -266,17 +299,23 @@ final class DocumentGenericListSchema extends DocumentListSchema {
   });
 
   @override
-  DocumentGenericListSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericListSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentGenericListSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
       isSubsection: isSubsection,
       isRequired: isRequired,
-      itemsSchema: itemsSchema.withNodeId(nodeId),
+      itemsSchema: itemsSchema.copyWith(nodeId: newNodeId),
       itemsRange: itemsRange,
       uniqueItems: uniqueItems,
     );
