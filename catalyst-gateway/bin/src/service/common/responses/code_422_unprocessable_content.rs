@@ -45,15 +45,16 @@ impl Example for UnprocessableContent {
 /// request.
 pub(crate) struct ContentErrorDetail {
     /// The location of the error
-    #[oai(validator(max_items = 100))]
+    #[oai(validator(max_items = 100), nullable)]
     loc: Option<Vec<common::types::generic::error_msg::ErrorMessage>>,
     /// The error message.
-    #[oai(validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"))]
+    #[oai(validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"), nullable)]
     msg: Option<common::types::generic::error_msg::ErrorMessage>,
     /// The type of error
     #[oai(
         rename = "type",
-        validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$")
+        validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"),
+        nullable
     )]
     err_type: Option<common::types::generic::error_msg::ErrorMessage>,
 }
