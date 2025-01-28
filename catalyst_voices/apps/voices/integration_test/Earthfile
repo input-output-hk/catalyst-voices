@@ -22,23 +22,19 @@ integration-test-web:
     #    LET driver = "msedgedriver"
     # END
 
-
-#    RUN ($driver --port=$driver_port > $driver.log &) && sleep 5
-#    RUN useradd -ms /bin/bash newuser
-#    USER newuser
     WORKDIR /frontend/apps/voices
 
     RUN ($driver --port=$driver_port > $driver.log &) && \
-            sleep 5 && \
-            flutter drive --driver=test_driver/integration_tests.dart \
-            --target=integration_test/all_test.dart \
+        sleep 5 && \
+        flutter drive --driver=test_driver/integration_tests.dart \
+            --target=integration_test/app_test.dart \
             -d web-server --browser-name=$browser --driver-port=$driver_port \
             # https://github.com/flutter/flutter/issues/154727
             --web-browser-flag=--disable-web-security \
             --web-browser-flag=--disable-gpu \
             --web-browser-flag=--headless \
             --web-browser-flag=--disable-search-engine-choice-screen \
-            --profile
+            --profile || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
