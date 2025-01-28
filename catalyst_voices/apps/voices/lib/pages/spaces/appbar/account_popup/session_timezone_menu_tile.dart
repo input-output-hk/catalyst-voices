@@ -35,7 +35,7 @@ class _SegmentsTile extends StatelessWidget {
       ),
       selected: selected,
       onChanged: (value) {
-        //
+        context.read<SessionCubit>().updateTimezone(value);
       },
     );
   }
