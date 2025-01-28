@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -9,7 +10,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a proposal in pending state on a card.
-class PendingProposalCard extends StatelessWidget {
+class PendingProposalCard extends StatefulWidget {
   final PendingProposal proposal;
   final bool showStatus;
   final bool showLastUpdate;
@@ -26,52 +27,80 @@ class PendingProposalCard extends StatelessWidget {
   });
 
   @override
+  State<PendingProposalCard> createState() => _PendingProposalCardState();
+}
+
+class _PendingProposalCardState extends State<PendingProposalCard> {
+  bool isHovered = false;
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 326),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _Topbar(
-                  showStatus: showStatus,
-                  isFavorite: isFavorite,
-                  onFavoriteChanged: onFavoriteChanged,
-                ),
-                _Category(
-                  category: proposal.category,
-                ),
-                const SizedBox(height: 4),
-                _Title(text: proposal.title),
-                _Author(author: proposal.author),
-                _FundsAndDuration(
-                  funds: proposal.fundsRequested,
-                  duration: proposal.duration,
-                ),
-                const SizedBox(height: 12),
-                _Description(text: proposal.description),
-                const SizedBox(height: 24),
-                _ProposalInfo(
-                  proposalStage: proposal.publishStage,
-                  version: proposal.version,
-                  lastUpdate: proposal.lastUpdateDate,
-                  commentsCount: proposal.commentsCount,
-                  showLastUpdate: showLastUpdate,
-                ),
-              ],
-            ),
+    return MouseRegion(
+      onEnter: (_) => _changeHoverState(value: true),
+      onExit: (_) => _changeHoverState(value: false),
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 326),
+        decoration: BoxDecoration(
+          color: context.colors.elevationsOnSurfaceNeutralLv1White,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isHovered
+                ? _hoverBorderColor(context)
+                : context.colors.elevationsOnSurfaceNeutralLv1White,
           ),
-        ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _Topbar(
+                    showStatus: widget.showStatus,
+                    isFavorite: widget.isFavorite,
+                    onFavoriteChanged: widget.onFavoriteChanged,
+                  ),
+                  _Category(
+                    category: widget.proposal.category,
+                  ),
+                  const SizedBox(height: 4),
+                  _Title(text: widget.proposal.title),
+                  _Author(author: widget.proposal.author),
+                  _FundsAndDuration(
+                    funds: widget.proposal.fundsRequested,
+                    duration: widget.proposal.duration,
+                  ),
+                  const SizedBox(height: 12),
+                  _Description(text: widget.proposal.description),
+                  const SizedBox(height: 24),
+                  _ProposalInfo(
+                    proposalStage: widget.proposal.publishStage,
+                    version: widget.proposal.version,
+                    lastUpdate: widget.proposal.lastUpdateDate,
+                    commentsCount: widget.proposal.commentsCount,
+                    showLastUpdate: widget.showLastUpdate,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _changeHoverState({required bool value}) {
+    setState(() {
+      isHovered = value;
+    });
+  }
+
+  Color _hoverBorderColor(BuildContext context) {
+    return switch (widget.proposal.publishStage) {
+      ProposalPublish.draft => context.colorScheme.secondary,
+      ProposalPublish.published => context.colorScheme.primary,
+    };
   }
 }
 
@@ -327,13 +356,13 @@ class _ProposalInfo extends StatelessWidget {
         ),
         if (showLastUpdate) ...[
           const SizedBox(width: 4),
-          Text(
-            DateFormatter.formatShortMonth(
+          VoicesPlainTooltip(
+            message: DateFormatter.formatFullDateWithoutDayname(
               context.l10n,
               lastUpdate,
             ),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+            child: DayMonthTimeText(
+              dateTime: lastUpdate,
             ),
           ),
         ],
@@ -356,7 +385,7 @@ class _ProposalInfo extends StatelessWidget {
   ) {
     return switch (proposalStage) {
       ProposalPublish.draft => l10n.draft,
-      ProposalPublish.published => l10n.published,
+      ProposalPublish.published => l10n.finalProposal,
     };
   }
 }
