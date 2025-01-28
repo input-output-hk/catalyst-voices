@@ -8,8 +8,7 @@ project: {
 	}
 	deployment: {
 		on: {
-			// TODO: Remove always before merging
-			always: {}
+			merge: {}
 		}
 		environment: "dev"
 		modules: main: {
@@ -219,8 +218,8 @@ project: {
 	release: {
 		docker: {
 			on: {
-				// TODO: Remove always before merging
-				always: {}
+				merge: {}
+				tag: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_COMMIT_HASH")
