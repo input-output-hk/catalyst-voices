@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -87,8 +88,7 @@ class _Buttons extends StatelessWidget {
         const SizedBox(height: 8),
         VoicesFilledButton(
           onTap: () {
-            // TODO(LynxxLynx): implement redirect to proposals
-            //page with category filter
+            ProposalsRoute(categoryId: categoryId).go(context);
           },
           backgroundColor: context.colors.elevationsOnSurfaceNeutralLv2,
           foregroundColor: context.colorScheme.primary,

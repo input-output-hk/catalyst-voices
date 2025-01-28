@@ -114,24 +114,27 @@ class _CurrentCampaignDetails extends StatelessWidget {
         children: [
           VoicesAssets.icons.library.buildIcon(),
           const SizedBox(height: 32),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _CampaignFundsDetail(
-                title: context.l10n.campaignTreasury,
-                description: context.l10n.campaignTreasuryDescription,
-                funds: allFunds,
-              ),
-              _CampaignFundsDetail(
-                title: context.l10n.campaignTotalAsk,
-                description: context.l10n.campaignTotalAskDescription,
-                funds: totalAsk,
-                largeFundsText: false,
-              ),
-              _RangeAsk(range: askRange),
-            ],
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                _CampaignFundsDetail(
+                  title: context.l10n.campaignTreasury,
+                  description: context.l10n.campaignTreasuryDescription,
+                  funds: allFunds,
+                ),
+                _CampaignFundsDetail(
+                  title: context.l10n.campaignTotalAsk,
+                  description: context.l10n.campaignTotalAskDescription,
+                  funds: totalAsk,
+                  largeFundsText: false,
+                ),
+                _RangeAsk(range: askRange),
+              ],
+            ),
           ),
         ],
       ),
