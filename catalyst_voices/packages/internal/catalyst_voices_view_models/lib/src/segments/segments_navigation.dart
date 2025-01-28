@@ -13,12 +13,12 @@ abstract interface class Segment implements SegmentsListViewItem {
 
   SvgGenImage get icon;
 
-  List<Section2> get sections;
+  List<Section> get sections;
 
   String resolveTitle(BuildContext context);
 }
 
-abstract interface class Section2 implements SegmentsListViewItem {
+abstract interface class Section implements SegmentsListViewItem {
   @override
   NodeId get id;
 
@@ -29,7 +29,7 @@ abstract interface class Section2 implements SegmentsListViewItem {
   String resolveTitle(BuildContext context);
 }
 
-abstract base class BaseSegment<T extends Section2> extends Equatable
+abstract base class BaseSegment<T extends Section> extends Equatable
     implements Segment {
   @override
   final NodeId id;
@@ -49,7 +49,7 @@ abstract base class BaseSegment<T extends Section2> extends Equatable
   List<Object?> get props => [id, sections];
 }
 
-abstract base class BaseSection extends Equatable implements Section2 {
+abstract base class BaseSection extends Equatable implements Section {
   @override
   final NodeId id;
   @override

@@ -230,6 +230,17 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
     required super.order,
   });
 
+  const DocumentGenericObjectSchema.optional({
+    required super.nodeId,
+    super.format,
+    super.title = '',
+    super.description,
+    super.isRequired = false,
+    super.properties = const [],
+    super.oneOf,
+    super.order = const [],
+  });
+
   @override
   DocumentGenericObjectSchema withNodeId(DocumentNodeId nodeId) {
     return DocumentGenericObjectSchema(

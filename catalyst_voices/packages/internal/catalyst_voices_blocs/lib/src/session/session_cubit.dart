@@ -28,10 +28,12 @@ final class SessionCubit extends Cubit<SessionState>
 
   final _logger = Logger('SessionCubit');
 
+  UserSettings? _userSettings;
   Account? _account;
   AdminToolsState _adminToolsState;
   bool _hasWallets = false;
 
+  StreamSubscription<UserSettings>? _userSettingsSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
   StreamSubscription<Account?>? _accountSub;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
@@ -43,7 +45,12 @@ final class SessionCubit extends Cubit<SessionState>
     this._accessControl,
     this._adminTools,
   )   : _adminToolsState = _adminTools.state,
-        super(const VisitorSessionState(isRegistrationInProgress: false)) {
+        super(const SessionState.initial()) {
+    _userSettingsSub = _userService.watchUser
+        .map((user) => user.settings)
+        .distinct()
+        .listen(_handleUserSettings);
+
     _keychainUnlockedSub = _userService.watchAccount
         .transform(AccountToKeychainUnlockTransformer())
         .distinct()
@@ -91,8 +98,27 @@ final class SessionCubit extends Cubit<SessionState>
     await _userService.useAccount(dummyAccount);
   }
 
+  void updateTimezonePreferences(TimezonePreferences value) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings = settings.copyWith(timezone: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
+  void updateTheme(ThemePreferences value) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings = settings.copyWith(theme: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
   @override
   Future<void> close() async {
+    await _userSettingsSub?.cancel();
+    _userSettingsSub = null;
+
     await _keychainUnlockedSub?.cancel();
     _keychainUnlockedSub = null;
 
@@ -112,6 +138,12 @@ final class SessionCubit extends Cubit<SessionState>
     _logger.fine('Active account changed [$account]');
 
     _account = account;
+
+    _updateState();
+  }
+
+  void _handleUserSettings(UserSettings settings) {
+    _userSettings = settings;
 
     _updateState();
   }
@@ -155,19 +187,28 @@ final class SessionCubit extends Cubit<SessionState>
 
   SessionState _createSessionState() {
     final account = _account;
+    final userSettings = _userSettings;
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
     final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
 
+    final sessionSettings = userSettings != null
+        ? SessionSettings.fromUser(userSettings)
+        : const SessionSettings.fallback();
+
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
-      return VisitorSessionState(
+      return SessionState.visitor(
         canCreateAccount: canCreateAccount,
         isRegistrationInProgress: !isEmpty,
+        settings: sessionSettings,
       );
     }
 
     if (!isUnlocked) {
-      return GuestSessionState(canCreateAccount: canCreateAccount);
+      return SessionState.guest(
+        canCreateAccount: canCreateAccount,
+        settings: sessionSettings,
+      );
     }
 
     final sessionAccount = SessionAccount.fromAccount(account);
@@ -175,29 +216,37 @@ final class SessionCubit extends Cubit<SessionState>
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
-    return ActiveAccountSessionState(
+    return SessionState(
+      status: SessionStatus.actor,
       account: sessionAccount,
       spaces: spaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,
+      settings: sessionSettings,
     );
   }
 
   SessionState _createMockedSessionState() {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
-        return ActiveAccountSessionState(
+        return SessionState(
+          status: SessionStatus.actor,
           account: const SessionAccount.mocked(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
           canCreateAccount: true,
+          settings: const SessionSettings.fallback(),
         );
       case SessionStatus.guest:
-        return const GuestSessionState(canCreateAccount: true);
+        return const SessionState.guest(
+          canCreateAccount: true,
+          settings: SessionSettings.fallback(),
+        );
       case SessionStatus.visitor:
-        return const VisitorSessionState(
+        return const SessionState.visitor(
+          settings: SessionSettings.fallback(),
           isRegistrationInProgress: false,
           canCreateAccount: true,
         );

@@ -15,6 +15,9 @@ final class Proposal extends ProposalBase {
     required super.category,
     required super.commentsCount,
     required this.document,
+    required super.version,
+    required super.duration,
+    required super.author,
   });
 
   @override
