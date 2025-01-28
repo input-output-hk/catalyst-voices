@@ -53,7 +53,7 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
 
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {
-    // TODO(dtscalac): object type validation
+    // Object types don't have any validation rules currently.
     return const SuccessfulDocumentValidation();
   }
 
