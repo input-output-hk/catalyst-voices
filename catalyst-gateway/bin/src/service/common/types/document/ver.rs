@@ -79,6 +79,15 @@ impl_string_types!(
     is_valid
 );
 
+impl DocumentVer {
+    /// Creates a new `DocumentVer` instance without validation.
+    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
+    /// valid `DocumentVer`
+    pub(crate) fn new_unchecked(uuid: String) -> Self {
+        Self(uuid)
+    }
+}
+
 impl Example for DocumentVer {
     /// An example.
     fn example() -> Self {
@@ -119,6 +128,12 @@ impl TryFrom<String> for DocumentVer {
 
 impl From<uuidv7::UUIDv7> for DocumentVer {
     fn from(value: uuidv7::UUIDv7) -> Self {
+        Self(value.to_string())
+    }
+}
+
+impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
+    fn from(value: catalyst_signed_doc::UuidV7) -> Self {
         Self(value.to_string())
     }
 }
@@ -250,5 +265,21 @@ pub(crate) struct EqOrRangedVerDocumented(pub(crate) EqOrRangedVer);
 impl Example for EqOrRangedVerDocumented {
     fn example() -> Self {
         Self(EqOrRangedVer::example())
+    }
+}
+
+impl TryFrom<EqOrRangedVerDocumented> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedVerDocumented) -> Result<Self, Self::Error> {
+        match value.0 {
+            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedVer::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
     }
 }

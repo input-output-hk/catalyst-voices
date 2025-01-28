@@ -1,10 +1,13 @@
 //! Catalyst Signed Document Endpoint Response Objects.
 use poem_openapi::{types::Example, NewType, Object};
 
-use self::common::types::document::{
-    doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+use super::SignedDocBody;
+use crate::service::common::{
+    self,
+    types::document::{
+        doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+    },
 };
-use crate::service::common;
 
 /// A single page of documents.
 ///
@@ -164,5 +167,38 @@ pub(crate) struct IndexedDocumentVersionDocumented(pub(crate) IndexedDocumentVer
 impl Example for IndexedDocumentVersionDocumented {
     fn example() -> Self {
         Self(IndexedDocumentVersion::example())
+    }
+}
+
+impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
+    type Error = anyhow::Error;
+
+    fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
+        let mut doc_ref = None;
+        let mut reply = None;
+        let mut template = None;
+        let mut brand = None;
+        let mut campaign = None;
+        let mut category = None;
+        if let Some(json_meta) = doc.metadata() {
+            let meta: catalyst_signed_doc::ExtraFields = serde_json::from_value(json_meta.clone())?;
+            doc_ref = meta.doc_ref().map(Into::into);
+            reply = meta.reply().map(Into::into);
+            template = meta.template().map(Into::into);
+            brand = meta.brand_id().map(Into::into);
+            campaign = meta.campaign_id().map(Into::into);
+            category = meta.campaign_id().map(Into::into);
+        }
+
+        Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
+            ver: DocumentVer::new_unchecked(doc.ver().to_string()),
+            doc_type: DocumentType::new_unchecked(doc.doc_type().to_string()),
+            doc_ref,
+            reply,
+            template,
+            brand,
+            campaign,
+            category,
+        }))
     }
 }

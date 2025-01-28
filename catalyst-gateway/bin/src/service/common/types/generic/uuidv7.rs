@@ -92,3 +92,9 @@ impl TryInto<uuid::Uuid> for UUIDv7 {
         uuid::Uuid::parse_str(&self.0)
     }
 }
+
+impl From<catalyst_signed_doc::UuidV7> for UUIDv7 {
+    fn from(value: catalyst_signed_doc::UuidV7) -> Self {
+        Self(value.to_string())
+    }
+}

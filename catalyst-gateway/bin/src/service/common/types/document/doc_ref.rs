@@ -9,6 +9,7 @@ use super::{
     id::{DocumentId, EqOrRangedIdDocumented},
     ver::{DocumentVer, EqOrRangedVerDocumented},
 };
+use crate::db::event::signed_docs::DocumentRef;
 
 #[derive(Object, Debug, PartialEq)]
 #[oai(example = true)]
@@ -161,6 +162,27 @@ impl Example for IdAndVerRefDocumented {
     }
 }
 
+impl TryFrom<IdAndVerRefDocumented> for DocumentRef {
+    type Error = anyhow::Error;
+
+    fn try_from(value: IdAndVerRefDocumented) -> Result<Self, Self::Error> {
+        match value.0 {
+            IdAndVerRef::IdRefOnly(val) => {
+                Ok(DocumentRef {
+                    id: Some(val.0.id.try_into()?),
+                    ver: None,
+                })
+            },
+            IdAndVerRef::IdAndVerRef(val) => {
+                Ok(DocumentRef {
+                    id: val.0.id.map(TryInto::try_into).transpose()?,
+                    ver: Some(val.0.ver.try_into()?),
+                })
+            },
+        }
+    }
+}
+
 impl IdAndVerRefDocumented {
     /// Returns an example of this type that includes only an `id`
     pub(crate) fn example_id_ref() -> Self {
@@ -190,6 +212,15 @@ impl Example for DocumentReference {
         Self {
             doc_id: DocumentId::example(),
             ver: Some(DocumentVer::example()),
+        }
+    }
+}
+
+impl From<catalyst_signed_doc::DocumentRef> for DocumentReference {
+    fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
+        Self {
+            doc_id: value.id.into(),
+            ver: value.ver.map(Into::into),
         }
     }
 }

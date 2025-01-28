@@ -73,6 +73,15 @@ fn is_valid(uuid: &str) -> bool {
 
 impl_string_types!(DocumentId, "string", FORMAT, Some(SCHEMA.clone()), is_valid);
 
+impl DocumentId {
+    /// Creates a new `DocumentId` instance without validation.
+    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
+    /// valid `DocumentId`
+    pub(crate) fn new_unchecked(uuid: String) -> Self {
+        Self(uuid)
+    }
+}
+
 impl Example for DocumentId {
     /// An example.
     fn example() -> Self {
@@ -113,6 +122,12 @@ impl TryFrom<String> for DocumentId {
 
 impl From<uuidv7::UUIDv7> for DocumentId {
     fn from(value: uuidv7::UUIDv7) -> Self {
+        Self(value.to_string())
+    }
+}
+
+impl From<catalyst_signed_doc::UuidV7> for DocumentId {
+    fn from(value: catalyst_signed_doc::UuidV7) -> Self {
         Self(value.to_string())
     }
 }
@@ -239,5 +254,21 @@ pub(crate) struct EqOrRangedIdDocumented(pub(crate) EqOrRangedId);
 impl Example for EqOrRangedIdDocumented {
     fn example() -> Self {
         Self(EqOrRangedId::example())
+    }
+}
+
+impl TryFrom<EqOrRangedIdDocumented> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedIdDocumented) -> Result<Self, Self::Error> {
+        match value.0 {
+            EqOrRangedId::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedId::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
     }
 }
