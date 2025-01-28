@@ -58,7 +58,7 @@ impl From<result::PrimaryKey> for Params {
             txn_hash: value.0,
             txo: value.1,
             policy_id: value.2,
-            asset_name: value.3
+            asset_name: value.3,
         }
     }
 }

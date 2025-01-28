@@ -1,10 +1,14 @@
 //! Integration tests of the `IndexDB` queries testing on its session.
-//! This is mainly to test whether the defined queries work with the database or not.
+//! This is mainly to test whether the defined purge queries work with the database or
+//! not.
 
 use futures::StreamExt;
 
 use super::*;
-use crate::db::index::queries::purge::*;
+use crate::db::index::{
+    block::*,
+    queries::{purge::*, PreparedQuery},
+};
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
@@ -13,21 +17,43 @@ async fn test_chain_root_for_role0_key() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // insert
+    let data = rbac509::insert_chain_root_for_role0_key::Params::new(&[0], &[0], 0, 0);
+
+    session
+        .execute_batch(PreparedQuery::ChainRootForRole0KeyInsertQuery, vec![data])
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = chain_root_for_role0_key::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
+    let read_row_count = read_rows.len();
 
-    let row_stream = chain_root_for_role0_key::DeleteQuery::execute(&session, vec![])
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(chain_root_for_role0_key::Params::from)
+        .collect();
+    let row_stream = chain_root_for_role0_key::DeleteQuery::execute(&session, delete_params)
         .await
         .unwrap();
 
+    let mut deleted_row_count = 0;
     for row in row_stream {
         drop(row.into_rows_result().unwrap());
+        deleted_row_count += 1;
     }
+
+    println!("{}", read_row_count);
+    println!("{}", deleted_row_count);
+    panic!();
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
