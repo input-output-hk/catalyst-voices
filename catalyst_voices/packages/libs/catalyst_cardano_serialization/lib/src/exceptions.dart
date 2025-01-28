@@ -25,14 +25,32 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
   List<Object?> get props => [maxTxSize, actualTxSize];
 }
 
+/// Exception thrown when the maximum number of inputs is exceeded.
+final class MaximumInputExceededException extends Equatable
+    implements Exception {
+  /// The maximum nr. of allowed inputs.
+  final int maxInputs;
+
+  /// Creates an instance of [MaximumInputExceededException].
+  const MaximumInputExceededException({
+    required this.maxInputs,
+  });
+
+  @override
+  String toString() => 'Maximum input limit exceeded: $maxInputs';
+
+  @override
+  List<Object?> get props => [maxInputs];
+}
+
 /// Exception thrown when the transaction outputs exceed the inputs.
 final class InsufficientUtxoBalanceException extends Equatable
     implements Exception {
-  /// The amount of [Coin] that user has.
-  final Coin actualAmount;
+  /// The amount of [Balance] that user has.
+  final Balance actualAmount;
 
-  /// The amount of [Coin] that user wants to spend.
-  final Coin requiredAmount;
+  /// The amount of [Balance] that user wants to spend.
+  final Balance requiredAmount;
 
   /// The default constructor for [InsufficientUtxoBalanceException].
   const InsufficientUtxoBalanceException({
