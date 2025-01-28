@@ -20,6 +20,10 @@ pub(super) struct Params {
     transaction_id: Vec<u8>,
     /// Chain Root Hash. 32 bytes.
     chain_root: Vec<u8>,
+    /// Slot Number the chain root is in.
+    slot_no: num_bigint::BigInt,
+    /// Transaction Offset inside the block.
+    txn_idx: i16,
 }
 
 impl Debug for Params {
@@ -27,16 +31,22 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("transaction_id", &self.transaction_id)
             .field("chain_root", &self.chain_root)
+            .field("slot_no", &self.slot_no)
+            .field("txn_idx", &self.txn_idx)
             .finish()
     }
 }
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(chain_root: &[u8], transaction_id: &[u8]) -> Self {
+    pub(super) fn new(
+        chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn_idx: i16,
+    ) -> Self {
         Params {
             transaction_id: transaction_id.to_vec(),
             chain_root: chain_root.to_vec(),
+            slot_no: num_bigint::BigInt::from(slot_no),
+            txn_idx,
         }
     }
 

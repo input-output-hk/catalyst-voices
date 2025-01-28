@@ -1,14 +1,14 @@
 //! Cardano API endpoints
+use cardano_blockchain_types::Network;
 use poem_openapi::{
     param::{Path, Query},
     OpenApi,
 };
-use types::DateTime;
 
 use crate::service::{
+    api::cardano::types::DateTime,
     common::{
         auth::none_or_rbac::NoneOrRBAC,
-        objects::cardano::network::Network,
         tags::ApiTags,
         types::{
             cardano::cip19_stake_address::Cip19StakeAddress,

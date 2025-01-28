@@ -1,13 +1,11 @@
 //! Implementation of the GET `/date_time_to_slot_number` endpoint
 
+use cardano_blockchain_types::Network;
 use poem_openapi::{payload::Json, types::Example, ApiResponse};
 
 use super::types::DateTime;
 use crate::service::common::{
-    objects::cardano::{
-        network::Network,
-        slot_info::{Slot, SlotInfo},
-    },
+    objects::cardano::slot_info::{Slot, SlotInfo},
     responses::WithErrorResponses,
 };
 

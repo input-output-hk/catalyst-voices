@@ -1,10 +1,10 @@
 //! Implementation of the GET `/sync_state` endpoint
 
+use cardano_blockchain_types::Network;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::service::common::{
-    objects::cardano::{network::Network, sync_state::SyncState},
-    responses::WithErrorResponses,
+    objects::cardano::sync_state::SyncState, responses::WithErrorResponses,
 };
 
 /// Endpoint responses.

@@ -2,12 +2,16 @@
 
 use std::{fmt::Debug, sync::Arc};
 
+use catalyst_types::{hashes::Blake2b256Hash, uuid::UuidV4};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::index::{
+        block::from_saturating,
+        queries::{PreparedQueries, SizedBatch},
+    },
     settings::cassandra_db::EnvVars,
 };
 
@@ -21,29 +25,29 @@ pub(super) struct Params {
     chain_root: Vec<u8>,
     /// Transaction ID Hash. 32 bytes.
     transaction_id: Vec<u8>,
-    /// Purpose.`UUIDv4`. 16 bytes.
-    purpose: Vec<u8>,
     /// Block Slot Number
     slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
     txn: i16,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
-    prv_txn_id: MaybeUnset<Vec<u8>>,
+    prv_txn_id: MaybeUnset<Blake2b256Hash>,
+    /// Purpose.`UUIDv4`. 16 bytes.
+    purpose: UuidV4,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let prv_txn_id = match self.prv_txn_id {
-            MaybeUnset::Unset => "UNSET",
-            MaybeUnset::Set(ref v) => &hex::encode(v),
+            MaybeUnset::Unset => "UNSET".to_owned(),
+            MaybeUnset::Set(ref v) => format!("{v:?}"),
         };
         f.debug_struct("Params")
             .field("chain_root", &self.chain_root)
             .field("transaction_id", &self.transaction_id)
-            .field("purpose", &self.purpose)
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .field("prv_txn_id", &prv_txn_id)
+            .field("purpose", &self.purpose)
             .finish()
     }
 }
@@ -51,19 +55,20 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn: i16, cip509: &Cip509,
+        chain_root: TransactionHash, transaction_id: TransactionHash, slot_no: u64, txn_idx: usize,
+        cip509: &Cip509,
     ) -> Self {
         Params {
             chain_root: chain_root.to_vec(),
             transaction_id: transaction_id.to_vec(),
-            purpose: cip509.purpose.into(),
+            // TODO: FIXME:
+            purpose: cip509.purpose().unwrap(),
             slot_no: num_bigint::BigInt::from(slot_no),
-            txn,
-            prv_txn_id: if let Some(tx_id) = cip509.prv_tx_id {
-                MaybeUnset::Set(tx_id.to_vec())
-            } else {
-                MaybeUnset::Unset
-            },
+            txn: from_saturating(txn_idx),
+            prv_txn_id: cip509
+                .previous_transaction()
+                .map(MaybeUnset::Set)
+                .unwrap_or(MaybeUnset::Unset),
         }
     }
 

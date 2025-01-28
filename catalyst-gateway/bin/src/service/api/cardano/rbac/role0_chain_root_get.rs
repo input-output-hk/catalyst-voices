@@ -7,7 +7,7 @@ use tracing::error;
 use crate::{
     db::index::{
         queries::rbac::get_role0_chain_root::{
-            GetRole0ChainRootQuery, GetRole0ChainRootQueryParams,
+            Query as GetRole0ChainRootQuery, QueryParams as GetRole0ChainRootQueryParams,
         },
         session::CassandraSession,
     },
@@ -52,9 +52,12 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
         return Responses::BadRequest.into();
     };
 
-    let query_res = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
-        role0_key: decoded_role0_key,
-    })
+    let query_res = GetRole0ChainRootQuery::execute(
+        &session,
+        GetRole0ChainRootQueryParams {
+            role0_kid: decoded_role0_key,
+        },
+    )
     .await;
 
     match query_res {

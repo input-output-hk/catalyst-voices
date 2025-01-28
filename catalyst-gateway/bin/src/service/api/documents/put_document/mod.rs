@@ -46,7 +46,6 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
-#[allow(clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
     match CatalystSignedDocument::decode(&mut Decoder::new(&doc_bytes), &mut ()) {
         Ok(doc) => {

@@ -1,5 +1,6 @@
 //! Cardano Staking API Endpoints.
 
+use cardano_blockchain_types::Network;
 use poem_openapi::{
     param::{Path, Query},
     OpenApi,
@@ -8,7 +9,7 @@ use poem_openapi::{
 use super::types::SlotNumber;
 use crate::service::{
     common::{
-        auth::none_or_rbac::NoneOrRBAC, objects::cardano::network::Network, tags::ApiTags,
+        auth::none_or_rbac::NoneOrRBAC, tags::ApiTags,
         types::cardano::cip19_stake_address::Cip19StakeAddress,
     },
     utilities::middleware::schema_validation::schema_version_validation,

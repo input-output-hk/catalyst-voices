@@ -6,7 +6,7 @@ use futures::StreamExt;
 use super::*;
 use crate::{
     db::index::queries::{
-        rbac::{get_chain_root::*, get_registrations::*, get_role0_chain_root::*},
+        rbac::{get_chain_root, get_registrations::*, get_role0_chain_root},
         registrations::{
             get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*, get_invalid::*,
         },
@@ -42,8 +42,8 @@ async fn test_get_assets_by_stake_addr() {
 async fn test_get_chain_root() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut row_stream = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
-        stake_address: vec![],
+    let mut row_stream = get_chain_root::Query::execute(&session, get_chain_root::QueryParams {
+        transaction_id: vec![],
     })
     .await
     .unwrap();
@@ -112,11 +112,12 @@ async fn test_get_registrations_w_stake_addr() {
 async fn test_get_role0_key_chain_root() {
     let (session, _) = get_shared_session().await.unwrap();
 
-    let mut row_stream = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
-        role0_key: vec![],
-    })
-    .await
-    .unwrap();
+    let mut row_stream =
+        get_role0_chain_root::Query::execute(&session, get_role0_chain_root::QueryParams {
+            role0_kid: vec![],
+        })
+        .await
+        .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         let row = row_res.unwrap();

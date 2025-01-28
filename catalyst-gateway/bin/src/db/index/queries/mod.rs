@@ -13,8 +13,9 @@ use std::{fmt::Debug, sync::Arc};
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use rbac::{
-    get_chain_root::GetChainRootQuery, get_registrations::GetRegistrationsByChainRootQuery,
-    get_role0_chain_root::GetRole0ChainRootQuery,
+    get_chain_root, get_chain_root_from_stake_addr,
+    get_registrations::GetRegistrationsByChainRootQuery,
+    get_role0_chain_root::Query as GetRole0ChainRootQuery,
 };
 use registrations::{
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
@@ -98,6 +99,8 @@ pub(crate) enum PreparedSelectQuery {
     RegistrationsByChainRoot,
     /// Get chain root by role0 key
     ChainRootByRole0Key,
+    /// Get chain root by transaction id
+    ChainRootByTransactionId,
     /// Get all stake and vote keys for snapshot (`stake_pub_key,vote_key`)
     GetAllStakesAndVoteKeys,
 }
@@ -161,6 +164,8 @@ pub(crate) struct PreparedQueries {
     registrations_by_chain_root_query: PreparedStatement,
     /// Get chain root by role0 key
     chain_root_by_role0_key_query: PreparedStatement,
+    /// Get chain root by transaction ID
+    chain_root_by_transaction_id_query: PreparedStatement,
     /// Get all stake and vote keys (`stake_key,vote_key`) for snapshot
     get_all_stakes_and_vote_keys_query: PreparedStatement,
 }
@@ -197,10 +202,12 @@ impl PreparedQueries {
         let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await;
-        let chain_root_by_stake_address = GetChainRootQuery::prepare(session.clone()).await;
+        let chain_root_by_stake_address =
+            get_chain_root_from_stake_addr::Query::prepare(session.clone()).await;
         let registrations_by_chain_root =
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
         let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
+        let chain_root_by_transaction_id = get_chain_root::Query::prepare(session.clone()).await;
         let get_all_stakes_and_vote_keys_query =
             GetAllStakesAndVoteKeysQuery::prepare(session).await;
 
@@ -250,6 +257,7 @@ impl PreparedQueries {
             chain_root_by_stake_address_query: chain_root_by_stake_address?,
             registrations_by_chain_root_query: registrations_by_chain_root?,
             chain_root_by_role0_key_query: chain_root_by_role0_key?,
+            chain_root_by_transaction_id_query: chain_root_by_transaction_id?,
             get_all_stakes_and_vote_keys_query: get_all_stakes_and_vote_keys_query?,
         })
     }
@@ -303,7 +311,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_upsert<P>(
         &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
     ) -> anyhow::Result<()>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match upsert_query {
             PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
         };
@@ -323,7 +333,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
@@ -341,6 +353,9 @@ impl PreparedQueries {
                 &self.registrations_by_chain_root_query
             },
             PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
+            PreparedSelectQuery::ChainRootByTransactionId => {
+                &self.chain_root_by_transaction_id_query
+            },
             PreparedSelectQuery::GetAllStakesAndVoteKeys => {
                 &self.get_all_stakes_and_vote_keys_query
             },
@@ -438,7 +453,9 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
 pub(crate) async fn session_execute_iter<P>(
     session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
 ) -> anyhow::Result<QueryPager>
-where P: SerializeRow {
+where
+    P: SerializeRow,
+{
     session
         .execute_iter(prepared_stmt.clone(), params)
         .await
