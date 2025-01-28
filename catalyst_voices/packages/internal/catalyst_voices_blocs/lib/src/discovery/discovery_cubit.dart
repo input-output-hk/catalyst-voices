@@ -15,6 +15,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   Future<void> getAllData() async {
     await Future.wait([
       getCurrentCampaign(),
+      getCampaignCategories(),
     ]);
   }
 
@@ -31,7 +32,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     );
     if (isClosed) return;
 
-    final currentCampaign = CurrentCampaignInfoViewModel.dummy();
+    final currentCampaign = isSuccess
+        ? CurrentCampaignInfoViewModel.dummy()
+        : const NullCurrentCampaignInfoViewModel();
 
     final error = isSuccess ? null : const LocalizedUnknownException();
 
@@ -39,8 +42,38 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       state.copyWith(
         currentCampaign: DiscoveryCurrentCampaignState(
           currentCampaign: currentCampaign,
-          error: null,
+          error: error,
           isLoading: false,
+        ),
+      ),
+    );
+  }
+
+  Future<void> getCampaignCategories() async {
+    emit(
+      state.copyWith(
+        campaignCategories: const DiscoveryCampaignCategoriesState(),
+      ),
+    );
+
+    final isSuccess = await Future.delayed(
+      const Duration(seconds: 1),
+      () => Random().nextBool(),
+    );
+    if (isClosed) return;
+
+    final categories = isSuccess
+        ? List.filled(6, CampaignCategoryCardViewModel.dummy())
+        : <CampaignCategoryCardViewModel>[];
+
+    final error = isSuccess ? null : const LocalizedUnknownException();
+
+    emit(
+      state.copyWith(
+        campaignCategories: DiscoveryCampaignCategoriesState(
+          isLoading: false,
+          error: error,
+          categories: categories,
         ),
       ),
     );

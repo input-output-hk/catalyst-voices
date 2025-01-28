@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
+import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categories_state_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
-import 'package:catalyst_voices/widgets/cards/campaign_category_card.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
@@ -77,12 +77,7 @@ class _GuestVisitorBody extends StatelessWidget {
               ),
               const HowItWorks(),
               const CurrentCampaignSelector(),
-              _CampaignCategories(
-                List.filled(
-                  6,
-                  CampaignCategoryCardViewModel.dummy(),
-                ),
-              ),
+              const CampaignCategoriesStateSelector(),
               _LatestProposals(
                 proposals: List.filled(
                   7,
@@ -176,38 +171,6 @@ class _CampaignBrief extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class _CampaignCategories extends StatelessWidget {
-  final List<CampaignCategoryCardViewModel> categories;
-
-  const _CampaignCategories(this.categories);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 120),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            context.l10n.campaignCategories,
-            style: context.textTheme.titleLarge,
-          ),
-          const SizedBox(height: 24),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: categories
-                .map((e) => CampaignCategoryCard(category: e))
-                .toList(),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
     );
   }
 }

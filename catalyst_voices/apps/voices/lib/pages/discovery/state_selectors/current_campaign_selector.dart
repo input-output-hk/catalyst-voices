@@ -83,11 +83,16 @@ class CurrentCampaignError extends StatelessWidget {
         final errorMessage = state.error?.message(context);
         return Offstage(
           offstage: !state.show,
-          child: VoicesErrorIndicator(
-            message: errorMessage ?? context.l10n.somethingWentWrong,
-            onRetry: () async {
-              await context.read<DiscoveryCubit>().getCurrentCampaign();
-            },
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: VoicesErrorIndicator(
+                message: errorMessage ?? context.l10n.somethingWentWrong,
+                onRetry: () async {
+                  await context.read<DiscoveryCubit>().getCurrentCampaign();
+                },
+              ),
+            ),
           ),
         );
       },
