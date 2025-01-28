@@ -50,7 +50,7 @@ static PAGE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Page to be returned in the response.
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Page(u64);
 
 impl Default for Page {

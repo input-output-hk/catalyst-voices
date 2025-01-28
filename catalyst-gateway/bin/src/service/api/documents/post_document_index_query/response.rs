@@ -1,4 +1,4 @@
-//! Cip36 Registration Query Endpoint Response
+//! Catalyst Signed Document Endpoint Response Objects.
 use poem_openapi::{types::Example, NewType, Object};
 
 use self::common::types::document::{

@@ -55,6 +55,9 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 1,
   ),
   ProposalBase(
     id: 'f14/1',
@@ -67,6 +70,9 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 2,
   ),
   ProposalBase(
     id: 'f14/2',
@@ -79,5 +85,8 @@ final _proposals = [
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 3,
   ),
 ];

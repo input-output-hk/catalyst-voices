@@ -9,6 +9,7 @@ void main() {
           // Given
           /* cSpell:disable */
           const json = <String, dynamic>{
+            'catalystId': 'cardano/uuid',
             'keychainId': 'uuid',
             'roles': ['voter'],
             'walletInfo': {

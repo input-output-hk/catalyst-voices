@@ -1,30 +1,26 @@
+import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a proposal in pending state on a card.
 class PendingProposalCard extends StatelessWidget {
-  final AssetGenImage image;
   final PendingProposal proposal;
   final bool showStatus;
   final bool showLastUpdate;
-  final bool showComments;
-  final bool showSegments;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const PendingProposalCard({
     super.key,
-    required this.image,
     required this.proposal,
     this.showStatus = true,
     this.showLastUpdate = true,
-    this.showComments = true,
-    this.showSegments = true,
     this.isFavorite = false,
     this.onFavoriteChanged,
   });
@@ -32,8 +28,7 @@ class PendingProposalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 326,
-      clipBehavior: Clip.antiAlias,
+      constraints: const BoxConstraints(maxWidth: 326),
       decoration: BoxDecoration(
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(12),
@@ -41,57 +36,51 @@ class PendingProposalCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Header(
-            image: image,
-            showStatus: showStatus,
-            isFavorite: isFavorite,
-            onFavoriteChanged: onFavoriteChanged,
-          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _FundCategory(
-                  fund: proposal.campaignName,
+                _Topbar(
+                  showStatus: showStatus,
+                  isFavorite: isFavorite,
+                  onFavoriteChanged: onFavoriteChanged,
+                ),
+                _Category(
                   category: proposal.category,
                 ),
                 const SizedBox(height: 4),
                 _Title(text: proposal.title),
-                if (showLastUpdate) ...[
-                  const SizedBox(height: 4),
-                  _LastUpdateDate(dateTime: proposal.lastUpdateDate),
-                ],
-                const SizedBox(height: 24),
-                _FundsAndComments(
+                _Author(author: proposal.author),
+                _FundsAndDuration(
                   funds: proposal.fundsRequested,
-                  commentsCount: proposal.commentsCount,
-                  showComments: showComments,
+                  duration: proposal.duration,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 _Description(text: proposal.description),
+                const SizedBox(height: 24),
+                _ProposalInfo(
+                  proposalStage: proposal.publishStage,
+                  version: proposal.version,
+                  lastUpdate: proposal.lastUpdateDate,
+                  commentsCount: proposal.commentsCount,
+                  showLastUpdate: showLastUpdate,
+                ),
               ],
             ),
           ),
-          if (showSegments)
-            _CompletedSegments(
-              completed: proposal.completedSegments,
-              total: proposal.totalSegments,
-            ),
         ],
       ),
     );
   }
 }
 
-class _Header extends StatelessWidget {
-  final AssetGenImage image;
+class _Topbar extends StatelessWidget {
   final bool showStatus;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
-  const _Header({
-    required this.image,
+  const _Topbar({
     required this.showStatus,
     required this.isFavorite,
     required this.onFavoriteChanged,
@@ -99,74 +88,60 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 168,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: CatalystImage.asset(
-              image.path,
-              fit: BoxFit.cover,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Spacer(),
+        VoicesIconButton.filled(
+          onTap: () {},
+          style: _buttonStyle(context),
+          child: VoicesAssets.icons.share.buildIcon(
+            color: context.colorScheme.primary,
+          ),
+        ),
+        if (onFavoriteChanged != null) ...[
+          const SizedBox(width: 4),
+          VoicesIconButton.filled(
+            onTap: () => onFavoriteChanged?.call(!isFavorite),
+            style: _buttonStyle(context),
+            child: CatalystSvgIcon.asset(
+              isFavorite
+                  ? VoicesAssets.icons.starFilled.path
+                  : VoicesAssets.icons.starOutlined.path,
+              color: context.colorScheme.primary,
             ),
           ),
-          if (onFavoriteChanged != null)
-            Positioned(
-              top: 2,
-              right: 2,
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () => onFavoriteChanged?.call(!isFavorite),
-                icon: CatalystSvgIcon.asset(
-                  isFavorite
-                      ? VoicesAssets.icons.starFilled.path
-                      : VoicesAssets.icons.starOutlined.path,
-                  size: 20,
-                  color: Theme.of(context).colors.iconsOnImage,
-                ),
-              ),
-            ),
-          if (showStatus)
-            Positioned(
-              left: 12,
-              bottom: 12,
-              child: VoicesChip.rectangular(
-                padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-                leading: VoicesAssets.icons.briefcase.buildIcon(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                content: Text(context.l10n.publishedProposal),
-                backgroundColor: Theme.of(context).colors.primary98,
-              ),
-            ),
         ],
+      ],
+    );
+  }
+
+  ButtonStyle _buttonStyle(BuildContext context) {
+    return IconButton.styleFrom(
+      padding: const EdgeInsets.all(10),
+      backgroundColor: context.colors.onSurfacePrimary08,
+      foregroundColor: context.colorScheme.primary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
       ),
+      iconSize: 18,
     );
   }
 }
 
-class _FundCategory extends StatelessWidget {
-  final String fund;
+class _Category extends StatelessWidget {
   final String category;
 
-  const _FundCategory({
-    required this.fund,
+  const _Category({
     required this.category,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        text: '$fund / ',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colors.textDisabled,
-            ),
-        children: [
-          TextSpan(
-            text: category,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
+    return Text(
+      category,
+      style: context.textTheme.labelMedium?.copyWith(
+        color: context.colors.textDisabled,
       ),
     );
   }
@@ -188,31 +163,45 @@ class _Title extends StatelessWidget {
   }
 }
 
-class _LastUpdateDate extends StatelessWidget {
-  final DateTime dateTime;
+class _Author extends StatelessWidget {
+  final String author;
 
-  const _LastUpdateDate({required this.dateTime});
+  const _Author({
+    required this.author,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      context.l10n.lastUpdateDate(
-        DateFormatter.formatRecentDate(context.l10n, dateTime),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          VoicesAvatar(
+            icon: Text(author[0]),
+            backgroundColor: context.colors.primaryContainer,
+            foregroundColor: context.colors.textOnPrimaryWhite,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            author,
+            style: context.textTheme.titleSmall?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
+          ),
+        ],
       ),
-      style: Theme.of(context).textTheme.bodySmall,
     );
   }
 }
 
-class _FundsAndComments extends StatelessWidget {
+class _FundsAndDuration extends StatelessWidget {
   final String funds;
-  final int commentsCount;
-  final bool showComments;
+  final int duration;
 
-  const _FundsAndComments({
+  const _FundsAndDuration({
     required this.funds,
-    required this.commentsCount,
-    required this.showComments,
+    required this.duration,
   });
 
   @override
@@ -226,35 +215,48 @@ class _FundsAndComments extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            children: [
-              Text(
-                funds,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              Text(
-                context.l10n.fundsRequested,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
+          _PropertyValue(
+            title: context.l10n.fundsRequested,
+            formattedValue: funds,
           ),
-          if (showComments)
-            VoicesChip.rectangular(
-              padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-              leading: VoicesAssets.icons.checkCircle.buildIcon(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              content: Text(
-                context.l10n.noOfComments(commentsCount),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              backgroundColor:
-                  Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
-            ),
+          _PropertyValue(
+            title: context.l10n.duration,
+            formattedValue: context.l10n.valueMonths(duration),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _PropertyValue extends StatelessWidget {
+  final String title;
+  final String formattedValue;
+  const _PropertyValue({
+    required this.title,
+    required this.formattedValue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+        Text(
+          formattedValue,
+          style: context.textTheme.titleLarge?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -268,47 +270,93 @@ class _Description extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Theme.of(context).colors.textOnPrimary,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colors.textOnPrimaryLevel0,
           ),
-      maxLines: 4,
+      maxLines: 5,
       overflow: TextOverflow.ellipsis,
     );
   }
 }
 
-class _CompletedSegments extends StatelessWidget {
-  final int completed;
-  final int total;
+class _ProposalInfo extends StatelessWidget {
+  final ProposalPublish proposalStage;
+  final int version;
+  final DateTime lastUpdate;
+  final int commentsCount;
+  final bool showLastUpdate;
 
-  const _CompletedSegments({
-    required this.completed,
-    required this.total,
+  const _ProposalInfo({
+    required this.proposalStage,
+    required this.version,
+    required this.lastUpdate,
+    required this.commentsCount,
+    required this.showLastUpdate,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          VoicesAssets.icons.clipboardCheck.buildIcon(
-            size: 18,
-            color: Theme.of(context).colorScheme.primary,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        VoicesChip.rectangular(
+          backgroundColor: proposalStage.isDraft
+              ? context.colorScheme.secondary
+              : context.colorScheme.primary,
+          content: Text(
+            _localizedProposalStage(
+              proposalStage,
+              context.l10n,
+            ),
+            style: context.textTheme.labelLarge?.copyWith(
+              color: context.colors.onWarning,
+            ),
           ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              context.l10n.noOfSegmentsCompleted(
-                completed,
-                total,
-                (completed / total * 100).round(),
-              ),
+        ),
+        const SizedBox(width: 4),
+        VoicesChip.rectangular(
+          leading: VoicesAssets.icons.documentText.buildIcon(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+          content: Text(
+            version.toString(),
+            style: context.textTheme.labelLarge?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
+          ),
+        ),
+        if (showLastUpdate) ...[
+          const SizedBox(width: 4),
+          Text(
+            DateFormatter.formatShortMonth(
+              context.l10n,
+              lastUpdate,
+            ),
+            style: context.textTheme.labelLarge?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
             ),
           ),
         ],
-      ),
+        const Spacer(),
+        VoicesChip.rectangular(
+          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
+          leading: VoicesAssets.icons.chatAlt2.buildIcon(),
+          content: Text(
+            version.toString(),
+            style: context.textTheme.labelLarge,
+          ),
+        ),
+      ],
     );
+  }
+
+  String _localizedProposalStage(
+    ProposalPublish proposalStage,
+    VoicesLocalizations l10n,
+  ) {
+    return switch (proposalStage) {
+      ProposalPublish.draft => l10n.draft,
+      ProposalPublish.published => l10n.published,
+    };
   }
 }
