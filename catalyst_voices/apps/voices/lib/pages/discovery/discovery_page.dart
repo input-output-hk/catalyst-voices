@@ -119,7 +119,7 @@ class _CampaignBrief extends StatelessWidget {
           children: [
             VoicesFilledButton(
               onTap: () {
-                // TODO(LynxxLynx): implement redirect to current campaign
+                const ProposalsRoute().go(context);
               },
               backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
               foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,

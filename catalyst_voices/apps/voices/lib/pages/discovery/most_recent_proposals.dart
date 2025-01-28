@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
@@ -110,7 +111,7 @@ class _LatestProposalsState extends State<MostRecentProposals>
             child: Text(
               context.l10n.viewAllProposals,
             ),
-            onTap: () {},
+            onTap: () => const ProposalsRoute().go(context),
           ),
           const SizedBox(height: 72),
         ],
