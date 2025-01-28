@@ -205,13 +205,23 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
 
   void _handleRemoveListItemChange(DocumentRemoveListItemChange change) {
     if (change.nodeId == nodeId) {
-      // targets this property
-      _properties.removeWhere((e) => e.nodeId == change.nodeId);
-      _syncChildrenTitles();
-    } else {
-      // targets child property
-      _properties.findTargetFor(change).addChange(change);
+      throw ArgumentError(
+        'The property cannot remove itself from the parent',
+        nodeId.toString(),
+      );
     }
+
+    for (final property in _properties) {
+      if (property.nodeId == change.nodeId) {
+        // found a direct child, this change targeted this property
+        _properties.remove(property);
+        _syncChildrenTitles();
+        return;
+      }
+    }
+
+    // targets child property
+    _properties.findTargetFor(change).addChange(change);
   }
 
   /// Children in a list have titles that are built
