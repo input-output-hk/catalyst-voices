@@ -92,6 +92,7 @@ class _PopupMenu extends StatelessWidget {
         _Links(),
         VoicesDivider.expanded(height: 17),
         _Session(),
+        SizedBox(height: 8),
       ],
     );
   }

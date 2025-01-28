@@ -37,8 +37,11 @@ class MenuSegmentsItemTile<T extends Object> extends StatelessWidget {
             selected: {
               if (selected != null) selected!,
             },
-            onChanged:
-                onChanged != null ? (value) => onChanged(value.single) : null,
+            onChanged: onChanged != null
+                ? (value) {
+                    onChanged(value.single);
+                  }
+                : null,
             multiSelectionEnabled: false,
             emptySelectionAllowed: false,
             showSelectedIcon: false,
