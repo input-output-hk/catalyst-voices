@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/spaces/appbar/session_account_popup_menu.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_popup_menu.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
