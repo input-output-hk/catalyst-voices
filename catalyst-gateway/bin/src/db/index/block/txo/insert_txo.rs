@@ -56,7 +56,7 @@ impl Params {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let txo_insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_TXO_QUERY,
             cfg,
@@ -64,12 +64,8 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = txo_insert_queries {
-            error!(error=%error,"Failed to prepare Insert TXO Asset Query.");
-        };
-
-        txo_insert_queries
+        .await
+        .inspect_err(|error| error!(error=%error,"Failed to prepare Insert TXO Query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_TXO_QUERY}"))
     }
 }

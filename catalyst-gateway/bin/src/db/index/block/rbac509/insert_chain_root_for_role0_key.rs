@@ -52,7 +52,7 @@ impl Params {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_CHAIN_ROOT_FOR_ROLE0_KEY_QUERY,
             cfg,
@@ -60,12 +60,8 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = insert_queries {
-            error!(error=%error,"Failed to prepare Insert Chain Root For Role 0 Key Query.");
-        };
-
-        insert_queries
+        .await
+        .inspect_err(|error| error!(error=%error,"Failed to prepare Insert Chain Root For Role 0 Key Query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_CHAIN_ROOT_FOR_ROLE0_KEY_QUERY}"))
     }
 }

@@ -71,7 +71,7 @@ impl Params {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_RBAC509_QUERY,
             cfg,
@@ -79,12 +79,10 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = insert_queries {
-            error!(error=%error,"Failed to prepare Insert RBAC 509 Registration Query.");
-        };
-
-        insert_queries
+        .await
+        .inspect_err(
+            |error| error!(error=%error,"Failed to prepare Insert RBAC 509 Registration Query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_RBAC509_QUERY}"))
     }
 }

@@ -84,7 +84,7 @@ impl Params {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_CIP36_REGISTRATION_QUERY,
             cfg,
@@ -92,12 +92,10 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = insert_queries {
-            error!(error=%error,"Failed to prepare Insert CIP-36 Registration Query.");
-        };
-
-        insert_queries
+        .await
+        .inspect_err(
+            |error| error!(error=%error,"Failed to prepare Insert CIP-36 Registration Query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_CIP36_REGISTRATION_QUERY}"))
     }
 }
