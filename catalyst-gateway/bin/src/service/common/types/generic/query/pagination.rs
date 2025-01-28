@@ -187,7 +187,7 @@ static LIMIT_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Limit of items to be returned in a page of data.
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub(crate) struct Limit(u64);
 
 impl Default for Limit {
@@ -314,11 +314,11 @@ static REMAINING_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Limit of items to be returned in a page of data.
+/// The remaining number of items to be returned after a page.
 #[derive(Debug, Eq, PartialEq, Hash)]
 pub(crate) struct Remaining(u64);
 
-/// Is the `Page` valid?
+/// Is the `Remaining` valid?
 fn is_valid_remaining(value: u64) -> bool {
     (REMAINING_MINIMUM..=REMAINING_MAXIMUM).contains(&value)
 }
@@ -380,6 +380,17 @@ impl TryFrom<u64> for Remaining {
             "Invalid `remaining` value, must be in range {REMAINING_MINIMUM}..{REMAINING_MAXIMUM}"
         );
         Ok(Self(remaining))
+    }
+}
+
+impl Remaining {
+    /// Calculate remaining from total, page, limit, and the number of items returned.
+    /// remaining = total - (page * limit) - items
+    pub(crate) fn calculate(page: u64, limit: u64, total: u64, items: u64) -> Self {
+        let remaining: u64 = total
+            .saturating_sub(page.saturating_mul(limit))
+            .saturating_sub(items);
+        Self(remaining)
     }
 }
 
