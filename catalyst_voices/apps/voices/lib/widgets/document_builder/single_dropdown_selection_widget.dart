@@ -60,7 +60,7 @@ class _SingleDropdownSelectionWidgetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          widget.schema.title,
+          _title,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
