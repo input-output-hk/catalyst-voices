@@ -65,6 +65,14 @@ jobs:
             command: run
             args: ./catalyst-gateway/tests/schemathesis_tests+nightly-test-fuzzer-api
 
+      - name: Get integration tests report
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
+        if: always()
+        continue-on-error: true
+        with:
+          command: run
+          args: ./catalyst_voices/apps/voices/integration_test+nightly-test-web-all
+
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
         if: always()
