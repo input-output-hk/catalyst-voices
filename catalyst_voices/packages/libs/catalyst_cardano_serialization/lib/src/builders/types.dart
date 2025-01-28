@@ -28,7 +28,7 @@ typedef SelectionResult = (
 abstract class CoinSelectionStrategy {
   /// Apply the coin selection strategy to the UTxOs in the given [assetsGroup].
   ///
-  /// - [assetsGroup]: Maps assets to UTxOs, to be prioritised by the strategy.
+  /// - [assetsGroup]: Maps assets to UTxOs, to be prioritized by the strategy.
   void apply(AssetsGroup assetsGroup);
 }
 

@@ -8,7 +8,7 @@ void main() {
   const config = SelectionUtils.defaultConfig;
   final changeAddress = SelectionUtils.randomAddress();
 
-  group('TransactionBuilder Coin Selection Tests', () {
+  group('$TransactionBuilder Coin Selection Tests', () {
     test('selectInputs should throw an exception if funds are insufficient',
         () {
       const builder = TransactionBuilder(config: config, inputs: {});
@@ -20,7 +20,6 @@ void main() {
     });
 
     group('Property-based tests for coin selection', () {
-      //var i = 0;
       property(
           'Coin selection should maintain accounting properties for '
           'various UTxO and output combinations', () {
@@ -38,7 +37,6 @@ void main() {
               maxOutputs: 10,
             );
 
-            //print('#${i++}: Utxos: $utxoCount, outputs: ${outputs.length}.');
             final builder = TransactionBuilder(
               config: config,
               inputs: utxos,
@@ -50,7 +48,6 @@ void main() {
               anyOf([
                 returnsNormally,
                 throwsA(isA<MaxTxSizeExceededException>()),
-                //isNot(isA<InsufficientUtxoBalanceException>()),
               ]),
             );
           },

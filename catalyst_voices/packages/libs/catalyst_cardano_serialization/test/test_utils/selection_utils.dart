@@ -8,7 +8,7 @@ import 'package:convert/convert.dart';
 /// operations for testing purposes.
 ///
 /// This class is used only in testing and resides under the `./test` folder.
-sealed class SelectionUtils {
+final class SelectionUtils {
   static final _kRandom = Random();
 
   static const String _chars = 'abcdefghijklmnopqrstuvwxyz'
@@ -50,52 +50,50 @@ sealed class SelectionUtils {
   ///
   /// - [isBase]: If `true`, generates a base address. Otherwise, generates an
   ///   enterprise address.
-  /// - [isMainnet]: If `true`, generates a mainnet address. Otherwise,
-  ///   generates a testnet address.
+  /// - [networkId]: Specifies the network for address generation.
   ///
   /// Returns:
   /// - A random [ShelleyAddress].
   static ShelleyAddress randomAddress({
     bool isBase = true,
-    bool isMainnet = false,
+    NetworkId networkId = NetworkId.testnet,
   }) =>
       ShelleyAddress(
         [
-          _getMockAddressHrp(isBase: isBase, isMainnet: isMainnet),
+          _getMockAddressHrp(isBase: isBase, networkId: networkId),
           ...randomBytes(isBase ? 56 : 28),
         ],
       );
 
   static int _getMockAddressHrp({
     bool isBase = true,
-    bool isMainnet = false,
+    NetworkId networkId = NetworkId.testnet,
   }) =>
-      0 | (isBase ? 0x00 : 0x20) | (isMainnet ? 0x01 : 0x00);
+      0 | (isBase ? 0x00 : 0x20) | NetworkId.testnet.id;
 
   /// Generates a list of random Shelley addresses.
   ///
   /// - [count]: The number of addresses to generate.
   /// - [isBase]: If `true`, generates base addresses. Otherwise, generates
   ///   enterprise addresses.
-  /// - [isMainnet]: If `true`, generates mainnet addresses. Otherwise,
-  ///   generates testnet addresses.
+  /// - [networkId]: Specifies the network for address generation.
   ///
   /// Returns:
   /// - A list of random [ShelleyAddress] objects.
   static List<ShelleyAddress> randomAddresses({
     required int count,
     bool isBase = true,
-    bool isMainnet = false,
+    NetworkId networkId = NetworkId.testnet,
   }) =>
       List<ShelleyAddress>.generate(
         count,
-        (_) => randomAddress(isBase: isBase, isMainnet: isMainnet),
+        (_) => randomAddress(isBase: isBase, networkId: networkId),
       );
 
   static List<ShelleyAddress> mockAddresses({
     required int count,
     bool isBase = true,
-    bool isMainnet = false,
+    NetworkId networkId = NetworkId.testnet,
   }) {
     return List<ShelleyAddress>.generate(
       count,
@@ -105,7 +103,7 @@ sealed class SelectionUtils {
         );
 
         final pub = prv.publicKey;
-        final hrp = _getMockAddressHrp(isBase: isBase, isMainnet: isMainnet);
+        final hrp = _getMockAddressHrp(isBase: isBase, networkId: networkId);
 
         final addrBytes = isBase
             ? <int>[...pub.prefix, ...List<int>.filled(28, count)]
@@ -409,7 +407,7 @@ sealed class SelectionUtils {
   ///
   /// Returns:
   /// - A normalized [TransactionOutput].
-  static TransactionOutput normaliseInputForMinAda({
+  static TransactionOutput normalizeInputForMinAda({
     required TransactionUnspentOutput input,
     required TransactionBuilderConfig config,
   }) {

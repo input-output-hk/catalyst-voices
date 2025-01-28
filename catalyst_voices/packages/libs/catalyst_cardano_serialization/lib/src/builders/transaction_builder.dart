@@ -775,7 +775,7 @@ final class TransactionOutputBuilder {
   }) =>
       Coin(
         cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient +
-                    // Switch from 1 lentgh array to 3 length representation in
+                    // Switch from 1 length array to 3 length representation in
                     // CBOR.
                     numOutputs ==
                 255
@@ -841,7 +841,7 @@ final class TransactionOutputBuilder {
   ///   - The value is a positive uint64 (1 to 2^64 - 1).
   ///   - Since this range exceeds Dart's `int` limits on the web, `BigInt`
   ///     should be used.
-  // TODO(ilap): Consider using BigInt for multiassets' values.
+  // TODO(ilap): Consider using BigInt for multiasset's values.
   static bool isOutputValueValid(TransactionOutput output) {
     final balance = output.amount;
     final coin = balance.coin;

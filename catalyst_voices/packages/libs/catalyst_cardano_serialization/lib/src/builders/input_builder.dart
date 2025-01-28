@@ -13,7 +13,7 @@ import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 /// - The calculated transaction fee.
 ///
 final class InputBuilder implements CoinSelector {
-  /// Strategy used to prioritise the available UTxOs.
+  /// Strategy used to prioritize the available UTxOs.
   final CoinSelectionStrategy selectionStrategy;
 
   /// Creates an [InputBuilder] with the given [selectionStrategy].
@@ -53,7 +53,7 @@ final class InputBuilder implements CoinSelector {
     // Group UTXOs by asset ID for coin selection.
     final assetGroups = buildAssetGroups(targetTotal, availableInputs);
 
-    // Apply the coin selection strategy to prioritise UTXOs within each group.
+    // Apply the coin selection strategy to prioritize UTXOs within each group.
     selectionStrategy.apply(assetGroups);
 
     final groupCount = assetGroups.length;
