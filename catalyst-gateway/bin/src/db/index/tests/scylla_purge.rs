@@ -34,7 +34,8 @@ async fn test_chain_root_for_role0_key() {
     while let Some(row_res) = row_stream.next().await {
         read_rows.push(row_res.unwrap());
     }
-    let read_row_count = read_rows.len();
+
+    assert_eq!(read_rows.len(), 1);
 
     // delete
     let delete_params = read_rows
@@ -46,14 +47,24 @@ async fn test_chain_root_for_role0_key() {
         .unwrap();
 
     let mut deleted_row_count = 0;
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    for _ in row_stream {
+        // drop(row.into_rows_result().unwrap());
         deleted_row_count += 1;
     }
 
-    println!("{}", read_row_count);
-    println!("{}", deleted_row_count);
-    panic!();
+    assert_eq!(deleted_row_count, 1);
+    
+    // re-read
+    let mut row_stream = chain_root_for_role0_key::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), 0);
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
