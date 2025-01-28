@@ -1316,7 +1316,7 @@
       }
     }
   },
-  "errorValidationListItemsNotUnique": "The values must be unique",
+  "errorValidationListItemsNotUnique": "The values must be unique.",
   "@errorValidationListItemsNotUnique": {
     "description": "The list items must be unique."
   },

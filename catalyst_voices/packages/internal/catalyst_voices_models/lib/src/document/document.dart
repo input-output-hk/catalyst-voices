@@ -71,8 +71,8 @@ sealed class DocumentProperty extends Equatable implements DocumentNode {
 
   /// Returns the value related to this property.
   ///
-  /// [DocumentListProperty] - returns a list of values (the same type).
-  /// [DocumentObjectProperty] - returns a list of values (different types).
+  /// [DocumentListProperty] - returns a list of values.
+  /// [DocumentObjectProperty] - returns a list of values.
   /// [DocumentValueProperty] - returns a singular value.
   Object? get value;
 
