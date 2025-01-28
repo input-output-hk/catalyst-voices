@@ -151,22 +151,17 @@ final class ProposalBuilderBloc
 
   List<Segment> _mapDocumentToSegments(Document document) {
     return document.segments.map((segment) {
-      final sectionCandidates = <DocumentProperty>[];
-
-      for (final section in segment.sections) {
-        sectionCandidates.addAll(_findSectionsAndSubsections(section));
-      }
-
-      final sections = sectionCandidates.map(
-        (section) {
-          return ProposalBuilderSection(
-            id: section.schema.nodeId,
-            property: section,
-            isEnabled: true,
-            isEditable: true,
-          );
-        },
-      ).toList();
+      final sections = segment.sections
+          .expand(_findSectionsAndSubsections)
+          .map(
+            (section) => ProposalBuilderSection(
+              id: section.schema.nodeId,
+              property: section,
+              isEnabled: true,
+              isEditable: true,
+            ),
+          )
+          .toList();
 
       return ProposalBuilderSegment(
         id: segment.schema.nodeId,

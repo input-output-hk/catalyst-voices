@@ -87,7 +87,7 @@ class _DocumentBuilderSectionTileState
               key: ValueKey(_editedSection.schema.nodeId),
               property: _editedSection,
               isEditMode: _isEditMode,
-              onChanged: _handlePropertyChange,
+              onChanged: _handlePropertyChanges,
             ),
             if (_isEditMode) ...[
               const SizedBox(height: 12),
@@ -122,7 +122,7 @@ class _DocumentBuilderSectionTileState
     });
   }
 
-  void _handlePropertyChange(List<DocumentChange> changes) {
+  void _handlePropertyChanges(List<DocumentChange> changes) {
     setState(() {
       for (final change in changes) {
         _builder.addChange(change);
