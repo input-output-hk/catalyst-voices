@@ -54,7 +54,7 @@ void main() {
       // Then
       final currentAccount = service.account;
 
-      expect(currentAccount?.id, account.id);
+      expect(currentAccount?.catalystId, account.catalystId);
       expect(currentAccount?.isActive, isTrue);
     });
 
@@ -76,9 +76,9 @@ void main() {
         accountStream,
         emitsInOrder([
           isNull,
-          predicate<Account?>((e) => e?.id == accountOne.id),
-          predicate<Account?>((e) => e?.id == accountTwo.id),
-          predicate<Account?>((e) => e?.id == accountOne.id),
+          predicate<Account?>((e) => e?.catalystId == accountOne.catalystId),
+          predicate<Account?>((e) => e?.catalystId == accountTwo.catalystId),
+          predicate<Account?>((e) => e?.catalystId == accountOne.catalystId),
           isNull,
         ]),
       );
@@ -111,7 +111,10 @@ void main() {
       // Then
       final user = await service.getUser();
 
-      expect(user.accounts.map((e) => e.id), accounts.map((e) => e.id));
+      expect(
+        user.accounts.map((e) => e.catalystId),
+        accounts.map((e) => e.catalystId),
+      );
     });
 
     test('use last account restores previously stored', () async {
