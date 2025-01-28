@@ -25,6 +25,9 @@ class VoicesPlainTooltip extends StatelessWidget {
   /// Optional widget that will be shown after [message].
   final Widget? trailing;
 
+  /// Optional constraints for tooltip widget.
+  final BoxConstraints constraints;
+
   /// The widget that triggers tooltip visibility.
   final Widget child;
 
@@ -33,6 +36,7 @@ class VoicesPlainTooltip extends StatelessWidget {
     required this.message,
     this.leading,
     this.trailing,
+    this.constraints = const BoxConstraints(maxWidth: 200),
     required this.child,
   });
 
@@ -49,7 +53,7 @@ class VoicesPlainTooltip extends StatelessWidget {
       richMessage: WidgetSpan(
         child: ConstrainedBox(
           key: const ValueKey('VoicesPlainTooltipContentKey'),
-          constraints: const BoxConstraints(maxWidth: 200),
+          constraints: constraints,
           child: DefaultTextStyle(
             style: textStyle,
             child: AffixDecorator(

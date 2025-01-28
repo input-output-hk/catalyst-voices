@@ -1,5 +1,6 @@
 {
   "@@locale": "en",
+  "local": "Local",
   "emailLabelText": "Email",
   "@emailLabelText": {
     "description": "Text shown in email field"
@@ -1345,6 +1346,27 @@
     "description": "Used in discovery page in how it works section"
   },
   "howItWorksFollowDescription": "Receive regular updates on all the funded ideas, so you can follow along and see how things are progressing.",
+  "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
+  "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
+  "viewCurrentCampaign": "View Current Campaign",
+  "catalystF14": "Catalyst Found 14",
+  "@catalystF14": {
+    "description": "Used in discovery page in hero section"
+  },
+  "currentCampaign": "Current Campaign",
+  "currentCampaignDescription": "Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.",
+  "campaignTreasury": "Campaign Treasury",
+  "campaignTreasuryDescription": "Total budget, including ecosystem incentives",
+  "campaignTotalAsk": "Campaign Total Ask",
+  "campaignTotalAskDescription": "Funds requested by all submitted projects",
+  "maximumAsk": "Maximum Ask",
+  "minimumAsk": "Minimum Ask",
+  "ideaJourney": "Idea Journey",
+  "ideaJourneyDescription": "#### Ideas comes to life in Catalyst through its key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-timeline) Gitbook page.",
+  "ongoing": "Ongoing",
+  "from": "From",
+  "to": "To",
+  "weekOf": "Week of",
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
   "errorDisplayNameValidationOutOfRange": "Invalid length",
   "headsUp": "Heads up",
@@ -1352,5 +1374,20 @@
     "description": "In context for important information below"
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
-  "errorEmailValidationOutOfRange": "Invalid length"
+  "errorEmailValidationOutOfRange": "Invalid length",
+  "categoryDetails": "Category Details",
+  "fundsAvailable": "Funds Available",
+  "duration": "Duration",
+  "valueMonths": "{value} {value, plural, =0{Month} other{Months}}",
+  "@valueMonths": {
+    "description": "Used in proposal card",
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "finalProposal": "Final",
+  "mostRecent": "Most Recent",
+  "viewAllProposals": "View All Proposals"
 }

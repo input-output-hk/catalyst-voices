@@ -36,7 +36,7 @@ class _MultilineTextEntryMarkdownWidgetState
   StreamSubscription<quill.DocChange>? _documentChangeSub;
   quill.Document? _preEditDocument;
 
-  String get _description => widget.schema.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
   int? get _maxLength => widget.schema.strLengthRange?.max;
 
   @override
@@ -80,7 +80,7 @@ class _MultilineTextEntryMarkdownWidgetState
     return VoicesRichText(
       controller: _controller,
       enabled: widget.isEditMode,
-      title: _description,
+      title: _title,
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,

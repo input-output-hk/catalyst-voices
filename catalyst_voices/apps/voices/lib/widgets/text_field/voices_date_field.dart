@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_date_time_text_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
@@ -48,9 +49,10 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   void initState() {
     final initialDate = _effectiveController.value;
     final initialText = _convertDateToText(initialDate);
+    final textValue = TextEditingValueExt.collapsedAtEndOf(initialText);
 
-    _textEditingController = TextEditingController(text: initialText);
-    _textEditingController.addListener(_handleTextChanged);
+    _textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleTextChanged);
 
     _effectiveController.addListener(_handleDateChanged);
 
@@ -75,7 +77,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
       (widget.controller ?? _controller)?.addListener(_handleDateChanged);
 
       final date = _effectiveController.value;
-      _textEditingController.text = _convertDateToText(date);
+      _textEditingController.textWithSelection = _convertDateToText(date);
     }
   }
 
@@ -126,7 +128,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   void _handleDateChanged() {
     final text = _convertDateToText(_effectiveController.value);
     if (_textEditingController.text != text) {
-      _textEditingController.text = text;
+      _textEditingController.textWithSelection = text;
     }
   }
 

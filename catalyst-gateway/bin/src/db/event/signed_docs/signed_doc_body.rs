@@ -40,9 +40,19 @@ impl SignedDocBody {
         &self.ver
     }
 
+    /// Returns the document type.
+    pub(crate) fn doc_type(&self) -> &uuid::Uuid {
+        &self.doc_type
+    }
+
     /// Returns the document authors.
     pub(crate) fn authors(&self) -> &Vec<String> {
         &self.authors
+    }
+
+    /// Returns the document metadata.
+    pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
+        self.metadata.as_ref()
     }
 
     /// Returns all signed document fields for the event db queries

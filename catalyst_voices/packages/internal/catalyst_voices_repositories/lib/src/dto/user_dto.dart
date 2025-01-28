@@ -9,16 +9,19 @@ part 'user_dto.g.dart';
 @JsonSerializable()
 final class UserDto {
   final List<AccountDto> accounts;
+  final UserSettingsDto settings;
   final String? activeKeychainId;
 
   UserDto({
     this.accounts = const [],
+    this.settings = const UserSettingsDto(),
     this.activeKeychainId,
   });
 
   UserDto.fromModel(User data)
       : this(
           accounts: data.accounts.map(AccountDto.fromModel).toList(),
+          settings: UserSettingsDto.fromModel(data.settings),
           activeKeychainId: data.activeAccount?.keychain.id,
         );
 
@@ -44,12 +47,46 @@ final class UserDto {
 
     return User(
       accounts: accounts,
+      settings: settings.toModel(),
+    );
+  }
+}
+
+@JsonSerializable()
+final class UserSettingsDto {
+  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final TimezonePreferences? timezone;
+  @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final ThemePreferences? theme;
+
+  const UserSettingsDto({
+    this.timezone,
+    this.theme,
+  });
+
+  UserSettingsDto.fromModel(UserSettings data)
+      : this(
+          timezone: data.timezone,
+          theme: data.theme,
+        );
+
+  factory UserSettingsDto.fromJson(Map<String, dynamic> json) {
+    return _$UserSettingsDtoFromJson(json);
+  }
+
+  Map<String, dynamic> toJson() => _$UserSettingsDtoToJson(this);
+
+  UserSettings toModel() {
+    return UserSettings(
+      timezone: timezone,
+      theme: theme,
     );
   }
 }
 
 @JsonSerializable(createJsonKeys: true)
 final class AccountDto {
+  final String catalystId;
   final String displayName;
   final String email;
   final String keychainId;
@@ -58,6 +95,7 @@ final class AccountDto {
   final bool isProvisional;
 
   AccountDto({
+    required this.catalystId,
     required this.displayName,
     required this.email,
     required this.keychainId,
@@ -68,6 +106,7 @@ final class AccountDto {
 
   AccountDto.fromModel(Account data)
       : this(
+          catalystId: data.catalystId,
           displayName: data.displayName,
           email: data.email,
           keychainId: data.keychain.id,
@@ -109,6 +148,7 @@ final class AccountDto {
     final keychain = await keychainProvider.get(keychainId);
 
     return Account(
+      catalystId: catalystId,
       displayName: displayName,
       email: email,
       keychain: keychain,
