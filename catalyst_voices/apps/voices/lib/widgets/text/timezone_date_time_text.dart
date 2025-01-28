@@ -60,12 +60,14 @@ class TimezoneDateTimeText extends StatelessWidget {
   final DateTime data;
   final TimezoneDateTimeTextFormatter formatter;
   final TextStyle? style;
+  final bool showTimezone;
 
   const TimezoneDateTimeText(
     this.data, {
     super.key,
     required this.formatter,
     this.style,
+    this.showTimezone = true,
   });
 
   @override
@@ -90,8 +92,8 @@ class TimezoneDateTimeText extends StatelessWidget {
     final effectiveStyle = style.merge(baseStyle);
 
     return AffixDecorator(
-      gap: 6,
-      suffix: _TimezoneCard(timezone),
+      gap: showTimezone ? 6 : 0,
+      suffix: showTimezone ? _TimezoneCard(timezone) : null,
       child: Text(
         string,
         style: effectiveStyle,

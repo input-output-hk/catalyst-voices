@@ -1389,5 +1389,16 @@
   },
   "finalProposal": "Final",
   "mostRecent": "Most Recent",
-  "viewAllProposals": "View All Proposals"
+  "viewAllProposals": "View All Proposals",
+  "publishedOn": "Published on {date} at {time}",
+  "@publishedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

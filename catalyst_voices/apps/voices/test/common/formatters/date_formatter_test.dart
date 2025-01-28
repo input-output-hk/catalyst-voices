@@ -20,6 +20,10 @@ class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   String get from => 'From';
   @override
   String get to => 'To';
+  @override
+  String publishedOn(String date, String time) {
+    return 'Published on $date at $time';
+  }
 }
 
 class _FakeMaterialLocalizations extends Fake implements MaterialLocalizations {
@@ -184,6 +188,24 @@ void main() {
       );
 
       expect(result, '');
+    });
+
+    test('should return translation for publishedOn', () {
+      final date = DateTime(2025, 1, 28, 14);
+      const expectedValue = 'Published on 28 January 2025 at 14:00';
+
+      final result = DateFormatter.formatFullDateWithoutDayname(l10n, date);
+
+      expect(result, expectedValue);
+    });
+
+    test('should return formatted day month time string', () {
+      final date = DateTime(2025, 1, 28, 14);
+      const expectedValue = '28 Jan 14:00';
+
+      final result = DateFormatter.formatDayMonthTime(date);
+
+      expect(result, expectedValue);
     });
   });
 }

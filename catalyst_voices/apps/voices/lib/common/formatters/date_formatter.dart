@@ -119,4 +119,18 @@ abstract class DateFormatter {
 
     return '';
   }
+
+  static String formatDayMonthTime(DateTime dateTime) {
+    return DateFormat('d MMM HH:mm').format(dateTime);
+  }
+
+  static String formatFullDateWithoutDayname(
+    VoicesLocalizations l10n,
+    DateTime dateTime,
+  ) {
+    final date = DateFormat('d MMMM yyyy').format(dateTime);
+    final time = DateFormat('HH:mm').format(dateTime);
+
+    return l10n.publishedOn(date, time);
+  }
 }
