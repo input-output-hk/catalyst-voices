@@ -16,6 +16,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     await Future.wait([
       getCurrentCampaign(),
       getCampaignCategories(),
+      getMostRecentProposals(),
     ]);
   }
 
@@ -77,5 +78,38 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
         ),
       ),
     );
+  }
+
+  Future<void> getMostRecentProposals() async {
+    emit(
+      state.copyWith(
+        mostRecentProposals: const DiscoveryMostRecentProposalsState(),
+      ),
+    );
+
+    final isSuccess = await Future.delayed(
+      const Duration(seconds: 1),
+      () => Random().nextBool(),
+    );
+    if (isClosed) return;
+
+    final proposals = isSuccess
+        ? List<PendingProposal>.generate(
+            7,
+            (index) => PendingProposal.dummy(),
+          )
+        : const <PendingProposal>[];
+
+    final error = isSuccess ? null : const LocalizedUnknownException();
+
+    final newState = state.copyWith(
+      mostRecentProposals: DiscoveryMostRecentProposalsState(
+        isLoading: false,
+        error: error,
+        proposals: proposals,
+      ),
+    );
+
+    emit(newState);
   }
 }
