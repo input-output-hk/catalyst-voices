@@ -94,6 +94,47 @@ final class DocumentItemsOutOfRange<T extends num>
   List<Object?> get props => [invalidNodeId, expectedRange, actualItems];
 }
 
+/// The [List]'s items are not unique.
+final class DocumentItemsNotUnique extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+
+  const DocumentItemsNotUnique({
+    required this.invalidNodeId,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId];
+}
+
+/// A value of the property doesn't match against the const value.
+final class DocumentConstValueMismatch extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final Object constValue;
+
+  const DocumentConstValueMismatch({
+    required this.invalidNodeId,
+    required this.constValue,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, constValue];
+}
+
+/// A value of the property doesn't match against the enum values.
+final class DocumentEnumValueMismatch extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final List<Object> enumValues;
+
+  const DocumentEnumValueMismatch({
+    required this.invalidNodeId,
+    required this.enumValues,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, enumValues];
+}
+
+/// A string doesn't match the pattern.
 final class DocumentPatternMismatch extends DocumentValidationResult {
   final RegExp pattern;
   final String? value;

@@ -47,7 +47,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
           sectionBuilder: (context, data) {
             return DocumentBuilderSectionTile(
               key: key,
-              section: data.documentSection,
+              section: data.property,
               onChanged: (value) {
                 final event = SectionChangedEvent(changes: value);
                 context.read<ProposalBuilderBloc>().add(event);

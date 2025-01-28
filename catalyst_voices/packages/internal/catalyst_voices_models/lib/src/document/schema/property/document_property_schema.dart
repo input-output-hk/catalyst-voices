@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:uuid/uuid.dart';
@@ -34,6 +35,12 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   final DocumentPropertyFormat? format;
   final String title;
   final MarkdownData? description;
+  final String? placeholder;
+  final String? guidance;
+
+  /// True if the property should be treated as a standalone
+  /// section rather than a nested property.
+  final bool isSubsection;
 
   /// True if the property must exist and be non-nullable,
   /// false if the property may not exist or be nullable.
@@ -45,6 +52,9 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
     required this.format,
     required this.title,
     required this.description,
+    required this.placeholder,
+    required this.guidance,
+    required this.isSubsection,
     required this.isRequired,
   });
 
@@ -71,6 +81,9 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
         format,
         title,
         description,
+        placeholder,
+        guidance,
+        isSubsection,
         isRequired,
       ];
 }
@@ -78,7 +91,14 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
 /// A schema property that can have a value.
 sealed class DocumentValueSchema<T extends Object>
     extends DocumentPropertySchema {
+  /// The default value this property should have
+  /// if not assigned any custom value.
   final T? defaultValue;
+
+  /// The "const" value for validation. The only allowed value is this one.
+  final T? constValue;
+
+  /// A list of allowed values.
   final List<T>? enumValues;
 
   const DocumentValueSchema({
@@ -87,8 +107,12 @@ sealed class DocumentValueSchema<T extends Object>
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required this.defaultValue,
+    required this.constValue,
     required this.enumValues,
   });
 
@@ -143,5 +167,6 @@ sealed class DocumentValueSchema<T extends Object>
 
   @override
   @mustCallSuper
-  List<Object?> get props => super.props + [defaultValue, enumValues];
+  List<Object?> get props =>
+      super.props + [defaultValue, constValue, enumValues];
 }

@@ -8,7 +8,7 @@ class AgreementConfirmationWidget extends StatefulWidget {
   final DocumentValueProperty<bool> property;
   final DocumentAgreementConfirmationSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const AgreementConfirmationWidget({
     super.key,
@@ -90,12 +90,12 @@ class _DocumentCheckboxBuilderWidgetState
       _currentEditValue = value;
     });
 
-    widget.onChanged(
-      DocumentValueChange(
-        nodeId: _nodeId,
-        value: _currentEditValue,
-      ),
+    final change = DocumentValueChange(
+      nodeId: _nodeId,
+      value: _currentEditValue,
     );
+
+    widget.onChanged([change]);
   }
 
   void _setInitialValues() {

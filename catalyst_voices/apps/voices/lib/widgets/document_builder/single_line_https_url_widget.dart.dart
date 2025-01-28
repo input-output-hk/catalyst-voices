@@ -10,7 +10,7 @@ class SingleLineHttpsUrlWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
   final DocumentStringSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SingleLineHttpsUrlWidget({
     super.key,
@@ -102,7 +102,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
       value: value,
     );
 
-    widget.onChanged(change);
+    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(String? value) {

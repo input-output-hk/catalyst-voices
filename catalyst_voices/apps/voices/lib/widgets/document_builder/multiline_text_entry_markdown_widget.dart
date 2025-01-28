@@ -10,7 +10,7 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 class MultilineTextEntryMarkdownWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
   final DocumentMultiLineTextEntryMarkdownSchema schema;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
   final bool isEditMode;
 
   const MultilineTextEntryMarkdownWidget({
@@ -132,12 +132,11 @@ class _MultilineTextEntryMarkdownWidgetState
   void _notifyChangeListener() {
     final delta = _controller.document.toDelta();
     final markdownData = markdown.decoder.convert(delta);
-    widget.onChanged(
-      DocumentValueChange(
-        nodeId: widget.schema.nodeId,
-        value: markdownData.data,
-      ),
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: markdownData.data,
     );
+    widget.onChanged([change]);
   }
 
   void _toggleEditMode() {

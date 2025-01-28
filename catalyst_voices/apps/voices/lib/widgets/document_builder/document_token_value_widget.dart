@@ -11,7 +11,7 @@ class DocumentTokenValueWidget extends StatefulWidget {
   final DocumentIntegerSchema schema;
   final Currency currency;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const DocumentTokenValueWidget({
     super.key,
@@ -101,7 +101,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       value: value,
     );
 
-    widget.onChanged(change);
+    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(int? value, String text) {

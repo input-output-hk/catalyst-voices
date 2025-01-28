@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class YesNoChoiceWidget extends StatefulWidget {
   final DocumentValueProperty<bool> property;
   final DocumentYesNoChoiceSchema schema;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
   final bool isEditMode;
 
   const YesNoChoiceWidget({
@@ -92,12 +92,11 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   }
 
   void _notifyChangeListener(bool? value) {
-    widget.onChanged(
-      DocumentValueChange(
-        nodeId: widget.schema.nodeId,
-        value: value,
-      ),
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: value,
     );
+    widget.onChanged([change]);
   }
 }
 

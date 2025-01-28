@@ -38,6 +38,9 @@ final class DocumentListSchemaMapper {
     final description = schema.description;
     final descriptionMarkdown =
         description != null ? MarkdownData(description) : null;
+    final placeholder = schema.placeholder;
+    final guidance = schema.guidance;
+    final isSubsection = schema.subsection ?? false;
     final itemsSchema = schema.items!.toModel(
       definitions: definitions,
       nodeId: nodeId,
@@ -47,6 +50,7 @@ final class DocumentListSchemaMapper {
       min: schema.minItems,
       max: schema.maxItems,
     );
+    final uniqueItems = schema.uniqueItems ?? false;
     final definition = _DocumentArrayDefinition.fromDef(schema.definition());
 
     switch (definition) {
@@ -56,9 +60,13 @@ final class DocumentListSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.singleLineTextEntryList:
         return DocumentSingleLineTextEntryListSchema(
@@ -66,9 +74,13 @@ final class DocumentListSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.multiLineTextEntryListMarkdown:
         return DocumentMultiLineTextEntryListMarkdownSchema(
@@ -76,9 +88,13 @@ final class DocumentListSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.singleLineHttpsURLEntryList:
         return DocumentSingleLineHttpsUrlEntryListSchema(
@@ -86,9 +102,13 @@ final class DocumentListSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.nestedQuestionsList:
         return DocumentNestedQuestionsListSchema(
@@ -96,9 +116,13 @@ final class DocumentListSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
       case _DocumentArrayDefinition.unknown:
         return DocumentGenericListSchema(
@@ -106,9 +130,13 @@ final class DocumentListSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
+          uniqueItems: uniqueItems,
         );
     }
   }

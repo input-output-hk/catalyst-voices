@@ -6,12 +6,10 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 /// Encodable as json but to decode with [DocumentDto.fromJsonSchema]
 /// a [DocumentSchema] is needed which explains how to interpret the data.
 final class DocumentDto {
-  final String schemaUrl;
   final DocumentSchema schema;
   final List<DocumentPropertyDto> properties;
 
   const DocumentDto({
-    required this.schemaUrl,
     required this.schema,
     required this.properties,
   });
@@ -21,7 +19,6 @@ final class DocumentDto {
     DocumentSchema schema,
   ) {
     return DocumentDto(
-      schemaUrl: data.schemaUrl,
       schema: schema,
       properties: schema.properties
           .map(
@@ -36,7 +33,6 @@ final class DocumentDto {
 
   factory DocumentDto.fromModel(Document model) {
     return DocumentDto(
-      schemaUrl: model.schemaUrl,
       schema: model.schema,
       properties: model.properties.map(DocumentPropertyDto.fromModel).toList(),
     );
@@ -45,7 +41,6 @@ final class DocumentDto {
   Document toModel() {
     // building a document via builder to sort properties
     return DocumentBuilder(
-      schemaUrl: schemaUrl,
       schema: schema,
       properties: properties
           .map((e) => DocumentPropertyBuilder.fromProperty(e.toModel()))
@@ -55,7 +50,7 @@ final class DocumentDto {
 
   DocumentDataDto toJson() {
     return DocumentDataDto.fromDocument(
-      schemaUrl: schemaUrl,
+      schemaUrl: schema.schemaSelfUrl,
       properties: properties.map((e) => e.toJson()),
     );
   }

@@ -85,7 +85,7 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateListItems(
+  static DocumentValidationResult validateListItemsRange(
     DocumentListSchema schema,
     List<dynamic>? value,
   ) {
@@ -103,12 +103,53 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-  static DocumentValidationResult validateBool(
-    DocumentBooleanSchema schema,
-    // ignore: avoid_positional_boolean_parameters
-    bool? value,
+  static DocumentValidationResult validateListItemsUnique(
+    DocumentListSchema schema,
+    List<dynamic>? value,
   ) {
-    // TODO(dtscalac): validate against "const" or "enumValues" or "oneOf"
+    if (schema.uniqueItems && value != null) {
+      final unique = value.length == value.toSet().length;
+      if (!unique) {
+        return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateConstValue(
+    DocumentValueSchema schema,
+    Object? value,
+  ) {
+    final constValue = schema.constValue;
+    if (constValue != null && value != null) {
+      final isValid = value == constValue;
+      if (!isValid) {
+        return DocumentConstValueMismatch(
+          invalidNodeId: schema.nodeId,
+          constValue: constValue,
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateEnumValues(
+    DocumentValueSchema schema,
+    Object? value,
+  ) {
+    final enumValues = schema.enumValues;
+    if (enumValues != null && value != null) {
+      final isValid = enumValues.contains(value);
+      if (!isValid) {
+        return DocumentEnumValueMismatch(
+          invalidNodeId: schema.nodeId,
+          enumValues: enumValues,
+        );
+      }
+    }
+
     return const SuccessfulDocumentValidation();
   }
 }

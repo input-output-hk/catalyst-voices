@@ -37,6 +37,9 @@ final class DocumentObjectSchemaMapper {
     final description = schema.description;
     final descriptionMarkdown =
         description != null ? MarkdownData(description) : null;
+    final placeholder = schema.placeholder;
+    final guidance = schema.guidance;
+    final isSubsection = schema.subsection ?? false;
     final properties = schema.properties ?? const {};
     final required = schema.required ?? const [];
     final oneOf = schema.oneOf;
@@ -71,6 +74,9 @@ final class DocumentObjectSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
           oneOf: mappedOneOf,
@@ -84,6 +90,9 @@ final class DocumentObjectSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
           oneOf: mappedOneOf,
@@ -95,6 +104,9 @@ final class DocumentObjectSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
           oneOf: mappedOneOf,
@@ -106,6 +118,9 @@ final class DocumentObjectSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
           oneOf: mappedOneOf,
@@ -117,6 +132,9 @@ final class DocumentObjectSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
           oneOf: mappedOneOf,

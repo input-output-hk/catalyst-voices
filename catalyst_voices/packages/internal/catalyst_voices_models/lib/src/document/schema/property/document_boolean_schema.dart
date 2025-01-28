@@ -6,9 +6,13 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
-    required super.enumValues,
     required super.defaultValue,
+    required super.constValue,
+    required super.enumValues,
   }) : super(
           type: DocumentPropertyType.boolean,
         );
@@ -17,7 +21,8 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
   DocumentValidationResult validate(bool? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
-      DocumentValidator.validateBool(this, value),
+      DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 }
@@ -28,8 +33,12 @@ final class DocumentYesNoChoiceSchema extends DocumentBooleanSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
   });
 
@@ -40,8 +49,12 @@ final class DocumentYesNoChoiceSchema extends DocumentBooleanSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
     );
   }
@@ -53,8 +66,12 @@ final class DocumentAgreementConfirmationSchema extends DocumentBooleanSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
   });
 
@@ -65,8 +82,12 @@ final class DocumentAgreementConfirmationSchema extends DocumentBooleanSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
     );
   }
@@ -78,8 +99,12 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
   });
 
@@ -88,8 +113,12 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
     super.format,
     super.title = '',
     super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
     super.isRequired = false,
     super.defaultValue,
+    super.constValue,
     super.enumValues,
   });
 
@@ -100,8 +129,12 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
     );
   }

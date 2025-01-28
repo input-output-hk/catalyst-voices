@@ -24,14 +24,19 @@ final class DocumentPropertySchemaDto {
   final String? description;
   @JsonKey(name: 'default')
   final Object? defaultValue;
+  @JsonKey(name: 'x-placeholder')
+  final String? placeholder;
   @JsonKey(name: 'x-guidance')
   final String? guidance;
   @JsonKey(name: 'x-icon')
   final String? icon;
+  @JsonKey(name: 'x-subsection')
+  final bool? subsection;
   @JsonKey(name: 'const')
   final Object? constValue;
   @JsonKey(name: 'enum')
   final List<Object>? enumValues;
+  final bool? uniqueItems;
   final Map<String, DocumentPropertySchemaDto>? properties;
   final DocumentPropertySchemaDto? items;
   final int? minimum;
@@ -60,10 +65,13 @@ final class DocumentPropertySchemaDto {
     required this.title,
     required this.description,
     required this.defaultValue,
+    required this.placeholder,
     required this.guidance,
     required this.icon,
+    required this.subsection,
     required this.constValue,
     required this.enumValues,
+    required this.uniqueItems,
     required this.properties,
     required this.items,
     required this.minimum,
@@ -86,10 +94,13 @@ final class DocumentPropertySchemaDto {
     this.title,
     this.description,
     this.defaultValue,
+    this.placeholder,
     this.guidance,
     this.icon,
+    this.subsection,
     this.constValue,
     this.enumValues,
+    this.uniqueItems,
     this.properties,
     this.items,
     this.minimum,
@@ -237,10 +248,13 @@ final class DocumentPropertySchemaDto {
       title: title ?? other.title,
       description: description ?? other.description,
       defaultValue: defaultValue ?? other.defaultValue,
+      placeholder: placeholder ?? other.placeholder,
       guidance: guidance ?? other.guidance,
       icon: icon ?? other.icon,
+      subsection: subsection ?? other.subsection,
       constValue: constValue ?? other.constValue,
       enumValues: enumValues ?? other.enumValues,
+      uniqueItems: uniqueItems ?? other.uniqueItems,
       properties: mergedProperties,
       items: mergedItems,
       minimum: minimum ?? other.minimum,
