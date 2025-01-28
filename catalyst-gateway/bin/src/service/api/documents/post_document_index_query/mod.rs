@@ -1,6 +1,6 @@
 //! Document Index Query
 
-use std::future::{self};
+use std::future;
 
 use dashmap::DashMap;
 use futures::TryStreamExt;
