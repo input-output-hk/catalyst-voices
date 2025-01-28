@@ -1,6 +1,6 @@
 //! Document Index Query
 
-use std::future;
+use std::future::{self};
 
 use dashmap::DashMap;
 use futures::TryStreamExt;
@@ -17,7 +17,10 @@ use crate::{
         common::query_limits::QueryLimits,
         signed_docs::{DocsQueryFilter, SignedDocBody},
     },
-    service::common::responses::WithErrorResponses,
+    service::common::{
+        objects::generic::pagination::CurrentPage, responses::WithErrorResponses,
+        types::generic::query::pagination::Remaining,
+    },
 };
 
 pub(crate) mod query_filter;
@@ -52,13 +55,43 @@ pub(crate) async fn endpoint(
         Err(e) => return AllResponses::handle_error(&e),
     };
 
-    match fetch_docs(&conditions, &query_limits).await {
-        Ok(docs) if docs.is_empty() => Responses::NotFound.into(),
+    let (docs, counts) = tokio::join!(
+        fetch_docs(&conditions, &query_limits),
+        SignedDocBody::retrieve_count(&conditions)
+    );
+
+    // Use default if page or limit is None
+    let page = page.unwrap_or_default();
+    let limit = limit.unwrap_or_default();
+
+    let total: u64 = match counts {
+        Ok(total) => {
+            match total.try_into() {
+                Ok(t) => t,
+                Err(e) => {
+                    return AllResponses::handle_error(&e.into());
+                },
+            }
+        },
+        Err(e) => return AllResponses::handle_error(&e),
+    };
+
+    match docs {
         Ok(docs) => {
+            let doc_count: u64 = match docs.len().try_into() {
+                Ok(d) => d,
+                Err(e) => return AllResponses::handle_error(&e.into()),
+            };
+
+            let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
+
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
                 docs: docs.into_iter().map(IndexedDocumentDocumented).collect(),
-                // TODO implement proper `page` field instantiation
-                page: None,
+                page: Some(CurrentPage {
+                    page,
+                    limit,
+                    remaining,
+                }),
             })))
             .into()
         },
