@@ -123,6 +123,8 @@ Future<BootstrapArgs> bootstrap({
       .getAppConfig()
       .onError((error, stackTrace) => const AppConfig());
 
+  await _cleanupOldStorages();
+
   await registerDependencies(config: config);
 
   // Key derivation needs to be initialized before it can be used
@@ -141,6 +143,10 @@ Future<void> _runApp(Widget app) async {
   } else {
     runApp(app);
   }
+}
+
+Future<void> _cleanupOldStorages() async {
+  await SecureUserStorage.clearPreviousVersions();
 }
 
 Widget _defaultBuilder(BootstrapArgs args) {

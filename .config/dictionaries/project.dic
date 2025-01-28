@@ -15,6 +15,7 @@ Arbritrary
 ARCHS
 ARGB
 Arissara
+Arweave
 asat
 asmjs
 asyncio
@@ -102,6 +103,7 @@ Eternl
 EUTXO
 extn
 fetchval
+Filecoin
 fmtchk
 fmtfix
 fontawesome
@@ -133,6 +135,7 @@ Intellij
 interps
 inversed
 iohk
+IPFS
 iphoneos
 iphonesimulator
 jdbc

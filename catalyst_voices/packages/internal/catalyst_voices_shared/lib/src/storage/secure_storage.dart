@@ -4,12 +4,14 @@ import 'package:catalyst_voices_shared/src/storage/storage.dart';
 import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-base class SecureStorage with StorageAsStringMixin implements Storage {
+abstract base class SecureStorage with StorageAsStringMixin implements Storage {
   final String key;
+  final int version;
   final FlutterSecureStorage _secureStorage;
 
-  const SecureStorage({
+  SecureStorage({
     this.key = 'SecureStorage',
+    this.version = 1,
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
   }) : _secureStorage = secureStorage;
 
@@ -40,9 +42,11 @@ base class SecureStorage with StorageAsStringMixin implements Storage {
   }
 
   @override
-  FutureOr<void> clear() async {
+  Future<void> clear() async {
+    final prefix = _buildVersionedPrefix(version);
+
     final all = await _secureStorage.readAll();
-    final vaultKeys = List.of(all.keys).where((e) => e.startsWith(key));
+    final vaultKeys = List.of(all.keys).where((e) => e.startsWith(prefix));
 
     for (final key in vaultKeys) {
       await _secureStorage.delete(key: key);
@@ -50,6 +54,17 @@ base class SecureStorage with StorageAsStringMixin implements Storage {
   }
 
   String _effectiveKey(String value) {
-    return '$key.$value';
+    return _buildVersionedKey(value, version: version);
   }
+
+  String _buildVersionedKey(
+    String value, {
+    required int version,
+  }) {
+    final prefix = _buildVersionedPrefix(version);
+
+    return '$prefix.$value';
+  }
+
+  String _buildVersionedPrefix(int version) => '$key.v$version';
 }

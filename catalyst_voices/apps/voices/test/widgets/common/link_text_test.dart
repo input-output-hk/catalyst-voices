@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/common/link_text.dart';
+import 'package:catalyst_voices/widgets/text/link_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
