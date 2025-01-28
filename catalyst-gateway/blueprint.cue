@@ -76,6 +76,12 @@ project: {
 									key:  "cassandra-persistent-deployment"
 								}
 							}
+							"INTERNAL_API_KEY": {
+								secret: {
+									name: "gateway"
+									key:  "api-key"
+								}
+							}
 							"EVENT_DB_URL": {
 								secret: {
 									name: "db-url"
