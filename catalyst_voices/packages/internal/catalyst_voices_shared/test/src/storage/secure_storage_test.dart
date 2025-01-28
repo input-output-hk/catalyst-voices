@@ -2,6 +2,8 @@ import 'package:catalyst_voices_shared/src/storage/secure_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:test/test.dart';
 
+const _key = 'Testing';
+
 void main() {
   late final FlutterSecureStorage flutterSecureStorage;
   late final SecureStorage secureStorage;
@@ -10,7 +12,10 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
 
     flutterSecureStorage = const FlutterSecureStorage();
-    secureStorage = SecureStorage(secureStorage: flutterSecureStorage);
+    secureStorage = _TestSecureStorage(
+      key: _key,
+      secureStorage: flutterSecureStorage,
+    );
   });
 
   tearDown(() async {
@@ -76,5 +81,12 @@ void main() {
 
     // Then
     expect(values, everyElement(isNull));
+  });
+}
+
+final class _TestSecureStorage extends SecureStorage {
+  _TestSecureStorage({
+    super.key,
+    super.secureStorage,
   });
 }

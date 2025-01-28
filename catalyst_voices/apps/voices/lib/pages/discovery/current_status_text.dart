@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,10 +13,10 @@ class CurrentUserStatusText extends StatelessWidget {
     final theme = Theme.of(context);
     final sessionBloc = context.watch<SessionCubit>();
 
-    final stateDesc = switch (sessionBloc.state) {
-      VisitorSessionState() => 'Visitor / no key',
-      GuestSessionState() => 'Guest / locked',
-      ActiveAccountSessionState() => 'Actor / unlocked',
+    final stateDesc = switch (sessionBloc.state.status) {
+      SessionStatus.visitor => 'Visitor / no key',
+      SessionStatus.guest => 'Guest / locked',
+      SessionStatus.actor => 'Actor / unlocked',
     };
 
     return Text(
