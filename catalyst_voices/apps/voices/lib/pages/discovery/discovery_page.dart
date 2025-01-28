@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/current_campaign.dart';
 import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
@@ -6,6 +8,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_category_card.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -13,9 +16,22 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
-class DiscoveryPage extends StatelessWidget {
+class DiscoveryPage extends StatefulWidget {
   const DiscoveryPage({super.key});
+
+  @override
+  State<DiscoveryPage> createState() => _DiscoveryPageState();
+}
+
+class _DiscoveryPageState extends State<DiscoveryPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    unawaited(context.read<MostRecentCubit>().loadMostRecentProposals());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +78,11 @@ class _GuestVisitorBody extends StatelessWidget {
               ),
               _CampaignCategories(
                 List.filled(
-                  7,
+                  6,
                   CampaignCategoryCardViewModel.dummy(),
                 ),
               ),
-              _LatestProposals(
-                List.filled(
-                  7,
-                  PendingProposal.dummy(),
-                ),
-              ),
+              const _BuildLatestProposals(),
             ],
           ),
         ),
@@ -198,12 +209,51 @@ class _CampaignCategories extends StatelessWidget {
   }
 }
 
+class _BuildLatestProposals extends StatelessWidget {
+  const _BuildLatestProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MostRecentCubit, MostRecentState>(
+      builder: (context, state) {
+        return switch (state) {
+          LoadingMostRecent() => _LatestProposals(
+              proposals: List.filled(
+                7,
+                PendingProposal.dummy(),
+              ),
+              isLoading: true,
+            ),
+          LoadedMostRecent(:final proposals) => Offstage(
+              offstage: proposals.length < 7,
+              child: _LatestProposals(
+                proposals: proposals,
+              ),
+            ),
+          ErrorMostRecent(:final exception) => Center(
+              child: VoicesErrorIndicator(
+                message: exception.message(context),
+                onRetry: () {
+                  unawaited(
+                    context.read<MostRecentCubit>().loadMostRecentProposals(),
+                  );
+                },
+              ),
+            ),
+        };
+      },
+    );
+  }
+}
+
 class _LatestProposals extends StatefulWidget {
   final List<PendingProposal> proposals;
+  final bool isLoading;
 
-  const _LatestProposals(
-    this.proposals,
-  );
+  const _LatestProposals({
+    required this.proposals,
+    this.isLoading = false,
+  });
 
   @override
   State<_LatestProposals> createState() => _LatestProposalsState();
@@ -265,10 +315,13 @@ class _LatestProposalsState extends State<_LatestProposals>
                   itemCount: widget.proposals.length,
                   itemBuilder: (context, index) {
                     final proposal = widget.proposals[index];
-                    return PendingProposalCard(
-                      key: Key('PendingProposalCard_${proposal.id}'),
-                      proposal: proposal,
-                      onFavoriteChanged: (value) {},
+                    return Skeletonizer(
+                      enabled: widget.isLoading,
+                      child: PendingProposalCard(
+                        key: Key('PendingProposalCard_${proposal.id}'),
+                        proposal: proposal,
+                        onFavoriteChanged: (value) {},
+                      ),
                     );
                   },
                   separatorBuilder: (context, index) =>
