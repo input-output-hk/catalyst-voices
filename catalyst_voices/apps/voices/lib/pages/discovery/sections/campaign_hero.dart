@@ -39,7 +39,7 @@ class CampaignHeroSection extends StatelessWidget {
 }
 
 class _CampaignBrief extends StatelessWidget {
-  const _CampaignBrief({super.key});
+  const _CampaignBrief();
 
   @override
   Widget build(BuildContext context) {

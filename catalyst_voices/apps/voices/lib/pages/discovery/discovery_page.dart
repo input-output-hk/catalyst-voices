@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/discovery/sections/campaign_brief.dart';
+import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categories_state_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
