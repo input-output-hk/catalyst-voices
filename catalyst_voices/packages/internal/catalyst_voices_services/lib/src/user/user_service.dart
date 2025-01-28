@@ -96,11 +96,11 @@ final class UserServiceImpl implements UserService {
   Future<void> useAccount(Account account) async {
     var user = await getUser();
 
-    if (!user.hasAccount(id: account.id)) {
+    if (!user.hasAccount(catalystId: account.catalystId)) {
       user = user.addAccount(account);
     }
 
-    user = user.useAccount(id: account.id);
+    user = user.useAccount(catalystId: account.catalystId);
 
     await _updateUser(user);
   }
@@ -109,14 +109,14 @@ final class UserServiceImpl implements UserService {
   Future<void> removeAccount(Account account) async {
     var user = await getUser();
 
-    if (user.hasAccount(id: account.id)) {
-      user = user.removeAccount(id: account.id);
+    if (user.hasAccount(catalystId: account.catalystId)) {
+      user = user.removeAccount(catalystId: account.catalystId);
     }
 
     if (user.activeAccount == null) {
       final firstAccount = user.accounts.firstOrNull;
       if (firstAccount != null) {
-        user = user.useAccount(id: firstAccount.id);
+        user = user.useAccount(catalystId: firstAccount.catalystId);
       }
     }
 
