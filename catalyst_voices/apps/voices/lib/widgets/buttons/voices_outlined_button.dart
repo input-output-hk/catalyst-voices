@@ -16,6 +16,10 @@ class VoicesOutlinedButton extends StatelessWidget {
   /// The widget to be displayed after the button's main content.
   final Widget? trailing;
 
+  final Color? foregroundColor;
+
+  final Color? backgroundColor;
+
   /// The main content of the button.
   final Widget child;
 
@@ -24,12 +28,18 @@ class VoicesOutlinedButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
+    this.foregroundColor,
+    this.backgroundColor,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
+      ),
       onPressed: onTap,
       child: VoicesButtonAffixDecoration(
         leading: leading,

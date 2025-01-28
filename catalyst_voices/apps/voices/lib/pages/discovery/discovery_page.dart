@@ -141,14 +141,14 @@ class _CampaignBrief extends StatelessWidget {
         Text(
           context.l10n.heroSectionTitle,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
+                color: ThemeBuilder.buildTheme().colorScheme.primary,
               ),
         ),
         const SizedBox(height: 32),
         Text(
           context.l10n.projectCatalystDescription,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colors.textOnPrimaryLevel0,
+                color: ThemeBuilder.buildTheme().colors.textOnPrimaryLevel0,
               ),
         ),
         const SizedBox(height: 32),
@@ -158,6 +158,8 @@ class _CampaignBrief extends StatelessWidget {
               onTap: () {
                 // TODO(LynxxLynx): implement redirect to current campaign
               },
+              backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+              foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
               child: Text(context.l10n.viewProposals),
             ),
             const SizedBox(width: 8),
@@ -167,6 +169,7 @@ class _CampaignBrief extends StatelessWidget {
                 onTap: () {
                   // TODO(LynxxLynx): implement redirect to my proposals
                 },
+                foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
                 child: Text(context.l10n.myProposals),
               ),
             ),
@@ -260,7 +263,7 @@ class _LatestProposalsState extends State<_LatestProposals>
           Text(
             context.l10n.mostRecent,
             style: context.textTheme.headlineLarge?.copyWith(
-              color: context.colors.textOnPrimaryWhite,
+              color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
             ),
           ),
           const SizedBox(height: 48),
@@ -303,8 +306,8 @@ class _LatestProposalsState extends State<_LatestProposals>
           ),
           const SizedBox(height: 16),
           VoicesFilledButton(
-            backgroundColor: context.colorScheme.onPrimary,
-            foregroundColor: context.colorScheme.primary,
+            backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+            foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
             child: Text(
               context.l10n.viewAllProposals,
             ),
