@@ -41,8 +41,6 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> {
       initialValue: null,
       onSelected: _handleEvent,
       itemBuilder: (context) => const [_PopupMenuItem()],
-      position: PopupMenuPosition.over,
-      padding: EdgeInsets.zero,
       tooltip: 'Account menu',
       constraints: const BoxConstraints(maxWidth: 320),
       routeSettings: const RouteSettings(name: '/account_menu'),
