@@ -147,8 +147,13 @@ final class RegistrationServiceImpl implements RegistrationService {
     final keychainId = const Uuid().v4();
     final keychain = await _keychainProvider.create(keychainId);
 
+    // TODO(damian-molinski): should extracted from role0.
+    //  See [Account.catalystId]
+    final catalystId = 'cardano/$keychainId';
+
     // Note. with rootKey query backend for account details.
     return Account(
+      catalystId: catalystId,
       displayName: displayName,
       email: email,
       keychain: keychain,
@@ -233,7 +238,12 @@ final class RegistrationServiceImpl implements RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
+      // TODO(damian-molinski): should extracted from role0.
+      //  See [Account.catalystId]
+      final catalystId = 'cardano/$keychainId';
+
       return Account(
+        catalystId: catalystId,
         displayName: displayName,
         email: email,
         keychain: keychain,
@@ -265,7 +275,10 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
 
+    final catalystId = 'cardano/$keychain';
+
     return Account(
+      catalystId: catalystId,
       displayName: 'Dummy',
       email: 'dummy@iohk.com',
       keychain: keychain,
