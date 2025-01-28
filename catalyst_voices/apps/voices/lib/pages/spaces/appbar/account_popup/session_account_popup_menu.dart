@@ -44,6 +44,7 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> {
       tooltip: 'Account menu',
       constraints: const BoxConstraints(maxWidth: 320),
       routeSettings: const RouteSettings(name: '/account_menu'),
+      color: PopupMenuTheme.of(context).color,
       // disable because PopupMenuButton internally always wraps child in
       // InkWell which adds unwanted background over color.
       enabled: false,
@@ -71,6 +72,8 @@ class _PopupMenuItem extends PopupMenuItem<_MenuItemEvent> {
           // disabled because PopupMenuItem always adds InkWell
           // and ripple which we don't want.
           enabled: false,
+          padding: EdgeInsets.zero,
+          value: null,
           child: const _PopupMenu(),
         );
 }
@@ -80,20 +83,27 @@ class _PopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _AccountHeader(),
-        VoicesDivider.expanded(),
-        _Account(),
-        _Settings(),
-        VoicesDivider.expanded(height: 17),
-        _Links(),
-        VoicesDivider.expanded(height: 17),
-        _Session(),
-        SizedBox(height: 8),
-      ],
+    final theme = PopupMenuTheme.of(context);
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        color: theme.color,
+        shape: theme.shape ?? const RoundedRectangleBorder(),
+      ),
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _AccountHeader(),
+          VoicesDivider.expanded(),
+          _Account(),
+          _Settings(),
+          VoicesDivider.expanded(height: 17),
+          _Links(),
+          VoicesDivider.expanded(height: 17),
+          _Session(),
+          SizedBox(height: 8),
+        ],
+      ),
     );
   }
 }
