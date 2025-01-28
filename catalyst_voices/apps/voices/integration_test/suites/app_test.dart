@@ -146,7 +146,7 @@ void main() async {
           await $(SpacesDrawerPage.chooserIcon(space)).longPress();
           await Future<void>.delayed(const Duration(seconds: 1));
           final expectedText = spaceToTooltipText[space];
-         final chooserItem = find.byKey(SpacesDrawerPage.chooserItem(space));
+          final chooserItem = find.byKey(SpacesDrawerPage.chooserItem(space));
           final tooltipElement = find.descendant(
             of: chooserItem,
             matching: find.byKey(SpacesDrawerPage.tooltipElement),
