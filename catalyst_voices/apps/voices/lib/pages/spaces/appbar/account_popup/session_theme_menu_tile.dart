@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -35,7 +36,14 @@ class _SegmentsTile extends StatelessWidget {
       ),
       selected: selected,
       onChanged: (value) {
-        //
+        final themeMode = switch (value) {
+          ThemePreferences.dark => ThemeMode.dark,
+          ThemePreferences.light => ThemeMode.light,
+        };
+
+        AppContent.of(context).updateThemeMode(themeMode);
+
+        context.read<SessionCubit>().updateTheme(value);
       },
     );
   }
