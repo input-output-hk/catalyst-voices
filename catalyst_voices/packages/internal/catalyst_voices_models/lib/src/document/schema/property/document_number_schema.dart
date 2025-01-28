@@ -25,6 +25,7 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateNumberRange(this, value),
       DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 

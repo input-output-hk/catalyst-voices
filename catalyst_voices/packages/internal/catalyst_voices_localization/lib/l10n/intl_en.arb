@@ -1332,6 +1332,15 @@
       }
     }
   },
+  "errorValidationEnumValuesMismatch": "The value must be one of {enumValues}.",
+  "@errorValidationEnumValuesMismatch": {
+    "description": "Validation error when the user entered value does not match the enum values",
+    "placeholders": {
+      "enumValues": {
+        "type": "String"
+      }
+    }
+  },
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"

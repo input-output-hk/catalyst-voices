@@ -25,6 +25,7 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateIntegerRange(this, value),
       DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 

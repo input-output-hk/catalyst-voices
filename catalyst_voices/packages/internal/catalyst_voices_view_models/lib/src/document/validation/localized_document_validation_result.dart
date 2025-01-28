@@ -27,6 +27,8 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       DocumentItemsNotUnique() => const LocalizedDocumentListItemsNotUnique(),
       DocumentConstValueMismatch() =>
         LocalizedDocumentConstValueMismatch(constValue: result.constValue),
+      DocumentEnumValueMismatch() =>
+        LocalizedDocumentEnumValuesMismatch(enumValues: result.enumValues),
       DocumentPatternMismatch() => const LocalizedDocumentPatternMismatch(),
     };
   }
@@ -174,6 +176,23 @@ final class LocalizedDocumentConstValueMismatch
 
   @override
   List<Object?> get props => [constValue];
+}
+
+final class LocalizedDocumentEnumValuesMismatch
+    extends LocalizedDocumentValidationResult {
+  final List<Object> enumValues;
+
+  const LocalizedDocumentEnumValuesMismatch({required this.enumValues});
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationEnumValuesMismatch(
+      enumValues.map((e) => '"$e"').join(', '),
+    );
+  }
+
+  @override
+  List<Object?> get props => [enumValues];
 }
 
 final class LocalizedDocumentPatternMismatch

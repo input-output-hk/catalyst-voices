@@ -134,4 +134,22 @@ final class DocumentValidator {
 
     return const SuccessfulDocumentValidation();
   }
+
+  static DocumentValidationResult validateEnumValues(
+    DocumentValueSchema schema,
+    Object? value,
+  ) {
+    final enumValues = schema.enumValues;
+    if (enumValues != null && value != null) {
+      final isValid = enumValues.contains(value);
+      if (!isValid) {
+        return DocumentEnumValueMismatch(
+          invalidNodeId: schema.nodeId,
+          enumValues: enumValues,
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
 }

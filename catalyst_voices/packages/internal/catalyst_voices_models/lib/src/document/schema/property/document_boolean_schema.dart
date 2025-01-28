@@ -21,6 +21,7 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 }

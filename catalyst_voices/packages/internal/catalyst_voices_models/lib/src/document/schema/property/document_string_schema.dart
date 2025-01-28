@@ -30,6 +30,7 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
       DocumentValidator.validateStringLength(this, value),
       DocumentValidator.validateStringPattern(this, value),
       DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 

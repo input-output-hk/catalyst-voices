@@ -120,6 +120,20 @@ final class DocumentConstValueMismatch extends DocumentValidationResult {
   List<Object?> get props => [invalidNodeId, constValue];
 }
 
+/// A value of the property doesn't match against the enum values.
+final class DocumentEnumValueMismatch extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final List<Object> enumValues;
+
+  const DocumentEnumValueMismatch({
+    required this.invalidNodeId,
+    required this.enumValues,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, enumValues];
+}
+
 /// A string doesn't match the pattern.
 final class DocumentPatternMismatch extends DocumentValidationResult {
   final RegExp pattern;
