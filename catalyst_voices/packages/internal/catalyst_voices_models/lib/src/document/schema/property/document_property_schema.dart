@@ -38,6 +38,10 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   final String? placeholder;
   final String? guidance;
 
+  /// True if the property should be treated as a standalone
+  /// section rather than a nested property.
+  final bool isSubsection;
+
   /// True if the property must exist and be non-nullable,
   /// false if the property may not exist or be nullable.
   final bool isRequired;
@@ -50,6 +54,7 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
     required this.description,
     required this.placeholder,
     required this.guidance,
+    required this.isSubsection,
     required this.isRequired,
   });
 
@@ -78,6 +83,7 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
         description,
         placeholder,
         guidance,
+        isSubsection,
         isRequired,
       ];
 }
@@ -103,6 +109,7 @@ sealed class DocumentValueSchema<T extends Object>
     required super.description,
     required super.placeholder,
     required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required this.defaultValue,
     required this.constValue,

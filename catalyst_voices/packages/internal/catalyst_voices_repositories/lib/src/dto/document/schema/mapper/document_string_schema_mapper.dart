@@ -46,6 +46,7 @@ final class DocumentStringSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final isSubsection = schema.subsection ?? false;
     final defaultValue = schema.defaultValue as String?;
     final constValue = schema.constValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
@@ -65,6 +66,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -81,6 +83,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -97,6 +100,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -113,6 +117,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -129,6 +134,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -145,6 +151,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -161,6 +168,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -177,6 +185,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -193,6 +202,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -209,6 +219,7 @@ final class DocumentStringSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,

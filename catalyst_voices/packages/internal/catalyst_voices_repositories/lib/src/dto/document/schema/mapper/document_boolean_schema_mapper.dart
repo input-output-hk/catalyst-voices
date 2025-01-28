@@ -36,6 +36,7 @@ final class DocumentBooleanSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final isSubsection = schema.subsection ?? false;
     final defaultValue = schema.defaultValue as bool?;
     final constValue = schema.constValue as bool?;
     final enumValues = schema.enumValues?.cast<bool>();
@@ -50,6 +51,7 @@ final class DocumentBooleanSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -63,6 +65,7 @@ final class DocumentBooleanSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,
@@ -76,6 +79,7 @@ final class DocumentBooleanSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
           constValue: constValue,

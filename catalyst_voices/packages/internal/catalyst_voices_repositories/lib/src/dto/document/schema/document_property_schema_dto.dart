@@ -30,6 +30,8 @@ final class DocumentPropertySchemaDto {
   final String? guidance;
   @JsonKey(name: 'x-icon')
   final String? icon;
+  @JsonKey(name: 'x-subsection')
+  final bool? subsection;
   @JsonKey(name: 'const')
   final Object? constValue;
   @JsonKey(name: 'enum')
@@ -66,6 +68,7 @@ final class DocumentPropertySchemaDto {
     required this.placeholder,
     required this.guidance,
     required this.icon,
+    required this.subsection,
     required this.constValue,
     required this.enumValues,
     required this.uniqueItems,
@@ -94,6 +97,7 @@ final class DocumentPropertySchemaDto {
     this.placeholder,
     this.guidance,
     this.icon,
+    this.subsection,
     this.constValue,
     this.enumValues,
     this.uniqueItems,
@@ -247,6 +251,7 @@ final class DocumentPropertySchemaDto {
       placeholder: placeholder ?? other.placeholder,
       guidance: guidance ?? other.guidance,
       icon: icon ?? other.icon,
+      subsection: subsection ?? other.subsection,
       constValue: constValue ?? other.constValue,
       enumValues: enumValues ?? other.enumValues,
       uniqueItems: uniqueItems ?? other.uniqueItems,

@@ -40,6 +40,7 @@ final class DocumentListSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final isSubsection = schema.subsection ?? false;
     final itemsSchema = schema.items!.toModel(
       definitions: definitions,
       nodeId: nodeId,
@@ -61,6 +62,7 @@ final class DocumentListSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -74,6 +76,7 @@ final class DocumentListSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -87,6 +90,7 @@ final class DocumentListSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -100,6 +104,7 @@ final class DocumentListSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -113,6 +118,7 @@ final class DocumentListSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
@@ -126,6 +132,7 @@ final class DocumentListSchemaMapper {
           description: descriptionMarkdown,
           placeholder: placeholder,
           guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
           itemsRange: itemsRange,
