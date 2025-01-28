@@ -36,6 +36,7 @@ class VoicesSlider extends StatelessWidget {
             ),
             overlayColor: Colors.transparent,
             inactiveTickMarkColor: Colors.transparent,
+            activeTickMarkColor: Colors.transparent,
           ),
       child: Slider(
         value: value,

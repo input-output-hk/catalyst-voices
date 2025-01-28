@@ -212,18 +212,21 @@ class _FundsAndDuration extends StatelessWidget {
         color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _PropertyValue(
-            title: context.l10n.fundsRequested,
-            formattedValue: funds,
-          ),
-          _PropertyValue(
-            title: context.l10n.duration,
-            formattedValue: context.l10n.valueMonths(duration),
-          ),
-        ],
+      child: SizedBox(
+        width: double.infinity,
+        child: Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          children: [
+            _PropertyValue(
+              title: context.l10n.fundsRequested,
+              formattedValue: funds,
+            ),
+            _PropertyValue(
+              title: context.l10n.duration,
+              formattedValue: context.l10n.valueMonths(duration),
+            ),
+          ],
+        ),
       ),
     );
   }

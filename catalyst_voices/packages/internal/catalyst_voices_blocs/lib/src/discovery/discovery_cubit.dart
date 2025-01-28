@@ -39,7 +39,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       state.copyWith(
         currentCampaign: DiscoveryCurrentCampaignState(
           currentCampaign: currentCampaign,
-          error: error,
+          error: null,
           isLoading: false,
         ),
       ),

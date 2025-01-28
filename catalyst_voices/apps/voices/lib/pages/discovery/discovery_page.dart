@@ -11,7 +11,9 @@ import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -101,21 +103,24 @@ class _CampaignHeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HeroSection(
-      asset: VoicesAssets.videos.heroDesktop,
-      assetPackageName: 'catalyst_voices_assets',
-      child: Padding(
-        padding: const EdgeInsets.only(
-          left: 120,
-          bottom: 64,
-          top: 32,
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 450,
-          ),
-          child: _CampaignBrief(
-            isProposer: isProposer,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 450),
+      child: HeroSection(
+        asset: VoicesAssets.videos.heroDesktop,
+        assetPackageName: 'catalyst_voices_assets',
+        child: ResponsivePadding(
+          xs: const EdgeInsets.only(left: 40, bottom: 16, top: 8, right: 40),
+          sm: const EdgeInsets.only(left: 80, bottom: 32, top: 18),
+          md: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
+          lg: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
+          other: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 450,
+            ),
+            child: _CampaignBrief(
+              isProposer: isProposer,
+            ),
           ),
         ),
       ),
@@ -142,7 +147,9 @@ class _CampaignBrief extends StatelessWidget {
         const SizedBox(height: 32),
         Text(
           context.l10n.projectCatalystDescription,
-          style: Theme.of(context).textTheme.bodyLarge,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colors.textOnPrimaryLevel0,
+              ),
         ),
         const SizedBox(height: 32),
         Row(
@@ -188,29 +195,14 @@ class _CampaignCategories extends StatelessWidget {
             style: context.textTheme.titleLarge,
           ),
           const SizedBox(height: 24),
-          ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxHeight: 1480,
-            ),
-            child: GridView.builder(
-              scrollDirection: Axis.vertical,
-              physics: const ClampingScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 390,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                mainAxisExtent: 651,
-              ),
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                return CampaignCategoryCard(
-                  key: Key('CampaignCategoryCard${category.id}'),
-                  category: category,
-                );
-              },
-              itemCount: categories.length,
-            ),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: categories
+                .map((e) => CampaignCategoryCard(category: e))
+                .toList(),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );

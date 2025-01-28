@@ -149,26 +149,34 @@ class _CampaignStats extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            _TextStats(
-              text: context.l10n.fundsAvailable,
-              value: availableFunds,
-            ),
-            const Spacer(),
-            SizedBox(
-              height: 48,
-              child: VerticalDivider(
-                thickness: 1,
-                color: context.colors.onSurfacePrimary016,
+        child: SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            children: [
+              _TextStats(
+                text: context.l10n.fundsAvailable,
+                value: availableFunds,
               ),
-            ),
-            const SizedBox(width: 16),
-            _TextStats(
-              text: context.l10n.proposals,
-              value: proposalsCount.toString(),
-            ),
-          ],
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    child: VerticalDivider(
+                      thickness: 1,
+                      color: context.colors.onSurfacePrimary016,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  _TextStats(
+                    text: context.l10n.proposals,
+                    value: proposalsCount.toString(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
