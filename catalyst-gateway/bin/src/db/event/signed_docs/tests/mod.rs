@@ -171,6 +171,12 @@ async fn filter_all(docs: &[FullSignedDoc]) {
     }
 }
 
+async fn filter_count(len: i64) {
+    let filter = DocsQueryFilter::all();
+    let count = SignedDocBody::retrieve_count(&filter).await.unwrap();
+    assert_eq!(len, count);
+}
+
 #[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn queries_test() {
@@ -190,4 +196,5 @@ async fn queries_test() {
 
     filter_by_type(&docs, doc_type).await;
     filter_all(&docs).await;
+    filter_count(docs.len().try_into().unwrap()).await;
 }
