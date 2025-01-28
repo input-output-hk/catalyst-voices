@@ -129,7 +129,6 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerServices() {
-    registerLazySingleton<Storage>(() => const SecureStorage());
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
     registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
     registerLazySingleton<KeychainProvider>(() {

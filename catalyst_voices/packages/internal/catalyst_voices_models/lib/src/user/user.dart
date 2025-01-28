@@ -29,20 +29,24 @@ final class User extends Equatable {
     return accounts.singleWhereOrNull((account) => account.isActive);
   }
 
-  User useAccount({required String id}) {
-    if (this.accounts.none((e) => e.id == id)) {
-      throw ArgumentError('Account[$id] is not on the list');
+  User useAccount({
+    required String catalystId,
+  }) {
+    if (this.accounts.none((e) => e.catalystId == catalystId)) {
+      throw ArgumentError('Account[$catalystId] is not on the list');
     }
 
     final accounts = [...this.accounts]
-        .map((e) => e.copyWith(isActive: e.id == id))
+        .map((e) => e.copyWith(isActive: e.catalystId == catalystId))
         .toList();
 
     return copyWith(accounts: accounts);
   }
 
-  bool hasAccount({required String id}) {
-    return accounts.any((element) => element.id == id);
+  bool hasAccount({
+    required String catalystId,
+  }) {
+    return accounts.any((element) => element.catalystId == catalystId);
   }
 
   User addAccount(Account account) {
@@ -51,9 +55,12 @@ final class User extends Equatable {
     return copyWith(accounts: accounts);
   }
 
-  User removeAccount({required String id}) {
-    final accounts =
-        [...this.accounts].where((element) => element.id != id).toList();
+  User removeAccount({
+    required String catalystId,
+  }) {
+    final accounts = [...this.accounts]
+        .where((element) => element.catalystId != catalystId)
+        .toList();
 
     return copyWith(accounts: accounts);
   }
