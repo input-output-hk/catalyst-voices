@@ -4,6 +4,7 @@ import 'package:catalyst_voices/pages/discovery/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categories_state_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
@@ -45,32 +46,12 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState, bool>(
-      selector: (state) => state.account?.isProposer ?? false,
-      builder: (context, state) {
-        return _GuestVisitorBody(
-          isProposer: state,
-        );
-      },
-    );
-  }
-}
-
-class _GuestVisitorBody extends StatelessWidget {
-  final bool isProposer;
-
-  const _GuestVisitorBody({required this.isProposer});
-
-  @override
-  Widget build(BuildContext context) {
     return SliverMainAxisGroup(
       slivers: [
         SliverList(
           delegate: SliverChildListDelegate(
             [
-              _CampaignHeroSection(
-                isProposer: isProposer,
-              ),
+              const _CampaignHeroSection(),
               const HowItWorks(),
               const CurrentCampaignSelector(),
               const CampaignCategoriesStateSelector(),
@@ -84,8 +65,7 @@ class _GuestVisitorBody extends StatelessWidget {
 }
 
 class _CampaignHeroSection extends StatelessWidget {
-  final bool isProposer;
-  const _CampaignHeroSection({required this.isProposer});
+  const _CampaignHeroSection();
 
   @override
   Widget build(BuildContext context) {
@@ -104,9 +84,7 @@ class _CampaignHeroSection extends StatelessWidget {
             constraints: const BoxConstraints(
               maxWidth: 450,
             ),
-            child: _CampaignBrief(
-              isProposer: isProposer,
-            ),
+            child: const _CampaignBrief(),
           ),
         ),
       ),
@@ -115,8 +93,7 @@ class _CampaignHeroSection extends StatelessWidget {
 }
 
 class _CampaignBrief extends StatelessWidget {
-  final bool isProposer;
-  const _CampaignBrief({required this.isProposer});
+  const _CampaignBrief();
 
   @override
   Widget build(BuildContext context) {
@@ -149,19 +126,33 @@ class _CampaignBrief extends StatelessWidget {
               child: Text(context.l10n.viewProposals),
             ),
             const SizedBox(width: 8),
-            Offstage(
-              offstage: !isProposer,
-              child: VoicesOutlinedButton(
-                onTap: () {
-                  // TODO(LynxxLynx): implement redirect to my proposals
-                },
-                foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
-                child: Text(context.l10n.myProposals),
-              ),
-            ),
+            const _DiscoveryMyProposalsButton(),
           ],
         ),
       ],
+    );
+  }
+}
+
+class _DiscoveryMyProposalsButton extends StatelessWidget {
+  const _DiscoveryMyProposalsButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<SessionCubit, SessionState, bool>(
+      selector: (state) => (state.account?.isProposer ?? false),
+      builder: (context, state) {
+        return Offstage(
+          offstage: !state,
+          child: VoicesOutlinedButton(
+            onTap: () {
+              const WorkspaceRoute().go(context);
+            },
+            foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+            child: Text(context.l10n.myProposals),
+          ),
+        );
+      },
     );
   }
 }
