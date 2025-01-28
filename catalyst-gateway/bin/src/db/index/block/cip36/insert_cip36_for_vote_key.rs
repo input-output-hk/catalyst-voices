@@ -17,7 +17,7 @@ const INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY: &str =
 
 /// Insert CIP-36 Registration Invalid Query Parameters
 #[derive(SerializeRow, Debug)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
@@ -48,7 +48,7 @@ impl Params {
     }
 
     /// Prepare Batch of Insert CIP-36 Registration Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let insert_queries = PreparedQueries::prepare_batch(

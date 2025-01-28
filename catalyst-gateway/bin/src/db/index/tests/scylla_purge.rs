@@ -10,6 +10,33 @@ use crate::db::index::{
     queries::{purge::*, PreparedQuery},
 };
 
+mod helper {
+    use cardano_chain_follower::Metadata::cip36::{Cip36, VotingPubKey};
+    use ed25519_dalek::VerifyingKey;
+
+    pub(super) fn create_dummy_cip39(number: u32) -> (Cip36, VotingPubKey) {
+        let empty_cip36 = Cip36 {
+            cip36: None,
+            voting_keys: vec![],
+            stake_pk: Some(VerifyingKey::from_bytes(&[u8::try_from(number).unwrap(); 32]).unwrap()),
+            payment_addr: vec![],
+            payable: false,
+            raw_nonce: 0,
+            nonce: 0,
+            purpose: 0,
+            signed: false,
+            strict_catalyst: true,
+        };
+
+        let pub_key = VotingPubKey {
+            voting_pk: VerifyingKey::from_bytes(&[u8::try_from(number).unwrap(); 32]).unwrap(),
+            weight: 0,
+        };
+
+        (empty_cip36, pub_key)
+    }
+}
+
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn test_chain_root_for_role0_key() {
@@ -17,13 +44,14 @@ async fn test_chain_root_for_role0_key() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    // insert
+    // data
     let data = vec![
         rbac509::insert_chain_root_for_role0_key::Params::new(&[0], &[0], 0, 0),
         rbac509::insert_chain_root_for_role0_key::Params::new(&[1], &[1], 1, 1),
     ];
     let data_len = data.len();
 
+    // insert
     session
         .execute_batch(PreparedQuery::ChainRootForRole0KeyInsertQuery, data)
         .await
@@ -64,7 +92,7 @@ async fn test_chain_root_for_role0_key() {
         read_rows.push(row_res.unwrap());
     }
 
-    assert_eq!(read_rows.len(), 0);
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -74,21 +102,55 @@ async fn test_chain_root_for_stake_address() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        rbac509::insert_chain_root_for_stake_address::Params::new(&[0], &[0], 0, 0),
+        rbac509::insert_chain_root_for_stake_address::Params::new(&[1], &[1], 1, 1),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::ChainRootForStakeAddressInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = chain_root_for_stake_address::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = chain_root_for_stake_address::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(chain_root_for_stake_address::Params::from)
+        .collect();
+    let row_results = chain_root_for_stake_address::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = chain_root_for_stake_address::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -98,21 +160,55 @@ async fn test_chain_root_for_txn_id() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let data = vec![
+        rbac509::insert_chain_root_for_txn_id::Params::new(&[0], &[0]),
+        rbac509::insert_chain_root_for_txn_id::Params::new(&[1], &[1]),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::ChainRootForTxnIdInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = chain_root_for_txn_id::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = chain_root_for_txn_id::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(chain_root_for_txn_id::Params::from)
+        .collect();
+    let row_results = chain_root_for_txn_id::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = chain_root_for_txn_id::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -122,21 +218,62 @@ async fn test_cip36_registration_for_vote_key() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let dummy0 = helper::create_dummy_cip39(0);
+    let dummy1 = helper::create_dummy_cip39(1);
+
+    let data = vec![
+        cip36::insert_cip36_for_vote_key::Params::new(&dummy0.1, 0, 0, &dummy0.0, false),
+        cip36::insert_cip36_for_vote_key::Params::new(&dummy1.1, 1, 1, &dummy1.0, true),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(
+            PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
+            data,
+        )
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = cip36_registration_for_vote_key::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = cip36_registration_for_vote_key::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(cip36_registration_for_vote_key::Params::from)
+        .collect();
+    let row_results =
+        cip36_registration_for_vote_key::DeleteQuery::execute(&session, delete_params)
+            .await
+            .unwrap()
+            .into_iter()
+            .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = cip36_registration_for_vote_key::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -146,21 +283,58 @@ async fn test_cip36_registration_invalid() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let dummy0 = helper::create_dummy_cip39(0);
+    let dummy1 = helper::create_dummy_cip39(1);
+
+    let data = vec![
+        cip36::insert_cip36_invalid::Params::new(Some(&dummy0.1), 0, 0, &dummy0.0, vec![]),
+        cip36::insert_cip36_invalid::Params::new(Some(&dummy1.1), 1, 1, &dummy1.0, vec![]),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::Cip36RegistrationInsertErrorQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = cip36_registration_invalid::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = cip36_registration_invalid::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(cip36_registration_invalid::Params::from)
+        .collect();
+    let row_results = cip36_registration_invalid::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = cip36_registration_invalid::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -170,21 +344,58 @@ async fn test_cip36_registration() {
         panic!("{SESSION_ERR_MSG}");
     };
 
+    // data
+    let dummy0 = helper::create_dummy_cip39(0);
+    let dummy1 = helper::create_dummy_cip39(1);
+
+    let data = vec![
+        cip36::insert_cip36::Params::new(&dummy0.1, 0, 0, &dummy0.0),
+        cip36::insert_cip36::Params::new(&dummy1.1, 1, 1, &dummy1.0),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
     let mut row_stream = cip36_registration::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
+    let mut read_rows = vec![];
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        read_rows.push(row_res.unwrap());
     }
 
-    let row_stream = cip36_registration::DeleteQuery::execute(&session, vec![])
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(cip36_registration::Params::from)
+        .collect();
+    let row_results = cip36_registration::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = cip36_registration::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
-    for row in row_stream {
-        drop(row.into_rows_result().unwrap());
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
     }
+
+    assert!(read_rows.is_empty());
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
