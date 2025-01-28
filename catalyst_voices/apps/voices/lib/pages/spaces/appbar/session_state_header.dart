@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/account/account_popup.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_popup_menu.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -18,14 +18,9 @@ class SessionStateHeader extends StatelessWidget {
     return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
         return switch (state.status) {
-          SessionStatus.visitor => const _VisitorButton(),
-          SessionStatus.guest => const _GuestButton(),
-          SessionStatus.actor => AccountPopup(
-              key: const Key('AccountPopupButton'),
-              initials: state.account?.initials ?? '',
-              onLockAccountTap: () => _onLockAccount(context),
-              onProfileKeychainTap: () => _onSeeProfile(context),
-            ),
+          SessionStatus.visitor => const SessionAccountPopupMenu(),
+          SessionStatus.guest => const SessionAccountPopupMenu(),
+          SessionStatus.actor => const SessionAccountPopupMenu()
         };
       },
     );

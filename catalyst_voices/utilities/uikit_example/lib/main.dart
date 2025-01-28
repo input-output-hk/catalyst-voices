@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/toggles/voices_theme_mode_switch.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +50,8 @@ class _UIKitExampleAppState extends State<UIKitExampleApp> {
       settings: settings,
       builder: (_) {
         return _ThemeModeSwitcherWrapper(
+          brightness:
+              _themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light,
           onChanged: _onThemeModeChanged,
           child: page,
         );
@@ -65,10 +67,12 @@ class _UIKitExampleAppState extends State<UIKitExampleApp> {
 }
 
 class _ThemeModeSwitcherWrapper extends StatelessWidget {
+  final Brightness brightness;
   final ValueChanged<ThemeMode> onChanged;
   final Widget child;
 
   const _ThemeModeSwitcherWrapper({
+    required this.brightness,
     required this.onChanged,
     required this.child,
   });
@@ -86,8 +90,11 @@ class _ThemeModeSwitcherWrapper extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             child: Align(
               alignment: Alignment.centerRight,
-              child: VoicesThemeModeSwitch(
-                onChanged: onChanged,
+              child: VoicesSwitch(
+                value: brightness == Brightness.dark,
+                onChanged: (value) {
+                  onChanged(value ? ThemeMode.dark : ThemeMode.light);
+                },
               ),
             ),
           ),
