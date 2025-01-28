@@ -1,5 +1,6 @@
 {
   "@@locale": "en",
+  "local": "Local",
   "emailLabelText": "Email",
   "@emailLabelText": {
     "description": "Text shown in email field"
@@ -1395,5 +1396,20 @@
     "description": "In context for important information below"
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
-  "errorEmailValidationOutOfRange": "Invalid length"
+  "errorEmailValidationOutOfRange": "Invalid length",
+  "categoryDetails": "Category Details",
+  "fundsAvailable": "Funds Available",
+  "duration": "Duration",
+  "valueMonths": "{value} {value, plural, =0{Month} other{Months}}",
+  "@valueMonths": {
+    "description": "Used in proposal card",
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "finalProposal": "Final",
+  "mostRecent": "Most Recent",
+  "viewAllProposals": "View All Proposals"
 }

@@ -101,7 +101,7 @@ void main() {
 
       // Then
       expect(userService.account, isNull);
-      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.visitor);
     });
 
     test('when no keychain is found session is in Visitor state', () async {
@@ -118,10 +118,10 @@ void main() {
 
       // Then
       expect(userService.account, isNull);
-      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.visitor);
       expect(
         sessionCubit.state,
-        const VisitorSessionState(
+        const SessionState.visitor(
           isRegistrationInProgress: false,
           canCreateAccount: true,
         ),
@@ -150,10 +150,10 @@ void main() {
 
       // Then
       expect(userService.account, isNull);
-      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.visitor);
       expect(
         sessionCubit.state,
-        const VisitorSessionState(
+        const SessionState.visitor(
           isRegistrationInProgress: true,
           canCreateAccount: true,
         ),
@@ -179,9 +179,9 @@ void main() {
 
       // Then
       expect(userService.account, isNotNull);
-      expect(userService.account?.id, account.id);
-      expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
-      expect(sessionCubit.state, isA<GuestSessionState>());
+
+      expect(userService.account?.keychain.id, account.keychain.id);
+      expect(sessionCubit.state.status, SessionStatus.guest);
     });
 
     test('when keychain is unlocked session is in Active state', () async {
@@ -203,9 +203,7 @@ void main() {
 
       // Then
       expect(userService.account, isNotNull);
-      expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
-      expect(sessionCubit.state, isNot(isA<GuestSessionState>()));
-      expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.actor);
     });
 
     test('when admin tools enabled is in mocked state', () async {
@@ -220,14 +218,14 @@ void main() {
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
-      expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.actor);
     });
 
     group('can create account', () {
       test('is disabled when no cardano wallets are found', () async {
         // Given
         const cardanoWallets = <CardanoWallet>[];
-        const expectedState = VisitorSessionState(
+        const expectedState = SessionState.visitor(
           isRegistrationInProgress: false,
           canCreateAccount: false,
         );
@@ -258,7 +256,7 @@ void main() {
         final cardanoWallets = <CardanoWallet>[
           _MockCardanoWallet(),
         ];
-        const expectedState = VisitorSessionState(
+        const expectedState = SessionState.visitor(
           isRegistrationInProgress: false,
           canCreateAccount: true,
         );

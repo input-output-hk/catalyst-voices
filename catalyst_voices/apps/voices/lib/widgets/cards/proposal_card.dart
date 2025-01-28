@@ -35,12 +35,9 @@ class ProposalCard extends StatelessWidget {
 
     return switch (proposal) {
       PendingProposal() => PendingProposalCard(
-          image: image,
           proposal: proposal,
           showStatus: showStatus,
           showLastUpdate: showLastUpdate,
-          showComments: showComments,
-          showSegments: showSegments,
           isFavorite: isFavorite,
           onFavoriteChanged: onFavoriteChanged,
         ),
