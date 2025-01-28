@@ -47,7 +47,7 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
 
     final updatedProperties = properties.map(
       (e) {
-        final childNodeId = nodeId.child(e.nodeId.lastPath);
+        final childNodeId = nodeId.child(e.id);
         return e.createChildPropertyAt(nodeId: childNodeId);
       },
     ).toList();

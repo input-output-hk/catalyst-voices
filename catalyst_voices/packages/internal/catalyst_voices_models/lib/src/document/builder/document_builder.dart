@@ -205,6 +205,7 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
 
   void _handleRemoveListItemChange(DocumentRemoveListItemChange change) {
     if (change.nodeId == nodeId) {
+      // targets this property
       _properties.removeWhere((e) => e.nodeId == change.nodeId);
       _syncChildrenTitles();
     } else {
@@ -213,12 +214,12 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
     }
   }
 
-  /// Children in list have titles that are built
+  /// Children in a list have titles that are built
   /// from [DocumentListSchema.itemsSchema] title.
   ///
   /// Each child is given a `${itemsSchema.title} ${index + 1}` title.
   ///
-  /// If a middle child get removed we need to resync outdated children.
+  /// If a middle child gets removed we need to resync outdated children.
   void _syncChildrenTitles() {
     for (var i = 0; i < _properties.length; i++) {
       final property = _properties[i];
