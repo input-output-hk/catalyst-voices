@@ -40,7 +40,7 @@ class ListLengthPickerWidget extends StatelessWidget {
               ),
           ],
           enabled: isEditMode,
-          onSelected: _onSelected,
+          onChanged: _onChanged,
           initialValue: currentCount,
           hintText: list.schema.placeholder,
         ),
@@ -48,7 +48,7 @@ class ListLengthPickerWidget extends StatelessWidget {
     );
   }
 
-  void _onSelected(int? newCount) {
+  void _onChanged(int? newCount) {
     final currentCount = list.properties.length;
     if (newCount == null || newCount == currentCount) {
       return;
