@@ -19,7 +19,7 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
   }) : super(
           type: DocumentPropertyType.number,
         );
-        
+
   @override
   DocumentNumberSchema copyWith({DocumentNodeId? nodeId, String? title});
 
