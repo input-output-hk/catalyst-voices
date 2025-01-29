@@ -1,5 +1,5 @@
 //! Catalyst RBAC Security Scheme
-use std::{error::Error, sync::LazyLock, time::Duration};
+use std::{env, error::Error, sync::LazyLock, time::Duration};
 
 use dashmap::DashMap;
 use ed25519_dalek::{VerifyingKey, PUBLIC_KEY_LENGTH};
@@ -109,6 +109,12 @@ async fn checker_api_catalyst_auth(
             error!("Corrupt auth token: {:?}", err);
             Err(AuthTokenError)?
         },
+    };
+
+    // Temporary: Conditional RBAC for testing
+    const RBAC_OFF: &str = "RBAC_OFF";
+    if env::var(RBAC_OFF).is_ok() {
+        return Ok(token);
     };
 
     // Check if the token is young enough.
