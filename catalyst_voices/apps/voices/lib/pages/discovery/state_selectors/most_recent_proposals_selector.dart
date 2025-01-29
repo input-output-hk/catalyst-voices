@@ -17,8 +17,8 @@ class MostRecentProposalsSelector extends StatelessWidget {
     return const Stack(
       children: [
         _MostRecentProposalsLoading(),
-        _MostRecentProposalsData(),
         _MostRecentProposalsError(),
+        _MostRecentProposalsData(),
       ],
     );
   }
@@ -34,17 +34,7 @@ class _MostRecentProposalsLoading extends StatelessWidget {
         return state.mostRecentProposals.isLoading;
       },
       builder: (context, state) {
-        final dummy = List.filled(
-          7,
-          PendingProposal.dummy(),
-        );
-        return Offstage(
-          offstage: !state,
-          child: MostRecentProposals(
-            proposals: dummy,
-            isLoading: true,
-          ),
-        );
+        return const Offstage();
       },
     );
   }
@@ -82,7 +72,7 @@ class _MostRecentProposalsError extends StatelessWidget {
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
-          offstage: !state.show,
+          offstage: state.show,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Center(

@@ -93,8 +93,6 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
 
   bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
 
-  bool get showEmptyState => !isLoading && proposals.isEmpty && error == null;
-
   bool get showError => !isLoading && error != null;
 
   @override

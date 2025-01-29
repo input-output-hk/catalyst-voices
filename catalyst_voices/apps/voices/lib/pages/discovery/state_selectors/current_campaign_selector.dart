@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/current_campaign.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -13,12 +14,55 @@ class CurrentCampaignSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Stack(
+    return const Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CurrentCampaignLoading(),
-        CurrentCampaignData(),
-        CurrentCampaignError(),
+        Padding(
+          padding: EdgeInsets.only(left: 120, top: 64, right: 120),
+          child: _Header(),
+        ),
+        Stack(
+          children: [
+            CurrentCampaignLoading(),
+            CurrentCampaignData(),
+            CurrentCampaignError(),
+          ],
+        ),
       ],
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 568),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            context.l10n.currentCampaign,
+            style: context.textTheme.titleSmall,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            context.l10n.catalystF14,
+            style: context.textTheme.displayMedium?.copyWith(
+              color: context.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.currentCampaignDescription,
+            style: context.textTheme.bodyLarge,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -84,7 +128,7 @@ class CurrentCampaignError extends StatelessWidget {
         return Offstage(
           offstage: !state.show,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(32),
             child: Center(
               child: VoicesErrorIndicator(
                 message: errorMessage ?? context.l10n.somethingWentWrong,

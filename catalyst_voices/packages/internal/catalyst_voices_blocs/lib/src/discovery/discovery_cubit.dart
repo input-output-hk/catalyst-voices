@@ -93,10 +93,12 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     );
     if (isClosed) return;
 
+    // isSuccess = false;
+
     final proposals = isSuccess
-        ? List<PendingProposal>.generate(
+        ? List<PendingProposal>.filled(
             7,
-            (index) => PendingProposal.dummy(),
+            PendingProposal.dummy(),
           )
         : const <PendingProposal>[];
 

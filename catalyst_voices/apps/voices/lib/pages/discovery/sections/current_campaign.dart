@@ -31,8 +31,6 @@ class CurrentCampaign extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const _Header(),
-              const SizedBox(height: 32),
               Skeletonizer(
                 enabled: isLoading,
                 child: _CurrentCampaignDetails(
@@ -49,39 +47,6 @@ class CurrentCampaign extends StatelessWidget {
         const SizedBox(height: 32),
         _CampaignTimeline(mockCampaignTimeline),
       ],
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 568),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            context.l10n.currentCampaign,
-            style: context.textTheme.titleSmall,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            context.l10n.catalystF14,
-            style: context.textTheme.displayMedium?.copyWith(
-              color: context.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            context.l10n.currentCampaignDescription,
-            style: context.textTheme.bodyLarge,
-          ),
-        ],
-      ),
     );
   }
 }
@@ -159,37 +124,34 @@ class _CampaignFundsDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Skeleton.keep(
-            child: Text(
-              title,
-              style: context.textTheme.titleMedium?.copyWith(
-                color: context.colors.textOnPrimaryLevel1,
-              ),
-            ),
-          ),
-          Skeleton.keep(
-            child: Text(
-              description,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: context.colors.sysColorsNeutralN60,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '${const Currency.ada().symbol} $_formattedFunds',
-            style: _foundsTextStyle(context)?.copyWith(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Skeleton.keep(
+          child: Text(
+            title,
+            style: context.textTheme.titleMedium?.copyWith(
               color: context.colors.textOnPrimaryLevel1,
             ),
           ),
-        ],
-      ),
+        ),
+        Skeleton.keep(
+          child: Text(
+            description,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: context.colors.sysColorsNeutralN60,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          '${const Currency.ada().symbol} $_formattedFunds',
+          style: _foundsTextStyle(context)?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+      ],
     );
   }
 
@@ -211,30 +173,28 @@ class _RangeAsk extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              color: context.colors.outlineBorder,
-              width: 1,
-            ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: context.colors.outlineBorder,
+            width: 1,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _RangeValue(
-              title: context.l10n.maximumAsk,
-              value: range.max ?? 0,
-            ),
-            const SizedBox(height: 19),
-            _RangeValue(
-              title: context.l10n.minimumAsk,
-              value: range.min ?? 0,
-            ),
-          ],
-        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _RangeValue(
+            title: context.l10n.maximumAsk,
+            value: range.max ?? 0,
+          ),
+          const SizedBox(height: 19),
+          _RangeValue(
+            title: context.l10n.minimumAsk,
+            value: range.min ?? 0,
+          ),
+        ],
       ),
     );
   }

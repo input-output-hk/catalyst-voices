@@ -17,7 +17,6 @@ class MostRecentProposals extends StatefulWidget {
   const MostRecentProposals({
     super.key,
     required this.proposals,
-    // ignore: unused_element
     this.isLoading = false,
   });
 
