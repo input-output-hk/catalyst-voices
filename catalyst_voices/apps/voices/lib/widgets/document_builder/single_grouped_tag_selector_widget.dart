@@ -203,8 +203,7 @@ class _TagGroupsDropdown extends StatelessWidget {
           .map((e) => DropdownMenuEntry(value: e, label: e.group))
           .toList(),
       initialValue: value,
-      onSelected: onChanged,
-      hintText: hintText,
+      onChanged: onChanged,
     );
   }
 }
