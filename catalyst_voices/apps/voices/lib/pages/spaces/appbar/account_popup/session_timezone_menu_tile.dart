@@ -2,6 +2,7 @@ import 'package:catalyst_voices/common/ext/preferences_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +29,7 @@ class _SegmentsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MenuSegmentsItemTile<TimezonePreferences>(
-      title: Text('Timezone'),
+      title: Text(context.l10n.timezone),
       segments: (
         first: TimezonePreferences.utc.asSegmentButton(context),
         second: TimezonePreferences.local.asSegmentButton(context),

@@ -29,8 +29,8 @@ extension ThemePreferencesExt on ThemePreferences {
 
   String localizedName(BuildContext context) {
     return switch (this) {
-      ThemePreferences.dark => 'Dark',
-      ThemePreferences.light => 'Light',
+      ThemePreferences.dark => context.l10n.themeDark,
+      ThemePreferences.light => context.l10n.themeLight,
     };
   }
 

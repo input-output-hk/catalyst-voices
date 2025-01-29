@@ -3,9 +3,9 @@ import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_accoun
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_display_name.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
-import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 sealed class _MenuItemEvent {
@@ -41,7 +41,7 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> {
       initialValue: null,
       onSelected: _handleEvent,
       itemBuilder: (context) => const [_PopupMenuItem()],
-      tooltip: 'Account menu',
+      tooltip: context.l10n.accountMenuPopupTooltip,
       constraints: const BoxConstraints(maxWidth: 320),
       routeSettings: const RouteSettings(name: '/account_menu'),
       color: PopupMenuTheme.of(context).color,
@@ -126,7 +126,7 @@ class _AccountHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SessionAccountDisplayName(),
-                //TODO(damian-molinski): Use CatalystId widget
+                // TODO(damian-molinski): Use CatalystId widget
               ],
             ),
           ),
@@ -142,13 +142,13 @@ class _Account extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Section(
-      name: 'Account',
+      name: context.l10n.account,
       children: [
         MenuItemTile(
           leading: VoicesAssets.icons.userCircle.buildIcon(),
-          title: Text('Profile & Keychain'),
+          title: Text(context.l10n.profileAndKeychain),
           trailing: VoicesAssets.icons.chevronRight.buildIcon(),
-          onTap: () => const AccountRoute().go(context),
+          onTap: () => Navigator.pop(context, const _OpenAccountDetails()),
         ),
       ],
     );
@@ -161,8 +161,8 @@ class _Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Section(
-      name: 'Settings',
-      children: [
+      name: context.l10n.settings,
+      children: const [
         SessionTimezoneMenuTile(),
         SessionThemeMenuTile(),
       ],
@@ -180,17 +180,17 @@ class _Links extends StatelessWidget {
       children: [
         MenuItemTile(
           leading: VoicesAssets.icons.userGroup.buildIcon(),
-          title: Text('Setup Catalyst roles'),
+          title: Text(context.l10n.setupCatalystRoles),
           onTap: () {},
         ),
         MenuItemTile(
           leading: VoicesAssets.icons.support.buildIcon(),
-          title: Text('Submit support request'),
+          title: Text(context.l10n.submitSupportRequest),
           onTap: () {},
         ),
         MenuItemTile(
           leading: VoicesAssets.icons.academicCap.buildIcon(),
-          title: Text('Catalyst knowledge base'),
+          title: Text(context.l10n.catalystKnowledgeBase),
           onTap: () {},
         ),
       ],
@@ -207,8 +207,8 @@ class _Session extends StatelessWidget {
       children: [
         MenuItemTile(
           leading: VoicesAssets.icons.lockClosed.buildIcon(),
-          title: Text('Lock account'),
-          onTap: () {},
+          title: Text(context.l10n.lockAccount),
+          onTap: () => Navigator.pop(context, const _Lock()),
         ),
       ],
     );
