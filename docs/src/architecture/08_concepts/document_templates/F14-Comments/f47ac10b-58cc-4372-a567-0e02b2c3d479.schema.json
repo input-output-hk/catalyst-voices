@@ -1,0 +1,56 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://cardano.org/schemas/catalyst/comments",
+    "title": "Proposal Comments Schema",
+    "description": "Schema for comments on Catalyst proposals",
+    "definitions": {
+        "uuidField": {
+            "$comment": "NOT UI: A UUID field type",
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "multiLineTextEntry": {
+            "$comment": "UI - Multiline text entry without any markup or rich text capability.",
+            "type": "string",
+            "contentMediaType": "text/plain",
+            "pattern": "^[\\S\\s]*$",
+            "x-note": "Enter multiple lines of plain text. You can use line breaks but no special formatting."
+        }
+    },
+    "type": "object",
+    "required": ["metadata", "comment"],
+    "properties": {
+        "metadata": {
+            "type": "object",
+            "required": ["id", "proposal_id"],
+            "properties": {            
+            "id": {
+                "$ref": "#/definitions/uuidField",
+                "description": "Unique identifier for the comment"
+            },
+            "parent_id": {
+                "$ref": "#/definitions/uuidField",
+                "description": "ID of the parent comment (for replies)"
+            },
+            "proposal_id": {
+                "$ref": "#/definitions/uuidField",
+                "description": "ID of the proposal these comments belong to"
+            }
+        },
+        "comment": {
+            "type": "object",
+            "required": ["content"],
+            "description": "The comments on the proposal",
+            "properties": {
+                "content": {
+                    "$ref": "#/definitions/multiLineTextEntry",
+                    "description": "The comment text content",
+                    "minLength": 1,
+                    "maxLength": 5000
+                }
+            }
+
+        }
+    }
+}
