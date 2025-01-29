@@ -21,6 +21,9 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
         );
 
   @override
+  DocumentNumberSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(double? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
@@ -67,11 +70,14 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
   });
 
   @override
-  DocumentGenericNumberSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericNumberSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentGenericNumberSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
