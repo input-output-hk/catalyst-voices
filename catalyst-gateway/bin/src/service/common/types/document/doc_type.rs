@@ -69,6 +69,15 @@ impl_string_types!(
     is_valid
 );
 
+impl DocumentType {
+    /// Creates a new `DocumentType` instance without validation.
+    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
+    /// valid `DocumentType`
+    pub(crate) fn new_unchecked(uuid: String) -> Self {
+        Self(uuid)
+    }
+}
+
 impl Example for DocumentType {
     /// An example.
     fn example() -> Self {
