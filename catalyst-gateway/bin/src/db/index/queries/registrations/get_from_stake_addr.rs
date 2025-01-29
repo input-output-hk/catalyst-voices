@@ -63,7 +63,7 @@ impl GetRegistrationQuery {
             true,
         )
         .await
-        .inspect_err(|error| error!(error=%error, "Failed to prepare get registration query."))
+        .inspect_err(|error| error!(error=%error, "Failed to prepare get registration from stake address query."))
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY}"))
     }
 

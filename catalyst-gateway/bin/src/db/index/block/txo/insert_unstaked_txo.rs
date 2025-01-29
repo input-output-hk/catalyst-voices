@@ -58,7 +58,7 @@ impl Params {
             false,
         )
         .await
-        .inspect_err(|error| error!(error=%error,"Failed to prepare Insert TXO Asset Query."))
+        .inspect_err(|error| error!(error=%error,"Failed to prepare Unstaked Insert TXO Query."))
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_UNSTAKED_TXO_QUERY}"))
     }
 }
