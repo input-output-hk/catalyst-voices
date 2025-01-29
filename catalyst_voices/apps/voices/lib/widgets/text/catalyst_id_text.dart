@@ -206,7 +206,11 @@ class _Chip extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-          child: Text(data),
+          child: Text(
+            data,
+            maxLines: 2,
+            overflow: TextOverflow.clip,
+          ),
         ),
       ),
     );

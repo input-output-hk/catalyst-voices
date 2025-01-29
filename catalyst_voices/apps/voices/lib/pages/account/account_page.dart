@@ -34,48 +34,45 @@ class _AccountPageState extends State<AccountPage> {
         children: [
           AccountStatusBanner(),
           Expanded(
-            child: ColoredBox(
-              color: Colors.green,
-              child: ListView(
-                padding: EdgeInsets.all(24),
-                children: [
-                  AccountPageTitle(),
-                  SizedBox(height: 42),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: AccountHeaderTile()),
-                      SizedBox(width: 28),
-                      Expanded(child: AccountActionTile())
-                    ],
-                  ),
-                  SizedBox(height: 40),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            AccountDisplayNameTile(),
-                            AccountEmailTile(),
-                          ].separatedBy(SizedBox(height: 20)).toList(),
-                        ),
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                AccountPageTitle(),
+                SizedBox(height: 42),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: AccountHeaderTile()),
+                    SizedBox(width: 28),
+                    Expanded(child: AccountActionTile())
+                  ],
+                ),
+                SizedBox(height: 40),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          AccountDisplayNameTile(),
+                          AccountEmailTile(),
+                        ].separatedBy(SizedBox(height: 20)).toList(),
                       ),
-                      SizedBox(width: 28),
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            AccountRolesTile(),
-                            AccountKeychainTile(),
-                          ].separatedBy(SizedBox(height: 20)).toList(),
-                        ),
+                    ),
+                    SizedBox(width: 28),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          AccountRolesTile(),
+                          AccountKeychainTile(),
+                        ].separatedBy(SizedBox(height: 20)).toList(),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
