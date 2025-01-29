@@ -29,7 +29,9 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
   String get _title => widget.schema.formattedTitle;
 
   int get _min => widget.schema.numRange?.min ?? 0;
+
   int get _max => widget.schema.numRange?.max ?? 0;
+
   List<DropdownMenuEntry<int>> get _mapItems {
     final items = <DropdownMenuEntry<int>>[];
     for (var i = _min; i <= _max; i++) {
@@ -68,7 +70,10 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
         if (_title.isNotEmpty) ...[
           Text(
             _title,
-            style: Theme.of(context).textTheme.titleSmall,
+            style: Theme
+                .of(context)
+                .textTheme
+                .titleSmall,
           ),
           const SizedBox(height: 8),
           SingleSelectDropdown(

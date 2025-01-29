@@ -7,6 +7,7 @@ class FilterByDropdown<T> extends StatelessWidget {
   final List<DropdownMenuEntry<T?>> items;
   final ValueChanged<T?>? onChanged;
   final T? value;
+
   const FilterByDropdown({
     super.key,
     required this.items,
@@ -55,6 +56,7 @@ class FilterByDropdown<T> extends StatelessWidget {
 
 class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
   final BuildContext context;
+
   VoicesDropdownMenuEntry({
     required super.value,
     required super.label,
@@ -78,6 +80,7 @@ class SingleSelectDropdown<T> extends FormField<T> {
   final ValueChanged<T?>? onChanged;
   final List<DropdownMenuEntry<T>> items;
   final String? hintText;
+
   SingleSelectDropdown({
     super.key,
     super.initialValue,
