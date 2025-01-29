@@ -3,7 +3,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:uuid/uuid.dart';
 
 part 'document_boolean_schema.dart';
 part 'document_integer_schema.dart';
@@ -63,15 +62,21 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
 
   /// Creates a new property from this schema with a default value.
   ///
-  /// Specify the [parentNodeId] if the created property should
-  /// be moved to another node. By default it is created under
-  /// the same node that this schema points to.
+  /// Specify the [nodeId] where the property should be created.
+  /// Optionally specify a new [title] that should replace the old title.
   ///
   /// This is useful to create new items for the [DocumentListProperty].
-  DocumentProperty createChildPropertyAt([DocumentNodeId? parentNodeId]);
+  DocumentProperty createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  });
 
-  /// Moves the schema and it's children to the [nodeId].
-  DocumentPropertySchema withNodeId(DocumentNodeId nodeId);
+  /// Creates a new copy of the schema.
+  ///
+  /// - If [nodeId] is not null then it moves the schema
+  /// and it's children to the [nodeId].
+  /// - If [title] is not null then the new schema will use the updated title.
+  DocumentPropertySchema copyWith({DocumentNodeId? nodeId, String? title});
 
   @override
   @mustCallSuper
@@ -129,18 +134,16 @@ sealed class DocumentValueSchema<T extends Object>
   }
 
   @override
-  DocumentValueProperty<T> createChildPropertyAt([
-    DocumentNodeId? parentNodeId,
-  ]) {
-    parentNodeId ??= nodeId;
+  DocumentValueProperty<T> createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  }) {
+    final updatedSchema = copyWith(
+      nodeId: nodeId,
+      title: title,
+    );
 
-    final childId = const Uuid().v4();
-    final value = defaultValue;
-
-    final updatedSchema =
-        withNodeId(parentNodeId.child(childId)) as DocumentValueSchema<T>;
-
-    return updatedSchema.buildProperty(value: value);
+    return updatedSchema.buildProperty(value: defaultValue);
   }
 
   /// Casts the property linked to this schema so that
@@ -161,6 +164,9 @@ sealed class DocumentValueSchema<T extends Object>
   T? castValue(Object? value) {
     return value as T?;
   }
+
+  @override
+  DocumentValueSchema<T> copyWith({DocumentNodeId? nodeId, String? title});
 
   /// Validates the property [value] against document rules.
   DocumentValidationResult validate(T? value);
