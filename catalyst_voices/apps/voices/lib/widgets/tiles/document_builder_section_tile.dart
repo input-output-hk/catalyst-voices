@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/duration_in_months_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/multiline_text_entry_markdown_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/radio_button_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
@@ -324,10 +325,8 @@ class _PropertyValueBuilder extends StatelessWidget {
     final schema = property.schema;
     switch (schema) {
       case DocumentDropDownSingleSelectSchema():
-        final castProperty = schema.castProperty(property);
         return SingleDropdownSelectionWidget(
-          value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
-          items: castProperty.schema.enumValues ?? [],
+          property: schema.castProperty(property),
           schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
@@ -380,6 +379,7 @@ class _PropertyValueBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
+
       case DocumentRadioButtonSelect():
         return RadioButtonSelectWidget(
           property: schema.castProperty(property),
@@ -387,9 +387,16 @@ class _PropertyValueBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
+
+      case DocumentDurationInMonthsSchema():
+        return DurationInMonthsWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
       case DocumentSpdxLicenseOrUrlSchema():
       case DocumentLanguageCodeSchema():
-      case DocumentDurationInMonthsSchema():
       case DocumentGenericIntegerSchema():
       case DocumentGenericNumberSchema():
       case DocumentGenericBooleanSchema():
