@@ -3,15 +3,20 @@ part of 'document_property_schema.dart';
 sealed class DocumentListSchema extends DocumentPropertySchema {
   final DocumentPropertySchema itemsSchema;
   final Range<int>? itemsRange;
+  final bool uniqueItems;
 
   const DocumentListSchema({
     required super.nodeId,
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required this.itemsSchema,
     required this.itemsRange,
+    required this.uniqueItems,
   }) : super(
           type: DocumentPropertyType.list,
         );
@@ -47,12 +52,18 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
 
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {
-    return DocumentValidator.validateListItems(this, properties);
+    final values = properties.map((e) => e.value).toList();
+
+    return DocumentValidationResult.merge([
+      DocumentValidator.validateListItemsRange(this, values),
+      DocumentValidator.validateListItemsUnique(this, values),
+    ]);
   }
 
   @override
   @mustCallSuper
-  List<Object?> get props => super.props + [itemsSchema, itemsRange];
+  List<Object?> get props =>
+      super.props + [itemsSchema, itemsRange, uniqueItems];
 }
 
 final class DocumentMultiSelectSchema extends DocumentListSchema {
@@ -61,9 +72,13 @@ final class DocumentMultiSelectSchema extends DocumentListSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.itemsSchema,
     required super.itemsRange,
+    required super.uniqueItems,
   });
 
   @override
@@ -73,9 +88,13 @@ final class DocumentMultiSelectSchema extends DocumentListSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       itemsSchema: itemsSchema.withNodeId(nodeId),
       itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
     );
   }
 }
@@ -86,9 +105,13 @@ final class DocumentSingleLineTextEntryListSchema extends DocumentListSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.itemsSchema,
     required super.itemsRange,
+    required super.uniqueItems,
   });
 
   @override
@@ -98,9 +121,13 @@ final class DocumentSingleLineTextEntryListSchema extends DocumentListSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       itemsSchema: itemsSchema.withNodeId(nodeId),
       itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
     );
   }
 }
@@ -112,9 +139,13 @@ final class DocumentMultiLineTextEntryListMarkdownSchema
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.itemsSchema,
     required super.itemsRange,
+    required super.uniqueItems,
   });
 
   @override
@@ -126,9 +157,13 @@ final class DocumentMultiLineTextEntryListMarkdownSchema
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       itemsSchema: itemsSchema.withNodeId(nodeId),
       itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
     );
   }
 }
@@ -140,9 +175,13 @@ final class DocumentSingleLineHttpsUrlEntryListSchema
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.itemsSchema,
     required super.itemsRange,
+    required super.uniqueItems,
   });
 
   @override
@@ -152,9 +191,13 @@ final class DocumentSingleLineHttpsUrlEntryListSchema
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       itemsSchema: itemsSchema.withNodeId(nodeId),
       itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
     );
   }
 }
@@ -165,9 +208,13 @@ final class DocumentNestedQuestionsListSchema extends DocumentListSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.itemsSchema,
     required super.itemsRange,
+    required super.uniqueItems,
   });
 
   @override
@@ -177,9 +224,13 @@ final class DocumentNestedQuestionsListSchema extends DocumentListSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       itemsSchema: itemsSchema.withNodeId(nodeId),
       itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
     );
   }
 }
@@ -190,9 +241,13 @@ final class DocumentGenericListSchema extends DocumentListSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.itemsSchema,
     required super.itemsRange,
+    required super.uniqueItems,
   });
 
   const DocumentGenericListSchema.optional({
@@ -200,10 +255,14 @@ final class DocumentGenericListSchema extends DocumentListSchema {
     super.format,
     super.title = '',
     super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
     super.isRequired = false,
     super.itemsSchema =
         const DocumentGenericStringSchema.optional(nodeId: DocumentNodeId.root),
     super.itemsRange,
+    super.uniqueItems = false,
   });
 
   @override
@@ -213,9 +272,13 @@ final class DocumentGenericListSchema extends DocumentListSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       itemsSchema: itemsSchema.withNodeId(nodeId),
       itemsRange: itemsRange,
+      uniqueItems: uniqueItems,
     );
   }
 }

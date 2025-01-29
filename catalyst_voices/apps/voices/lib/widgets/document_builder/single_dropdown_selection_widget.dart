@@ -8,7 +8,7 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
   final List<String> items;
   final DocumentDropDownSingleSelectSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SingleDropdownSelectionWidget({
     super.key,
@@ -83,9 +83,10 @@ class _SingleDropdownSelectionWidgetState
               nodeId: widget.schema.nodeId,
               value: val,
             );
-            widget.onChanged(change);
+            widget.onChanged([change]);
           },
           initialValue: widget.value,
+          hintText: widget.schema.placeholder,
         ),
       ],
     );
