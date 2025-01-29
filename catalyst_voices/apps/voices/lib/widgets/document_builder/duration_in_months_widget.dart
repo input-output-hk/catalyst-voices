@@ -8,7 +8,7 @@ class DurationInMonthsWidget extends StatefulWidget {
   final DocumentValueProperty<int> property;
   final DocumentDurationInMonthsSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const DurationInMonthsWidget({
     super.key,
@@ -70,10 +70,7 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
         if (_title.isNotEmpty) ...[
           Text(
             _title,
-            style: Theme
-                .of(context)
-                .textTheme
-                .titleSmall,
+            style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
           SingleSelectDropdown(
@@ -105,10 +102,12 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
 
   void _notifyChangeListener(int? value) {
     widget.onChanged(
-      DocumentValueChange(
-        nodeId: widget.schema.nodeId,
-        value: value,
-      ),
+      [
+        DocumentValueChange(
+          nodeId: widget.schema.nodeId,
+          value: value,
+        ),
+      ],
     );
   }
 
