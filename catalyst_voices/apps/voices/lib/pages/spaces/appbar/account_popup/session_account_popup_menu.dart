@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_avatar.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_display_name.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_popup_catalyst_id.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -126,7 +127,7 @@ class _AccountHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SessionAccountDisplayName(),
-                // TODO(damian-molinski): Use CatalystId widget
+                SessionAccountPopupCatalystId(),
               ],
             ),
           ),
