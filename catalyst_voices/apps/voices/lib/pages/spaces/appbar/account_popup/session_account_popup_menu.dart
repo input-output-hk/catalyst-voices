@@ -1,13 +1,20 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_avatar.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_display_name.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_popup_catalyst_id.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 sealed class _MenuItemEvent {
   const _MenuItemEvent();
@@ -15,6 +22,18 @@ sealed class _MenuItemEvent {
 
 final class _OpenAccountDetails extends _MenuItemEvent {
   const _OpenAccountDetails();
+}
+
+final class _SetupRoles extends _MenuItemEvent {
+  const _SetupRoles();
+}
+
+final class _RedirectToSupport extends _MenuItemEvent {
+  const _RedirectToSupport();
+}
+
+final class _RedirectToDocs extends _MenuItemEvent {
+  const _RedirectToDocs();
 }
 
 final class _Lock extends _MenuItemEvent {
@@ -32,7 +51,8 @@ class SessionAccountPopupMenu extends StatefulWidget {
   }
 }
 
-class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> {
+class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
+    with LaunchUrlMixin {
   final _popupMenuButtonKey = GlobalKey<PopupMenuButtonState<_MenuItemEvent>>();
 
   @override
@@ -60,9 +80,17 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> {
   void _handleEvent(_MenuItemEvent event) {
     switch (event) {
       case _OpenAccountDetails():
-      // TODO: Handle this case.
+        const AccountRoute().go(context);
+      case _SetupRoles():
+      // TODO(damian-molinski): don't know what it should do
+      case _RedirectToSupport():
+        final uri = Uri.parse(VoicesConstants.supportUrl);
+        unawaited(launchUri(uri));
+      case _RedirectToDocs():
+        final uri = Uri.parse(VoicesConstants.docsUrl);
+        unawaited(launchUri(uri));
       case _Lock():
-      // TODO: Handle this case.
+        unawaited(context.read<SessionCubit>().lock());
     }
   }
 }
@@ -182,17 +210,17 @@ class _Links extends StatelessWidget {
         MenuItemTile(
           leading: VoicesAssets.icons.userGroup.buildIcon(),
           title: Text(context.l10n.setupCatalystRoles),
-          onTap: () {},
+          onTap: () => Navigator.pop(context, const _SetupRoles()),
         ),
         MenuItemTile(
           leading: VoicesAssets.icons.support.buildIcon(),
           title: Text(context.l10n.submitSupportRequest),
-          onTap: () {},
+          onTap: () => Navigator.pop(context, const _RedirectToSupport()),
         ),
         MenuItemTile(
           leading: VoicesAssets.icons.academicCap.buildIcon(),
           title: Text(context.l10n.catalystKnowledgeBase),
-          onTap: () {},
+          onTap: () => Navigator.pop(context, const _RedirectToDocs()),
         ),
       ],
     );
