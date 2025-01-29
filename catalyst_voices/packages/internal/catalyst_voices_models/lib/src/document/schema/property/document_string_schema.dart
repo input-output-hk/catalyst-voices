@@ -25,6 +25,9 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
         );
 
   @override
+  DocumentStringSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(String? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
@@ -60,12 +63,15 @@ final class DocumentSingleLineTextEntrySchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentSingleLineTextEntrySchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSingleLineTextEntrySchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentSingleLineTextEntrySchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -99,12 +105,15 @@ final class DocumentSingleLineHttpsUrlEntrySchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentSingleLineHttpsUrlEntrySchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSingleLineHttpsUrlEntrySchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentSingleLineHttpsUrlEntrySchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -138,12 +147,15 @@ final class DocumentMultiLineTextEntrySchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentMultiLineTextEntrySchema withNodeId(DocumentNodeId nodeId) {
+  DocumentMultiLineTextEntrySchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentMultiLineTextEntrySchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -178,12 +190,15 @@ final class DocumentMultiLineTextEntryMarkdownSchema
   });
 
   @override
-  DocumentMultiLineTextEntryMarkdownSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentMultiLineTextEntryMarkdownSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentMultiLineTextEntryMarkdownSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -217,12 +232,15 @@ final class DocumentDropDownSingleSelectSchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentDropDownSingleSelectSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentDropDownSingleSelectSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentDropDownSingleSelectSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -256,12 +274,15 @@ final class DocumentTagGroupSchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentTagGroupSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentTagGroupSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentTagGroupSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -295,12 +316,15 @@ final class DocumentTagSelectionSchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentTagSelectionSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentTagSelectionSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentTagSelectionSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -334,12 +358,15 @@ final class DocumentSpdxLicenseOrUrlSchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentSpdxLicenseOrUrlSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSpdxLicenseOrUrlSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentSpdxLicenseOrUrlSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -373,12 +400,15 @@ final class DocumentLanguageCodeSchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentLanguageCodeSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentLanguageCodeSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentLanguageCodeSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -429,12 +459,15 @@ final class DocumentGenericStringSchema extends DocumentStringSchema {
   });
 
   @override
-  DocumentGenericStringSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericStringSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentGenericStringSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
