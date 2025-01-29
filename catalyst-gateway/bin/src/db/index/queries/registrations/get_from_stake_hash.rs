@@ -48,7 +48,9 @@ impl GetStakeAddrQuery {
             true,
         )
         .await
-        .inspect_err(|error| error!(error=%error, "Failed to prepare get stake addr from stake hash query."))
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get stake addr from stake hash query."),
+        )
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_STAKE_ADDR_FROM_STAKE_HASH}"))
     }
 
