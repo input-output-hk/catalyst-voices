@@ -2,7 +2,6 @@
 use std::collections::HashMap;
 
 use anyhow::anyhow;
-use cardano_blockchain_types::Network;
 use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -23,7 +22,10 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
-        objects::cardano::stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
+        objects::cardano::{
+            network::Network,
+            stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
+        },
         responses::WithErrorResponses,
         types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
     },

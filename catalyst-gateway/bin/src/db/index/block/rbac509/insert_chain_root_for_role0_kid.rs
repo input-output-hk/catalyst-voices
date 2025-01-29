@@ -6,16 +6,18 @@ use scylla::{SerializeRow, Session};
 use to_vec::ToVec;
 use tracing::error;
 
+use super::TransactionHash;
 use crate::{
-    db::index::{
-        block::from_saturating,
-        queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::{
+            block::from_saturating,
+            queries::{PreparedQueries, SizedBatch},
+        },
+        types::DbTransactionHash,
     },
     service::common::auth::rbac::role0_kid::Role0Kid,
     settings::cassandra_db::EnvVars,
 };
-
-use super::TransactionHash;
 
 /// Index RBAC Chain Root by Role 0 Key
 const INSERT_CHAIN_ROOT_FOR_ROLE0_KEY_QUERY: &str =
@@ -31,7 +33,7 @@ pub(super) struct Params {
     /// Transaction Offset inside the block.
     txn: i16,
     /// Chain Root Hash. 32 bytes.
-    chain_root: Vec<u8>,
+    chain_root: DbTransactionHash,
     /// Chain root slot number
     chain_root_slot: num_bigint::BigInt,
     /// Chain root transaction index
@@ -65,7 +67,7 @@ impl Params {
             role0_kid: role0_kid.to_vec(),
             slot_no: num_bigint::BigInt::from(slot_no),
             txn: from_saturating(txn),
-            chain_root: chain_root.to_vec(),
+            chain_root: chain_root.into(),
             chain_root_slot: num_bigint::BigInt::from(chain_root_slot),
             chain_root_txn: from_saturating(chain_root_txn),
             signature_alg: "ed25519".to_string(),

@@ -5,7 +5,7 @@ use std::{
     thread,
 };
 
-use cardano_chain_follower::{Network, Statistics};
+use cardano_chain_follower::Statistics;
 
 use crate::settings::Settings;
 

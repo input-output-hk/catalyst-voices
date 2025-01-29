@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_chain_follower::Metadata::cip36::{Cip36, VotingPubKey};
+use cardano_blockchain_types::Cip36;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 

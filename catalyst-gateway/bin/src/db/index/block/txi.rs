@@ -2,6 +2,7 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -26,11 +27,11 @@ pub(crate) struct TxiInsertParams {
 
 impl TxiInsertParams {
     /// Create a new record for this transaction.
-    pub fn new(txn_hash: &[u8], txo: i16, slot_no: u64) -> Self {
+    pub fn new(txn_hash: &[u8], txo: i16, slot: Slot) -> Self {
         Self {
             txn_hash: txn_hash.to_vec(),
             txo,
-            slot_no: slot_no.into(),
+            slot_no: slot.into(),
         }
     }
 }
@@ -74,7 +75,7 @@ impl TxiInsertQuery {
     }
 
     /// Index the transaction Inputs.
-    pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: u64) {
+    pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: Slot) {
         // Index the TXI's.
         for txi in txs.inputs() {
             let txn_hash = txi.hash().to_vec();

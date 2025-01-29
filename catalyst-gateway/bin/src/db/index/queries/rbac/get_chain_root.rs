@@ -7,9 +7,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbTransactionHash, DbTxnIndex},
 };
 
 /// Get get chain root by stake address query string.
@@ -19,18 +22,18 @@ const GET_CHAIN_ROOT: &str = include_str!("../cql/get_chain_root_for_transaction
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
     /// Transaction ID to look up.
-    pub(crate) transaction_id: Vec<u8>,
+    pub(crate) transaction_id: DbTransactionHash,
 }
 
 /// Get chain root by stake address query.
 #[derive(DeserializeRow)]
 pub(crate) struct Query {
     /// Chain root for the queries stake address.
-    pub(crate) chain_root: Vec<u8>,
+    pub(crate) chain_root: DbTransactionHash,
     /// Slot Number the cert is in.
     pub(crate) slot_no: num_bigint::BigInt,
     /// Transaction Index.
-    pub(crate) txn: i16,
+    pub(crate) txn: DbTxnIndex,
 }
 
 impl Query {

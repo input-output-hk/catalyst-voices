@@ -4,12 +4,14 @@ use std::{fmt::Debug, sync::Arc};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
+use super::TransactionHash;
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::DbTransactionHash,
+    },
     settings::cassandra_db::EnvVars,
 };
-
-use super::TransactionHash;
 
 /// Index RBAC Chain Root by Stake Address
 const INSERT_CHAIN_ROOT_FOR_STAKE_ADDRESS_QUERY: &str =
@@ -23,9 +25,9 @@ pub(super) struct Params {
     /// Block Slot Number
     slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
-    txn: i16,
+    txn: DbTxnIndex,
     /// Chain Root Hash. 32 bytes.
-    chain_root: Vec<u8>,
+    chain_root: DbTransactionHash,
     /// Chain root slot number
     chain_root_slot: num_bigint::BigInt,
     /// Chain root transaction index

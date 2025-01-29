@@ -8,7 +8,7 @@ pub(crate) mod roll_forward;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
-use cardano_blockchain_types::MultiEraBlock;
+use cardano_blockchain_types::{MultiEraBlock, TransactionHash};
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
 use rbac509::Rbac509InsertQuery;
@@ -33,33 +33,30 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     let mut txi_index = TxiInsertQuery::new();
     let mut txo_index = TxoInsertQuery::new();
 
-    let block_data = block.decode();
-    let slot_no = block_data.slot();
+    let slot = block.point().slot_or_default();
 
     // We add all transactions in the block to their respective index data sets.
-    for (txn_index, txs) in block_data.txs().iter().enumerate() {
-        let txn = from_saturating(txn_index);
-
-        let txn_hash = txs.hash();
+    for (index, txn) in block.enumerate_txs() {
+        let txn_hash = TransactionHash::from(txn.hash());
 
         // Index the TXIs.
-        txi_index.index(txs, slot_no);
+        txi_index.index(&txn, slot);
 
         // TODO: Index minting.
         // let mint = txs.mints().iter() {};
 
         // TODO: Index Metadata.
-        cip36_index.index(txn_index, txn, slot_no, block);
+        cip36_index.index(index, slot, block);
 
         // Index Certificates inside the transaction.
-        cert_index.index(txs, slot_no, txn, block);
+        cert_index.index(txn, slot, index, block);
 
         // Index the TXOs.
-        txo_index.index(txs, slot_no, txn_hash, txn);
+        txo_index.index(txs, slot, txn_hash, index);
 
         // Index RBAC 509 inside the transaction.
         rbac509_index
-            .index(&session, txn_hash, txn_index, slot_no, block)
+            .index(&session, txn_hash, index, slot, block)
             .await;
     }
 

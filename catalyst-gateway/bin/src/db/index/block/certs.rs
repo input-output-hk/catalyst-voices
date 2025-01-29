@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::MultiEraBlock;
+use cardano_blockchain_types::{MultiEraBlock, TxnIndex};
 use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
@@ -12,7 +12,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    service::utilities::convert::from_saturating,
+    service::{common::objects::legacy::block::Slot, utilities::convert::from_saturating},
     settings::cassandra_db,
 };
 
@@ -193,24 +193,24 @@ impl CertInsertQuery {
 
     /// Index an Alonzo Era certificate into the database.
     fn index_alonzo_cert(
-        &mut self, cert: &alonzo::Certificate, slot_no: u64, txn: i16, block: &MultiEraBlock,
+        &mut self, cert: &alonzo::Certificate, slot: Slot, index: TxnIndex, block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         match cert {
-            pallas::ledger::primitives::alonzo::Certificate::StakeRegistration(cred) => {
+            alonzo::Certificate::StakeRegistration(cred) => {
                 // This may not be witnessed, its normal but disappointing.
-                self.stake_address(cred, slot_no, txn, true, false, None, block);
+                self.stake_address(cred, slot, index, true, false, None, block);
             },
-            pallas::ledger::primitives::alonzo::Certificate::StakeDeregistration(cred) => {
-                self.stake_address(cred, slot_no, txn, false, true, None, block);
+            alonzo::Certificate::StakeDeregistration(cred) => {
+                self.stake_address(cred, slot, index, false, true, None, block);
             },
-            pallas::ledger::primitives::alonzo::Certificate::StakeDelegation(cred, pool) => {
-                self.stake_address(cred, slot_no, txn, false, false, Some(pool.to_vec()), block);
+            alonzo::Certificate::StakeDelegation(cred, pool) => {
+                self.stake_address(cred, slot, index, false, false, Some(pool.to_vec()), block);
             },
-            pallas::ledger::primitives::alonzo::Certificate::PoolRegistration { .. } => {},
-            pallas::ledger::primitives::alonzo::Certificate::PoolRetirement(..) => {},
-            pallas::ledger::primitives::alonzo::Certificate::GenesisKeyDelegation(..) => {},
-            pallas::ledger::primitives::alonzo::Certificate::MoveInstantaneousRewardsCert(_) => {},
+            alonzo::Certificate::PoolRegistration { .. } => {},
+            alonzo::Certificate::PoolRetirement(..) => {},
+            alonzo::Certificate::GenesisKeyDelegation(..) => {},
+            alonzo::Certificate::MoveInstantaneousRewardsCert(_) => {},
         }
     }
 
@@ -249,7 +249,7 @@ impl CertInsertQuery {
 
     /// Index the certificates in a transaction.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64, txn: i16,
+        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot: Slot, index: TxnIndex,
         block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
@@ -257,10 +257,10 @@ impl CertInsertQuery {
             match cert {
                 pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
                 pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
-                    self.index_alonzo_cert(cert, slot_no, txn, block);
+                    self.index_alonzo_cert(cert, slot, index, block);
                 },
                 pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
-                    self.index_conway_cert(cert, slot_no, txn, block);
+                    self.index_conway_cert(cert, slot, index, block);
                 },
                 _ => {},
             }

@@ -3,8 +3,7 @@ use std::sync::{Arc, LazyLock};
 
 use anyhow::bail;
 use futures::StreamExt;
-use moka::policy::EvictionPolicy;
-use moka::sync::Cache;
+use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::StakeAddress;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
@@ -12,12 +11,17 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::block::rbac509::chain_root::{self, ChainRoot};
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            block::rbac509::chain_root::{self, ChainRoot},
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::DbTransactionHash,
+    },
+    service::utilities::convert::{big_uint_to_u64, from_saturating},
 };
-use crate::service::utilities::convert::{big_uint_to_u64, from_saturating};
 
 /// Cached Chain Root By Stake Address.
 static CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, ChainRoot>> =
@@ -51,7 +55,7 @@ pub(crate) struct Query {
     /// Transaction Offset the stake address was registered in.
     pub(crate) txn: i16,
     /// Chain root for the queries stake address.
-    pub(crate) chain_root: Vec<u8>,
+    pub(crate) chain_root: DbTransactionHash,
     /// Chain roots slot number
     pub(crate) chain_root_slot: num_bigint::BigInt,
     /// Chain roots txn index
@@ -95,20 +99,19 @@ impl Query {
     pub(crate) async fn get_latest_uncached(
         session: &CassandraSession, stake_addr: &StakeAddress,
     ) -> anyhow::Result<Option<ChainRoot>> {
-        let mut result = Self::execute(
-            session,
-            QueryParams {
-                stake_address: stake_addr.to_vec(),
-            },
-        )
+        let mut result = Self::execute(session, QueryParams {
+            stake_address: stake_addr.to_vec(),
+        })
         .await?;
 
         match result.next().await {
-            Some(Ok(first_row)) => Ok(Some(ChainRoot::new(
-                first_row.chain_root.as_slice().into(),
-                big_uint_to_u64(&first_row.chain_root_slot),
-                from_saturating(first_row.chain_root_txn),
-            ))),
+            Some(Ok(first_row)) => {
+                Ok(Some(ChainRoot::new(
+                    first_row.chain_root.into(),
+                    big_uint_to_u64(&first_row.chain_root_slot),
+                    from_saturating(first_row.chain_root_txn),
+                )))
+            },
             Some(Err(err)) => {
                 bail!(
                     "Failed to get chain root by stake address query row: {}",

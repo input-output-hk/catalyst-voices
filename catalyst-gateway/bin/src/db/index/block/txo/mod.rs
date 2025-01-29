@@ -18,7 +18,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    service::utilities::convert::from_saturating,
+    service::{common::types::cardano::txn_index::TxnIndex, utilities::convert::from_saturating},
     settings::cassandra_db,
 };
 
@@ -137,8 +137,8 @@ impl TxoInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64,
-        txn_hash: Hash<32>, txn: i16,
+        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot: Slot, txn_hash: Hash<32>,
+        index: TxnIndex,
     ) {
         let txn_id = hex::encode_upper(txn_hash);
 

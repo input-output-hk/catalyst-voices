@@ -2,7 +2,7 @@
 
 use std::sync::{Arc, LazyLock};
 
-use cardano_chain_follower::Metadata::cip509::Cip509;
+use cardano_blockchain_types::TransactionHash;
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::StakeAddress;

@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, sync::Arc, time::Duration};
 
-use cardano_blockchain_types::{Network, Point};
+use cardano_blockchain_types::{Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
@@ -336,13 +336,13 @@ struct SyncTask {
     current_sync_tasks: u16,
 
     /// Start for the next block we would sync.
-    start_slot: u64,
+    start_slot: Slot,
 
     /// The immutable tip slot.
-    immutable_tip_slot: u64,
+    immutable_tip_slot: Slot,
 
     /// The live tip slot.
-    live_tip_slot: u64,
+    live_tip_slot: Slot,
 
     /// Current Sync Status
     sync_status: Vec<SyncStatus>,

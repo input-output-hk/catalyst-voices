@@ -2,15 +2,19 @@
 
 use std::{fmt::Debug, sync::Arc};
 
+use cardano_blockchain_types::TransactionHash;
 use catalyst_types::{hashes::Blake2b256Hash, uuid::UuidV4};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::{
-        block::from_saturating,
-        queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::{
+            block::from_saturating,
+            queries::{PreparedQueries, SizedBatch},
+        },
+        types::DbTransactionHash,
     },
     settings::cassandra_db::EnvVars,
 };
@@ -22,15 +26,15 @@ const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
 #[derive(SerializeRow)]
 pub(super) struct Params {
     /// Chain Root Hash. 32 bytes.
-    chain_root: Vec<u8>,
+    chain_root: DbTransactionHash,
     /// Transaction ID Hash. 32 bytes.
-    transaction_id: Vec<u8>,
+    transaction_id: DbTransactionHash,
     /// Block Slot Number
     slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
     txn: i16,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
-    prv_txn_id: MaybeUnset<Blake2b256Hash>,
+    prv_txn_id: MaybeUnset<DbTransactionHash>,
     /// Purpose.`UUIDv4`. 16 bytes.
     purpose: UuidV4,
 }

@@ -3,6 +3,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use cardano_blockchain_types::Slot;
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -36,7 +37,6 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 
 /// Slot number
 #[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
-
 pub(crate) struct SlotNo(u64);
 
 /// Is the Slot Number valid?
@@ -135,5 +135,17 @@ impl SlotNo {
 impl Example for SlotNo {
     fn example() -> Self {
         Self(EXAMPLE)
+    }
+}
+
+impl From<Slot> for SlotNo {
+    fn from(value: Slot) -> Self {
+        Self(value.into())
+    }
+}
+
+impl From<SlotNo> for Slot {
+    fn from(value: SlotNo) -> Self {
+        value.0.into()
     }
 }

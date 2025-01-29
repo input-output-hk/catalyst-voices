@@ -6,7 +6,7 @@ mod insert_cip36_invalid;
 
 use std::sync::Arc;
 
-use cardano_chain_follower::{Metadata, MultiEraBlock};
+use cardano_blockchain_types::{MetadatumLabel, MultiEraBlock, Slot};
 use scylla::Session;
 
 use crate::{
@@ -14,6 +14,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
+    service::common::types::cardano::txn_index::TxnIndex,
     settings::cassandra_db,
 };
 
@@ -55,10 +56,10 @@ impl Cip36InsertQuery {
     }
 
     /// Index the CIP-36 registrations in a transaction.
-    pub(crate) fn index(
-        &mut self, txn: usize, txn_index: i16, slot_no: u64, block: &MultiEraBlock,
-    ) {
-        if let Some(decoded_metadata) = block.txn_metadata(txn, Metadata::cip36::LABEL) {
+    pub(crate) fn index(&mut self, index: TxnIndex, slot_no: Slot, block: &MultiEraBlock) {
+        if let Some(decoded_metadata) =
+            block.txn_metadata(index, MetadatumLabel::CIP036_REGISTRATION)
+        {
             if let Metadata::DecodedMetadataValues::Cip36(cip36) = &decoded_metadata.value {
                 // Check if we are indexing a valid or invalid registration.
                 // Note, we ONLY care about catalyst, we should only have 1 voting key, if not, call

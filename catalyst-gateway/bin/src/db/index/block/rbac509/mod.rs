@@ -13,15 +13,12 @@ use c509_certificate::{
     extensions::{alt_name::GeneralNamesOrText, extension::ExtensionValue},
     general_names::general_name::{GeneralNameTypeRegistry, GeneralNameValue},
 };
-use cardano_chain_follower::{
-    Metadata::{self, cip509::Cip509},
-    MultiEraBlock,
-};
+use cardano_blockchain_types::{MetadatumLabel, MultiEraBlock, TransactionHash};
 use chain_root::ChainRoot;
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use rbac_registration::cardano::cip509::{
-    C509Cert, Cip509RbacMetadata, KeyLocalRef, LocalRefInt, X509DerCert,
+    C509Cert, Cip509, Cip509RbacMetadata, KeyLocalRef, LocalRefInt, X509DerCert,
 };
 use scylla::Session;
 use tracing::error;
@@ -31,7 +28,6 @@ use x509_cert::{
 };
 
 use crate::{
-    cardano::types::TransactionHash,
     db::index::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
