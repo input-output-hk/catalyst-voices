@@ -10,6 +10,9 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required this.properties,
     required this.oneOf,
@@ -33,25 +36,39 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
   }
 
   @override
-  DocumentObjectProperty createChildPropertyAt([DocumentNodeId? parentNodeId]) {
-    parentNodeId ??= nodeId;
+  DocumentObjectProperty createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  }) {
+    final updatedSchema = copyWith(
+      nodeId: nodeId,
+      title: title,
+    );
 
-    final childId = const Uuid().v4();
-    final childNodeId = parentNodeId.child(childId);
-
-    final updatedSchema = withNodeId(childNodeId) as DocumentObjectSchema;
-    final updatedProperties =
-        properties.map((e) => e.createChildPropertyAt(parentNodeId)).toList();
+    final updatedProperties = properties.map(
+      (e) {
+        final childNodeId = nodeId.child(e.id);
+        return e.createChildPropertyAt(nodeId: childNodeId);
+      },
+    ).toList();
 
     return updatedSchema.buildProperty(
       properties: List.unmodifiable(updatedProperties),
     );
   }
 
+  @override
+  DocumentObjectSchema copyWith({DocumentNodeId? nodeId, String? title});
+
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {
-    // TODO(dtscalac): object type validation
+    // Object types don't have any validation rules currently.
     return const SuccessfulDocumentValidation();
+  }
+
+  DocumentPropertySchema?
+      getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
+    return properties.firstWhereOrNull((e) => e is T);
   }
 
   @override
@@ -68,6 +85,9 @@ final class DocumentSegmentSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -79,15 +99,25 @@ final class DocumentSegmentSchema extends DocumentObjectSchema {
       properties.whereType<DocumentSectionSchema>().toList();
 
   @override
-  DocumentSegmentSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSegmentSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentSegmentSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
-      properties:
-          properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
+      properties: properties
+          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
+          .toList(),
       oneOf: oneOf,
       order: order,
       icon: icon,
@@ -106,6 +136,9 @@ final class DocumentSectionSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -113,15 +146,25 @@ final class DocumentSectionSchema extends DocumentObjectSchema {
   });
 
   @override
-  DocumentSectionSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSectionSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentSectionSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
-      properties:
-          properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
+      isSubsection: isSubsection,
+      properties: properties
+          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
+          .toList(),
       oneOf: oneOf,
       order: order,
     );
@@ -134,6 +177,9 @@ final class DocumentNestedQuestionsSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -141,15 +187,25 @@ final class DocumentNestedQuestionsSchema extends DocumentObjectSchema {
   });
 
   @override
-  DocumentNestedQuestionsSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentNestedQuestionsSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentNestedQuestionsSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
-      properties:
-          properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
+      isSubsection: isSubsection,
+      properties: properties
+          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
+          .toList(),
       oneOf: oneOf,
       order: order,
     );
@@ -163,6 +219,9 @@ final class DocumentSingleGroupedTagSelectorSchema
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -170,15 +229,25 @@ final class DocumentSingleGroupedTagSelectorSchema
   });
 
   @override
-  DocumentSingleGroupedTagSelectorSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSingleGroupedTagSelectorSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentSingleGroupedTagSelectorSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
-      properties:
-          properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
+      isSubsection: isSubsection,
+      properties: properties
+          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
+          .toList(),
       oneOf: oneOf,
       order: order,
     );
@@ -212,6 +281,24 @@ final class DocumentSingleGroupedTagSelectorSchema
     );
   }
 
+  List<DocumentChange> buildDocumentChanges(GroupedTagsSelection selection) {
+    final groupProperty = getPropertyWithSchemaType<DocumentTagGroupSchema>()!;
+
+    final tagProperty =
+        getPropertyWithSchemaType<DocumentTagSelectionSchema>()!;
+
+    return [
+      DocumentValueChange(
+        nodeId: groupProperty.nodeId,
+        value: selection.group,
+      ),
+      DocumentValueChange(
+        nodeId: tagProperty.nodeId,
+        value: selection.tag,
+      ),
+    ];
+  }
+
   List<GroupedTags> groupedTags() {
     final oneOf = this.oneOf ?? const [];
     return GroupedTags.fromLogicalGroups(oneOf);
@@ -224,6 +311,9 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -235,6 +325,9 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
     super.format,
     super.title = '',
     super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
     super.isRequired = false,
     super.properties = const [],
     super.oneOf,
@@ -242,15 +335,25 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
   });
 
   @override
-  DocumentGenericObjectSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericObjectSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
     return DocumentGenericObjectSchema(
-      nodeId: nodeId,
+      nodeId: newNodeId,
       format: format,
-      title: title,
+      title: newTitle,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
-      properties:
-          properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
+      isSubsection: isSubsection,
+      properties: properties
+          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
+          .toList(),
       oneOf: oneOf,
       order: order,
     );

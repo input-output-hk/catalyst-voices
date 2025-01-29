@@ -52,7 +52,7 @@
             "licenseInformation": "All source code and documentation will be released under the MIT license."
         }
     },
-    "horizons": {
+    "theme": {
         "theme": {
             "grouped_tag": {
                 "group": "DeFi",
