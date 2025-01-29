@@ -8,7 +8,7 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
   final DocumentDropDownSingleSelectSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SingleDropdownSelectionWidget({
     super.key,
@@ -29,6 +29,7 @@ class _SingleDropdownSelectionWidgetState
   late String? _selectedValue;
 
   String get _title => widget.schema.formattedTitle;
+
   List<DropdownMenuEntry<String>> get _mapItems {
     final items = widget.schema.enumValues ?? [];
     return items.map((e) => DropdownMenuEntry(value: e, label: e)).toList();
@@ -91,12 +92,12 @@ class _SingleDropdownSelectionWidgetState
   }
 
   void _notifyChangeListener(String? value) {
-    widget.onChanged(
+    widget.onChanged([
       DocumentValueChange(
         nodeId: widget.schema.nodeId,
         value: value,
       ),
-    );
+    ]);
   }
 
   String? _validator(String? value) {

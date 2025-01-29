@@ -10,7 +10,7 @@ class SimpleTextEntryWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
   final DocumentStringSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SimpleTextEntryWidget({
     super.key,
@@ -87,8 +87,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           onFieldSubmitted: _notifyChangeListener,
           validator: _validate,
           enabled: widget.isEditMode,
-          // TODO(LynxLynxx): check if this is right after schema is finalized
-          hintText: widget.schema.defaultValue,
+          hintText: widget.schema.placeholder,
           resizable: _resizable,
           maxLength: _maxLength,
         ),
@@ -120,7 +119,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       value: value,
     );
 
-    widget.onChanged(change);
+    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(String? value) {
