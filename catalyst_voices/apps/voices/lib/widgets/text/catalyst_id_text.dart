@@ -68,13 +68,15 @@ class _CatalystIdTextState extends State<CatalystIdText> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              VoicesPlainTooltip(
-                message: widget.data,
-                // Do not constraint width.
-                constraints: const BoxConstraints(),
-                child: _Chip(
-                  _effectiveData,
-                  onTap: _copyDataToClipboard,
+              Flexible(
+                child: VoicesPlainTooltip(
+                  message: widget.data,
+                  // Do not constraint width.
+                  constraints: const BoxConstraints(),
+                  child: _Chip(
+                    _effectiveData,
+                    onTap: _copyDataToClipboard,
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
