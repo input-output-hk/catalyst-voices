@@ -314,6 +314,7 @@ ThemeData _buildThemeData(
   BrandAssets brandAssets,
 ) {
   final textTheme = _buildTextTheme(voicesColorScheme);
+
   return ThemeData(
     visualDensity: VisualDensity.standard,
     appBarTheme: AppBarTheme(
