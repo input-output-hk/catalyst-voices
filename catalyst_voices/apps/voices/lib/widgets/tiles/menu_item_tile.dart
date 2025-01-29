@@ -19,19 +19,27 @@ class MenuItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final trailing = this.trailing;
 
-    return Container(
+    return ConstrainedBox(
       constraints: const BoxConstraints.tightFor(height: 40),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          _AffixDecoration(child: leading),
-          const SizedBox(width: 12),
-          Expanded(child: _TitleDecoration(child: title)),
-          if (trailing != null) ...[
-            const SizedBox(width: 12),
-            _AffixDecoration(child: trailing),
-          ],
-        ],
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _AffixDecoration(child: leading),
+                const SizedBox(width: 12),
+                Expanded(child: _TitleDecoration(child: title)),
+                if (trailing != null) ...[
+                  const SizedBox(width: 12),
+                  _AffixDecoration(child: trailing),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
