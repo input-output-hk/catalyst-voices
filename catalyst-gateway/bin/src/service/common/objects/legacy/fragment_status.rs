@@ -1,6 +1,6 @@
 //! Defines API schemas of fragment status types.
 
-use poem_openapi::{types::Example, Object, Union};
+use poem_openapi::{types::Example, Object};
 
 use crate::service::common::objects::legacy::{block::BlockDate, hash::Hash};
 
@@ -45,16 +45,4 @@ impl Example for StatusInABlock {
             block: Hash::example(),
         }
     }
-}
-
-#[derive(Union)]
-#[oai(one_of = true)]
-/// DEPRECATED: Possible fragment statuses.
-pub(crate) enum FragmentStatus {
-    /// Fragment is pending inclusion in a block.
-    Pending(StatusPending),
-    /// Fragment was rejected.
-    Rejected(StatusRejected),
-    /// Fragment was included in a block.
-    InABlock(StatusInABlock),
 }
