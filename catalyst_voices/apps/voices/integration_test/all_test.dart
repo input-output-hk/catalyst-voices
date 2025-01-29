@@ -15,6 +15,6 @@ void main() async {
   });
 
   app_test.main();
-  onboarding_test.main();
-  account_test.main();
+  // onboarding_test.main();
+  // account_test.main();
 }

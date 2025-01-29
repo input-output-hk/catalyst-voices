@@ -30,13 +30,13 @@ void main() async {
   });
 
   group('Spaces drawer -', () {
-    // patrolWidgetTest(
-    //   'visitor - no drawer button',
-    //   (PatrolTester $) async {
-    //     await $.pumpWidgetAndSettle(App(routerConfig: router));
-    //     expect($(AppBarPage.spacesDrawerButton).exists, false);
-    //   },
-    // );
+    patrolWidgetTest(
+      'visitor - no drawer button',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        expect($(AppBarPage.spacesDrawerButton).exists, false);
+      },
+    );
 
     patrolWidgetTest(
       tags: 'issues_1473',
