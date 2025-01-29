@@ -31,76 +31,116 @@ class PendingProposalCard extends StatefulWidget {
 }
 
 class _PendingProposalCardState extends State<PendingProposalCard> {
+  late final WidgetStatesController _statesController;
+  late final _ProposalBorderColor border;
+
+  @override
+  void initState() {
+    super.initState();
+    _statesController = WidgetStatesController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    border = _ProposalBorderColor(
+      publishStage: widget.proposal.publishStage,
+      colorScheme: context.colorScheme,
+      colors: context.colors,
+    );
+  }
+
+  @override
+  void dispose() {
+    _statesController.dispose();
+    super.dispose();
+  }
+
   bool isHovered = false;
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => _changeHoverState(value: true),
-      onExit: (_) => _changeHoverState(value: false),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 326),
-        decoration: BoxDecoration(
-          color: context.colors.elevationsOnSurfaceNeutralLv1White,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isHovered
-                ? _hoverBorderColor(context)
-                : context.colors.elevationsOnSurfaceNeutralLv1White,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _Topbar(
-                    showStatus: widget.showStatus,
-                    isFavorite: widget.isFavorite,
-                    onFavoriteChanged: widget.onFavoriteChanged,
-                  ),
-                  _Category(
-                    category: widget.proposal.category,
-                  ),
-                  const SizedBox(height: 4),
-                  _Title(text: widget.proposal.title),
-                  _Author(author: widget.proposal.author),
-                  _FundsAndDuration(
-                    funds: widget.proposal.fundsRequested,
-                    duration: widget.proposal.duration,
-                  ),
-                  const SizedBox(height: 12),
-                  _Description(text: widget.proposal.description),
-                  const SizedBox(height: 24),
-                  _ProposalInfo(
-                    proposalStage: widget.proposal.publishStage,
-                    version: widget.proposal.version,
-                    lastUpdate: widget.proposal.lastUpdateDate,
-                    commentsCount: widget.proposal.commentsCount,
-                    showLastUpdate: widget.showLastUpdate,
-                  ),
-                ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        statesController: _statesController,
+        onTap: () {},
+        child: ValueListenableBuilder(
+          valueListenable: _statesController,
+          builder: (context, value, child) => Container(
+            constraints: const BoxConstraints(maxWidth: 326),
+            decoration: BoxDecoration(
+              color: context.colors.elevationsOnSurfaceNeutralLv1White,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: border.resolve(_statesController.value),
               ),
             ),
-          ],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _Topbar(
+                        showStatus: widget.showStatus,
+                        isFavorite: widget.isFavorite,
+                        onFavoriteChanged: widget.onFavoriteChanged,
+                      ),
+                      _Category(
+                        category: widget.proposal.category,
+                      ),
+                      const SizedBox(height: 4),
+                      _Title(text: widget.proposal.title),
+                      _Author(author: widget.proposal.author),
+                      _FundsAndDuration(
+                        funds: widget.proposal.fundsRequested,
+                        duration: widget.proposal.duration,
+                      ),
+                      const SizedBox(height: 12),
+                      _Description(text: widget.proposal.description),
+                      const SizedBox(height: 24),
+                      _ProposalInfo(
+                        proposalStage: widget.proposal.publishStage,
+                        version: widget.proposal.version,
+                        lastUpdate: widget.proposal.lastUpdateDate,
+                        commentsCount: widget.proposal.commentsCount,
+                        showLastUpdate: widget.showLastUpdate,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+}
 
-  void _changeHoverState({required bool value}) {
-    setState(() {
-      isHovered = value;
-    });
-  }
+final class _ProposalBorderColor extends WidgetStateColor {
+  final ProposalPublish publishStage;
+  final VoicesColorScheme colors;
+  final ColorScheme colorScheme;
 
-  Color _hoverBorderColor(BuildContext context) {
-    return switch (widget.proposal.publishStage) {
-      ProposalPublish.draft => context.colorScheme.secondary,
-      ProposalPublish.published => context.colorScheme.primary,
-    };
+  _ProposalBorderColor({
+    required this.publishStage,
+    required this.colors,
+    required this.colorScheme,
+  }) : super(colors.outlineBorder.value);
+
+  @override
+  Color resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.hovered)) {
+      return switch (publishStage) {
+        ProposalPublish.draft => colorScheme.secondary,
+        ProposalPublish.published => colorScheme.primary,
+      };
+    }
+
+    return colors.elevationsOnSurfaceNeutralLv1White;
   }
 }
 
