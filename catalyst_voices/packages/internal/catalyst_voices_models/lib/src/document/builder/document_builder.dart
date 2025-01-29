@@ -13,26 +13,21 @@ import 'package:collection/collection.dart';
 ///
 /// Once edits are done convert the builder to a [Document] with [build] method.
 final class DocumentBuilder {
-  String _schemaUrl;
   DocumentSchema _schema;
   List<DocumentPropertyBuilder> _properties;
 
   /// The default constructor for the [DocumentBuilder].
   DocumentBuilder({
-    required String schemaUrl,
     required DocumentSchema schema,
     required List<DocumentPropertyBuilder> properties,
-  })  : _schemaUrl = schemaUrl,
-        _schema = schema,
+  })  : _schema = schema,
         _properties = properties;
 
   /// Creates an empty [DocumentBuilder] from a [schema].
   factory DocumentBuilder.fromSchema({
-    required String schemaUrl,
     required DocumentSchema schema,
   }) {
     return DocumentBuilder(
-      schemaUrl: schemaUrl,
       schema: schema,
       properties:
           schema.properties.map(DocumentPropertyBuilder.fromSchema).toList(),
@@ -42,7 +37,6 @@ final class DocumentBuilder {
   /// Creates a [DocumentBuilder] from existing [document].
   factory DocumentBuilder.fromDocument(Document document) {
     return DocumentBuilder(
-      schemaUrl: document.schemaUrl,
       schema: document.schema,
       properties: document.properties
           .map(DocumentPropertyBuilder.fromProperty)
@@ -69,7 +63,6 @@ final class DocumentBuilder {
       ..sortByOrder(_schema.order);
 
     return Document(
-      schemaUrl: _schemaUrl,
       schema: _schema,
       properties: List.unmodifiable(mappedProperties),
     );

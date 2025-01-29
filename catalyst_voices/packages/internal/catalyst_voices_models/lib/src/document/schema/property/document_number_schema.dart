@@ -8,8 +8,12 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required this.numRange,
   }) : super(
@@ -21,6 +25,8 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateNumberRange(this, value),
+      DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 
@@ -35,8 +41,12 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.numRange,
   });
@@ -46,8 +56,12 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
     super.format,
     super.title = '',
     super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
     super.isRequired = false,
     super.defaultValue,
+    super.constValue,
     super.enumValues,
     super.numRange,
   });
@@ -59,8 +73,12 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
     );
