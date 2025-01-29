@@ -104,7 +104,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
 
     final url = Uri.tryParse(_effectiveController.text);
     if (url != null) {
-      await launchHrefUrl(url);
+      await launchUri(url);
     }
   }
 

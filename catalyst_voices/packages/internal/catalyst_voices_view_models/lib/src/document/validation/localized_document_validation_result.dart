@@ -23,7 +23,12 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       DocumentStringOutOfRange() =>
         LocalizedDocumentStringOutOfRange(range: result.expectedRange),
       DocumentItemsOutOfRange() =>
-        LocalizedDocumentItemsOutOfRange(range: result.expectedRange),
+        LocalizedDocumentListItemsOutOfRange(range: result.expectedRange),
+      DocumentItemsNotUnique() => const LocalizedDocumentListItemsNotUnique(),
+      DocumentConstValueMismatch() =>
+        LocalizedDocumentConstValueMismatch(constValue: result.constValue),
+      DocumentEnumValueMismatch() =>
+        LocalizedDocumentEnumValuesMismatch(enumValues: result.enumValues),
       DocumentPatternMismatch() => const LocalizedDocumentPatternMismatch(),
     };
   }
@@ -65,14 +70,14 @@ final class LocalizedMissingRequiredDocumentValue
 
 final class LocalizedDocumentNumOutOfRange
     extends LocalizedDocumentValidationResult {
-  final Range<int> range;
+  final Range<num> range;
 
   const LocalizedDocumentNumOutOfRange({required this.range});
 
   @override
   String? message(BuildContext context) {
-    final min = range.min;
-    final max = range.max;
+    final min = range.min?.toInt();
+    final max = range.max?.toInt();
 
     if (min != null && max != null) {
       return context.l10n.errorValidationNumFieldOutOfRange(min, max);
@@ -117,11 +122,11 @@ final class LocalizedDocumentStringOutOfRange
   List<Object?> get props => [range];
 }
 
-final class LocalizedDocumentItemsOutOfRange
+final class LocalizedDocumentListItemsOutOfRange
     extends LocalizedDocumentValidationResult {
   final Range<int> range;
 
-  const LocalizedDocumentItemsOutOfRange({required this.range});
+  const LocalizedDocumentListItemsOutOfRange({required this.range});
 
   @override
   String? message(BuildContext context) {
@@ -142,6 +147,52 @@ final class LocalizedDocumentItemsOutOfRange
 
   @override
   List<Object?> get props => [range];
+}
+
+final class LocalizedDocumentListItemsNotUnique
+    extends LocalizedDocumentValidationResult {
+  const LocalizedDocumentListItemsNotUnique();
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationListItemsNotUnique;
+  }
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class LocalizedDocumentConstValueMismatch
+    extends LocalizedDocumentValidationResult {
+  final Object constValue;
+
+  const LocalizedDocumentConstValueMismatch({required this.constValue});
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n
+        .errorValidationConstValueMismatch(constValue.toString());
+  }
+
+  @override
+  List<Object?> get props => [constValue];
+}
+
+final class LocalizedDocumentEnumValuesMismatch
+    extends LocalizedDocumentValidationResult {
+  final List<Object> enumValues;
+
+  const LocalizedDocumentEnumValuesMismatch({required this.enumValues});
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationEnumValuesMismatch(
+      enumValues.map((e) => '"$e"').join(', '),
+    );
+  }
+
+  @override
+  List<Object?> get props => [enumValues];
 }
 
 final class LocalizedDocumentPatternMismatch

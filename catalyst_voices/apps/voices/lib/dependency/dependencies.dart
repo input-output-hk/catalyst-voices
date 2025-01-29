@@ -129,7 +129,6 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerServices() {
-    registerLazySingleton<Storage>(() => const SecureStorage());
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
     registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
     registerLazySingleton<KeychainProvider>(() {
@@ -146,10 +145,10 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
-        transactionConfigRepository: get<TransactionConfigRepository>(),
-        keychainProvider: get<KeychainProvider>(),
-        cardano: get<CatalystCardano>(),
-        keyDerivation: get<KeyDerivation>(),
+        get<TransactionConfigRepository>(),
+        get<KeychainProvider>(),
+        get<CatalystCardano>(),
+        get<KeyDerivation>(),
       );
     });
     registerLazySingleton<UserService>(

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -5,22 +6,16 @@ import 'package:flutter/material.dart';
 class SingleDropdownSelectionWidget extends StatefulWidget {
   final String value;
   final List<String> items;
-  final DropDownSingleSelectDefinition definition;
-  final DocumentNodeId nodeId;
-  final String title;
+  final DocumentDropDownSingleSelectSchema schema;
   final bool isEditMode;
-  final bool isRequired;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SingleDropdownSelectionWidget({
     super.key,
     required this.value,
     required this.items,
-    required this.definition,
-    required this.nodeId,
-    required this.title,
+    required this.schema,
     required this.isEditMode,
-    required this.isRequired,
     required this.onChanged,
   });
 
@@ -44,9 +39,8 @@ class _SingleDropdownSelectionWidgetState
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController();
-    _textEditingController.text = widget.value;
-
+    final textValue = TextEditingValueExt.collapsedAtEndOf(widget.value);
+    _textEditingController = TextEditingController.fromValue(textValue);
     _dropdownMenuEntries = _mapItems;
   }
 
@@ -60,7 +54,7 @@ class _SingleDropdownSelectionWidgetState
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
       final value = widget.value;
-      _textEditingController.text = value;
+      _textEditingController.textWithSelection = value;
     }
   }
 
@@ -76,7 +70,7 @@ class _SingleDropdownSelectionWidgetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          widget.title,
+          widget.schema.title,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
@@ -85,9 +79,14 @@ class _SingleDropdownSelectionWidgetState
           items: _dropdownMenuEntries,
           enabled: widget.isEditMode,
           onSelected: (val) {
-            widget.onChanged(DocumentChange(nodeId: widget.nodeId, value: val));
+            final change = DocumentValueChange(
+              nodeId: widget.schema.nodeId,
+              value: val,
+            );
+            widget.onChanged([change]);
           },
           initialValue: widget.value,
+          hintText: widget.schema.placeholder,
         ),
       ],
     );

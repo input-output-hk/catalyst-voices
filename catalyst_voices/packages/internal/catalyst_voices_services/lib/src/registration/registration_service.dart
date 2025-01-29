@@ -20,19 +20,12 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 final _logger = Logger('RegistrationService');
 
 abstract interface class RegistrationService {
-  factory RegistrationService({
-    required TransactionConfigRepository transactionConfigRepository,
-    required KeychainProvider keychainProvider,
-    required CatalystCardano cardano,
-    required KeyDerivation keyDerivation,
-  }) {
-    return RegistrationServiceImpl(
-      transactionConfigRepository,
-      keychainProvider,
-      cardano,
-      keyDerivation,
-    );
-  }
+  factory RegistrationService(
+    TransactionConfigRepository transactionConfigRepository,
+    KeychainProvider keychainProvider,
+    CatalystCardano cardano,
+    KeyDerivation keyDerivation,
+  ) = RegistrationServiceImpl;
 
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
@@ -73,6 +66,8 @@ abstract interface class RegistrationService {
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Account> register({
+    required String displayName,
+    required String email,
     required CardanoWallet wallet,
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
@@ -141,6 +136,10 @@ final class RegistrationServiceImpl implements RegistrationService {
       throw const RegistrationUnknownException();
     }
 
+    // TODO(damian-molinski): should come from backend
+    const displayName = 'Recovered';
+    const email = 'recovered@iohk.com';
+
     // TODO(dtscalac): derive a key from the seed phrase and fetch
     // from the backend info about the registration (roles, wallet, etc).
     final roles = {AccountRole.root};
@@ -148,8 +147,15 @@ final class RegistrationServiceImpl implements RegistrationService {
     final keychainId = const Uuid().v4();
     final keychain = await _keychainProvider.create(keychainId);
 
+    // TODO(damian-molinski): should extracted from role0.
+    //  See [Account.catalystId]
+    final catalystId = 'cardano/$keychainId';
+
     // Note. with rootKey query backend for account details.
     return Account(
+      catalystId: catalystId,
+      displayName: displayName,
+      email: email,
       keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
@@ -200,6 +206,8 @@ final class RegistrationServiceImpl implements RegistrationService {
 
   @override
   Future<Account> register({
+    required String displayName,
+    required String email,
     required CardanoWallet wallet,
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
@@ -230,7 +238,14 @@ final class RegistrationServiceImpl implements RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
+      // TODO(damian-molinski): should extracted from role0.
+      //  See [Account.catalystId]
+      final catalystId = 'cardano/$keychainId';
+
       return Account(
+        catalystId: catalystId,
+        displayName: displayName,
+        email: email,
         keychain: keychain,
         roles: roles,
         walletInfo: WalletInfo(
@@ -260,7 +275,12 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
 
+    final catalystId = 'cardano/$keychain';
+
     return Account(
+      catalystId: catalystId,
+      displayName: 'Dummy',
+      email: 'dummy@iohk.com',
       keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(

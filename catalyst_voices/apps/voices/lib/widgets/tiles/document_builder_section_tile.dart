@@ -1,12 +1,22 @@
+import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/multiline_text_entry_markdown_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
+import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-/// Displays a [DocumentSection] as list tile in edit / view mode.
+/// Displays a [DocumentSectionSchema] as list tile in edit / view mode.
 class DocumentBuilderSectionTile extends StatefulWidget {
-  /// A section of the document that groups [DocumentProperty].
-  final DocumentSection section;
+  /// A section of the document that groups [DocumentValueProperty].
+  final DocumentProperty section;
 
   /// A callback that should be called with a list of [DocumentChange]
   /// when the user wants to save the changes.
@@ -31,8 +41,8 @@ class DocumentBuilderSectionTile extends StatefulWidget {
 
 class _DocumentBuilderSectionTileState
     extends State<DocumentBuilderSectionTile> {
-  late DocumentSection _editedSection;
-  late DocumentSectionBuilder _builder;
+  late DocumentProperty _editedSection;
+  late DocumentPropertyBuilder _builder;
 
   final _pendingChanges = <DocumentChange>[];
 
@@ -59,7 +69,7 @@ class _DocumentBuilderSectionTileState
 
   @override
   Widget build(BuildContext context) {
-    final title = _editedSection.schema.title ?? '';
+    final title = _editedSection.schema.title;
 
     return SelectableTile(
       child: Padding(
@@ -73,15 +83,12 @@ class _DocumentBuilderSectionTileState
               isEditMode: _isEditMode,
               onToggleEditMode: _toggleEditMode,
             ),
-            for (final property in widget.section.properties) ...[
-              const SizedBox(height: 8),
-              _PropertyBuilder(
-                key: ValueKey(property.schema.nodeId),
-                property: property,
-                isEditMode: _isEditMode,
-                onChanged: _handlePropertyChange,
-              ),
-            ],
+            _PropertyBuilder(
+              key: ValueKey(_editedSection.schema.nodeId),
+              property: _editedSection,
+              isEditMode: _isEditMode,
+              onChanged: _handlePropertyChanges,
+            ),
             if (_isEditMode) ...[
               const SizedBox(height: 12),
               _Footer(
@@ -98,7 +105,6 @@ class _DocumentBuilderSectionTileState
   void _saveChanges() {
     widget.onChanged(List.of(_pendingChanges));
 
-    // ignore: unnecessary_lambdas
     setState(() {
       _pendingChanges.clear();
       _isEditMode = false;
@@ -116,22 +122,24 @@ class _DocumentBuilderSectionTileState
     });
   }
 
-  void _handlePropertyChange(DocumentChange change) {
+  void _handlePropertyChanges(List<DocumentChange> changes) {
     setState(() {
-      _builder.addChange(change);
+      for (final change in changes) {
+        _builder.addChange(change);
+      }
       _editedSection = _builder.build();
-      _pendingChanges.add(change);
+      _pendingChanges.addAll(changes);
     });
   }
 }
 
 class _Header extends StatelessWidget {
-  final String? title;
+  final String title;
   final bool isEditMode;
   final VoidCallback? onToggleEditMode;
 
   const _Header({
-    this.title,
+    required this.title,
     this.isEditMode = false,
     this.onToggleEditMode,
   });
@@ -142,7 +150,7 @@ class _Header extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            title ?? '',
+            title,
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -185,7 +193,7 @@ class _Footer extends StatelessWidget {
 class _PropertyBuilder extends StatelessWidget {
   final DocumentProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyBuilder({
     required super.key,
@@ -196,105 +204,217 @@ class _PropertyBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final definition = property.schema.definition;
+    final property = this.property;
+    switch (property) {
+      case DocumentListProperty():
+        return _PropertyListBuilder(
+          list: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentObjectProperty():
+        return _PropertyObjectBuilder(
+          property: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentValueProperty():
+        return _PropertyValueBuilder(
+          property: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+    }
+  }
+}
 
-    switch (definition) {
-      case SegmentDefinition():
-      case SectionDefinition():
-      case TagGroupDefinition():
-      case TagSelectionDefinition():
-        throw UnsupportedError(
-          '${property.schema.definition} unsupported '
-          'by $DocumentBuilderSectionTile',
+class _PropertyListBuilder extends StatelessWidget {
+  final DocumentListProperty list;
+  final bool isEditMode;
+  final ValueChanged<List<DocumentChange>> onChanged;
+
+  const _PropertyListBuilder({
+    required this.list,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: list.properties
+          .whereNot((child) => child.schema.isSubsection)
+          .map<Widget>((child) {
+            return _PropertyBuilder(
+              key: ValueKey(child.schema.nodeId),
+              property: child,
+              isEditMode: isEditMode,
+              onChanged: onChanged,
+            );
+          })
+          .separatedBy(const SizedBox(height: 24))
+          .toList(),
+    );
+  }
+}
+
+class _PropertyObjectBuilder extends StatelessWidget {
+  final DocumentObjectProperty property;
+  final bool isEditMode;
+  final ValueChanged<List<DocumentChange>> onChanged;
+
+  const _PropertyObjectBuilder({
+    required this.property,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final schema = property.schema;
+    switch (schema) {
+      case DocumentSingleGroupedTagSelectorSchema():
+        return SingleGroupedTagSelectorWidget(
+          schema: schema,
+          property: property,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
         );
 
-      case MultiSelectDefinition():
-      case SingleLineTextEntryListDefinition():
-      case MultiLineTextEntryListMarkdownDefinition():
-      case SingleLineHttpsURLEntryListDefinition():
-      case NestedQuestionsListDefinition():
-      case NestedQuestionsDefinition():
-      case DurationInMonthsDefinition():
-      case SPDXLicenceOrUrlDefinition():
-      case LanguageCodeDefinition():
-        return Text('${definition.runtimeType} not implemented');
-      case SingleLineHttpsURLEntryDefinition():
-      /*       final castProperty = definition.castProperty(property);
-        return SingleLineHttpsUrlWidget(
-          property: castProperty,
-          isEditMode: isEditMode,
-          onChanged: onChanged,
-        );*/
-      case SingleGroupedTagSelectorDefinition():
-      /* final castProperty = definition.castProperty(property);
-        return SingleGroupedTagSelectorWidget(
-          id: castProperty.schema.nodeId,
-          selection: castProperty.value ?? const GroupedTagsSelection(),
-          groupedTags: definition.groupedTags(castProperty.schema),
-          isEditMode: isEditMode,
-          onChanged: onChanged,
-          isRequired: castProperty.schema.isRequired,
-        );*/
-      case DropDownSingleSelectDefinition():
-      /* final castProperty = definition.castProperty(property);
+      case DocumentSegmentSchema():
+      case DocumentSectionSchema():
+      case DocumentNestedQuestionsSchema():
+      case DocumentGenericObjectSchema():
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: property.properties
+              .whereNot((child) => child.schema.isSubsection)
+              .map<Widget>((child) {
+                return _PropertyBuilder(
+                  key: ValueKey(child.schema.nodeId),
+                  property: child,
+                  isEditMode: isEditMode,
+                  onChanged: onChanged,
+                );
+              })
+              .separatedBy(const SizedBox(height: 24))
+              .toList(),
+        );
+    }
+  }
+}
+
+class _PropertyValueBuilder extends StatelessWidget {
+  final DocumentValueProperty property;
+  final bool isEditMode;
+  final ValueChanged<List<DocumentChange>> onChanged;
+
+  const _PropertyValueBuilder({
+    required this.property,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final schema = property.schema;
+    switch (schema) {
+      case DocumentDropDownSingleSelectSchema():
+        final castProperty = schema.castProperty(property);
         return SingleDropdownSelectionWidget(
           value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
           items: castProperty.schema.enumValues ?? [],
-          definition: definition,
-          nodeId: castProperty.schema.nodeId,
-          title: castProperty.schema.title ?? '',
+          schema: schema,
           isEditMode: isEditMode,
-          isRequired: castProperty.schema.isRequired,
           onChanged: onChanged,
-        );*/
-      case AgreementConfirmationDefinition():
-      /*final castProperty = definition.castProperty(property);
+        );
+      case DocumentAgreementConfirmationSchema():
+        final castProperty = schema.castProperty(property);
         return AgreementConfirmationWidget(
-          value: castProperty.value,
-          definition: definition,
-          nodeId: castProperty.schema.nodeId,
-          description: castProperty.schema.description ?? '',
-          title: castProperty.schema.title ?? '',
+          property: castProperty,
+          schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
-        );*/
-      case TokenValueCardanoADADefinition():
-      /*final castProperty = definition.castProperty(property);
+        );
+      case DocumentTokenValueCardanoAdaSchema():
         return DocumentTokenValueWidget(
-          property: castProperty as DocumentProperty<int>,
+          property: schema.castProperty(property),
+          schema: schema,
           currency: const Currency.ada(),
           isEditMode: isEditMode,
           onChanged: onChanged,
-        );*/
-      case SingleLineTextEntryDefinition():
-      case MultiLineTextEntryDefinition():
-      /*final castProperty = definition.castProperty(property);
-        return SimpleTextEntryWidget(
-          property: castProperty as DocumentProperty<String>,
-          isEditMode: isEditMode,
-          onChanged: onChanged,
-        );*/
-      case YesNoChoiceDefinition():
-      /*final castProperty = definition.castProperty(property);
+        );
+      case DocumentYesNoChoiceSchema():
         return YesNoChoiceWidget(
-          property: castProperty,
+          property: schema.castProperty(property),
+          schema: schema,
           onChanged: onChanged,
           isEditMode: isEditMode,
-          isRequired: castProperty.schema.isRequired,
-        );*/
+        );
+      case DocumentSingleLineHttpsUrlEntrySchema():
+        return SingleLineHttpsUrlWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentSingleLineTextEntrySchema():
+      case DocumentMultiLineTextEntrySchema():
+      case DocumentGenericStringSchema():
+        final castSchema = schema as DocumentStringSchema;
+        return SimpleTextEntryWidget(
+          property: castSchema.castProperty(property),
+          schema: castSchema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
 
-      case MultiLineTextEntryMarkdownDefinition():
-        /*final castProperty = definition.castProperty(property);
-        final castProperty = definition.castProperty(property);
+      case DocumentMultiLineTextEntryMarkdownSchema():
         return MultilineTextEntryMarkdownWidget(
-          property: castProperty,
-          onChanged: onChanged,
+          property: schema.castProperty(property),
+          schema: schema,
           isEditMode: isEditMode,
-          isRequired: castProperty.schema.isRequired,
-        );*/
+          onChanged: onChanged,
+        );
 
-        // TODO(dtscalac): uncomment tiles when casting works.
-        return Text('${definition.runtimeType} casting problem');
+      case DocumentSpdxLicenseOrUrlSchema():
+      case DocumentLanguageCodeSchema():
+      case DocumentDurationInMonthsSchema():
+      case DocumentGenericIntegerSchema():
+      case DocumentGenericNumberSchema():
+      case DocumentGenericBooleanSchema():
+        return _UnimplementedWidget(schema: schema);
+
+      case DocumentTagGroupSchema():
+      case DocumentTagSelectionSchema():
+        // DocumentTagGroupSchema and DocumentTagSelectionSchema should
+        // be handled by their parent (DocumentSingleGroupedTagSelectorSchema)
+        // so the code here should never be executed
+        return _UnimplementedWidget(schema: schema);
     }
+  }
+}
+
+// TODO(dtscalac): remove this widget when all document properties
+// are implemented
+class _UnimplementedWidget extends StatelessWidget {
+  final DocumentPropertySchema schema;
+
+  const _UnimplementedWidget({
+    required this.schema,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Text(
+        'Unimplemented ${schema.runtimeType}: ${schema.nodeId}',
+        style: const TextStyle(color: Colors.red),
+      ),
+    );
   }
 }
