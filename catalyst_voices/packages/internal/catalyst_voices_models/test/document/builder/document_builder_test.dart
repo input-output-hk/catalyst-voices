@@ -145,5 +145,43 @@ void main() {
 
       expect(property.value, equals('value2'));
     });
+
+    test('should add and remove list items', () {
+      final builder = DocumentBuilder.fromSchema(schema: schema);
+
+      final addItemChange =
+          DocumentAddListItemChange(nodeId: listSchema.nodeId);
+
+      // add the first item
+      builder.addChange(addItemChange);
+
+      // assert first item was added
+      final document1 = builder.build();
+      final listProperty1 =
+          document1.getProperty(listSchema.nodeId)! as DocumentListProperty;
+      expect(listProperty1.properties, hasLength(1));
+
+      // add the second item
+      builder.addChange(addItemChange);
+
+      // assert second item was added
+      final document2 = builder.build();
+      final listProperty2 =
+          document2.getProperty(listSchema.nodeId)! as DocumentListProperty;
+      expect(listProperty2.properties, hasLength(2));
+
+      final removeItemChange = DocumentRemoveListItemChange(
+        nodeId: listProperty2.properties.last.nodeId,
+      );
+
+      // remove second item
+      builder.addChange(removeItemChange);
+
+      // assert there is only one item remaining
+      final document3 = builder.build();
+      final listProperty3 =
+          document3.getProperty(listSchema.nodeId)! as DocumentListProperty;
+      expect(listProperty3.properties, hasLength(1));
+    });
   });
 }
