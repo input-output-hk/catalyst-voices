@@ -14,7 +14,7 @@ mod helper {
     use cardano_chain_follower::Metadata::cip36::{Cip36, VotingPubKey};
     use ed25519_dalek::VerifyingKey;
 
-    pub(super) fn create_dummy_cip39(number: u32) -> (Cip36, VotingPubKey) {
+    pub(super) fn create_dummy_cip36(number: u32) -> (Cip36, VotingPubKey) {
         let empty_cip36 = Cip36 {
             cip36: None,
             voting_keys: vec![],
@@ -219,8 +219,8 @@ async fn test_cip36_registration_for_vote_key() {
     };
 
     // data
-    let dummy0 = helper::create_dummy_cip39(0);
-    let dummy1 = helper::create_dummy_cip39(1);
+    let dummy0 = helper::create_dummy_cip36(0);
+    let dummy1 = helper::create_dummy_cip36(1);
 
     let data = vec![
         cip36::insert_cip36_for_vote_key::Params::new(&dummy0.1, 0, 0, &dummy0.0, false),
@@ -284,8 +284,8 @@ async fn test_cip36_registration_invalid() {
     };
 
     // data
-    let dummy0 = helper::create_dummy_cip39(0);
-    let dummy1 = helper::create_dummy_cip39(1);
+    let dummy0 = helper::create_dummy_cip36(0);
+    let dummy1 = helper::create_dummy_cip36(1);
 
     let data = vec![
         cip36::insert_cip36_invalid::Params::new(Some(&dummy0.1), 0, 0, &dummy0.0, vec![]),
@@ -345,8 +345,8 @@ async fn test_cip36_registration() {
     };
 
     // data
-    let dummy0 = helper::create_dummy_cip39(0);
-    let dummy1 = helper::create_dummy_cip39(1);
+    let dummy0 = helper::create_dummy_cip36(0);
+    let dummy1 = helper::create_dummy_cip36(1);
 
     let data = vec![
         cip36::insert_cip36::Params::new(&dummy0.1, 0, 0, &dummy0.0),
