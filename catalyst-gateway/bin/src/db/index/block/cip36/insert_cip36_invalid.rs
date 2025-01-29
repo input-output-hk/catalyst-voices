@@ -73,6 +73,10 @@ impl Params {
         let vote_key = vote_key
             .and_then(|k| k.voting_pk().map(|k| k.as_bytes().to_vec()))
             .unwrap_or_else(Vec::new);
+        let is_cip36 = cip36
+            .is_cip36()
+            .map(MaybeUnset::Set)
+            .unwrap_or(MaybeUnset::Unset);
         Params {
             stake_address: cip36
                 .stake_pk()
@@ -84,12 +88,8 @@ impl Params {
             payment_address: cip36.payment_addr.clone(),
             is_payable: cip36.payable,
             raw_nonce: cip36.raw_nonce.into(),
-            nonce: cip36.nonce.into(),
-            cip36: if let Some(cip36) = cip36.cip36 {
-                MaybeUnset::Set(cip36)
-            } else {
-                MaybeUnset::Unset
-            },
+            nonce: cip36.nonce().into(),
+            cip36: is_cip36,
             signed: cip36.signed,
             error_report,
         }

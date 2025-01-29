@@ -12,7 +12,7 @@ use c509_certificate::{
     extensions::{alt_name::GeneralNamesOrText, extension::ExtensionValue},
     general_names::general_name::{GeneralNameTypeRegistry, GeneralNameValue},
 };
-use cardano_blockchain_types::{MetadatumLabel, MultiEraBlock, Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionHash, TxnIndex};
 use chain_root::ChainRoot;
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
@@ -128,56 +128,81 @@ impl Rbac509InsertQuery {
 
     /// Index the RBAC 509 registrations in a transaction.
     pub(crate) async fn index(
-        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: TxnIndex,
-        slot_no: Slot, block: &MultiEraBlock,
+        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionHash, index: TxnIndex,
+        slot: Slot, block: &MultiEraBlock,
     ) {
-        if let Some((rbac, chain_root)) =
-            rbac_metadata(session, txn_hash, txn_idx, slot_no, block).await
-        {
-            self.registrations.push(insert_rbac509::Params::new(
-                chain_root.txn_hash,
-                txn_hash,
-                slot_no,
-                txn_idx,
-                &rbac.cip509,
-            ));
-
-            // TODO: Create a getter, should not need to access public properties like this.
-            let rbac_metadata = &rbac.cip509.x509_chunks.0;
-            if let Some(role_set) = &rbac_metadata.role_set {
-                // TODO: Change RoleSet to be a map, so we don't have to iterate here.
-                for role in role_set.iter().filter(|role| role.role_number == 0) {
-                    // Index Role 0 data
-                    if let Some(Role0CertificateData {
-                        role0_key,
-                        stake_addresses,
-                    }) = role
-                        .role_signing_key
-                        .as_ref()
-                        .and_then(|key_reference| extract_role0_data(key_reference, rbac_metadata))
-                    {
-                        CHAIN_ROOT_BY_ROLE0_KEY_CACHE
-                            .insert(role0_key.clone(), (chain_root.clone(), slot_no, txn_idx));
-                        if let Some(stake_addresses) = stake_addresses {
-                            for stake_address in stake_addresses {
-                                CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(
-                                    stake_address.clone(),
-                                    (chain_root.clone(), slot_no, txn_idx),
-                                );
-                                self.chain_root_for_stake_address.push(
-                                    insert_chain_root_for_stake_address::Params::new(
-                                        &stake_address,
-                                        &chain_root,
-                                        slot_no,
-                                        txn_idx,
-                                    ),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
+        // TODO: FIXME: pass track_payment_addresses?..
+        let track_payment_addresses = &[];
+        match Cip509::new(block, index, track_payment_addresses) {
+            Ok(None) => {
+                // Nothing to index.
+            },
+            Ok(Some(cip509)) if !cip509.report().is_problematic() => {
+                // TODO: FIXME: Potentially valid registration.
+                todo!();
+            },
+            Ok(Some(cip509)) => {
+                // TODO: FIXME: Use problem report!
+                todo!();
+            },
+            Err(e) => {
+                error!(
+                    slot = slot,
+                    index = index,
+                    "Invalid RBAC Registration Metadata in transaction: {e:?}"
+                );
+            },
         }
+        let a = Cip509::new(block, index, track_payment_addresses);
+
+        // TODO: FIXME: Remove
+        // if let Some((rbac, chain_root)) =
+        //     rbac_metadata(session, txn_hash, txn_idx, slot_no, block).await
+        // {
+        //     self.registrations.push(insert_rbac509::Params::new(
+        //         chain_root.txn_hash,
+        //         txn_hash,
+        //         slot_no,
+        //         txn_idx,
+        //         &rbac.cip509,
+        //     ));
+        //
+        //     // TODO: Create a getter, should not need to access public properties like
+        // this.     let rbac_metadata = &rbac.cip509.x509_chunks.0;
+        //     if let Some(role_set) = &rbac_metadata.role_set {
+        //         // TODO: Change RoleSet to be a map, so we don't have to iterate here.
+        //         for role in role_set.iter().filter(|role| role.role_number == 0) {
+        //             // Index Role 0 data
+        //             if let Some(Role0CertificateData {
+        //                 role0_key,
+        //                 stake_addresses,
+        //             }) = role
+        //                 .role_signing_key
+        //                 .as_ref()
+        //                 .and_then(|key_reference| extract_role0_data(key_reference,
+        // rbac_metadata))             {
+        //                 CHAIN_ROOT_BY_ROLE0_KEY_CACHE
+        //                     .insert(role0_key.clone(), (chain_root.clone(), slot_no,
+        // txn_idx));                 if let Some(stake_addresses) =
+        // stake_addresses {                     for stake_address in
+        // stake_addresses {
+        // CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(
+        // stake_address.clone(),                             (chain_root.clone(),
+        // slot_no, txn_idx),                         );
+        //                         self.chain_root_for_stake_address.push(
+        //                             insert_chain_root_for_stake_address::Params::new(
+        //                                 &stake_address,
+        //                                 &chain_root,
+        //                                 slot_no,
+        //                                 txn_idx,
+        //                             ),
+        //                         );
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     /// Execute the RBAC 509 Registration Indexing Queries.
@@ -381,28 +406,4 @@ fn extract_stake_addresses_from_c509(c509: &C509) -> Option<Vec<StakeAddress>> {
     } else {
         Some(stake_addresses)
     }
-}
-
-/// Return RBAC metadata if it is found in the transaction, or None
-async fn rbac_metadata(
-    session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: usize, slot_no: u64,
-    block: &MultiEraBlock,
-) -> Option<(Arc<Cip509>, ChainRoot)> {
-    if let Some(decoded_metadata) = block.txn_metadata(txn_idx, MetadatumLabel::CIP509_RBAC) {
-        if let Metadata::DecodedMetadataValues::Cip509(rbac) = &decoded_metadata.value {
-            if let Some(chain_root) =
-                ChainRoot::get(session, txn_hash, txn_idx, slot_no, rbac).await
-            {
-                return Some((rbac.clone(), chain_root));
-            }
-
-            // TODO: Maybe Index Invalid RBAC Registrations detected.
-            error!(
-                slot = slot_no,
-                txn_idx = txn_idx,
-                "Invalid RBAC Registration Metadata in transaction."
-            );
-        }
-    }
-    None
 }

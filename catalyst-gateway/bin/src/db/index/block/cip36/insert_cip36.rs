@@ -7,7 +7,10 @@ use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTxnIndex},
+    },
     settings::cassandra_db,
 };
 
@@ -22,9 +25,9 @@ pub(super) struct Params {
     /// Nonce value after normalization.
     nonce: num_bigint::BigInt,
     /// Slot Number the cert is in.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Index.
-    txn: i16,
+    txn: DbTxnIndex,
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
@@ -59,7 +62,7 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new Insert Query.
-    pub fn new(vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36) -> Self {
+    pub fn new(vote_key: &VotingPubKey, slot_no: DbSlot, txn: DbTxnIndex, cip36: &Cip36) -> Self {
         Params {
             stake_address: cip36
                 .stake_pk()

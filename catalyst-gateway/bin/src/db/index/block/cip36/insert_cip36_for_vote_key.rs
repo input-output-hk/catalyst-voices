@@ -7,7 +7,10 @@ use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTxnIndex},
+    },
     settings::cassandra_db,
 };
 
@@ -23,9 +26,9 @@ pub(super) struct Params {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     stake_address: Vec<u8>,
     /// Slot Number the cert is in.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Index.
-    txn: i16,
+    txn: DbTxnIndex,
     /// Is the registration Valid or not.
     valid: bool,
 }
@@ -33,12 +36,15 @@ pub(super) struct Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36, valid: bool,
+        vote_key: &VotingPubKey, slot_no: DbSlot, txn: DbTxnIndex, cip36: &Cip36, valid: bool,
     ) -> Self {
         Params {
-            vote_key: vote_key.voting_pk().to_bytes().to_vec(),
+            vote_key: vote_key
+                .voting_pk()
+                .map(|k| k.to_bytes().to_vec())
+                .unwrap_or_default(),
             stake_address: cip36
-                .stake_pk
+                .stake_pk()
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
             slot_no: slot_no.into(),
