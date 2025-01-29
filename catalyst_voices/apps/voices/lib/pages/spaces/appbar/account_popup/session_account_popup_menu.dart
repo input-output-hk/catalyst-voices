@@ -80,9 +80,10 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu>
   void _handleEvent(_MenuItemEvent event) {
     switch (event) {
       case _OpenAccountDetails():
-        const AccountRoute().go(context);
+        unawaited(const AccountRoute().push(context));
       case _SetupRoles():
-      // TODO(damian-molinski): don't know what it should do
+        // TODO(damian-molinski): don't know what it should do
+        break;
       case _RedirectToSupport():
         final uri = Uri.parse(VoicesConstants.supportUrl);
         unawaited(launchUri(uri));
