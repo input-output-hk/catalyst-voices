@@ -10,6 +10,9 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required this.properties,
     required this.oneOf,
@@ -50,8 +53,13 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
 
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {
-    // TODO(dtscalac): object type validation
+    // Object types don't have any validation rules currently.
     return const SuccessfulDocumentValidation();
+  }
+
+  DocumentPropertySchema?
+      getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
+    return properties.firstWhereOrNull((e) => e is T);
   }
 
   @override
@@ -68,6 +76,9 @@ final class DocumentSegmentSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -85,6 +96,9 @@ final class DocumentSegmentSchema extends DocumentObjectSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       properties:
           properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
@@ -106,6 +120,9 @@ final class DocumentSectionSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -119,7 +136,10 @@ final class DocumentSectionSchema extends DocumentObjectSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
+      isSubsection: isSubsection,
       properties:
           properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
       oneOf: oneOf,
@@ -134,6 +154,9 @@ final class DocumentNestedQuestionsSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -147,7 +170,10 @@ final class DocumentNestedQuestionsSchema extends DocumentObjectSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
+      isSubsection: isSubsection,
       properties:
           properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
       oneOf: oneOf,
@@ -163,6 +189,9 @@ final class DocumentSingleGroupedTagSelectorSchema
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -176,7 +205,10 @@ final class DocumentSingleGroupedTagSelectorSchema
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
+      isSubsection: isSubsection,
       properties:
           properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
       oneOf: oneOf,
@@ -212,6 +244,24 @@ final class DocumentSingleGroupedTagSelectorSchema
     );
   }
 
+  List<DocumentChange> buildDocumentChanges(GroupedTagsSelection selection) {
+    final groupProperty = getPropertyWithSchemaType<DocumentTagGroupSchema>()!;
+
+    final tagProperty =
+        getPropertyWithSchemaType<DocumentTagSelectionSchema>()!;
+
+    return [
+      DocumentValueChange(
+        nodeId: groupProperty.nodeId,
+        value: selection.group,
+      ),
+      DocumentValueChange(
+        nodeId: tagProperty.nodeId,
+        value: selection.tag,
+      ),
+    ];
+  }
+
   List<GroupedTags> groupedTags() {
     final oneOf = this.oneOf ?? const [];
     return GroupedTags.fromLogicalGroups(oneOf);
@@ -224,6 +274,9 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.properties,
     required super.oneOf,
@@ -235,6 +288,9 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
     super.format,
     super.title = '',
     super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
     super.isRequired = false,
     super.properties = const [],
     super.oneOf,
@@ -248,7 +304,10 @@ final class DocumentGenericObjectSchema extends DocumentObjectSchema {
       format: format,
       title: title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
       isRequired: isRequired,
+      isSubsection: isSubsection,
       properties:
           properties.map((e) => e.withNodeId(nodeId.child(e.id))).toList(),
       oneOf: oneOf,
