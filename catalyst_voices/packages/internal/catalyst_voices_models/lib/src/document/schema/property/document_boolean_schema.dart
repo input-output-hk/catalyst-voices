@@ -18,6 +18,9 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
         );
 
   @override
+  DocumentBooleanSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(bool? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),

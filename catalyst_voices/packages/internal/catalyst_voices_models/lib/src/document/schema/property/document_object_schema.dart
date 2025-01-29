@@ -43,7 +43,7 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
     final updatedSchema = copyWith(
       nodeId: nodeId,
       title: title,
-    ) as DocumentObjectSchema;
+    );
 
     final updatedProperties = properties.map(
       (e) {
@@ -56,6 +56,9 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
       properties: List.unmodifiable(updatedProperties),
     );
   }
+
+  @override
+  DocumentObjectSchema copyWith({DocumentNodeId? nodeId, String? title});
 
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {

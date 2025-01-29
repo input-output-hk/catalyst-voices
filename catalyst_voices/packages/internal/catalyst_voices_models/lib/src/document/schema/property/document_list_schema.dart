@@ -43,12 +43,15 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
     final updatedSchema = copyWith(
       nodeId: nodeId,
       title: title,
-    ) as DocumentListSchema;
+    );
 
     return updatedSchema.buildProperty(
       properties: List.unmodifiable(<DocumentProperty>[]),
     );
   }
+
+  @override
+  DocumentListSchema copyWith({DocumentNodeId? nodeId, String? title});
 
   /// Validates the property against document rules.
   DocumentValidationResult validate(List<DocumentProperty> properties) {

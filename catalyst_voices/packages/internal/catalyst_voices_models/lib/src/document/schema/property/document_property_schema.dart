@@ -141,7 +141,7 @@ sealed class DocumentValueSchema<T extends Object>
     final updatedSchema = copyWith(
       nodeId: nodeId,
       title: title,
-    ) as DocumentValueSchema<T>;
+    );
 
     return updatedSchema.buildProperty(value: defaultValue);
   }
@@ -164,6 +164,9 @@ sealed class DocumentValueSchema<T extends Object>
   T? castValue(Object? value) {
     return value as T?;
   }
+
+  @override
+  DocumentValueSchema<T> copyWith({DocumentNodeId? nodeId, String? title});
 
   /// Validates the property [value] against document rules.
   DocumentValidationResult validate(T? value);

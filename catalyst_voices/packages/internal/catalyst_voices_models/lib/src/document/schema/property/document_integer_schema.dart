@@ -21,6 +21,9 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
         );
 
   @override
+  DocumentIntegerSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(int? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),

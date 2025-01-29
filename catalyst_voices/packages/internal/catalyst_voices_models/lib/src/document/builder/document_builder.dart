@@ -228,8 +228,13 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   /// from [DocumentListSchema.itemsSchema] title.
   ///
   /// Each child is given a `${itemsSchema.title} ${index + 1}` title.
-  ///
   /// If a middle child gets removed we need to resync outdated children.
+  ///
+  /// Context: milestone titles should be formatted using their index in a list:
+  /// - Milestone #1
+  /// - Milestone #2
+  /// - ...
+  /// - Milestone #n
   void _syncChildrenTitles() {
     for (var i = 0; i < _properties.length; i++) {
       final property = _properties[i];

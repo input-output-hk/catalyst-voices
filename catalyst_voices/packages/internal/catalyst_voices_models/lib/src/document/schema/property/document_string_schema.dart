@@ -25,6 +25,9 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
         );
 
   @override
+  DocumentStringSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(String? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
