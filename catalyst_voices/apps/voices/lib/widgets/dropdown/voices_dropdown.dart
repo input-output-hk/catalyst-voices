@@ -75,13 +75,11 @@ class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
 }
 
 class SingleSelectDropdown<T> extends FormField<T> {
-  final TextEditingController? controller;
   final ValueChanged<T?>? onChanged;
   final List<DropdownMenuEntry<T>> items;
   final String? hintText;
   SingleSelectDropdown({
     super.key,
-    this.controller,
     super.initialValue,
     super.validator,
     super.enabled,
@@ -89,11 +87,7 @@ class SingleSelectDropdown<T> extends FormField<T> {
     required this.items,
     this.hintText,
     AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
-  })  : assert(
-          initialValue == null || controller == null,
-          'initialValue and controller cannot be both set',
-        ),
-        super(
+  }) : super(
           autovalidateMode: autovalidateMode,
           builder: (field) {
             final state = field as _SelectDropdownState;
