@@ -77,6 +77,7 @@ class _RadioButtonList extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?>? onChanged;
   final String? value;
+
   const _RadioButtonList({
     required this.enabled,
     required this.items,
