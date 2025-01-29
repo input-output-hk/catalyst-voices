@@ -40,7 +40,7 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant RadioButtonSelectWidget oldWidget) {
+  void didUpdateWidget(RadioButtonSelectWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.property.value != widget.property.value) {
       _handleInitialValue();
@@ -126,55 +126,19 @@ class _RadioButtonForm extends FormField<String> {
               onChanged?.call(selected);
             }
 
-            TextStyle? getStyle(String? value) {
-              final textStyle = field.context.textTheme.bodyLarge;
-              if (enabled || state._internalValue == value) {
-                return textStyle;
-              }
-              return textStyle?.copyWith(
-                color: field.context.colors.textDisabled,
-              );
-            }
-
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IgnorePointer(
-                  ignoring: !enabled,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: items
-                        .map<Widget>(
-                          (e) => VoicesRadio(
-                            key: ValueKey(e),
-                            value: e,
-                            label: Text(
-                              e,
-                              style: getStyle(e),
-                            ),
-                            groupValue: state._internalValue,
-                            onChanged: onChangedHandler,
-                          ),
-                        )
-                        .separatedBy(const SizedBox(height: 10))
-                        .toList(),
-                  ),
+                _RadioButtonList(
+                  enabled: enabled,
+                  items: items,
+                  onChanged: onChangedHandler,
+                  value: state._internalValue,
                 ),
                 if (field.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      field.errorText ??
-                          field.context.l10n.snackbarErrorLabelText,
-                      style: Theme.of(field.context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(
-                            color: Theme.of(field.context).colorScheme.error,
-                          ),
-                    ),
+                  _ErrorText(
+                    errorText: field.errorText,
                   ),
               ],
             );
@@ -183,6 +147,76 @@ class _RadioButtonForm extends FormField<String> {
 
   @override
   FormFieldState<String> createState() => _RadioButtonFormState();
+}
+
+class _RadioButtonList extends StatelessWidget {
+  final bool enabled;
+  final List<String> items;
+  final ValueChanged<String?>? onChanged;
+  final String? value;
+  const _RadioButtonList({
+    required this.enabled,
+    required this.items,
+    this.onChanged,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      ignoring: !enabled,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: items
+            .map<Widget>(
+              (e) => VoicesRadio<String>(
+                key: ValueKey(e),
+                value: e,
+                label: Text(
+                  e,
+                  style: getStyle(context, e),
+                ),
+                groupValue: value,
+                onChanged: onChanged,
+              ),
+            )
+            .separatedBy(const SizedBox(height: 10))
+            .toList(),
+      ),
+    );
+  }
+
+  TextStyle? getStyle(BuildContext context, String? itemValue) {
+    final textStyle = context.textTheme.bodyLarge;
+    if (enabled || value == itemValue) {
+      return textStyle;
+    }
+    return textStyle?.copyWith(
+      color: context.colors.textDisabled,
+    );
+  }
+}
+
+class _ErrorText extends StatelessWidget {
+  final String? errorText;
+
+  const _ErrorText({
+    this.errorText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text(
+        errorText ?? context.l10n.snackbarErrorLabelText,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
+      ),
+    );
+  }
 }
 
 class _RadioButtonFormState extends FormFieldState<String> {
