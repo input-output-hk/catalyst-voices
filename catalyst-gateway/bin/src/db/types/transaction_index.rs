@@ -8,7 +8,7 @@ use scylla::_macro_internal::{
 
 /// A `TxnIndex` wrapper that can be stored to and load from a database.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DbTxnIndex(Internal);
+pub struct DbTxnIndex(i16);
 
 impl From<TxnIndex> for DbTxnIndex {
     fn from(value: TxnIndex) -> Self {

@@ -22,7 +22,6 @@ pub(crate) async fn purge_live_index(purge_slot: u64) -> anyhow::Result<()> {
         .into();
 
     let txn_hashes = purge_txi_by_hash(&session, &purge_to_slot).await?;
-    purge_chain_root_for_role0_key(&session, &purge_to_slot).await?;
     purge_chain_root_for_stake_address(&session, &purge_to_slot).await?;
     purge_chain_root_for_txn_id(&session, &txn_hashes).await?;
     purge_cip36_registration(&session, &purge_to_slot).await?;
@@ -35,27 +34,6 @@ pub(crate) async fn purge_live_index(purge_slot: u64) -> anyhow::Result<()> {
     purge_unstaked_txo_ada(&session, &purge_to_slot).await?;
     purge_unstaked_txo_assets(&session, &purge_to_slot).await?;
 
-    Ok(())
-}
-
-/// Purge data from `chain_root_for_role0_key`.
-async fn purge_chain_root_for_role0_key(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
-) -> anyhow::Result<()> {
-    use purge::chain_root_for_role0_key::{DeleteQuery, Params, PrimaryKeyQuery};
-
-    // Get all keys
-    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
-    // Filter
-    let mut delete_params: Vec<Params> = Vec::new();
-    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
-            delete_params.push(params);
-        }
-    }
-    // Delete filtered keys
-    DeleteQuery::execute(session, delete_params).await?;
     Ok(())
 }
 

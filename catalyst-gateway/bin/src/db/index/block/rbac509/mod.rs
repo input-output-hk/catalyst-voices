@@ -1,7 +1,6 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
 pub(crate) mod chain_root;
-mod insert_chain_root_for_role0_kid;
 mod insert_chain_root_for_stake_address;
 mod insert_chain_root_for_txn_id;
 mod insert_rbac509;
@@ -102,8 +101,6 @@ pub(crate) struct Rbac509InsertQuery {
     registrations: Vec<insert_rbac509::Params>,
     /// Chain Root For Transaction ID Data captured during indexing.
     chain_root_for_txn_id: Vec<insert_chain_root_for_txn_id::Params>,
-    /// Chain Root For Role0 Key Data captured during indexing.
-    chain_root_for_role0_key: Vec<insert_chain_root_for_role0_kid::Params>,
     /// Chain Root For Stake Address Data captured during indexing.
     chain_root_for_stake_address: Vec<insert_chain_root_for_stake_address::Params>,
 }
@@ -114,7 +111,6 @@ impl Rbac509InsertQuery {
         Rbac509InsertQuery {
             registrations: Vec::new(),
             chain_root_for_txn_id: Vec::new(),
-            chain_root_for_role0_key: Vec::new(),
             chain_root_for_stake_address: Vec::new(),
         }
     }
@@ -122,11 +118,10 @@ impl Rbac509InsertQuery {
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
+    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
             insert_chain_root_for_txn_id::Params::prepare_batch(session, cfg).await?,
-            insert_chain_root_for_role0_kid::Params::prepare_batch(session, cfg).await?,
             insert_chain_root_for_stake_address::Params::prepare_batch(session, cfg).await?,
         ))
     }
@@ -163,14 +158,6 @@ impl Rbac509InsertQuery {
                     {
                         CHAIN_ROOT_BY_ROLE0_KEY_CACHE
                             .insert(role0_key.clone(), (chain_root.clone(), slot_no, txn_idx));
-                        self.chain_root_for_role0_key.push(
-                            insert_chain_root_for_role0_kid::Params::new(
-                                &role0_key,
-                                &chain_root,
-                                slot_no,
-                                txn_idx,
-                            ),
-                        );
                         if let Some(stake_addresses) = stake_addresses {
                             for stake_address in stake_addresses {
                                 CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(
@@ -215,18 +202,6 @@ impl Rbac509InsertQuery {
                     .execute_batch(
                         PreparedQuery::ChainRootForTxnIdInsertQuery,
                         self.chain_root_for_txn_id,
-                    )
-                    .await
-            }));
-        }
-
-        if !self.chain_root_for_role0_key.is_empty() {
-            let inner_session = session.clone();
-            query_handles.push(tokio::spawn(async move {
-                inner_session
-                    .execute_batch(
-                        PreparedQuery::ChainRootForRole0KeyInsertQuery,
-                        self.chain_root_for_role0_key,
                     )
                     .await
             }));

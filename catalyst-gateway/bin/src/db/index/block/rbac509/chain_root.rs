@@ -7,6 +7,7 @@ use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::StakeAddress;
 use pallas_crypto::hash::Hash;
+use rbac_registration::cardano::cip509::Cip509;
 use tracing::{error, warn};
 
 use self::rbac::{

@@ -1,20 +1,25 @@
 //! Integration tests of the `IndexDB` queries testing on its session.
 //! This is mainly to test whether the defined queries work with the database or not.
 
+use cardano_blockchain_types::TransactionHash;
 use futures::StreamExt;
 
 use super::*;
 use crate::{
-    db::index::queries::{
-        rbac::{get_chain_root, get_registrations::*, get_role0_chain_root},
-        registrations::{
-            get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*, get_invalid::*,
+    db::{
+        index::queries::{
+            rbac::{get_chain_root, get_registrations::*, get_role0_chain_root},
+            registrations::{
+                get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*,
+                get_invalid::*,
+            },
+            staked_ada::{
+                get_assets_by_stake_address::*, get_txi_by_txn_hash::*,
+                get_txo_by_stake_address::*, update_txo_spent::*,
+            },
+            sync_status::update::*,
         },
-        staked_ada::{
-            get_assets_by_stake_address::*, get_txi_by_txn_hash::*, get_txo_by_stake_address::*,
-            update_txo_spent::*,
-        },
-        sync_status::update::*,
+        types::DbTransactionHash,
     },
     service::common::types::cardano::slot_no::SlotNo,
 };
@@ -43,7 +48,7 @@ async fn test_get_chain_root() {
     let (session, _) = get_shared_session().await.unwrap();
 
     let mut row_stream = get_chain_root::Query::execute(&session, get_chain_root::QueryParams {
-        transaction_id: vec![],
+        transaction_id: TransactionHash::new(&[]).into(),
     })
     .await
     .unwrap();

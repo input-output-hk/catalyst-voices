@@ -1,6 +1,5 @@
 //! Queries for purging volatile data.
 
-pub(crate) mod chain_root_for_role0_key;
 pub(crate) mod chain_root_for_stake_address;
 pub(crate) mod chain_root_for_txn_id;
 pub(crate) mod cip36_registration;
@@ -136,10 +135,6 @@ pub(crate) struct PreparedQueries {
     select_chain_root_for_txn_id: PreparedStatement,
     /// Chain Root for TX ID Delete Query..
     delete_chain_root_for_txn_id: SizedBatch,
-    /// Chain Root for Role 0 Key Primary Key Query..
-    select_chain_root_for_role0_key: PreparedStatement,
-    /// Chain Root for Role 0 Key Delete Query..
-    delete_chain_root_for_role0_key: SizedBatch,
     /// Chain Root for Stake Address Primary Key Query..
     select_chain_root_for_stake_address: PreparedStatement,
     /// Chain Root for Stake Address Delete Query..
@@ -191,14 +186,6 @@ impl PreparedQueries {
             select_rbac509_registration: rbac509_registration::PrimaryKeyQuery::prepare(&session)
                 .await?,
             delete_rbac509_registration: rbac509_registration::DeleteQuery::prepare_batch(
-                &session, cfg,
-            )
-            .await?,
-            select_chain_root_for_role0_key: chain_root_for_role0_key::PrimaryKeyQuery::prepare(
-                &session,
-            )
-            .await?,
-            delete_chain_root_for_role0_key: chain_root_for_role0_key::DeleteQuery::prepare_batch(
                 &session, cfg,
             )
             .await?,
@@ -257,7 +244,6 @@ impl PreparedQueries {
             },
             PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration,
             PreparedSelectQuery::ChainRootForTxnId => &self.select_chain_root_for_txn_id,
-            PreparedSelectQuery::ChainRootForRole0Key => &self.select_chain_root_for_role0_key,
             PreparedSelectQuery::ChainRootForStakeAddress => {
                 &self.select_chain_root_for_stake_address
             },
@@ -287,7 +273,6 @@ impl PreparedQueries {
             },
             PreparedDeleteQuery::Rbac509 => &self.delete_rbac509_registration,
             PreparedDeleteQuery::ChainRootForTxnId => &self.delete_chain_root_for_txn_id,
-            PreparedDeleteQuery::ChainRootForRole0Key => &self.delete_chain_root_for_role0_key,
             PreparedDeleteQuery::ChainRootForStakeAddress => {
                 &self.delete_chain_root_for_stake_address
             },

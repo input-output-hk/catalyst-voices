@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::Cip36;
+use cardano_blockchain_types::{Cip36, VotingPubKey};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 

@@ -8,7 +8,7 @@ use super::TransactionHash;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::DbTransactionHash,
+        types::{DbTransactionHash, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -21,7 +21,7 @@ const INSERT_CHAIN_ROOT_FOR_STAKE_ADDRESS_QUERY: &str =
 #[derive(SerializeRow)]
 pub(super) struct Params {
     /// Stake Address Hash. 32 bytes.
-    stake_addr: Vec<u8>,
+    stake_addr: DbStakeAddress,
     /// Block Slot Number
     slot_no: num_bigint::BigInt,
     /// Transaction Offset inside the block.
@@ -50,14 +50,14 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        stake_addr: TransactionHash, slot_no: u64, txn: i16, chain_root: TransactionHash,
+        stake_addr: StakeAddress, slot_no: u64, txn: i16, chain_root: TransactionHash,
         chain_root_slot: u64, chain_root_txn: i16,
     ) -> Self {
         Params {
-            stake_addr: stake_addr.to_vec(),
+            stake_addr: stake_addr.into(),
             slot_no: num_bigint::BigInt::from(slot_no),
             txn,
-            chain_root: chain_root.to_vec(),
+            chain_root: chain_root.into(),
             chain_root_slot: num_bigint::BigInt::from(chain_root_slot),
             chain_root_txn,
         }

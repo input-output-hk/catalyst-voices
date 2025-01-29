@@ -71,8 +71,6 @@ pub(crate) enum PreparedQuery {
     Rbac509InsertQuery,
     /// Chain Root For Transaction ID Insert query.
     ChainRootForTxnIdInsertQuery,
-    /// Chain Root For Role0 Key Insert query.
-    ChainRootForRole0KeyInsertQuery,
     /// Chain Root For Stake Address Insert query.
     ChainRootForStakeAddressInsertQuery,
 }
@@ -142,8 +140,6 @@ pub(crate) struct PreparedQueries {
     rbac509_registration_insert_queries: SizedBatch,
     /// Chain Root for TX ID Insert Query..
     chain_root_for_txn_id_insert_queries: SizedBatch,
-    /// Chain Root for Role 0 Key Insert Query..
-    chain_root_for_role0_key_insert_queries: SizedBatch,
     /// Chain Root for Stake Address Insert Query..
     chain_root_for_stake_address_insert_queries: SizedBatch,
     /// Get native assets by stake address query.
@@ -227,7 +223,6 @@ impl PreparedQueries {
         let (
             rbac509_registration_insert_queries,
             chain_root_for_txn_id_insert_queries,
-            chain_root_for_role0_key_insert_queries,
             chain_root_for_stake_address_insert_queries,
         ) = all_rbac_queries?;
 
@@ -246,7 +241,6 @@ impl PreparedQueries {
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
             rbac509_registration_insert_queries,
             chain_root_for_txn_id_insert_queries,
-            chain_root_for_role0_key_insert_queries,
             chain_root_for_stake_address_insert_queries,
             native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
             registration_from_stake_addr_query: registration_from_stake_addr_query?,
@@ -311,9 +305,7 @@ impl PreparedQueries {
     pub(crate) async fn execute_upsert<P>(
         &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
     ) -> anyhow::Result<()>
-    where
-        P: SerializeRow,
-    {
+    where P: SerializeRow {
         let prepared_stmt = match upsert_query {
             PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
         };
@@ -333,9 +325,7 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<QueryPager>
-    where
-        P: SerializeRow,
-    {
+    where P: SerializeRow {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
@@ -392,9 +382,6 @@ impl PreparedQueries {
             PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
             PreparedQuery::ChainRootForTxnIdInsertQuery => {
                 &self.chain_root_for_txn_id_insert_queries
-            },
-            PreparedQuery::ChainRootForRole0KeyInsertQuery => {
-                &self.chain_root_for_role0_key_insert_queries
             },
             PreparedQuery::ChainRootForStakeAddressInsertQuery => {
                 &self.chain_root_for_stake_address_insert_queries
@@ -453,9 +440,7 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
 pub(crate) async fn session_execute_iter<P>(
     session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
 ) -> anyhow::Result<QueryPager>
-where
-    P: SerializeRow,
-{
+where P: SerializeRow {
     session
         .execute_iter(prepared_stmt.clone(), params)
         .await
