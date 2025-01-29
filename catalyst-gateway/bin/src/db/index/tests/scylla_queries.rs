@@ -6,20 +6,16 @@ use futures::StreamExt;
 
 use super::*;
 use crate::{
-    db::{
-        index::queries::{
-            rbac::{get_chain_root, get_registrations::*, get_role0_chain_root},
-            registrations::{
-                get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*,
-                get_invalid::*,
-            },
-            staked_ada::{
-                get_assets_by_stake_address::*, get_txi_by_txn_hash::*,
-                get_txo_by_stake_address::*, update_txo_spent::*,
-            },
-            sync_status::update::*,
+    db::index::queries::{
+        rbac::{get_chain_root, get_registrations::*, get_role0_chain_root},
+        registrations::{
+            get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*, get_invalid::*,
         },
-        types::DbTransactionHash,
+        staked_ada::{
+            get_assets_by_stake_address::*, get_txi_by_txn_hash::*, get_txo_by_stake_address::*,
+            update_txo_spent::*,
+        },
+        sync_status::update::*,
     },
     service::common::types::cardano::slot_no::SlotNo,
 };

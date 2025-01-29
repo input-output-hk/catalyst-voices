@@ -62,7 +62,7 @@ impl Params {
     pub fn new(vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36) -> Self {
         Params {
             stake_address: cip36
-                .stake_pk
+                .stake_pk()
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
             nonce: cip36.nonce.into(),

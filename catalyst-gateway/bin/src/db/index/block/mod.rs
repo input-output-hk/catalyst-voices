@@ -8,7 +8,8 @@ pub(crate) mod roll_forward;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
-use cardano_blockchain_types::{MultiEraBlock, TransactionHash};
+use cardano_blockchain_types::MultiEraBlock;
+use catalyst_types::hashes::Blake2b256Hash;
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
 use rbac509::Rbac509InsertQuery;
@@ -37,7 +38,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
 
     // We add all transactions in the block to their respective index data sets.
     for (index, txn) in block.enumerate_txs() {
-        let txn_hash = TransactionHash::from(txn.hash());
+        let txn_hash = Blake2b256Hash::from(txn.hash()).into();
 
         // Index the TXIs.
         txi_index.index(&txn, slot);
@@ -49,10 +50,10 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         cip36_index.index(index, slot, block);
 
         // Index Certificates inside the transaction.
-        cert_index.index(txn, slot, index, block);
+        cert_index.index(&txn, slot, index, block);
 
         // Index the TXOs.
-        txo_index.index(txs, slot, txn_hash, index);
+        txo_index.index(&txn, slot, txn_hash, index);
 
         // Index RBAC 509 inside the transaction.
         rbac509_index

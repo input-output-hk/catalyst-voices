@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::DbTransactionHash,
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXI by hash purge queries.
 
+    use crate::db::types::{DbSlot, DbTransactionHash};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, i16, num_bigint::BigInt);
+    pub(crate) type PrimaryKey = (DbTransactionHash, i16, DbSlot);
 }
 
 /// Select primary keys for TXI by hash.
@@ -32,7 +37,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_txi_by_txn_hashes.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// 32 byte hash of this transaction.
-    pub(crate) txn_hash: Vec<u8>,
+    pub(crate) txn_hash: DbTransactionHash,
     /// Transaction Output Offset inside the transaction.
     pub(crate) txo: i16,
 }
@@ -40,7 +45,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("txn_hash", &hex::encode(&self.txn_hash))
+            .field("txn_hash", &self.txn_hash.to_string())
             .field("txo", &self.txo)
             .finish()
     }

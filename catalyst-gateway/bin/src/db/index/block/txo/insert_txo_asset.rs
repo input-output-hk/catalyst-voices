@@ -6,7 +6,10 @@ use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTxnIndex},
+    },
     settings::cassandra_db,
 };
 
@@ -20,9 +23,9 @@ pub(super) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     stake_address: Vec<u8>,
     /// Block Slot Number
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: i16,
+    txn: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
     txo: i16,
     /// Policy hash of the asset
@@ -40,7 +43,7 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn new(
-        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, policy_id: &[u8],
+        stake_address: &[u8], slot_no: DbSlot, txn: DbTxnIndex, txo: i16, policy_id: &[u8],
         asset_name: &[u8], value: i128,
     ) -> Self {
         Self {

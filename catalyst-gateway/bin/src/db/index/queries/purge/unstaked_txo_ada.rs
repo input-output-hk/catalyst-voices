@@ -9,12 +9,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::DbTransactionHash,
     },
     settings::cassandra_db,
 };
@@ -22,8 +25,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for Unstaked TXO ADA purge queries.
 
+    use crate::db::types::DbTransactionHash;
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, i16, num_bigint::BigInt);
+    pub(crate) type PrimaryKey = (DbTransactionHash, i16, num_bigint::BigInt);
 }
 
 /// Select primary keys for Unstaked TXO ADA.
@@ -33,7 +38,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_unstaked_txo_by_txn_hash.cql"
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// 32 byte hash of this transaction.
-    pub(crate) txn_hash: Vec<u8>,
+    pub(crate) txn_hash: DbTransactionHash,
     /// Transaction Output Offset inside the transaction.
     pub(crate) txo: i16,
 }

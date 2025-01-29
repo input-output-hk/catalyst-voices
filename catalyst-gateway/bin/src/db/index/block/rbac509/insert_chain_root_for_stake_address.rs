@@ -1,6 +1,8 @@
 //! Index RBAC Chain Root For Stake Address Insert Query.
+
 use std::{fmt::Debug, sync::Arc};
 
+use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -8,7 +10,7 @@ use super::TransactionHash;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbTransactionHash, DbTxnIndex},
+        types::{DbStakeAddress, DbTransactionHash, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -50,16 +52,16 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        stake_addr: StakeAddress, slot_no: u64, txn: i16, chain_root: TransactionHash,
-        chain_root_slot: u64, chain_root_txn: i16,
+        stake_addr: StakeAddress, slot_no: Slot, txn: TxnIndex, chain_root: TransactionHash,
+        chain_root_slot: Slot, chain_root_txn: TxnIndex,
     ) -> Self {
         Params {
             stake_addr: stake_addr.into(),
             slot_no: num_bigint::BigInt::from(slot_no),
-            txn,
+            txn: txn.into(),
             chain_root: chain_root.into(),
             chain_root_slot: num_bigint::BigInt::from(chain_root_slot),
-            chain_root_txn,
+            chain_root_txn: chain_root_txn.into(),
         }
     }
 

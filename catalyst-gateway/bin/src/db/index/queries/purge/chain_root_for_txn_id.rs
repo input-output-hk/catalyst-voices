@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::DbTransactionHash,
     },
     settings::cassandra_db,
 };
@@ -22,11 +25,13 @@ pub(crate) mod result {
     //! Return values for Chain Root For TX ID registration purge queries.
     use scylla::DeserializeRow;
 
+    use crate::db::types::DbTransactionHash;
+
     /// Primary Key Row
     #[derive(DeserializeRow)]
     pub(crate) struct PrimaryKey {
         /// TXN ID HASH - Binary 32 bytes.
-        pub(crate) transaction_id: Vec<u8>,
+        pub(crate) transaction_id: DbTransactionHash,
     }
 }
 
@@ -37,13 +42,13 @@ const SELECT_QUERY: &str = include_str!("./cql/get_chain_root_for_txn_id.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// TXN ID HASH - Binary 32 bytes.
-    pub(crate) transaction_id: Vec<u8>,
+    pub(crate) transaction_id: DbTransactionHash,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("transaction_id", &hex::encode(&self.transaction_id))
+            .field("transaction_id", &self.transaction_id.to_string())
             .finish()
     }
 }

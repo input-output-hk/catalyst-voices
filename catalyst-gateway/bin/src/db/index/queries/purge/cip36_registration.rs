@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::{DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for CIP-36 registration purge queries.
 
+    use crate::db::types::{DbSlot, DbTxnIndex};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, num_bigint::BigInt, i16);
+    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for CIP-36 registration.
@@ -36,9 +41,9 @@ pub(crate) struct Params {
     /// Nonce that has been slot corrected.
     pub(crate) nonce: num_bigint::BigInt,
     /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
+    pub(crate) txn: DbTxnIndex,
 }
 
 impl Debug for Params {

@@ -12,15 +12,15 @@ use to_vec::ToVec;
 use tracing::error;
 
 use crate::{
-    db::index::{
-        block::rbac509::chain_root::{self, ChainRoot},
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+    db::{
+        index::{
+            block::rbac509::chain_root::{self, ChainRoot},
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbTransactionHash, DbTxnIndex},
     },
-    service::{
-        common::auth::rbac::role0_kid::Role0Kid,
-        utilities::convert::{big_uint_to_u64, from_saturating},
-    },
+    service::common::auth::rbac::role0_kid::Role0Kid,
 };
 
 /// Cached Chain Root By Role 0 Kid.
@@ -53,13 +53,13 @@ pub(crate) struct Query {
     /// Slot Number the stake address was registered in.
     pub(crate) slot_no: num_bigint::BigInt,
     /// Transaction Offset the stake address was registered in.
-    pub(crate) txn: i16,
+    pub(crate) txn: DbTxnIndex,
     /// Chain root for the queries stake address.
-    pub(crate) chain_root: Vec<u8>,
+    pub(crate) chain_root: DbTransactionHash,
     /// Chain roots slot number
-    pub(crate) chain_root_slot: num_bigint::BigInt,
+    pub(crate) chain_root_slot: DbSlot,
     /// Chain roots txn index
-    pub(crate) chain_root_txn: i16,
+    pub(crate) chain_root_txn: DbTxnIndex,
 }
 
 impl Query {
@@ -100,20 +100,19 @@ impl Query {
     pub(crate) async fn get_latest_uncached(
         session: &CassandraSession, kid: Role0Kid,
     ) -> anyhow::Result<Option<ChainRoot>> {
-        let mut result = Self::execute(
-            session,
-            QueryParams {
-                role0_kid: kid.to_vec(),
-            },
-        )
+        let mut result = Self::execute(session, QueryParams {
+            role0_kid: kid.to_vec(),
+        })
         .await?;
 
         match result.next().await {
-            Some(Ok(first_row)) => Ok(Some(ChainRoot::new(
-                first_row.chain_root.as_slice().into(),
-                big_uint_to_u64(&first_row.chain_root_slot),
-                from_saturating(first_row.chain_root_txn),
-            ))),
+            Some(Ok(first_row)) => {
+                Ok(Some(ChainRoot::new(
+                    first_row.chain_root.into(),
+                    first_row.chain_root_slot.into(),
+                    first_row.chain_root_txn.into(),
+                )))
+            },
             Some(Err(err)) => {
                 bail!(
                     "Failed to get chain root by stake address query row: {}",

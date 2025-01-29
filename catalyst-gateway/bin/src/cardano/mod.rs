@@ -2,7 +2,7 @@
 
 use std::{fmt::Display, sync::Arc, time::Duration};
 
-use cardano_blockchain_types::{Network, Point, Slot};
+use cardano_blockchain_types::{Network, Point};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
@@ -191,7 +191,10 @@ impl SyncParams {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
-            update_sync_status(self.end.slot_or_default(), self.start.slot_or_default());
+            update_sync_status(
+                self.end.slot_or_default().into(),
+                self.start.slot_or_default().into(),
+            );
         }
 
         let mut done = self.clone();
@@ -336,13 +339,13 @@ struct SyncTask {
     current_sync_tasks: u16,
 
     /// Start for the next block we would sync.
-    start_slot: Slot,
+    start_slot: u64,
 
     /// The immutable tip slot.
-    immutable_tip_slot: Slot,
+    immutable_tip_slot: u64,
 
     /// The live tip slot.
-    live_tip_slot: Slot,
+    live_tip_slot: u64,
 
     /// Current Sync Status
     sync_status: Vec<SyncStatus>,
@@ -369,8 +372,8 @@ impl SyncTask {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
         let tips = cardano_chain_follower::ChainFollower::get_tips(self.cfg.chain).await;
-        self.immutable_tip_slot = tips.0.slot_or_default();
-        self.live_tip_slot = tips.1.slot_or_default();
+        self.immutable_tip_slot = tips.0.slot_or_default().into();
+        self.live_tip_slot = tips.1.slot_or_default().into();
         info!(chain=%self.cfg.chain, immutable_tip=self.immutable_tip_slot, live_tip=self.live_tip_slot, "Blockchain ready to sync from.");
 
         // Wait for indexing DB to be ready before continuing.
@@ -385,7 +388,7 @@ impl SyncTask {
         // So, if it fails, it will automatically be restarted.
         self.sync_tasks.push(sync_subchain(SyncParams::new(
             self.cfg.chain,
-            Point::fuzzy(self.immutable_tip_slot),
+            Point::fuzzy(self.immutable_tip_slot.into()),
             Point::TIP,
         )));
 
@@ -410,7 +413,7 @@ impl SyncTask {
                         if let Some(ref roll_forward_point) = finished.follower_roll_forward {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
-                            self.immutable_tip_slot = roll_forward_point.slot_or_default();
+                            self.immutable_tip_slot = roll_forward_point.slot_or_default().into();
                             self.start_immutable_followers();
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished,
@@ -461,7 +464,9 @@ impl SyncTask {
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
             if self.sync_tasks.len() == 1 {
-                if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
+                if let Err(error) =
+                    roll_forward::purge_live_index(self.immutable_tip_slot.into()).await
+                {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 }
             }
@@ -486,7 +491,7 @@ impl SyncTask {
                 );
 
                 if let Some((first_point, last_point)) =
-                    self.get_syncable_range(self.start_slot, end_slot)
+                    self.get_syncable_range(self.start_slot.into(), end_slot)
                 {
                     self.sync_tasks.push(sync_subchain(SyncParams::new(
                         self.cfg.chain,
@@ -529,17 +534,20 @@ impl SyncTask {
                 // It is not a problem to sync the same data mutiple times, so for simplicity we do
                 // not account for this, if the requested range goes beyond the sync
                 // block it starts within we assume that the rest is not synced.
-                return Some((Point::fuzzy(sync_block.end_slot), Point::fuzzy(end)));
+                return Some((
+                    Point::fuzzy(sync_block.end_slot.into()),
+                    Point::fuzzy(end.into()),
+                ));
             }
         }
 
         let start_slot = if start == 0 {
             Point::ORIGIN
         } else {
-            Point::fuzzy(start)
+            Point::fuzzy(start.into())
         };
 
-        Some((start_slot, Point::fuzzy(end)))
+        Some((start_slot, Point::fuzzy(end.into())))
     }
 }
 

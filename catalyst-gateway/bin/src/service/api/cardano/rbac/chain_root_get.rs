@@ -1,4 +1,5 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
+
 use anyhow::anyhow;
 use der_parser::asn1_rs::ToDer;
 use futures::StreamExt;
@@ -72,7 +73,7 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
                 };
 
                 let res = Response {
-                    chain_root: format!("0x{}", hex::encode(row.chain_root)),
+                    chain_root: row.chain_root.to_string(),
                 };
 
                 Responses::Ok(Json(res)).into()

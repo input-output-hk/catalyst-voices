@@ -51,8 +51,6 @@ pub(crate) enum PreparedDeleteQuery {
     Rbac509,
     /// Chain Root For Transaction ID Delete query.
     ChainRootForTxnId,
-    /// Chain Root For Role0 Key Delete query.
-    ChainRootForRole0Key,
     /// Chain Root For Stake Address Delete query.
     ChainRootForStakeAddress,
 }
@@ -82,8 +80,6 @@ pub(crate) enum PreparedSelectQuery {
     Rbac509,
     /// Chain Root For Transaction ID Select query.
     ChainRootForTxnId,
-    /// Chain Root For Role0 Key Select query.
-    ChainRootForRole0Key,
     /// Chain Root For Stake Address Select query.
     ChainRootForStakeAddress,
 }

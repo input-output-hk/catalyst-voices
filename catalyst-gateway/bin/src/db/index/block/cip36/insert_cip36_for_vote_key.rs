@@ -36,7 +36,7 @@ impl Params {
         vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36, valid: bool,
     ) -> Self {
         Params {
-            vote_key: vote_key.voting_pk.to_bytes().to_vec(),
+            vote_key: vote_key.voting_pk().to_bytes().to_vec(),
             stake_address: cip36
                 .stake_pk
                 .map(|s| s.to_bytes().to_vec())

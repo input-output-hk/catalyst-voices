@@ -9,8 +9,7 @@ mod insert_unstaked_txo_asset;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::Slot;
-use pallas_crypto::hash::Hash;
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
 use scylla::Session;
 use tracing::{error, warn};
 
@@ -19,7 +18,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    service::{common::types::cardano::txn_index::TxnIndex, utilities::convert::from_saturating},
+    service::utilities::convert::from_saturating,
     settings::cassandra_db,
 };
 
@@ -80,7 +79,7 @@ impl TxoInsertQuery {
     /// stake address, and still have a primary key on the table. Otherwise return the
     /// stake key hash as a vec of 28 bytes.
     fn extract_stake_address(
-        txo: &pallas::ledger::traverse::MultiEraOutput<'_>, slot_no: u64, txn_id: &str,
+        txo: &pallas::ledger::traverse::MultiEraOutput<'_>, slot_no: Slot, txn_id: &str,
     ) -> Option<(Vec<u8>, String)> {
         let stake_address = match txo.address() {
             Ok(address) => {
@@ -94,7 +93,7 @@ impl TxoInsertQuery {
                             Ok(address) => address,
                             Err(error) => {
                                 // Shouldn't happen, but if it does error and don't index.
-                                error!(error=%error, slot=slot_no, txn=txn_id,"Error converting to bech32: skipping.");
+                                error!(error=%error, slot=?slot_no, txn=txn_id,"Error converting to bech32: skipping.");
                                 return None;
                             },
                         };
@@ -118,7 +117,7 @@ impl TxoInsertQuery {
                         // This should NOT appear in a TXO, so report if it does. But don't index it
                         // as a stake address.
                         warn!(
-                            slot = slot_no,
+                            slot = ?slot_no,
                             txn = txn_id,
                             "Unexpected Stake address found in TXO. Refusing to index."
                         );
@@ -128,7 +127,7 @@ impl TxoInsertQuery {
             },
             Err(error) => {
                 // This should not ever happen.
-                error!(error=%error, slot = slot_no, txn = txn_id, "Failed to get Address from TXO. Skipping TXO.");
+                error!(error=%error, slot = ?slot_no, txn = txn_id, "Failed to get Address from TXO. Skipping TXO.");
                 return None;
             },
         };
@@ -138,13 +137,13 @@ impl TxoInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: Slot,
-        txn_hash: Hash<32>, index: TxnIndex,
+        &mut self, txn: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: Slot,
+        txn_hash: TransactionHash, index: TxnIndex,
     ) {
-        let txn_id = hex::encode_upper(txn_hash);
+        let txn_id = txn_hash.to_string();
 
         // Accumulate all the data we want to insert from this transaction here.
-        for (txo_index, txo) in txs.outputs().iter().enumerate() {
+        for (txo_index, txo) in txn.outputs().iter().enumerate() {
             // This will only return None if the TXO is not to be indexed (Byron Addresses)
             let Some((stake_address, address)) = Self::extract_stake_address(txo, slot_no, &txn_id)
             else {
@@ -157,21 +156,21 @@ impl TxoInsertQuery {
             if staked {
                 let params = insert_txo::Params::new(
                     &stake_address,
-                    slot_no,
-                    txn,
+                    slot_no.into(),
+                    index.into(),
                     txo_index,
                     &address,
                     txo.lovelace_amount(),
-                    txn_hash,
+                    txn_hash.into(),
                 );
 
                 self.staked_txo.push(params);
             } else {
                 let params = insert_unstaked_txo::Params::new(
-                    txn_hash,
+                    txn_hash.into(),
                     txo_index,
-                    slot_no,
-                    txn,
+                    slot_no.into(),
+                    index.into(),
                     &address,
                     txo.lovelace_amount(),
                 );
@@ -189,8 +188,8 @@ impl TxoInsertQuery {
                         if staked {
                             let params = insert_txo_asset::Params::new(
                                 &stake_address,
-                                slot_no,
-                                txn,
+                                slot_no.into(),
+                                index.into(),
                                 txo_index,
                                 &policy_id,
                                 asset_name,
@@ -199,7 +198,13 @@ impl TxoInsertQuery {
                             self.staked_txo_asset.push(params);
                         } else {
                             let params = insert_unstaked_txo_asset::Params::new(
-                                txn_hash, txo_index, &policy_id, asset_name, slot_no, txn, value,
+                                txn_hash.into(),
+                                txo_index,
+                                &policy_id,
+                                asset_name,
+                                slot_no.into(),
+                                index.into(),
+                                value,
                             );
                             self.unstaked_txo_asset.push(params);
                         }

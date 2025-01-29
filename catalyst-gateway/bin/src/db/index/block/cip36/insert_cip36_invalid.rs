@@ -70,14 +70,12 @@ impl Params {
         vote_key: Option<&VotingPubKey>, slot_no: u64, txn: i16, cip36: &Cip36,
         error_report: Vec<String>,
     ) -> Self {
-        let vote_key = if let Some(vote_key) = vote_key {
-            vote_key.voting_pk.to_bytes().to_vec()
-        } else {
-            Vec::new()
-        };
+        let vote_key = vote_key
+            .and_then(|k| k.voting_pk().map(|k| k.as_bytes().to_vec()))
+            .unwrap_or_else(Vec::new);
         Params {
             stake_address: cip36
-                .stake_pk
+                .stake_pk()
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
             slot_no: slot_no.into(),

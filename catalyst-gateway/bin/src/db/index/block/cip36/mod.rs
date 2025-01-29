@@ -6,7 +6,7 @@ mod insert_cip36_invalid;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{MetadatumLabel, MultiEraBlock, Slot};
+use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, TxnIndex};
 use scylla::Session;
 
 use crate::{
@@ -14,7 +14,6 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    service::common::types::cardano::txn_index::TxnIndex,
     settings::cassandra_db,
 };
 
@@ -56,52 +55,76 @@ impl Cip36InsertQuery {
     }
 
     /// Index the CIP-36 registrations in a transaction.
-    pub(crate) fn index(&mut self, index: TxnIndex, slot_no: Slot, block: &MultiEraBlock) {
-        if let Some(decoded_metadata) =
-            block.txn_metadata(index, MetadatumLabel::CIP036_REGISTRATION)
-        {
-            if let Metadata::DecodedMetadataValues::Cip36(cip36) = &decoded_metadata.value {
-                // Check if we are indexing a valid or invalid registration.
-                // Note, we ONLY care about catalyst, we should only have 1 voting key, if not, call
-                // it an error.
-                if decoded_metadata.report.is_empty() && cip36.voting_keys.len() == 1 {
-                    // Always true, because we already checked if the array has only one entry.
-                    if let Some(vote_key) = cip36.voting_keys.first() {
-                        self.registrations.push(insert_cip36::Params::new(
-                            vote_key, slot_no, txn_index, cip36,
-                        ));
-                        self.for_vote_key
-                            .push(insert_cip36_for_vote_key::Params::new(
-                                vote_key, slot_no, txn_index, cip36, true,
-                            ));
-                    }
-                } else if cip36.stake_pk.is_some() {
-                    // We can't index an error, if there is no stake public key.
-                    if cip36.voting_keys.is_empty() {
-                        self.invalid.push(insert_cip36_invalid::Params::new(
-                            None,
-                            slot_no,
-                            txn_index,
-                            cip36,
-                            decoded_metadata.report.clone(),
-                        ));
-                    }
-                    for vote_key in &cip36.voting_keys {
-                        self.invalid.push(insert_cip36_invalid::Params::new(
-                            Some(vote_key),
-                            slot_no,
-                            txn_index,
-                            cip36,
-                            decoded_metadata.report.clone(),
-                        ));
-                        self.for_vote_key
-                            .push(insert_cip36_for_vote_key::Params::new(
-                                vote_key, slot_no, txn_index, cip36, false,
-                            ));
-                    }
-                }
-            }
+    pub(crate) fn index(&mut self, index: TxnIndex, _slot_no: Slot, block: &MultiEraBlock) {
+        match Cip36::new(block, index, true) {
+            Ok(Some(cip36)) if cip36.is_valid() => {
+                // Valid registration.
+                // TODO: FIXME:
+                let _ = cip36;
+                todo!();
+            },
+            Ok(Some(cip36)) => {
+                // Invalid registration.
+                // TODO: FIXME:
+                let _ = cip36;
+                todo!();
+            },
+            Ok(None) => {
+                // Nothing to index.
+            },
+            Err(e) => {
+                // TODO: FIXME:
+                let _ = e;
+                todo!();
+            },
         }
+
+        // // TODO: FIXME:
+        // if let Some(decoded_metadata) =
+        //     block.txn_metadata(index, MetadatumLabel::CIP036_REGISTRATION)
+        // {
+        //     if let Metadata::DecodedMetadataValues::Cip36(cip36) =
+        // &decoded_metadata.value {         // Check if we are indexing a valid
+        // or invalid registration.         // Note, we ONLY care about catalyst,
+        // we should only have 1 voting key, if not, call         // it an error.
+        //         if decoded_metadata.report.is_empty() && cip36.voting_keys.len() == 1 {
+        //             // Always true, because we already checked if the array has only
+        // one entry.             if let Some(vote_key) =
+        // cip36.voting_keys.first() {
+        // self.registrations.push(insert_cip36::Params::new(
+        // vote_key, slot_no, txn_index, cip36,                 ));
+        //                 self.for_vote_key
+        //                     .push(insert_cip36_for_vote_key::Params::new(
+        //                         vote_key, slot_no, txn_index, cip36, true,
+        //                     ));
+        //             }
+        //         } else if cip36.stake_pk.is_some() {
+        //             // We can't index an error, if there is no stake public key.
+        //             if cip36.voting_keys.is_empty() {
+        //                 self.invalid.push(insert_cip36_invalid::Params::new(
+        //                     None,
+        //                     slot_no,
+        //                     txn_index,
+        //                     cip36,
+        //                     decoded_metadata.report.clone(),
+        //                 ));
+        //             }
+        //             for vote_key in &cip36.voting_keys {
+        //                 self.invalid.push(insert_cip36_invalid::Params::new(
+        //                     Some(vote_key),
+        //                     slot_no,
+        //                     txn_index,
+        //                     cip36,
+        //                     decoded_metadata.report.clone(),
+        //                 ));
+        //                 self.for_vote_key
+        //                     .push(insert_cip36_for_vote_key::Params::new(
+        //                         vote_key, slot_no, txn_index, cip36, false,
+        //                     ));
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     /// Execute the CIP-36 Registration Indexing Queries.

@@ -11,16 +11,13 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::{
-    db::{
-        index::{
-            block::rbac509::chain_root::{self, ChainRoot},
-            queries::{PreparedQueries, PreparedSelectQuery},
-            session::CassandraSession,
-        },
-        types::DbTransactionHash,
+use crate::db::{
+    index::{
+        block::rbac509::chain_root::{self, ChainRoot},
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
     },
-    service::utilities::convert::{big_uint_to_u64, from_saturating},
+    types::{DbSlot, DbTransactionHash, DbTxnIndex},
 };
 
 /// Cached Chain Root By Stake Address.
@@ -53,13 +50,13 @@ pub(crate) struct Query {
     /// Slot Number the stake address was registered in.
     pub(crate) slot_no: num_bigint::BigInt,
     /// Transaction Offset the stake address was registered in.
-    pub(crate) txn: i16,
+    pub(crate) txn: DbTxnIndex,
     /// Chain root for the queries stake address.
     pub(crate) chain_root: DbTransactionHash,
     /// Chain roots slot number
-    pub(crate) chain_root_slot: num_bigint::BigInt,
+    pub(crate) chain_root_slot: DbSlot,
     /// Chain roots txn index
-    pub(crate) chain_root_txn: i16,
+    pub(crate) chain_root_txn: DbTxnIndex,
 }
 
 impl Query {
@@ -108,8 +105,8 @@ impl Query {
             Some(Ok(first_row)) => {
                 Ok(Some(ChainRoot::new(
                     first_row.chain_root.into(),
-                    big_uint_to_u64(&first_row.chain_root_slot),
-                    from_saturating(first_row.chain_root_txn),
+                    first_row.chain_root_slot.into(),
+                    first_row.chain_root_txn.into(),
                 )))
             },
             Some(Err(err)) => {

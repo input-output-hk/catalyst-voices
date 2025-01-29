@@ -12,7 +12,7 @@ use c509_certificate::{
     extensions::{alt_name::GeneralNamesOrText, extension::ExtensionValue},
     general_names::general_name::{GeneralNameTypeRegistry, GeneralNameValue},
 };
-use cardano_blockchain_types::{MetadatumLabel, MultiEraBlock, TransactionHash};
+use cardano_blockchain_types::{MetadatumLabel, MultiEraBlock, Slot, TransactionHash, TxnIndex};
 use chain_root::ChainRoot;
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
@@ -128,8 +128,8 @@ impl Rbac509InsertQuery {
 
     /// Index the RBAC 509 registrations in a transaction.
     pub(crate) async fn index(
-        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: usize,
-        slot_no: u64, block: &MultiEraBlock,
+        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: TxnIndex,
+        slot_no: Slot, block: &MultiEraBlock,
     ) {
         if let Some((rbac, chain_root)) =
             rbac_metadata(session, txn_hash, txn_idx, slot_no, block).await
@@ -383,7 +383,7 @@ fn extract_stake_addresses_from_c509(c509: &C509) -> Option<Vec<StakeAddress>> {
     }
 }
 
-/// Return RBAC metadata if its found in the transaction, or None
+/// Return RBAC metadata if it is found in the transaction, or None
 async fn rbac_metadata(
     session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: usize, slot_no: u64,
     block: &MultiEraBlock,

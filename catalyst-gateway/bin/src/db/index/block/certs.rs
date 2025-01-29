@@ -2,17 +2,20 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{MultiEraBlock, TxnIndex};
+use cardano_blockchain_types::{MultiEraBlock, Slot, TxnIndex, VKeyHash};
+use ed25519_dalek::VerifyingKey;
 use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
-        session::CassandraSession,
+    db::{
+        index::{
+            queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbTxnIndex},
     },
-    service::{common::objects::legacy::block::Slot, utilities::convert::from_saturating},
     settings::cassandra_db,
 };
 
@@ -22,9 +25,9 @@ pub(crate) struct StakeRegistrationInsertQuery {
     /// Stake key hash
     stake_hash: Vec<u8>,
     /// Slot Number the cert is in.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Index.
-    txn: i16,
+    txn: DbTxnIndex,
     /// Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
     stake_address: MaybeUnset<Vec<u8>>,
     /// Is the stake address a script or not.
@@ -76,18 +79,17 @@ impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        stake_hash: Vec<u8>, slot_no: u64, txn: i16, stake_address: Vec<u8>, script: bool,
-        register: bool, deregister: bool, pool_delegation: Option<Vec<u8>>,
+        stake_hash: Vec<u8>, slot_no: DbSlot, txn: DbTxnIndex, stake_address: Option<VerifyingKey>,
+        script: bool, register: bool, deregister: bool, pool_delegation: Option<Vec<u8>>,
     ) -> Self {
+        let stake_address = stake_address
+            .map(|a| MaybeUnset::Set(a.as_bytes().to_vec()))
+            .unwrap_or(MaybeUnset::Unset);
         StakeRegistrationInsertQuery {
             stake_hash,
             slot_no: slot_no.into(),
             txn,
-            stake_address: if stake_address.is_empty() {
-                MaybeUnset::Unset
-            } else {
-                MaybeUnset::Set(stake_address)
-            },
+            stake_address,
             script,
             register: if register {
                 MaybeUnset::Set(true)
@@ -155,30 +157,27 @@ impl CertInsertQuery {
     /// Get the stake address for a hash, return an empty address if one can not be found.
     #[allow(clippy::too_many_arguments)]
     fn stake_address(
-        &mut self, cred: &alonzo::StakeCredential, slot_no: u64, txn: i16, register: bool,
+        &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex, register: bool,
         deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
-        let default_addr = Vec::new();
         let (key_hash, pubkey, script) = match cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
-                let addr = block
-                    .witness_for_tx(cred, from_saturating(txn))
-                    .unwrap_or(default_addr);
+                let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
                 (cred.to_vec(), addr.clone(), false)
             },
-            conway::StakeCredential::Scripthash(script) => (script.to_vec(), default_addr, true),
+            conway::StakeCredential::Scripthash(script) => (script.to_vec(), None, true),
         };
 
-        if pubkey.is_empty() && !script && deregister {
+        if pubkey.is_none() && !script && deregister {
             error!(
                 "Stake Deregistration Certificate {:?} is NOT Witnessed.",
                 key_hash
             );
         }
 
-        if pubkey.is_empty() && !script && delegation.is_some() {
+        if pubkey.is_none() && !script && delegation.is_some() {
             error!(
                 "Stake Delegation Certificate {:?} is NOT Witnessed.",
                 key_hash
@@ -187,7 +186,14 @@ impl CertInsertQuery {
 
         // This may not be witnessed, its normal but disappointing.
         self.stake_reg_data.push(StakeRegistrationInsertQuery::new(
-            key_hash, slot_no, txn, pubkey, script, register, deregister, delegation,
+            key_hash,
+            slot_no.into(),
+            txn.into(),
+            pubkey,
+            script,
+            register,
+            deregister,
+            delegation,
         ));
     }
 
@@ -216,34 +222,34 @@ impl CertInsertQuery {
 
     /// Index a certificate from a conway transaction.
     fn index_conway_cert(
-        &mut self, cert: &conway::Certificate, slot_no: u64, txn: i16, block: &MultiEraBlock,
+        &mut self, cert: &conway::Certificate, slot_no: Slot, txn: TxnIndex, block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         match cert {
-            pallas::ledger::primitives::conway::Certificate::StakeRegistration(cred) => {
+            conway::Certificate::StakeRegistration(cred) => {
                 // This may not be witnessed, its normal but disappointing.
                 self.stake_address(cred, slot_no, txn, true, false, None, block);
             },
-            pallas::ledger::primitives::conway::Certificate::StakeDeregistration(cred) => {
+            conway::Certificate::StakeDeregistration(cred) => {
                 self.stake_address(cred, slot_no, txn, false, true, None, block);
             },
-            pallas::ledger::primitives::conway::Certificate::StakeDelegation(cred, pool) => {
+            conway::Certificate::StakeDelegation(cred, pool) => {
                 self.stake_address(cred, slot_no, txn, false, false, Some(pool.to_vec()), block);
             },
-            pallas::ledger::primitives::conway::Certificate::PoolRegistration { .. } => {},
-            pallas::ledger::primitives::conway::Certificate::PoolRetirement(..) => {},
-            pallas::ledger::primitives::conway::Certificate::Reg(..) => {},
-            pallas::ledger::primitives::conway::Certificate::UnReg(..) => {},
-            pallas::ledger::primitives::conway::Certificate::VoteDeleg(..) => {},
-            pallas::ledger::primitives::conway::Certificate::StakeVoteDeleg(..) => {},
-            pallas::ledger::primitives::conway::Certificate::StakeRegDeleg(..) => {},
-            pallas::ledger::primitives::conway::Certificate::VoteRegDeleg(..) => {},
-            pallas::ledger::primitives::conway::Certificate::StakeVoteRegDeleg(..) => {},
-            pallas::ledger::primitives::conway::Certificate::AuthCommitteeHot(..) => {},
-            pallas::ledger::primitives::conway::Certificate::ResignCommitteeCold(..) => {},
-            pallas::ledger::primitives::conway::Certificate::RegDRepCert(..) => {},
-            pallas::ledger::primitives::conway::Certificate::UnRegDRepCert(..) => {},
-            pallas::ledger::primitives::conway::Certificate::UpdateDRepCert(..) => {},
+            conway::Certificate::PoolRegistration { .. } => {},
+            conway::Certificate::PoolRetirement(..) => {},
+            conway::Certificate::Reg(..) => {},
+            conway::Certificate::UnReg(..) => {},
+            conway::Certificate::VoteDeleg(..) => {},
+            conway::Certificate::StakeVoteDeleg(..) => {},
+            conway::Certificate::StakeRegDeleg(..) => {},
+            conway::Certificate::VoteRegDeleg(..) => {},
+            conway::Certificate::StakeVoteRegDeleg(..) => {},
+            conway::Certificate::AuthCommitteeHot(..) => {},
+            conway::Certificate::ResignCommitteeCold(..) => {},
+            conway::Certificate::RegDRepCert(..) => {},
+            conway::Certificate::UnRegDRepCert(..) => {},
+            conway::Certificate::UpdateDRepCert(..) => {},
         }
     }
 

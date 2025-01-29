@@ -52,12 +52,9 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
         return Responses::BadRequest.into();
     };
 
-    let query_res = GetRole0ChainRootQuery::execute(
-        &session,
-        GetRole0ChainRootQueryParams {
-            role0_kid: decoded_role0_key,
-        },
-    )
+    let query_res = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
+        role0_kid: decoded_role0_key,
+    })
     .await;
 
     match query_res {
@@ -73,7 +70,7 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
                 };
 
                 let res = RbacRole0ChainRootResponse {
-                    chain_root: format!("0x{}", hex::encode(row.chain_root)),
+                    chain_root: row.chain_root.to_string(),
                 };
 
                 Responses::Ok(Json(res)).into()

@@ -2,19 +2,14 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::TransactionHash;
-use catalyst_types::{hashes::Blake2b256Hash, uuid::UuidV4};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
     db::{
-        index::{
-            block::from_saturating,
-            queries::{PreparedQueries, SizedBatch},
-        },
-        types::DbTransactionHash,
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -30,13 +25,13 @@ pub(super) struct Params {
     /// Transaction ID Hash. 32 bytes.
     transaction_id: DbTransactionHash,
     /// Block Slot Number
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: i16,
+    txn: DbTxnIndex,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<DbTransactionHash>,
     /// Purpose.`UUIDv4`. 16 bytes.
-    purpose: UuidV4,
+    purpose: DbUuidV4,
 }
 
 impl Debug for Params {
@@ -59,19 +54,19 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        chain_root: TransactionHash, transaction_id: TransactionHash, slot_no: u64, txn_idx: usize,
-        cip509: &Cip509,
+        chain_root: DbTransactionHash, transaction_id: DbTransactionHash, slot_no: DbSlot,
+        txn: DbTxnIndex, cip509: &Cip509,
     ) -> Self {
         Params {
-            chain_root: chain_root.to_vec(),
-            transaction_id: transaction_id.to_vec(),
+            chain_root,
+            transaction_id,
             // TODO: FIXME:
-            purpose: cip509.purpose().unwrap(),
-            slot_no: num_bigint::BigInt::from(slot_no),
-            txn: from_saturating(txn_idx),
+            purpose: cip509.purpose().unwrap().into(),
+            slot_no,
+            txn,
             prv_txn_id: cip509
                 .previous_transaction()
-                .map(MaybeUnset::Set)
+                .map(|t| MaybeUnset::Set(t.into()))
                 .unwrap_or(MaybeUnset::Unset),
         }
     }

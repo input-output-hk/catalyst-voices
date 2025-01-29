@@ -4,12 +4,14 @@
 
 use std::sync::Arc;
 
-use pallas_crypto::hash::Hash;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTransactionHash, DbTxnIndex},
+    },
     settings::cassandra_db,
 };
 
@@ -23,9 +25,9 @@ pub(super) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     stake_address: Vec<u8>,
     /// Block Slot Number
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: i16,
+    txn: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
     txo: i16,
     /// Actual full TXO Address
@@ -33,23 +35,23 @@ pub(super) struct Params {
     /// Actual TXO Value in lovelace
     value: num_bigint::BigInt,
     /// Transactions hash.
-    txn_hash: Vec<u8>,
+    txn_hash: DbTransactionHash,
 }
 
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, address: &str, value: u64,
-        txn_hash: Hash<32>,
+        stake_address: &[u8], slot_no: DbSlot, txn: DbTxnIndex, txo: i16, address: &str,
+        value: u64, txn_hash: DbTransactionHash,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
-            slot_no: slot_no.into(),
+            slot_no,
             txn,
             txo,
             address: address.to_string(),
             value: value.into(),
-            txn_hash: txn_hash.to_vec(),
+            txn_hash,
         }
     }
 

@@ -2,7 +2,7 @@
 
 use std::sync::{Arc, LazyLock};
 
-use cardano_blockchain_types::TransactionHash;
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::StakeAddress;
@@ -22,18 +22,15 @@ use crate::{
     service::{common::auth::rbac::role0_kid::Role0Kid, utilities::convert::big_uint_to_u64},
 };
 
-/// Chain Root Id - Hash of the first transaction in an RBAC Chain.
-pub(crate) type ChainRootId = TransactionHash;
-
 /// The Chain Root for an RBAC Key Chain.
 #[derive(Debug, Clone)]
 pub(crate) struct ChainRoot {
     /// Transaction hash of the Chain Root itself
-    pub txn_hash: ChainRootId,
+    pub txn_hash: TransactionHash,
     /// What slot# the Chain root is found in on the blockchain
-    pub slot: u64,
+    pub slot: Slot,
     /// What transaction in the block holds the chain root.
-    pub idx: usize,
+    pub idx: TxnIndex,
 }
 
 pub(crate) const LRU_MAX_CAPACITY: usize = 1024;
@@ -54,11 +51,11 @@ static CHAIN_ROOT_BY_TXN_HASH_CACHE: LazyLock<Cache<TransactionHash, ChainRoot>>
 
 impl ChainRoot {
     /// Create a new ChainRoot record
-    pub(crate) fn new(chain_root: TransactionHash, slot_no: u64, txn_idx: usize) -> Self {
+    pub(crate) fn new(chain_root: TransactionHash, slot: Slot, idx: TxnIndex) -> Self {
         Self {
             txn_hash: chain_root,
-            slot: slot_no,
-            idx: txn_idx,
+            slot,
+            idx,
         }
     }
 
