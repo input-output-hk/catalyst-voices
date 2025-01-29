@@ -10,8 +10,12 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required this.contentMediaType,
     required this.strLengthRange,
@@ -21,11 +25,16 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
         );
 
   @override
+  DocumentStringSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(String? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateStringLength(this, value),
       DocumentValidator.validateStringPattern(this, value),
+      DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 
@@ -42,23 +51,34 @@ final class DocumentSingleLineTextEntrySchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentSingleLineTextEntrySchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSingleLineTextEntrySchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentSingleLineTextEntrySchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -73,23 +93,34 @@ final class DocumentSingleLineHttpsUrlEntrySchema extends DocumentStringSchema {
     required super.format,
     required super.contentMediaType,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentSingleLineHttpsUrlEntrySchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSingleLineHttpsUrlEntrySchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentSingleLineHttpsUrlEntrySchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -104,23 +135,34 @@ final class DocumentMultiLineTextEntrySchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentMultiLineTextEntrySchema withNodeId(DocumentNodeId nodeId) {
+  DocumentMultiLineTextEntrySchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentMultiLineTextEntrySchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -136,23 +178,34 @@ final class DocumentMultiLineTextEntryMarkdownSchema
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentMultiLineTextEntryMarkdownSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentMultiLineTextEntryMarkdownSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentMultiLineTextEntryMarkdownSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -167,23 +220,34 @@ final class DocumentDropDownSingleSelectSchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentDropDownSingleSelectSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentDropDownSingleSelectSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentDropDownSingleSelectSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -198,23 +262,34 @@ final class DocumentTagGroupSchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentTagGroupSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentTagGroupSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentTagGroupSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -229,23 +304,34 @@ final class DocumentTagSelectionSchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentTagSelectionSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentTagSelectionSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentTagSelectionSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -260,23 +346,34 @@ final class DocumentSpdxLicenseOrUrlSchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentSpdxLicenseOrUrlSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentSpdxLicenseOrUrlSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentSpdxLicenseOrUrlSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -291,23 +388,34 @@ final class DocumentLanguageCodeSchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
   });
 
   @override
-  DocumentLanguageCodeSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentLanguageCodeSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentLanguageCodeSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
@@ -322,8 +430,12 @@ final class DocumentGenericStringSchema extends DocumentStringSchema {
     required super.contentMediaType,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.strLengthRange,
     required super.pattern,
@@ -335,23 +447,34 @@ final class DocumentGenericStringSchema extends DocumentStringSchema {
     super.contentMediaType,
     super.title = '',
     super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
     super.isRequired = false,
     super.defaultValue,
+    super.constValue,
     super.enumValues,
     super.strLengthRange,
     super.pattern,
   });
 
   @override
-  DocumentGenericStringSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericStringSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentGenericStringSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
       contentMediaType: contentMediaType,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       strLengthRange: strLengthRange,
       pattern: pattern,
