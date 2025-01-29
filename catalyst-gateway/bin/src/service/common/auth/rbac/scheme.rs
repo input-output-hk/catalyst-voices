@@ -1,5 +1,5 @@
 //! Catalyst RBAC Security Scheme
-use std::{error::Error, sync::LazyLock, time::Duration};
+use std::{env, error::Error, sync::LazyLock, time::Duration};
 
 use ed25519_dalek::{VerifyingKey, PUBLIC_KEY_LENGTH};
 use moka::future::Cache;
@@ -94,6 +94,9 @@ const MAX_TOKEN_SKEW: Duration = Duration::from_secs(5 * 60); // 5 minutes
 async fn checker_api_catalyst_auth(
     _req: &Request, bearer: Bearer,
 ) -> poem::Result<CatalystRBACTokenV1> {
+    /// Temporary: Conditional RBAC for testing
+    const RBAC_OFF: &str = "RBAC_OFF";
+
     // First check the token can be deserialized.
     let token = match CatalystRBACTokenV1::decode(&bearer.token) {
         Ok(token) => token,
@@ -102,6 +105,11 @@ async fn checker_api_catalyst_auth(
             error!("Corrupt auth token: {:?}", err);
             Err(AuthTokenError)?
         },
+    };
+
+    // If env var explicitly set by SRE, switch off full verification
+    if env::var(RBAC_OFF).is_ok() {
+        return Ok(token);
     };
 
     // Check if the token is young enough.
