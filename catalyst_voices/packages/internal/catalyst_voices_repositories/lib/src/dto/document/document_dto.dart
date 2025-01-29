@@ -122,7 +122,10 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
       properties: [
         for (int i = 0; i < values.length; i++)
           DocumentPropertyDto.fromJsonSchema(
-            itemsSchema.withNodeId(schema.nodeId.child('$i')),
+            itemsSchema.copyWith(
+              nodeId: schema.nodeId.child('$i'),
+              title: schema.getChildItemTitle(i),
+            ),
             data: data,
           ),
       ],
