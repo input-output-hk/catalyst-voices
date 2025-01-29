@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -70,7 +71,7 @@ class _SingleDropdownSelectionWidgetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          widget.schema.title,
+          widget.schema.formattedTitle,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),

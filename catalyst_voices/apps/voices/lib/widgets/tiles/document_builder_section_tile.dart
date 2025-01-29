@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/list_item_count_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/multiline_text_entry_markdown_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
@@ -83,16 +84,17 @@ class _DocumentBuilderSectionTileState
               isEditMode: _isEditMode,
               onToggleEditMode: _toggleEditMode,
             ),
+            const SizedBox(height: 24),
             _PropertyBuilder(
-              key: ValueKey(_editedSection.schema.nodeId),
+              key: ValueKey(_editedSection.nodeId),
               property: _editedSection,
               isEditMode: _isEditMode,
               onChanged: _handlePropertyChanges,
             ),
             if (_isEditMode) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               _Footer(
-                isValid: _editedSection.isValid,
+                isValid: _editedSection.isValidExcludingSubsections,
                 onSave: _saveChanges,
               ),
             ],
@@ -244,18 +246,24 @@ class _PropertyListBuilder extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: list.properties
-          .whereNot((child) => child.schema.isSubsection)
-          .map<Widget>((child) {
-            return _PropertyBuilder(
-              key: ValueKey(child.schema.nodeId),
-              property: child,
-              isEditMode: isEditMode,
-              onChanged: onChanged,
-            );
-          })
-          .separatedBy(const SizedBox(height: 24))
-          .toList(),
+      children: [
+        ListLengthPickerWidget(
+          key: ValueKey(list.nodeId),
+          list: list,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        ),
+        ...list.properties
+            .whereNot((child) => child.schema.isSubsection)
+            .map<Widget>((child) {
+          return _PropertyBuilder(
+            key: ValueKey(child.nodeId),
+            property: child,
+            isEditMode: isEditMode,
+            onChanged: onChanged,
+          );
+        }),
+      ].separatedBy(const SizedBox(height: 24)).toList(),
     );
   }
 }
@@ -294,7 +302,7 @@ class _PropertyObjectBuilder extends StatelessWidget {
               .whereNot((child) => child.schema.isSubsection)
               .map<Widget>((child) {
                 return _PropertyBuilder(
-                  key: ValueKey(child.schema.nodeId),
+                  key: ValueKey(child.nodeId),
                   property: child,
                   isEditMode: isEditMode,
                   onChanged: onChanged,
