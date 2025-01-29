@@ -65,9 +65,7 @@ impl ResponseError for AuthTokenError {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where
-        Self: Error + Send + Sync + 'static,
-    {
+    where Self: Error + Send + Sync + 'static {
         ErrorResponses::unauthorized().into_response()
     }
 }
@@ -86,9 +84,7 @@ impl ResponseError for AuthTokenAccessViolation {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where
-        Self: Error + Send + Sync + 'static,
-    {
+    where Self: Error + Send + Sync + 'static {
         // TODO: Actually check permissions needed for an endpoint.
         ErrorResponses::forbidden(Some(self.0.clone())).into_response()
     }
