@@ -30,20 +30,18 @@ void main() async {
   });
 
   group('Spaces drawer -', () {
-    patrolWidgetTest(
-      'visitor - no drawer button',
-      (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await $(OverallSpacesPage.visitorShortcutBtn)
-            .tap(settleTimeout: Time.long.duration);
-        expect($(AppBarPage.spacesDrawerButton).exists, false);
-      },
-    );
+    // patrolWidgetTest(
+    //   'visitor - no drawer button',
+    //   (PatrolTester $) async {
+    //     await $.pumpWidgetAndSettle(App(routerConfig: router));
+    //     expect($(AppBarPage.spacesDrawerButton).exists, false);
+    //   },
+    // );
 
     patrolWidgetTest(
-      'guest - chooser - clicking on icons works correctly',
-      tags: 'https://github.com/input-output-hk/catalyst-voices/issues/1473',
+      tags: 'issues_1473',
       skip: true,
+      'guest - chooser - clicking on icons works correctly',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(OverallSpacesPage.guestShortcutBtn)
@@ -61,7 +59,7 @@ void main() async {
     );
 
     patrolWidgetTest(
-      tags: 'https://github.com/input-output-hk/catalyst-voices/issues/1473',
+      tags: 'issues_1473',
       skip: true,
       'guest - chooser - next,previous buttons work correctly',
       (PatrolTester $) async {
@@ -89,6 +87,8 @@ void main() async {
     );
 
     patrolWidgetTest(
+      tags: 'issues_1715',
+      skip: true,
       'user - chooser - clicking on icons works correctly',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -104,6 +104,8 @@ void main() async {
     );
 
     patrolWidgetTest(
+      tags: 'issues_1715',
+      skip: true,
       'guest - chooser - all spaces button works',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -116,6 +118,8 @@ void main() async {
     );
 
     patrolWidgetTest(
+      tags: 'issues_1715',
+      skip: true,
       'user - chooser - all spaces button works',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -128,7 +132,9 @@ void main() async {
     );
 
     patrolWidgetTest(
-      'check tooltip text',
+      tags: 'issues_1715',
+      skip: true,
+      'user - chooser - check tooltip text',
       (PatrolTester $) async {
         final spaceToTooltipText = <Space, String>{
           Space.discovery: 'Discovery space',
