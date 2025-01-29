@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:flutter/material.dart';
 
 class MenuItemTile extends StatelessWidget {
@@ -27,39 +28,20 @@ class MenuItemTile extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                _AffixDecoration(child: leading),
-                const SizedBox(width: 12),
-                Expanded(child: _TitleDecoration(child: title)),
-                if (trailing != null) ...[
-                  const SizedBox(width: 12),
-                  _AffixDecoration(child: trailing),
-                ],
-              ],
+            child: AffixDecorator(
+              gap: 12,
+              iconTheme: IconThemeData(
+                size: 24,
+                color: context.colors.iconsForeground,
+              ),
+              prefix: leading,
+              suffix: trailing,
+              mainAxisSize: MainAxisSize.max,
+              child: _TitleDecoration(child: title),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AffixDecoration extends StatelessWidget {
-  final Widget child;
-
-  const _AffixDecoration({
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IconTheme(
-      data: IconThemeData(
-        size: 24,
-        color: context.colors.iconsForeground,
-      ),
-      child: child,
     );
   }
 }

@@ -38,7 +38,6 @@ class _Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesAvatar(
       icon: Text(letter),
-      // Size 40
       radius: 20,
       onTap: onTap,
     );
