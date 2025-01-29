@@ -8,8 +8,12 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required this.numRange,
   }) : super(
@@ -17,10 +21,15 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
         );
 
   @override
+  DocumentNumberSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(double? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateNumberRange(this, value),
+      DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
     ]);
   }
 
@@ -35,8 +44,12 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required super.defaultValue,
+    required super.constValue,
     required super.enumValues,
     required super.numRange,
   });
@@ -46,21 +59,32 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
     super.format,
     super.title = '',
     super.description,
+    super.placeholder,
+    super.guidance,
+    super.isSubsection = false,
     super.isRequired = false,
     super.defaultValue,
+    super.constValue,
     super.enumValues,
     super.numRange,
   });
 
   @override
-  DocumentGenericNumberSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericNumberSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentGenericNumberSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
       isRequired: isRequired,
       defaultValue: defaultValue,
+      constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
     );

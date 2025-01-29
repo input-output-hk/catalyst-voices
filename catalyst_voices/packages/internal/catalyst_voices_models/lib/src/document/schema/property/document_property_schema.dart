@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:uuid/uuid.dart';
 
 part 'document_boolean_schema.dart';
 part 'document_integer_schema.dart';
@@ -34,6 +34,12 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   final DocumentPropertyFormat? format;
   final String title;
   final MarkdownData? description;
+  final String? placeholder;
+  final String? guidance;
+
+  /// True if the property should be treated as a standalone
+  /// section rather than a nested property.
+  final bool isSubsection;
 
   /// True if the property must exist and be non-nullable,
   /// false if the property may not exist or be nullable.
@@ -45,6 +51,9 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
     required this.format,
     required this.title,
     required this.description,
+    required this.placeholder,
+    required this.guidance,
+    required this.isSubsection,
     required this.isRequired,
   });
 
@@ -53,15 +62,21 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
 
   /// Creates a new property from this schema with a default value.
   ///
-  /// Specify the [parentNodeId] if the created property should
-  /// be moved to another node. By default it is created under
-  /// the same node that this schema points to.
+  /// Specify the [nodeId] where the property should be created.
+  /// Optionally specify a new [title] that should replace the old title.
   ///
   /// This is useful to create new items for the [DocumentListProperty].
-  DocumentProperty createChildPropertyAt([DocumentNodeId? parentNodeId]);
+  DocumentProperty createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  });
 
-  /// Moves the schema and it's children to the [nodeId].
-  DocumentPropertySchema withNodeId(DocumentNodeId nodeId);
+  /// Creates a new copy of the schema.
+  ///
+  /// - If [nodeId] is not null then it moves the schema
+  /// and it's children to the [nodeId].
+  /// - If [title] is not null then the new schema will use the updated title.
+  DocumentPropertySchema copyWith({DocumentNodeId? nodeId, String? title});
 
   @override
   @mustCallSuper
@@ -71,6 +86,9 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
         format,
         title,
         description,
+        placeholder,
+        guidance,
+        isSubsection,
         isRequired,
       ];
 }
@@ -78,7 +96,14 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
 /// A schema property that can have a value.
 sealed class DocumentValueSchema<T extends Object>
     extends DocumentPropertySchema {
+  /// The default value this property should have
+  /// if not assigned any custom value.
   final T? defaultValue;
+
+  /// The "const" value for validation. The only allowed value is this one.
+  final T? constValue;
+
+  /// A list of allowed values.
   final List<T>? enumValues;
 
   const DocumentValueSchema({
@@ -87,8 +112,12 @@ sealed class DocumentValueSchema<T extends Object>
     required super.format,
     required super.title,
     required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
     required super.isRequired,
     required this.defaultValue,
+    required this.constValue,
     required this.enumValues,
   });
 
@@ -105,18 +134,16 @@ sealed class DocumentValueSchema<T extends Object>
   }
 
   @override
-  DocumentValueProperty<T> createChildPropertyAt([
-    DocumentNodeId? parentNodeId,
-  ]) {
-    parentNodeId ??= nodeId;
+  DocumentValueProperty<T> createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  }) {
+    final updatedSchema = copyWith(
+      nodeId: nodeId,
+      title: title,
+    );
 
-    final childId = const Uuid().v4();
-    final value = defaultValue;
-
-    final updatedSchema =
-        withNodeId(parentNodeId.child(childId)) as DocumentValueSchema<T>;
-
-    return updatedSchema.buildProperty(value: value);
+    return updatedSchema.buildProperty(value: defaultValue);
   }
 
   /// Casts the property linked to this schema so that
@@ -138,10 +165,14 @@ sealed class DocumentValueSchema<T extends Object>
     return value as T?;
   }
 
+  @override
+  DocumentValueSchema<T> copyWith({DocumentNodeId? nodeId, String? title});
+
   /// Validates the property [value] against document rules.
   DocumentValidationResult validate(T? value);
 
   @override
   @mustCallSuper
-  List<Object?> get props => super.props + [defaultValue, enumValues];
+  List<Object?> get props =>
+      super.props + [defaultValue, constValue, enumValues];
 }

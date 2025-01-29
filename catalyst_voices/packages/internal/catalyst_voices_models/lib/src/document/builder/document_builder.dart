@@ -13,26 +13,21 @@ import 'package:collection/collection.dart';
 ///
 /// Once edits are done convert the builder to a [Document] with [build] method.
 final class DocumentBuilder {
-  String _schemaUrl;
   DocumentSchema _schema;
   List<DocumentPropertyBuilder> _properties;
 
   /// The default constructor for the [DocumentBuilder].
   DocumentBuilder({
-    required String schemaUrl,
     required DocumentSchema schema,
     required List<DocumentPropertyBuilder> properties,
-  })  : _schemaUrl = schemaUrl,
-        _schema = schema,
+  })  : _schema = schema,
         _properties = properties;
 
   /// Creates an empty [DocumentBuilder] from a [schema].
   factory DocumentBuilder.fromSchema({
-    required String schemaUrl,
     required DocumentSchema schema,
   }) {
     return DocumentBuilder(
-      schemaUrl: schemaUrl,
       schema: schema,
       properties:
           schema.properties.map(DocumentPropertyBuilder.fromSchema).toList(),
@@ -42,7 +37,6 @@ final class DocumentBuilder {
   /// Creates a [DocumentBuilder] from existing [document].
   factory DocumentBuilder.fromDocument(Document document) {
     return DocumentBuilder(
-      schemaUrl: document.schemaUrl,
       schema: document.schema,
       properties: document.properties
           .map(DocumentPropertyBuilder.fromProperty)
@@ -69,7 +63,6 @@ final class DocumentBuilder {
       ..sortByOrder(_schema.order);
 
     return Document(
-      schemaUrl: _schemaUrl,
       schema: _schema,
       properties: List.unmodifiable(mappedProperties),
     );
@@ -106,6 +99,12 @@ sealed class DocumentPropertyBuilder implements DocumentNode {
         return DocumentValuePropertyBuilder.fromProperty(property);
     }
   }
+
+  /// Returns the schema assigned to this property.
+  DocumentPropertySchema get schema;
+
+  /// Updates the property schema.
+  set schema(DocumentPropertySchema schema);
 
   /// Applies a change on this builder or any child builder.
   void addChange(DocumentChange change);
@@ -155,6 +154,14 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   DocumentNodeId get nodeId => _schema.nodeId;
 
   @override
+  DocumentListSchema get schema => _schema;
+
+  @override
+  set schema(DocumentPropertySchema schema) {
+    _schema = schema as DocumentListSchema;
+  }
+
+  @override
   void addChange(DocumentChange change) {
     switch (change) {
       case DocumentValueChange():
@@ -183,7 +190,12 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   void _handleAddListItemChange(DocumentAddListItemChange change) {
     if (change.nodeId == nodeId) {
       // targets this property
-      final property = _schema.itemsSchema.createChildPropertyAt();
+      final nextIndex = _properties.length;
+      final childNodeId = nodeId.child('$nextIndex');
+      final property = _schema.itemsSchema.createChildPropertyAt(
+        nodeId: childNodeId,
+        title: _schema.getChildItemTitle(nextIndex),
+      );
       _properties.add(DocumentPropertyBuilder.fromProperty(property));
     } else {
       // targets child property
@@ -193,11 +205,42 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
 
   void _handleRemoveListItemChange(DocumentRemoveListItemChange change) {
     if (change.nodeId == nodeId) {
-      // targets this property
-      _properties.removeWhere((e) => e.nodeId == change.nodeId);
-    } else {
-      // targets child property
-      _properties.findTargetFor(change).addChange(change);
+      throw ArgumentError(
+        'The property cannot remove itself from the parent',
+        nodeId.toString(),
+      );
+    }
+
+    for (final property in _properties) {
+      if (property.nodeId == change.nodeId) {
+        // found a direct child, this change targeted this property
+        _properties.remove(property);
+        _syncChildrenTitles();
+        return;
+      }
+    }
+
+    // targets child property
+    _properties.findTargetFor(change).addChange(change);
+  }
+
+  /// Children in a list have titles that are built
+  /// from [DocumentListSchema.itemsSchema] title.
+  ///
+  /// Each child is given a `${itemsSchema.title} ${index + 1}` title.
+  /// If a middle child gets removed we need to resync outdated children.
+  ///
+  /// Context: milestone titles should be formatted using their index in a list:
+  /// - Milestone #1
+  /// - Milestone #2
+  /// - ...
+  /// - Milestone #n
+  void _syncChildrenTitles() {
+    for (var i = 0; i < _properties.length; i++) {
+      final property = _properties[i];
+      final updatedTitle = _schema.getChildItemTitle(i);
+      final updatedSchema = property.schema.copyWith(title: updatedTitle);
+      property.schema = updatedSchema;
     }
   }
 }
@@ -242,6 +285,14 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
 
   @override
   DocumentNodeId get nodeId => _schema.nodeId;
+
+  @override
+  DocumentObjectSchema get schema => _schema;
+
+  @override
+  set schema(DocumentPropertySchema schema) {
+    _schema = schema as DocumentObjectSchema;
+  }
 
   @override
   void addChange(DocumentChange change) {
@@ -298,6 +349,14 @@ final class DocumentValuePropertyBuilder<T extends Object>
 
   @override
   DocumentNodeId get nodeId => _schema.nodeId;
+
+  @override
+  DocumentValueSchema<T> get schema => _schema;
+
+  @override
+  set schema(DocumentPropertySchema schema) {
+    _schema = schema as DocumentValueSchema<T>;
+  }
 
   @override
   void addChange(DocumentChange change) {
