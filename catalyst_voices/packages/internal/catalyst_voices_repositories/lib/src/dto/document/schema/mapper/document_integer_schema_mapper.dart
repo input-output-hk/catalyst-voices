@@ -35,7 +35,11 @@ final class DocumentIntegerSchemaMapper {
     final description = schema.description;
     final descriptionMarkdown =
         description != null ? MarkdownData(description) : null;
+    final placeholder = schema.placeholder;
+    final guidance = schema.guidance;
+    final isSubsection = schema.subsection ?? false;
     final defaultValue = schema.defaultValue as int?;
+    final constValue = schema.constValue as int?;
     final enumValues = schema.enumValues?.cast<int>();
     final numRange =
         Range.optionalRangeOf(min: schema.minimum, max: schema.maximum);
@@ -48,8 +52,12 @@ final class DocumentIntegerSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
         );
@@ -59,8 +67,12 @@ final class DocumentIntegerSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
         );
@@ -70,8 +82,12 @@ final class DocumentIntegerSchemaMapper {
           format: format,
           title: title,
           description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
+          constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
         );
