@@ -33,7 +33,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
   List<DropdownMenuEntry<String>> get _mapItems {
     return (widget.schema.enumValues ?? [])
         .map((e) {
-          final label = getLocalizedLanguageName(e);
+          final label = _getLocalizedLanguageName(e);
           return label != null
               ? DropdownMenuEntry(value: e, label: label)
               : null;
@@ -45,7 +45,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
   @override
   void initState() {
     super.initState();
-    handleInitialValue();
+    _handleInitialValue();
   }
 
   @override
@@ -54,11 +54,11 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
 
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
-      handleInitialValue();
+      _handleInitialValue();
     }
 
     if (oldWidget.property.value != widget.property.value) {
-      handleInitialValue();
+      _handleInitialValue();
     }
   }
 
@@ -84,29 +84,29 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
         SingleSelectDropdown(
           items: _dropdownMenuEntries,
           initialValue: _selectedValue,
-          onChanged: handleValueChanged,
+          onChanged: _handleValueChanged,
           enabled: widget.isEditMode,
         ),
       ],
     );
   }
 
-  void handleInitialValue() {
+  void _handleInitialValue() {
     _selectedValue =
         widget.property.value ?? widget.property.schema.defaultValue;
   }
 
-  void handleValueChanged(String? value) {
+  void _handleValueChanged(String? value) {
     setState(() {
       _selectedValue = value;
     });
 
     if (widget.property.value != value) {
-      notifyChangeListener(value);
+      _notifyChangeListener(value);
     }
   }
 
-  void notifyChangeListener(String? value) {
+  void _notifyChangeListener(String? value) {
     widget.onChanged([
       DocumentValueChange(
         nodeId: widget.schema.nodeId,
@@ -115,7 +115,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
     ]);
   }
 
-  String? getLocalizedLanguageName(String languageCode) {
+  String? _getLocalizedLanguageName(String languageCode) {
     return LocaleNames.of(context)?.nameOf(languageCode);
   }
 }
