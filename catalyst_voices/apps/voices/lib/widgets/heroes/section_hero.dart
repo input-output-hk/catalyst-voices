@@ -61,7 +61,7 @@ class _HeroSectionState extends State<HeroSection>
   }
 
   @override
-  void dispose()  {
+  void dispose() {
     unawaited(_controller?.dispose());
     _controller = null;
     super.dispose();
