@@ -15,6 +15,7 @@ export 'cards/role_chooser_card.dart';
 export 'chips/voices_chip.dart';
 export 'common/delayed_widget.dart';
 export 'common/infrastructure/voices_loadable.dart';
+export 'common/navigation_back.dart';
 export 'common/navigation_location.dart';
 export 'common/shortcut_activator_view.dart';
 export 'common/simple_tree_view.dart';

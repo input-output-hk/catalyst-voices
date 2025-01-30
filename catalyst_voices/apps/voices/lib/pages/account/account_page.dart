@@ -32,7 +32,7 @@ class _AccountPageState extends State<AccountPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AccountStatusBanner(),
+          Offstage(child: AccountStatusBanner()),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(24),
@@ -44,7 +44,7 @@ class _AccountPageState extends State<AccountPage> {
                   children: [
                     Expanded(child: AccountHeaderTile()),
                     SizedBox(width: 28),
-                    Expanded(child: AccountActionTile())
+                    Expanded(child: Offstage(child: AccountActionTile()))
                   ],
                 ),
                 SizedBox(height: 40),

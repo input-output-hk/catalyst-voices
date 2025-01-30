@@ -1422,5 +1422,6 @@
   "lockAccount": "Lock account",
   "timezone": "Timezone",
   "displayName": "Display Name",
-  "emailAddress": "Email address"
+  "emailAddress": "Email address",
+  "myAccount": "My account"
 }
