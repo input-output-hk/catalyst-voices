@@ -28,6 +28,7 @@ pub(crate) mod response;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
+#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## OK
     ///
@@ -38,7 +39,6 @@ pub(crate) enum Responses {
     ///
     /// No documents were found which match the query filter.
     #[oai(status = 404)]
-    #[allow(dead_code)]
     NotFound,
 }
 
