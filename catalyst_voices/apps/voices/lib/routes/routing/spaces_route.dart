@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/category/category_page.dart';
 import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/funded_projects/funded_projects_page.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder.dart';
@@ -27,6 +28,9 @@ const _prefix = Routes.currentMilestone;
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
+        ),
+        TypedGoRoute<CategoryDetailRoute>(
+          path: 'category/:categoryId',
         ),
       ],
     ),
@@ -199,5 +203,17 @@ final class TreasuryRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const TreasuryPage();
+  }
+}
+
+final class CategoryDetailRoute extends GoRouteData
+    with FadePageTransitionMixin {
+  final String categoryId;
+
+  const CategoryDetailRoute(this.categoryId);
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return CategoryPage(categoryId: categoryId);
   }
 }
