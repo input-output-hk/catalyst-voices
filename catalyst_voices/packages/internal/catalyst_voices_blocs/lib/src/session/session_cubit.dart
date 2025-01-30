@@ -98,7 +98,7 @@ final class SessionCubit extends Cubit<SessionState>
     await _userService.useAccount(dummyAccount);
   }
 
-  void updateTimezonePreferences(TimezonePreferences value) {
+  void updateTimezone(TimezonePreferences value) {
     final settings = _userService.user.settings;
 
     final updatedSettings = settings.copyWith(timezone: Optional.of(value));

@@ -1,16 +1,18 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
-class SingleDropdownSelectionWidget extends StatefulWidget {
+class LanguageCodeWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
-  final DocumentDropDownSingleSelectSchema schema;
+  final DocumentLanguageCodeSchema schema;
   final bool isEditMode;
+
   final ValueChanged<List<DocumentChange>> onChanged;
 
-  const SingleDropdownSelectionWidget({
+  const LanguageCodeWidget({
     super.key,
     required this.property,
     required this.schema,
@@ -19,20 +21,25 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
   });
 
   @override
-  State<SingleDropdownSelectionWidget> createState() =>
-      _SingleDropdownSelectionWidgetState();
+  State<LanguageCodeWidget> createState() => _LanguageCodeWidgetState();
 }
 
-class _SingleDropdownSelectionWidgetState
-    extends State<SingleDropdownSelectionWidget> {
+class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
   late List<DropdownMenuEntry<String>> _dropdownMenuEntries;
   late String? _selectedValue;
 
   String get _title => widget.schema.formattedTitle;
 
   List<DropdownMenuEntry<String>> get _mapItems {
-    final items = widget.schema.enumValues ?? [];
-    return items.map((e) => DropdownMenuEntry(value: e, label: e)).toList();
+    return (widget.schema.enumValues ?? [])
+        .map((e) {
+          final label = _getLocalizedLanguageName(e);
+          return label != null
+              ? DropdownMenuEntry(value: e, label: label)
+              : null;
+        })
+        .whereNotNull()
+        .toList();
   }
 
   @override
@@ -42,7 +49,7 @@ class _SingleDropdownSelectionWidgetState
   }
 
   @override
-  void didUpdateWidget(covariant SingleDropdownSelectionWidget oldWidget) {
+  void didUpdateWidget(LanguageCodeWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.isEditMode != widget.isEditMode &&
@@ -56,20 +63,28 @@ class _SingleDropdownSelectionWidgetState
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _dropdownMenuEntries = _mapItems;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _title,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 8),
+        if (_title.isNotEmpty) ...[
+          Text(
+            _title,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+        ],
         SingleSelectDropdown(
           items: _dropdownMenuEntries,
           initialValue: _selectedValue,
           onChanged: _handleValueChanged,
-          validator: _validator,
           enabled: widget.isEditMode,
         ),
       ],
@@ -77,8 +92,8 @@ class _SingleDropdownSelectionWidgetState
   }
 
   void _handleInitialValue() {
-    _selectedValue = widget.property.value;
-    _dropdownMenuEntries = _mapItems;
+    _selectedValue =
+        widget.property.value ?? widget.property.schema.defaultValue;
   }
 
   void _handleValueChanged(String? value) {
@@ -100,9 +115,7 @@ class _SingleDropdownSelectionWidgetState
     ]);
   }
 
-  String? _validator(String? value) {
-    final result = widget.schema.validate(value);
-
-    return LocalizedDocumentValidationResult.from(result).message(context);
+  String? _getLocalizedLanguageName(String languageCode) {
+    return LocaleNames.of(context)?.nameOf(languageCode);
   }
 }
