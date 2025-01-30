@@ -18,6 +18,9 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
         );
 
   @override
+  DocumentBooleanSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(bool? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
@@ -43,11 +46,11 @@ final class DocumentYesNoChoiceSchema extends DocumentBooleanSchema {
   });
 
   @override
-  DocumentYesNoChoiceSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentYesNoChoiceSchema copyWith({DocumentNodeId? nodeId, String? title}) {
     return DocumentYesNoChoiceSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -76,11 +79,14 @@ final class DocumentAgreementConfirmationSchema extends DocumentBooleanSchema {
   });
 
   @override
-  DocumentAgreementConfirmationSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentAgreementConfirmationSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentAgreementConfirmationSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -123,11 +129,14 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
   });
 
   @override
-  DocumentGenericBooleanSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericBooleanSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentGenericBooleanSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
