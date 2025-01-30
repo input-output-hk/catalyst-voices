@@ -32,7 +32,7 @@ class PendingProposalCard extends StatefulWidget {
 
 class _PendingProposalCardState extends State<PendingProposalCard> {
   late final WidgetStatesController _statesController;
-  late final _ProposalBorderColor border;
+  late final _ProposalBorderColor _border;
 
   @override
   void initState() {
@@ -43,11 +43,23 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    border = _ProposalBorderColor(
+    _border = _ProposalBorderColor(
       publishStage: widget.proposal.publishStage,
       colorScheme: context.colorScheme,
       colors: context.colors,
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant PendingProposalCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
+      _border = _ProposalBorderColor(
+        publishStage: widget.proposal.publishStage,
+        colors: context.colors,
+        colorScheme: context.colorScheme,
+      );
+    }
   }
 
   @override
@@ -57,6 +69,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   }
 
   bool isHovered = false;
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -72,7 +85,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
               color: context.colors.elevationsOnSurfaceNeutralLv1White,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: border.resolve(_statesController.value),
+                color: _border.resolve(_statesController.value),
               ),
             ),
             child: Column(
@@ -301,6 +314,7 @@ class _FundsAndDuration extends StatelessWidget {
 class _PropertyValue extends StatelessWidget {
   final String title;
   final String formattedValue;
+
   const _PropertyValue({
     required this.title,
     required this.formattedValue,
