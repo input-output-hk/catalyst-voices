@@ -13,6 +13,7 @@ enum _DocumentStringDefinition {
   tagSelection('tagSelection'),
   spdxLicenseOrUrl('spdxLicenseOrURL'),
   languageCode('languageCode'),
+  radioButtonSelect('radioButtonSelect'),
   unknown('unknown');
 
   final String def;
@@ -195,6 +196,24 @@ final class DocumentStringSchemaMapper {
         );
       case _DocumentStringDefinition.languageCode:
         return DocumentLanguageCodeSchema(
+          nodeId: nodeId,
+          format: format,
+          contentMediaType: contentMediaType,
+          title: title,
+          description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
+          isRequired: isRequired,
+          defaultValue: defaultValue,
+          constValue: constValue,
+          enumValues: enumValues,
+          strLengthRange: strLengthRange,
+          pattern: patternRegExp,
+        );
+
+      case _DocumentStringDefinition.radioButtonSelect:
+        return DocumentRadioButtonSelect(
           nodeId: nodeId,
           format: format,
           contentMediaType: contentMediaType,
