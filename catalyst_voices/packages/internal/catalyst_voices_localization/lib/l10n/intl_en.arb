@@ -1420,5 +1420,7 @@
   "submitSupportRequest": "Submit support request",
   "catalystKnowledgeBase": "Catalyst knowledge base",
   "lockAccount": "Lock account",
-  "timezone": "Timezone"
+  "timezone": "Timezone",
+  "displayName": "Display Name",
+  "emailAddress": "Email address"
 }

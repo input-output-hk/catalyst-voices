@@ -59,8 +59,8 @@ class _AppState extends State<App> {
       BlocProvider<ProposalBuilderBloc>(
         create: (context) => Dependencies.instance.get<ProposalBuilderBloc>(),
       ),
-      BlocProvider<AccountBloc>(
-        create: (context) => Dependencies.instance.get<AccountBloc>(),
+      BlocProvider<AccountCubit>(
+        create: (context) => Dependencies.instance.get<AccountCubit>(),
       )
     ];
   }
