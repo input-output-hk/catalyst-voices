@@ -1,7 +1,7 @@
+import 'package:catalyst_voices/common/ext/preferences_ext.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -120,18 +120,13 @@ class _TimezoneCard extends StatelessWidget {
       color: foregroundColor,
     );
 
-    final text = switch (data) {
-      TimezonePreferences.utc => 'UTC',
-      TimezonePreferences.local => context.l10n.local,
-    };
-
     return Material(
       color: backgroundColor,
       borderRadius: BorderRadius.circular(4),
       textStyle: style,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-        child: Text(text),
+        child: Text(data.localizedName(context)),
       ),
     );
   }

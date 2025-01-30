@@ -7,6 +7,8 @@ import 'package:catalyst_voices_brands/src/themes/widgets/slider_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/voices_dialog_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_popup_menu_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_segmented_button_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -323,7 +325,13 @@ ThemeData _buildThemeData(
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
+    popupMenuTheme: VoicesPopupMenuThemeData(colors: voicesColorScheme),
     dialogTheme: VoicesDialogTheme(colors: voicesColorScheme),
+    segmentedButtonTheme: VoicesSegmentedButtonTheme(
+      colors: colorScheme,
+      voicesColors: voicesColorScheme,
+      textTheme: textTheme,
+    ),
     listTileTheme: ListTileThemeData(
       shape: const StadiumBorder(),
       minTileHeight: 56,
