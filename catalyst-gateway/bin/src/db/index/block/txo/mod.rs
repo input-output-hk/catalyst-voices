@@ -27,7 +27,6 @@ const NO_STAKE_ADDRESS: &[u8] = &[];
 /// Insert TXO Query and Parameters
 ///
 /// There are multiple possible parameters to a query, which are represented separately.
-#[allow(dead_code)]
 pub(crate) struct TxoInsertQuery {
     /// Staked TXO Data Parameters
     staked_txo: Vec<insert_txo::Params>,

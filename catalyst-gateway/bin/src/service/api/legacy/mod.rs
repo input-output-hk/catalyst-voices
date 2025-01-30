@@ -9,5 +9,4 @@ mod v0;
 mod v1;
 
 /// Legacy endpoints API
-#[allow(dead_code)]
 pub(crate) type LegacyApi = (RegistrationApi, V0Api, V1Api);
