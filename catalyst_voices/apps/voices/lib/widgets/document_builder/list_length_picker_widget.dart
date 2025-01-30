@@ -69,8 +69,11 @@ class ListLengthPickerWidget extends StatelessWidget {
   }
 
   // TODO(dtscalac): temporary solution to format dynamic strings as plural,
-  // after F14 document schema must be altered to support this out-of-the-box
-  // without the need for this magic
+  // after F14 the document schema must be altered to support
+  // other languages than English.
+  //
+  // The current workaround won't work for exceptions like "mouse" -> "mice",
+  // this was accepted for the time being.
   String _formatAsPlural(String word, int count) {
     return switch (count) {
       1 => '$count $word',
