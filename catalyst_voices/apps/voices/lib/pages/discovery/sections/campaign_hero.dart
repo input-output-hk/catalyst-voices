@@ -94,7 +94,9 @@ class _DiscoveryMyProposalsButton extends StatelessWidget {
             onTap: () {
               const WorkspaceRoute().go(context);
             },
-            foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+            style: OutlinedButton.styleFrom(
+              backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+            ),
             child: Text(context.l10n.myProposals),
           ),
         );
