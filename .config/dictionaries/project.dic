@@ -277,6 +277,7 @@ sendfile
 servernum
 serviceworker
 slotno
+skeletonizer
 sqlfluff
 SRCROOT
 sslmode

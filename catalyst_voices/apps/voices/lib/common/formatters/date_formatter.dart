@@ -41,13 +41,44 @@ abstract class DateFormatter {
     return l10n.inXDays(days);
   }
 
-  static (String date, String time) formatDateTimeParts(
-    DateTime date,
-  ) {
-    final dayMonthFormatter = DateFormat('d MMMM').format(date);
+  /// Formats a given DateTime into separate date and time strings.
+  ///
+  /// The method formats the date part in either 'd MMMM yyyy' or
+  /// 'd MMMM' format depending on the value of [includeYear].
+  /// The time part is always formatted in 'HH:mm' format.
+  ///
+  /// Parameters:
+  /// - [date]: The DateTime object to format.
+  /// - [includeYear]: A boolean indicating whether the year should be included
+  ///   in the formatted date string. Defaults to `false`.
+  ///
+  /// Returns a map with:
+  /// - `date`: The formatted date string.
+  /// - `time`: The formatted time string.
+  ///
+  /// Examples:
+  /// - For `DateTime(2023, 10, 14, 9, 30)` with `includeYear = false`:
+  ///   - date: "14 October"
+  ///   - time: "09:30"
+  /// - For `DateTime(2023, 10, 14, 9, 30)` with `includeYear = true`:
+  ///   - date: "14 October 2023"
+  ///   - time: "09:30"
+  /// - For `DateTime(2022, 2, 5, 15, 45)` with `includeYear = false`:
+  ///   - date: "5 February"
+  ///   - time: "15:45"
+  /// - For `DateTime(2022, 2, 5, 15, 45)` with `includeYear = true`:
+  ///   - date: "5 February 2022"
+  ///   - time: "15:45"
+  static ({String date, String time}) formatDateTimeParts(
+    DateTime date, {
+    bool includeYear = false,
+  }) {
+    final formatter =
+        includeYear ? DateFormat('d MMMM yyyy') : DateFormat('d MMMM');
+    final dayMonthFormatter = formatter.format(date);
     final timeFormatter = DateFormat('HH:mm').format(date);
 
-    return (dayMonthFormatter, timeFormatter);
+    return (date: dayMonthFormatter, time: timeFormatter);
   }
 
   static String formatShortMonth(
@@ -118,5 +149,16 @@ abstract class DateFormatter {
     }
 
     return '';
+  }
+
+  /// Formats a given [DateTime] object into a string
+  /// with the format "d MMM HH:mm".
+  ///
+  /// The format consists of:
+  /// - Day of the month as a number without leading zeros (e.g., 4)
+  /// - Abbreviated month name (e.g., Jan, Feb, Mar)
+  /// - 24-hour time format with hours and minutes (e.g., 14:30)
+  static String formatDayMonthTime(DateTime dateTime) {
+    return DateFormat('d MMM HH:mm').format(dateTime);
   }
 }
