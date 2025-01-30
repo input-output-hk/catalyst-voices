@@ -40,29 +40,19 @@ class _EditableTileState extends State<EditableTile> {
 
   @override
   Widget build(BuildContext context) {
-    return SelectableTile(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _Header(
-              title: widget.title,
-              isEditMode: _isEditMode,
-              onToggleEditMode: _toggleEditMode,
-            ),
-            widget.child,
-            if (_isEditMode) ...[
-              const SizedBox(height: 12),
-              _Footer(
-                isSaveEnabled: widget.isSaveEnabled,
-                onSave: _save,
-              ),
-            ],
-          ],
-        ),
+    return PropertyTile(
+      title: widget.title,
+      action: VoicesEditSaveButton(
+        onTap: _toggleEditMode,
+        isEditing: _isEditMode,
       ),
+      footer: _isEditMode
+          ? _Footer(
+              isSaveEnabled: widget.isSaveEnabled,
+              onSave: _save,
+            )
+          : null,
+      child: widget.child,
     );
   }
 
@@ -93,42 +83,6 @@ class _EditableTileState extends State<EditableTile> {
         onChanged(change);
       }
     });
-  }
-}
-
-class _Header extends StatelessWidget {
-  final String title;
-  final bool isEditMode;
-  final VoidCallback? onToggleEditMode;
-
-  const _Header({
-    required this.title,
-    this.isEditMode = false,
-    this.onToggleEditMode,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
-        const SizedBox(width: 16),
-        VoicesTextButton(
-          onTap: onToggleEditMode,
-          child: Text(
-            isEditMode
-                ? context.l10n.cancelButtonText
-                : context.l10n.editButtonText,
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        ),
-      ],
-    );
   }
 }
 
