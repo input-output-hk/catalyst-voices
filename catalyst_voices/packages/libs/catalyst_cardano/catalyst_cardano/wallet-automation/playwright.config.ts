@@ -21,7 +21,7 @@ export default defineConfig({
   timeout: 60 * 1000,
   projects: [
     {
-      name: "chromium",
+      name: "chrome",
       use: {
         // ...devices["Desktop Chrome"],
         launchOptions: {
