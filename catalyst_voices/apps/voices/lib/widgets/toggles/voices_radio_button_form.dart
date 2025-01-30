@@ -9,7 +9,7 @@ class VoicesRadioButtonFormField extends FormField<String> {
   final ValueChanged<String?>? onChanged;
   final List<String> items;
 
-  VoicesRadioButtonForm({
+  VoicesRadioButtonFormField({
     super.key,
     required this.items,
     required this.onChanged,
@@ -60,7 +60,7 @@ class _RadioButtonFormState extends FormFieldState<String> {
   }
 
   @override
-  void didUpdateWidget(VoicesRadioButtonForm oldWidget) {
+  void didUpdateWidget(VoicesRadioButtonFormField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialValue != _internalValue) {
       _internalValue = widget.initialValue;

@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/helpers.dart';
 
 void main() {
-  group(VoicesRadioButtonForm, () {
+  group(VoicesRadioButtonFormField, () {
     late List<String> items;
     late VoicesColorScheme voicesColors;
 
@@ -24,7 +24,7 @@ void main() {
       await tester.pumpApp(
         Scaffold(
           body: Center(
-            child: VoicesRadioButtonForm(
+            child: VoicesRadioButtonFormField(
               items: items,
               selectedValue: null,
               onChanged: (_) {},
@@ -52,7 +52,7 @@ void main() {
       await tester.pumpApp(
         Scaffold(
           body: Center(
-            child: VoicesRadioButtonForm(
+            child: VoicesRadioButtonFormField(
               items: items,
               selectedValue: 'Item 1',
               onChanged: (value) {
@@ -76,7 +76,7 @@ void main() {
       await tester.pumpApp(
         Scaffold(
           body: Center(
-            child: VoicesRadioButtonForm(
+            child: VoicesRadioButtonFormField(
               items: items,
               selectedValue: null,
               onChanged: (_) {},
