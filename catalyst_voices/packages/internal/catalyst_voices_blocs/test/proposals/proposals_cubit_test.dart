@@ -11,12 +11,12 @@ import 'package:uuid/uuid.dart';
 void main() {
   group(ProposalsCubit, () {
     const proposalTemplate = DocumentSchema(
-      jsonSchema: '',
+      parentSchemaUrl: '',
+      schemaSelfUrl: '',
       title: '',
       description: MarkdownData.empty,
       properties: [],
       order: [],
-      propertiesSchema: '',
     );
 
     final proposalDocument = ProposalDocument(
@@ -25,7 +25,6 @@ void main() {
         version: const Uuid().v7(),
       ),
       document: const Document(
-        schemaUrl: '',
         schema: proposalTemplate,
         properties: [],
       ),
@@ -53,6 +52,9 @@ void main() {
       access: ProposalAccess.private,
       commentsCount: 0,
       document: proposalDocument,
+      version: 1,
+      duration: 6,
+      author: 'Alex Wells',
     );
 
     final pendingProposal = PendingProposal.fromProposal(

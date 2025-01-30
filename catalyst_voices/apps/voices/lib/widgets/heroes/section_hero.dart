@@ -51,19 +51,12 @@ class _HeroSectionState extends State<HeroSection>
   }
 
   @override
-  Future<void> didUpdateWidget(covariant HeroSection oldWidget) async {
+  void didUpdateWidget(covariant HeroSection oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.asset != widget.asset ||
         oldWidget.assetPackageName != widget.assetPackageName) {
-      await _controller?.dispose();
-      _controller = VideoPlayerController.asset(
-        widget.asset,
-        package: widget.assetPackageName,
-      );
-      if (mounted) {
-        await _initalizedVideoPlayer();
-      }
+      unawaited(_disposeAndReinitializeVideoPlayer());
     }
   }
 
@@ -101,6 +94,19 @@ class _HeroSectionState extends State<HeroSection>
     });
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  Future<void> _disposeAndReinitializeVideoPlayer() async {
+    if (mounted) {
+      await _controller?.dispose();
+    }
+    if (mounted) {
+      _controller = VideoPlayerController.asset(
+        widget.asset,
+        package: widget.assetPackageName,
+      );
+      await _initalizedVideoPlayer();
     }
   }
 }

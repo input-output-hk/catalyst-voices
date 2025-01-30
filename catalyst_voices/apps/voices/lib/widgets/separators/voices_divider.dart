@@ -36,6 +36,14 @@ class VoicesDivider extends StatelessWidget {
     this.color,
   });
 
+  const VoicesDivider.expanded({
+    super.key,
+    this.height,
+    this.indent = 0,
+    this.endIndent = 0,
+    this.color,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Divider(

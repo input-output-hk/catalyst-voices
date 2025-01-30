@@ -86,6 +86,7 @@ impl DocumentApi {
             Err(_) => {
                 put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(
                     "Failed to read document from the request",
+                    None,
                 )))
                 .into()
             },

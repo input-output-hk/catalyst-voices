@@ -5,7 +5,8 @@ use std::sync::LazyLock;
 use minijinja::{Environment, Template};
 
 use crate::db::event::signed_docs::{
-    FILTERED_SELECT_SIGNED_DOCS_TEMPLATE, SELECT_SIGNED_DOCS_TEMPLATE,
+    FILTERED_COUNT_SIGNED_DOCS_TEMPLATE, FILTERED_SELECT_SIGNED_DOCS_TEMPLATE,
+    SELECT_SIGNED_DOCS_TEMPLATE,
 };
 
 /// Jinja template source struct.
@@ -30,6 +31,11 @@ static JINJA_ENV: LazyLock<Environment> = LazyLock::new(|| {
     env.add_template(
         FILTERED_SELECT_SIGNED_DOCS_TEMPLATE.name,
         FILTERED_SELECT_SIGNED_DOCS_TEMPLATE.source,
+    )
+    .unwrap();
+    env.add_template(
+        FILTERED_COUNT_SIGNED_DOCS_TEMPLATE.name,
+        FILTERED_COUNT_SIGNED_DOCS_TEMPLATE.source,
     )
     .unwrap();
 
