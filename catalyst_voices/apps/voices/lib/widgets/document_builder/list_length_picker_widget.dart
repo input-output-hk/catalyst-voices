@@ -35,8 +35,7 @@ class ListLengthPickerWidget extends StatelessWidget {
             for (int i = minCount; i <= maxCount; i++)
               DropdownMenuEntry(
                 value: i,
-                // TODO(dtscalac): how to format as a plural?
-                label: '$i ${list.schema.itemsSchema.title}',
+                label: _formatAsPlural(list.schema.itemsSchema.title, i),
               ),
           ],
           enabled: isEditMode,
@@ -67,5 +66,15 @@ class ListLengthPickerWidget extends StatelessWidget {
           .toList();
       onChanged(changes);
     }
+  }
+
+  // TODO(dtscalac): temporary solution to format dynamic strings as plural,
+  // after F14 document schema must be altered to support this out-of-the-box
+  // without the need for this magic
+  String _formatAsPlural(String word, int count) {
+    return switch (count) {
+      1 => '$count $word',
+      _ => '$count ${word}s',
+    };
   }
 }
