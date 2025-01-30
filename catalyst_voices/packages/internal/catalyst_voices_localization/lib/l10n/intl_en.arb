@@ -1423,5 +1423,7 @@
   "timezone": "Timezone",
   "displayName": "Display Name",
   "emailAddress": "Email address",
-  "myAccount": "My account"
+  "myAccount": "My account",
+  "myRoles": "My Roles",
+  "addRole": "Add role"
 }

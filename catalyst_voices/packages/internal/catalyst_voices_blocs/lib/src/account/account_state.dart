@@ -1,24 +1,23 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class AccountState extends Equatable {
   final DisplayName displayName;
   final Email email;
-  final Set<AccountRole> roles;
+  final AccountRolesState roles;
   final String walletConnected;
 
   const AccountState({
     this.displayName = const DisplayName.pure(),
     this.email = const Email.pure(),
-    this.roles = const {},
+    this.roles = const AccountRolesState(),
     this.walletConnected = '',
   });
 
   AccountState copyWith({
     DisplayName? displayName,
     Email? email,
-    Set<AccountRole>? roles,
+    AccountRolesState? roles,
     String? walletConnected,
   }) {
     return AccountState(
@@ -36,4 +35,17 @@ final class AccountState extends Equatable {
         roles,
         walletConnected,
       ];
+}
+
+final class AccountRolesState extends Equatable {
+  final List<MyAccountRoleItem> items;
+  final bool canAddRole;
+
+  const AccountRolesState({
+    this.items = const [],
+    this.canAddRole = false,
+  });
+
+  @override
+  List<Object?> get props => [items, canAddRole];
 }
