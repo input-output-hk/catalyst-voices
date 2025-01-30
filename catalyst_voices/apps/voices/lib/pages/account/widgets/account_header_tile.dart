@@ -39,6 +39,7 @@ class AccountHeaderTile extends StatelessWidget {
               CatalystIdText(
                 'cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE',
                 isCompact: false,
+                backgroundColor: context.colors.onSurfaceNeutralOpaqueLv2,
               ),
             ],
           ),

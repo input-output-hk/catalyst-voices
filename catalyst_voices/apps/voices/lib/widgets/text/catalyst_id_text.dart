@@ -11,11 +11,13 @@ const _compactMaxLength = 6;
 class CatalystIdText extends StatefulWidget {
   final String data;
   final bool isCompact;
+  final Color? backgroundColor;
 
   const CatalystIdText(
     this.data, {
     super.key,
     required this.isCompact,
+    this.backgroundColor,
   });
 
   @override
@@ -76,6 +78,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
                   child: _Chip(
                     _effectiveData,
                     onTap: _copyDataToClipboard,
+                    backgroundColor: widget.backgroundColor,
                   ),
                 ),
               ),
@@ -175,10 +178,12 @@ class _TapDetector extends StatelessWidget {
 class _Chip extends StatelessWidget {
   final String data;
   final VoidCallback onTap;
+  final Color? backgroundColor;
 
   const _Chip(
     this.data, {
     required this.onTap,
+    this.backgroundColor,
   });
 
   @override
@@ -187,7 +192,8 @@ class _Chip extends StatelessWidget {
     final textTheme = theme.textTheme;
     final colors = theme.colors;
 
-    final backgroundColor = colors.elevationsOnSurfaceNeutralLv1Grey;
+    final backgroundColor =
+        this.backgroundColor ?? colors.elevationsOnSurfaceNeutralLv1Grey;
     final foregroundColor = colors.textOnPrimaryLevel1;
     final overlayColor = colors.onSurfaceNeutralOpaqueLv2;
 
