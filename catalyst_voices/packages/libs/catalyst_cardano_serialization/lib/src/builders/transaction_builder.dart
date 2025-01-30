@@ -764,19 +764,21 @@ final class TransactionOutputBuilder {
     );
   }
 
-  /// Calculates the fee specifically for the given [output].
+  /// Calculates the transaction fee for the given [output].
   ///
-  /// The output fee is computed by multiplying the size of the encoded
-  /// output (in bytes) by the fee coefficient from the builder's configuration.
+  /// The output fee is computed by multiplying the encoded output size
+  /// (in bytes) by the fee coefficient from the builder's configuration.
+  ///
+  /// The encoding switches from a definite-length array (98FE) at length 254
+  /// to an indefinite-length array (9F ... FF), making this calculation
+  /// sufficient.
   static Coin feeForOutput(
     TransactionBuilderConfig config,
     ShelleyMultiAssetTransactionOutput output, {
     required int numOutputs,
   }) =>
       Coin(
-        cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient +
-            // Switch from 1 length array to 3 length representation in CBOR.
-            (numOutputs == 256 ? 2 : 0),
+        cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient,
       );
 
   /// Calculates the minimum amount of extra [Coin] for UTXO input.
