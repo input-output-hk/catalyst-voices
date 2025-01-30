@@ -11,6 +11,7 @@ enum ProposalPublish {
   published;
 
   bool get isDraft => this == draft;
+  bool get isPublished => this == published;
 }
 
 enum ProposalAccess { private, public }
