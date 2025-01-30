@@ -62,7 +62,7 @@ class _GuestVisitorBody extends StatelessWidget {
               ),
               _CampaignCategories(
                 List.filled(
-                  7,
+                  6,
                   CampaignCategoryCardViewModel.dummy(),
                 ),
               ),
