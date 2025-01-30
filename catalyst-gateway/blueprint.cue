@@ -87,6 +87,10 @@ project: {
 									key:  "url"
 								}
 							}
+
+                            "RBAC_OFF": {
+                                value: "true"
+                            }
 						}
 
 						port: 3030
