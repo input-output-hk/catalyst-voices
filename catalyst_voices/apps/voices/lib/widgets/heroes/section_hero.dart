@@ -61,8 +61,8 @@ class _HeroSectionState extends State<HeroSection>
   }
 
   @override
-  Future<void> dispose() async {
-    await _controller?.dispose();
+  void dispose() {
+    unawaited(_controller?.dispose());
     _controller = null;
     super.dispose();
   }
