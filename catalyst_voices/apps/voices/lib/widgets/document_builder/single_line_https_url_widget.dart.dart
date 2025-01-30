@@ -89,10 +89,10 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   void _handleControllerChange() {
-    final controllerValue = _textEditingController.text;
-    if (widget.property.value != controllerValue &&
-        controllerValue.isNotEmpty) {
-      _notifyChangeListener(controllerValue);
+    final oldValue = widget.property.value;
+    final newValue = _textEditingController.text;
+    if (oldValue != newValue) {
+      _notifyChangeListener(newValue);
     }
   }
 
@@ -106,9 +106,6 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   VoicesTextFieldValidationResult _validate(String? value) {
-    if (value == null || value.isEmpty) {
-      return const VoicesTextFieldValidationResult.none();
-    }
     final schema = widget.schema;
     final result = schema.validate(value);
     if (result.isValid) {
