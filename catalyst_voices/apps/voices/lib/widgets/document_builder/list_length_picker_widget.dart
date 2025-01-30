@@ -75,6 +75,11 @@ class ListLengthPickerWidget extends StatelessWidget {
   // The current workaround won't work for exceptions like "mouse" -> "mice",
   // this was accepted for the time being.
   String _formatAsPlural(String word, int count) {
+    if (word.isEmpty) {
+      // cannot make plural, lets just use the number
+      return count.toString();
+    }
+
     return switch (count) {
       1 => '$count $word',
       _ => '$count ${word}s',
