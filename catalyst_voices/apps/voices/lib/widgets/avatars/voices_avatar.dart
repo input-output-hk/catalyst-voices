@@ -66,6 +66,7 @@ class VoicesAvatar extends StatelessWidget {
                 ),
                 child: DefaultTextStyle(
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        fontWeight: FontWeight.w700,
                         fontSize: 18,
                         height: 1,
                         color: foregroundColor ??
