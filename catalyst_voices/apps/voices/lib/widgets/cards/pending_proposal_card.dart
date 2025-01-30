@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -9,7 +10,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a proposal in pending state on a card.
-class PendingProposalCard extends StatelessWidget {
+class PendingProposalCard extends StatefulWidget {
   final PendingProposal proposal;
   final bool showStatus;
   final bool showLastUpdate;
@@ -26,52 +27,133 @@ class PendingProposalCard extends StatelessWidget {
   });
 
   @override
+  State<PendingProposalCard> createState() => _PendingProposalCardState();
+}
+
+class _PendingProposalCardState extends State<PendingProposalCard> {
+  late final WidgetStatesController _statesController;
+  late final _ProposalBorderColor _border;
+
+  @override
+  void initState() {
+    super.initState();
+    _statesController = WidgetStatesController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _border = _ProposalBorderColor(
+      publishStage: widget.proposal.publishStage,
+      colorScheme: context.colorScheme,
+      colors: context.colors,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant PendingProposalCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
+      _border = _ProposalBorderColor(
+        publishStage: widget.proposal.publishStage,
+        colors: context.colors,
+        colorScheme: context.colorScheme,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _statesController.dispose();
+    super.dispose();
+  }
+
+  bool isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 326),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        statesController: _statesController,
+        onTap: () {},
+        child: ValueListenableBuilder(
+          valueListenable: _statesController,
+          builder: (context, value, child) => Container(
+            constraints: const BoxConstraints(maxWidth: 326),
+            decoration: BoxDecoration(
+              color: context.colors.elevationsOnSurfaceNeutralLv1White,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _border.resolve(_statesController.value),
+              ),
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Topbar(
-                  showStatus: showStatus,
-                  isFavorite: isFavorite,
-                  onFavoriteChanged: onFavoriteChanged,
-                ),
-                _Category(
-                  category: proposal.category,
-                ),
-                const SizedBox(height: 4),
-                _Title(text: proposal.title),
-                _Author(author: proposal.author),
-                _FundsAndDuration(
-                  funds: proposal.fundsRequested,
-                  duration: proposal.duration,
-                ),
-                const SizedBox(height: 12),
-                _Description(text: proposal.description),
-                const SizedBox(height: 24),
-                _ProposalInfo(
-                  proposalStage: proposal.publishStage,
-                  version: proposal.version,
-                  lastUpdate: proposal.lastUpdateDate,
-                  commentsCount: proposal.commentsCount,
-                  showLastUpdate: showLastUpdate,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _Topbar(
+                        showStatus: widget.showStatus,
+                        isFavorite: widget.isFavorite,
+                        onFavoriteChanged: widget.onFavoriteChanged,
+                      ),
+                      _Category(
+                        category: widget.proposal.category,
+                      ),
+                      const SizedBox(height: 4),
+                      _Title(text: widget.proposal.title),
+                      _Author(author: widget.proposal.author),
+                      _FundsAndDuration(
+                        funds: widget.proposal.fundsRequested,
+                        duration: widget.proposal.duration,
+                      ),
+                      const SizedBox(height: 12),
+                      _Description(text: widget.proposal.description),
+                      const SizedBox(height: 24),
+                      _ProposalInfo(
+                        proposalStage: widget.proposal.publishStage,
+                        version: widget.proposal.version,
+                        lastUpdate: widget.proposal.lastUpdateDate,
+                        commentsCount: widget.proposal.commentsCount,
+                        showLastUpdate: widget.showLastUpdate,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
+  }
+}
+
+final class _ProposalBorderColor extends WidgetStateColor {
+  final ProposalPublish publishStage;
+  final VoicesColorScheme colors;
+  final ColorScheme colorScheme;
+
+  _ProposalBorderColor({
+    required this.publishStage,
+    required this.colors,
+    required this.colorScheme,
+  }) : super(colors.outlineBorder.value);
+
+  @override
+  Color resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.hovered)) {
+      return switch (publishStage) {
+        ProposalPublish.draft => colorScheme.secondary,
+        ProposalPublish.published => colorScheme.primary,
+      };
+    }
+
+    return colors.elevationsOnSurfaceNeutralLv1White;
   }
 }
 
@@ -235,6 +317,7 @@ class _FundsAndDuration extends StatelessWidget {
 class _PropertyValue extends StatelessWidget {
   final String title;
   final String formattedValue;
+
   const _PropertyValue({
     required this.title,
     required this.formattedValue,
@@ -330,13 +413,10 @@ class _ProposalInfo extends StatelessWidget {
         ),
         if (showLastUpdate) ...[
           const SizedBox(width: 4),
-          Text(
-            DateFormatter.formatShortMonth(
-              context.l10n,
-              lastUpdate,
-            ),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
+          VoicesPlainTooltip(
+            message: _tooltipMessage(context),
+            child: DayMonthTimeText(
+              dateTime: lastUpdate,
             ),
           ),
         ],
@@ -359,7 +439,13 @@ class _ProposalInfo extends StatelessWidget {
   ) {
     return switch (proposalStage) {
       ProposalPublish.draft => l10n.draft,
-      ProposalPublish.published => l10n.published,
+      ProposalPublish.published => l10n.finalProposal,
     };
+  }
+
+  String _tooltipMessage(BuildContext context) {
+    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
+
+    return context.l10n.publishedOn(dt.date, dt.time);
   }
 }

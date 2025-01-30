@@ -49,6 +49,7 @@ class _Body extends StatelessWidget {
               const CurrentCampaignSelector(),
               const CampaignCategoriesStateSelector(),
               const MostRecentProposalsSelector(),
+
             ],
           ),
         ),
