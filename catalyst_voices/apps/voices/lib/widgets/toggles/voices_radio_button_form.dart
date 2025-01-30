@@ -4,7 +4,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class VoicesRadioButtonForm extends FormField<String> {
+class VoicesRadioButtonFormField extends FormField<String> {
   final String? selectedValue;
   final ValueChanged<String?>? onChanged;
   final List<String> items;
