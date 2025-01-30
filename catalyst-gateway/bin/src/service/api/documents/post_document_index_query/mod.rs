@@ -8,7 +8,6 @@ use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
 use response::{
     DocumentIndexList, DocumentIndexListDocumented, IndexedDocument, IndexedDocumentDocumented,
-    IndexedDocumentVersion, IndexedDocumentVersionDocumented,
 };
 
 use super::{Limit, Page};
@@ -17,7 +16,11 @@ use crate::{
         common::query_limits::QueryLimits,
         signed_docs::{DocsQueryFilter, SignedDocBody},
     },
-    service::common::responses::WithErrorResponses,
+    service::common::{
+        objects::generic::pagination::CurrentPage,
+        responses::WithErrorResponses,
+        types::{document::id::DocumentId, generic::query::pagination::Remaining},
+    },
 };
 
 pub(crate) mod query_filter;
@@ -52,13 +55,43 @@ pub(crate) async fn endpoint(
         Err(e) => return AllResponses::handle_error(&e),
     };
 
-    match fetch_docs(&conditions, &query_limits).await {
-        Ok(docs) if docs.is_empty() => Responses::NotFound.into(),
+    let (docs, counts) = tokio::join!(
+        fetch_docs(&conditions, &query_limits),
+        SignedDocBody::retrieve_count(&conditions)
+    );
+
+    // Use default if page or limit is None
+    let page = page.unwrap_or_default();
+    let limit = limit.unwrap_or_default();
+
+    let total: u64 = match counts {
+        Ok(total) => {
+            match total.try_into() {
+                Ok(t) => t,
+                Err(e) => {
+                    return AllResponses::handle_error(&e.into());
+                },
+            }
+        },
+        Err(e) => return AllResponses::handle_error(&e),
+    };
+
+    match docs {
         Ok(docs) => {
+            let doc_count: u64 = match docs.len().try_into() {
+                Ok(d) => d,
+                Err(e) => return AllResponses::handle_error(&e.into()),
+            };
+
+            let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
+
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
-                docs: docs.into_iter().map(IndexedDocumentDocumented).collect(),
-                // TODO implement proper `page` field instantiation
-                page: None,
+                docs,
+                page: Some(CurrentPage {
+                    page,
+                    limit,
+                    remaining,
+                }),
             })))
             .into()
         },
@@ -69,7 +102,7 @@ pub(crate) async fn endpoint(
 /// Fetch documents from the event db
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-) -> anyhow::Result<Vec<IndexedDocument>> {
+) -> anyhow::Result<Vec<IndexedDocumentDocumented>> {
     let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
     let indexed_docs = DashMap::new();
 
@@ -86,26 +119,13 @@ async fn fetch_docs(
         .map(|(id, docs)| -> anyhow::Result<_> {
             let ver = docs
                 .into_iter()
-                .map(|doc| -> anyhow::Result<_> {
-                    Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
-                        ver: doc.ver().to_string().try_into()?,
-                        doc_type: doc.doc_type().to_string().try_into()?,
-                        // TODO get all necessary metadata fields from the document and fill these
-                        // fields
-                        doc_ref: None,
-                        reply: None,
-                        template: None,
-                        brand: None,
-                        campaign: None,
-                        category: None,
-                    }))
-                })
+                .map(TryInto::try_into)
                 .collect::<Result<_, _>>()?;
 
-            Ok(IndexedDocument {
-                doc_id: id.to_string().try_into()?,
+            Ok(IndexedDocumentDocumented(IndexedDocument {
+                doc_id: DocumentId::new_unchecked(id.to_string()),
                 ver,
-            })
+            }))
         })
         .collect::<Result<_, _>>()?;
     Ok(docs)

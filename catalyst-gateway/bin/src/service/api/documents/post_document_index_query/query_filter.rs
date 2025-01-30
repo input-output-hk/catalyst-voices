@@ -162,10 +162,28 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
             db_filter = db_filter.with_type(doc_type.parse()?);
         }
         if let Some(id) = value.id {
-            db_filter = db_filter.with_id(id.0.try_into()?);
+            db_filter = db_filter.with_id(id.try_into()?);
         }
         if let Some(ver) = value.ver {
-            db_filter = db_filter.with_ver(ver.0.try_into()?);
+            db_filter = db_filter.with_ver(ver.try_into()?);
+        }
+        if let Some(doc_ref) = value.doc_ref {
+            db_filter = db_filter.with_ref(doc_ref.try_into()?);
+        }
+        if let Some(template) = value.template {
+            db_filter = db_filter.with_template(template.try_into()?);
+        }
+        if let Some(reply) = value.reply {
+            db_filter = db_filter.with_reply(reply.try_into()?);
+        }
+        if let Some(brand) = value.brand {
+            db_filter = db_filter.with_brand_id(brand.try_into()?);
+        }
+        if let Some(campaign) = value.campaign {
+            db_filter = db_filter.with_campaign_id(campaign.try_into()?);
+        }
+        if let Some(category) = value.category {
+            db_filter = db_filter.with_category_id(category.try_into()?);
         }
         // TODO process also the rest of the fields like `ref`, `template` etc.
         Ok(db_filter)

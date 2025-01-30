@@ -21,6 +21,9 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
         );
 
   @override
+  DocumentIntegerSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
   DocumentValidationResult validate(int? value) {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
@@ -52,11 +55,14 @@ final class DocumentTokenValueCardanoAdaSchema extends DocumentIntegerSchema {
   });
 
   @override
-  DocumentTokenValueCardanoAdaSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentTokenValueCardanoAdaSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentTokenValueCardanoAdaSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -87,11 +93,14 @@ final class DocumentDurationInMonthsSchema extends DocumentIntegerSchema {
   });
 
   @override
-  DocumentDurationInMonthsSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentDurationInMonthsSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentDurationInMonthsSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
@@ -137,11 +146,14 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
   });
 
   @override
-  DocumentGenericIntegerSchema withNodeId(DocumentNodeId nodeId) {
+  DocumentGenericIntegerSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
     return DocumentGenericIntegerSchema(
-      nodeId: nodeId,
+      nodeId: nodeId ?? this.nodeId,
       format: format,
-      title: title,
+      title: title ?? this.title,
       description: description,
       placeholder: placeholder,
       guidance: guidance,
