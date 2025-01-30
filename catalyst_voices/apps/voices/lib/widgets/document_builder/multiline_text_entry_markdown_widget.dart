@@ -43,7 +43,7 @@ class _MultilineTextEntryMarkdownWidgetState
   void initState() {
     super.initState();
 
-    _controller = _buildController(value: widget.property.value);
+    _controller = _buildController(widget.property.value ?? '');
     _controller.addListener(_onControllerChanged);
 
     _focus = VoicesRichTextFocusNode();
@@ -51,7 +51,7 @@ class _MultilineTextEntryMarkdownWidgetState
   }
 
   @override
-  void didUpdateWidget(covariant MultilineTextEntryMarkdownWidget oldWidget) {
+  void didUpdateWidget(MultilineTextEntryMarkdownWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -61,9 +61,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _controller.dispose();
-      _controller = _buildController(value: widget.property.value);
-      _controller.addListener(_onControllerChanged);
+      _updateContents(widget.property.value ?? '');
     }
   }
 
@@ -93,22 +91,20 @@ class _MultilineTextEntryMarkdownWidgetState
     );
   }
 
-  VoicesRichTextController _buildController({
-    String? value,
-  }) {
-    if (value != null) {
+  VoicesRichTextController _buildController(String value) {
+    final quill.Document document;
+    if (value.isNotEmpty) {
       final input = MarkdownData(value);
       final delta = markdown.encoder.convert(input);
-      return VoicesRichTextController(
-        document: quill.Document.fromDelta(delta),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+      document = quill.Document.fromDelta(delta);
     } else {
-      return VoicesRichTextController(
-        document: quill.Document(),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+      document = quill.Document();
     }
+
+    return VoicesRichTextController(
+      document: document,
+      selection: const TextSelection.collapsed(offset: 0),
+    );
   }
 
   void _onControllerChanged() {
@@ -121,6 +117,16 @@ class _MultilineTextEntryMarkdownWidgetState
     _observedDocument = _controller.document;
     unawaited(_documentChangeSub?.cancel());
     _documentChangeSub = _observedDocument?.changes.listen(_onDocumentChanged);
+  }
+
+  void _updateContents(String value) {
+    if (value.isNotEmpty) {
+      final input = MarkdownData(value);
+      final delta = markdown.encoder.convert(input);
+      _controller.setContents(delta, changeSource: quill.ChangeSource.remote);
+    } else {
+      _controller.clear();
+    }
   }
 
   void _onDocumentChanged(quill.DocChange change) {
