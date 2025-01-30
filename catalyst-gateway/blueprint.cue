@@ -13,7 +13,7 @@ project: {
 		environment: "dev"
 		modules: main: {
 			name:    "app"
-			version: "0.3.2"
+			version: "0.3.3"
 			values: {
 				deployment: {
 					containers: gateway: {
@@ -23,6 +23,9 @@ project: {
 						}
 
 						env: {
+							"RBAC_OFF": {
+								value: "True"
+							}
 							"RUST_LOG": {
 								value: "error,cat_gateway=info,cardano_chain_follower=info"
 							}
