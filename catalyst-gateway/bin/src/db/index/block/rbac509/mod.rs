@@ -1,5 +1,8 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
+// TODO: FIXME:
+#![allow(unused_imports)]
+
 pub(crate) mod chain_root;
 mod insert_chain_root_for_stake_address;
 mod insert_chain_root_for_txn_id;
@@ -147,13 +150,12 @@ impl Rbac509InsertQuery {
             },
             Err(e) => {
                 error!(
-                    slot = slot,
-                    index = index,
+                    slot = ?slot,
+                    index = ?index,
                     "Invalid RBAC Registration Metadata in transaction: {e:?}"
                 );
             },
         }
-        let a = Cip509::new(block, index, track_payment_addresses);
 
         // TODO: FIXME: Remove
         // if let Some((rbac, chain_root)) =
@@ -256,154 +258,154 @@ struct Role0CertificateData {
     stake_addresses: Option<Vec<StakeAddress>>,
 }
 
-/// Get Role0 X509 Certificate from `KeyReference`
-fn get_role0_x509_certs_from_reference(
-    x509_certs: Option<&Vec<X509DerCert>>, key_offset: Option<usize>,
-) -> Option<(Role0Kid, x509_cert::Certificate)> {
-    x509_certs.and_then(|certs| {
-        key_offset.and_then(|pk_idx| {
-            certs.get(pk_idx).and_then(|cert| {
-                match cert {
-                    X509DerCert::X509Cert(der_cert) => {
-                        match x509_cert::Certificate::from_der(der_cert) {
-                            Ok(decoded_cert) => {
-                                let x = blake2b_128(&der_cert);
-                            },
-                            Err(err) => error!(err=%err,"Failed to decode Role0 certificate."),
-                        }
-                    },
-                    X509DerCert::Deleted | X509DerCert::Undefined => None,
-                }
-            })
-        })
-    })
-}
-
-/// Get Role0 C509 Certificate from `KeyReference`
-fn get_role0_c509_certs_from_reference(
-    c509_certs: Option<&Vec<C509Cert>>, key_offset: Option<usize>,
-) -> Option<&C509> {
-    c509_certs.and_then(|certs| {
-        key_offset.and_then(|pk_idx| {
-            certs.get(pk_idx).and_then(|cert| {
-                match cert {
-                    C509Cert::C509Certificate(cert) => Some(cert.as_ref()),
-                    // Currently C509CertInMetadatumReference is unsupported
-                    C509Cert::C509CertInMetadatumReference(_)
-                    | C509Cert::Undefined
-                    | C509Cert::Deleted => None,
-                }
-            })
-        })
-    })
-}
-
-/// Extract Role0 Key from `KeyReference`
-fn extract_role0_data(
-    key_local_ref: &KeyLocalRef, rbac_metadata: &Cip509RbacMetadata,
-) -> Option<Role0CertificateData> {
-    let key_offset: Option<usize> = key_local_ref.key_offset.try_into().ok();
-    match key_local_ref.local_ref {
-        LocalRefInt::X509Certs => {
-            get_role0_x509_certs_from_reference(rbac_metadata.x509_certs.as_ref(), key_offset)
-                .and_then(|der_cert| {
-                    let cert = der_cert;
-                    let role0_key = der_cert
-                        .tbs_certificate
-                        .subject_public_key_info
-                        .subject_public_key
-                        .as_bytes()
-                        .map(<[u8]>::to_vec);
-
-                    role0_key.map(|role0_key| {
-                        let stake_addresses = extract_stake_addresses_from_x509(&der_cert);
-                        Role0CertificateData {
-                            role0_key,
-                            stake_addresses,
-                        }
-                    })
-                })
-        },
-        LocalRefInt::C509Certs => {
-            get_role0_c509_certs_from_reference(rbac_metadata.c509_certs.as_ref(), key_offset).map(
-                |cert| {
-                    let stake_addresses = extract_stake_addresses_from_c509(cert);
-                    Role0CertificateData {
-                        role0_key: cert.tbs_cert().subject_public_key().to_vec(),
-                        stake_addresses,
-                    }
-                },
-            )
-        },
-        LocalRefInt::PubKeys => None, // Invalid for Role0 to have a simple key.
-    }
-}
-
-/// Extract Stake Address from X509 Certificate
-fn extract_stake_addresses_from_x509(
-    der_cert: &CertificateInner<Rfc5280>,
-) -> Option<Vec<StakeAddress>> {
-    let mut stake_addresses = Vec::new();
-    // Find the Subject Alternative Name extension
-    let san_ext = der_cert
-        .tbs_certificate
-        .extensions
-        .as_ref()
-        .and_then(|exts| {
-            exts.iter()
-                .find(|ext| ext.extn_id == ID_CE_SUBJECT_ALT_NAME)
-        });
-    // Subject Alternative Name extension if it exists
-    san_ext
-        .and_then(|san_ext| parse_der_sequence(san_ext.extn_value.as_bytes()).ok())
-        .and_then(|(_, parsed_seq)| {
-            for data in parsed_seq.ref_iter() {
-                // Check for context-specific primitive type with tag number
-                // 6 (raw_tag 134)
-                if data.header.raw_tag() == Some(&[SAN_URI]) {
-                    if let Ok(content) = data.content.as_slice() {
-                        // Decode the UTF-8 string
-                        if let Some(addr) = std::str::from_utf8(content)
-                            .map(std::string::ToString::to_string)
-                            .ok()
-                            .and_then(|addr| extract_cip19_hash(&addr, Some("stake")))
-                        {
-                            stake_addresses.push(addr);
-                        }
-                    }
-                }
-            }
-            if stake_addresses.is_empty() {
-                None
-            } else {
-                Some(stake_addresses)
-            }
-        })
-}
-
-/// Extract Stake Address from C509 Certificate
-fn extract_stake_addresses_from_c509(c509: &C509) -> Option<Vec<StakeAddress>> {
-    let mut stake_addresses = Vec::new();
-    for exts in c509.tbs_cert().extensions().extensions() {
-        if *exts.registered_oid().c509_oid().oid() == SUBJECT_ALT_NAME_OID {
-            if let ExtensionValue::AlternativeName(alt_name) = exts.value() {
-                if let GeneralNamesOrText::GeneralNames(gn) = alt_name.general_name() {
-                    for name in gn.general_names() {
-                        if name.gn_type() == &GeneralNameTypeRegistry::UniformResourceIdentifier {
-                            if let GeneralNameValue::Text(s) = name.gn_value() {
-                                if let Some(h) = extract_cip19_hash(s, Some("stake")) {
-                                    stake_addresses.push(h);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if stake_addresses.is_empty() {
-        None
-    } else {
-        Some(stake_addresses)
-    }
-}
+// /// Get Role0 X509 Certificate from `KeyReference`
+// fn get_role0_x509_certs_from_reference(
+//     x509_certs: Option<&Vec<X509DerCert>>, key_offset: Option<usize>,
+// ) -> Option<(Role0Kid, x509_cert::Certificate)> {
+//     x509_certs.and_then(|certs| {
+//         key_offset.and_then(|pk_idx| {
+//             certs.get(pk_idx).and_then(|cert| {
+//                 match cert {
+//                     X509DerCert::X509Cert(der_cert) => {
+//                         match x509_cert::Certificate::from_der(der_cert) {
+//                             Ok(decoded_cert) => {
+//                                 let x = blake2b_128(&der_cert);
+//                             },
+//                             Err(err) => error!(err=%err,"Failed to decode Role0
+// certificate."),                         }
+//                     },
+//                     X509DerCert::Deleted | X509DerCert::Undefined => None,
+//                 }
+//             })
+//         })
+//     })
+// }
+//
+// /// Get Role0 C509 Certificate from `KeyReference`
+// fn get_role0_c509_certs_from_reference(
+//     c509_certs: Option<&Vec<C509Cert>>, key_offset: Option<usize>,
+// ) -> Option<&C509> {
+//     c509_certs.and_then(|certs| {
+//         key_offset.and_then(|pk_idx| {
+//             certs.get(pk_idx).and_then(|cert| {
+//                 match cert {
+//                     C509Cert::C509Certificate(cert) => Some(cert.as_ref()),
+//                     // Currently C509CertInMetadatumReference is unsupported
+//                     C509Cert::C509CertInMetadatumReference(_)
+//                     | C509Cert::Undefined
+//                     | C509Cert::Deleted => None,
+//                 }
+//             })
+//         })
+//     })
+// }
+//
+// /// Extract Role0 Key from `KeyReference`
+// fn extract_role0_data(
+//     key_local_ref: &KeyLocalRef, rbac_metadata: &Cip509RbacMetadata,
+// ) -> Option<Role0CertificateData> {
+//     let key_offset: Option<usize> = key_local_ref.key_offset.try_into().ok();
+//     match key_local_ref.local_ref {
+//         LocalRefInt::X509Certs => {
+//             get_role0_x509_certs_from_reference(rbac_metadata.x509_certs.as_ref(),
+// key_offset)                 .and_then(|der_cert| {
+//                     let cert = der_cert;
+//                     let role0_key = der_cert
+//                         .tbs_certificate
+//                         .subject_public_key_info
+//                         .subject_public_key
+//                         .as_bytes()
+//                         .map(<[u8]>::to_vec);
+//
+//                     role0_key.map(|role0_key| {
+//                         let stake_addresses =
+// extract_stake_addresses_from_x509(&der_cert);
+// Role0CertificateData {                             role0_key,
+//                             stake_addresses,
+//                         }
+//                     })
+//                 })
+//         },
+//         LocalRefInt::C509Certs => {
+//             get_role0_c509_certs_from_reference(rbac_metadata.c509_certs.as_ref(),
+// key_offset).map(                 |cert| {
+//                     let stake_addresses = extract_stake_addresses_from_c509(cert);
+//                     Role0CertificateData {
+//                         role0_key: cert.tbs_cert().subject_public_key().to_vec(),
+//                         stake_addresses,
+//                     }
+//                 },
+//             )
+//         },
+//         LocalRefInt::PubKeys => None, // Invalid for Role0 to have a simple key.
+//     }
+// }
+//
+// /// Extract Stake Address from X509 Certificate
+// fn extract_stake_addresses_from_x509(
+//     der_cert: &CertificateInner<Rfc5280>,
+// ) -> Option<Vec<StakeAddress>> {
+//     let mut stake_addresses = Vec::new();
+//     // Find the Subject Alternative Name extension
+//     let san_ext = der_cert
+//         .tbs_certificate
+//         .extensions
+//         .as_ref()
+//         .and_then(|exts| {
+//             exts.iter()
+//                 .find(|ext| ext.extn_id == ID_CE_SUBJECT_ALT_NAME)
+//         });
+//     // Subject Alternative Name extension if it exists
+//     san_ext
+//         .and_then(|san_ext| parse_der_sequence(san_ext.extn_value.as_bytes()).ok())
+//         .and_then(|(_, parsed_seq)| {
+//             for data in parsed_seq.ref_iter() {
+//                 // Check for context-specific primitive type with tag number
+//                 // 6 (raw_tag 134)
+//                 if data.header.raw_tag() == Some(&[SAN_URI]) {
+//                     if let Ok(content) = data.content.as_slice() {
+//                         // Decode the UTF-8 string
+//                         if let Some(addr) = std::str::from_utf8(content)
+//                             .map(std::string::ToString::to_string)
+//                             .ok()
+//                             .and_then(|addr| extract_cip19_hash(&addr, Some("stake")))
+//                         {
+//                             stake_addresses.push(addr);
+//                         }
+//                     }
+//                 }
+//             }
+//             if stake_addresses.is_empty() {
+//                 None
+//             } else {
+//                 Some(stake_addresses)
+//             }
+//         })
+// }
+//
+// /// Extract Stake Address from C509 Certificate
+// fn extract_stake_addresses_from_c509(c509: &C509) -> Option<Vec<StakeAddress>> {
+//     let mut stake_addresses = Vec::new();
+//     for exts in c509.tbs_cert().extensions().extensions() {
+//         if *exts.registered_oid().c509_oid().oid() == SUBJECT_ALT_NAME_OID {
+//             if let ExtensionValue::AlternativeName(alt_name) = exts.value() {
+//                 if let GeneralNamesOrText::GeneralNames(gn) = alt_name.general_name() {
+//                     for name in gn.general_names() {
+//                         if name.gn_type() ==
+// &GeneralNameTypeRegistry::UniformResourceIdentifier {                             if
+// let GeneralNameValue::Text(s) = name.gn_value() {                                 if
+// let Some(h) = extract_cip19_hash(s, Some("stake")) {
+// stake_addresses.push(h);                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     if stake_addresses.is_empty() {
+//         None
+//     } else {
+//         Some(stake_addresses)
+//     }
+// }

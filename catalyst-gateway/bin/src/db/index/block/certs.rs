@@ -14,7 +14,7 @@ use crate::{
             queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
-        types::{DbSlot, DbTxnIndex},
+        types::{DbSlot, DbTxnIndex, DbVerifyingKey},
     },
     settings::cassandra_db,
 };
@@ -29,7 +29,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
     /// Transaction Index.
     txn: DbTxnIndex,
     /// Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
-    stake_address: MaybeUnset<Vec<u8>>,
+    stake_address: MaybeUnset<DbVerifyingKey>,
     /// Is the stake address a script or not.
     script: bool,
     /// Is the Certificate Registered?
@@ -41,10 +41,10 @@ pub(crate) struct StakeRegistrationInsertQuery {
 }
 
 impl Debug for StakeRegistrationInsertQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         let stake_address = match self.stake_address {
             MaybeUnset::Unset => "UNSET",
-            MaybeUnset::Set(ref v) => &hex::encode(v),
+            MaybeUnset::Set(ref v) => &hex::encode(v.as_ref()),
         };
         let register = match self.register {
             MaybeUnset::Unset => "UNSET",
@@ -83,7 +83,7 @@ impl StakeRegistrationInsertQuery {
         script: bool, register: bool, deregister: bool, pool_delegation: Option<Vec<u8>>,
     ) -> Self {
         let stake_address = stake_address
-            .map(|a| MaybeUnset::Set(a.as_bytes().to_vec()))
+            .map(|a| MaybeUnset::Set(a.into()))
             .unwrap_or(MaybeUnset::Unset);
         StakeRegistrationInsertQuery {
             stake_hash,

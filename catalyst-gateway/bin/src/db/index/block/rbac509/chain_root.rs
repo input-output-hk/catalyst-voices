@@ -64,8 +64,8 @@ impl ChainRoot {
     /// Will try and get it from the cache first, and fall back to the Index DB if not
     /// found.
     pub(crate) async fn get(
-        session: &Arc<CassandraSession>, txn_hash: Hash<32>, txn_index: usize, slot_no: u64,
-        cip509: &Cip509,
+        session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_index: TxnIndex,
+        slot_no: Slot, cip509: &Cip509,
     ) -> Option<ChainRoot> {
         if let Some(prv_tx_id) = cip509.cip509.prv_tx_id {
             match CHAIN_ROOT_BY_TXN_HASH_CACHE.get(&prv_tx_id) {
@@ -74,7 +74,7 @@ impl ChainRoot {
                     // Not cached, need to see if its in the DB.
                     if let Ok(mut result) =
                         get_chain_root::Query::execute(session, get_chain_root::QueryParams {
-                            transaction_id: prv_tx_id.to_vec(),
+                            transaction_id: prv_tx_id.into(),
                         })
                         .await
                     {
@@ -87,12 +87,12 @@ impl ChainRoot {
                                 },
                             };
 
-                            let txn_hash = Hash::<32>::from(row.chain_root.as_slice());
+                            let txn_hash = row.chain_root.into();
 
                             let new_root = Self {
                                 txn_hash,
-                                slot: big_uint_to_u64(&row.slot_no),
-                                idx: from_saturating(row.txn),
+                                slot: row.slot_no.into(),
+                                idx: row.txn.into(),
                             };
 
                             // Add the new Chain root to the cache.

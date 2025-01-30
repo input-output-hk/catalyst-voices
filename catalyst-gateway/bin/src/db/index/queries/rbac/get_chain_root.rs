@@ -12,7 +12,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbTransactionHash, DbTxnIndex},
+    types::{DbSlot, DbTransactionHash, DbTxnIndex},
 };
 
 /// Get get chain root by stake address query string.
@@ -31,7 +31,7 @@ pub(crate) struct Query {
     /// Chain root for the queries stake address.
     pub(crate) chain_root: DbTransactionHash,
     /// Slot Number the cert is in.
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Index.
     pub(crate) txn: DbTxnIndex,
 }

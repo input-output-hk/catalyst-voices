@@ -10,6 +10,12 @@ use scylla::_macro_internal::{
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct DbVerifyingKey([u8; PUBLIC_KEY_LENGTH]);
 
+impl AsRef<[u8]> for DbVerifyingKey {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_ref()
+    }
+}
+
 impl From<VerifyingKey> for DbVerifyingKey {
     fn from(value: VerifyingKey) -> Self {
         Self(value.to_bytes())
