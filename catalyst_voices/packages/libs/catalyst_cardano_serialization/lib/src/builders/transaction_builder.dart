@@ -336,17 +336,17 @@ final class TransactionBuilder extends Equatable {
       body: txBody,
       // TODO(ilap): The buildFake should be refactored instead.
       witnessSet: useWitnesses
-          ? _generateWitnessSet(inputs)
+          ? generateFakeWitnessSet(inputs)
           : witnessBuilder.buildFake(),
       isValid: true,
       auxiliaryData: auxiliaryData,
     );
   }
 
-  /// Generates TransactionWitnessSet based on unique addresses derived from the
-  /// inputs, this ensures that the required number of VKey witnesses is used
-  /// for calculating the proper transaction fee.
-  TransactionWitnessSet _generateWitnessSet(
+  /// Generates a fake `TransactionWitnessSet` for accurate transaction fee
+  /// calculation, ensuring the correct number of VKey witnesses based on
+  /// the builder's unique input addresses.
+  static TransactionWitnessSet generateFakeWitnessSet(
     Set<TransactionUnspentOutput> inputs,
   ) {
     final uniqueAddresses = inputs.map((input) => input.output.address).toSet();
