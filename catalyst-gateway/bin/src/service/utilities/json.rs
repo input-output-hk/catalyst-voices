@@ -14,7 +14,7 @@ pub(crate) fn load_json(data: &str) -> Value {
 /// Serialize a JSON value to a byte vector.
 pub(crate) fn serialize_to_bytes(value: &Value) -> Vec<u8> {
     serde_json::to_vec(value).unwrap_or_else(|err| {
-        error!(id="load_json_lazy", error=?err, "Error serializing JSON");
+        error!(id="json_serialize_to_bytes", error=?err, "Error serializing JSON");
         vec![]
     })
 }
