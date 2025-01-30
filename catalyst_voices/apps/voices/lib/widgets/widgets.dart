@@ -82,6 +82,7 @@ export 'text_field/voices_int_field.dart';
 export 'text_field/voices_password_text_field.dart';
 export 'text_field/voices_text_field.dart';
 export 'tiles/document_builder_section_tile.dart';
+export 'tiles/editable_tile.dart';
 export 'tiles/menu_item_tile.dart';
 export 'tiles/menu_segments_item_tile.dart';
 export 'tiles/selectable_tile.dart';

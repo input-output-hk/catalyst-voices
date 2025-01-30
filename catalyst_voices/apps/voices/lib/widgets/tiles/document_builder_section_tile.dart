@@ -8,7 +8,6 @@ import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_sele
 import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_widget.dart.dart';
 import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -72,55 +71,46 @@ class _DocumentBuilderSectionTileState
   Widget build(BuildContext context) {
     final title = _editedSection.schema.title;
 
-    return SelectableTile(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _Header(
-              title: title,
-              isEditMode: _isEditMode,
-              onToggleEditMode: _toggleEditMode,
-            ),
-            _PropertyBuilder(
-              key: ValueKey(_editedSection.schema.nodeId),
-              property: _editedSection,
-              isEditMode: _isEditMode,
-              onChanged: _handlePropertyChanges,
-            ),
-            if (_isEditMode) ...[
-              const SizedBox(height: 12),
-              _Footer(
-                isValid: _editedSection.isValid,
-                onSave: _saveChanges,
-              ),
-            ],
-          ],
-        ),
+    return EditableTile(
+      title: title,
+      initialEditMode: _isEditMode,
+      isSaveEnabled: _editedSection.isValid,
+      onChanged: _handleEditModeChange,
+      child: _PropertyBuilder(
+        key: ValueKey(_editedSection.schema.nodeId),
+        property: _editedSection,
+        isEditMode: _isEditMode,
+        onChanged: _handlePropertyChanges,
       ),
     );
   }
 
-  void _saveChanges() {
-    widget.onChanged(List.of(_pendingChanges));
-
+  void _handleEditModeChange(EditableTileChange value) {
     setState(() {
-      _pendingChanges.clear();
-      _isEditMode = false;
+      _isEditMode = value.isEditMode;
+
+      switch (value.source) {
+        case EditableTileChangeSource.cancel:
+          if (!value.isEditMode) {
+            _onCancel();
+          }
+        case EditableTileChangeSource.save:
+          _onSave();
+      }
     });
   }
 
-  void _toggleEditMode() {
-    setState(() {
-      _isEditMode = !_isEditMode;
-      if (!_isEditMode) {
-        _pendingChanges.clear();
-        _editedSection = widget.section;
-        _builder = _editedSection.toBuilder();
-      }
-    });
+  void _onSave() {
+    widget.onChanged(List.of(_pendingChanges));
+
+    _pendingChanges.clear();
+    _isEditMode = false;
+  }
+
+  void _onCancel() {
+    _pendingChanges.clear();
+    _editedSection = widget.section;
+    _builder = _editedSection.toBuilder();
   }
 
   void _handlePropertyChanges(List<DocumentChange> changes) {
@@ -131,63 +121,6 @@ class _DocumentBuilderSectionTileState
       _editedSection = _builder.build();
       _pendingChanges.addAll(changes);
     });
-  }
-}
-
-class _Header extends StatelessWidget {
-  final String title;
-  final bool isEditMode;
-  final VoidCallback? onToggleEditMode;
-
-  const _Header({
-    required this.title,
-    this.isEditMode = false,
-    this.onToggleEditMode,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
-        const SizedBox(width: 16),
-        VoicesTextButton(
-          onTap: onToggleEditMode,
-          child: Text(
-            isEditMode
-                ? context.l10n.cancelButtonText
-                : context.l10n.editButtonText,
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Footer extends StatelessWidget {
-  final bool isValid;
-  final VoidCallback onSave;
-
-  const _Footer({
-    required this.isValid,
-    required this.onSave,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: VoicesFilledButton(
-        onTap: isValid ? onSave : null,
-        child: Text(context.l10n.saveButtonText.toUpperCase()),
-      ),
-    );
   }
 }
 
