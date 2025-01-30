@@ -849,6 +849,7 @@
   "@uploadKeychainInfo": {
     "description": "An info on keychain upload dialog"
   },
+  "theme": "Theme",
   "themeLight": "Light",
   "@themeLight": {
     "description": "Refers to a light theme mode."
@@ -1411,5 +1412,13 @@
   },
   "finalProposal": "Final",
   "mostRecent": "Most Recent",
-  "viewAllProposals": "View All Proposals"
+  "viewAllProposals": "View All Proposals",
+  "accountMenuPopupTooltip": "Account menu",
+  "account": "Account",
+  "settings": "Settings",
+  "setupCatalystRoles": "Setup Catalyst roles",
+  "submitSupportRequest": "Submit support request",
+  "catalystKnowledgeBase": "Catalyst knowledge base",
+  "lockAccount": "Lock account",
+  "timezone": "Timezone"
 }
