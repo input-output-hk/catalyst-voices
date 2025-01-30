@@ -52,6 +52,11 @@ package-app:
 nightly-test:
     FROM earthly/dind:alpine-3.20-docker-26.1.5-r0
     COPY compose.yml .
+    RUN apt-get update --fix-missing && \
+                apt-get install -y \
+                apt-utils \
+                curl \
+                unzip
     DO flutter-installer+INSTALL_CHROME_LINUX64
     WITH DOCKER \
         --compose compose.yml \
