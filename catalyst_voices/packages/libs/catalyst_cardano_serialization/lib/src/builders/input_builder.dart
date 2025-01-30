@@ -144,11 +144,17 @@ final class InputBuilder implements CoinSelector {
 
       for (final policy in [CoinSelector.adaPolicy, ...inputPolicies]) {
         if (requiredAssets.containsKey(policy)) {
-          final assets = inputBalance.multiAsset!.bundle[policy]!.entries;
+          final inputAssets = inputBalance.multiAsset!.bundle[policy]!.entries;
 
-          for (final asset in assets) {
+          for (final asset in inputAssets) {
             final assetId = (policy, asset.key);
-            assetMap.putIfAbsent(assetId, () => []).add(input);
+            if (requiredAssets[policy]!.containsKey(asset.key)) {
+              assetMap.putIfAbsent(assetId, () => []).add(input);
+            } else {
+              assetMap
+                  .putIfAbsent(CoinSelector.adaAssetId, () => [])
+                  .add(input);
+            }
           }
         } else {
           assetMap.putIfAbsent(CoinSelector.adaAssetId, () => []).add(input);
@@ -246,15 +252,18 @@ final class InputBuilder implements CoinSelector {
     Coin minFee,
   ) {
     if (remainingBalance.isZero) return ([], const Coin(0));
-
     if (builder.changeAddress == null) {
       throw Exception('Change address required for non-zero balance.');
     }
 
-    final changeOutputs = <TransactionOutput>[];
+    // Remove empty multiasset from the balance
+    final normalizedBalance = remainingBalance.hasMultiAssets()
+        ? remainingBalance
+        : Balance(coin: remainingBalance.coin);
+
     final output = TransactionOutput(
       address: builder.changeAddress!,
-      amount: remainingBalance,
+      amount: normalizedBalance,
     );
     final changeFee = TransactionOutputBuilder.feeForOutput(
       builder.config,
@@ -266,9 +275,10 @@ final class InputBuilder implements CoinSelector {
       builder.config.coinsPerUtxoByte,
     );
 
-    if (remainingBalance.coin >= minAda + changeFee) {
+    final changeOutputs = <TransactionOutput>[];
+    if (normalizedBalance.coin >= minAda + changeFee) {
       changeOutputs.add(
-        output.copyWith(amount: remainingBalance - Balance(coin: changeFee)),
+        output.copyWith(amount: normalizedBalance - Balance(coin: changeFee)),
       );
       return (changeOutputs, changeFee);
     } else {

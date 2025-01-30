@@ -775,12 +775,8 @@ final class TransactionOutputBuilder {
   }) =>
       Coin(
         cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient +
-                    // Switch from 1 length array to 3 length representation in
-                    // CBOR.
-                    numOutputs ==
-                255
-            ? 2
-            : 0,
+            // Switch from 1 length array to 3 length representation in CBOR.
+            (numOutputs == 256 ? 2 : 0),
       );
 
   /// Calculates the minimum amount of extra [Coin] for UTXO input.
