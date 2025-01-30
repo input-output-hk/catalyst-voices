@@ -6,4 +6,7 @@ abstract class VoicesConstants {
       'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions';
   static const privacyPolicyUrl =
       'https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
+  static const supportUrl =
+      'https://catalystiog.zendesk.com/hc/en-us/requests/new';
+  static const docsUrl = 'https://docs.projectcatalyst.io/';
 }
