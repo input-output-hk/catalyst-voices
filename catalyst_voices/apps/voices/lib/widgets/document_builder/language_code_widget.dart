@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
@@ -10,6 +11,7 @@ class LanguageCodeWidget extends StatefulWidget {
   final bool isEditMode;
 
   final ValueChanged<List<DocumentChange>> onChanged;
+
   const LanguageCodeWidget({
     super.key,
     required this.property,
@@ -36,7 +38,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
               ? DropdownMenuEntry(value: e, label: label)
               : null;
         })
-        .whereType<DropdownMenuEntry<String>>()
+        .whereNotNull()
         .toList();
   }
 
@@ -64,7 +66,6 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _dropdownMenuEntries = _mapItems;
-    setState(() {});
   }
 
   @override
