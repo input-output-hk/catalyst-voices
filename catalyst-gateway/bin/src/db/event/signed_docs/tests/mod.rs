@@ -1,5 +1,7 @@
 //! Integration tests of the `signed docs` queries
 
+use std::str::FromStr;
+
 use futures::TryStreamExt;
 
 use super::*;
@@ -7,6 +9,36 @@ use crate::db::event::{
     common::{eq_or_ranged_uuid::EqOrRangedUuid, query_limits::QueryLimits},
     establish_connection,
 };
+
+mod filter_by_field;
+
+#[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn queries_test() {
+    establish_connection();
+
+    let doc_type = uuid::Uuid::new_v4();
+    let docs = test_docs(doc_type);
+
+    for doc in &docs {
+        store_full_signed_doc(doc, doc_type).await;
+        retrieve_full_signed_doc(doc).await;
+        filter_by_id(doc).await;
+        filter_by_ver(doc).await;
+        filter_by_id_and_ver(doc).await;
+
+        filter_by_field::filter_by_field!(doc, "ref", with_ref);
+        filter_by_field::filter_by_field!(doc, "template", with_template);
+        filter_by_field::filter_by_field!(doc, "reply", with_reply);
+        filter_by_field::filter_by_field!(doc, "brand_id", with_brand_id);
+        filter_by_field::filter_by_field!(doc, "campaign_id", with_campaign_id);
+        filter_by_field::filter_by_field!(doc, "category_id", with_category_id);
+    }
+
+    filter_by_type(&docs, doc_type).await;
+    filter_all(&docs).await;
+    filter_count(docs.len().try_into().unwrap()).await;
+}
 
 fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
     vec![
@@ -18,8 +50,12 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Alex".to_string()],
                 Some(serde_json::json!(
                     {
-                        "name": "Alex",
-                        "amount": 105,
+                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),
@@ -34,8 +70,12 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Steven".to_string()],
                 Some(serde_json::json!(
                     {
-                        "name": "Steven",
-                        "amount": 15,
+                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
                     }
                 )),
             ),
@@ -138,17 +178,6 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     assert!(res_docs.try_next().await.unwrap().is_none());
 }
 
-async fn filter_by_metadata(doc: &FullSignedDoc) {
-    if let Some(meta) = doc.metadata() {
-        let filter = DocsQueryFilter::all().with_metadata(meta.clone());
-        let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
-            .await
-            .unwrap();
-        let res_doc = res_docs.try_next().await.unwrap().unwrap();
-        assert_eq!(doc.body(), &res_doc);
-    }
-}
-
 async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
     let filter = DocsQueryFilter::all().with_type(doc_type);
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
@@ -175,26 +204,4 @@ async fn filter_count(len: i64) {
     let filter = DocsQueryFilter::all();
     let count = SignedDocBody::retrieve_count(&filter).await.unwrap();
     assert_eq!(len, count);
-}
-
-#[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
-#[tokio::test]
-async fn queries_test() {
-    establish_connection();
-
-    let doc_type = uuid::Uuid::new_v4();
-    let docs = test_docs(doc_type);
-
-    for doc in &docs {
-        store_full_signed_doc(doc, doc_type).await;
-        retrieve_full_signed_doc(doc).await;
-        filter_by_id(doc).await;
-        filter_by_ver(doc).await;
-        filter_by_id_and_ver(doc).await;
-        filter_by_metadata(doc).await;
-    }
-
-    filter_by_type(&docs, doc_type).await;
-    filter_all(&docs).await;
-    filter_count(docs.len().try_into().unwrap()).await;
 }

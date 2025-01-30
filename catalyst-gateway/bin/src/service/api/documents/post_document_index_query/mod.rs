@@ -8,7 +8,6 @@ use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
 use response::{
     DocumentIndexList, DocumentIndexListDocumented, IndexedDocument, IndexedDocumentDocumented,
-    IndexedDocumentVersion, IndexedDocumentVersionDocumented,
 };
 
 use super::{Limit, Page};
@@ -18,8 +17,9 @@ use crate::{
         signed_docs::{DocsQueryFilter, SignedDocBody},
     },
     service::common::{
-        objects::generic::pagination::CurrentPage, responses::WithErrorResponses,
-        types::generic::query::pagination::Remaining,
+        objects::generic::pagination::CurrentPage,
+        responses::WithErrorResponses,
+        types::{document::id::DocumentId, generic::query::pagination::Remaining},
     },
 };
 
@@ -86,7 +86,7 @@ pub(crate) async fn endpoint(
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
-                docs: docs.into_iter().map(IndexedDocumentDocumented).collect(),
+                docs,
                 page: Some(CurrentPage {
                     page,
                     limit,
@@ -102,7 +102,7 @@ pub(crate) async fn endpoint(
 /// Fetch documents from the event db
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-) -> anyhow::Result<Vec<IndexedDocument>> {
+) -> anyhow::Result<Vec<IndexedDocumentDocumented>> {
     let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
     let indexed_docs = DashMap::new();
 
@@ -119,26 +119,13 @@ async fn fetch_docs(
         .map(|(id, docs)| -> anyhow::Result<_> {
             let ver = docs
                 .into_iter()
-                .map(|doc| -> anyhow::Result<_> {
-                    Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
-                        ver: doc.ver().to_string().try_into()?,
-                        doc_type: doc.doc_type().to_string().try_into()?,
-                        // TODO get all necessary metadata fields from the document and fill these
-                        // fields
-                        doc_ref: None,
-                        reply: None,
-                        template: None,
-                        brand: None,
-                        campaign: None,
-                        category: None,
-                    }))
-                })
+                .map(TryInto::try_into)
                 .collect::<Result<_, _>>()?;
 
-            Ok(IndexedDocument {
-                doc_id: id.to_string().try_into()?,
+            Ok(IndexedDocumentDocumented(IndexedDocument {
+                doc_id: DocumentId::new_unchecked(id.to_string()),
                 ver,
-            })
+            }))
         })
         .collect::<Result<_, _>>()?;
     Ok(docs)
