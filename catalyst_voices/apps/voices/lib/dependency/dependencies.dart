@@ -104,7 +104,8 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
         );
-      });
+      })
+      ..registerFactory<AccountBloc>(AccountBloc.new);
   }
 
   void _registerRepositories() {

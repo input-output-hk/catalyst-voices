@@ -207,3 +207,25 @@ class VoicesBackButton extends StatelessWidget {
     );
   }
 }
+
+class VoicesEditSaveButton extends StatelessWidget {
+  final VoidCallback? onTap;
+  final bool isEditing;
+
+  const VoicesEditSaveButton({
+    super.key,
+    this.onTap,
+    required this.isEditing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesTextButton(
+      onTap: onTap,
+      child: Text(
+        isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText,
+        style: Theme.of(context).textTheme.labelSmall,
+      ),
+    );
+  }
+}

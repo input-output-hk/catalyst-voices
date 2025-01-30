@@ -85,6 +85,7 @@ export 'tiles/document_builder_section_tile.dart';
 export 'tiles/editable_tile.dart';
 export 'tiles/menu_item_tile.dart';
 export 'tiles/menu_segments_item_tile.dart';
+export 'tiles/property_tile.dart';
 export 'tiles/selectable_tile.dart';
 export 'tiles/voices_expansion_tile.dart';
 export 'tiles/voices_nav_tile.dart';

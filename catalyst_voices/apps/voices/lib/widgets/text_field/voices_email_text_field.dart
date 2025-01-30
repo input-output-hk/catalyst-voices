@@ -10,6 +10,7 @@ final class VoicesEmailTextField extends StatelessWidget {
   final VoidCallback? onEditingComplete;
   final TextInputAction textInputAction;
   final VoicesTextFieldDecoration? decoration;
+  final bool readOnly;
   final int? maxLength;
 
   const VoicesEmailTextField({
@@ -20,6 +21,7 @@ final class VoicesEmailTextField extends StatelessWidget {
     this.onEditingComplete,
     this.textInputAction = TextInputAction.next,
     this.decoration,
+    this.readOnly = false,
     this.maxLength,
   });
 
@@ -33,6 +35,7 @@ final class VoicesEmailTextField extends StatelessWidget {
       onFieldSubmitted: onFieldSubmitted,
       onEditingComplete: onEditingComplete,
       decoration: decoration,
+      readOnly: readOnly,
       style: const TextStyle(
         fontWeight: FontWeight.w500,
       ),
