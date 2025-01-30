@@ -16,6 +16,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalsPage extends StatefulWidget {
   final String? categoryId;
+
   const ProposalsPage({
     super.key,
     this.categoryId,

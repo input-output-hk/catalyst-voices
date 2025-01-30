@@ -23,3 +23,11 @@ class CurrentCampaignInfoViewModel extends Equatable {
   @override
   List<Object?> get props => [allFunds, totalAsk, askRange];
 }
+
+class NullCurrentCampaignInfoViewModel extends CurrentCampaignInfoViewModel {
+  const NullCurrentCampaignInfoViewModel({
+    super.allFunds = 50000000,
+    super.totalAsk = 4020000,
+    super.askRange = const Range(min: 30000, max: 150000),
+  });
+}

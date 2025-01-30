@@ -114,8 +114,9 @@ final class WorkspaceRoute extends GoRouteData
 final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
 
-  const ProposalsRoute({this.categoryId});
-
+  const ProposalsRoute({
+    this.categoryId,
+  });
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return ProposalsPage(
