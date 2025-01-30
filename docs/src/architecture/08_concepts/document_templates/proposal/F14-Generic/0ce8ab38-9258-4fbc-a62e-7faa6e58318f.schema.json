@@ -903,8 +903,8 @@
                     "properties": {
                         "milestone_list": {
                             "type": "array",
-                            "title": "Milestones",
-                            "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                            "title": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                            "description": "Your requested budget requires a minimum of 3 milestones. However you can add additional milestones, please confirm how many milestones you would like to submit.",
                             "x-guidance": "**Milestone Requirements:**\n\n- For Grant Amounts of up to 75k ada: at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (**3 milestones in total**)\n- For Grant Amounts over 75k ada up to 150k ada: at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (**4 milestones in total**)\n- For Grant Amounts over 150k ada up to 300k ada: at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (**5 milestones in total**)\n- For Grant Amounts exceeding 300k ada: at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (**6 milestones in total**)",
                             "minItems": 3,
                             "maxItems": 6,
