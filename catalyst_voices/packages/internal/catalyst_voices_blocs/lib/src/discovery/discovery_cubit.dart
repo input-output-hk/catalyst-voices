@@ -20,6 +20,12 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     ]);
   }
 
+  @override
+  Future<void> close() async {
+    print('DiscoveryCubit.close()');
+    await super.close();
+  }
+
   Future<void> getCurrentCampaign() async {
     emit(
       state.copyWith(

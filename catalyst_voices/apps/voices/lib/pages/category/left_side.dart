@@ -1,8 +1,10 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class LeftSide extends StatelessWidget {
@@ -29,7 +31,12 @@ class LeftSide extends StatelessWidget {
                 '''Cardano Use Cases: Concept will accept early stage ideas to deliver proof of concept, design research and basic prototyping through to MVP for innovative Cardano-based products, services, and business models.''',
           ),
           const SizedBox(height: 64),
-          const Placeholder(fallbackHeight: 200),
+          const FundsDetailCard(
+            allFunds: 500000,
+            totalAsk: 100000,
+            askRange: Range(min: 15000, max: 100000),
+            type: FundsDetailCardType.category,
+          ),
           const SizedBox(height: 48),
           ExpansionPanelList(
             elevation: 0,

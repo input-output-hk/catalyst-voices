@@ -1424,6 +1424,17 @@
       }
     }
   },
+  "dateTimeAt": "{date} at {time}",
+  "@dateTimeAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "accountMenuPopupTooltip": "Account menu",
   "account": "Account",
   "settings": "Settings",
@@ -1456,5 +1467,8 @@
   "proposalsSubmissionClose": "Proposals submission close:",
   "backToCampaign": "Back to Campaign",
   "category": "Category",
-  "exploreCategories": "Explore Categories"
+  "exploreCategories": "Explore Categories",
+  "categoryBudget": "Category Budget",
+  "fundsAvailableForCategory": "Funds available for this category",
+  "currentAsk": "Current Ask"
 }

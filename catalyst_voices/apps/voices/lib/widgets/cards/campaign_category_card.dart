@@ -81,7 +81,7 @@ class _Buttons extends StatelessWidget {
       children: [
         VoicesFilledButton(
           onTap: () {
-            // TODO(LynxxLynx): implement redirect to category details
+            CategoryDetailRoute(categoryId).go(context);
           },
           child: Text(context.l10n.categoryDetails),
         ),

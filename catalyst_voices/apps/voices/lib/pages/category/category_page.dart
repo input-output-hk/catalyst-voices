@@ -6,10 +6,20 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class CategoryPage extends StatelessWidget {
+class CategoryPage extends StatefulWidget {
   final String categoryId;
 
   const CategoryPage({super.key, required this.categoryId});
+
+  @override
+  State<CategoryPage> createState() => _CategoryPageState();
+}
+
+class _CategoryPageState extends State<CategoryPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +36,12 @@ class CategoryPage extends StatelessWidget {
           children: [
             Expanded(
               child: LeftSide(
-                categoryId: categoryId,
+                categoryId: widget.categoryId,
               ),
             ),
             const SizedBox(width: 48),
             _CardInformation(
-              categoryId: categoryId,
+              categoryId: widget.categoryId,
               categoryName: 'Cardano Use Cases: Concept',
               categoryProposalsCount: 256,
             ),

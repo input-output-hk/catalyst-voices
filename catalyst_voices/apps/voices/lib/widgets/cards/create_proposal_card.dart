@@ -108,11 +108,6 @@ class _SubmissionCloseAt extends StatelessWidget {
 
   const _SubmissionCloseAt(this.dateTime);
 
-  String get formattedDate {
-    final date = DateFormatter.formatDateTimeParts(dateTime);
-    return '${date.$1} at ${date.$2}';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -130,12 +125,17 @@ class _SubmissionCloseAt extends StatelessWidget {
               style: context.textTheme.bodyMedium,
             ),
             Text(
-              formattedDate,
+              _formattedDate(context),
               style: context.textTheme.titleSmall,
             ),
           ],
         ),
       ],
     );
+  }
+
+  String _formattedDate(BuildContext context) {
+    final date = DateFormatter.formatDateTimeParts(dateTime);
+    return context.l10n.dateTimeAt(date.date, date.time);
   }
 }
