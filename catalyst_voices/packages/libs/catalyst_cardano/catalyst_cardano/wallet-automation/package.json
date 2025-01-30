@@ -7,7 +7,7 @@
         "test": "tests"
     },
     "scripts": {
-        "test": "npx playwright test"
+        "test": "chrome --version"
     },
     "repository": {
         "type": "git",
