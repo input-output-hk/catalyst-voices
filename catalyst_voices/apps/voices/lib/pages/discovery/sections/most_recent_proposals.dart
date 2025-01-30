@@ -24,8 +24,7 @@ class MostRecentProposals extends StatefulWidget {
   State<MostRecentProposals> createState() => _LatestProposalsState();
 }
 
-class _LatestProposalsState extends State<MostRecentProposals>
-    with TickerProviderStateMixin {
+class _LatestProposalsState extends State<MostRecentProposals> {
   late final ScrollController _scrollController;
   late double _scrollPercentage;
 
