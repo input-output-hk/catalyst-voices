@@ -349,7 +349,8 @@ final class TransactionBuilder extends Equatable {
   static TransactionWitnessSet generateFakeWitnessSet(
     Set<TransactionUnspentOutput> inputs,
   ) {
-    final uniqueAddresses = inputs.map((input) => input.output.address).toSet();
+    final uniqueAddresses =
+        inputs.map((input) => input.output.address.publicKeyHash).toSet();
 
     return TransactionWitnessSet(
       vkeyWitnesses: {

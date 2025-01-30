@@ -161,6 +161,6 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   ///
   /// Format [ 8 bit header | payload ]
   static Ed25519PublicKeyHash _extractPublicKeyHash(List<int> bytes) {
-    return Ed25519PublicKeyHash.fromBytes(bytes: bytes.sublist(1));
+    return Ed25519PublicKeyHash.fromBytes(bytes: bytes.sublist(1, 29));
   }
 }
