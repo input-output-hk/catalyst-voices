@@ -59,29 +59,6 @@ extension ButtonsThemeExt on ThemeData {
           shape: const CircleBorder(),
         ).merge(_buildBaseButtonStyle(textTheme)),
       ),
-      segmentedButtonTheme: SegmentedButtonThemeData(
-        style: SegmentedButton.styleFrom(
-          foregroundColor: colors.textOnPrimary,
-          backgroundColor: Colors.transparent,
-          selectedForegroundColor: colors.textOnPrimary,
-          selectedBackgroundColor: colors.onSurfacePrimary012,
-          disabledForegroundColor: colors.iconsDisabled,
-          disabledBackgroundColor: Colors.transparent,
-          textStyle: textTheme.labelLarge,
-        ).copyWith(
-          side: WidgetStateProperty.resolveWith(
-            (states) {
-              if (states.contains(WidgetState.disabled)) {
-                return BorderSide(color: colors.iconsDisabled);
-              }
-
-              return BorderSide(color: colors.outlineBorder);
-            },
-          ),
-          iconSize: const WidgetStatePropertyAll(18),
-        ),
-        selectedIcon: const Icon(Icons.check),
-      ),
     );
   }
 }

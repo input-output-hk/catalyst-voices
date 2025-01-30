@@ -423,6 +423,45 @@ final class DocumentLanguageCodeSchema extends DocumentStringSchema {
   }
 }
 
+final class DocumentRadioButtonSelect extends DocumentStringSchema {
+  const DocumentRadioButtonSelect({
+    required super.nodeId,
+    required super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.defaultValue,
+    required super.constValue,
+    required super.enumValues,
+    required super.contentMediaType,
+    required super.strLengthRange,
+    required super.pattern,
+  });
+
+  @override
+  DocumentStringSchema copyWith({DocumentNodeId? nodeId, String? title}) {
+    return DocumentRadioButtonSelect(
+      nodeId: nodeId ?? this.nodeId,
+      format: format,
+      title: title ?? this.title,
+      description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
+      isRequired: isRequired,
+      defaultValue: defaultValue,
+      constValue: constValue,
+      enumValues: enumValues,
+      contentMediaType: contentMediaType,
+      strLengthRange: strLengthRange,
+      pattern: pattern,
+    );
+  }
+}
+
 final class DocumentGenericStringSchema extends DocumentStringSchema {
   const DocumentGenericStringSchema({
     required super.nodeId,
