@@ -58,18 +58,20 @@ class _AccountStatusBannerState extends State<_AccountStatusBanner> {
         color: widget.status.type.backgroundColor(context),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          child: Row(
-            children: [
-              Expanded(child: AccountStatusTitleText(data: widget.status)),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: _onDismissTap,
-                child: VoicesAssets.icons.x.buildIcon(
-                  size: 18,
-                  color: widget.status.type.foregroundColor(context),
+          child: IconTheme(
+            data: IconThemeData(
+                size: 18, color: widget.status.type.foregroundColor(context)),
+            child: Row(
+              children: [
+                widget.status.icon.buildIcon(),
+                Expanded(child: AccountStatusTitleText(data: widget.status)),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: _onDismissTap,
+                  child: VoicesAssets.icons.x.buildIcon(),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
