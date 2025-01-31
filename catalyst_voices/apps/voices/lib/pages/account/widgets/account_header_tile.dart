@@ -21,7 +21,7 @@ class AccountHeaderTile extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 24),
+        const SizedBox(width: 24),
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,

@@ -1428,5 +1428,6 @@
   "addRole": "Add role",
   "accountFinishedNotificationTitle": "Account Finalized",
   "accountFinishedNotificationTitleDesc": "Account blockchain verified",
-  "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and..."
+  "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and...",
+  "startProposal": "Start Proposal"
 }

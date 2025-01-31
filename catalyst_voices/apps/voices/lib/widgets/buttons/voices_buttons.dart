@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
@@ -226,6 +227,18 @@ class VoicesEditSaveButton extends StatelessWidget {
         isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText,
         style: Theme.of(context).textTheme.labelSmall,
       ),
+    );
+  }
+}
+
+class VoicesStartProposalButton extends StatelessWidget {
+  const VoicesStartProposalButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesOutlinedButton(
+      onTap: () => const ProposalBuilderDraftRoute().go(context),
+      child: Text(context.l10n.startProposal),
     );
   }
 }
