@@ -12,7 +12,7 @@ import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 /// - Change outputs, if applicable.
 /// - The calculated transaction fee.
 ///
-class InputBuilder implements CoinSelector {
+final class InputBuilder implements CoinSelector {
   /// Strategy used to prioritize the available UTxOs.
   final CoinSelectionStrategy selectionStrategy;
 
