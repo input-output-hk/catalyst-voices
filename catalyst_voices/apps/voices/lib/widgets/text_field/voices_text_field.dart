@@ -763,7 +763,7 @@ class VoicesTextFieldDecoration {
     this.suffixText,
     this.counterText,
     this.showStatusSuffixIcon = true,
-    this.filled = false,
+    this.filled = true,
     this.fillColor,
   });
 }
