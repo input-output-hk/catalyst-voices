@@ -1,5 +1,10 @@
 //! Generic Responses are all contained in their own modules, grouped by response codes.
 
+use std::{
+    collections::HashSet,
+    hash::{Hash, Hasher},
+};
+
 use code_401_unauthorized::Unauthorized;
 use code_403_forbidden::Forbidden;
 use code_422_unprocessable_content::UnprocessableContent;
@@ -8,7 +13,7 @@ use code_503_service_unavailable::ServiceUnavailable;
 use poem::{http::StatusCode, IntoResponse};
 use poem_openapi::{
     payload::Json,
-    registry::{MetaHeader, MetaResponses, Registry},
+    registry::{MetaHeader, MetaResponse, MetaResponses, Registry},
     ApiResponse,
 };
 use tracing::error;
@@ -222,14 +227,25 @@ impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
         let t_meta = T::meta();
         let default_meta = ErrorResponses::meta();
 
-        let mut responses = Vec::new();
-        responses.extend(t_meta.responses);
-        responses.extend(default_meta.responses);
+        let mut responses = HashSet::new();
+        responses.extend(
+            t_meta
+                .responses
+                .into_iter()
+                .map(FilteredByStatusCodeResponse),
+        );
+        responses.extend(
+            default_meta
+                .responses
+                .into_iter()
+                .map(FilteredByStatusCodeResponse),
+        );
 
         let responses =
             responses
                 .into_iter()
-                .map(|mut response| {
+                .map(|val| {
+                    let mut response = val.0;
                     // Make modifications to the responses to set common headers
                     if let Some(status) = response.status {
                         // Only 2xx and 4xx responses get RateLimit Headers.
@@ -285,5 +301,20 @@ impl<T: IntoResponse + Send> IntoResponse for WithErrorResponses<T> {
             Self::With(t) => t.into_response(),
             Self::Error(default) => default.into_response(),
         }
+    }
+}
+
+/// `FilteredByStatusCodeResponse` is used to filter out duplicate responses by status
+/// code.
+struct FilteredByStatusCodeResponse(MetaResponse);
+impl PartialEq for FilteredByStatusCodeResponse {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.status.eq(&other.0.status)
+    }
+}
+impl Eq for FilteredByStatusCodeResponse {}
+impl Hash for FilteredByStatusCodeResponse {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.status.hash(state);
     }
 }

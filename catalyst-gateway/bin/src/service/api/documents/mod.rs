@@ -84,9 +84,11 @@ impl DocumentApi {
             Ok(doc_bytes) => put_document::endpoint(doc_bytes.to_vec()).await,
             Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
             Err(_) => {
-                put_document::Responses::BadRequest(Json(PutDocumentUnprocessableContent::new(
-                    "Failed to read document from the request",
-                )))
+                put_document::Responses::UnprocessableContent(Json(
+                    PutDocumentUnprocessableContent::new(
+                        "Failed to read document from the request",
+                    ),
+                ))
                 .into()
             },
         }
