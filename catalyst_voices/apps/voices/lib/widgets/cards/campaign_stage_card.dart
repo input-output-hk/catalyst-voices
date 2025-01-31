@@ -88,11 +88,12 @@ class CampaignStageCard extends StatelessWidget {
         final formattedDate =
             DateFormatter.formatDateTimeParts(campaign.startDate);
         return context.l10n
-            .campaignBeginsOn(formattedDate.$1, formattedDate.$2);
+            .campaignBeginsOn(formattedDate.date, formattedDate.time);
       case CampaignStage.live:
         final formattedDate =
             DateFormatter.formatDateTimeParts(campaign.endDate);
-        return context.l10n.campaignEndsOn(formattedDate.$1, formattedDate.$2);
+        return context.l10n
+            .campaignEndsOn(formattedDate.date, formattedDate.time);
       case CampaignStage.completed:
         return '';
     }
