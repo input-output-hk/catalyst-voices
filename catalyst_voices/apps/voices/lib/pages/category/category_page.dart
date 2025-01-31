@@ -19,6 +19,7 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
+    print(context.read<DiscoveryCubit>().state.campaignCategories);
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class LeftSide extends StatelessWidget {
@@ -38,28 +39,11 @@ class LeftSide extends StatelessWidget {
             type: FundsDetailCardType.category,
           ),
           const SizedBox(height: 48),
-          ExpansionPanelList(
-            elevation: 0,
-            children: [
-              ExpansionPanel(
-                isExpanded: true,
-                headerBuilder: (context, isExpanded) => const Text('Header'),
-                body: const Text('LONG TEXT'),
-                backgroundColor: Colors.transparent,
-              ),
-              ExpansionPanel(
-                isExpanded: true,
-                headerBuilder: (context, isExpanded) => const Text('Header'),
-                body: const Text('LONG TEXT'),
-                backgroundColor: Colors.transparent,
-              ),
-              ExpansionPanel(
-                isExpanded: true,
-                headerBuilder: (context, isExpanded) => const Text('Header'),
-                body: const Text('LONG TEXT'),
-                backgroundColor: Colors.transparent,
-              ),
-            ],
+          _ExpandableDescriptionList(
+            descriptions: List.filled(
+              3,
+              CategoryDescriptionViewModel.dummy(),
+            ),
           ),
         ],
       ),
@@ -129,6 +113,63 @@ class _CategoryBrief extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ExpandableDescriptionList extends StatelessWidget {
+  final List<CategoryDescriptionViewModel> descriptions;
+  const _ExpandableDescriptionList({
+    required this.descriptions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: descriptions
+          .map<Widget>(
+            (e) => VoicesExpansionTile(
+              title: _Header(e.title),
+              initiallyExpanded: true,
+              backgroundColor: Colors.transparent,
+              children: [
+                _BodyText(e.description),
+              ],
+            ),
+          )
+          .separatedBy(const SizedBox(height: 32))
+          .toList(),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  final String value;
+
+  const _Header(this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      value,
+      style: context.textTheme.titleLarge
+          ?.copyWith(color: context.colors.textOnPrimaryLevel1),
+    );
+  }
+}
+
+class _BodyText extends StatelessWidget {
+  final String value;
+
+  const _BodyText(this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      value,
+      style: context.textTheme.bodyMedium,
     );
   }
 }
