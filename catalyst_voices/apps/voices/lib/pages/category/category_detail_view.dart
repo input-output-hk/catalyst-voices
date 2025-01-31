@@ -8,12 +8,12 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class LeftSide extends StatelessWidget {
-  final String categoryId;
+class CategoryDetailView extends StatelessWidget {
+  final CampaignCategoryViewModel category;
 
-  const LeftSide({
+  const CategoryDetailView({
     super.key,
-    required this.categoryId,
+    required this.category,
   });
 
   @override
@@ -26,24 +26,20 @@ class LeftSide extends StatelessWidget {
         children: [
           const _BackButton(),
           const SizedBox(height: 32),
-          const _CategoryBrief(
-            categoryName: 'Cardano Use Cases: Concept',
-            categoryDescription:
-                '''Cardano Use Cases: Concept will accept early stage ideas to deliver proof of concept, design research and basic prototyping through to MVP for innovative Cardano-based products, services, and business models.''',
+          _CategoryBrief(
+            categoryName: category.formattedName,
+            categoryDescription: category.description,
           ),
           const SizedBox(height: 64),
-          const FundsDetailCard(
-            allFunds: 500000,
-            totalAsk: 100000,
-            askRange: Range(min: 15000, max: 100000),
+          FundsDetailCard(
+            allFunds: category.availableFunds.value,
+            totalAsk: category.totalAsk.value,
+            askRange: category.range,
             type: FundsDetailCardType.category,
           ),
           const SizedBox(height: 48),
           _ExpandableDescriptionList(
-            descriptions: List.filled(
-              3,
-              CategoryDescriptionViewModel.dummy(),
-            ),
+            descriptions: category.descriptions,
           ),
         ],
       ),
@@ -76,6 +72,7 @@ class _BackButton extends StatelessWidget {
 class _CategoryBrief extends StatelessWidget {
   final String categoryName;
   final String categoryDescription;
+
   const _CategoryBrief({
     required this.categoryName,
     required this.categoryDescription,
@@ -119,6 +116,7 @@ class _CategoryBrief extends StatelessWidget {
 
 class _ExpandableDescriptionList extends StatelessWidget {
   final List<CategoryDescriptionViewModel> descriptions;
+
   const _ExpandableDescriptionList({
     required this.descriptions,
   });

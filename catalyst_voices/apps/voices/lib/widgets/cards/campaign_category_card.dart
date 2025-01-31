@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoryCard extends StatelessWidget {
-  final CampaignCategoryCardViewModel category;
+  final CampaignCategoryViewModel category;
 
   const CampaignCategoryCard({
     super.key,
