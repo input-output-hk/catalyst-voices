@@ -92,13 +92,13 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.inputFormatters]
   final List<TextInputFormatter>? inputFormatters;
 
-  /// [AutovalidateMode]
+  /// [TextFormField.autovalidateMode]
   final AutovalidateMode? autovalidateMode;
 
-  /// [MaxLengthEnforcement]
+  /// [TextField.maxLengthEnforcement]
   final MaxLengthEnforcement? maxLengthEnforcement;
 
-  /// [MouseCursor]
+  /// [TextField.mouseCursor]
   final MouseCursor? mouseCursor;
 
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
