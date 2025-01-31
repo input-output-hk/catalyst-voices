@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 
 final class AccountState extends Equatable {
   final MyAccountStatusNotification status;
+  final String catalystId;
   final DisplayName displayName;
   final Email email;
   final AccountRolesState roles;
@@ -10,6 +11,7 @@ final class AccountState extends Equatable {
 
   const AccountState({
     this.status = const None(),
+    this.catalystId = '',
     this.displayName = const DisplayName.pure(),
     this.email = const Email.pure(),
     this.roles = const AccountRolesState(),
@@ -18,6 +20,7 @@ final class AccountState extends Equatable {
 
   AccountState copyWith({
     MyAccountStatusNotification? status,
+    String? catalystId,
     DisplayName? displayName,
     Email? email,
     AccountRolesState? roles,
@@ -25,6 +28,7 @@ final class AccountState extends Equatable {
   }) {
     return AccountState(
       status: status ?? this.status,
+      catalystId: catalystId ?? this.catalystId,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       roles: roles ?? this.roles,
@@ -35,6 +39,7 @@ final class AccountState extends Equatable {
   @override
   List<Object?> get props => [
         status,
+        catalystId,
         displayName,
         email,
         roles,

@@ -55,6 +55,7 @@ final class AccountCubit extends Cubit<AccountState> {
 
     return AccountState(
       status: const AccountFinalized(),
+      catalystId: from?.catalystId ?? '',
       displayName: DisplayName.pure(from?.displayName ?? ''),
       email: Email.pure(from?.email ?? ''),
       roles: AccountRolesState(
