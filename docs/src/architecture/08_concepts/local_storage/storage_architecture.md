@@ -964,7 +964,8 @@ For the latest and most detailed API specification, refer to the following locat
 ### V1.1 Changes
 
 Narrowing of scope for fund 14 to include the following items.
-* Removal of encryption for local drafts, unpublished draft documents will be stored in plain text in the drafts table, draft documents stored in memory until saved to draft table through action by the user.
+* Removal of encryption for local drafts, unpublished draft documents will be stored in plain text in the drafts table, 
+draft documents stored in memory until saved to draft table through action by the user.
 * Removed context to "Session-bound encryption for drafts using deterministic key derivation for both encryption and decryption."
 * Draft documents will not be associated with a cross device session until future versions.
 * Clarification on separate database for each account and removal lifecycle of drafts and documents once keychain is deleted.
