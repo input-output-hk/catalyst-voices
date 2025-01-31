@@ -105,7 +105,9 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         );
       })
-      ..registerFactory<AccountCubit>(AccountCubit.new);
+      ..registerFactory<AccountCubit>(() {
+        return AccountCubit(get<UserService>());
+      });
   }
 
   void _registerRepositories() {

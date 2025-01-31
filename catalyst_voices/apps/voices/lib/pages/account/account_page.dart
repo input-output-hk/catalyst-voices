@@ -26,6 +26,13 @@ final class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   @override
+  void initState() {
+    super.initState();
+
+    unawaited(context.read<AccountCubit>().loadAccountDetails());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: VoicesAppBar(),
