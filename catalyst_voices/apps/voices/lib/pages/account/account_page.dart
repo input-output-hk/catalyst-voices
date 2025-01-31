@@ -44,17 +44,17 @@ class _AccountPageState extends State<AccountPage> {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                AccountPageTitle(),
-                SizedBox(height: 42),
-                Row(
+                const AccountPageTitle(),
+                const SizedBox(height: 42),
+                const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: AccountHeaderTile()),
                     SizedBox(width: 28),
-                    Expanded(child: Offstage(child: AccountActionTile()))
+                    Expanded(child: AccountActionTile())
                   ],
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

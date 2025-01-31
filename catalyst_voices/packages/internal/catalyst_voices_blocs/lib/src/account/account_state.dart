@@ -2,12 +2,14 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class AccountState extends Equatable {
+  final MyAccountStatusNotification status;
   final DisplayName displayName;
   final Email email;
   final AccountRolesState roles;
   final String walletConnected;
 
   const AccountState({
+    this.status = const None(),
     this.displayName = const DisplayName.pure(),
     this.email = const Email.pure(),
     this.roles = const AccountRolesState(),
@@ -15,12 +17,14 @@ final class AccountState extends Equatable {
   });
 
   AccountState copyWith({
+    MyAccountStatusNotification? status,
     DisplayName? displayName,
     Email? email,
     AccountRolesState? roles,
     String? walletConnected,
   }) {
     return AccountState(
+      status: status ?? this.status,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       roles: roles ?? this.roles,
@@ -30,6 +34,7 @@ final class AccountState extends Equatable {
 
   @override
   List<Object?> get props => [
+        status,
         displayName,
         email,
         roles,
