@@ -14,6 +14,9 @@ use crate::service::common::responses::ErrorResponses;
 /// Auth token in the form of catv1..
 pub type EncodedAuthToken = String;
 
+/// The header name that holds the authorization berear token
+pub(crate) const AUTHORIZATION_HEADER: &str = "Authorization";
+
 /// Cached auth tokens
 static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock::new(|| {
     Cache::builder()
@@ -45,6 +48,7 @@ static CERTS: LazyLock<DashMap<String, [u8; PUBLIC_KEY_LENGTH]>> = LazyLock::new
 #[derive(SecurityScheme)]
 #[oai(
     ty = "bearer",
+    key_name = "Authorization", // MUST match the `AUTHORIZATION_HEADER` constant.
     bearer_format = "catalyst-rbac-token",
     checker = "checker_api_catalyst_auth"
 )]

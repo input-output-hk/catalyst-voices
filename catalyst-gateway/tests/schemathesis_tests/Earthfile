@@ -2,7 +2,6 @@ VERSION 0.8
 
 package-schemathesis:
     FROM python:3.12-alpine3.20
-    # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
     ARG api_spec
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG version=3.39.5
