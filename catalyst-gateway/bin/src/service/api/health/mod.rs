@@ -1,10 +1,7 @@
 //! Health Endpoints
 use poem_openapi::{param::Query, OpenApi};
 
-use crate::service::common::{
-    auth::{api_key::InternalApiKeyAuthorization, none::NoAuthorization},
-    tags::ApiTags,
-};
+use crate::service::common::{auth::api_key::InternalApiKeyAuthorization, tags::ApiTags};
 
 mod inspection_get;
 mod live_get;
@@ -31,7 +28,7 @@ impl HealthApi {
         method = "get",
         operation_id = "healthStarted"
     )]
-    async fn started_get(&self, _auth: NoAuthorization) -> started_get::AllResponses {
+    async fn started_get(&self, _auth: InternalApiKeyAuthorization) -> started_get::AllResponses {
         started_get::endpoint().await
     }
 
@@ -49,7 +46,7 @@ impl HealthApi {
         method = "get",
         operation_id = "healthReady"
     )]
-    async fn ready_get(&self, _auth: NoAuthorization) -> ready_get::AllResponses {
+    async fn ready_get(&self, _auth: InternalApiKeyAuthorization) -> ready_get::AllResponses {
         ready_get::endpoint().await
     }
 
@@ -62,7 +59,7 @@ impl HealthApi {
     /// *This endpoint is for internal use of the service deployment infrastructure.
     /// It may not be exposed publicly. Refer to []*
     #[oai(path = "/v1/health/live", method = "get", operation_id = "healthLive")]
-    async fn live_get(&self, _auth: NoAuthorization) -> live_get::AllResponses {
+    async fn live_get(&self, _auth: InternalApiKeyAuthorization) -> live_get::AllResponses {
         live_get::endpoint().await
     }
 
