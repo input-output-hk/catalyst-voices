@@ -15,7 +15,7 @@ extension AccountRoleExt on AccountRole {
     };
 
     if (addDefaultState && isDefault) {
-      name = '$name ${context.l10n.defaultRole}';
+      name = '$name (${context.l10n.defaultRole})';
     }
 
     return name;

@@ -13,11 +13,11 @@ class AccountHeaderTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<AccountCubit, AccountState, _Data>(
+    return BlocSelector<SessionCubit, SessionState, _Data>(
       selector: (state) {
         return (
-          catalystId: state.catalystId,
-          displayName: state.displayName.value,
+          catalystId: state.account?.catalystId ?? '',
+          displayName: state.account?.displayName ?? '',
         );
       },
       builder: (context, state) => _AccountHeaderTile(data: state),

@@ -61,7 +61,7 @@ class _AppState extends State<App> {
       ),
       BlocProvider<AccountCubit>(
         create: (context) => Dependencies.instance.get<AccountCubit>(),
-      )
+      ),
     ];
   }
 }

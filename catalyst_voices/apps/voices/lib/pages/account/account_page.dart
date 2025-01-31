@@ -9,7 +9,7 @@ import 'package:catalyst_voices/pages/account/widgets/account_page_title.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_avatar.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_lock_button.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -35,9 +35,10 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const VoicesAppBar(
+        automaticallyImplyLeading: false,
         actions: [
           VoicesStartProposalButton(),
-          SessionLockButton(),
+          SessionActionHeader(),
           SessionAccountAvatar(),
         ],
       ),

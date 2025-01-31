@@ -12,7 +12,6 @@ final class UserAccessGuard implements RouteGuard {
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
-    return null;
     final account = context.read<SessionCubit>().state.account;
 
     if (account == null) {

@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/account/unlock_keychain_dialog.dart';
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_lock_button.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_unlock_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -25,7 +24,7 @@ class SessionActionHeader extends StatelessWidget {
           SessionStatus.visitor => state.isRegistrationInProgress
               ? const _FinishRegistrationButton()
               : _GetStartedButton(isEnabled: state.canCreateAccount),
-          SessionStatus.guest => const _UnlockButton(),
+          SessionStatus.guest => const SessionUnlockButton(),
           SessionStatus.actor => const SessionLockButton(),
         };
       },
@@ -58,20 +57,6 @@ class _FinishRegistrationButton extends StatelessWidget {
     return VoicesFilledButton(
       onTap: () => unawaited(RegistrationDialog.show(context)),
       child: Text(context.l10n.finishAccountCreation),
-    );
-  }
-}
-
-class _UnlockButton extends StatelessWidget {
-  const _UnlockButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      key: const Key('UnlockButton'),
-      trailing: VoicesAssets.icons.lockOpen.buildIcon(),
-      onTap: () => unawaited(UnlockKeychainDialog.show(context)),
-      child: Text(context.l10n.unlock),
     );
   }
 }

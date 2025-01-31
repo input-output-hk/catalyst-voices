@@ -14,7 +14,6 @@ final class SessionUnlockedGuard implements RouteGuard {
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
-    return null;
     final sessionCubit = context.read<SessionCubit>();
     if (sessionCubit.state.isActive) {
       // if already unlocked skip redirection
