@@ -1,6 +1,5 @@
 //! Generic Responses are all contained in their own modules, grouped by response codes.
 
-use code_400_bad_request::BadRequestResponse;
 use code_401_unauthorized::Unauthorized;
 use code_403_forbidden::Forbidden;
 use code_422_unprocessable_content::UnprocessableContent;
@@ -14,7 +13,6 @@ use poem_openapi::{
 };
 use tracing::error;
 
-mod code_400_bad_request;
 mod code_401_unauthorized;
 mod code_403_forbidden;
 mod code_422_unprocessable_content;
@@ -35,9 +33,10 @@ use super::types::headers::{
 pub(crate) enum ErrorResponses {
     /// ## Bad Request
     ///
-    /// The client has sent an invalid request.
+    /// The client has not sent valid request, could be an invalid HTTP in general or
+    /// provided not correct headers, path or query arguments.
     #[oai(status = 400)]
-    BadRequest(BadRequestResponse),
+    BadRequest,
 
     /// ## Unauthorized
     ///
@@ -135,16 +134,6 @@ pub(crate) enum WithErrorResponses<T> {
 }
 
 impl<T> WithErrorResponses<T> {
-    /// Handle a 400 bad request response.
-    ///
-    /// Returns a 400 Bad Request response.
-    /// Should not be returned during the endpoint processing.
-    /// This is only for internal `poem` or `hyper` errors.
-    fn bad_request(err: &poem::Error) -> Self {
-        let error = BadRequestResponse::new(err);
-        Self::Error(ErrorResponses::BadRequest(error))
-    }
-
     /// Handle a 5xx response.
     /// Returns a Server Error or a Service Unavailable response.
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
@@ -284,7 +273,7 @@ impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
         if err.status() == StatusCode::UNAUTHORIZED {
             WithErrorResponses::unauthorized()
         } else {
-            WithErrorResponses::bad_request(&err)
+            WithErrorResponses::unprocessable_content(vec![err])
         }
     }
 }
