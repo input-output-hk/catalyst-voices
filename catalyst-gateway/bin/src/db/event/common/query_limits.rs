@@ -41,7 +41,10 @@ impl QueryLimits {
     pub(crate) fn new(limit: Option<Limit>, page: Option<Page>) -> Self {
         match (limit, page) {
             (Some(limit), Some(page)) => {
-                Self(QueryLimitsInner::LimitAndOffset(limit.into(), page.into()))
+                Self(QueryLimitsInner::LimitAndOffset(
+                    limit.into(),
+                    cal_offset(limit.into(), page.into()),
+                ))
             },
             (Some(limit), None) => {
                 Self(QueryLimitsInner::LimitAndOffset(
@@ -50,9 +53,11 @@ impl QueryLimits {
                 ))
             },
             (None, Some(page)) => {
+                let limit = Limit::default();
+
                 Self(QueryLimitsInner::LimitAndOffset(
-                    Limit::default().into(),
-                    page.into(),
+                    limit.into(),
+                    cal_offset(limit.into(), page.into()),
                 ))
             },
             (None, None) => {
@@ -63,4 +68,10 @@ impl QueryLimits {
             },
         }
     }
+}
+
+/// Calculate the offset value from page and limit.
+/// offset = limit * page
+fn cal_offset(page: u64, limit: u64) -> u64 {
+    limit.saturating_mul(page)
 }

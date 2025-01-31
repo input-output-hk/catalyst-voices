@@ -8,9 +8,9 @@ part 'document_schema_dto.g.dart';
 @JsonSerializable(includeIfNull: false)
 final class DocumentSchemaDto {
   @JsonKey(name: r'$schema')
-  final String jsonSchema;
+  final String schema;
   @JsonKey(name: r'$id')
-  final String jsonSchemaId;
+  final String id;
   final String title;
   final String description;
   final DocumentDefinitionsDto definitions;
@@ -20,12 +20,10 @@ final class DocumentSchemaDto {
   final List<String>? required;
   @JsonKey(name: 'x-order')
   final List<String>? order;
-  @JsonKey(includeToJson: false)
-  final String propertiesSchema;
 
   const DocumentSchemaDto({
-    required this.jsonSchema,
-    required this.jsonSchemaId,
+    required this.schema,
+    required this.id,
     required this.title,
     required this.description,
     required this.definitions,
@@ -34,7 +32,6 @@ final class DocumentSchemaDto {
     required this.properties,
     required this.required,
     required this.order,
-    required this.propertiesSchema,
   });
 
   factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
@@ -63,12 +60,12 @@ final class DocumentSchemaDto {
         .toList();
 
     return DocumentSchema(
-      jsonSchema: jsonSchema,
+      parentSchemaUrl: schema,
+      schemaSelfUrl: id,
       title: title,
       description: MarkdownData(description),
       properties: mappedProperties,
       order: order.map(nodeId.child).toList(),
-      propertiesSchema: propertiesSchema,
     );
   }
 }

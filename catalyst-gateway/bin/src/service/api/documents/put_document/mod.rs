@@ -48,7 +48,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # PUT `/document`
 #[allow(clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
-    match CatalystSignedDocument::decode(&mut Decoder::new(&doc_bytes), &mut ()) {
+    match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
         Ok(doc) => {
             let authors = doc
                 .signatures()
@@ -96,9 +96,18 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(_) => {
-            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+        Err(e) => {
+            let json_report = match serde_json::to_value(e.report()) {
+                Ok(json_report) => json_report,
+                Err(e) => {
+                    return AllResponses::internal_error(&anyhow!(
+                        "Invalid Signed Document decoding Problem Report, not Json encoded: {e}"
+                    ))
+                },
+            };
+            Responses::UnprocessableContent(Json(PutDocumentBadRequest::new(
                 "Invalid CBOR encoded document",
+                Some(json_report),
             )))
             .into()
         },

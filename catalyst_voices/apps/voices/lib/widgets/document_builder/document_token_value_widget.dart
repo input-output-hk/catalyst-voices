@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
@@ -11,7 +11,7 @@ class DocumentTokenValueWidget extends StatefulWidget {
   final DocumentIntegerSchema schema;
   final Currency currency;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const DocumentTokenValueWidget({
     super.key,
@@ -64,14 +64,13 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   @override
   Widget build(BuildContext context) {
     final schema = widget.schema;
-    final label = schema.title;
 
     return TokenField(
       controller: _controller,
       focusNode: _focusNode,
       onFieldSubmitted: _notifyChangeListener,
       validator: _validate,
-      labelText: label.starred(isEnabled: schema.isRequired),
+      labelText: schema.formattedTitle,
       range: schema.numRange,
       currency: widget.currency,
       showHelper: widget.isEditMode,
@@ -101,7 +100,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       value: value,
     );
 
-    widget.onChanged(change);
+    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(int? value, String text) {

@@ -27,6 +27,7 @@ fn is_live() -> bool {
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
+#[allow(dead_code)]
 pub(crate) enum Responses {
     /// Service is OK and can keep running.
     #[oai(status = 204)]
@@ -47,12 +48,11 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// by an endpoint in a short window.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    if is_live() {
-        Responses::NoContent.into()
-    } else {
-        AllResponses::service_unavailable(
-            &anyhow::anyhow!("Service is possibly not running reliably."),
-            RetryAfterOption::Default,
-        )
-    }
+    // TODO: Needs engineering discussion
+    // if is_live() {
+    // Responses::NoContent.into()
+    // } else {
+    // Responses::ServiceUnavailable.into()
+    // }
+    Responses::NoContent.into()
 }

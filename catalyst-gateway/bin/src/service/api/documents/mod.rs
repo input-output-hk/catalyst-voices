@@ -87,6 +87,7 @@ impl DocumentApi {
                 put_document::Responses::UnprocessableContent(Json(
                     PutDocumentUnprocessableContent::new(
                         "Failed to read document from the request",
+                        None,
                     ),
                 ))
                 .into()

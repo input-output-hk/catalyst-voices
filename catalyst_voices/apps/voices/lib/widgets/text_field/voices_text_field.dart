@@ -92,11 +92,14 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.inputFormatters]
   final List<TextInputFormatter>? inputFormatters;
 
-  /// [AutovalidateMode]
+  /// [TextFormField.autovalidateMode]
   final AutovalidateMode? autovalidateMode;
 
-  /// [MaxLengthEnforcement]
+  /// [TextField.maxLengthEnforcement]
   final MaxLengthEnforcement? maxLengthEnforcement;
+
+  /// [TextField.mouseCursor]
+  final MouseCursor? mouseCursor;
 
   final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
 
@@ -132,6 +135,7 @@ class VoicesTextField extends StatefulWidget {
     this.inputFormatters,
     this.autovalidateMode,
     this.maxLengthEnforcement,
+    this.mouseCursor,
     this.onStatusChanged,
   });
 
@@ -239,6 +243,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           minHeight: widget.maxLines == null ? 65 : 48,
           iconBottomSpacing: widget.maxLines == null ? 18 : 0,
           child: TextFormField(
+            mouseCursor: widget.mouseCursor,
             key: const Key('VoicesTextField'),
             textAlignVertical: TextAlignVertical.top,
             autofocus: widget.autofocus,
