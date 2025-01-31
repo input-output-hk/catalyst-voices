@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/account/account_state.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,6 +20,24 @@ final class AccountCubit extends Cubit<AccountState> {
       (computationCount) =>
           computationCount.isEven ? 'damian@iohk.com' : 'damian@gmail.com',
     ).listen(_t2);
+
+    Future<void>.delayed(
+      const Duration(seconds: 1),
+      () {
+        final items =
+            AccountRole.values.where((role) => !role.isHidden).map((e) {
+          return MyAccountRoleItem(
+            type: e,
+            isSelected: e.isDefault,
+          );
+        }).toList();
+        final roles = AccountRolesState(
+          items: items,
+          canAddRole: items.any((element) => !element.isSelected),
+        );
+        emit(state.copyWith(roles: roles));
+      },
+    );
   }
 
   @override

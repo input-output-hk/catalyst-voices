@@ -76,4 +76,12 @@ extension AccountRoleExt on AccountRole {
       AccountRole.proposer => VoicesAssets.images.roleProposer,
     };
   }
+
+  SvgGenImage get smallIcon {
+    return switch (this) {
+      AccountRole.voter => VoicesAssets.icons.vote,
+      AccountRole.drep => VoicesAssets.icons.documentText,
+      AccountRole.proposer => VoicesAssets.icons.badgeCheck,
+    };
+  }
 }

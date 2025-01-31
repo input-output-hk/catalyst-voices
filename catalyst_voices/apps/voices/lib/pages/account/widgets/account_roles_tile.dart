@@ -54,7 +54,10 @@ class _EditButton extends StatelessWidget {
               // TODO(damian-molinski): registration dialog
             }
           : null,
-      child: Text(context.l10n.addRole),
+      child: Text(
+        context.l10n.addRole,
+        style: Theme.of(context).textTheme.labelSmall,
+      ),
     );
   }
 }
@@ -101,7 +104,7 @@ class _RoleCell extends StatelessWidget {
         border: border.resolve(states),
       ),
       child: AffixDecorator(
-        prefix: item.type.icon.buildIcon(
+        prefix: item.type.smallIcon.buildIcon(
           size: 18,
           color: iconColor.resolve(states),
         ),
