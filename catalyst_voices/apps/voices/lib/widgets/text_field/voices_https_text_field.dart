@@ -42,7 +42,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: widget.enabled ? null : _launchUrl,
       child: VoicesTextField(
         controller: _effectiveController,
@@ -82,6 +82,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
         enabled: widget.enabled,
         readOnly: !widget.enabled,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        mouseCursor: widget.enabled ? null : SystemMouseCursors.click,
       ),
     );
   }
