@@ -138,10 +138,14 @@ class _MultilineTextEntryMarkdownWidgetState
   void _notifyChangeListener() {
     final delta = _controller.document.toDelta();
     final markdownData = markdown.decoder.convert(delta);
+    final value = markdownData.data;
+    final normalizedValue = widget.schema.normalizeValue(value);
+
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
-      value: markdownData.data,
+      value: normalizedValue,
     );
+
     widget.onChanged([change]);
   }
 

@@ -29,6 +29,9 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
 
   @override
   DocumentValidationResult validate(String? value) {
+    // TODO(dtscalac): for the purpose of validation empty string == null?
+    // single line https url is not required but then it's always
+    // null which doesn't pass the pattern validation
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateStringLength(this, value),
@@ -36,6 +39,18 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
       DocumentValidator.validateConstValue(this, value),
       DocumentValidator.validateEnumValues(this, value),
     ]);
+  }
+
+  /// Normalizes a user entered [value].
+  ///
+  /// For the purpose of the document schema validation
+  /// the empty string needs to be translated to `null`.
+  String? normalizeValue(String? value) {
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+
+    return value;
   }
 
   @override

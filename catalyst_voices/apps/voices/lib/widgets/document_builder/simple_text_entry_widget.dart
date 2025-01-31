@@ -114,20 +114,18 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   }
 
   void _notifyChangeListener(String? value) {
+    final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
-      value: value,
+      value: normalizedValue,
     );
-
     widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(String? value) {
-    if (!widget.isEditMode) {
-      return const VoicesTextFieldValidationResult.none();
-    }
     final schema = widget.schema;
-    final result = schema.validate(value);
+    final normalizedValue = schema.normalizeValue(value);
+    final result = schema.validate(normalizedValue);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {

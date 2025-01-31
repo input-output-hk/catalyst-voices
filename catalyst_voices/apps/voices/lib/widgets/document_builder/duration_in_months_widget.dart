@@ -101,14 +101,11 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
   }
 
   void _notifyChangeListener(int? value) {
-    widget.onChanged(
-      [
-        DocumentValueChange(
-          nodeId: widget.schema.nodeId,
-          value: value,
-        ),
-      ],
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: value,
     );
+    widget.onChanged([change]);
   }
 
   String? _validator(int? value) {
