@@ -63,7 +63,7 @@ jobs:
         continue-on-error: true
         with:
             command: run
-            args: ./catalyst-gateway/tests/schemathesis_tests+nightly-test-fuzzer-api
+            args: --no-cache ./catalyst-gateway/tests/schemathesis_tests+nightly-test-fuzzer-api
 
       - name: Get integration tests report
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
