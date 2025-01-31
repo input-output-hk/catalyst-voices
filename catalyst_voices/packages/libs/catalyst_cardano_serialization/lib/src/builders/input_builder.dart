@@ -101,7 +101,7 @@ final class InputBuilder implements CoinSelector {
           }
         }
 
-        if (shouldCalculateChange) {
+        if (shouldCalculateChange && selectedInputs.length >= minInputs) {
           final changeAndFee = _getChangeAndFee(
             assetId,
             builder,
