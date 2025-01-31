@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -87,8 +88,7 @@ class _Buttons extends StatelessWidget {
         const SizedBox(height: 8),
         VoicesFilledButton(
           onTap: () {
-            // TODO(LynxxLynx): implement redirect to proposals
-            //page with category filter
+            ProposalsRoute(categoryId: categoryId).go(context);
           },
           backgroundColor: context.colors.elevationsOnSurfaceNeutralLv2,
           foregroundColor: context.colorScheme.primary,
@@ -149,26 +149,34 @@ class _CampaignStats extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            _TextStats(
-              text: context.l10n.fundsAvailable,
-              value: availableFunds,
-            ),
-            const Spacer(),
-            SizedBox(
-              height: 48,
-              child: VerticalDivider(
-                thickness: 1,
-                color: context.colors.onSurfacePrimary016,
+        child: SizedBox(
+          width: double.infinity,
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            children: [
+              _TextStats(
+                text: context.l10n.fundsAvailable,
+                value: availableFunds,
               ),
-            ),
-            const SizedBox(width: 16),
-            _TextStats(
-              text: context.l10n.proposals,
-              value: proposalsCount.toString(),
-            ),
-          ],
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    child: VerticalDivider(
+                      thickness: 1,
+                      color: context.colors.onSurfacePrimary016,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  _TextStats(
+                    text: context.l10n.proposals,
+                    value: proposalsCount.toString(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
