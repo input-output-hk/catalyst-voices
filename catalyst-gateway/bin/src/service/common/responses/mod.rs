@@ -36,6 +36,7 @@ pub(crate) enum ErrorResponses {
     /// The client has not sent valid request, could be an invalid HTTP in general or
     /// provided not correct headers, path or query arguments.
     #[oai(status = 400)]
+    #[allow(dead_code)]
     BadRequest,
 
     /// ## Unauthorized

@@ -1,11 +1,7 @@
 //! Implementation of the GET /health/ready endpoint
 use poem_openapi::ApiResponse;
-use tracing::{debug, error};
 
-use crate::{
-    db::event::{schema_check::MismatchedSchemaError, EventDB},
-    service::common::responses::WithErrorResponses,
-};
+use crate::service::common::responses::WithErrorResponses;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -13,9 +9,6 @@ pub(crate) enum Responses {
     /// Service is Started and can serve requests.
     #[oai(status = 204)]
     NoContent,
-    /// Service is not ready, do not send other requests.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
 
 /// All responses.
@@ -39,15 +32,5 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// This would let the load balancer shift traffic to other instances of this
 /// service that are ready.
 pub(crate) async fn endpoint() -> AllResponses {
-    match EventDB::schema_version_check().await {
-        Ok(_) => {
-            debug!("DB schema version status ok");
-            Responses::NoContent.into()
-        },
-        Err(err) if err.is::<MismatchedSchemaError>() => {
-            error!(id="health_ready_mismatch_schema", error=?err, "DB schema version mismatch");
-            Responses::ServiceUnavailable.into()
-        },
-        Err(err) => AllResponses::handle_error(&err),
-    }
+    Responses::NoContent.into()
 }

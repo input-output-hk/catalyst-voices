@@ -4,7 +4,12 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use poem_openapi::ApiResponse;
 
-use crate::{db::index::session::CassandraSession, service::common::responses::WithErrorResponses};
+use crate::{
+    db::index::session::CassandraSession,
+    service::common::{
+        responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption,
+    },
+};
 
 /// Flag to determine if the service has started
 static IS_LIVE: AtomicBool = AtomicBool::new(true);
@@ -26,9 +31,6 @@ pub(crate) enum Responses {
     /// Service is OK and can keep running.
     #[oai(status = 204)]
     NoContent,
-    /// Service is possibly not running reliably.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
 
 /// All responses.
@@ -48,6 +50,9 @@ pub(crate) async fn endpoint() -> AllResponses {
     if is_live() {
         Responses::NoContent.into()
     } else {
-        Responses::ServiceUnavailable.into()
+        AllResponses::service_unavailable(
+            &anyhow::anyhow!("Service is possibly not running reliably."),
+            RetryAfterOption::Default,
+        )
     }
 }
