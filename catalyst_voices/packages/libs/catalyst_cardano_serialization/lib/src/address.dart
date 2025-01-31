@@ -30,6 +30,12 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   static const Bech32Encoder _testNetRewardEncoder =
       Bech32Encoder(hrp: defaultRewardHrp + testnetHrpSuffix);
 
+  /// Length of a Cardano base address (1 byte + 28 bytes + 28 bytes).
+  static const int baseAddrLength = 57;
+
+  /// Length of a Cardano enterprise address (1 byte + 28 bytes).
+  static const int entAddrLength = 29;
+
   /// Raw bytes of address.
   /// Format [ 8 bit header | payload ]
   final Uint8List bytes;
@@ -40,7 +46,14 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   /// The constructor for [ShelleyAddress] from raw [bytes] and [hrp].
   ShelleyAddress(List<int> bytes)
       : bytes = Uint8List.fromList(bytes),
-        hrp = _extractHrp(bytes);
+        hrp = _extractHrp(bytes) {
+    if (bytes.length != entAddrLength && bytes.length != baseAddrLength) {
+      throw ArgumentError(
+        'Bytes length (${bytes.length}) must be either $entAddrLength'
+        ' or $baseAddrLength.',
+      );
+    }
+  }
 
   /// The constructor which parses the address from bech32 format.
   factory ShelleyAddress.fromBech32(String address) {

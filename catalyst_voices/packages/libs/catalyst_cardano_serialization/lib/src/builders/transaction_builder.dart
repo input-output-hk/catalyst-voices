@@ -657,7 +657,10 @@ final class TransactionBuilder extends Equatable {
     );
   }
 
-  /// CopyWidth
+  /// Creates a copy of this transaction builder with modified fields.
+  ///
+  /// Only the specified parameters will be updated; all other fields
+  /// remain unchanged.
   TransactionBuilder copyWith({
     Set<TransactionUnspentOutput>? inputs,
     List<TransactionOutput>? outputs,

@@ -7,7 +7,6 @@ class RandomSelectionStrategy implements CoinSelectionStrategy {
   final Random _random = Random();
 
   @override
-  @override
   void apply(AssetsGroup assetsGroup) {
     for (final asset in assetsGroup) {
       asset.value.shuffle(_random);

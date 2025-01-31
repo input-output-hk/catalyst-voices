@@ -28,7 +28,7 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
 /// Exception thrown when the maximum number of inputs is exceeded.
 final class MaximumInputExceededException extends Equatable
     implements Exception {
-  /// The maximum nr. of allowed inputs.
+  /// The maximum nr of allowed inputs.
   final int maxInputs;
 
   /// Creates an instance of [MaximumInputExceededException].

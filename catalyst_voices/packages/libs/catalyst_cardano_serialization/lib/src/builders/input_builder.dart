@@ -12,12 +12,12 @@ import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 /// - Change outputs, if applicable.
 /// - The calculated transaction fee.
 ///
-final class InputBuilder implements CoinSelector {
+class InputBuilder implements CoinSelector {
   /// Strategy used to prioritize the available UTxOs.
   final CoinSelectionStrategy selectionStrategy;
 
   /// Creates an [InputBuilder] with the given [selectionStrategy].
-  InputBuilder({required this.selectionStrategy});
+  const InputBuilder({required this.selectionStrategy});
 
   /// Selects inputs to satisfy transaction outputs and fees.
   ///
@@ -253,7 +253,7 @@ final class InputBuilder implements CoinSelector {
   ) {
     if (remainingBalance.isZero) return ([], const Coin(0));
     if (builder.changeAddress == null) {
-      throw Exception('Change address required for non-zero balance.');
+      throw ArgumentError('Change address required for non-zero balance.');
     }
 
     // Remove empty multiasset from the balance

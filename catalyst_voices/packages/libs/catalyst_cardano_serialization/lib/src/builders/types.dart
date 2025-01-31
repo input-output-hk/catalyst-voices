@@ -2,7 +2,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 
 /// Represents the valid range for coin values as a tuple of minimum and
 /// maximum [Coin] values.
-typedef ValidRange = (Coin, Coin);
+typedef ValidRange = (Coin minInclusive, Coin maxInclusive);
 
 /// Represents an asset identified by a [PolicyId] and [AssetName].
 typedef AssetId = (PolicyId, AssetName);
@@ -37,6 +37,9 @@ abstract class CoinSelectionStrategy {
 /// Coin selection is the process of choosing UTxOs as inputs to fulfill the
 /// transaction's outputs, while also calculating necessary change.
 abstract interface class CoinSelector {
+  /// Allows subclasses to define `const` constructors.
+  const CoinSelector();
+
   /// The predefined [PolicyId] for ADA.
   static PolicyId adaPolicy = PolicyId('');
 
@@ -71,8 +74,6 @@ abstract interface class CoinSelector {
   ///
   /// This constant defines the lower limit on the number of UTxOs
   /// that must be selected for inclusion in a transaction. It defaults to 0.
-  ///
-  ///
   static const minInputs = 0;
 
   /// Selects UTxOs to fulfill the required outputs and calculates change.
