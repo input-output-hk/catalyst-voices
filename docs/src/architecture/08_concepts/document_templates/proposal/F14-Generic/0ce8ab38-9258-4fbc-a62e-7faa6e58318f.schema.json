@@ -631,7 +631,6 @@
                         },
                         "adoption_potential": {
                             "$ref": "#/definitions/section",
-                            "title": "Adoption Potential",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
