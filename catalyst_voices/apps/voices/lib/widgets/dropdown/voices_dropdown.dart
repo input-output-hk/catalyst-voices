@@ -17,7 +17,7 @@ class FilterByDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctx = Theme.of(context);
+    final theme = Theme.of(context);
     return DropdownMenu<T?>(
       dropdownMenuEntries: [
         VoicesDropdownMenuEntry<T?>(
@@ -44,12 +44,12 @@ class FilterByDropdown<T> extends StatelessWidget {
         visualDensity: VisualDensity.compact,
       ),
       trailingIcon: VoicesAssets.icons.chevronDown
-          .buildIcon(color: ctx.colorScheme.primary),
+          .buildIcon(color: theme.colorScheme.primary),
       selectedTrailingIcon: VoicesAssets.icons.chevronUp
-          .buildIcon(color: ctx.colorScheme.primary),
+          .buildIcon(color: theme.colorScheme.primary),
       textAlign: TextAlign.end,
-      textStyle:
-          ctx.textTheme.labelLarge?.copyWith(color: ctx.colorScheme.primary),
+      textStyle: theme.textTheme.labelLarge
+          ?.copyWith(color: theme.colorScheme.primary),
     );
   }
 }
