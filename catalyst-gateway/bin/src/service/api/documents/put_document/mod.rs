@@ -1,7 +1,7 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
-use bad_put_request::PutDocumentBadRequest;
+use bad_put_request::PutDocumentUnprocessableContent;
 use catalyst_signed_doc::{CatalystSignedDocument, Decode, Decoder};
 use poem_openapi::{payload::Json, ApiResponse};
 
@@ -32,8 +32,8 @@ pub(crate) enum Responses {
     /// ## Bad Request
     ///
     /// Error Response. The document submitted is invalid.
-    #[oai(status = 400)]
-    BadRequest(Json<PutDocumentBadRequest>),
+    #[oai(status = 422)]
+    UnprocessableContent(Json<PutDocumentUnprocessableContent>),
     /// ## Content Too Large
     ///
     /// Payload Too Large. The document exceeds the maximum size of a legitimate single
@@ -97,7 +97,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
             }
         },
         Err(_) => {
-            Responses::BadRequest(Json(PutDocumentBadRequest::new(
+            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Invalid CBOR encoded document",
             )))
             .into()

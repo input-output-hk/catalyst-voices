@@ -8,7 +8,7 @@ use poem_openapi::{
     OpenApi,
 };
 use post_document_index_query::query_filter::DocumentIndexQueryFilterBody;
-use put_document::{bad_put_request::PutDocumentBadRequest, MAXIMUM_DOCUMENT_SIZE};
+use put_document::{bad_put_request::PutDocumentUnprocessableContent, MAXIMUM_DOCUMENT_SIZE};
 
 use crate::service::{
     common::{
@@ -84,7 +84,7 @@ impl DocumentApi {
             Ok(doc_bytes) => put_document::endpoint(doc_bytes.to_vec()).await,
             Err(ReadBodyError::PayloadTooLarge) => put_document::Responses::PayloadTooLarge.into(),
             Err(_) => {
-                put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                put_document::Responses::BadRequest(Json(PutDocumentUnprocessableContent::new(
                     "Failed to read document from the request",
                 )))
                 .into()
