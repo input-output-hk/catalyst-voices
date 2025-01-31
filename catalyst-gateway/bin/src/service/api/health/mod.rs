@@ -49,7 +49,7 @@ impl HealthApi {
         method = "get",
         operation_id = "healthReady"
     )]
-    async fn ready_get(&self, _auth: NoAuthorization) -> ready_get::AllResponses {
+    async fn ready_get(&self, _auth: InternalApiKeyAuthorization) -> ready_get::AllResponses {
         ready_get::endpoint().await
     }
 
