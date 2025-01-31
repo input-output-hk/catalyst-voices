@@ -42,7 +42,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: widget.enabled ? null : _launchUrl,
       child: VoicesTextField(
         controller: _effectiveController,
