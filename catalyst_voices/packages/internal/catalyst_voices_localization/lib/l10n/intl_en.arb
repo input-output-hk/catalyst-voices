@@ -1425,5 +1425,8 @@
   "emailAddress": "Email address",
   "myAccount": "My account",
   "myRoles": "My Roles",
-  "addRole": "Add role"
+  "addRole": "Add role",
+  "accountFinishedNotificationTitle": "Account Finalized",
+  "accountFinishedNotificationTitleDesc": "Account blockchain verified",
+  "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and..."
 }

@@ -59,9 +59,10 @@ class _AccountActionTile extends StatelessWidget {
                   Expanded(child: AccountStatusTitleText(data: status)),
                 ],
               ),
-              const SizedBox(height: 6),
-              Text(status.message(context)),
-              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                child: Text(status.message(context)),
+              ),
             ],
           ),
         ),

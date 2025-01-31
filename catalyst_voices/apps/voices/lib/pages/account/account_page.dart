@@ -39,7 +39,7 @@ class _AccountPageState extends State<AccountPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Offstage(child: AccountStatusBanner()),
+          const AccountStatusBanner(),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(24),

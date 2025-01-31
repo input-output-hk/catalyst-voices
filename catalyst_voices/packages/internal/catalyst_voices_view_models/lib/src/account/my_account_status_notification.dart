@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -83,11 +84,17 @@ final class AccountFinalized extends MyAccountStatusNotification {
   SvgGenImage get icon => VoicesAssets.icons.check;
 
   @override
-  String title(BuildContext context) => '';
+  String title(BuildContext context) {
+    return context.l10n.accountFinishedNotificationTitle;
+  }
 
   @override
-  String titleDesc(BuildContext context) => '';
+  String titleDesc(BuildContext context) {
+    return context.l10n.accountFinishedNotificationTitleDesc;
+  }
 
   @override
-  String message(BuildContext context) => '';
+  String message(BuildContext context) {
+    return context.l10n.accountFinishedNotificationMessage;
+  }
 }
