@@ -4,40 +4,16 @@
     "title": "Proposal Comments Schema",
     "description": "Schema for comments on Catalyst proposals",
     "definitions": {
-        "uuidField": {
-            "$comment": "NOT UI: A UUID field type",
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-        },
         "multiLineTextEntry": {
             "$comment": "UI - Multiline text entry without any markup or rich text capability.",
             "type": "string",
-            "contentMediaType": "text/plain",
-            "pattern": "^[\\S\\s]*$",
+            "pattern": "^[\\S\\s]+$",
             "x-note": "Enter multiple lines of plain text. You can use line breaks but no special formatting."
         }
     },
     "type": "object",
-    "required": ["metadata", "comment"],
+    "required": ["comment"],
     "properties": {
-        "metadata": {
-            "type": "object",
-            "required": ["id", "proposal_id"],
-            "properties": {            
-            "id": {
-                "$ref": "#/definitions/uuidField",
-                "description": "Unique identifier for the comment"
-            },
-            "parent_id": {
-                "$ref": "#/definitions/uuidField",
-                "description": "ID of the parent comment (for replies)"
-            },
-            "proposal_id": {
-                "$ref": "#/definitions/uuidField",
-                "description": "ID of the proposal these comments belong to"
-            }
-        },
         "comment": {
             "type": "object",
             "required": ["content"],
@@ -52,6 +28,5 @@
             }
 
         }
-    }
 }
 }
