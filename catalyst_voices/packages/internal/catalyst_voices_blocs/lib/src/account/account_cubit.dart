@@ -7,7 +7,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class AccountCubit extends Cubit<AccountState> {
-  // ignore: unused_field
   final UserService _userService;
 
   AccountCubit(
@@ -32,6 +31,13 @@ final class AccountCubit extends Cubit<AccountState> {
 
   Future<void> updateEmail(Email value) async {
     // TODO(damian-molinski): Integration
+  }
+
+  Future<void> deleteActiveKeychain() async {
+    final account = _userService.account;
+    if (account != null) {
+      await _userService.removeAccount(account);
+    }
   }
 
   static AccountState _buildState({Account? from}) {

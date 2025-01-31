@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -51,7 +54,7 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
         style: ButtonStyle(
           textStyle: WidgetStatePropertyAll(context.textTheme.labelSmall),
         ),
-        onTap: () {},
+        onTap: _removeKeychain,
         child: Text(context.l10n.removeKeychain),
       ),
       child: VoicesTextField(
@@ -62,5 +65,24 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
         maxLines: 3,
       ),
     );
+  }
+
+  Future<void> _removeKeychain() async {
+    final confirmed = await DeleteKeychainDialog.show(context);
+    if (!confirmed) {
+      return;
+    }
+
+    if (mounted) {
+      await context.read<AccountCubit>().deleteActiveKeychain();
+    }
+
+    if (mounted) {
+      await KeychainDeletedDialog.show(context);
+    }
+
+    if (mounted) {
+      const DiscoveryRoute().go(context);
+    }
   }
 }

@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_display_name_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
@@ -10,7 +8,6 @@ import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart
 import 'package:catalyst_voices/pages/account/widgets/account_page_title.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
-import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -85,24 +82,5 @@ class _AccountPageState extends State<AccountPage> {
         ],
       ),
     );
-  }
-
-  Future<void> _removeKeychain() async {
-    final confirmed = await DeleteKeychainDialog.show(context);
-    if (!confirmed) {
-      return;
-    }
-
-    if (mounted) {
-      await context.read<SessionCubit>().removeKeychain();
-    }
-
-    if (mounted) {
-      await KeychainDeletedDialog.show(context);
-    }
-
-    if (mounted) {
-      const DiscoveryRoute().go(context);
-    }
   }
 }
