@@ -14,7 +14,7 @@ use crate::service::common::responses::ErrorResponses;
 /// Auth token in the form of catv1..
 pub type EncodedAuthToken = String;
 
-/// The header name that holds the authorization berear token
+/// The header name that holds the authorization RBAC token
 pub(crate) const AUTHORIZATION_HEADER: &str = "Authorization";
 
 /// Cached auth tokens
