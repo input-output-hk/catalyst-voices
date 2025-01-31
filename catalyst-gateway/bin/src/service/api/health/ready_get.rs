@@ -31,6 +31,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// and is not able to properly service requests while it is occurring.
 /// This would let the load balancer shift traffic to other instances of this
 /// service that are ready.
+#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
     Responses::NoContent.into()
 }
