@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/account/edit_roles_dialog.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -22,7 +23,7 @@ class AccountRolesTile extends StatelessWidget {
   }
 }
 
-class _AccountRolesTile extends StatelessWidget {
+class _AccountRolesTile extends StatefulWidget {
   final AccountRolesState state;
 
   const _AccountRolesTile({
@@ -30,30 +31,43 @@ class _AccountRolesTile extends StatelessWidget {
   });
 
   @override
+  State<_AccountRolesTile> createState() => _AccountRolesTileState();
+}
+
+class _AccountRolesTileState extends State<_AccountRolesTile> {
+  @override
   Widget build(BuildContext context) {
     return PropertyTile(
       title: context.l10n.myRoles,
-      action: _EditButton(isEnabled: state.canAddRole),
-      child: _Roles(items: state.items),
+      action: _EditButton(
+        onTap: widget.state.canAddRole ? _addAccountRole : null,
+      ),
+      child: _Roles(items: widget.state.items),
     );
+  }
+
+  Future<void> _addAccountRole() async {
+    final confirmed = await EditRolesDialog.show(context);
+
+    if (!confirmed || !mounted) {
+      return;
+    }
+
+    // TODO(damian-molinski): Registration dialog
   }
 }
 
 class _EditButton extends StatelessWidget {
-  final bool isEnabled;
+  final VoidCallback? onTap;
 
   const _EditButton({
-    required this.isEnabled,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesTextButton(
-      onTap: isEnabled
-          ? () {
-              // TODO(damian-molinski): registration dialog
-            }
-          : null,
+      onTap: onTap,
       child: Text(
         context.l10n.addRole,
         style: Theme.of(context).textTheme.labelSmall,
