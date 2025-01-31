@@ -52,6 +52,20 @@
             "licenseInformation": "All source code and documentation will be released under the MIT license."
         }
     },
+    "campaign_category": {
+        "category_questions": {
+            "informational_content": true,
+            "foundational_rd": true,
+            "financial_products": true,
+            "early_stage_product": true,
+            "developer_tools": true,
+            "enterprise_partnership": true,
+            "working_product": true,
+            "timeline": true,
+            "matching_funds": true,
+            "adoption_potential": true
+        }
+    },
     "theme": {
         "theme": {
             "grouped_tag": {
