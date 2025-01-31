@@ -35,11 +35,11 @@ class _AccountPageState extends State<AccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: VoicesAppBar(),
+      appBar: const VoicesAppBar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Offstage(child: AccountStatusBanner()),
+          const Offstage(child: AccountStatusBanner()),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(24),
@@ -51,7 +51,7 @@ class _AccountPageState extends State<AccountPage> {
                   children: [
                     Expanded(child: AccountHeaderTile()),
                     SizedBox(width: 28),
-                    Expanded(child: AccountActionTile())
+                    Expanded(child: AccountActionTile()),
                   ],
                 ),
                 const SizedBox(height: 40),
@@ -61,20 +61,20 @@ class _AccountPageState extends State<AccountPage> {
                     Expanded(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
+                        children: const <Widget>[
                           AccountDisplayNameTile(),
                           AccountEmailTile(),
-                        ].separatedBy(SizedBox(height: 20)).toList(),
+                        ].separatedBy(const SizedBox(height: 20)).toList(),
                       ),
                     ),
-                    SizedBox(width: 28),
+                    const SizedBox(width: 28),
                     Expanded(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
+                        children: const <Widget>[
                           AccountRolesTile(),
                           AccountKeychainTile(),
-                        ].separatedBy(SizedBox(height: 20)).toList(),
+                        ].separatedBy(const SizedBox(height: 20)).toList(),
                       ),
                     ),
                   ],
