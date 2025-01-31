@@ -19,6 +19,9 @@ class VoicesFilledButton extends StatelessWidget {
   /// The optional button's background color.
   final Color? backgroundColor;
 
+  /// The optional button's foreground color.
+  final Color? foregroundColor;
+
   /// The main content of the button.
   final Widget child;
 
@@ -28,6 +31,7 @@ class VoicesFilledButton extends StatelessWidget {
     this.leading,
     this.trailing,
     this.backgroundColor,
+    this.foregroundColor,
     required this.child,
   });
 
@@ -36,6 +40,7 @@ class VoicesFilledButton extends StatelessWidget {
     return FilledButton(
       style: FilledButton.styleFrom(
         backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
       ),
       onPressed: onTap,
       child: VoicesButtonAffixDecoration(

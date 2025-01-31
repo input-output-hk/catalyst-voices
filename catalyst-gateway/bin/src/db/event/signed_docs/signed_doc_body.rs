@@ -4,7 +4,7 @@ use futures::{Stream, StreamExt};
 
 use super::DocsQueryFilter;
 use crate::{
-    db::event::{common::query_limits::QueryLimits, EventDB},
+    db::event::{common::query_limits::QueryLimits, error::NotFoundError, EventDB},
     jinja::{get_template, JinjaTemplateSource},
 };
 
@@ -12,6 +12,12 @@ use crate::{
 pub(crate) const FILTERED_SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
     name: "filtered_select_signed_documents.jinja.template",
     source: include_str!("./sql/filtered_select_signed_documents.sql.jinja"),
+};
+
+/// Filtered count sql query jinja template
+pub(crate) const FILTERED_COUNT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplateSource {
+    name: "filtered_count_signed_documents.jinja.template",
+    source: include_str!("./sql/filtered_count_signed_documents.sql.jinja"),
 };
 
 /// Signed doc body event db struct
@@ -40,9 +46,19 @@ impl SignedDocBody {
         &self.ver
     }
 
+    /// Returns the document type.
+    pub(crate) fn doc_type(&self) -> &uuid::Uuid {
+        &self.doc_type
+    }
+
     /// Returns the document authors.
     pub(crate) fn authors(&self) -> &Vec<String> {
         &self.authors
+    }
+
+    /// Returns the document metadata.
+    pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
+        self.metadata.as_ref()
     }
 
     /// Returns all signed document fields for the event db queries
@@ -83,6 +99,20 @@ impl SignedDocBody {
         let rows = EventDB::query_stream(&query, &[]).await?;
         let docs = rows.map(|res_row| res_row.and_then(|row| SignedDocBody::from_row(&row)));
         Ok(docs)
+    }
+
+    /// Loads a count of `SignedDocBody` from the event db.
+    pub(crate) async fn retrieve_count(condition: &DocsQueryFilter) -> anyhow::Result<i64> {
+        let query_template = get_template(&FILTERED_COUNT_SIGNED_DOCS_TEMPLATE)?;
+        let query = query_template.render(serde_json::json!({
+            "conditions": condition.to_string(),
+        }))?;
+        let row = EventDB::query_one(&query, &[]).await?;
+
+        match row.get(0) {
+            Some(count) => Ok(count),
+            None => Err(NotFoundError.into()),
+        }
     }
 
     /// Creates a  `SignedDocBody` from postgresql row object.

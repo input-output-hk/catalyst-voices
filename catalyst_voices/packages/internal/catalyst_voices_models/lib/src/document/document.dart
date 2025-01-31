@@ -11,9 +11,6 @@ import 'package:equatable/equatable.dart';
 /// The document is immutable, in order to edit it make use
 /// of [toBuilder] method and act on [DocumentBuilder] instance.
 final class Document extends Equatable {
-  /// The url of the [schema].
-  final String schemaUrl;
-
   /// The schema which explains how to interpret this document.
   final DocumentSchema schema;
 
@@ -22,7 +19,6 @@ final class Document extends Equatable {
 
   /// The default constructor for the [Document].
   const Document({
-    required this.schemaUrl,
     required this.schema,
     required this.properties,
   });
@@ -50,7 +46,7 @@ final class Document extends Equatable {
   }
 
   @override
-  List<Object?> get props => [schemaUrl, schema, properties];
+  List<Object?> get props => [schema, properties];
 }
 
 /// A property of the [Document].
@@ -72,6 +68,17 @@ sealed class DocumentProperty extends Equatable implements DocumentNode {
   /// Returns true if the property (including children properties) are valid,
   /// false otherwise.
   bool get isValid;
+
+  /// Return true if the property (including children properties but excluding
+  /// children which are standalone sections) are valid, false otherwise.
+  bool get isValidExcludingSubsections;
+
+  /// Returns the value related to this property.
+  ///
+  /// [DocumentListProperty] - returns a list of values.
+  /// [DocumentObjectProperty] - returns a list of values.
+  /// [DocumentValueProperty] - returns a singular value.
+  Object? get value;
 
   /// Queries this property and it's children for a property with [nodeId].
   DocumentProperty? getProperty(DocumentNodeId nodeId);
@@ -108,6 +115,27 @@ final class DocumentListProperty extends DocumentProperty {
     }
 
     return properties.every((e) => e.isValid);
+  }
+
+  @override
+  bool get isValidExcludingSubsections {
+    if (validationResult.isInvalid) {
+      return false;
+    }
+
+    for (final property in properties) {
+      if (property.schema.isSubsection) continue;
+      if (!property.isValidExcludingSubsections) return false;
+    }
+
+    return true;
+  }
+
+  @override
+  Object? get value {
+    if (properties.isEmpty) return null;
+
+    return properties.map((e) => e.value).toList();
   }
 
   @override
@@ -173,6 +201,27 @@ final class DocumentObjectProperty extends DocumentProperty {
   }
 
   @override
+  bool get isValidExcludingSubsections {
+    if (validationResult.isInvalid) {
+      return false;
+    }
+
+    for (final property in properties) {
+      if (property.schema.isSubsection) continue;
+      if (!property.isValidExcludingSubsections) return false;
+    }
+
+    return true;
+  }
+
+  @override
+  Object? get value {
+    if (properties.isEmpty) return null;
+
+    return properties.map((e) => e.value).toList();
+  }
+
+  @override
   DocumentProperty? getProperty(DocumentNodeId nodeId) {
     if (nodeId == this.nodeId) {
       return this;
@@ -219,6 +268,7 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
   final DocumentValueSchema<T> schema;
 
   /// The current value this property holds.
+  @override
   final T? value;
 
   /// The validation result against the [schema].
@@ -233,6 +283,11 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
 
   @override
   bool get isValid {
+    return validationResult.isValid;
+  }
+
+  @override
+  bool get isValidExcludingSubsections {
     return validationResult.isValid;
   }
 

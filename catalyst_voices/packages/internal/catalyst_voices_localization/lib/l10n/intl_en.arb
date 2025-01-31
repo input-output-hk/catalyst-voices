@@ -1,5 +1,6 @@
 {
   "@@locale": "en",
+  "local": "Local",
   "emailLabelText": "Email",
   "@emailLabelText": {
     "description": "Text shown in email field"
@@ -848,6 +849,7 @@
   "@uploadKeychainInfo": {
     "description": "An info on keychain upload dialog"
   },
+  "theme": "Theme",
   "themeLight": "Light",
   "@themeLight": {
     "description": "Refers to a light theme mode."
@@ -1315,9 +1317,31 @@
       }
     }
   },
+  "errorValidationListItemsNotUnique": "The values must be unique.",
+  "@errorValidationListItemsNotUnique": {
+    "description": "The list items must be unique."
+  },
   "noTagSelected": "No Tag Selected",
   "@noTagSelected": {
     "description": "For example in context of document builder"
+  },
+  "errorValidationConstValueMismatch": "The value must be \"{constValue}\".",
+  "@errorValidationConstValueMismatch": {
+    "description": "Validation error when the user entered value does not match the const value",
+    "placeholders": {
+      "constValue": {
+        "type": "String"
+      }
+    }
+  },
+  "errorValidationEnumValuesMismatch": "The value must be one of {enumValues}.",
+  "@errorValidationEnumValuesMismatch": {
+    "description": "Validation error when the user entered value does not match the enum values",
+    "placeholders": {
+      "enumValues": {
+        "type": "String"
+      }
+    }
   },
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
@@ -1348,7 +1372,6 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-
   "catalystF14": "Catalyst Found 14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
@@ -1374,5 +1397,39 @@
     "description": "In context for important information below"
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
-  "errorEmailValidationOutOfRange": "Invalid length"
+  "errorEmailValidationOutOfRange": "Invalid length",
+  "categoryDetails": "Category Details",
+  "fundsAvailable": "Funds Available",
+  "duration": "Duration",
+  "valueMonths": "{value} {value, plural, =0{Month} other{Months}}",
+  "@valueMonths": {
+    "description": "Used in proposal card",
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "finalProposal": "Final",
+  "mostRecent": "Most Recent",
+  "viewAllProposals": "View All Proposals",
+  "publishedOn": "Published on {date} at {time}",
+  "@publishedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "accountMenuPopupTooltip": "Account menu",
+  "account": "Account",
+  "settings": "Settings",
+  "setupCatalystRoles": "Setup Catalyst roles",
+  "submitSupportRequest": "Submit support request",
+  "catalystKnowledgeBase": "Catalyst knowledge base",
+  "lockAccount": "Lock account",
+  "timezone": "Timezone"
 }

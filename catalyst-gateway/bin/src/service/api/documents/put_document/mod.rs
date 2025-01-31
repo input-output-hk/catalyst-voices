@@ -2,7 +2,7 @@
 
 use anyhow::anyhow;
 use bad_put_request::PutDocumentBadRequest;
-use catalyst_signed_doc::{CatalystSignedDocument, Decode, Decoder};
+use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
@@ -48,7 +48,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # PUT `/document`
 #[allow(clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
-    match CatalystSignedDocument::decode(&mut Decoder::new(&doc_bytes), &mut ()) {
+    match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
         Ok(doc) => {
             let authors = doc
                 .signatures()
@@ -67,15 +67,15 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
             };
 
             let doc_body = SignedDocBody::new(
-                doc.doc_id(),
-                doc.doc_ver(),
-                doc.doc_type(),
+                doc.doc_id().into(),
+                doc.doc_ver().into(),
+                doc.doc_type().into(),
                 authors,
                 Some(doc_meta_json),
             );
 
             let payload = if doc.doc_content().is_json() {
-                match serde_json::from_slice(doc.doc_content().bytes()) {
+                match serde_json::from_slice(doc.doc_content().decoded_bytes()) {
                     Ok(payload) => Some(payload),
                     Err(e) => {
                         return AllResponses::internal_error(&anyhow!(
@@ -96,9 +96,18 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(_) => {
+        Err(e) => {
+            let json_report = match serde_json::to_value(e.report()) {
+                Ok(json_report) => json_report,
+                Err(e) => {
+                    return AllResponses::internal_error(&anyhow!(
+                        "Invalid Signed Document decoding Problem Report, not Json encoded: {e}"
+                    ))
+                },
+            };
             Responses::BadRequest(Json(PutDocumentBadRequest::new(
                 "Invalid CBOR encoded document",
+                Some(json_report),
             )))
             .into()
         },

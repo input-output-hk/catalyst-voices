@@ -1,13 +1,13 @@
-//! CIP36 object
-
-// TODO: This is NOT common, remove it once the rationalized endpoint is implemented.
-// Retained to keep the existing code from breaking only.
+//! Catalyst Singed Document Request Filter Query Object
 
 use poem_openapi::{types::Example, NewType, Object};
 
-use crate::service::common::types::document::{
-    doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
-    ver::EqOrRangedVerDocumented,
+use crate::{
+    db::event::signed_docs::DocsQueryFilter,
+    service::common::types::document::{
+        doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
+        ver::EqOrRangedVerDocumented,
+    },
 };
 
 /// Query Filter for the generation of a signed document index.
@@ -152,3 +152,40 @@ impl Example for DocumentIndexQueryFilter {
 /// fields. This is equivalent to returning documents where those metadata fields either
 /// do not exist, or do exist, but have any value.
 pub(crate) struct DocumentIndexQueryFilterBody(pub(crate) DocumentIndexQueryFilter);
+
+impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
+    type Error = anyhow::Error;
+
+    fn try_from(value: DocumentIndexQueryFilter) -> Result<Self, Self::Error> {
+        let mut db_filter = DocsQueryFilter::all();
+        if let Some(doc_type) = value.doc_type {
+            db_filter = db_filter.with_type(doc_type.parse()?);
+        }
+        if let Some(id) = value.id {
+            db_filter = db_filter.with_id(id.try_into()?);
+        }
+        if let Some(ver) = value.ver {
+            db_filter = db_filter.with_ver(ver.try_into()?);
+        }
+        if let Some(doc_ref) = value.doc_ref {
+            db_filter = db_filter.with_ref(doc_ref.try_into()?);
+        }
+        if let Some(template) = value.template {
+            db_filter = db_filter.with_template(template.try_into()?);
+        }
+        if let Some(reply) = value.reply {
+            db_filter = db_filter.with_reply(reply.try_into()?);
+        }
+        if let Some(brand) = value.brand {
+            db_filter = db_filter.with_brand_id(brand.try_into()?);
+        }
+        if let Some(campaign) = value.campaign {
+            db_filter = db_filter.with_campaign_id(campaign.try_into()?);
+        }
+        if let Some(category) = value.category {
+            db_filter = db_filter.with_category_id(category.try_into()?);
+        }
+        // TODO process also the rest of the fields like `ref`, `template` etc.
+        Ok(db_filter)
+    }
+}

@@ -767,19 +767,5 @@ void main() async {
         },
       );
     },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - restore - keychain choice screen looks OK',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainRestoreChoice,
-      );
-    },
   );
 }

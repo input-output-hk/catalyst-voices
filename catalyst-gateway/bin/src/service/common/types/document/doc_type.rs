@@ -69,6 +69,15 @@ impl_string_types!(
     is_valid
 );
 
+impl DocumentType {
+    /// Creates a new `DocumentType` instance without validation.
+    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
+    /// valid `DocumentType`
+    pub(crate) fn new_unchecked(uuid: String) -> Self {
+        Self(uuid)
+    }
+}
+
 impl Example for DocumentType {
     /// An example.
     fn example() -> Self {
@@ -89,7 +98,7 @@ impl TryFrom<String> for DocumentType {
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if !is_valid(&value) {
-            bail!("Invalid DocumentID, must be a valid UUIDv4")
+            bail!("Invalid DocumentType '{value}', must be a valid UUIDv4")
         }
         Ok(Self(value))
     }

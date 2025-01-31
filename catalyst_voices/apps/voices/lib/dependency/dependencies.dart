@@ -104,6 +104,11 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
         );
+      })
+      ..registerFactory<DiscoveryCubit>(() {
+        return DiscoveryCubit(
+          get<CampaignService>(),
+        );
       });
   }
 
@@ -129,7 +134,6 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerServices() {
-    registerLazySingleton<Storage>(() => const SecureStorage());
     registerLazySingleton<CatalystKeyDerivation>(CatalystKeyDerivation.new);
     registerLazySingleton<KeyDerivation>(() => KeyDerivation(get()));
     registerLazySingleton<KeychainProvider>(() {
