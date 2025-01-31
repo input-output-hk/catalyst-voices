@@ -2,7 +2,7 @@
 
 use anyhow::anyhow;
 use bad_put_request::PutDocumentUnprocessableContent;
-use catalyst_signed_doc::{CatalystSignedDocument, Decode, Decoder};
+use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
@@ -105,7 +105,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                     ))
                 },
             };
-            Responses::UnprocessableContent(Json(PutDocumentBadRequest::new(
+            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Invalid CBOR encoded document",
                 Some(json_report),
             )))

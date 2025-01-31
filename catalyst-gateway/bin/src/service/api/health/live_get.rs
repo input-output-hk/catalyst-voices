@@ -4,12 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use poem_openapi::ApiResponse;
 
-use crate::{
-    db::index::session::CassandraSession,
-    service::common::{
-        responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption,
-    },
-};
+use crate::{db::index::session::CassandraSession, service::common::responses::WithErrorResponses};
 
 /// Flag to determine if the service has started
 static IS_LIVE: AtomicBool = AtomicBool::new(true);
