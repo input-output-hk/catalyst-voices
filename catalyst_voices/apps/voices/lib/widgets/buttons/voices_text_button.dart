@@ -22,8 +22,7 @@ class VoicesTextButton extends StatelessWidget {
   /// The main content of the button.
   final Widget child;
 
-  /// The foreground color of the button.
-  final Color? color;
+  final ButtonStyle? style;
 
   final _Variant _variant;
 
@@ -32,7 +31,7 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.color,
+    this.style,
     required this.child,
   }) : _variant = _Variant.primary;
 
@@ -41,7 +40,7 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.color,
+    this.style,
     required this.child,
   }) : _variant = _Variant.neutral;
 
@@ -50,7 +49,7 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.color,
+    this.style,
     required this.child,
   }) : _variant = _Variant.secondary;
 
@@ -59,7 +58,7 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.color,
+    this.style,
     required this.child,
   }) : _variant = _Variant.danger;
 
@@ -68,7 +67,7 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    required this.color,
+    required this.style,
     required this.child,
   }) : _variant = _Variant.custom;
 
@@ -76,7 +75,7 @@ class VoicesTextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onTap,
-      style: _buildVariantStyle(context),
+      style: (_buildVariantStyle(context) ?? const ButtonStyle()).merge(style),
       child: VoicesButtonAffixDecoration(
         leading: leading,
         trailing: trailing,
@@ -102,9 +101,7 @@ class VoicesTextButton extends StatelessWidget {
       _Variant.danger => TextButton.styleFrom(
           foregroundColor: Theme.of(context).colors.iconsError,
         ),
-      _Variant.custom => TextButton.styleFrom(
-          foregroundColor: color,
-        ),
+      _Variant.custom => null,
     };
   }
 }

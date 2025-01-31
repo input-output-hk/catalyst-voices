@@ -38,6 +38,13 @@ final class AccountCubit extends Cubit<AccountState> {
         emit(state.copyWith(roles: roles));
       },
     );
+
+    emit(
+      state.copyWith(
+        walletConnected:
+            'addr1q9gkq75mt2hykrktnsgt2zxrj5h9jnd6gkwr5s4r8v5x3dzp8n9h9mns5w7zx95jhtwz46yq4nr7y6hhlwtq75jflsqq9dxry2',
+      ),
+    );
   }
 
   @override
