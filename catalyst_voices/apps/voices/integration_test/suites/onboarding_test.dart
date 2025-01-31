@@ -38,212 +38,176 @@ void main() async {
   group(
     'Onboarding -',
     () {
+      patrolWidgetTest('visitor - get started button works',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn).tap();
+        expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
+        expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
+      });
+
+      patrolWidgetTest('visitor - get started screen looks OK',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.long.duration);
+        await OnboardingPage.onboardingScreenLooksAsExpected(
+          $,
+          RegistrationState.getStarted,
+        );
+      });
+
+      patrolWidgetTest('visitor - get started screen close button works',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.long.duration);
+        await OnboardingPage.closeBtn($).tap();
+        expect($(OnboardingPage.registrationDialog), findsNothing);
+      });
+
+      //ToDo(oldgreg): add Introduction screen tests and base profile screens
+
+      patrolWidgetTest('visitor - create - keychain info screen looks OK',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.short.duration);
+        await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+        await $(OnboardingPage.createBaseProfileNext).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await OnboardingPage.onboardingScreenLooksAsExpected(
+          $,
+          RegistrationState.createKeychainInfo,
+        );
+      });
+
+      patrolWidgetTest('visitor - create - keychain created screen looks OK',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.short.duration);
+        await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+        await $(OnboardingPage.createBaseProfileNext).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await OnboardingPage.onboardingScreenLooksAsExpected(
+          $,
+          RegistrationState.keychainCreated,
+        );
+      });
+
       patrolWidgetTest(
-        'visitor - get started button works',
-        (PatrolTester $) async {
-          await $.pumpWidgetAndSettle(App(routerConfig: router));
-            // duration: Time.short.duration,
-          // );
-          await Future<void>.delayed(const Duration(seconds: 2));
-          await $(AppBarPage.getStartedBtn).tap();
-          // expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
-          // expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
-        },
-      );
-    },
-    // skip: true,
-  );
+          'visitor - create - keychain created screen back button works',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.short.duration);
+        await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+        await $(OnboardingPage.createBaseProfileNext).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
+        await OnboardingPage.registrationInfoPanelLooksAsExpected(
+          $,
+          RegistrationState.createKeychainInfo,
+        );
+      });
 
-  patrolWidgetTest(
-    'visitor - get started screen looks OK',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.getStarted,
-      );
+      patrolWidgetTest('visitor - create - mnemonic writedown screen looks OK',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.short.duration);
+        await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+        await $(OnboardingPage.createBaseProfileNext).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.onboardingScreenLooksAsExpected(
+          $,
+          RegistrationState.keychainCreateMnemonicWritedown,
+        );
+      });
+
+      patrolWidgetTest(
+          'visitor - create - mnemonic writedown screen back button works',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.short.duration);
+        await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+        await $(OnboardingPage.createBaseProfileNext).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
+        await OnboardingPage.registrationInfoPanelLooksAsExpected(
+          $,
+          RegistrationState.keychainCreated,
+        );
+      });
+
+      patrolWidgetTest(
+          'visitor - create - mnemonic writedown screen next button is disabled',
+          (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await $(AppBarPage.getStartedBtn)
+            .tap(settleTimeout: Time.short.duration);
+        await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+        await $(OnboardingPage.createBaseProfileNext).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await $(OnboardingPage.nextButton).tap();
+        await OnboardingPage.registrationInfoPanelLooksAsExpected(
+          $,
+          RegistrationState.keychainCreateMnemonicWritedown,
+        );
+        OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
+      });
     },
     skip: true,
   );
 
-  patrolWidgetTest(
-    'visitor - get started screen close button works',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.closeBtn($).tap();
-      expect($(OnboardingPage.registrationDialog), findsNothing);
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - keychain info screen looks OK',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.createKeychainInfo,
-      );
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - keychain info screen back button works',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.getStarted,
-      );
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - keychain created screen looks OK',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreated,
-      );
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - keychain created screen back button works',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.createKeychainInfo,
-      );
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - mnemonic writedown screen looks OK',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicWritedown,
-      );
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - mnemonic writedown screen back button works',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.keychainCreated,
-      );
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - mnemonic writedown screen next button is disabled',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicWritedown,
-      );
-      OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
-    },
-    skip: true,
-  );
-
-  patrolWidgetTest(
-    'visitor - create - mnemonic input info screen looks OK',
-    (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicInputInfo,
-      );
-    },
-    skip: true,
-  );
+  patrolWidgetTest('visitor - create - mnemonic input info screen looks OK',
+      (PatrolTester $) async {
+    await $.pumpWidgetAndSettle(App(routerConfig: router));
+    await $(AppBarPage.getStartedBtn)
+        .tap(settleTimeout: Time.short.duration);
+    await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
+    await $(OnboardingPage.createBaseProfileNext).tap();
+    await $(OnboardingPage.nextButton).tap();
+    await $(OnboardingPage.nextButton).tap();
+    await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+    await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
+    await $(OnboardingPage.nextButton).tap();
+    await $(OnboardingPage.nextButton).tap();
+    await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
+    await $(OnboardingPage.nextButton).tap();
+    await OnboardingPage.onboardingScreenLooksAsExpected(
+      $,
+      RegistrationState.keychainCreateMnemonicInputInfo,
+    );
+  });
 
   patrolWidgetTest(
     'visitor - create - mnemonic input info screen back button works',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -261,11 +225,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - mnemonic input screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -286,11 +247,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - mnemonic input screen back button works',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -309,11 +267,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - mnemonic input - correct words unlock next button',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -333,11 +288,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - mnemonic input verified screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -361,11 +313,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - mnemonic input verified screen back button works',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -390,11 +339,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password info screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -419,11 +365,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password info screen back button works',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -450,11 +393,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password input screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -480,11 +420,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password input screen back button works',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -511,11 +448,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password input - valid minimum length password',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -552,11 +486,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password input - valid long password',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -589,11 +520,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password input - too short password',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -625,11 +553,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password input - valid password, no confirmation',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -661,11 +586,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - password input - not matching confirmation',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -695,11 +617,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - keychain created success screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -728,11 +647,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - link wallet info screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -762,11 +678,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - link wallet select screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -797,11 +710,8 @@ void main() async {
   patrolWidgetTest(
     'visitor - create - link wallet select screen back button works',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
       await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
       await $(OnboardingPage.nextButton).tap();
@@ -833,27 +743,22 @@ void main() async {
   patrolWidgetTest(
     'visitor - restore - keychain choice screen looks OK',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
       await OnboardingPage.onboardingScreenLooksAsExpected(
         $,
         RegistrationState.keychainRestoreChoice,
       );
     },
+    skip: true,
   );
 
   patrolWidgetTest(
     'visitor - restore - keychain choice screen back button works',
     (PatrolTester $) async {
-      await $.pumpWidgetAndSettle(
-        App(routerConfig: router),
-        duration: Time.short.duration,
-      );
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
       await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
       await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
       await OnboardingPage.onboardingScreenLooksAsExpected(

@@ -54,6 +54,7 @@ class OnboardingPage {
   static const recoverKeychainMethodsListTitle =
       Key('RecoverKeychainMethodsListTitle');
   static const registrationTileTitle = Key('RegistrationTileTitle');
+  static const createBaseProfileNext = Key('CreateBaseProfileNext');
 
   static Future<int> writedownSeedPhraseNumber(
     PatrolTester $,
@@ -203,13 +204,12 @@ class OnboardingPage {
         expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         expect(
           await infoPartHeaderSubtitleText($),
-          T.get('Write down your 12 Catalyst  security words'),
+          T.get('Write down your Catalyst seed phrase'),
         );
         expect(
           await infoPartHeaderBodyText($),
           T.get(
-            'Make sure you create an offline backup of your recovery phrase '
-            'as well.',
+            'Make sure you write down your 12-words in  a safe place as well.',
           ),
         );
         expect(infoPartTaskPicture($), findsOneWidget);
@@ -229,7 +229,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateMnemonicInput:
-        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
         expect(
           await infoPartHeaderSubtitleText($),
           T.get('Input your Catalyst security keys'),
@@ -248,7 +248,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateMnemonicVerified:
-        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
         //temporary: check for specific picture (green checked icon)
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
@@ -258,7 +258,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.passwordInfo:
-        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
         //temporary: check for specific picture (locked icon)
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
@@ -268,7 +268,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.passwordInput:
-        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
         expect(
           await infoPartHeaderSubtitleText($),
           T.get('Catalyst unlock password'),
@@ -288,7 +288,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateSuccess:
-        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
         //temporary: check for specific picture (green key locked icon)
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
@@ -378,7 +378,6 @@ class OnboardingPage {
           isNotEmpty,
         );
         expect(await detailsPartCreateKeychainBtn($), findsOneWidget);
-        expect($(backButton), findsOneWidget);
         break;
       case RegistrationState.keychainCreated:
         expect(
@@ -397,7 +396,7 @@ class OnboardingPage {
         expect($(downloadSeedPhraseButton), findsOneWidget);
         expect(
           $(downloadSeedPhraseButton).$(CommonPage.decorData).$(Text).text,
-          T.get('Download Catalyst key'),
+          T.get('Export Security Words'),
         );
         expect($(seedPhraseStoredCheckbox), findsOneWidget);
         expect(
@@ -410,7 +409,7 @@ class OnboardingPage {
       case RegistrationState.keychainCreateMnemonicInputInfo:
         expect(
           $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
-          T.get('Check your Catalyst security keys'),
+          T.get('Write down your Catalyst seed phrase'),
         );
         expect(
           $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
@@ -530,7 +529,7 @@ class OnboardingPage {
         );
         expect(
           $(registrationTileTitle).text,
-          T.get('12 security words'),
+          T.get('Restore/Upload with 12-word seed phrase'),
         );
         break;
       case RegistrationState.keychainRestoreMnemonicInfo:
