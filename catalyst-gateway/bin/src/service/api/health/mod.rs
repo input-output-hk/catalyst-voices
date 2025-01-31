@@ -1,10 +1,7 @@
 //! Health Endpoints
 use poem_openapi::{param::Query, OpenApi};
 
-use crate::service::common::{
-    auth::{api_key::InternalApiKeyAuthorization, none::NoAuthorization},
-    tags::ApiTags,
-};
+use crate::service::common::{auth::none::NoAuthorization, tags::ApiTags};
 
 mod inspection_get;
 mod live_get;
@@ -49,7 +46,7 @@ impl HealthApi {
         method = "get",
         operation_id = "healthReady"
     )]
-    async fn ready_get(&self, _auth: InternalApiKeyAuthorization) -> ready_get::AllResponses {
+    async fn ready_get(&self, _auth: NoAuthorization) -> ready_get::AllResponses {
         ready_get::endpoint().await
     }
 
@@ -87,7 +84,7 @@ impl HealthApi {
         /// Enable or disable Verbose Query inspection in the logs.  Used to find query
         /// performance issues.
         query_inspection: Query<Option<inspection_get::DeepQueryInspectionFlag>>,
-        _auth: InternalApiKeyAuthorization,
+        _auth: NoAuthorization,
     ) -> inspection_get::AllResponses {
         inspection_get::endpoint(log_level.0, query_inspection.0).await
     }
