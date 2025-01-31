@@ -20,9 +20,9 @@ env:
 
 jobs:
   ci_nightly:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.0
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.1
     with:
-      forge_version: 0.10.0
+      forge_version: 0.11.0
       nightly: true
 
   generate-test-reports:
@@ -34,15 +34,15 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.0
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.1
         with:
           version: 0.10.0
 
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.0
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.1
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
         if: always()
         continue-on-error: true
         with:
@@ -50,7 +50,7 @@ jobs:
             args: ./catalyst-gateway/tests/api_tests+nightly-test
 
       - name: Get cardano wallet integration test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
         if: always()
         continue-on-error: true
         with:
@@ -58,7 +58,7 @@ jobs:
             args: ./catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/wallet-automation+nightly-test
 
       - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
         if: always()
         continue-on-error: true
         with:
@@ -66,7 +66,7 @@ jobs:
             args: ./catalyst-gateway/tests/schemathesis_tests+nightly-test-fuzzer-api
 
       - name: Get integration tests report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
         if: always()
         continue-on-error: true
         with:
