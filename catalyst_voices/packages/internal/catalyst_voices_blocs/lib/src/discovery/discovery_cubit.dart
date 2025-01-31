@@ -23,7 +23,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
 
   @override
   Future<void> close() async {
-    print('DiscoveryCubit.close()');
     await super.close();
   }
 
