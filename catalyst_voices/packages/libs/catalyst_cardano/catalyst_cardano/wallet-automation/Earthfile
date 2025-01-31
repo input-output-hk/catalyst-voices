@@ -57,7 +57,7 @@ nightly-test:
                 apt-utils \
                 curl \
                 unzip
-    DO --no-cache flutter-installer+INSTALL_CHROME_LINUX64
+    DO flutter-installer+INSTALL_CHROME_LINUX64
     WITH DOCKER \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
