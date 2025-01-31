@@ -60,7 +60,9 @@ class _AccountStatusBannerState extends State<_AccountStatusBanner> {
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
           child: IconTheme(
             data: IconThemeData(
-                size: 18, color: widget.status.type.foregroundColor(context)),
+              size: 18,
+              color: widget.status.type.foregroundColor(context),
+            ),
             child: Row(
               children: [
                 widget.status.icon.buildIcon(),
