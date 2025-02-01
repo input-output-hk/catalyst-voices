@@ -73,7 +73,7 @@ final class SelectionUtils {
     bool isBase = true,
     NetworkId networkId = NetworkId.testnet,
   }) =>
-      0 | (isBase ? 0x00 : 0x20) | NetworkId.testnet.id;
+      0 | (isBase ? 0x00 : 0x20) | networkId.id;
 
   /// Generates a list of random Shelley addresses.
   ///
@@ -322,7 +322,8 @@ final class SelectionUtils {
     final maxUtxos = inputCount > 10 ? (inputCount * 0.1).floor() : 1;
 
     final normalizedOutputs = (inputCount / maxUtxos).floor();
-    final outputsCount = normalizedOutputs.clamp(1, maxUtxos);
+    final outputsCount =
+        normalizedOutputs.clamp(1, min(maxOutputs, maxUtxos)).toInt();
 
     var lastUsedIndex = 0;
 
