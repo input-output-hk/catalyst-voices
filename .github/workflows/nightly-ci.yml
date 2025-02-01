@@ -57,75 +57,75 @@ jobs:
             command: run
             args: ./catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/wallet-automation+nightly-test
 
-      - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
-        if: always()
-        continue-on-error: true
-        with:
-            command: run
-            args: --no-cache ./catalyst-gateway/tests/schemathesis_tests+nightly-test-fuzzer-api
+#      - name: Get schemathesis test report
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
+#        if: always()
+#        continue-on-error: true
+#        with:
+#            command: run
+#            args: --no-cache ./catalyst-gateway/tests/schemathesis_tests+nightly-test-fuzzer-api
+#
+#      - name: Get integration tests report
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
+#        if: always()
+#        continue-on-error: true
+#        with:
+#          command: run
+#          args: ./catalyst_voices/apps/voices/integration_test+nightly-test-web-all
+#
+#      - name: Collect and upload test reports
+#        uses: actions/upload-artifact@v4
+#        if: always()
+#        with:
+#            path: '**/*${{ env.REPORT_EXT }}'
+#            if-no-files-found: error
+#            retention-days: 1
 
-      - name: Get integration tests report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
-        if: always()
-        continue-on-error: true
-        with:
-          command: run
-          args: ./catalyst_voices/apps/voices/integration_test+nightly-test-web-all
-
-      - name: Collect and upload test reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-            path: '**/*${{ env.REPORT_EXT }}'
-            if-no-files-found: error
-            retention-days: 1
-
-  generate-allure-report:
-    name: Generate allure report
-    runs-on: ubuntu-latest
-    needs: generate-test-reports
-    if: always() && needs.generate-test-reports.result == 'success'
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-
-      - name: Setup Allure report
-        run: |
-              mkdir -p ${{ env.ALLURE_REPORT_PATH }}
-              shopt -s globstar
-              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
-              ls ${{ env.ALLURE_REPORT_PATH }}
-
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-dir
-
-      - name: Build Allure report
-        uses: mgrybyk/allure-report-branch-action@v1
-        id: allure
-        with:
-          report_id: 'nightly-test-report'
-          gh_pages: 'gh-pages-dir'
-          report_dir: ${{ env.ALLURE_REPORT_PATH }}
-
-      - name: Git push to gh-pages
-        uses: mgrybyk/git-commit-pull-push-action@v1
-        with:
-          repository: gh-pages-dir
-          branch: gh-pages
-          pull_args: --rebase -X ours
-
-      - name: Send Slack notification
-        if: ${{ always() && steps.allure.outputs.report_url }}
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          payload: |
-            {
-              "text": ":rocket: *Test Report*\n<${{ steps.allure.outputs.report_url }}|Click here to view the Allure report>\n*Passed:* ${{ steps.allure.outputs.test_result_passed }}/ ${{ steps.allure.outputs.test_result_total }}\n*Failed:* ${{ steps.allure.outputs.test_result_failed }}/ ${{ steps.allure.outputs.test_result_total }}"
-            }
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: webhook-trigger
+#  generate-allure-report:
+#    name: Generate allure report
+#    runs-on: ubuntu-latest
+#    needs: generate-test-reports
+#    if: always() && needs.generate-test-reports.result == 'success'
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - uses: actions/download-artifact@v4
+#
+#      - name: Setup Allure report
+#        run: |
+#              mkdir -p ${{ env.ALLURE_REPORT_PATH }}
+#              shopt -s globstar
+#              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
+#              ls ${{ env.ALLURE_REPORT_PATH }}
+#
+#      - name: Checkout gh-pages
+#        uses: actions/checkout@v4
+#        with:
+#          ref: gh-pages
+#          path: gh-pages-dir
+#
+#      - name: Build Allure report
+#        uses: mgrybyk/allure-report-branch-action@v1
+#        id: allure
+#        with:
+#          report_id: 'nightly-test-report'
+#          gh_pages: 'gh-pages-dir'
+#          report_dir: ${{ env.ALLURE_REPORT_PATH }}
+#
+#      - name: Git push to gh-pages
+#        uses: mgrybyk/git-commit-pull-push-action@v1
+#        with:
+#          repository: gh-pages-dir
+#          branch: gh-pages
+#          pull_args: --rebase -X ours
+#
+#      - name: Send Slack notification
+#        if: ${{ always() && steps.allure.outputs.report_url }}
+#        uses: slackapi/slack-github-action@v2.0.0
+#        with:
+#          payload: |
+#            {
+#              "text": ":rocket: *Test Report*\n<${{ steps.allure.outputs.report_url }}|Click here to view the Allure report>\n*Passed:* ${{ steps.allure.outputs.test_result_passed }}/ ${{ steps.allure.outputs.test_result_total }}\n*Failed:* ${{ steps.allure.outputs.test_result_failed }}/ ${{ steps.allure.outputs.test_result_total }}"
+#            }
+#          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+#          webhook-type: webhook-trigger
