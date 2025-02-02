@@ -141,6 +141,7 @@ invalid
 inversed
 IOHI
 iohk
+IPFS
 iphoneos
 iphonesimulator
 jdbc
@@ -260,8 +261,8 @@ ripgrep
 ristretto
 rlib
 rngs
-RPATH
 rolname
+RPATH
 ruleset
 rustc
 rustdoc
@@ -281,8 +282,8 @@ Sembast
 sendfile
 servernum
 serviceworker
-slotno
 skeletonizer
+slotno
 sqlfluff
 SRCROOT
 sslmode
@@ -367,3 +368,5 @@ xpub
 xpublic
 xvfb
 yoroi
+stake1u94ullc9nj9gawc08990nx8hwgw80l9zpmr8re44kydqy9cdjq6rq
+0x83B3B55589797EF953E24F4F0DBEE4D50B6363BCF041D15F6DBD33E014E54711

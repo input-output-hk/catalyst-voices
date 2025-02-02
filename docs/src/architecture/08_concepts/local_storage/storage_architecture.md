@@ -709,10 +709,11 @@ Once published all documents are considered immutable, in the public domain and 
 
 This requirement stems from several factors:
 
-2. **Offline Capability**: Users should be able to work on drafts without the need to connect to a server.
-3. **Performance**: Local storage reduces latency compared to constant server interactions.
-4. **Data Control**: Users maintain control over their data until they choose to publish it.
-5. **Future Synchronization**: While out of scope at present, the solution will enable the potential for syncing data across devices.
+1. **Offline Capability**: Users should be able to work on drafts without the need to connect to a server.
+2. **Performance**: Local storage reduces latency compared to constant server interactions.
+3. **Data Control**: Users maintain control over their data until they choose to publish it.
+4. **Future Synchronization**: While out of scope at present, the solution will enable the potential for syncing data across
+devices.
 
 ### 7.1 Storage Options
 
@@ -726,13 +727,14 @@ support defined at a system level.
 
 * **Draft Creation and Editing**:
   * Draft content is kept in plaintext in memory while being edited.
-  * When saving, metadata (e.g., title, status) is extracted and stored in specific columns in the drafts table or in the metadata table.
+  * When saving, metadata (e.g., title, status) is extracted and stored in specific columns in the drafts table or in the metadata
+  table.
   * The main content is stored unencrypted in the drafts table.
 * **Accessing Drafts**:
   * The app fetches content from `drafts` table using a combination of document id and version (iteration).
 * **Session & Authentication**:
-  * All drafts are stored unencrypted in local storage and are not tied to a session therefore drafts will persist across sessions, and
-  are not explicitly tied to the users keychain.
+  * All drafts are stored unencrypted in local storage and are not tied to a session therefore drafts will persist across sessions,
+  and are not explicitly tied to the users keychain.
 
 ### 7.5 Draft Database Design
 
@@ -964,7 +966,8 @@ For the latest and most detailed API specification, refer to the following locat
 ### V1.1 Changes
 
 Narrowing of scope for fund 14 to include the following items.
-* Removal of encryption for local drafts, unpublished draft documents will be stored in plain text in the drafts table, 
+
+* Removal of encryption for local drafts, unpublished draft documents will be stored in plain text in the drafts table,
 draft documents stored in memory until saved to draft table through action by the user.
 * Removed context to "Session-bound encryption for drafts using deterministic key derivation for both encryption and decryption."
 * Draft documents will not be associated with a cross device session until future versions.
