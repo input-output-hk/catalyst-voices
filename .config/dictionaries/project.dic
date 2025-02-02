@@ -15,6 +15,7 @@ Arbritrary
 ARCHS
 ARGB
 Arissara
+Arweave
 asat
 asmjs
 asyncio
@@ -101,8 +102,10 @@ encryptor
 endfunction
 Eternl
 EUTXO
+eventdb
 extn
 fetchval
+Filecoin
 fmtchk
 fmtfix
 fontawesome
@@ -138,7 +141,6 @@ invalid1u9nlq5nmuzthw3vhgakfpxyq4r0zl2c0p8uqy24gpyjsa6c3df4h6
 inversed
 IOHI
 iohk
-IPFS
 iphoneos
 iphonesimulator
 jdbc
@@ -155,6 +157,7 @@ keychains
 Keyhash
 keyserver
 keyspace
+keyspaces
 KUBECONFIG
 kubernetescrd
 kubetail
@@ -258,6 +261,7 @@ ristretto
 rlib
 rngs
 RPATH
+rolname
 ruleset
 rustc
 rustdoc
@@ -278,6 +282,7 @@ sendfile
 servernum
 serviceworker
 slotno
+skeletonizer
 sqlfluff
 SRCROOT
 sslmode
@@ -310,6 +315,7 @@ Toastify
 todos
 toggleable
 tojunit
+tolerations
 tomjs
 topbar
 Traceback

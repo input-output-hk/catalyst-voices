@@ -1,19 +1,18 @@
-import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SingleDropdownSelectionWidget extends StatefulWidget {
-  final String value;
-  final List<String> items;
+  final DocumentValueProperty<String> property;
   final DocumentDropDownSingleSelectSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SingleDropdownSelectionWidget({
     super.key,
-    required this.value,
-    required this.items,
+    required this.property,
     required this.schema,
     required this.isEditMode,
     required this.onChanged,
@@ -27,41 +26,33 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
 class _SingleDropdownSelectionWidgetState
     extends State<SingleDropdownSelectionWidget> {
   late List<DropdownMenuEntry<String>> _dropdownMenuEntries;
-  late TextEditingController _textEditingController;
+  late String? _selectedValue;
 
-  String? value;
+  String get _title => widget.schema.formattedTitle;
 
   List<DropdownMenuEntry<String>> get _mapItems {
-    final items = widget.items;
+    final items = widget.schema.enumValues ?? [];
     return items.map((e) => DropdownMenuEntry(value: e, label: e)).toList();
   }
 
   @override
   void initState() {
     super.initState();
-    final textValue = TextEditingValueExt.collapsedAtEndOf(widget.value);
-    _textEditingController = TextEditingController.fromValue(textValue);
-    _dropdownMenuEntries = _mapItems;
+    _handleInitialValue();
   }
 
   @override
   void didUpdateWidget(covariant SingleDropdownSelectionWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.items != widget.items) {
-      _dropdownMenuEntries = _mapItems;
-    }
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
-      final value = widget.value;
-      _textEditingController.textWithSelection = value;
+      _handleInitialValue();
     }
-  }
 
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-    super.dispose();
+    if (oldWidget.property.value != widget.property.value) {
+      _handleInitialValue();
+    }
   }
 
   @override
@@ -70,24 +61,48 @@ class _SingleDropdownSelectionWidgetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          widget.schema.title,
+          _title,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
         SingleSelectDropdown(
-          textEditingController: _textEditingController,
           items: _dropdownMenuEntries,
+          initialValue: _selectedValue,
+          onChanged: _handleValueChanged,
+          validator: _validator,
           enabled: widget.isEditMode,
-          onSelected: (val) {
-            final change = DocumentValueChange(
-              nodeId: widget.schema.nodeId,
-              value: val,
-            );
-            widget.onChanged(change);
-          },
-          initialValue: widget.value,
         ),
       ],
     );
+  }
+
+  void _handleInitialValue() {
+    _selectedValue = widget.property.value;
+    _dropdownMenuEntries = _mapItems;
+  }
+
+  void _handleValueChanged(String? value) {
+    setState(() {
+      _selectedValue = value;
+    });
+
+    if (widget.property.value != value) {
+      _notifyChangeListener(value);
+    }
+  }
+
+  void _notifyChangeListener(String? value) {
+    widget.onChanged([
+      DocumentValueChange(
+        nodeId: widget.schema.nodeId,
+        value: value,
+      ),
+    ]);
+  }
+
+  String? _validator(String? value) {
+    final result = widget.schema.validate(value);
+
+    return LocalizedDocumentValidationResult.from(result).message(context);
   }
 }

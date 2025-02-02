@@ -849,6 +849,7 @@
   "@uploadKeychainInfo": {
     "description": "An info on keychain upload dialog"
   },
+  "theme": "Theme",
   "themeLight": "Light",
   "@themeLight": {
     "description": "Refers to a light theme mode."
@@ -1316,9 +1317,31 @@
       }
     }
   },
+  "errorValidationListItemsNotUnique": "The values must be unique.",
+  "@errorValidationListItemsNotUnique": {
+    "description": "The list items must be unique."
+  },
   "noTagSelected": "No Tag Selected",
   "@noTagSelected": {
     "description": "For example in context of document builder"
+  },
+  "errorValidationConstValueMismatch": "The value must be \"{constValue}\".",
+  "@errorValidationConstValueMismatch": {
+    "description": "Validation error when the user entered value does not match the const value",
+    "placeholders": {
+      "constValue": {
+        "type": "String"
+      }
+    }
+  },
+  "errorValidationEnumValuesMismatch": "The value must be one of {enumValues}.",
+  "@errorValidationEnumValuesMismatch": {
+    "description": "Validation error when the user entered value does not match the enum values",
+    "placeholders": {
+      "enumValues": {
+        "type": "String"
+      }
+    }
   },
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
@@ -1389,5 +1412,24 @@
   },
   "finalProposal": "Final",
   "mostRecent": "Most Recent",
-  "viewAllProposals": "View All Proposals"
+  "viewAllProposals": "View All Proposals",
+  "publishedOn": "Published on {date} at {time}",
+  "@publishedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "accountMenuPopupTooltip": "Account menu",
+  "account": "Account",
+  "settings": "Settings",
+  "setupCatalystRoles": "Setup Catalyst roles",
+  "submitSupportRequest": "Submit support request",
+  "catalystKnowledgeBase": "Catalyst knowledge base",
+  "lockAccount": "Lock account",
+  "timezone": "Timezone"
 }

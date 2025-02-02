@@ -1,6 +1,10 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/duration_in_months_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/language_code_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/list_length_picker_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/multiline_text_entry_markdown_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/radio_button_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
@@ -10,12 +14,13 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a [DocumentSectionSchema] as list tile in edit / view mode.
 class DocumentBuilderSectionTile extends StatefulWidget {
   /// A section of the document that groups [DocumentValueProperty].
-  final DocumentObjectProperty section;
+  final DocumentProperty section;
 
   /// A callback that should be called with a list of [DocumentChange]
   /// when the user wants to save the changes.
@@ -40,8 +45,8 @@ class DocumentBuilderSectionTile extends StatefulWidget {
 
 class _DocumentBuilderSectionTileState
     extends State<DocumentBuilderSectionTile> {
-  late DocumentObjectProperty _editedSection;
-  late DocumentObjectPropertyBuilder _builder;
+  late DocumentProperty _editedSection;
+  late DocumentPropertyBuilder _builder;
 
   final _pendingChanges = <DocumentChange>[];
 
@@ -82,19 +87,17 @@ class _DocumentBuilderSectionTileState
               isEditMode: _isEditMode,
               onToggleEditMode: _toggleEditMode,
             ),
-            for (final property in widget.section.properties) ...[
-              const SizedBox(height: 24),
-              _PropertyBuilder(
-                key: ValueKey(property.schema.nodeId),
-                property: property,
-                isEditMode: _isEditMode,
-                onChanged: _handlePropertyChange,
-              ),
-            ],
+            const SizedBox(height: 24),
+            _PropertyBuilder(
+              key: ValueKey(_editedSection.nodeId),
+              property: _editedSection,
+              isEditMode: _isEditMode,
+              onChanged: _handlePropertyChanges,
+            ),
             if (_isEditMode) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               _Footer(
-                isValid: _editedSection.isValid,
+                isValid: _editedSection.isValidExcludingSubsections,
                 onSave: _saveChanges,
               ),
             ],
@@ -124,11 +127,13 @@ class _DocumentBuilderSectionTileState
     });
   }
 
-  void _handlePropertyChange(DocumentChange change) {
+  void _handlePropertyChanges(List<DocumentChange> changes) {
     setState(() {
-      _builder.addChange(change);
+      for (final change in changes) {
+        _builder.addChange(change);
+      }
       _editedSection = _builder.build();
-      _pendingChanges.add(change);
+      _pendingChanges.addAll(changes);
     });
   }
 }
@@ -193,7 +198,7 @@ class _Footer extends StatelessWidget {
 class _PropertyBuilder extends StatelessWidget {
   final DocumentProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyBuilder({
     required super.key,
@@ -231,7 +236,7 @@ class _PropertyBuilder extends StatelessWidget {
 class _PropertyListBuilder extends StatelessWidget {
   final DocumentListProperty list;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyListBuilder({
     required this.list,
@@ -241,22 +246,26 @@ class _PropertyListBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(dtscalac): build a property list, similar to a section,
-    // below is just dummy implementation
-
-    // TODO(dtscalac): there should be a plus button or something similar
-    // to add more items into the list
-
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        for (final property in list.properties)
-          _PropertyBuilder(
-            key: key,
-            property: property,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListLengthPickerWidget(
+          key: ValueKey(list.nodeId),
+          list: list,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        ),
+        ...list.properties
+            .whereNot((child) => child.schema.isSubsection)
+            .map<Widget>((child) {
+          return _PropertyBuilder(
+            key: ValueKey(child.nodeId),
+            property: child,
             isEditMode: isEditMode,
             onChanged: onChanged,
-          ),
+          );
+        }),
       ].separatedBy(const SizedBox(height: 24)).toList(),
     );
   }
@@ -265,7 +274,7 @@ class _PropertyListBuilder extends StatelessWidget {
 class _PropertyObjectBuilder extends StatelessWidget {
   final DocumentObjectProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyObjectBuilder({
     required this.property,
@@ -279,34 +288,31 @@ class _PropertyObjectBuilder extends StatelessWidget {
     switch (schema) {
       case DocumentSingleGroupedTagSelectorSchema():
         return SingleGroupedTagSelectorWidget(
-          id: property.schema.nodeId,
-          selection: schema.groupedTagsSelection(property) ??
-              const GroupedTagsSelection(),
-          groupedTags: schema.groupedTags(),
+          schema: schema,
+          property: property,
           isEditMode: isEditMode,
           onChanged: onChanged,
-          isRequired: schema.isRequired,
-        );
-
-      case DocumentNestedQuestionsSchema():
-      case DocumentGenericObjectSchema():
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            for (final property in property.properties)
-              _PropertyBuilder(
-                key: key,
-                property: property,
-                isEditMode: isEditMode,
-                onChanged: onChanged,
-              ),
-          ].separatedBy(const SizedBox(height: 24)).toList(),
         );
 
       case DocumentSegmentSchema():
       case DocumentSectionSchema():
-        throw UnsupportedError(
-          '${schema.type} not supported on this level.',
+      case DocumentNestedQuestionsSchema():
+      case DocumentGenericObjectSchema():
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: property.properties
+              .whereNot((child) => child.schema.isSubsection)
+              .map<Widget>((child) {
+                return _PropertyBuilder(
+                  key: ValueKey(child.nodeId),
+                  property: child,
+                  isEditMode: isEditMode,
+                  onChanged: onChanged,
+                );
+              })
+              .separatedBy(const SizedBox(height: 24))
+              .toList(),
         );
     }
   }
@@ -315,7 +321,7 @@ class _PropertyObjectBuilder extends StatelessWidget {
 class _PropertyValueBuilder extends StatelessWidget {
   final DocumentValueProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const _PropertyValueBuilder({
     required this.property,
@@ -328,10 +334,8 @@ class _PropertyValueBuilder extends StatelessWidget {
     final schema = property.schema;
     switch (schema) {
       case DocumentDropDownSingleSelectSchema():
-        final castProperty = schema.castProperty(property);
         return SingleDropdownSelectionWidget(
-          value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
-          items: castProperty.schema.enumValues ?? [],
+          property: schema.castProperty(property),
           schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
@@ -385,9 +389,29 @@ class _PropertyValueBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
 
-      case DocumentSpdxLicenseOrUrlSchema():
-      case DocumentLanguageCodeSchema():
+      case DocumentRadioButtonSelect():
+        return RadioButtonSelectWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+
       case DocumentDurationInMonthsSchema():
+        return DurationInMonthsWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentLanguageCodeSchema():
+        return LanguageCodeWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentSpdxLicenseOrUrlSchema():
       case DocumentGenericIntegerSchema():
       case DocumentGenericNumberSchema():
       case DocumentGenericBooleanSchema():
@@ -417,7 +441,7 @@ class _UnimplementedWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Text(
-        'Unimplemented ${schema.runtimeType}',
+        'Unimplemented ${schema.runtimeType}: ${schema.nodeId}',
         style: const TextStyle(color: Colors.red),
       ),
     );
