@@ -141,7 +141,7 @@ final class SelectionUtils {
     bool withTokens = false,
   }) {
     final pids = List.generate(10, (int index) {
-      return PolicyId(randomHexString(28));
+      return PolicyId(randomHexString(PolicyId.hashLength));
     });
 
     final assetNames = List.generate(10, (int index) {

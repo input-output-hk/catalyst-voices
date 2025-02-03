@@ -41,7 +41,7 @@ abstract interface class CoinSelector {
   const CoinSelector();
 
   /// The predefined [PolicyId] for ADA.
-  static PolicyId adaPolicy = PolicyId('');
+  static final PolicyId adaPolicy = PolicyId('');
 
   /// The predefined [AssetName] for ADA.
   static final AssetName adaAssetName = AssetName('');
