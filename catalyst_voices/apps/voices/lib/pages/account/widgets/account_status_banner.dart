@@ -37,7 +37,7 @@ class _AccountStatusBannerState extends State<_AccountStatusBanner> {
   @override
   void initState() {
     super.initState();
-    _offstage = widget.status.type == MyAccountStatusNotificationType.offstage;
+    _offstage = _isStatusTypeOffstage();
   }
 
   @override
@@ -45,8 +45,7 @@ class _AccountStatusBannerState extends State<_AccountStatusBanner> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.status != oldWidget.status) {
-      _offstage =
-          widget.status.type == MyAccountStatusNotificationType.offstage;
+      _offstage = _isStatusTypeOffstage();
     }
   }
 
@@ -84,5 +83,9 @@ class _AccountStatusBannerState extends State<_AccountStatusBanner> {
     setState(() {
       _offstage = true;
     });
+  }
+
+  bool _isStatusTypeOffstage() {
+    return widget.status.type == MyAccountStatusNotificationType.offstage;
   }
 }
