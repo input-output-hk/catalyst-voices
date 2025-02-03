@@ -60,19 +60,17 @@ pub(crate) struct SyncStatusInsertQuery;
 impl SyncStatusInsertQuery {
     /// Prepares a Sync Status Insert query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let sync_status_insert_query = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session,
             INSERT_SYNC_STATUS_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = sync_status_insert_query {
-            error!(error=%error, "Failed to prepare get Sync Status Insert query.");
-        };
-
-        sync_status_insert_query
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get Sync Status Insert query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_SYNC_STATUS_QUERY}"))
     }
 
     /// Executes a sync status insert query.
