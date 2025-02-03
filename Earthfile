@@ -42,3 +42,9 @@ repo-docs:
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
 
     SAVE ARTIFACT /repo repo
+
+# copy-docs : Copy the docs source folder.
+copy-docs:
+    FROM scratch
+    COPY --dir docs/src ./docs
+    SAVE ARTIFACT /docs docs
