@@ -178,4 +178,11 @@ mod tests {
         // Assert that no panic occurred
         assert!(result.is_ok(), "default_validator panicked");
     }
+
+    // Since load_json return an empty object for invalid JSON,
+    // Add test for default file to ensure it is not empty object.
+    #[test]
+    fn test_default_files() {
+        assert!(!FRONTEND_DEFAULT.as_object().unwrap().is_empty());
+    }
 }
