@@ -187,7 +187,10 @@ async fn create_namespace(
     // which transforms `<`, `>` symbols to `&lt`, `&gt`
     reg.register_escape_fn(|s| s.into());
     let query = reg
-        .render_template(CREATE_NAMESPACE_CQL, &json!({"keyspace": keyspace}))
+        .render_template(
+            CREATE_NAMESPACE_CQL,
+            &json!({"keyspace": keyspace,"options": cfg.deployment.clone().to_string()}),
+        )
         .context(format!("Keyspace: {keyspace}"))?;
 
     // Create the Keyspace if it doesn't exist already.
