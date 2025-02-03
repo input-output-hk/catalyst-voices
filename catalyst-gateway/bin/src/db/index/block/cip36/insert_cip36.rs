@@ -63,23 +63,27 @@ impl Debug for Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(vote_key: &VotingPubKey, slot_no: DbSlot, txn: DbTxnIndex, cip36: &Cip36) -> Self {
+        let stake_address = cip36
+            .stake_pk()
+            .map_or_else(Vec::new, |s| s.to_bytes().to_vec());
+        let vote_key = vote_key
+            .voting_pk()
+            .map_or_else(Vec::new, |v| v.to_bytes().to_vec());
+        let payment_address = match cip36.payment_address() {
+            Some(a) => MaybeUnset::Set(a.to_vec()),
+            None => MaybeUnset::Unset,
+        };
+        let is_cip36 = cip36.is_cip36().unwrap_or_default();
         Params {
-            stake_address: cip36
-                .stake_pk()
-                .map(|s| s.to_bytes().to_vec())
-                .unwrap_or_default(),
-            nonce: cip36.nonce.into(),
-            slot_no: slot_no.into(),
+            stake_address,
+            nonce: cip36.nonce().unwrap_or_default().into(),
+            slot_no,
             txn,
-            vote_key: vote_key.voting_pk.to_bytes().to_vec(),
-            payment_address: if cip36.payment_addr.is_empty() {
-                MaybeUnset::Unset
-            } else {
-                MaybeUnset::Set(cip36.payment_addr.clone())
-            },
-            is_payable: cip36.payable,
-            raw_nonce: cip36.raw_nonce.into(),
-            cip36: cip36.cip36.unwrap_or_default(),
+            vote_key,
+            payment_address,
+            is_payable: cip36.is_payable().unwrap_or_default(),
+            raw_nonce: cip36.raw_nonce().unwrap_or_default().into(),
+            cip36: is_cip36,
         }
     }
 

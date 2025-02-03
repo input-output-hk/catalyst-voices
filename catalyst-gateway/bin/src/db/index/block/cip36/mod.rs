@@ -55,76 +55,66 @@ impl Cip36InsertQuery {
     }
 
     /// Index the CIP-36 registrations in a transaction.
-    pub(crate) fn index(&mut self, index: TxnIndex, _slot_no: Slot, block: &MultiEraBlock) {
+    pub(crate) fn index(&mut self, index: TxnIndex, slot_no: Slot, block: &MultiEraBlock) {
+        // Catalyst strict is set to true
         match Cip36::new(block, index, true) {
-            Ok(Some(cip36)) if cip36.is_valid() => {
-                // Valid registration.
-                // TODO: FIXME:
-                let _ = cip36;
-                todo!();
-            },
-            Ok(Some(cip36)) => {
-                // Invalid registration.
-                // TODO: FIXME:
-                let _ = cip36;
-                todo!();
-            },
-            Ok(None) => {
-                // Nothing to index.
-            },
-            Err(e) => {
-                // TODO: FIXME:
-                let _ = e;
-                todo!();
-            },
-        }
+            // Check for CIP-36 validity and should be strict catalyst (only 1 voting key)
+            // Note that in `validate_voting_keys` we already checked if the array has only one
+            Ok(Some(cip36)) if cip36.is_valid() && cip36.is_cip36().unwrap_or_default() => {
+                // This should always pass, because we already checked if the array has only one
+                if let Some(voting_key) = cip36.voting_pks().first() {
+                    self.registrations.push(insert_cip36::Params::new(
+                        voting_key,
+                        slot_no.into(),
+                        index.into(),
+                        &cip36,
+                    ));
 
-        // // TODO: FIXME:
-        // if let Some(decoded_metadata) =
-        //     block.txn_metadata(index, MetadatumLabel::CIP036_REGISTRATION)
-        // {
-        //     if let Metadata::DecodedMetadataValues::Cip36(cip36) =
-        // &decoded_metadata.value {         // Check if we are indexing a valid
-        // or invalid registration.         // Note, we ONLY care about catalyst,
-        // we should only have 1 voting key, if not, call         // it an error.
-        //         if decoded_metadata.report.is_empty() && cip36.voting_keys.len() == 1 {
-        //             // Always true, because we already checked if the array has only
-        // one entry.             if let Some(vote_key) =
-        // cip36.voting_keys.first() {
-        // self.registrations.push(insert_cip36::Params::new(
-        // vote_key, slot_no, txn_index, cip36,                 ));
-        //                 self.for_vote_key
-        //                     .push(insert_cip36_for_vote_key::Params::new(
-        //                         vote_key, slot_no, txn_index, cip36, true,
-        //                     ));
-        //             }
-        //         } else if cip36.stake_pk.is_some() {
-        //             // We can't index an error, if there is no stake public key.
-        //             if cip36.voting_keys.is_empty() {
-        //                 self.invalid.push(insert_cip36_invalid::Params::new(
-        //                     None,
-        //                     slot_no,
-        //                     txn_index,
-        //                     cip36,
-        //                     decoded_metadata.report.clone(),
-        //                 ));
-        //             }
-        //             for vote_key in &cip36.voting_keys {
-        //                 self.invalid.push(insert_cip36_invalid::Params::new(
-        //                     Some(vote_key),
-        //                     slot_no,
-        //                     txn_index,
-        //                     cip36,
-        //                     decoded_metadata.report.clone(),
-        //                 ));
-        //                 self.for_vote_key
-        //                     .push(insert_cip36_for_vote_key::Params::new(
-        //                         vote_key, slot_no, txn_index, cip36, false,
-        //                     ));
-        //             }
-        //         }
-        //     }
-        // }
+                    self.for_vote_key
+                        .push(insert_cip36_for_vote_key::Params::new(
+                            voting_key,
+                            slot_no.into(),
+                            index.into(),
+                            &cip36,
+                            true,
+                        ));
+                }
+            },
+            // Invalid CIP-36 Registration
+            Ok(Some(cip36)) if cip36.is_cip36().unwrap_or_default() => {
+                // Cannot index an invalid CIP36, if there is no stake public key.
+                if cip36.stake_pk().is_some() {
+                    if cip36.voting_pks().is_empty() {
+                        self.invalid.push(insert_cip36_invalid::Params::new(
+                            None,
+                            slot_no.into(),
+                            index.into(),
+                            &cip36,
+                            Vec::new(),
+                        ));
+                    } else {
+                        for voting_key in cip36.voting_pks() {
+                            self.invalid.push(insert_cip36_invalid::Params::new(
+                                Some(voting_key),
+                                slot_no.into(),
+                                index.into(),
+                                &cip36,
+                                Vec::new(),
+                            ));
+                            self.for_vote_key
+                                .push(insert_cip36_for_vote_key::Params::new(
+                                    voting_key,
+                                    slot_no.into(),
+                                    index.into(),
+                                    &cip36,
+                                    false,
+                                ));
+                        }
+                    }
+                }
+            },
+            _ => {},
+        }
     }
 
     /// Execute the CIP-36 Registration Indexing Queries.
