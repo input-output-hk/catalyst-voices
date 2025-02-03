@@ -8,7 +8,9 @@ use poem_openapi::{
     OpenApi,
 };
 use post_document_index_query::query_filter::DocumentIndexQueryFilterBody;
-use put_document::{unprocessable_content_request::PutDocumentUnprocessableContent, MAXIMUM_DOCUMENT_SIZE};
+use put_document::{
+    unprocessable_content_request::PutDocumentUnprocessableContent, MAXIMUM_DOCUMENT_SIZE,
+};
 
 use crate::service::{
     common::{

@@ -1,9 +1,9 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
-use unprocessable_content_request::PutDocumentUnprocessableContent;
 use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
+use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody},
