@@ -25,7 +25,7 @@ fn is_live() -> bool {
 #[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## No Content
-    /// 
+    ///
     /// Service is OK and can keep running.
     #[oai(status = 204)]
     NoContent,

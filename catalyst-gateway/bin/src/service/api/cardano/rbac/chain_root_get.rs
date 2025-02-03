@@ -30,12 +30,12 @@ pub(crate) struct Response {
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
     /// ## Ok
-    /// 
+    ///
     /// Success returns the chain root hash.
     #[oai(status = 200)]
     Ok(Json<Response>),
     /// ## Not Found
-    /// 
+    ///
     /// No chain root found for the given stake address.
     #[oai(status = 404)]
     NotFound,

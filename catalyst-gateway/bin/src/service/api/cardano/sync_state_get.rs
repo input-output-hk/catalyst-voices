@@ -12,12 +12,12 @@ use crate::service::common::{
 #[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## Ok
-    /// 
+    ///
     /// The synchronisation state of the blockchain with the catalyst gateway service.
     #[oai(status = 200)]
     Ok(Json<SyncState>),
     /// ## Not Found
-    /// 
+    ///
     /// The network is unknown. Catalyst gateway is not syncing the queried network.
     #[oai(status = 404)]
     NotFound,
