@@ -8,7 +8,9 @@ project: {
 	}
 	deployment: {
 		on: {
-			merge: {}
+			//merge: {}
+			//tag: {}
+			always: {}
 		}
 		environment: "dev"
 		modules: main: {
@@ -27,7 +29,7 @@ project: {
 								value: "True"
 							}
 							"RUST_LOG": {
-								value: "error,cat_gateway=info,cardano_chain_follower=info"
+								value: "debug,cat_gateway=debug,cardano_chain_follower=info"
 							}
 							"CASSANDRA_VOLATILE_URL": {
 								secret: {
@@ -187,7 +189,13 @@ project: {
 					}
 				}
 
-				ingress: subdomain: "gateway"
+				ingress: {
+					health: {
+						path:         "/api/v1/health/live"
+						successCodes: "204"
+					}
+					subdomain: "gateway"
+				}
 
 				secrets: {
 					db: {
@@ -221,8 +229,9 @@ project: {
 	release: {
 		docker: {
 			on: {
-				merge: {}
-				tag: {}
+				//merge: {}
+				//tag: {}
+				always: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_COMMIT_HASH")
