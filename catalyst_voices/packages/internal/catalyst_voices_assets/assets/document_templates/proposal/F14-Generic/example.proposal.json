@@ -70,19 +70,23 @@
                 "answer": true
             },
             "enterprise_partnership": {
-                "answer": true
+                "answer": true,
+                "secondary_question": {}
             },
             "working_product": {
-                "answer": true
+                "answer": true,
+                "secondary_question": {}
             },
             "timeline": {
                 "answer": true
             },
             "matching_funds": {
-                "answer": true
+                "answer": true,
+                "secondary_question": {}
             },
             "adoption_potential": {
-                "answer": true
+                "answer": true,
+                "secondary_question": {}
             }
         }
     },
