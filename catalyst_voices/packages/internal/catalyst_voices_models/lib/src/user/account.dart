@@ -41,7 +41,7 @@ final class Account extends Equatable {
   final bool isProvisional;
 
   // TODO(damian-molinski): Not integrated. Backend should return it.
-  String get stakingAddress {
+  String get stakeAddress {
     /* cSpell:disable */
     return 'addr1q9gkq75mt2hykrktnsgt2zxrj5h9jnd6gkwr5s4r8v'
         '5x3dzp8n9h9mns5w7zx95jhtwz46yq4nr7y6hhlwtq75jflsqq9dxry2';
