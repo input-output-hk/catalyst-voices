@@ -8,23 +8,18 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::{
-        index::{
-            queries::{
-                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-                FallibleQueryResults, SizedBatch,
-            },
-            session::CassandraSession,
+    db::index::{
+        queries::{
+            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+            FallibleQueryResults, SizedBatch,
         },
-        types::{DbSlot, DbTxnIndex},
+        session::CassandraSession,
     },
     settings::cassandra_db,
 };
 
 pub(crate) mod result {
     //! Return values for TXO Assets by TXN Hash purge queries.
-
-    use crate::db::types::{DbSlot, DbTxnIndex};
 
     /// Primary Key Row
     pub(crate) type PrimaryKey = (Vec<u8>, i16, Vec<u8>, Vec<u8>, num_bigint::BigInt);

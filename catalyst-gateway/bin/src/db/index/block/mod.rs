@@ -18,7 +18,6 @@ use txi::TxiInsertQuery;
 use txo::TxoInsertQuery;
 
 use super::{queries::FallibleQueryTasks, session::CassandraSession};
-use crate::service::utilities::convert::from_saturating;
 
 /// Add all data needed from the block into the indexes.
 pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {

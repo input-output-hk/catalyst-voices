@@ -6,7 +6,6 @@ use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::StakeAddress;
-use pallas_crypto::hash::Hash;
 use rbac_registration::cardano::cip509::Cip509;
 use tracing::{error, warn};
 
@@ -15,11 +14,8 @@ use self::rbac::{
 };
 use super::CassandraSession;
 use crate::{
-    db::index::{
-        block::from_saturating,
-        queries::rbac::{self, get_chain_root},
-    },
-    service::{common::auth::rbac::role0_kid::Role0Kid, utilities::convert::big_uint_to_u64},
+    db::index::queries::rbac::{self, get_chain_root},
+    service::common::auth::rbac::role0_kid::Role0Kid,
 };
 
 /// The Chain Root for an RBAC Key Chain.

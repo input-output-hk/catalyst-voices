@@ -1,6 +1,9 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
-pub(crate) mod insert_chain_root_for_role0_key;
+// TODO: FIXME:
+#![allow(unused_imports)]
+
+pub(crate) mod chain_root;
 pub(crate) mod insert_chain_root_for_stake_address;
 pub(crate) mod insert_chain_root_for_txn_id;
 pub(crate) mod insert_rbac509;
@@ -13,7 +16,6 @@ use c509_certificate::{
     general_names::general_name::{GeneralNameTypeRegistry, GeneralNameValue},
 };
 use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionHash, TxnIndex};
-use chain_root::ChainRoot;
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use rbac_registration::cardano::cip509::{

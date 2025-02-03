@@ -278,7 +278,7 @@ async fn purge_unstaked_txo_assets(
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        if &primary_key.4 <= purge_to_slot {
+        if primary_key.4 <= purge_to_slot.into() {
             let params: Params = primary_key.into();
             delete_params.push(params);
         }

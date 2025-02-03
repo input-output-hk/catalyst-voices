@@ -13,7 +13,7 @@ use tracing::error;
 
 use crate::db::{
     index::{
-        block::rbac509::chain_root::{self, ChainRoot},
+        block::rbac509::{chain_root, chain_root::ChainRoot},
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
