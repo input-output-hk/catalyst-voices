@@ -46,5 +46,5 @@ repo-docs:
 # copy-docs : Copy the docs source folder.
 copy-docs:
     FROM scratch
-    COPY --dir docs/src ./docs
+    COPY --dir docs/src ./docs/src
     SAVE ARTIFACT /docs docs
