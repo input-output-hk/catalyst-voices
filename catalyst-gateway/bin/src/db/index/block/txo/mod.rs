@@ -2,10 +2,10 @@
 //!
 //! Note, there are multiple ways TXO Data is indexed and they all happen in here.
 
-mod insert_txo;
-mod insert_txo_asset;
-mod insert_unstaked_txo;
-mod insert_unstaked_txo_asset;
+pub(crate) mod insert_txo;
+pub(crate) mod insert_txo_asset;
+pub(crate) mod insert_unstaked_txo;
+pub(crate) mod insert_unstaked_txo_asset;
 
 use std::sync::Arc;
 
