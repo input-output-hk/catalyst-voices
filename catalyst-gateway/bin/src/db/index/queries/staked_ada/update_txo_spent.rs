@@ -39,7 +39,7 @@ impl UpdateTxoSpentQuery {
     pub(crate) async fn prepare_batch(
         session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let update_txo_spent_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             UPDATE_TXO_SPENT_QUERY,
             cfg,
@@ -47,13 +47,9 @@ impl UpdateTxoSpentQuery {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = update_txo_spent_queries {
-            error!(error=%error,"Failed to prepare update TXO spent query.");
-        };
-
-        update_txo_spent_queries
+        .await
+        .inspect_err(|error| error!(error=%error, "Failed to prepare update TXO spent query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{UPDATE_TXO_SPENT_QUERY}"))
     }
 
     /// Executes a update txo spent query.
