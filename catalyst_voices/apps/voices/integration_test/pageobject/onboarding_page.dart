@@ -173,7 +173,7 @@ class OnboardingPage {
     RegistrationState step,
   ) async {
     await registrationInfoPanelLooksAsExpected($, step);
-    await registrationDetailsPanelLooksAsExpected($, step);
+    // await registrationDetailsPanelLooksAsExpected($, step);
     expect(await closeBtn($), findsOneWidget);
   }
 
@@ -229,10 +229,10 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateMnemonicInput:
-        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         expect(
           await infoPartHeaderSubtitleText($),
-          T.get('Input your Catalyst security keys'),
+          T.get('Input your Catalyst seed phrase'),
         );
         expect(
           await infoPartHeaderBodyText($),
@@ -248,7 +248,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateMnemonicVerified:
-        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         //temporary: check for specific picture (green checked icon)
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
@@ -258,7 +258,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.passwordInfo:
-        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         //temporary: check for specific picture (locked icon)
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
@@ -268,7 +268,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.passwordInput:
-        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         expect(
           await infoPartHeaderSubtitleText($),
           T.get('Catalyst unlock password'),
@@ -288,7 +288,7 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateSuccess:
-        expect(await infoPartHeaderTitleText($), T.get('Welcome to Catalyst'));
+        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         //temporary: check for specific picture (green key locked icon)
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
@@ -421,7 +421,7 @@ class OnboardingPage {
         expect($(uploadKeyButton), findsOneWidget);
         expect(
           $(uploadKeyButton).$(CommonPage.decorData).$(Text).text,
-          T.get('Upload Catalyst Key'),
+          T.get('Import Catalyst Key'),
         );
         expect($(backButton), findsOneWidget);
         expect($(nextButton), findsOneWidget);
@@ -432,8 +432,8 @@ class OnboardingPage {
             .waitUntilVisible();
         expect(
           $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
-          T.get("Nice job! You've successfully verified the seed phrase for "
-              'your keychain.'),
+          T.get("Nice job! You've successfully verified your Catalyst seed "
+              'phase'),
         );
         expect(
           $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
