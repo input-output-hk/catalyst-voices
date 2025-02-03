@@ -5,4 +5,8 @@ extension DocumentPropertySchemaExt on DocumentPropertySchema {
   String get formattedTitle {
     return title.starred(isEnabled: isRequired);
   }
+
+  String get formattedDescriptionOrTitle {
+    return (description?.data ?? title).starred(isEnabled: isRequired);
+  }
 }
