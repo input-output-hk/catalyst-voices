@@ -32,17 +32,17 @@ final class UuidHiLo extends HiLo<BigInt> {
     );
   }
 
-  /// Version is always 13th digit of uuid.
-  /// This methods assumes [source] is sanitized (no '-').
-  static int _getVersion(String source) {
-    return int.parse(String.fromCharCode(source.codeUnitAt(12)));
-  }
-
   String get _fullHex => _highHex + _lowHex;
 
   String get _highHex => high.toRadixString(16).padLeft(16, '0');
 
   String get _lowHex => low.toRadixString(16).padLeft(16, '0');
+
+  /// Version is always 13th digit of uuid.
+  int get _version {
+    final source = String.fromCharCode(_highHex.codeUnitAt(12));
+    return int.parse(source);
+  }
 
   String get uuid {
     final fullHex = _fullHex;
@@ -53,7 +53,7 @@ final class UuidHiLo extends HiLo<BigInt> {
 
   /// supported for v7 only. Otherwise throws exception
   DateTime get dateTime {
-    if (_getVersion(_highHex) != 7) {
+    if (_version != 7) {
       throw StateError('uuid version is not v7');
     }
 
