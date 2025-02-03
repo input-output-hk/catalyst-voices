@@ -60,8 +60,8 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   /// The most nested object ID in the schema.
   String get id => nodeId.lastPath;
 
-/// Returns true if this should be treated as a standalone section
-/// rather than a child in a parent section.
+  /// Returns true if this should be treated as a standalone section
+  /// rather than a child in a parent section.
   bool get isSectionOrSubsection =>
       this is DocumentSectionSchema || isSubsection;
 
