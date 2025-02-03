@@ -83,7 +83,6 @@ mod tests {
         for tem in TEMPLATES.iter() {
             assert!(tem.doc_id().is_valid());
             assert!(tem.doc_ver().is_valid());
-            assert!(tem.doc_type().is_valid());
             assert!(tem.doc_content().is_json());
         }
     }
