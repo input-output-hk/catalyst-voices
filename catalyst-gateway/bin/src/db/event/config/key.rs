@@ -6,7 +6,10 @@ use jsonschema::{BasicOutput, Validator};
 use serde_json::{json, Value};
 use tracing::error;
 
-use crate::utils::schema::{extract_json_schema_for, SCHEMA_VERSION};
+use crate::{
+    service::utilities::json::load_json,
+    utils::schema::{extract_json_schema_for, SCHEMA_VERSION},
+};
 
 /// Configuration key
 #[derive(Debug, Clone, PartialEq)]
@@ -36,11 +39,11 @@ static FRONTEND_SCHEMA_VALIDATOR: LazyLock<Validator> =
 
 /// Frontend default configuration.
 static FRONTEND_DEFAULT: LazyLock<Value> =
-    LazyLock::new(|| load_json_lazy(include_str!("default/frontend.json")));
+    LazyLock::new(|| load_json(include_str!("default/frontend.json")));
 
 /// Frontend specific configuration.
 static FRONTEND_IP_DEFAULT: LazyLock<Value> =
-    LazyLock::new(|| load_json_lazy(include_str!("default/frontend_ip.json")));
+    LazyLock::new(|| load_json(include_str!("default/frontend_ip.json")));
 
 /// Helper function to create a JSON validator from a JSON schema.
 /// If the schema is invalid, a default JSON validator is created.
@@ -68,14 +71,6 @@ fn default_validator() -> Validator {
         "type": "object"
     }))
     .expect("Failed to create default JSON validator")
-}
-
-/// Helper function to convert a JSON string to a JSON value.
-fn load_json_lazy(data: &str) -> Value {
-    serde_json::from_str(data).unwrap_or_else(|err| {
-        error!(id="load_json_lazy", error=?err, "Error parsing JSON");
-        json!({})
-    })
 }
 
 impl ConfigKey {
@@ -182,5 +177,12 @@ mod tests {
         });
         // Assert that no panic occurred
         assert!(result.is_ok(), "default_validator panicked");
+    }
+
+    // Since load_json return an empty object for invalid JSON,
+    // Add test for default file to ensure it is not empty object.
+    #[test]
+    fn test_default_files() {
+        assert!(!FRONTEND_DEFAULT.as_object().unwrap().is_empty());
     }
 }
