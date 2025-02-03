@@ -54,16 +54,36 @@
     },
     "campaign_category": {
         "category_questions": {
-            "informational_content": true,
-            "foundational_rd": true,
-            "financial_products": true,
-            "early_stage_product": true,
-            "developer_tools": true,
-            "enterprise_partnership": true,
-            "working_product": true,
-            "timeline": true,
-            "matching_funds": true,
-            "adoption_potential": true
+            "informational_content": {
+                "answer": true
+            },
+            "foundational_rd": {
+                "answer": true
+            },
+            "financial_products": {
+                "answer": true
+            },
+            "early_stage_product": {
+                "answer": true
+            },
+            "developer_tools": {
+                "answer": true
+            },
+            "enterprise_partnership": {
+                "answer": true
+            },
+            "working_product": {
+                "answer": true
+            },
+            "timeline": {
+                "answer": true
+            },
+            "matching_funds": {
+                "answer": true
+            },
+            "adoption_potential": {
+                "answer": true
+            }
         }
     },
     "theme": {

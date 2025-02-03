@@ -515,78 +515,154 @@
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "properties": {
                         "informational_content": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Informational Content",
-                            "description": "Does your proposal involve informational content, such as websites, blogs, or similar media?",
-                            "guidance_card": "Informational content like websites or blogs is not eligible for this category. Focus on real-world utility and adoption. If your project is primarily informational, consider a different category.",
-                            "brief_citation": "Proposals for informational content, such as websites or blogs, are prohibited. This category prioritizes real-world adoption and utility-driven projects."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal involve informational content, such as websites, blogs, or similar media?",
+                                    "x-guidance": "Informational content like websites or blogs is not eligible for this category. Focus on real-world utility and adoption. If your project is primarily informational, consider a different category.",
+                                    "description": "Proposals for informational content, such as websites or blogs, are prohibited. This category prioritizes real-world adoption and utility-driven projects."
+                                }
+                            }
                         },
                         "foundational_rd": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Foundational R&D",
-                            "description": "Is your proposal for foundational R&D or maintenance of Cardano infrastructure (e.g., wallets, explorers, or bridges)?",
-                            "guidance_card": "Foundational R&D or infrastructure maintenance (e.g., wallets, bridges, explorers) should apply to a category focused on infrastructure funding, not this one.",
-                            "brief_citation": "This category does not cover foundational R&D or ongoing maintenance of Cardano infrastructure (e.g., wallets, explorers, bridges). These are better suited to categories specifically addressing infrastructure needs."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Is your proposal for foundational R&D or maintenance of Cardano infrastructure (e.g., wallets, explorers, or bridges)?",
+                                    "x-guidance": "Foundational R&D or infrastructure maintenance (e.g., wallets, bridges, explorers) should apply to a category focused on infrastructure funding, not this one.",
+                                    "description": "This category does not cover foundational R&D or ongoing maintenance of Cardano infrastructure (e.g., wallets, explorers, bridges). These are better suited to categories specifically addressing infrastructure needs."
+                                }
+                            }
                         },
                         "financial_products": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Financial Products",
-                            "description": "Does your project propose funding for liquidity, loans, buying NFTs, or other financial/token-based products?",
-                            "guidance_card": "Financial/token-based proposals like liquidity funding, loans, or NFT purchases are ineligible. Focus on real-world applications of Cardano technology.",
-                            "brief_citation": "Proposals requesting funding for liquidity, loans, or token-based financial products, including NFT purchases, are not within scope."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your project propose funding for liquidity, loans, buying NFTs, or other financial/token-based products?",
+                                    "x-guidance": "Financial/token-based proposals like liquidity funding, loans, or NFT purchases are ineligible. Focus on real-world applications of Cardano technology.",
+                                    "description": "Proposals requesting funding for liquidity, loans, or token-based financial products, including NFT purchases, are not within scope."
+                                }
+                            }
                         },
                         "early_stage_product": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Early Stage Product",
-                            "description": "Does your proposal focus on a brand-new or early-stage product that is not at least released to an MVP stage?",
-                            "guidance_card": "Proposals must enhance existing, deployed products or involve enterprise partnerships. Early-stage ideas without an MVP should apply to a different category.",
-                            "brief_citation": "Only projects with an existing product at MVP stage or beyond are eligible. Early-stage ideas should seek funding in more general innovation categories."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal focus on a brand-new or early-stage product that is not at least released to an MVP stage?",
+                                    "x-guidance": "Proposals must enhance existing, deployed products or involve enterprise partnerships. Early-stage ideas without an MVP should apply to a different category.",
+                                    "description": "Only projects with an existing product at MVP stage or beyond are eligible. Early-stage ideas should seek funding in more general innovation categories."
+                                }
+                            }
                         },
                         "developer_tools": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Developer Tools",
-                            "description": "Does your proposal primarily involve developer tools, middleware, APIs, or IDEs?",
-                            "guidance_card": "Developer tooling projects should apply to a developer-focused category, such as 'Cardano Open: Developers.' This category emphasizes adoption-driven use cases.",
-                            "brief_citation": "Developer tools, middleware, APIs, and IDEs fall outside the scope of this category. These projects should seek funding under developer-specific categories."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal primarily involve developer tools, middleware, APIs, or IDEs?",
+                                    "x-guidance": "Developer tooling projects should apply to a developer-focused category, such as 'Cardano Open: Developers.' This category emphasizes adoption-driven use cases.",
+                                    "description": "Developer tools, middleware, APIs, and IDEs fall outside the scope of this category. These projects should seek funding under developer-specific categories."
+                                }
+                            }
                         },
                         "enterprise_partnership": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Enterprise Partnership",
-                            "description": "Is your proposal led by or in partnership with an established enterprise or team with a proven business track record?",
-                            "secondary_question": "What is the name of the enterprise or team, and what is their track record in the industry?",
-                            "guidance_card": "Proposals must demonstrate enterprise experience and proven success. Include details about your team or partner's expertise.",
-                            "brief_citation": "Proposals must be led by established enterprises or teams with proven business track records. This ensures credibility and feasibility."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Is your proposal led by or in partnership with an established enterprise or team with a proven business track record?",
+                                    "x-guidance": "Proposals must demonstrate enterprise experience and proven success. Include details about your team or partner's expertise.",
+                                    "description": "Proposals must be led by established enterprises or teams with proven business track records. This ensures credibility and feasibility."
+                                },
+                                "secondary_question": {
+                                    "$ref": "#/definitions/section",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "What is the name of the enterprise or team, and what is their track record in the industry?"
+                                        }
+                                    }
+                                }
+                            }
                         },
                         "working_product": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Working Product",
-                            "description": "Does your project have a working product or measurable adoption metrics?",
-                            "secondary_question": "Provide a brief description of your product and its current adoption metrics.",
-                            "guidance_card": "Proposals should enhance existing products with measurable success. Include adoption metrics or examples of real-world use.",
-                            "brief_citation": "Proposals should demonstrate a working product and measurable adoption. Projects without existing success metrics are not eligible."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your project have a working product or measurable adoption metrics?",
+                                    "x-guidance": "Proposals should enhance existing products with measurable success. Include adoption metrics or examples of real-world use.",
+                                    "description": "Proposals should demonstrate a working product and measurable adoption. Projects without existing success metrics are not eligible."
+                                },
+                                "secondary_question": {
+                                    "$ref": "#/definitions/section",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "Provide a brief description of your product and its current adoption metrics."
+                                        }
+                                    }
+                                }
+                            }
                         },
                         "timeline": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Timeline",
-                            "description": "Does your proposal include a timeline for delivery within 12 months?",
-                            "guidance_card": "Projects must be delivered within 12 months. Include a clear timeline with milestones for evaluation.",
-                            "brief_citation": "All projects must be completed within 12 months. Proposals must include a detailed timeline with key milestones."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal include a timeline for delivery within 12 months?",
+                                    "x-guidance": "Projects must be delivered within 12 months. Include a clear timeline with milestones for evaluation.",
+                                    "description": "All projects must be completed within 12 months. Proposals must include a detailed timeline with key milestones."
+                                }
+                            }
                         },
                         "matching_funds": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Matching Funds",
-                            "description": "Does your proposal include matching funds or in-kind contributions?",
-                            "secondary_question": "Provide details on the matching funds or contributions, including their source and value.",
-                            "guidance_card": "Matching funds or contributions enhance feasibility and impact. Be transparent about sources and amounts.",
-                            "brief_citation": "Proposals with matching funds or in-kind contributions are prioritized for funding due to their higher feasibility and potential impact."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal include matching funds or in-kind contributions?",
+                                    "x-guidance": "Matching funds or contributions enhance feasibility and impact. Be transparent about sources and amounts.",
+                                    "description": "Proposals with matching funds or in-kind contributions are prioritized for funding due to their higher feasibility and potential impact."
+                                },
+                                "secondary_question": {
+                                    "$ref": "#/definitions/section",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "Provide details on the matching funds or contributions, including their source and value."
+                                        }
+                                    }
+                                }
+                            }
                         },
                         "adoption_potential": {
-                            "$ref": "#/definitions/yesNoChoice",
-                            "title": "Adoption Potential",
-                            "description": "Does your proposal showcase high adoption potential with measurable outcomes?",
-                            "secondary_question": "What measurable outcomes do you aim to achieve, and how will you assess success?",
-                            "guidance_card": "Proposals must drive tangible adoption with measurable results. Include metrics and methods for evaluating success.",
-                            "brief_citation": "Projects must demonstrate high adoption potential and outline measurable outcomes. Metrics for success should be included."
+                            "$ref": "#/definitions/section",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal showcase high adoption potential with measurable outcomes?",
+                                    "x-guidance": "Proposals must drive tangible adoption with measurable results. Include metrics and methods for evaluating success.",
+                                    "description": "Projects must demonstrate high adoption potential and outline measurable outcomes. Metrics for success should be included."
+                                },
+                                "secondary_question": {
+                                    "$ref": "#/definitions/section",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "What measurable outcomes do you aim to achieve, and how will you assess success?"
+                                        }
+                                    }
+                                }
+                            }
                         }
                     },
                     "x-order": [
