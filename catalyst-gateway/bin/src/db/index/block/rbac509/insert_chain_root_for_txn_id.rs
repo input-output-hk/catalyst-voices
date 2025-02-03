@@ -15,7 +15,7 @@ const INSERT_CHAIN_ROOT_FOR_TXN_ID_QUERY: &str =
 
 /// Insert Chain Root For Transaction ID Query Parameters
 #[derive(SerializeRow)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Transaction ID Hash. 32 bytes.
     transaction_id: Vec<u8>,
     /// Chain Root Hash. 32 bytes.
@@ -39,7 +39,7 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(
+    pub(crate) fn new(
         chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn_idx: i16,
     ) -> Self {
         Params {
@@ -51,10 +51,10 @@ impl Params {
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_CHAIN_ROOT_FOR_TXN_ID_QUERY,
             cfg,
@@ -62,12 +62,10 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = insert_queries {
-            error!(error=%error,"Failed to prepare Insert Chain Root For TXN ID Query.");
-        };
-
-        insert_queries
+        .await
+        .inspect_err(
+            |error| error!(error=%error,"Failed to prepare Insert Chain Root For TXN ID Query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_CHAIN_ROOT_FOR_TXN_ID_QUERY}"))
     }
 }

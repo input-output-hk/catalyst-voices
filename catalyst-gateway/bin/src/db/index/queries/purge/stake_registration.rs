@@ -27,7 +27,7 @@ pub(crate) mod result {
     use crate::db::types::{DbSlot, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (Vec<u8>, bool, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for Stake Registration.
@@ -38,6 +38,8 @@ const SELECT_QUERY: &str = include_str!("./cql/get_stake_registration.cql");
 pub(crate) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     pub(crate) stake_hash: Vec<u8>,
+    /// Is the address a script address.
+    pub(crate) script: bool,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -48,6 +50,7 @@ impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("stake_hash", &self.stake_hash)
+            .field("script", &self.script)
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .finish()
@@ -58,8 +61,9 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             stake_hash: value.0,
-            slot_no: value.1,
-            txn: value.2,
+            script: value.1,
+            slot_no: value.2,
+            txn: value.3,
         }
     }
 }
@@ -69,19 +73,17 @@ pub(crate) struct PrimaryKeyQuery;
 impl PrimaryKeyQuery {
     /// Prepares a query to get all Stake Registration primary keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let select_primary_key = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session.clone(),
             SELECT_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = select_primary_key {
-            error!(error=%error, "Failed to prepare get Stake Registration primary key query");
-        };
-
-        select_primary_key
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get Stake Registration primary key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
     /// Executes a query to get all Stake Registration primary keys.
@@ -108,7 +110,7 @@ impl DeleteQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let delete_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             DELETE_QUERY,
             cfg,
@@ -116,8 +118,11 @@ impl DeleteQuery {
             true,
             false,
         )
-        .await?;
-        Ok(delete_queries)
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare delete Stake Registration primary key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query

@@ -21,7 +21,7 @@ const INSERT_CHAIN_ROOT_FOR_STAKE_ADDRESS_QUERY: &str =
 
 /// Insert Chain Root For Stake Address Query Parameters
 #[derive(SerializeRow)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Stake Address Hash. 32 bytes.
     stake_addr: DbStakeAddress,
     /// Block Slot Number
@@ -51,7 +51,7 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(
+    pub(crate) fn new(
         stake_addr: StakeAddress, slot_no: Slot, txn: TxnIndex, chain_root: TransactionHash,
         chain_root_slot: Slot, chain_root_txn: TxnIndex,
     ) -> Self {
@@ -66,10 +66,10 @@ impl Params {
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_CHAIN_ROOT_FOR_STAKE_ADDRESS_QUERY,
             cfg,
@@ -77,12 +77,8 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = insert_queries {
-            error!(error=%error,"Failed to prepare Insert Chain Root For Stake Address Query.");
-        };
-
-        insert_queries
+        .await
+        .inspect_err(|error| error!(error=%error,"Failed to prepare Insert Chain Root For Stake Address Query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_CHAIN_ROOT_FOR_STAKE_ADDRESS_QUERY}"))
     }
 }

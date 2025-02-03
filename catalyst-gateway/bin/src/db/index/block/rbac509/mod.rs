@@ -1,12 +1,9 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
-// TODO: FIXME:
-#![allow(unused_imports)]
-
-pub(crate) mod chain_root;
-mod insert_chain_root_for_stake_address;
-mod insert_chain_root_for_txn_id;
-mod insert_rbac509;
+pub(crate) mod insert_chain_root_for_role0_key;
+pub(crate) mod insert_chain_root_for_stake_address;
+pub(crate) mod insert_chain_root_for_txn_id;
+pub(crate) mod insert_rbac509;
 
 use std::sync::{Arc, LazyLock};
 
