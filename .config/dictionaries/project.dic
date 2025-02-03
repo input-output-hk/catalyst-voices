@@ -101,6 +101,7 @@ encryptor
 endfunction
 Eternl
 EUTXO
+eventdb
 extn
 fetchval
 Filecoin
@@ -152,6 +153,7 @@ keychains
 Keyhash
 keyserver
 keyspace
+keyspaces
 kiri
 KUBECONFIG
 kubernetescrd
@@ -256,6 +258,7 @@ ristretto
 rlib
 rngs
 RPATH
+rolname
 ruleset
 rustc
 rustdoc
@@ -307,6 +310,7 @@ Toastify
 todos
 toggleable
 tojunit
+tolerations
 tomjs
 topbar
 Traceback
