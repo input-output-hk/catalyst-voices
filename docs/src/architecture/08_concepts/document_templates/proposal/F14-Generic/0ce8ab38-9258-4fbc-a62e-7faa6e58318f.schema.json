@@ -491,17 +491,17 @@
             ]
         },
         "campaign_category": {
-            "$ref": "#/definitions/segment",
+            "type": "object",
             "title": "Campaign Category",
             "description": "Determine the eligibility of the proposal for this category",
             "properties": {
                 "category_questions": {
-                    "$ref": "#/definitions/section",
+                    "type": "object",
                     "title": "Category Questions",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "properties": {
                         "informational_content": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -512,7 +512,7 @@
                             }
                         },
                         "foundational_rd": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -523,7 +523,7 @@
                             }
                         },
                         "financial_products": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -534,7 +534,7 @@
                             }
                         },
                         "early_stage_product": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -545,7 +545,7 @@
                             }
                         },
                         "developer_tools": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -556,7 +556,7 @@
                             }
                         },
                         "enterprise_partnership": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -565,7 +565,7 @@
                                     "description": "Proposals must be led by established enterprises or teams with proven business track records. This ensures credibility and feasibility."
                                 },
                                 "secondary_question": {
-                                    "$ref": "#/definitions/section",
+                                    "type": "object",
                                     "title": "If Yes",
                                     "properties": {
                                         "question": {
@@ -577,7 +577,7 @@
                             }
                         },
                         "working_product": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -586,7 +586,7 @@
                                     "description": "Proposals should demonstrate a working product and measurable adoption. Projects without existing success metrics are not eligible."
                                 },
                                 "secondary_question": {
-                                    "$ref": "#/definitions/section",
+                                    "type": "object",
                                     "title": "If Yes",
                                     "properties": {
                                         "question": {
@@ -598,7 +598,7 @@
                             }
                         },
                         "timeline": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -609,7 +609,7 @@
                             }
                         },
                         "matching_funds": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -618,7 +618,7 @@
                                     "description": "Proposals with matching funds or in-kind contributions are prioritized for funding due to their higher feasibility and potential impact."
                                 },
                                 "secondary_question": {
-                                    "$ref": "#/definitions/section",
+                                    "type": "object",
                                     "title": "If Yes",
                                     "properties": {
                                         "question": {
@@ -630,7 +630,7 @@
                             }
                         },
                         "adoption_potential": {
-                            "$ref": "#/definitions/section",
+                            "type": "object",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -639,7 +639,7 @@
                                     "description": "Projects must demonstrate high adoption potential and outline measurable outcomes. Metrics for success should be included."
                                 },
                                 "secondary_question": {
-                                    "$ref": "#/definitions/section",
+                                    "type": "object",
                                     "title": "If Yes",
                                     "properties": {
                                         "question": {
