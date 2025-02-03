@@ -47,7 +47,7 @@ impl Params {
                 .stake_pk()
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
-            slot_no: slot_no.into(),
+            slot_no,
             txn,
             valid,
         }
