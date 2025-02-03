@@ -21,7 +21,7 @@ impl<'a> poem_openapi::ApiExtractor<'a> for NoAuthorization {
                 description: Some("Endpoint can be used without any authorization."),
                 name: None,
                 key_in: None,
-                scheme: None,
+                scheme: Some("none"),
                 bearer_format: None,
                 flows: None,
                 openid_connect_url: None,
