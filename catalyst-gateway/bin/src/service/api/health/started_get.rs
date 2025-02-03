@@ -23,6 +23,8 @@ fn is_started() -> bool {
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## No Content
+    ///
     /// Service is Started and can serve requests.
     #[oai(status = 204)]
     NoContent,

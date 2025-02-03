@@ -6,6 +6,8 @@ use crate::service::common::{objects::legacy::vote_plan::VotePlan, responses::Wi
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## Ok
+    /// 
     /// JSON array with the list of vote plans with their respective data.
     #[oai(status = 200)]
     Ok(Json<Vec<VotePlan>>),

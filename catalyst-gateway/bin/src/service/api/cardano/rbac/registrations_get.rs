@@ -35,9 +35,13 @@ pub(crate) struct RbacRegistrationsResponse {
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## Ok
+    /// 
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
     Ok(Json<RbacRegistrationsResponse>),
+    /// ## Unprocessable Content
+    /// 
     /// Response for unprocessable content.
     #[oai(status = 422)]
     UnprocessableContent,

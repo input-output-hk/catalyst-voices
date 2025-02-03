@@ -29,7 +29,7 @@ pub(crate) enum Responses {
     /// The Document was already stored, and has not changed.
     #[oai(status = 204)]
     NoContent,
-    /// ## Bad Request
+    /// ## Unprocessable Content
     ///
     /// Error Response. The document submitted is invalid.
     #[oai(status = 422)]

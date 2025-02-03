@@ -11,6 +11,8 @@ use crate::service::common::{
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(crate) enum Responses {
+    /// ## Ok
+    /// 
     /// JSON array of the number of voted proposals in a plan.
     #[oai(status = 200)]
     Ok(Json<AccountVotesVec>),

@@ -13,6 +13,8 @@ use crate::service::common::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## No Content
+    ///
     /// Contains information about accepted and rejected fragments.
     #[oai(status = 200)]
     Ok(Json<FragmentsProcessingSummary>),

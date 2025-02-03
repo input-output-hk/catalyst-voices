@@ -12,6 +12,8 @@ use crate::service::common::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## Ok
+    ///
     /// Statuses of the fragments by id.
     #[oai(status = 200)]
     Ok(Json<HashMap<String, FragmentStatus>>),

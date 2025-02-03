@@ -16,9 +16,12 @@ use crate::service::{
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(super) enum Responses {
+    /// ## Ok
+    /// 
     /// The registration information for the stake address queried.
     #[oai(status = 200)]
     Ok(Json<RegistrationInfo>),
+    /// ## Not Found
     /// No valid registration found for the provided stake address
     /// and provided slot number.
     #[oai(status = 404)]
