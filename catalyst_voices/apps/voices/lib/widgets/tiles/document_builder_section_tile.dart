@@ -1,6 +1,10 @@
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/duration_in_months_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/language_code_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/list_length_picker_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/multiline_text_entry_markdown_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/radio_button_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/simple_text_entry_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_dropdown_selection_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/single_grouped_tag_selector_widget.dart';
@@ -83,16 +87,17 @@ class _DocumentBuilderSectionTileState
               isEditMode: _isEditMode,
               onToggleEditMode: _toggleEditMode,
             ),
+            const SizedBox(height: 24),
             _PropertyBuilder(
-              key: ValueKey(_editedSection.schema.nodeId),
+              key: ValueKey(_editedSection.nodeId),
               property: _editedSection,
               isEditMode: _isEditMode,
               onChanged: _handlePropertyChanges,
             ),
             if (_isEditMode) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               _Footer(
-                isValid: _editedSection.isValid,
+                isValid: _editedSection.isValidExcludingSubsections,
                 onSave: _saveChanges,
               ),
             ],
@@ -244,18 +249,24 @@ class _PropertyListBuilder extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: list.properties
-          .whereNot((child) => child.schema.isSubsection)
-          .map<Widget>((child) {
-            return _PropertyBuilder(
-              key: ValueKey(child.schema.nodeId),
-              property: child,
-              isEditMode: isEditMode,
-              onChanged: onChanged,
-            );
-          })
-          .separatedBy(const SizedBox(height: 24))
-          .toList(),
+      children: [
+        ListLengthPickerWidget(
+          key: ValueKey(list.nodeId),
+          list: list,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        ),
+        ...list.properties
+            .whereNot((child) => child.schema.isSubsection)
+            .map<Widget>((child) {
+          return _PropertyBuilder(
+            key: ValueKey(child.nodeId),
+            property: child,
+            isEditMode: isEditMode,
+            onChanged: onChanged,
+          );
+        }),
+      ].separatedBy(const SizedBox(height: 24)).toList(),
     );
   }
 }
@@ -294,7 +305,7 @@ class _PropertyObjectBuilder extends StatelessWidget {
               .whereNot((child) => child.schema.isSubsection)
               .map<Widget>((child) {
                 return _PropertyBuilder(
-                  key: ValueKey(child.schema.nodeId),
+                  key: ValueKey(child.nodeId),
                   property: child,
                   isEditMode: isEditMode,
                   onChanged: onChanged,
@@ -323,10 +334,8 @@ class _PropertyValueBuilder extends StatelessWidget {
     final schema = property.schema;
     switch (schema) {
       case DocumentDropDownSingleSelectSchema():
-        final castProperty = schema.castProperty(property);
         return SingleDropdownSelectionWidget(
-          value: castProperty.value ?? castProperty.schema.defaultValue ?? '',
-          items: castProperty.schema.enumValues ?? [],
+          property: schema.castProperty(property),
           schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
@@ -380,9 +389,29 @@ class _PropertyValueBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
 
-      case DocumentSpdxLicenseOrUrlSchema():
-      case DocumentLanguageCodeSchema():
+      case DocumentRadioButtonSelect():
+        return RadioButtonSelectWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+
       case DocumentDurationInMonthsSchema():
+        return DurationInMonthsWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentLanguageCodeSchema():
+        return LanguageCodeWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
+      case DocumentSpdxLicenseOrUrlSchema():
       case DocumentGenericIntegerSchema():
       case DocumentGenericNumberSchema():
       case DocumentGenericBooleanSchema():

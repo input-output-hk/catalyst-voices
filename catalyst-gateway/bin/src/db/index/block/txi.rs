@@ -56,7 +56,7 @@ impl TxiInsertQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let txi_insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_TXI_QUERY,
             cfg,
@@ -64,13 +64,9 @@ impl TxiInsertQuery {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = txi_insert_queries {
-            error!(error=%error,"Failed to prepare Insert TXI Query.");
-        };
-
-        txi_insert_queries
+        .await
+        .inspect_err(|error| error!(error=%error,"Failed to prepare Insert TXI Query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_TXI_QUERY}"))
     }
 
     /// Index the transaction Inputs.

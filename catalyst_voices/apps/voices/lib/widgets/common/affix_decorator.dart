@@ -31,6 +31,9 @@ class AffixDecorator extends StatelessWidget {
   /// The widget to be displayed after the child widget.
   final Widget? suffix;
 
+  /// See [Row.mainAxisSize].
+  final MainAxisSize mainAxisSize;
+
   /// The widget to be decorated with prefix and/or suffix.
   final Widget child;
 
@@ -44,6 +47,7 @@ class AffixDecorator extends StatelessWidget {
     this.iconTheme,
     this.prefix,
     this.suffix,
+    this.mainAxisSize = MainAxisSize.min,
     required this.child,
   });
 
@@ -52,8 +56,19 @@ class AffixDecorator extends StatelessWidget {
     final suffix = this.suffix;
     final prefix = this.prefix;
 
+    final child = switch (mainAxisSize) {
+      MainAxisSize.min => Flexible(
+          key: const Key('DecoratorData'),
+          child: this.child,
+        ),
+      MainAxisSize.max => Expanded(
+          key: const Key('DecoratorData'),
+          child: this.child,
+        ),
+    };
+
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: mainAxisSize,
       children: [
         if (prefix != null) ...[
           IconTheme(
@@ -63,10 +78,7 @@ class AffixDecorator extends StatelessWidget {
           ),
           SizedBox(width: gap),
         ],
-        Flexible(
-          key: const Key('DecoratorData'),
-          child: child,
-        ),
+        child,
         if (suffix != null) ...[
           SizedBox(width: gap),
           IconTheme(
