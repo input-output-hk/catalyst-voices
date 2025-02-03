@@ -17,7 +17,7 @@ final class AccountCubit extends Cubit<AccountState> {
 
   @override
   Future<void> close() {
-    //
+    // TODO(damian-molinski): cancel user subscription to _userService
     return super.close();
   }
 
