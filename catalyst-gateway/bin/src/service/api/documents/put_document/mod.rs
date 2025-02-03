@@ -1,7 +1,7 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
-use bad_put_request::PutDocumentUnprocessableContent;
+use unprocessable_content_request::PutDocumentUnprocessableContent;
 use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 
@@ -10,7 +10,7 @@ use crate::{
     service::common::responses::WithErrorResponses,
 };
 
-pub(crate) mod bad_put_request;
+pub(crate) mod unprocessable_content_request;
 
 /// Maximum size of a Signed Document (1MB)
 pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;

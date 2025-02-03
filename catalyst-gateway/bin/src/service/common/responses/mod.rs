@@ -7,7 +7,7 @@ use std::{
 
 use code_401_unauthorized::Unauthorized;
 use code_403_forbidden::Forbidden;
-use code_422_unprocessable_content::UnprocessableContent;
+use code_412_precondition_failed::PreconditionFailed;
 use code_429_too_many_requests::TooManyRequests;
 use code_503_service_unavailable::ServiceUnavailable;
 use poem::{http::StatusCode, IntoResponse};
@@ -20,7 +20,7 @@ use tracing::error;
 
 mod code_401_unauthorized;
 mod code_403_forbidden;
-mod code_422_unprocessable_content;
+mod code_412_precondition_failed;
 mod code_429_too_many_requests;
 pub(crate) mod code_500_internal_server_error;
 mod code_503_service_unavailable;
@@ -66,11 +66,11 @@ pub(crate) enum ErrorResponses {
     #[allow(dead_code)]
     UriTooLong,
 
-    /// ## Unprocessable Content
+    /// ## Precondition Failed
     ///
     /// The client has not sent valid data in its request, headers, parameters or body.
-    #[oai(status = 422)]
-    UnprocessableContent(Json<UnprocessableContent>),
+    #[oai(status = 412)]
+    PreconditionFailed(Json<PreconditionFailed>),
 
     /// ## Too Many Requests
     ///
@@ -193,12 +193,12 @@ impl<T> WithErrorResponses<T> {
         WithErrorResponses::Error(ErrorResponses::forbidden(roles))
     }
 
-    /// Handle a 422 unprocessable content response.
+    /// Handle a 412 precondition failed response.
     ///
-    /// Returns a 422 unprocessable content response.
-    pub(crate) fn unprocessable_content(errors: Vec<poem::Error>) -> Self {
-        let error = UnprocessableContent::new(errors);
-        WithErrorResponses::Error(ErrorResponses::UnprocessableContent(Json(error)))
+    /// Returns a 412 precondition failed response.
+    fn precondition_failed(errors: Vec<poem::Error>) -> Self {
+        let error = PreconditionFailed::new(errors);
+        WithErrorResponses::Error(ErrorResponses::PreconditionFailed(Json(error)))
     }
 
     /// Handle a 429 rate limiting response.
@@ -290,7 +290,7 @@ impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
         if err.status() == StatusCode::UNAUTHORIZED {
             WithErrorResponses::unauthorized()
         } else {
-            WithErrorResponses::unprocessable_content(vec![err])
+            WithErrorResponses::precondition_failed(vec![err])
         }
     }
 }

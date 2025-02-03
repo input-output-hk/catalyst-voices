@@ -2,7 +2,7 @@
 
 use poem_openapi::{types::Example, Object};
 
-/// Configuration Data Validation Error.
+/// Put Document Validation Error.
 #[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct PutDocumentUnprocessableContent {

@@ -1,13 +1,13 @@
-//! Define `Unprocessable Content` response type.
+//! Define `Precondition Failed` response type.
 
 use poem_openapi::{types::Example, Object};
 
 use crate::service::common;
 
+/// The client has not sent valid data in its request, headers, parameters or body.
 #[derive(Object)]
 #[oai(example)]
-/// The client has not sent valid data in its request, headers, parameters or body.
-pub(crate) struct UnprocessableContent {
+pub(crate) struct PreconditionFailed {
     #[oai(validator(max_items = "1000", min_items = "1"))]
     /// Details of each error in the content that was detected.
     ///
@@ -16,7 +16,7 @@ pub(crate) struct UnprocessableContent {
     detail: Vec<ContentErrorDetail>,
 }
 
-impl UnprocessableContent {
+impl PreconditionFailed {
     /// Create a new `ContentErrorDetail` Response Payload.
     pub(crate) fn new(errors: Vec<poem::Error>) -> Self {
         let mut detail = vec![];
@@ -28,7 +28,7 @@ impl UnprocessableContent {
     }
 }
 
-impl Example for UnprocessableContent {
+impl Example for PreconditionFailed {
     /// Example for the Too Many Requests Payload.
     fn example() -> Self {
         Self {
