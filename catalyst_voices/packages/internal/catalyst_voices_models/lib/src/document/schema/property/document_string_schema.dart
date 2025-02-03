@@ -40,7 +40,7 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
 
   /// Normalizes a user entered [value].
   ///
-  /// For the purpose of the document schema validation
+  /// For the purpose of document schema validation
   /// the empty string needs to be translated to `null`.
   String? normalizeValue(String? value) {
     if (value == null || value.isEmpty) {

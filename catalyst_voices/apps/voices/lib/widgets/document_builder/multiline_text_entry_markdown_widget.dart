@@ -83,7 +83,7 @@ class _MultilineTextEntryMarkdownWidgetState
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,
-      validator: (_) => _validate(),
+      validator: _validate,
     );
   }
 
@@ -125,10 +125,10 @@ class _MultilineTextEntryMarkdownWidgetState
     }
   }
 
-  String? _validate() {
-    final delta = _controller.document.toDelta();
-    final markdownData = markdown.decoder.convert(delta);
-    final markdownValue = markdownData.data;
+  String? _validate(quill.Document? document) {
+    final delta = document?.toDelta();
+    final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
+    final markdownValue = markdownData?.data;
     final normalizedValue = widget.schema.normalizeValue(markdownValue);
 
     final error = widget.schema.validate(normalizedValue);
