@@ -8,9 +8,9 @@ project: {
 	}
 	deployment: {
 		on: {
+			// TODO: re-enable once we can better control number of deployments
 			//merge: {}
 			//tag: {}
-			always: {}
 		}
 		environment: "dev"
 		modules: main: {
@@ -229,9 +229,8 @@ project: {
 	release: {
 		docker: {
 			on: {
-				//merge: {}
-				//tag: {}
-				always: {}
+				merge: {}
+				tag: {}
 			}
 			config: {
 				tag: _ @forge(name="GIT_COMMIT_HASH")
