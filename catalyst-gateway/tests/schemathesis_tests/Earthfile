@@ -12,7 +12,8 @@ package-schemathesis:
     COPY ./hooks/hooks.py .
     VOLUME /results
 
-    ENTRYPOINT st run --exclude-path-regex 'draft' \
+    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
+                && st run --exclude-path-regex 'draft' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     --checks=all $api_spec \
                     --workers=2 \
