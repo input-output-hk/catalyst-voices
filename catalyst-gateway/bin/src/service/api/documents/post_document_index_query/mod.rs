@@ -2,6 +2,7 @@
 
 use std::future;
 
+use catalyst_signed_doc::CatalystSignedDocument;
 use dashmap::DashMap;
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -9,8 +10,9 @@ use query_filter::DocumentIndexQueryFilter;
 use response::{
     DocumentIndexList, DocumentIndexListDocumented, IndexedDocument, IndexedDocumentDocumented,
 };
+use serde_json::json;
 
-use super::{Limit, Page};
+use super::{templates::TEMPLATES, Limit, Page};
 use crate::{
     db::event::{
         common::query_limits::QueryLimits,
@@ -50,13 +52,21 @@ pub(crate) async fn endpoint(
     filter: DocumentIndexQueryFilter, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
     let query_limits = QueryLimits::new(limit, page);
-    let conditions = match filter.try_into() {
+    let conditions: DocsQueryFilter = match filter.try_into() {
         Ok(db_filter) => db_filter,
         Err(e) => return AllResponses::handle_error(&e),
     };
 
+    let mut templates = vec![];
+
+    for template in TEMPLATES.iter() {
+        if conditions.filter(template) {
+            templates.push(template);
+        }
+    }
+
     let (docs, counts) = tokio::join!(
-        fetch_docs(&conditions, &query_limits),
+        fetch_docs(&conditions, &query_limits, templates.clone()),
         SignedDocBody::retrieve_count(&conditions)
     );
 
@@ -83,7 +93,12 @@ pub(crate) async fn endpoint(
                 Err(e) => return AllResponses::handle_error(&e.into()),
             };
 
-            let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
+            let remaining = Remaining::calculate(
+                page.into(),
+                limit.into(),
+                total.saturating_add(templates.len().try_into().unwrap_or_default()),
+                doc_count,
+            );
 
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
                 docs,
@@ -102,6 +117,7 @@ pub(crate) async fn endpoint(
 /// Fetch documents from the event db
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+    static_doc: Vec<&CatalystSignedDocument>,
 ) -> anyhow::Result<Vec<IndexedDocumentDocumented>> {
     let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
     let indexed_docs = DashMap::new();
@@ -113,6 +129,27 @@ async fn fetch_docs(
             future::ready(Ok(()))
         })
         .await?;
+
+    for doc in static_doc {
+        let authors = doc
+            .signatures()
+            .kids()
+            .into_iter()
+            .map(|kid| kid.to_string())
+            .collect();
+
+        indexed_docs
+            .entry(doc.doc_id().uuid())
+            .or_insert_with(Vec::new)
+            .push(SignedDocBody::new(
+                doc.doc_id().uuid(),
+                doc.doc_ver().uuid(),
+                doc.doc_type().uuid(),
+                authors,
+                // This should not fail
+                Some(json!(doc.doc_meta())),
+            ));
+    }
 
     let docs = indexed_docs
         .into_iter()

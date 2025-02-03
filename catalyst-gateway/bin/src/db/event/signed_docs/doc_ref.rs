@@ -29,4 +29,11 @@ impl DocumentRef {
         }
         stmt
     }
+
+    /// FIXME
+    #[allow(dead_code)]
+    pub(crate) fn matches(&self, id: uuid::Uuid, ver: uuid::Uuid) -> bool {
+        self.id.as_ref().map_or(true, |i| i.matches(id))
+            && self.ver.as_ref().map_or(true, |v| v.matches(ver))
+    }
 }

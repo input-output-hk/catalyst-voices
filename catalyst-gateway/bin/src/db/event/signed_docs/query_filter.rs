@@ -2,6 +2,8 @@
 
 use std::fmt::Display;
 
+use catalyst_signed_doc::CatalystSignedDocument;
+
 use super::DocumentRef;
 use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 
@@ -171,5 +173,27 @@ impl DocsQueryFilter {
             category_id: Some(category_id),
             ..self
         }
+    }
+
+    /// FIXME
+    pub(crate) fn filter(&self, signed_doc: &CatalystSignedDocument) -> bool {
+        // Check if the document matches the filter
+        let mut is_match = true;
+
+        if let Some(doc_type) = self.doc_type {
+            if signed_doc.doc_type().uuid() != doc_type {
+                is_match = false;
+            }
+        }
+
+        if let Some(id) = &self.id {
+            is_match = id.matches(signed_doc.doc_id().uuid());
+        }
+
+        if let Some(ver) = &self.ver {
+            is_match = ver.matches(signed_doc.doc_ver().uuid());
+        }
+
+        is_match
     }
 }

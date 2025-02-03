@@ -24,4 +24,12 @@ impl EqOrRangedUuid {
             },
         }
     }
+
+    /// Match the provided UUID.
+    pub(crate) fn matches(&self, value: uuid::Uuid) -> bool {
+        match self {
+            EqOrRangedUuid::Eq(uuid) => *uuid == value,
+            EqOrRangedUuid::Range { min, max } => min <= &value && &value <= max,
+        }
+    }
 }
