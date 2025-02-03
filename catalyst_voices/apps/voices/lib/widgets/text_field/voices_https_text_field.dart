@@ -82,6 +82,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
         enabled: widget.enabled,
         readOnly: !widget.enabled,
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        mouseCursor: widget.enabled ? null : SystemMouseCursors.click,
       ),
     );
   }
