@@ -4,6 +4,7 @@ import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
@@ -82,12 +83,7 @@ class _MultilineTextEntryMarkdownWidgetState
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,
-      validator: (val) {
-        return null;
-
-        // TODO(LynxxLynx): implement validator when we got answer how to
-        // validate formatted document against maxLength
-      },
+      validator: (_) => _validate(),
     );
   }
 
@@ -127,6 +123,16 @@ class _MultilineTextEntryMarkdownWidgetState
     } else {
       _controller.clear();
     }
+  }
+
+  String? _validate() {
+    final delta = _controller.document.toDelta();
+    final markdownData = markdown.decoder.convert(delta);
+    final markdownValue = markdownData.data;
+    final normalizedValue = widget.schema.normalizeValue(markdownValue);
+
+    final error = widget.schema.validate(normalizedValue);
+    return LocalizedDocumentValidationResult.from(error).message(context);
   }
 
   void _onDocumentChanged(quill.DocChange change) {

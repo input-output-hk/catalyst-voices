@@ -29,9 +29,6 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
 
   @override
   DocumentValidationResult validate(String? value) {
-    // TODO(dtscalac): for the purpose of validation empty string == null?
-    // single line https url is not required but then it's always
-    // null which doesn't pass the pattern validation
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateStringLength(this, value),
