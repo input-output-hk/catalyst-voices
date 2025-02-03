@@ -61,7 +61,7 @@ void main() async {
       expect($(OnboardingPage.registrationDialog), findsNothing);
     });
 
-    //ToDo(oldgreg): add Introduction screen tests and base profile screens
+    // TODO(oldgreg): add Introduction screen tests and base profile screens
 
     patrolWidgetTest('visitor - create - keychain info screen looks OK',
         (PatrolTester $) async {
