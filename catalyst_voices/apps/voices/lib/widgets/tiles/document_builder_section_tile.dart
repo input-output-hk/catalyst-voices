@@ -230,21 +230,29 @@ class _PropertyObjectBuilder extends StatelessWidget {
       case DocumentSectionSchema():
       case DocumentNestedQuestionsSchema():
       case DocumentGenericObjectSchema():
+        final title = schema.title;
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: property.properties
-              .whereNot((child) => child.schema.isSectionOrSubsection)
-              .map<Widget>((child) {
-                return _PropertyBuilder(
-                  key: ValueKey(child.nodeId),
-                  property: child,
-                  isEditMode: isEditMode,
-                  onChanged: onChanged,
-                );
-              })
-              .separatedBy(const SizedBox(height: 24))
-              .toList(),
+          children: [
+            if (title.isNotEmpty && !schema.isSectionOrSubsection) ...[
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+            ],
+            ...property.properties
+                .whereNot((child) => child.schema.isSectionOrSubsection)
+                .map<Widget>((child) {
+              return _PropertyBuilder(
+                key: ValueKey(child.nodeId),
+                property: child,
+                isEditMode: isEditMode,
+                onChanged: onChanged,
+              );
+            }).separatedBy(const SizedBox(height: 24)),
+          ],
         );
     }
   }
