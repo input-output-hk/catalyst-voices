@@ -3,7 +3,6 @@
 //! Means the API Endpoint does not need to use any Auth.
 
 /// Endpoint can be used without any authorization.
-#[allow(dead_code)]
 pub(crate) struct NoAuthorization();
 
 impl<'a> poem_openapi::ApiExtractor<'a> for NoAuthorization {
