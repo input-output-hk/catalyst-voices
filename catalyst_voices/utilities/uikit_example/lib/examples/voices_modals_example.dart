@@ -45,8 +45,14 @@ class VoicesModalsExample extends StatelessWidget {
                 await VoicesDialog.show<void>(
                   context: context,
                   builder: (context) {
-                    return const VoicesDesktopInfoDialog(
-                      title: Text('Desktop modal'),
+                    return VoicesDesktopInfoDialog(
+                      icon: VoicesAssets.icons.x.buildIcon(),
+                      title: const Text('Desktop modal'),
+                      message: const Text('Message'),
+                      action: VoicesFilledButton(
+                        onTap: () {},
+                        child: const Text('Continue'),
+                      ),
                     );
                   },
                 );

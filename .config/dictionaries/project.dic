@@ -101,6 +101,7 @@ encryptor
 endfunction
 Eternl
 EUTXO
+eventdb
 extn
 fetchval
 Filecoin
@@ -152,6 +153,8 @@ keychains
 Keyhash
 keyserver
 keyspace
+keyspaces
+kiri
 KUBECONFIG
 kubernetescrd
 kubetail
@@ -208,6 +211,7 @@ Nodetool
 NuFi
 oapi
 OCSP
+oldgreg
 Oleksandr
 onboarded
 oneshot
@@ -255,6 +259,7 @@ ristretto
 rlib
 rngs
 RPATH
+rolname
 ruleset
 rustc
 rustdoc
@@ -274,6 +279,7 @@ sendfile
 servernum
 serviceworker
 slotno
+skeletonizer
 sqlfluff
 SRCROOT
 sslmode
@@ -305,6 +311,7 @@ Toastify
 todos
 toggleable
 tojunit
+tolerations
 tomjs
 topbar
 Traceback

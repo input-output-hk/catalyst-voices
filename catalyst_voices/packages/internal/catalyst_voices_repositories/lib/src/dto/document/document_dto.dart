@@ -240,7 +240,18 @@ final class DocumentPropertyValueDto<T extends Object>
   }
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() {
+    if (value == null) {
+      // Don't output keys for nullable values, json schema distinguishes
+      // between nullable value and key missing, for the app it's the same.
+      //
+      // The schemas we are working with don't accept
+      // nullable values but they accept key missing.
+      return {};
+    } else {
+      return {
         schema.id: value,
       };
+    }
+  }
 }
