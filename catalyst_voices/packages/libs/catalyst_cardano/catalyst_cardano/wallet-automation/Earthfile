@@ -1,6 +1,7 @@
 VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.31 AS flutter-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.31 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter/installer:temp1 AS flutter-installer
 
 deps:
     DO playwright-ci+SETUP --workdir=/wallet-automation
@@ -49,8 +50,14 @@ package-app:
     SAVE IMAGE test-app:$tag
 
 nightly-test:
-    FROM earthly/dind:alpine-3.20-docker-26.1.5-r0
+    FROM earthly/dind:ubuntu-20.04-docker-27.2.1-1
     COPY compose.yml .
+    RUN apt-get update --fix-missing && \
+                apt-get install -y \
+                apt-utils \
+                curl \
+                unzip
+    DO flutter-installer+INSTALL_CHROME_LINUX64
     WITH DOCKER \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
