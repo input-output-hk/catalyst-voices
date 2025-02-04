@@ -81,6 +81,9 @@ class _SingleGroupedTagSelectorWidgetState
         group: Optional(groupedTags?.group),
         tag: groupChanged ? const Optional<String>.empty() : null,
       );
+
+      final changes = widget.schema.buildDocumentChanges(_selection);
+      widget.onChanged(changes);
     });
   }
 
