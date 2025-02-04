@@ -196,6 +196,7 @@ void main() {
           body: Center(
             child: SingleSelectDropdown<String>(
               items: items,
+              value: null,
               hintText: 'Select an item',
               onChanged: (value) => selectedValue = value,
             ),
@@ -228,6 +229,7 @@ void main() {
           body: Center(
             child: SingleSelectDropdown<String>(
               items: items,
+              value: null,
               hintText: 'Select an item',
               validator: (value) =>
                   value == 'item2' ? 'Value is invalid' : null,

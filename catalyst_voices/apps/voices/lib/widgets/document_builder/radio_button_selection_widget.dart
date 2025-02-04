@@ -62,10 +62,10 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
           ),
           const SizedBox(height: 8),
           VoicesRadioButtonFormField(
-            selectedValue: _selectedValue,
             items: _items,
-            enabled: widget.isEditMode,
+            value: _selectedValue,
             onChanged: _handleValueChanged,
+            enabled: widget.isEditMode,
             validator: _validate,
           ),
         ],

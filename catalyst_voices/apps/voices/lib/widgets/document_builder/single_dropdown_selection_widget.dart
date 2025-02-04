@@ -67,7 +67,7 @@ class _SingleDropdownSelectionWidgetState
         const SizedBox(height: 8),
         SingleSelectDropdown(
           items: _dropdownMenuEntries,
-          initialValue: _selectedValue,
+          value: _selectedValue,
           onChanged: _handleValueChanged,
           validator: _validator,
           enabled: widget.isEditMode,
