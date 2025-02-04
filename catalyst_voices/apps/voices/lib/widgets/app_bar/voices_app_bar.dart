@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/app_bar/actions/search_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
+import 'package:catalyst_voices/widgets/separators/voices_divider.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -39,16 +40,23 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
         xs: 8,
         other: 16,
         builder: (context, spacing) {
-          return AppBar(
-            titleSpacing: spacing,
-            toolbarHeight: preferredSize.height,
-            leading: _buildLeading(context),
-            leadingWidth: 48.0 + spacing,
-            automaticallyImplyLeading: false,
-            backgroundColor: backgroundColor,
-            title: _Title(showSearch: showSearch),
-            actions: [
-              _Actions(children: actions),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppBar(
+                titleSpacing: spacing,
+                toolbarHeight: preferredSize.height - 1,
+                leading: _buildLeading(context),
+                leadingWidth: 48.0 + spacing,
+                automaticallyImplyLeading: false,
+                backgroundColor: backgroundColor,
+                title: _Title(showSearch: showSearch),
+                actions: [
+                  _Actions(children: actions),
+                ],
+              ),
+              const VoicesDivider.expanded(height: 1),
             ],
           );
         },

@@ -11,11 +11,13 @@ const _compactMaxLength = 6;
 class CatalystIdText extends StatefulWidget {
   final String data;
   final bool isCompact;
+  final Color? backgroundColor;
 
   const CatalystIdText(
     this.data, {
     super.key,
     required this.isCompact,
+    this.backgroundColor,
   });
 
   @override
@@ -68,13 +70,16 @@ class _CatalystIdTextState extends State<CatalystIdText> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              VoicesPlainTooltip(
-                message: widget.data,
-                // Do not constraint width.
-                constraints: const BoxConstraints(),
-                child: _Chip(
-                  _effectiveData,
-                  onTap: _copyDataToClipboard,
+              Flexible(
+                child: VoicesPlainTooltip(
+                  message: widget.data,
+                  // Do not constraint width.
+                  constraints: const BoxConstraints(),
+                  child: _Chip(
+                    _effectiveData,
+                    onTap: _copyDataToClipboard,
+                    backgroundColor: widget.backgroundColor,
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
@@ -173,10 +178,12 @@ class _TapDetector extends StatelessWidget {
 class _Chip extends StatelessWidget {
   final String data;
   final VoidCallback onTap;
+  final Color? backgroundColor;
 
   const _Chip(
     this.data, {
     required this.onTap,
+    this.backgroundColor,
   });
 
   @override
@@ -185,7 +192,8 @@ class _Chip extends StatelessWidget {
     final textTheme = theme.textTheme;
     final colors = theme.colors;
 
-    final backgroundColor = colors.elevationsOnSurfaceNeutralLv1Grey;
+    final backgroundColor =
+        this.backgroundColor ?? colors.elevationsOnSurfaceNeutralLv1Grey;
     final foregroundColor = colors.textOnPrimaryLevel1;
     final overlayColor = colors.onSurfaceNeutralOpaqueLv2;
 
@@ -204,7 +212,11 @@ class _Chip extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-          child: Text(data),
+          child: Text(
+            data,
+            maxLines: 2,
+            overflow: TextOverflow.clip,
+          ),
         ),
       ),
     );

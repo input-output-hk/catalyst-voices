@@ -79,15 +79,9 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
       controller: _segmentsController,
       child: SpaceScaffold(
         left: const ProposalBuilderNavigationPanel(),
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            ProposalBuilderErrorSelector(onRetryTap: _updateSource),
-            ProposalBuilderSegmentsSelector(
-              itemScrollController: _segmentsScrollController,
-            ),
-            const ProposalBuilderLoadingSelector(),
-          ],
+        body: _ProposalBuilderContent(
+          controller: _segmentsScrollController,
+          onRetryTap: _updateSource,
         ),
         right: const ProposalBuilderSetupPanel(),
       ),
@@ -130,5 +124,29 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     }
 
     bloc.add(const LoadDefaultProposalTemplateEvent());
+  }
+}
+
+class _ProposalBuilderContent extends StatelessWidget {
+  final ItemScrollController controller;
+  final VoidCallback onRetryTap;
+
+  const _ProposalBuilderContent({
+    required this.controller,
+    required this.onRetryTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusTraversalGroup(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
+          ProposalBuilderSegmentsSelector(itemScrollController: controller),
+          const ProposalBuilderLoadingSelector(),
+        ],
+      ),
+    );
   }
 }

@@ -14,6 +14,4 @@ pub(crate) enum ApiTags {
     Config,
     /// Signed Document endpoints
     Documents,
-    /// Legacy Mobile App Support.
-    Legacy,
 }
