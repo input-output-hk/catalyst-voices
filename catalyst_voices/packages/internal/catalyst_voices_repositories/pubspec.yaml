@@ -18,6 +18,8 @@ dependencies:
     path: ../catalyst_voices_shared
   chopper: ^8.0.3
   collection: ^1.18.0
+  drift: ^2.24.0
+  drift_flutter: ^0.2.4
   equatable: ^2.0.7
   flutter:
     sdk: flutter
@@ -29,9 +31,10 @@ dependencies:
   uuid: ^4.5.1
 
 dev_dependencies:
-  build_runner: ^2.4.12
+  build_runner: ^2.4.14
   catalyst_analysis: ^2.0.1
   chopper_generator: ^8.0.3
+  drift_dev: ^2.24.0
   flutter_test:
     sdk: flutter
   json_serializable: ^6.7.1
