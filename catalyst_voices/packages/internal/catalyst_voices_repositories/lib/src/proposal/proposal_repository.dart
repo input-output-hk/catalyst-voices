@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -31,7 +33,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required String campaignId,
   }) async {
     // optionally filter by status.
-    return _proposals;
+    return List.filled(8, _proposal);
   }
 }
 
@@ -42,6 +44,23 @@ Zanzibar is becoming one of the hotspots for DID's through World Mobile
 and PRISM, but its potential is only barely exploited.
 """
     .replaceAll('\n', ' ');
+
+final _proposal = ProposalBase(
+  id: 'f14/0',
+  category: 'Cardano Use Cases / MVP',
+  title: 'Proposal Title that rocks the world',
+  updateDate: DateTime.now().minusDays(2),
+  fundsRequested: Coin.fromAda(100000),
+  status: ProposalStatus.draft,
+  publish:
+      Random().nextBool() ? ProposalPublish.draft : ProposalPublish.published,
+  access: ProposalAccess.private,
+  commentsCount: 0,
+  description: _proposalDescription,
+  duration: 6,
+  author: 'Alex Wells',
+  version: 1,
+);
 
 final _proposals = [
   ProposalBase(
@@ -82,6 +101,21 @@ final _proposals = [
     fundsRequested: Coin.fromAda(100000),
     status: ProposalStatus.draft,
     publish: ProposalPublish.draft,
+    access: ProposalAccess.private,
+    commentsCount: 0,
+    description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 3,
+  ),
+  ProposalBase(
+    id: 'f14/2',
+    category: 'Cardano Use Cases / MVP',
+    title: 'Proposal Title that rocks the world',
+    updateDate: DateTime.now().minusDays(2),
+    fundsRequested: Coin.fromAda(100000),
+    status: ProposalStatus.draft,
+    publish: ProposalPublish.published,
     access: ProposalAccess.private,
     commentsCount: 0,
     description: _proposalDescription,

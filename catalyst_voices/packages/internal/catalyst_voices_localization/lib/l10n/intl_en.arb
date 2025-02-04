@@ -243,9 +243,45 @@
   "@activeVotingRound": {
     "description": "Title of the voting space."
   },
-  "noOfAllProposals": "All proposals ({count})",
-  "@noOfAllProposals": {
+  "noOfAll": "All ({count})",
+  "@noOfAll": {
     "description": "Tab label for all proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfDraft": "Draft proposals ({count})",
+  "@noOfDraft": {
+    "description": "Tab label for draft proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfFinal": "Final proposals ({count})",
+  "@noOfFinal": {
+    "description": "Tab label for final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfMyProposals": "My proposals ({count})",
+  "@noOfMyProposals": {
+    "description": "Tab label for my proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfFavorites": "Favorites ({count})",
+  "@noOfFavorites": {
+    "description": "Tab label for draft proposals in voting space",
     "placeholders": {
       "count": {
         "type": "int"

@@ -1,12 +1,12 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
-import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
-import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
+import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
-import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -170,21 +170,54 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 2,
+    return DefaultTabController(
+      length: 5,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _TabBar(),
-          SizedBox(height: 24),
-          TabBarStackView(
+          const SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.end,
+              runSpacing: 10,
+              children: [
+                _TabBar(),
+                _Controls(),
+              ],
+            ),
+          ),
+          Offstage(
+            offstage: MediaQuery.sizeOf(context).width < 1400,
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              color: context.colors.primaryContainer,
+            ),
+          ),
+          const SizedBox(height: 24),
+          const TabBarStackView(
             children: [
               _AllProposals(),
+              _DraftProposals(),
+              _FinalProposals(),
+              _FavoriteProposals(),
               _FavoriteProposals(),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Text('1-8 of 240 proposals'),
+              VoicesIconButton(
+                child: VoicesAssets.icons.chevronLeft.buildIcon(),
+              ),
+              VoicesIconButton(
+                child: VoicesAssets.icons.chevronRight.buildIcon(),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -196,27 +229,76 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, int>(
-      selector: (state) =>
-          state is LoadedProposalsState ? state.proposals.length : 0,
-      builder: (context, proposalsCount) {
-        return TabBar(
-          isScrollable: true,
-          tabAlignment: TabAlignment.start,
-          tabs: [
-            Tab(
-              text: context.l10n.noOfAllProposals(proposalsCount),
-            ),
-            Tab(
-              child: AffixDecorator(
-                gap: 8,
-                prefix: VoicesAssets.icons.starOutlined.buildIcon(),
-                child: Text(context.l10n.favorites),
+    return BlocSelector<ProposalsCubit, ProposalsState,
+        List<ProposalViewModel>>(
+      selector: (state) => state.proposals,
+      builder: (context, proposals) {
+        return ConstrainedBox(
+          constraints: const BoxConstraints(),
+          child: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            dividerHeight: 0,
+            tabs: [
+              Tab(
+                text: context.l10n.noOfAll(proposals.length),
               ),
-            ),
-          ],
+              Tab(
+                text: context.l10n.noOfDraft(proposals.draftProposals.length),
+              ),
+              Tab(
+                text: context.l10n.noOfFinal(proposals.finalProposals.length),
+              ),
+              Tab(
+                text: context.l10n.noOfFavorites(proposals.favorites.length),
+              ),
+              Tab(
+                text: context.l10n.noOfMyProposals(100),
+              ),
+            ],
+          ),
         );
       },
+    );
+  }
+}
+
+class _Controls extends StatelessWidget {
+  const _Controls();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FilterByDropdown(
+            items: [],
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 250,
+            child: VoicesTextField(
+              onFieldSubmitted: (_) {},
+              decoration: VoicesTextFieldDecoration(
+                prefixIcon: VoicesAssets.icons.search.buildIcon(),
+                hintText: context.l10n.searchProposals,
+                filled: true,
+                fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
+                suffixIcon: Offstage(
+                  offstage: false,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(context.l10n.clear),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -229,22 +311,84 @@ class _AllProposals extends StatelessWidget {
     return BlocBuilder<ProposalsCubit, ProposalsState>(
       builder: (context, state) {
         return switch (state) {
-          LoadingProposalsState() => const _LoadingProposals(),
           LoadedProposalsState(:final proposals) => proposals.isEmpty
               ? const _EmptyProposals()
-              : _AllProposalsList(
+              : _ProposalsList(
                   proposals: proposals,
                 ),
+          _ => const _LoadingProposals(),
         };
       },
     );
   }
 }
 
-class _AllProposalsList extends StatelessWidget {
+class _DraftProposals extends StatelessWidget {
+  const _DraftProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProposalsCubit, ProposalsState>(
+      builder: (context, state) {
+        return switch (state) {
+          LoadedProposalsState(:final proposals) =>
+            proposals.draftProposals.isEmpty
+                ? const _EmptyProposals()
+                : _ProposalsList(
+                    proposals: proposals.draftProposals,
+                  ),
+          _ => const _LoadingProposals(),
+        };
+      },
+    );
+  }
+}
+
+class _FinalProposals extends StatelessWidget {
+  const _FinalProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProposalsCubit, ProposalsState>(
+      builder: (context, state) {
+        return switch (state) {
+          LoadedProposalsState(:final proposals) =>
+            proposals.finalProposals.isEmpty
+                ? const _EmptyProposals()
+                : _ProposalsList(
+                    proposals: proposals.finalProposals,
+                  ),
+          _ => const _LoadingProposals(),
+        };
+      },
+    );
+  }
+}
+
+class _FavoriteProposals extends StatelessWidget {
+  const _FavoriteProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProposalsCubit, ProposalsState>(
+      builder: (context, state) {
+        return switch (state) {
+          LoadedProposalsState(:final proposals) => proposals.favorites.isEmpty
+              ? const _EmptyProposals()
+              : _ProposalsList(
+                  proposals: proposals.favorites,
+                ),
+          _ => const _LoadingProposals(),
+        };
+      },
+    );
+  }
+}
+
+class _ProposalsList extends StatelessWidget {
   final List<ProposalViewModel> proposals;
 
-  const _AllProposalsList({
+  const _ProposalsList({
     required this.proposals,
   });
 
@@ -263,58 +407,6 @@ class _AllProposalsList extends StatelessWidget {
             showComments: false,
             showSegments: false,
             isFavorite: proposal.isFavorite,
-            onFavoriteChanged: (isFavorite) async {
-              await context.read<ProposalsCubit>().onChangeFavoriteProposal(
-                    proposal.id,
-                    isFavorite: isFavorite,
-                  );
-            },
-          ),
-      ],
-    );
-  }
-}
-
-class _FavoriteProposals extends StatelessWidget {
-  const _FavoriteProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProposalsCubit, ProposalsState>(
-      builder: (context, state) {
-        return switch (state) {
-          LoadingProposalsState() => const _LoadingProposals(),
-          LoadedProposalsState(:final proposals) => proposals.favorites.isEmpty
-              ? const _EmptyProposals()
-              : _FavoriteProposalsList(
-                  proposals: proposals.favorites,
-                ),
-        };
-      },
-    );
-  }
-}
-
-class _FavoriteProposalsList extends StatelessWidget {
-  final List<ProposalViewModel> proposals;
-
-  const _FavoriteProposalsList({required this.proposals});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      children: [
-        for (final proposal in proposals)
-          ProposalCard(
-            image: _generateImageForProposal(proposal.id),
-            proposal: proposal,
-            showStatus: false,
-            showLastUpdate: false,
-            showComments: false,
-            showSegments: false,
-            isFavorite: true,
             onFavoriteChanged: (isFavorite) async {
               await context.read<ProposalsCubit>().onChangeFavoriteProposal(
                     proposal.id,
