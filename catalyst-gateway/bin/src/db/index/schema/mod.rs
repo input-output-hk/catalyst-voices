@@ -10,15 +10,6 @@ use tracing::error;
 
 use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_from_data};
 
-/// The version of the Index DB Schema we SHOULD BE using.
-/// DO NOT change this unless you are intentionally changing the Schema.
-///
-/// This constant is ONLY used by Unit tests to identify when the schema version will
-/// change accidentally, and is NOT to be used directly to set the schema version of the
-/// table namespaces.
-#[allow(dead_code)]
-const SCHEMA_VERSION: &str = "75ae6ac9-ddd8-8472-8a7a-8676d04f8679";
-
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
 
@@ -261,6 +252,14 @@ pub(crate) async fn create_schema(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The version of the Index DB Schema we SHOULD BE using.
+    /// DO NOT change this unless you are intentionally changing the Schema.
+    ///
+    /// This constant is ONLY used by Unit tests to identify when the schema version will
+    /// change accidentally, and is NOT to be used directly to set the schema version of the
+    /// table namespaces.
+    const SCHEMA_VERSION: &str = "75ae6ac9-ddd8-8472-8a7a-8676d04f8679";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.
