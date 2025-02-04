@@ -154,6 +154,7 @@ Keyhash
 keyserver
 keyspace
 keyspaces
+kiri
 KUBECONFIG
 kubernetescrd
 kubetail
@@ -210,6 +211,7 @@ Nodetool
 NuFi
 oapi
 OCSP
+oldgreg
 Oleksandr
 onboarded
 oneshot
