@@ -124,7 +124,7 @@ final class DocumentListProperty extends DocumentProperty {
     }
 
     for (final property in properties) {
-      if (property.schema.isSubsection) continue;
+      if (property.schema.isSectionOrSubsection) continue;
       if (!property.isValidExcludingSubsections) return false;
     }
 
@@ -207,7 +207,7 @@ final class DocumentObjectProperty extends DocumentProperty {
     }
 
     for (final property in properties) {
-      if (property.schema.isSubsection) continue;
+      if (property.schema.isSectionOrSubsection) continue;
       if (!property.isValidExcludingSubsections) return false;
     }
 
