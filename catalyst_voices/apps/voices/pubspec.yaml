@@ -63,6 +63,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   sentry_flutter: ^8.8.0
   shared_preferences: ^2.3.3
+  skeletonizer: ^1.4.3
   url_launcher: ^6.2.2
   url_strategy: ^0.3.0
   video_player: ^2.9.2

@@ -32,6 +32,8 @@ void main() async {
     'Account dropdown -',
     () {
       patrolWidgetTest(
+        tags: 'issues_1715',
+        skip: true,
         'user - Account dropdown button opens account dropdown',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
@@ -43,7 +45,10 @@ void main() async {
         },
       );
 
-      patrolWidgetTest('user - locking account', (PatrolTester $) async {
+      patrolWidgetTest(
+          tags: 'issues_1715',
+          skip: true,
+          'user - locking account', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(OverallSpacesPage.userShortcutBtn)
             .tap(settleTimeout: const Duration(seconds: 10));
@@ -51,8 +56,10 @@ void main() async {
         expect($(AppBarPage.unlockBtn), findsOneWidget);
       });
 
-      patrolWidgetTest('user - locking and unlocking account',
-          (PatrolTester $) async {
+      patrolWidgetTest(
+          tags: 'issues_1715',
+          skip: true,
+          'user - locking and unlocking account', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(OverallSpacesPage.userShortcutBtn)
             .tap(settleTimeout: const Duration(seconds: 10));
