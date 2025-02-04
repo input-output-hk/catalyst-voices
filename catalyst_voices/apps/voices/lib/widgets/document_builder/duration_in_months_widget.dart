@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -26,12 +26,10 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
   late List<DropdownMenuEntry<int>> _dropdownMenuEntries;
   late int? _selectedValue;
 
-  String get _title => widget.schema.formattedTitle;
-
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
   String? get _placeholder => widget.schema.placeholder;
-
   int get _min => widget.schema.numRange?.min ?? 0;
-
   int get _max => widget.schema.numRange?.max ?? 0;
 
   List<DropdownMenuEntry<int>> get _mapItems {
@@ -71,7 +69,7 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

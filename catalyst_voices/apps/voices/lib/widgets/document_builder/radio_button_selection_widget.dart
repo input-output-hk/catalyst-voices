@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/toggles/voices_radio_button_form.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -27,8 +27,8 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
   late String _selectedValue;
 
   List<String> get _items => widget.schema.enumValues ?? <String>[];
-
-  String get _title => widget.schema.formattedTitle;
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

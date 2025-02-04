@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -28,11 +28,13 @@ class ListLengthPickerWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          list.schema.formattedTitle,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 8),
+        if (title.isNotEmpty) ...[
+          Text(
+            title.starred(isEnabled: list.schema.isRequired),
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+        ],
         if (description.data.isNotEmpty && description.data != title) ...[
           MarkdownText(description),
           const SizedBox(height: 22),

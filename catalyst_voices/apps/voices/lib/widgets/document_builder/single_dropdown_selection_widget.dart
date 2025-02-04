@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -28,7 +28,8 @@ class _SingleDropdownSelectionWidgetState
   late List<DropdownMenuEntry<String>> _dropdownMenuEntries;
   late String? _selectedValue;
 
-  String get _title => widget.schema.formattedTitle;
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   List<DropdownMenuEntry<String>> get _mapItems {
     final items = widget.schema.enumValues ?? [];
@@ -60,11 +61,13 @@ class _SingleDropdownSelectionWidgetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          _title,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 8),
+        if (_title.isNotEmpty) ...[
+          Text(
+            _title.starred(isEnabled: _isRequired),
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+        ],
         SingleSelectDropdown(
           items: _dropdownMenuEntries,
           value: _selectedValue,

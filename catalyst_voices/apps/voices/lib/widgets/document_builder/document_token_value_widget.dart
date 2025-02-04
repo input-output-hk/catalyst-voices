@@ -70,7 +70,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       focusNode: _focusNode,
       onFieldSubmitted: _notifyChangeListener,
       validator: _validate,
-      labelText: schema.formattedTitle,
+      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
       range: schema.numRange,
       currency: widget.currency,
       showHelper: widget.isEditMode,

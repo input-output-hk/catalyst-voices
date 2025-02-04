@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -27,7 +27,8 @@ class YesNoChoiceWidget extends StatefulWidget {
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   late bool? _selectedValue;
 
-  String get _title => widget.schema.formattedTitle;
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   @override
   void initState() {
@@ -58,7 +59,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

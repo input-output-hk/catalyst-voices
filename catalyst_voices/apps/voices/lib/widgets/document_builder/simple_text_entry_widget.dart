@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -28,7 +28,8 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
 
-  String get _title => widget.schema.formattedTitle;
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
   int? get _maxLength => widget.schema.strLengthRange?.max;
   bool get _resizable => widget.schema is DocumentMultiLineTextEntrySchema;
 
@@ -76,7 +77,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),

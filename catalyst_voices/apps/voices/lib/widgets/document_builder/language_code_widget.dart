@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
@@ -28,7 +28,8 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
   late List<DropdownMenuEntry<String>> _dropdownMenuEntries;
   late String? _selectedValue;
 
-  String get _title => widget.schema.formattedTitle;
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   List<DropdownMenuEntry<String>> get _mapItems {
     return (widget.schema.enumValues ?? [])
@@ -76,7 +77,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
