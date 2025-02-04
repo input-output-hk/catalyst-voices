@@ -1,6 +1,6 @@
 # Permission-less Authentication for Catalyst
 
-<!-- cspell: words catid Fftx -->
+<!-- cspell: words ftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsK -->
 
 ## Overview
 
@@ -17,7 +17,8 @@ This document defines the format of the Authentication Token, and how it should 
 ## Token Format
 
 The Authentication Token is based loosely on JWT.
-It consists of an Authentication Header attached to every authenticated request, and an encoded signed.
+It consists of an Authentication Header attached to every authenticated request.
+The header contains a catalyst ID and a signature over that ID.
 
 This token can be attached to either individual HTTP requests, or to the beginning of a web socket connection.
 
