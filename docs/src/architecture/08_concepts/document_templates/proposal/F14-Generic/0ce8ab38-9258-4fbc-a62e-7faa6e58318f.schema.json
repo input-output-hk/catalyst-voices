@@ -491,12 +491,12 @@
             ]
         },
         "campaign_category": {
-            "type": "object",
             "title": "Campaign Category",
+            "$ref": "#/definitions/segment",
             "description": "Determine the eligibility of the proposal for this category",
             "properties": {
                 "category_questions": {
-                    "type": "object",
+                    "$ref": "#/definitions/section",
                     "title": "Category Questions",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "properties": {
