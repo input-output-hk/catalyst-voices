@@ -24,7 +24,16 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(_handleInitialValue());
+    unawaited(context.read<CategoryDetailCubit>().init(widget.categoryId));
+  }
+
+  @override
+  void didUpdateWidget(CategoryPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.categoryId != oldWidget.categoryId) {
+      unawaited(context.read<CategoryDetailCubit>().init(widget.categoryId));
+    }
   }
 
   @override
@@ -61,18 +70,6 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
       ),
     );
-  }
-
-  Future<void> _handleInitialValue() async {
-    final discoveryCategory =
-        context.read<DiscoveryCubit>().localCategory(widget.categoryId);
-    if (discoveryCategory != null) {
-      context.read<CategoryDetailCubit>().loadCategoryDetail(discoveryCategory);
-    } else {
-      await context
-          .read<CategoryDetailCubit>()
-          .getCategoryDetail(widget.categoryId);
-    }
   }
 }
 

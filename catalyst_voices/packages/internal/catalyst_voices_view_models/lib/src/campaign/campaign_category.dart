@@ -43,8 +43,9 @@ final class CampaignCategoryViewModel extends CampaignCategory {
     required this.submissionCloseDate,
   });
 
-  factory CampaignCategoryViewModel.dummy() => CampaignCategoryViewModel(
-        id: '1',
+  factory CampaignCategoryViewModel.dummy({String? id}) =>
+      CampaignCategoryViewModel(
+        id: id ?? '1',
         name: 'Cardano Open:',
         subname: 'Developers',
         description:
