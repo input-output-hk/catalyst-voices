@@ -28,19 +28,16 @@ class GlobalSessionListener extends StatelessWidget {
   bool _listenToSessionChangesWhen(SessionState prev, SessionState next) {
     // We deliberately check if previous was guest because we don't
     // want to show the snackbar after the registration is completed.
-    final keychainUnlocked =
-        prev is GuestSessionState && next is ActiveAccountSessionState;
-
-    final keychainLocked =
-        prev is ActiveAccountSessionState && next is GuestSessionState;
+    final keychainUnlocked = prev.isGuest && next.isActive;
+    final keychainLocked = prev.isActive && next.isGuest;
 
     return keychainUnlocked || keychainLocked;
   }
 
   void _onSessionChanged(BuildContext context, SessionState state) {
-    if (state is ActiveAccountSessionState) {
+    if (state.isActive) {
       _onUnlockedKeychain(context);
-    } else if (state is GuestSessionState) {
+    } else if (state.isGuest) {
       _onLockedKeychain(context);
     }
   }

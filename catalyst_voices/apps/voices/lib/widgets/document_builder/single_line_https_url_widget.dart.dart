@@ -1,4 +1,5 @@
-import 'package:catalyst_voices/common/ext/document_property_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_https_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -6,13 +7,15 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SingleLineHttpsUrlWidget extends StatefulWidget {
-  final DocumentProperty<String> property;
+  final DocumentValueProperty<String> property;
+  final DocumentStringSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SingleLineHttpsUrlWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.isEditMode,
     required this.onChanged,
   });
@@ -26,13 +29,18 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
-  String get _description => widget.property.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
 
   @override
   void initState() {
     super.initState();
-    _textEditingController = TextEditingController(text: widget.property.value);
-    _textEditingController.addListener(_handleControllerChange);
+
+    final textValue =
+        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+
+    _textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleControllerChange);
+
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
@@ -42,7 +50,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
 
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
-      _textEditingController.text = widget.property.value ?? '';
+      _textEditingController.textWithSelection = widget.property.value ?? '';
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -62,9 +70,9 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
@@ -81,30 +89,32 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   void _handleControllerChange() {
-    final controllerValue = _textEditingController.text;
-    if (widget.property.value != controllerValue &&
-        controllerValue.isNotEmpty) {
-      _notifyChangeListener(controllerValue);
+    final oldValue = widget.property.value;
+    final newValue = _textEditingController.text;
+    if (oldValue != newValue) {
+      _notifyChangeListener(newValue);
     }
   }
 
   void _notifyChangeListener(String? value) {
-    final change = DocumentChange(
-      nodeId: widget.property.schema.nodeId,
-      value: value,
+    final normalizedValue = widget.schema.normalizeValue(value);
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: normalizedValue,
     );
-
-    widget.onChanged(change);
+    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(String? value) {
-    if (value == null || value.isEmpty) {
-      return const VoicesTextFieldValidationResult.none();
-    }
-    final schema = widget.property.schema;
-    final result = schema.validatePropertyValue(value);
+    final schema = widget.schema;
+    final normalizedValue = schema.normalizeValue(value);
+    final result = schema.validate(normalizedValue);
     if (result.isValid) {
-      return const VoicesTextFieldValidationResult.success();
+      if (normalizedValue == null) {
+        return const VoicesTextFieldValidationResult.none();
+      } else {
+        return const VoicesTextFieldValidationResult.success();
+      }
     } else {
       final localized = LocalizedDocumentValidationResult.from(result);
       return VoicesTextFieldValidationResult.error(localized.message(context));

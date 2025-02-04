@@ -8,7 +8,6 @@ use config::ConfigApi;
 use documents::DocumentApi;
 use gethostname::gethostname;
 use health::HealthApi;
-use legacy::LegacyApi;
 use local_ip_address::list_afinet_netifas;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 
@@ -19,7 +18,6 @@ pub(crate) mod cardano;
 mod config;
 mod documents;
 mod health;
-mod legacy;
 
 pub(crate) use health::started;
 
@@ -52,15 +50,13 @@ const TERMS_OF_SERVICE: &str =
     "https://github.com/input-output-hk/catalyst-voices/blob/main/CODE_OF_CONDUCT.md";
 
 /// Create the `OpenAPI` definition
-pub(crate) fn mk_api(
-) -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, DocumentApi, LegacyApi), ()> {
+pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, DocumentApi), ()> {
     let mut service = OpenApiService::new(
         (
             HealthApi,
             (cardano::Api, cardano::staking::Api, cardano::cip36::Api),
             ConfigApi,
             DocumentApi,
-            (legacy::RegistrationApi, legacy::V0Api, legacy::V1Api),
         ),
         API_TITLE,
         API_VERSION,

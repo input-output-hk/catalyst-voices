@@ -41,6 +41,18 @@ class VoicesAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final iconThemeData = IconTheme.of(context).copyWith(
+      size: 24,
+      color: foregroundColor ?? Theme.of(context).colorScheme.primary,
+    );
+
+    final textStyle = Theme.of(context).textTheme.bodyLarge!.copyWith(
+          fontWeight: FontWeight.w700,
+          fontSize: 18,
+          height: 1,
+          color: foregroundColor ?? Theme.of(context).colorScheme.primary,
+        );
+
     return Container(
       width: radius * 2,
       height: radius * 2,
@@ -56,22 +68,15 @@ class VoicesAvatar extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(radius * 2),
           child: Center(
-            child: Padding(
-              padding: padding,
-              child: IconTheme(
-                data: IconTheme.of(context).copyWith(
-                  size: 24,
-                  color:
-                      foregroundColor ?? Theme.of(context).colorScheme.primary,
-                ),
-                child: DefaultTextStyle(
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        fontSize: 18,
-                        height: 1,
-                        color: foregroundColor ??
-                            Theme.of(context).colorScheme.primary,
-                      ),
-                  child: icon,
+            child: MediaQuery.withNoTextScaling(
+              child: Padding(
+                padding: padding,
+                child: IconTheme(
+                  data: iconThemeData,
+                  child: DefaultTextStyle(
+                    style: textStyle,
+                    child: icon,
+                  ),
                 ),
               ),
             ),

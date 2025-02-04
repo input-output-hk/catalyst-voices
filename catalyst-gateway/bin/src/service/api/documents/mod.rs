@@ -28,6 +28,7 @@ use crate::service::{
 mod get_document;
 mod post_document_index_query;
 mod put_document;
+mod templates;
 
 /// Cardano Follower API Endpoints
 pub(crate) struct DocumentApi;
@@ -86,6 +87,7 @@ impl DocumentApi {
             Err(_) => {
                 put_document::Responses::BadRequest(Json(PutDocumentBadRequest::new(
                     "Failed to read document from the request",
+                    None,
                 )))
                 .into()
             },

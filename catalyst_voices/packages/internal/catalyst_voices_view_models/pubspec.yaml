@@ -13,12 +13,15 @@ dependencies:
   catalyst_cardano_web: ^0.4.0+3
   catalyst_voices_assets:
     path: ../catalyst_voices_assets
+  catalyst_voices_brands:
+    path: ../catalyst_voices_brands
   catalyst_voices_localization:
     path: ../catalyst_voices_localization
   catalyst_voices_models:
     path: ../catalyst_voices_models
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
+  email_validator: ^3.0.0
   equatable: ^2.0.7
   flutter:
     sdk: flutter

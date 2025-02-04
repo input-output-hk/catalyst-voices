@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -86,8 +87,8 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         child: BlocSelector<SessionCubit, SessionState,
             ({bool isUnlocked, bool isVisitor})>(
           selector: (state) => (
-            isUnlocked: state is ActiveAccountSessionState,
-            isVisitor: state is VisitorSessionState
+            isUnlocked: state.isActive,
+            isVisitor: state.isVisitor,
           ),
           builder: (context, state) {
             return Scaffold(
@@ -116,11 +117,9 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     if (space == Space.treasury) {
       return [
         const CampaignManagement(),
-        const SpacesThemeModeSwitch(),
       ];
     } else {
       return [
-        const SpacesThemeModeSwitch(),
         const SessionActionHeader(),
         const SessionStateHeader(),
       ];
@@ -195,12 +194,7 @@ class _Shortcuts extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState,
         Map<Space, ShortcutActivator>>(
-      selector: (state) {
-        return switch (state) {
-          ActiveAccountSessionState(:final spacesShortcuts) => spacesShortcuts,
-          _ => {},
-        };
-      },
+      selector: (state) => state.spacesShortcuts,
       builder: (context, shortcuts) {
         return CallbackShortcuts(
           bindings: <ShortcutActivator, VoidCallback>{

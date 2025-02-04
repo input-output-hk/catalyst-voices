@@ -1,4 +1,5 @@
-import 'package:catalyst_voices/common/ext/document_property_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -6,13 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class SimpleTextEntryWidget extends StatefulWidget {
-  final DocumentProperty<String> property;
+  final DocumentValueProperty<String> property;
+  final DocumentStringSchema schema;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SimpleTextEntryWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.isEditMode,
     required this.onChanged,
   });
@@ -25,16 +28,20 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
 
-  String get _description => widget.property.formattedDescription;
-  int? get _maxLength => widget.property.schema.strLengthRange?.max;
-  bool get _resizable =>
-      widget.property.schema.definition is MultiLineTextEntryDefinition;
+  String get _title => widget.schema.formattedTitle;
+  int? get _maxLength => widget.schema.strLengthRange?.max;
+  bool get _resizable => widget.schema is DocumentMultiLineTextEntrySchema;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.property.value);
-    _controller.addListener(_handleValueChange);
+
+    final textValue =
+        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+
+    _controller = TextEditingController.fromValue(textValue)
+      ..addListener(_handleValueChange);
+
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
@@ -45,12 +52,12 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
     if (oldWidget.isEditMode != widget.isEditMode) {
       _handleEditModeChanged();
       if (!widget.isEditMode) {
-        _controller.text = widget.property.value ?? '';
+        _controller.textWithSelection = widget.property.value ?? '';
       }
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _controller.text = widget.property.value ?? '';
+      _controller.textWithSelection = widget.property.value ?? '';
     }
   }
 
@@ -67,9 +74,9 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
@@ -80,8 +87,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           onFieldSubmitted: _notifyChangeListener,
           validator: _validate,
           enabled: widget.isEditMode,
-          // TODO(LynxLynxx): check if this is right after schema is finalized
-          hintText: widget.property.schema.defaultValue,
+          hintText: widget.schema.placeholder,
           resizable: _resizable,
           maxLength: _maxLength,
         ),
@@ -108,20 +114,18 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   }
 
   void _notifyChangeListener(String? value) {
-    final change = DocumentChange(
-      nodeId: widget.property.schema.nodeId,
-      value: value,
+    final normalizedValue = widget.schema.normalizeValue(value);
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: normalizedValue,
     );
-
-    widget.onChanged(change);
+    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(String? value) {
-    if (!widget.isEditMode) {
-      return const VoicesTextFieldValidationResult.none();
-    }
-    final schema = widget.property.schema;
-    final result = schema.validatePropertyValue(value);
+    final schema = widget.schema;
+    final normalizedValue = schema.normalizeValue(value);
+    final result = schema.validate(normalizedValue);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {
@@ -163,7 +167,8 @@ class _SimpleDocumentTextField extends StatelessWidget {
         hintText: hintText,
       ),
       enabled: enabled,
-      resizable: resizable,
+      resizableVertically: resizable,
+      resizableHorizontally: false,
       maxLengthEnforcement: MaxLengthEnforcement.none,
       autovalidateMode: AutovalidateMode.disabled,
       maxLines: resizable ? null : 1,

@@ -43,10 +43,11 @@ class _ProposalBuilderSegments extends StatelessWidget {
         return SegmentsListView<ProposalBuilderSegment, ProposalBuilderSection>(
           itemScrollController: itemScrollController,
           items: value,
+          padding: const EdgeInsets.only(top: 16, bottom: 64),
           sectionBuilder: (context, data) {
             return DocumentBuilderSectionTile(
               key: key,
-              section: data.documentSection,
+              section: data.property,
               onChanged: (value) {
                 final event = SectionChangedEvent(changes: value);
                 context.read<ProposalBuilderBloc>().add(event);

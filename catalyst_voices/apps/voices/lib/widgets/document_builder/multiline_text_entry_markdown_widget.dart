@@ -1,24 +1,25 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
-import 'package:catalyst_voices/common/ext/document_property_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class MultilineTextEntryMarkdownWidget extends StatefulWidget {
-  final DocumentProperty<String> property;
-  final ValueChanged<DocumentChange> onChanged;
+  final DocumentValueProperty<String> property;
+  final DocumentMultiLineTextEntryMarkdownSchema schema;
+  final ValueChanged<List<DocumentChange>> onChanged;
   final bool isEditMode;
-  final bool isRequired;
 
   const MultilineTextEntryMarkdownWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.onChanged,
     required this.isEditMode,
-    required this.isRequired,
   });
 
   @override
@@ -36,15 +37,14 @@ class _MultilineTextEntryMarkdownWidgetState
   StreamSubscription<quill.DocChange>? _documentChangeSub;
   quill.Document? _preEditDocument;
 
-  String get _description => widget.property.formattedDescription;
-  int? get _maxLength => widget.property.schema.strLengthRange?.max;
-  String? get _value => widget.property.value;
+  String get _title => widget.schema.formattedTitle;
+  int? get _maxLength => widget.schema.strLengthRange?.max;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = _buildController(value: _value);
+    _controller = _buildController(widget.property.value ?? '');
     _controller.addListener(_onControllerChanged);
 
     _focus = VoicesRichTextFocusNode();
@@ -52,7 +52,7 @@ class _MultilineTextEntryMarkdownWidgetState
   }
 
   @override
-  void didUpdateWidget(covariant MultilineTextEntryMarkdownWidget oldWidget) {
+  void didUpdateWidget(MultilineTextEntryMarkdownWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -62,9 +62,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _controller.dispose();
-      _controller = _buildController(value: _value);
-      _controller.addListener(_onControllerChanged);
+      _updateContents(widget.property.value ?? '');
     }
   }
 
@@ -81,35 +79,28 @@ class _MultilineTextEntryMarkdownWidgetState
     return VoicesRichText(
       controller: _controller,
       enabled: widget.isEditMode,
-      title: _description,
+      title: _title,
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,
-      validator: (val) {
-        return null;
-
-        // TODO(LynxxLynx): implement validator when we got answer how to
-        // validate formatted document against maxLength
-      },
+      validator: _validate,
     );
   }
 
-  VoicesRichTextController _buildController({
-    String? value,
-  }) {
-    if (value != null) {
+  VoicesRichTextController _buildController(String value) {
+    final quill.Document document;
+    if (value.isNotEmpty) {
       final input = MarkdownData(value);
       final delta = markdown.encoder.convert(input);
-      return VoicesRichTextController(
-        document: quill.Document.fromDelta(delta),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+      document = quill.Document.fromDelta(delta);
     } else {
-      return VoicesRichTextController(
-        document: quill.Document(),
-        selection: const TextSelection.collapsed(offset: 0),
-      );
+      document = quill.Document();
     }
+
+    return VoicesRichTextController(
+      document: document,
+      selection: const TextSelection.collapsed(offset: 0),
+    );
   }
 
   void _onControllerChanged() {
@@ -124,6 +115,26 @@ class _MultilineTextEntryMarkdownWidgetState
     _documentChangeSub = _observedDocument?.changes.listen(_onDocumentChanged);
   }
 
+  void _updateContents(String value) {
+    if (value.isNotEmpty) {
+      final input = MarkdownData(value);
+      final delta = markdown.encoder.convert(input);
+      _controller.setContents(delta, changeSource: quill.ChangeSource.remote);
+    } else {
+      _controller.clear();
+    }
+  }
+
+  String? _validate(quill.Document? document) {
+    final delta = document?.toDelta();
+    final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
+    final markdownValue = markdownData?.data;
+    final normalizedValue = widget.schema.normalizeValue(markdownValue);
+
+    final error = widget.schema.validate(normalizedValue);
+    return LocalizedDocumentValidationResult.from(error).message(context);
+  }
+
   void _onDocumentChanged(quill.DocChange change) {
     if (change.change.last.data != '\n') {
       _notifyChangeListener();
@@ -133,12 +144,15 @@ class _MultilineTextEntryMarkdownWidgetState
   void _notifyChangeListener() {
     final delta = _controller.document.toDelta();
     final markdownData = markdown.decoder.convert(delta);
-    widget.onChanged(
-      DocumentChange(
-        nodeId: widget.property.schema.nodeId,
-        value: markdownData.data,
-      ),
+    final value = markdownData.data;
+    final normalizedValue = widget.schema.normalizeValue(value);
+
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: normalizedValue,
     );
+
+    widget.onChanged([change]);
   }
 
   void _toggleEditMode() {

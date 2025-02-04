@@ -17,7 +17,10 @@ use poem_openapi::{
 use serde_json::Value;
 
 use self::generic::uuidv7;
-use crate::service::common::types::{generic, string_types::impl_string_types};
+use crate::{
+    db::event::common::eq_or_ranged_uuid::EqOrRangedUuid,
+    service::common::types::{generic, string_types::impl_string_types},
+};
 
 /// Title.
 const TITLE: &str = "Signed Document Version";
@@ -76,6 +79,15 @@ impl_string_types!(
     is_valid
 );
 
+impl DocumentVer {
+    /// Creates a new `DocumentVer` instance without validation.
+    /// **NOTE** could produce an invalid instance, be sure that passing `String` is a
+    /// valid `DocumentVer`
+    pub(crate) fn new_unchecked(uuid: String) -> Self {
+        Self(uuid)
+    }
+}
+
 impl Example for DocumentVer {
     /// An example.
     fn example() -> Self {
@@ -108,7 +120,7 @@ impl TryFrom<String> for DocumentVer {
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if !is_valid(&value) {
-            bail!("Invalid DocumentID, must be a valid UUIDv7")
+            bail!("Invalid DocumentVer '{value}', must be a valid UUIDv7")
         }
         Ok(Self(value))
     }
@@ -116,6 +128,12 @@ impl TryFrom<String> for DocumentVer {
 
 impl From<uuidv7::UUIDv7> for DocumentVer {
     fn from(value: uuidv7::UUIDv7) -> Self {
+        Self(value.to_string())
+    }
+}
+
+impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
+    fn from(value: catalyst_signed_doc::UuidV7) -> Self {
         Self(value.to_string())
     }
 }
@@ -216,6 +234,22 @@ impl Example for EqOrRangedVer {
     }
 }
 
+impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedVer) -> Result<Self, Self::Error> {
+        match value {
+            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedVer::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
+    }
+}
+
 #[derive(NewType, Debug, PartialEq)]
 #[oai(
     from_multipart = false,
@@ -226,10 +260,26 @@ impl Example for EqOrRangedVer {
 /// Document Version Selector
 ///
 /// Either a absolute single Document Version or a range of Document Versions
-pub(crate) struct EqOrRangedVerDocumented(EqOrRangedVer);
+pub(crate) struct EqOrRangedVerDocumented(pub(crate) EqOrRangedVer);
 
 impl Example for EqOrRangedVerDocumented {
     fn example() -> Self {
         Self(EqOrRangedVer::example())
+    }
+}
+
+impl TryFrom<EqOrRangedVerDocumented> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedVerDocumented) -> Result<Self, Self::Error> {
+        match value.0 {
+            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedVer::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
     }
 }

@@ -6,7 +6,16 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+bool _alwaysAllowRegistration = kDebugMode;
+
+@visibleForTesting
+// ignore: avoid_positional_boolean_parameters
+set alwaysAllowRegistration(bool newValue) {
+  _alwaysAllowRegistration = newValue;
+}
 
 /// Manages the user session.
 final class SessionCubit extends Cubit<SessionState>
@@ -19,9 +28,12 @@ final class SessionCubit extends Cubit<SessionState>
 
   final _logger = Logger('SessionCubit');
 
+  UserSettings? _userSettings;
   Account? _account;
   AdminToolsState _adminToolsState;
+  bool _hasWallets = false;
 
+  StreamSubscription<UserSettings>? _userSettingsSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
   StreamSubscription<Account?>? _accountSub;
   StreamSubscription<AdminToolsState>? _adminToolsSub;
@@ -33,7 +45,12 @@ final class SessionCubit extends Cubit<SessionState>
     this._accessControl,
     this._adminTools,
   )   : _adminToolsState = _adminTools.state,
-        super(const VisitorSessionState(isRegistrationInProgress: false)) {
+        super(const SessionState.initial()) {
+    _userSettingsSub = _userService.watchUser
+        .map((user) => user.settings)
+        .distinct()
+        .listen(_handleUserSettings);
+
     _keychainUnlockedSub = _userService.watchAccount
         .transform(AccountToKeychainUnlockTransformer())
         .distinct()
@@ -44,6 +61,10 @@ final class SessionCubit extends Cubit<SessionState>
     _accountSub = _userService.watchAccount.listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
+
+    if (!_alwaysAllowRegistration) {
+      unawaited(_checkAvailableWallets());
+    }
   }
 
   Future<bool> unlock(LockFactor lockFactor) async {
@@ -77,8 +98,27 @@ final class SessionCubit extends Cubit<SessionState>
     await _userService.useAccount(dummyAccount);
   }
 
+  void updateTimezone(TimezonePreferences value) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings = settings.copyWith(timezone: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
+  void updateTheme(ThemePreferences value) {
+    final settings = _userService.user.settings;
+
+    final updatedSettings = settings.copyWith(theme: Optional.of(value));
+
+    unawaited(_userService.updateSettings(updatedSettings));
+  }
+
   @override
   Future<void> close() async {
+    await _userSettingsSub?.cancel();
+    _userSettingsSub = null;
+
     await _keychainUnlockedSub?.cancel();
     _keychainUnlockedSub = null;
 
@@ -102,6 +142,12 @@ final class SessionCubit extends Cubit<SessionState>
     _updateState();
   }
 
+  void _handleUserSettings(UserSettings settings) {
+    _userSettings = settings;
+
+    _updateState();
+  }
+
   void _onActiveKeychainUnlockChanged(bool isUnlocked) {
     _logger.fine('Keychain unlock changed [$isUnlocked]');
 
@@ -119,15 +165,21 @@ final class SessionCubit extends Cubit<SessionState>
     _updateState();
   }
 
+  Future<void> _checkAvailableWallets() async {
+    final wallets = await _registrationService
+        .getCardanoWallets()
+        .onError((_, __) => const []);
+
+    _hasWallets = wallets.isNotEmpty;
+
+    if (!isClosed) {
+      _updateState();
+    }
+  }
+
   void _updateState() {
     if (_adminToolsState.enabled) {
-      unawaited(
-        _createMockedSessionState().then((value) {
-          if (!isClosed) {
-            emit(value);
-          }
-        }),
-      );
+      emit(_createMockedSessionState());
     } else {
       emit(_createSessionState());
     }
@@ -135,45 +187,69 @@ final class SessionCubit extends Cubit<SessionState>
 
   SessionState _createSessionState() {
     final account = _account;
+    final userSettings = _userSettings;
     final isUnlocked = _account?.keychain.lastIsUnlocked ?? false;
+    final canCreateAccount = _alwaysAllowRegistration || _hasWallets;
+
+    final sessionSettings = userSettings != null
+        ? SessionSettings.fromUser(userSettings)
+        : const SessionSettings.fallback();
 
     if (account == null) {
       final isEmpty = _registrationProgressNotifier.value.isEmpty;
-      return VisitorSessionState(isRegistrationInProgress: !isEmpty);
+      return SessionState.visitor(
+        canCreateAccount: canCreateAccount,
+        isRegistrationInProgress: !isEmpty,
+        settings: sessionSettings,
+      );
     }
 
     if (!isUnlocked) {
-      return const GuestSessionState();
+      return SessionState.guest(
+        canCreateAccount: canCreateAccount,
+        settings: sessionSettings,
+      );
     }
 
+    final sessionAccount = SessionAccount.fromAccount(account);
     final spaces = _accessControl.spacesAccess(account);
     final overallSpaces = _accessControl.overallSpaces(account);
     final spacesShortcuts = _accessControl.spacesShortcutsActivators(account);
 
-    return ActiveAccountSessionState(
-      account: account,
+    return SessionState(
+      status: SessionStatus.actor,
+      account: sessionAccount,
       spaces: spaces,
       overallSpaces: overallSpaces,
       spacesShortcuts: spacesShortcuts,
+      canCreateAccount: canCreateAccount,
+      settings: sessionSettings,
     );
   }
 
-  Future<SessionState> _createMockedSessionState() async {
+  SessionState _createMockedSessionState() {
     switch (_adminToolsState.sessionStatus) {
       case SessionStatus.actor:
-        // TODO(damian-molinski): Limiting exposed Account so its not future.
-        final dummyAccount = await _getDummyAccount();
-
-        return ActiveAccountSessionState(
-          account: dummyAccount,
+        return SessionState(
+          status: SessionStatus.actor,
+          account: const SessionAccount.mocked(),
           spaces: Space.values,
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
+          canCreateAccount: true,
+          settings: const SessionSettings.fallback(),
         );
       case SessionStatus.guest:
-        return const GuestSessionState();
+        return const SessionState.guest(
+          canCreateAccount: true,
+          settings: SessionSettings.fallback(),
+        );
       case SessionStatus.visitor:
-        return const VisitorSessionState(isRegistrationInProgress: false);
+        return const SessionState.visitor(
+          settings: SessionSettings.fallback(),
+          isRegistrationInProgress: false,
+          canCreateAccount: true,
+        );
     }
   }
 

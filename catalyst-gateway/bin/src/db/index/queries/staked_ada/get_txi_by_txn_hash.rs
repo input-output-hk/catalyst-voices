@@ -44,19 +44,15 @@ pub(crate) struct GetTxiByTxnHashesQuery {
 impl GetTxiByTxnHashesQuery {
     /// Prepares a get txi query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_txi_by_txn_hashes_query = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session,
             GET_TXI_BY_TXN_HASHES_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = get_txi_by_txn_hashes_query {
-            error!(error=%error, "Failed to prepare get TXI by txn hashes query.");
-        };
-
-        get_txi_by_txn_hashes_query
+        .await
+        .inspect_err(|error| error!(error=%error, "Failed to prepare get TXI by txn hashes query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_TXI_BY_TXN_HASHES_QUERY}"))
     }
 
     /// Executes a get txi by transaction hashes query.

@@ -96,6 +96,7 @@ command:
       cryptography: ^2.7.0
       dotted_border: ^2.1.0
       ed25519_hd_key: ^2.3.0
+      email_validator: ^3.0.0
       equatable: ^2.0.7
       ffi: ^2.1.0
       ffigen: ^11.0.0
@@ -132,6 +133,7 @@ command:
       scrollable_positioned_list: ^0.3.8
       shared_preferences: ^2.3.3
       shared_preferences_platform_interface: ^2.4.1
+      skeletonizer: ^1.4.3
       synchronized: ^3.3.0+3
       # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
       # but here we import it explicitly to make sure the latest version is used which addresses

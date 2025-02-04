@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
@@ -7,16 +7,18 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DocumentTokenValueWidget extends StatefulWidget {
-  final DocumentProperty<int> property;
+  final DocumentValueProperty<int> property;
+  final DocumentIntegerSchema schema;
   final Currency currency;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const DocumentTokenValueWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.currency,
-    this.isEditMode = false,
+    required this.isEditMode,
     required this.onChanged,
   });
 
@@ -61,15 +63,14 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final schema = widget.property.schema;
-    final label = schema.title ?? '';
+    final schema = widget.schema;
 
     return TokenField(
       controller: _controller,
       focusNode: _focusNode,
       onFieldSubmitted: _notifyChangeListener,
       validator: _validate,
-      labelText: label.starred(isEnabled: schema.isRequired),
+      labelText: schema.formattedTitle,
       range: schema.numRange,
       currency: widget.currency,
       showHelper: widget.isEditMode,
@@ -80,7 +81,9 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
 
   void _handleControllerChange() {
     final value = _controller.value;
-    _notifyChangeListener(value);
+    if (value != widget.property.value) {
+      _notifyChangeListener(value);
+    }
   }
 
   void _handleEditModeChanged() {
@@ -94,17 +97,16 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   void _notifyChangeListener(int? value) {
-    final change = DocumentChange(
-      nodeId: widget.property.schema.nodeId,
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
       value: value,
     );
 
-    widget.onChanged(change);
+    widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(int? value, String text) {
-    final schema = widget.property.schema;
-    final result = schema.validatePropertyValue(value);
+    final result = widget.schema.validate(value);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {

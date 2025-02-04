@@ -1,41 +1,37 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_definitions_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_segment_dto.dart';
-import 'package:catalyst_voices_repositories/src/utils/document_schema_dto_converter.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_schema_dto.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 final class DocumentSchemaDto {
   @JsonKey(name: r'$schema')
-  final String jsonSchema;
+  final String schema;
   @JsonKey(name: r'$id')
-  final String jsonSchemaId;
+  final String id;
   final String title;
   final String description;
   final DocumentDefinitionsDto definitions;
   final String type;
   final bool additionalProperties;
-  @JsonKey(name: 'properties')
-  @DocumentSchemaSegmentsDtoConverter()
-  final List<DocumentSchemaSegmentDto> segments;
+  final Map<String, DocumentPropertySchemaDto> properties;
+  final List<String>? required;
   @JsonKey(name: 'x-order')
   final List<String>? order;
-  @JsonKey(includeToJson: false)
-  final String propertiesSchema;
 
   const DocumentSchemaDto({
-    required this.jsonSchema,
-    required this.jsonSchemaId,
+    required this.schema,
+    required this.id,
     required this.title,
     required this.description,
     required this.definitions,
     this.type = 'object',
     this.additionalProperties = false,
-    required this.segments,
+    required this.properties,
+    required this.required,
     required this.order,
-    required this.propertiesSchema,
   });
 
   factory DocumentSchemaDto.fromJson(Map<String, dynamic> json) {
@@ -50,25 +46,26 @@ final class DocumentSchemaDto {
 
   DocumentSchema toModel() {
     const nodeId = DocumentNodeId.root;
+    final required = this.required ?? const [];
     final order = this.order ?? const [];
 
-    final mappedSegments = segments
-        .where((e) => e.ref.contains('segment'))
+    final mappedProperties = properties.entries
         .map(
-          (e) => e.toModel(
-            definitions.models,
-            parentNodeId: DocumentNodeId.root,
+          (property) => property.value.toModel(
+            definitions: definitions,
+            nodeId: DocumentNodeId.root.child(property.key),
+            isRequired: required.contains(property.key),
           ),
         )
         .toList();
 
     return DocumentSchema(
-      jsonSchema: jsonSchema,
+      parentSchemaUrl: schema,
+      schemaSelfUrl: id,
       title: title,
-      description: description,
-      segments: mappedSegments,
+      description: MarkdownData(description),
+      properties: mappedProperties,
       order: order.map(nodeId.child).toList(),
-      propertiesSchema: propertiesSchema,
     );
   }
 }

@@ -15,7 +15,7 @@ targets:
           separate_models: true
           overriden_models:
             - file_name: "vitss-openapi"
-              import_url: "../../src/api_models/overriden_models.dart"
+              import_url: "../../src/api_models/overridden_models.dart"
               overriden_models:
                 - SimpleProposal$ProposalCategory
                 - SimpleProposal$Proposer

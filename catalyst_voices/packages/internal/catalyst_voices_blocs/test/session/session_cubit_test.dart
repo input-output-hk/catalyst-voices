@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -24,6 +25,8 @@ void main() {
   late SessionCubit sessionCubit;
 
   setUpAll(() {
+    alwaysAllowRegistration = false;
+
     FlutterSecureStorage.setMockInitialValues({});
 
     final store = InMemorySharedPreferencesAsync.empty();
@@ -42,7 +45,12 @@ void main() {
     userService = UserService(
       userRepository: userRepository,
     );
-    registrationService = _MockRegistrationService(keychainProvider);
+    registrationService = _MockRegistrationService(
+      keychainProvider,
+      [
+        _MockCardanoWallet(),
+      ],
+    );
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
   });
@@ -50,6 +58,11 @@ void main() {
   setUp(() {
     // each test might emit using this cubit, therefore we reset it here
     adminToolsCubit = AdminToolsCubit();
+
+    // restart list of wallets to default one found.
+    (registrationService as _MockRegistrationService).cardanoWallets = [
+      _MockCardanoWallet(),
+    ];
 
     sessionCubit = SessionCubit(
       userService,
@@ -71,6 +84,8 @@ void main() {
     await const FlutterSecureStorage().deleteAll();
     await SharedPreferencesAsync().clear();
 
+    notifier.value = const RegistrationProgress();
+
     reset(registrationService);
   });
 
@@ -86,7 +101,7 @@ void main() {
 
       // Then
       expect(userService.account, isNull);
-      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.visitor);
     });
 
     test('when no keychain is found session is in Visitor state', () async {
@@ -103,10 +118,13 @@ void main() {
 
       // Then
       expect(userService.account, isNull);
-      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.visitor);
       expect(
         sessionCubit.state,
-        const VisitorSessionState(isRegistrationInProgress: false),
+        const SessionState.visitor(
+          isRegistrationInProgress: false,
+          canCreateAccount: true,
+        ),
       );
     });
 
@@ -132,10 +150,13 @@ void main() {
 
       // Then
       expect(userService.account, isNull);
-      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.visitor);
       expect(
         sessionCubit.state,
-        const VisitorSessionState(isRegistrationInProgress: true),
+        const SessionState.visitor(
+          isRegistrationInProgress: true,
+          canCreateAccount: true,
+        ),
       );
     });
 
@@ -158,9 +179,9 @@ void main() {
 
       // Then
       expect(userService.account, isNotNull);
-      expect(userService.account?.id, account.id);
-      expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
-      expect(sessionCubit.state, isA<GuestSessionState>());
+
+      expect(userService.account?.keychain.id, account.keychain.id);
+      expect(sessionCubit.state.status, SessionStatus.guest);
     });
 
     test('when keychain is unlocked session is in Active state', () async {
@@ -182,9 +203,7 @@ void main() {
 
       // Then
       expect(userService.account, isNotNull);
-      expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
-      expect(sessionCubit.state, isNot(isA<GuestSessionState>()));
-      expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.actor);
     });
 
     test('when admin tools enabled is in mocked state', () async {
@@ -199,15 +218,86 @@ void main() {
       // Gives time for stream to emit.
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
-      expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+      expect(sessionCubit.state.status, SessionStatus.actor);
+    });
+
+    group('can create account', () {
+      test('is disabled when no cardano wallets are found', () async {
+        // Given
+        const cardanoWallets = <CardanoWallet>[];
+        const expectedState = SessionState.visitor(
+          isRegistrationInProgress: false,
+          canCreateAccount: false,
+        );
+        final mockedService = (registrationService as _MockRegistrationService);
+
+        // When
+
+        // ignore: cascade_invocations
+        mockedService.cardanoWallets = cardanoWallets;
+
+        sessionCubit = SessionCubit(
+          userService,
+          registrationService,
+          notifier,
+          accessControl,
+          adminToolsCubit,
+        );
+
+        // Gives time for stream to emit.
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        // Then
+        expect(sessionCubit.state, expectedState);
+      });
+
+      test('is enabled when at least one cardano wallets is found', () async {
+        // Given
+        final cardanoWallets = <CardanoWallet>[
+          _MockCardanoWallet(),
+        ];
+        const expectedState = SessionState.visitor(
+          isRegistrationInProgress: false,
+          canCreateAccount: true,
+        );
+        final mockedService = (registrationService as _MockRegistrationService);
+
+        // When
+
+        // ignore: cascade_invocations
+        mockedService.cardanoWallets = cardanoWallets;
+
+        sessionCubit = SessionCubit(
+          userService,
+          registrationService,
+          notifier,
+          accessControl,
+          adminToolsCubit,
+        );
+
+        // Gives time for stream to emit.
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        // Then
+        expect(sessionCubit.state, expectedState);
+      });
     });
   });
 }
 
 class _MockRegistrationService extends Mock implements RegistrationService {
   final KeychainProvider keychainProvider;
+  List<CardanoWallet> cardanoWallets;
 
-  _MockRegistrationService(this.keychainProvider);
+  _MockRegistrationService(
+    this.keychainProvider,
+    this.cardanoWallets,
+  );
+
+  @override
+  Future<List<CardanoWallet>> getCardanoWallets() {
+    return Future.value(cardanoWallets);
+  }
 
   @override
   Future<Account> registerTestAccount({
@@ -222,4 +312,8 @@ class _MockRegistrationService extends Mock implements RegistrationService {
 
     return Account.dummy(keychain: keychain);
   }
+}
+
+class _MockCardanoWallet extends Mock implements CardanoWallet {
+  _MockCardanoWallet();
 }

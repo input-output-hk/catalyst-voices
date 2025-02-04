@@ -1,4 +1,5 @@
-import 'package:catalyst_voices/common/ext/document_property_ext.dart';
+import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -6,17 +7,17 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class YesNoChoiceWidget extends StatefulWidget {
-  final DocumentProperty<bool> property;
-  final ValueChanged<DocumentChange> onChanged;
+  final DocumentValueProperty<bool> property;
+  final DocumentYesNoChoiceSchema schema;
+  final ValueChanged<List<DocumentChange>> onChanged;
   final bool isEditMode;
-  final bool isRequired;
 
   const YesNoChoiceWidget({
     super.key,
     required this.property,
+    required this.schema,
     required this.onChanged,
     required this.isEditMode,
-    required this.isRequired,
   });
 
   @override
@@ -24,9 +25,9 @@ class YesNoChoiceWidget extends StatefulWidget {
 }
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
-  late bool? selectedValue;
+  late bool? _selectedValue;
 
-  String get _description => widget.property.formattedDescription;
+  String get _title => widget.schema.formattedTitle;
 
   @override
   void initState() {
@@ -55,21 +56,19 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_description.isNotEmpty) ...[
+        if (_title.isNotEmpty) ...[
           Text(
-            _description,
+            _title,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
-          context,
-          value: selectedValue,
+          value: _selectedValue,
           enabled: widget.isEditMode,
           onChanged: _handleValueChanged,
           validator: (value) {
-            // TODO(dtscalac): add validation
-            final result = widget.property.schema.validatePropertyValue(value);
+            final result = widget.schema.validate(value);
 
             return LocalizedDocumentValidationResult.from(result)
                 .message(context);
@@ -80,48 +79,43 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   }
 
   void _handleInitialValue() {
-    selectedValue = widget.property.value;
+    _selectedValue = widget.property.value;
   }
 
   void _handleValueChanged(bool? value) {
     setState(() {
-      selectedValue = value;
+      _selectedValue = value;
     });
-    if (value == null && widget.property.value != value) {
+
+    if (widget.property.value != value) {
       _notifyChangeListener(value);
     }
   }
 
   void _notifyChangeListener(bool? value) {
-    widget.onChanged(
-      DocumentChange(
-        nodeId: widget.property.schema.nodeId,
-        value: value,
-      ),
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: value,
     );
+    widget.onChanged([change]);
   }
 }
 
-class _YesNoChoiceSegmentButton extends FormField<bool?> {
-  final bool? value;
-  final ValueChanged<bool?>? onChanged;
-
-  _YesNoChoiceSegmentButton(
-    BuildContext context, {
+class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
+  _YesNoChoiceSegmentButton({
     super.key,
-    required this.value,
-    required this.onChanged,
+    required super.value,
+    required super.onChanged,
     super.validator,
     super.enabled,
-    AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
-          initialValue: value,
-          autovalidateMode: autovalidateMode,
           builder: (field) {
+            final state = field as VoicesFormFieldState<bool?>;
+            final value = state.value;
+
             void onChangedHandler(Set<bool> selected) {
               final newValue = selected.isEmpty ? null : selected.first;
               field.didChange(newValue);
-              onChanged?.call(newValue);
             }
 
             return Column(
@@ -135,26 +129,34 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                     segments: [
                       ButtonSegment(
                         value: true,
-                        label: Text(context.l10n.yes),
+                        label: Text(field.context.l10n.yes),
                       ),
                       ButtonSegment(
                         value: false,
-                        label: Text(context.l10n.no),
+                        label: Text(field.context.l10n.no),
                       ),
                     ],
-                    selected: value != null ? {value} : {},
+                    selected: {
+                      if (value != null) value,
+                    },
                     onChanged: onChangedHandler,
                     emptySelectionAllowed: true,
                     style: _getButtonStyle(field),
                   ),
                 ),
                 if (field.hasError)
-                  Text(
-                    field.errorText ?? context.l10n.snackbarErrorLabelText,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Theme.of(context).colorScheme.error),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      field.errorText ??
+                          field.context.l10n.snackbarErrorLabelText,
+                      style: Theme.of(field.context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(
+                            color: Theme.of(field.context).colorScheme.error,
+                          ),
+                    ),
                   ),
               ],
             );

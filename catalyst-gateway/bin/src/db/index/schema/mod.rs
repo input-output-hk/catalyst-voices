@@ -187,7 +187,10 @@ async fn create_namespace(
     // which transforms `<`, `>` symbols to `&lt`, `&gt`
     reg.register_escape_fn(|s| s.into());
     let query = reg
-        .render_template(CREATE_NAMESPACE_CQL, &json!({"keyspace": keyspace}))
+        .render_template(
+            CREATE_NAMESPACE_CQL,
+            &json!({"keyspace": keyspace,"options": cfg.deployment.clone().to_string()}),
+        )
         .context(format!("Keyspace: {keyspace}"))?;
 
     // Create the Keyspace if it doesn't exist already.
@@ -219,24 +222,35 @@ pub(crate) async fn create_schema(
         .await
         .context("Creating Namespace")?;
 
-    let mut failed = false;
+    let mut errors = Vec::with_capacity(SCHEMAS.len());
 
     for (schema, schema_name) in SCHEMAS {
         match session.prepare(*schema).await {
             Ok(stmt) => {
                 if let Err(err) = session.execute_unpaged(&stmt, ()).await {
-                    failed = true;
                     error!(schema=schema_name, error=%err, "Failed to Execute Create Schema Query");
+                    errors.push(anyhow::anyhow!(
+                        "Failed to Execute Create Schema Query: {err}\n--\nSchema: {schema_name}\n--\n{schema}"
+                    ));
                 };
             },
             Err(err) => {
-                failed = true;
                 error!(schema=schema_name, error=%err, "Failed to Prepare Create Schema Query");
+                errors.push(anyhow::anyhow!(
+                    "Failed to Prepare Create Schema Query: {err}\n--\nSchema: {schema_name}\n--\n{schema}"
+                ));
             },
         }
     }
 
-    anyhow::ensure!(!failed, "Failed to Create Schema");
+    if !errors.is_empty() {
+        let fmt_err: Vec<_> = errors.into_iter().map(|err| format!("{err}")).collect();
+        return Err(anyhow::anyhow!(format!(
+            "{} Error(s): {}",
+            fmt_err.len(),
+            fmt_err.join("\n")
+        )));
+    }
 
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;

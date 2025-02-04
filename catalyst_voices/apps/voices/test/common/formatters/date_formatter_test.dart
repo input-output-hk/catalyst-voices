@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
@@ -13,11 +14,32 @@ class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   String get yesterday => 'Yesterday';
   @override
   String get twoDaysAgo => '2 days ago';
+  @override
+  String get weekOf => 'Week of';
+  @override
+  String get from => 'From';
+  @override
+  String get to => 'To';
+  @override
+  String publishedOn(String date, String time) {
+    return 'Published on $date at $time';
+  }
+}
+
+class _FakeMaterialLocalizations extends Fake implements MaterialLocalizations {
+  int _firstDayOfWeekIndex = 0;
+  @override
+  int get firstDayOfWeekIndex => _firstDayOfWeekIndex;
+
+  set firstDayOfWeekIndex(int value) {
+    _firstDayOfWeekIndex = value;
+  }
 }
 
 void main() {
   group(DateFormatter, () {
     final l10n = _FakeVoicesLocalizations();
+    final mockLocalizations = _FakeMaterialLocalizations();
 
     test('should return "Today" for today\'s date', () {
       final today = DateTimeExt.now();
@@ -48,6 +70,150 @@ void main() {
       final result = DateFormatter.formatRecentDate(l10n, pastDate);
       final expectedFormat = DateFormat.yMMMMd().format(pastDate);
       expect(result, expectedFormat);
+    });
+
+    test(
+        'Dates are in the same week for Local when Sunday is first day of week',
+        () {
+      // Set Sunday as first day of week
+      mockLocalizations.firstDayOfWeekIndex = 0;
+      final dateRangeWhenSundayFirst = DateRange(
+        from: DateTime(2025, 1, 19),
+        to: DateTime(2025, 1, 25),
+      );
+      final dateRangeWhenMondayFirst = DateRange(
+        from: DateTime(2025, 1, 20),
+        to: DateTime(2025, 1, 26),
+      );
+
+      final resultSunday = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        dateRangeWhenSundayFirst,
+      );
+      final resultMonday = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        dateRangeWhenMondayFirst,
+      );
+
+      expect(resultSunday, 'Week of Jan 19');
+      expect(resultMonday, 'Jan 20 - Jan 26');
+    });
+
+    test(
+        'Dates are in the same week for Local when Monday is first day of week',
+        () {
+      // Set Monday as first day of week
+      mockLocalizations.firstDayOfWeekIndex = 1;
+      final dateRangeWhenSundayFirst = DateRange(
+        from: DateTime(2025, 1, 19),
+        to: DateTime(2025, 1, 25),
+      );
+      final dateRangeWhenMondayFirst = DateRange(
+        from: DateTime(2025, 1, 20),
+        to: DateTime(2025, 1, 26),
+      );
+
+      final resultSunday = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        dateRangeWhenSundayFirst,
+      );
+      final resultMonday = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        dateRangeWhenMondayFirst,
+      );
+
+      expect(resultSunday, 'Jan 19 - Jan 25');
+      expect(resultMonday, 'Week of Jan 20');
+    });
+
+    test('Return range when both dates are not null', () {
+      final range = DateRange(
+        from: DateTime(2025, 1, 18),
+        to: DateTime(2025, 2, 25),
+      );
+
+      final result = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        range,
+      );
+
+      expect(result, 'Jan 18 - Feb 25');
+    });
+
+    test('Return only from', () {
+      final range = DateRange(
+        from: DateTime(2025, 1, 18),
+        to: null,
+      );
+
+      final result = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        range,
+      );
+
+      expect(result, 'From Jan 18');
+    });
+
+    test('Return only to', () {
+      final range = DateRange(
+        from: null,
+        to: DateTime(2025, 1, 18),
+      );
+
+      final result = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        range,
+      );
+
+      expect(result, 'To Jan 18');
+    });
+
+    test('Return empty string when both dates are null', () {
+      const range = DateRange(
+        from: null,
+        to: null,
+      );
+
+      final result = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        range,
+      );
+
+      expect(result, '');
+    });
+
+    test('should return formatted day month time string', () {
+      final date = DateTime(2025, 1, 28, 14);
+      const expectedValue = '28 Jan 14:00';
+
+      final result = DateFormatter.formatDayMonthTime(date);
+
+      expect(result, expectedValue);
+    });
+
+    test('should format date without year when includeYear is false', () {
+      final date = DateTime(2023, 10, 25, 14, 30); // 25th October 2023, 14:30
+      final result =
+          DateFormatter.formatDateTimeParts(date, includeYear: false);
+
+      expect(result.date, '25 October');
+      expect(result.time, '14:30');
+    });
+
+    test('should format date with year when includeYear is true', () {
+      final date = DateTime(2025, 10, 25, 14, 30); // 25th October 2023, 14:30
+      final result = DateFormatter.formatDateTimeParts(date, includeYear: true);
+
+      expect(result.date, '25 October 2025');
+      expect(result.time, '14:30');
     });
   });
 }

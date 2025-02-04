@@ -8,21 +8,17 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class SingleGroupedTagSelectorWidget extends StatefulWidget {
-  final DocumentNodeId id;
-  final GroupedTagsSelection selection;
-  final List<GroupedTags> groupedTags;
+  final DocumentSingleGroupedTagSelectorSchema schema;
+  final DocumentObjectProperty property;
   final bool isEditMode;
-  final ValueChanged<DocumentChange> onChanged;
-  final bool isRequired;
+  final ValueChanged<List<DocumentChange>> onChanged;
 
   const SingleGroupedTagSelectorWidget({
     super.key,
-    required this.id,
-    this.selection = const GroupedTagsSelection(),
-    required this.groupedTags,
+    required this.schema,
+    required this.property,
     required this.isEditMode,
     required this.onChanged,
-    required this.isRequired,
   });
 
   @override
@@ -39,15 +35,18 @@ class _SingleGroupedTagSelectorWidgetState
   void initState() {
     super.initState();
 
-    _selection = widget.selection;
+    _selection = _getInitialSelection(widget);
   }
 
   @override
   void didUpdateWidget(covariant SingleGroupedTagSelectorWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.selection != oldWidget.selection) {
-      _selection = widget.selection;
+    final oldSelection = _getInitialSelection(oldWidget);
+    final newSelection = _getInitialSelection(widget);
+
+    if (newSelection != oldSelection) {
+      _selection = newSelection;
     }
   }
 
@@ -55,15 +54,23 @@ class _SingleGroupedTagSelectorWidgetState
   Widget build(BuildContext context) {
     if (widget.isEditMode) {
       return _TagSelector(
-        groupedTags: widget.groupedTags,
+        groupedTags: widget.schema.groupedTags(),
         selection: _selection,
         onGroupChanged: _handleGroupedTagsSelection,
         onSelectionChanged: _handleTagSelection,
-        isRequired: widget.isRequired,
+        hintText: widget.schema.placeholder,
+        isRequired: widget.schema.isRequired,
       );
     } else {
       return _GroupedTagChip(_selection);
     }
+  }
+
+  GroupedTagsSelection _getInitialSelection(
+    SingleGroupedTagSelectorWidget from,
+  ) {
+    return from.schema.groupedTagsSelection(from.property) ??
+        const GroupedTagsSelection();
   }
 
   void _handleGroupedTagsSelection(GroupedTags? groupedTags) {
@@ -81,8 +88,8 @@ class _SingleGroupedTagSelectorWidgetState
     setState(() {
       _selection = value;
 
-      final change = DocumentChange(nodeId: widget.id, value: value);
-      widget.onChanged(change);
+      final changes = widget.schema.buildDocumentChanges(value);
+      widget.onChanged(changes);
     });
   }
 }
@@ -92,6 +99,7 @@ class _TagSelector extends StatelessWidget {
   final GroupedTagsSelection selection;
   final ValueChanged<GroupedTags?> onGroupChanged;
   final ValueChanged<GroupedTagsSelection> onSelectionChanged;
+  final String? hintText;
   final bool isRequired;
 
   GroupedTags? get _selectedGroupedTags {
@@ -105,6 +113,7 @@ class _TagSelector extends StatelessWidget {
     required this.selection,
     required this.onGroupChanged,
     required this.onSelectionChanged,
+    required this.hintText,
     required this.isRequired,
   });
 
@@ -128,6 +137,7 @@ class _TagSelector extends StatelessWidget {
           groupedTags: groupedTags,
           onChanged: onGroupChanged,
           value: selectedGroup,
+          hintText: hintText,
         ),
         const SizedBox(height: 8.5),
         _TagSelectorLabel(
@@ -177,11 +187,13 @@ class _TagGroupsDropdown extends StatelessWidget {
   final List<GroupedTags> groupedTags;
   final ValueChanged<GroupedTags?> onChanged;
   final GroupedTags? value;
+  final String? hintText;
 
   const _TagGroupsDropdown({
     required this.groupedTags,
     required this.onChanged,
     required this.value,
+    required this.hintText,
   });
 
   @override
@@ -190,8 +202,8 @@ class _TagGroupsDropdown extends StatelessWidget {
       items: groupedTags
           .map((e) => DropdownMenuEntry(value: e, label: e.group))
           .toList(),
-      initialValue: value,
-      onSelected: onChanged,
+      value: value,
+      onChanged: onChanged,
     );
   }
 }

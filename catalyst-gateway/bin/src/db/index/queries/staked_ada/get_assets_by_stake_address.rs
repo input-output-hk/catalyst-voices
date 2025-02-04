@@ -55,19 +55,15 @@ pub(crate) struct GetAssetsByStakeAddressQuery {
 impl GetAssetsByStakeAddressQuery {
     /// Prepares a get assets by stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_assets_by_stake_address_query = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session,
             GET_ASSETS_BY_STAKE_ADDRESS_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = get_assets_by_stake_address_query {
-            error!(error=%error, "Failed to prepare get assets by stake address");
-        };
-
-        get_assets_by_stake_address_query
+        .await
+        .inspect_err(|error| error!(error=%error, "Failed to prepare get assets by stake address."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_ASSETS_BY_STAKE_ADDRESS_QUERY}"))
     }
 
     /// Executes a get assets by stake address query.
