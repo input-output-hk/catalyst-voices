@@ -15,11 +15,13 @@ final class SessionUnlockedGuard implements RouteGuard {
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
     final sessionCubit = context.read<SessionCubit>();
-    if (sessionCubit.state.isActive) {
-      // if already unlocked skip redirection
-      return null;
-    } else {
-      return const DiscoveryRoute().location;
-    }
+    return const WorkspaceRoute().location;
+    // if (sessionCubit.state.isActive) {
+    //   // if already unlocked skip redirection
+    //   return null;
+    // } else {
+    //   return const DiscoveryRoute().location;
+
+    // }
   }
 }

@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/pages/workspace/workspace_empty_state.dart';
 import 'package:catalyst_voices/pages/workspace/workspace_error.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_header.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_header/workspace_header.dart';
 import 'package:catalyst_voices/pages/workspace/workspace_loading.dart';
 import 'package:catalyst_voices/pages/workspace/workspace_proposals.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
