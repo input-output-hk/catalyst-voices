@@ -102,7 +102,6 @@ pub(crate) struct IndexedFollowerDataParams<'a> {
 
 impl<'a> IndexedFollowerDataParams<'a> {
     /// Creates a [`IndexedFollowerDataParams`] from block data.
-    #[allow(dead_code)]
     pub(crate) fn from_block_data(
         genesis_values: &GenesisValues, network: &'a str, block: &MultiEraBlock<'a>,
     ) -> Option<Self> {
@@ -142,7 +141,6 @@ impl<'a> IndexedFollowerDataParams<'a> {
 
 impl EventDB {
     /// Batch writes follower data.
-    #[allow(dead_code)]
     pub(crate) async fn index_many_follower_data(
         values: &[IndexedFollowerDataParams<'_>],
     ) -> anyhow::Result<()> {
@@ -231,7 +229,6 @@ impl EventDB {
 
     /// Mark point in time where the last follower finished indexing in order for future
     /// followers to pick up from this point
-    #[allow(dead_code)]
     pub(crate) async fn refresh_last_updated(
         last_updated: DateTime, slot_no: SlotNumber, block_hash: BlockHash, network: Network,
         machine_id: &MachineId,
