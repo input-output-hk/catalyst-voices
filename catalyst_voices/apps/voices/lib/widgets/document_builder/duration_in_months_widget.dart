@@ -28,6 +28,8 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
 
   String get _title => widget.schema.formattedTitle;
 
+  String? get _placeholder => widget.schema.placeholder;
+
   int get _min => widget.schema.numRange?.min ?? 0;
 
   int get _max => widget.schema.numRange?.max ?? 0;
@@ -79,6 +81,7 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
             validator: _validator,
             initialValue: _selectedValue,
             enabled: widget.isEditMode,
+            hintText: _placeholder,
           ),
         ],
       ],
@@ -101,14 +104,11 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
   }
 
   void _notifyChangeListener(int? value) {
-    widget.onChanged(
-      [
-        DocumentValueChange(
-          nodeId: widget.schema.nodeId,
-          value: value,
-        ),
-      ],
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: value,
     );
+    widget.onChanged([change]);
   }
 
   String? _validator(int? value) {

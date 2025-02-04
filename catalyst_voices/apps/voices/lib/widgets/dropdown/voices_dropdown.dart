@@ -70,8 +70,9 @@ class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
         textStyle: WidgetStateProperty.all(
           Theme.of(context).textTheme.labelLarge,
         ),
-        foregroundColor:
-            WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+        foregroundColor: WidgetStateProperty.all(
+          Theme.of(context).colorScheme.primary,
+        ),
         visualDensity: VisualDensity.compact,
       );
 }
@@ -129,8 +130,11 @@ class SingleSelectDropdown<T> extends FormField<T> {
                       disabledBorder: _border(field.context),
                       focusedBorder: _border(field.context),
                     ),
-                    trailingIcon: Offstage(
-                      offstage: !enabled,
+                    // using visibility so that the widget reserves
+                    // the space for the icon, otherwise when widget changes
+                    // to edits mode it expands to make space for the icon
+                    trailingIcon: Visibility.maintain(
+                      visible: enabled,
                       child: VoicesAssets.icons.chevronDown.buildIcon(),
                     ),
                     selectedTrailingIcon:

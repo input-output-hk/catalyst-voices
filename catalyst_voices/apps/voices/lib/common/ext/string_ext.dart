@@ -1,4 +1,6 @@
 extension StringExt on String {
+  String? get firstLetter => isEmpty ? null : substring(0, 1);
+
   String capitalize() {
     if (isNotEmpty) {
       return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';

@@ -89,30 +89,32 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   void _handleControllerChange() {
-    final controllerValue = _textEditingController.text;
-    if (widget.property.value != controllerValue &&
-        controllerValue.isNotEmpty) {
-      _notifyChangeListener(controllerValue);
+    final oldValue = widget.property.value;
+    final newValue = _textEditingController.text;
+    if (oldValue != newValue) {
+      _notifyChangeListener(newValue);
     }
   }
 
   void _notifyChangeListener(String? value) {
+    final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
-      value: value,
+      value: normalizedValue,
     );
-
     widget.onChanged([change]);
   }
 
   VoicesTextFieldValidationResult _validate(String? value) {
-    if (value == null || value.isEmpty) {
-      return const VoicesTextFieldValidationResult.none();
-    }
     final schema = widget.schema;
-    final result = schema.validate(value);
+    final normalizedValue = schema.normalizeValue(value);
+    final result = schema.validate(normalizedValue);
     if (result.isValid) {
-      return const VoicesTextFieldValidationResult.success();
+      if (normalizedValue == null) {
+        return const VoicesTextFieldValidationResult.none();
+      } else {
+        return const VoicesTextFieldValidationResult.success();
+      }
     } else {
       final localized = LocalizedDocumentValidationResult.from(result);
       return VoicesTextFieldValidationResult.error(localized.message(context));

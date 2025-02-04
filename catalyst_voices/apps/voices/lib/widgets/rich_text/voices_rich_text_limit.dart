@@ -47,13 +47,19 @@ class _VoicesRichTextLimitState extends State<VoicesRichTextLimit> {
 
   @override
   Widget build(BuildContext context) {
+    final error = widget.errorMessage ?? '';
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: error.isEmpty ? 0 : 4,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              widget.errorMessage ?? '',
+              error,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

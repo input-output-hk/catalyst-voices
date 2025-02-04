@@ -54,7 +54,8 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
 /// Describes the Blake2b-256 hash of the transaction which serves as proof
 /// of transaction validation.
 final class TransactionHash extends BaseHash {
-  static const int _length = 32;
+  /// Length of the [TransactionHash].
+  static const int hashLength = 32;
 
   /// Constructs the [TransactionHash] from raw [bytes].
   TransactionHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -68,7 +69,7 @@ final class TransactionHash extends BaseHash {
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(cbor.encode(body.toCbor())),
-            digestSize: _length,
+            digestSize: hashLength,
           ),
         );
 
@@ -76,14 +77,15 @@ final class TransactionHash extends BaseHash {
   TransactionHash.fromCbor(super.value) : super.fromCbor();
 
   @override
-  int get length => _length;
+  int get length => hashLength;
 }
 
 /// Describes the Blake2b-128 hash of the transaction inputs (UTXOs)
 /// which can be used as a link to a certain transaction
 /// (as UTXOs can only be spent once).
 final class TransactionInputsHash extends BaseHash {
-  static const int _length = 16;
+  /// Length of the [TransactionInputsHash].
+  static const int hashLength = 16;
 
   /// Constructs the [TransactionInputsHash] from raw [bytes].
   TransactionInputsHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -104,7 +106,7 @@ final class TransactionInputsHash extends BaseHash {
                 ]),
               ),
             ),
-            digestSize: _length,
+            digestSize: hashLength,
           ),
         );
 
@@ -112,13 +114,14 @@ final class TransactionInputsHash extends BaseHash {
   TransactionInputsHash.fromCbor(super.value) : super.fromCbor();
 
   @override
-  int get length => _length;
+  int get length => hashLength;
 }
 
 /// Describes the Blake2b-256 hash of auxiliary data which is included
 /// in the transaction body.
 final class AuxiliaryDataHash extends BaseHash {
-  static const int _length = 32;
+  /// Length of the [AuxiliaryDataHash].
+  static const int hashLength = 32;
 
   /// Constructs the [AuxiliaryDataHash] from raw [bytes].
   AuxiliaryDataHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -132,7 +135,7 @@ final class AuxiliaryDataHash extends BaseHash {
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(cbor.encode(data.toCbor())),
-            digestSize: _length,
+            digestSize: hashLength,
           ),
         );
 
@@ -140,12 +143,13 @@ final class AuxiliaryDataHash extends BaseHash {
   AuxiliaryDataHash.fromCbor(super.value) : super.fromCbor();
 
   @override
-  int get length => _length;
+  int get length => hashLength;
 }
 
 /// Describes the Blake2b-128 hash of a certificate.
 final class CertificateHash extends BaseHash {
-  static const int _length = 16;
+  /// Length of the [CertificateHash].
+  static const int hashLength = 16;
 
   /// Constructs the [CertificateHash] from raw [bytes].
   CertificateHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -159,7 +163,7 @@ final class CertificateHash extends BaseHash {
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(certificate.bytes),
-            digestSize: _length,
+            digestSize: hashLength,
           ),
         );
 
@@ -168,7 +172,7 @@ final class CertificateHash extends BaseHash {
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(certificate.bytes),
-            digestSize: _length,
+            digestSize: hashLength,
           ),
         );
 
@@ -176,12 +180,13 @@ final class CertificateHash extends BaseHash {
   CertificateHash.fromCbor(super.value) : super.fromCbor();
 
   @override
-  int get length => _length;
+  int get length => hashLength;
 }
 
 /// Describes the Blake2b-224 hash of a [Ed25519PublicKey].
 final class Ed25519PublicKeyHash extends BaseHash {
-  static const int _length = 28;
+  /// Length of the [Ed25519PublicKeyHash].
+  static const int hashLength = 28;
 
   /// Constructs the [Ed25519PublicKeyHash] from raw [bytes].
   Ed25519PublicKeyHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -195,7 +200,7 @@ final class Ed25519PublicKeyHash extends BaseHash {
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(key.bytes),
-            digestSize: _length,
+            digestSize: hashLength,
           ),
         );
 
@@ -203,13 +208,14 @@ final class Ed25519PublicKeyHash extends BaseHash {
   Ed25519PublicKeyHash.fromCbor(super.value) : super.fromCbor();
 
   @override
-  int get length => _length;
+  int get length => hashLength;
 }
 
 /// Describes the Blake2b-256 hash of script data which is included
 /// in the transaction body.
 final class ScriptDataHash extends BaseHash {
-  static const int _length = 32;
+  /// Length of the [ScriptDataHash].
+  static const int hashLength = 32;
 
   /// Constructs the [ScriptDataHash] from raw [bytes].
   ScriptDataHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -223,7 +229,7 @@ final class ScriptDataHash extends BaseHash {
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(cbor.encode(data.toCbor())),
-            digestSize: _length,
+            digestSize: hashLength,
           ),
         );
 
@@ -231,5 +237,5 @@ final class ScriptDataHash extends BaseHash {
   ScriptDataHash.fromCbor(super.value) : super.fromCbor();
 
   @override
-  int get length => _length;
+  int get length => hashLength;
 }
