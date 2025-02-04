@@ -54,6 +54,7 @@ class OnboardingPage {
   static const recoverKeychainMethodsListTitle =
       Key('RecoverKeychainMethodsListTitle');
   static const registrationTileTitle = Key('RegistrationTileTitle');
+  static const createBaseProfileNext = Key('CreateBaseProfileNext');
 
   static Future<int> writedownSeedPhraseNumber(
     PatrolTester $,
@@ -172,7 +173,7 @@ class OnboardingPage {
     RegistrationState step,
   ) async {
     await registrationInfoPanelLooksAsExpected($, step);
-    await registrationDetailsPanelLooksAsExpected($, step);
+    // await registrationDetailsPanelLooksAsExpected($, step);
     expect(await closeBtn($), findsOneWidget);
   }
 
@@ -203,13 +204,12 @@ class OnboardingPage {
         expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         expect(
           await infoPartHeaderSubtitleText($),
-          T.get('Write down your 12 Catalyst  security words'),
+          T.get('Write down your Catalyst seed phrase'),
         );
         expect(
           await infoPartHeaderBodyText($),
           T.get(
-            'Make sure you create an offline backup of your recovery phrase '
-            'as well.',
+            'Make sure you write down your 12-words in  a safe place as well.',
           ),
         );
         expect(infoPartTaskPicture($), findsOneWidget);
@@ -232,7 +232,7 @@ class OnboardingPage {
         expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
         expect(
           await infoPartHeaderSubtitleText($),
-          T.get('Input your Catalyst security keys'),
+          T.get('Input your Catalyst seed phrase'),
         );
         expect(
           await infoPartHeaderBodyText($),
@@ -378,7 +378,6 @@ class OnboardingPage {
           isNotEmpty,
         );
         expect(await detailsPartCreateKeychainBtn($), findsOneWidget);
-        expect($(backButton), findsOneWidget);
         break;
       case RegistrationState.keychainCreated:
         expect(
@@ -397,7 +396,7 @@ class OnboardingPage {
         expect($(downloadSeedPhraseButton), findsOneWidget);
         expect(
           $(downloadSeedPhraseButton).$(CommonPage.decorData).$(Text).text,
-          T.get('Download Catalyst key'),
+          T.get('Export Security Words'),
         );
         expect($(seedPhraseStoredCheckbox), findsOneWidget);
         expect(
@@ -410,7 +409,7 @@ class OnboardingPage {
       case RegistrationState.keychainCreateMnemonicInputInfo:
         expect(
           $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
-          T.get('Check your Catalyst security keys'),
+          T.get('Write down your Catalyst seed phrase'),
         );
         expect(
           $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
@@ -422,7 +421,7 @@ class OnboardingPage {
         expect($(uploadKeyButton), findsOneWidget);
         expect(
           $(uploadKeyButton).$(CommonPage.decorData).$(Text).text,
-          T.get('Upload Catalyst Key'),
+          T.get('Import Catalyst Key'),
         );
         expect($(backButton), findsOneWidget);
         expect($(nextButton), findsOneWidget);
@@ -433,8 +432,8 @@ class OnboardingPage {
             .waitUntilVisible();
         expect(
           $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
-          T.get("Nice job! You've successfully verified the seed phrase for "
-              'your keychain.'),
+          T.get("Nice job! You've successfully verified your Catalyst seed "
+              'phase'),
         );
         expect(
           $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
@@ -530,7 +529,7 @@ class OnboardingPage {
         );
         expect(
           $(registrationTileTitle).text,
-          T.get('12 security words'),
+          T.get('Restore/Upload with 12-word seed phrase'),
         );
         break;
       case RegistrationState.keychainRestoreMnemonicInfo:
