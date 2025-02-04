@@ -106,12 +106,12 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
   }
 
   void _notifyChangeListener(String? value) {
-    widget.onChanged([
-      DocumentValueChange(
-        nodeId: widget.schema.nodeId,
-        value: value,
-      ),
-    ]);
+    final normalizedValue = widget.schema.normalizeValue(value);
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: normalizedValue,
+    );
+    widget.onChanged([change]);
   }
 
   String? _getLocalizedLanguageName(String languageCode) {
