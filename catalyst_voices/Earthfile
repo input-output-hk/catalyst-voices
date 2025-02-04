@@ -77,7 +77,6 @@ code-generator:
     # restore current working directory to the root of the project
     WORKDIR /frontend
 
-
 # Runs static analysis on the code.
 check-static-analysis:
     FROM +code-generator
