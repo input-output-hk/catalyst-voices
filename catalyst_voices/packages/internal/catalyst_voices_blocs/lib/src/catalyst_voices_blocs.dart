@@ -1,3 +1,4 @@
+export 'account/account.dart';
 export 'admin_tools/admin_tools.dart';
 export 'bloc_error_emitter_mixin.dart';
 export 'brand/brand.dart';
