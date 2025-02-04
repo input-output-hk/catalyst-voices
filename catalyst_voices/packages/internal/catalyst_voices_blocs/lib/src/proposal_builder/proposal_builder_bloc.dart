@@ -175,8 +175,7 @@ final class ProposalBuilderBloc
   Iterable<DocumentProperty> _findSectionsAndSubsections(
     DocumentProperty property,
   ) sync* {
-    if (property.schema is DocumentSectionSchema ||
-        property.schema.isSubsection) {
+    if (property.schema.isSectionOrSubsection) {
       yield property;
     }
 
