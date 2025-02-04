@@ -150,7 +150,6 @@ impl EventDB {
     /// # Returns
     ///
     /// `anyhow::Result<()>`
-    #[allow(dead_code)]
     pub(crate) async fn modify(stmt: &str, params: &[&(dyn ToSql + Sync)]) -> anyhow::Result<()> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_commit(stmt, params).await?;
@@ -170,7 +169,6 @@ impl EventDB {
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and commit the transaction.
-    #[allow(dead_code)]
     async fn explain_analyze_commit(
         stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {

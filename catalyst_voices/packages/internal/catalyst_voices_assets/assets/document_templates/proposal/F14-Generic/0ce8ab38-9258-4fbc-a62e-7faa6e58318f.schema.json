@@ -453,7 +453,8 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Does the project have any dependency",
                             "description": "Does your project have any dependencies on other organizations, technical or otherwise?",
-                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\""
+                            "x-guidance": "If YES, please describe what the dependency is and why you believe it is essential for your project's delivery. If NO, please write \"No dependencies\"",
+                            "x-placeholder": "Select if your project has any dependencies"
                         },
                         "dependencyDetail": {
                             "$ref": "#/definitions/singleLineTextEntry",
@@ -501,6 +502,185 @@
                 "supportingLinks",
                 "dependencies",
                 "open_source"
+            ]
+        },
+        "campaign_category": {
+            "title": "Campaign Category",
+            "$ref": "#/definitions/segment",
+            "description": "Determine the eligibility of the proposal for this category",
+            "properties": {
+                "category_questions": {
+                    "$ref": "#/definitions/section",
+                    "title": "Category Questions",
+                    "description": "Answer the following questions to determine the eligibility of your proposal.",
+                    "properties": {
+                        "informational_content": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal involve informational content, such as websites, blogs, or similar media?",
+                                    "x-guidance": "Informational content like websites or blogs is not eligible for this category. Focus on real-world utility and adoption. If your project is primarily informational, consider a different category.",
+                                    "description": "Proposals for informational content, such as websites or blogs, are prohibited. This category prioritizes real-world adoption and utility-driven projects."
+                                }
+                            }
+                        },
+                        "foundational_rd": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Is your proposal for foundational R&D or maintenance of Cardano infrastructure (e.g., wallets, explorers, or bridges)?",
+                                    "x-guidance": "Foundational R&D or infrastructure maintenance (e.g., wallets, bridges, explorers) should apply to a category focused on infrastructure funding, not this one.",
+                                    "description": "This category does not cover foundational R&D or ongoing maintenance of Cardano infrastructure (e.g., wallets, explorers, bridges). These are better suited to categories specifically addressing infrastructure needs."
+                                }
+                            }
+                        },
+                        "financial_products": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your project propose funding for liquidity, loans, buying NFTs, or other financial/token-based products?",
+                                    "x-guidance": "Financial/token-based proposals like liquidity funding, loans, or NFT purchases are ineligible. Focus on real-world applications of Cardano technology.",
+                                    "description": "Proposals requesting funding for liquidity, loans, or token-based financial products, including NFT purchases, are not within scope."
+                                }
+                            }
+                        },
+                        "early_stage_product": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal focus on a brand-new or early-stage product that is not at least released to an MVP stage?",
+                                    "x-guidance": "Proposals must enhance existing, deployed products or involve enterprise partnerships. Early-stage ideas without an MVP should apply to a different category.",
+                                    "description": "Only projects with an existing product at MVP stage or beyond are eligible. Early-stage ideas should seek funding in more general innovation categories."
+                                }
+                            }
+                        },
+                        "developer_tools": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal primarily involve developer tools, middleware, APIs, or IDEs?",
+                                    "x-guidance": "Developer tooling projects should apply to a developer-focused category, such as 'Cardano Open: Developers.' This category emphasizes adoption-driven use cases.",
+                                    "description": "Developer tools, middleware, APIs, and IDEs fall outside the scope of this category. These projects should seek funding under developer-specific categories."
+                                }
+                            }
+                        },
+                        "enterprise_partnership": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Is your proposal led by or in partnership with an established enterprise or team with a proven business track record?",
+                                    "x-guidance": "Proposals must demonstrate enterprise experience and proven success. Include details about your team or partner's expertise.",
+                                    "description": "Proposals must be led by established enterprises or teams with proven business track records. This ensures credibility and feasibility."
+                                },
+                                "secondary_question": {
+                                    "type": "object",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "What is the name of the enterprise or team, and what is their track record in the industry?"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "working_product": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your project have a working product or measurable adoption metrics?",
+                                    "x-guidance": "Proposals should enhance existing products with measurable success. Include adoption metrics or examples of real-world use.",
+                                    "description": "Proposals should demonstrate a working product and measurable adoption. Projects without existing success metrics are not eligible."
+                                },
+                                "secondary_question": {
+                                    "type": "object",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "Provide a brief description of your product and its current adoption metrics."
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "timeline": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal include a timeline for delivery within 12 months?",
+                                    "x-guidance": "Projects must be delivered within 12 months. Include a clear timeline with milestones for evaluation.",
+                                    "description": "All projects must be completed within 12 months. Proposals must include a detailed timeline with key milestones."
+                                }
+                            }
+                        },
+                        "matching_funds": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal include matching funds or in-kind contributions?",
+                                    "x-guidance": "Matching funds or contributions enhance feasibility and impact. Be transparent about sources and amounts.",
+                                    "description": "Proposals with matching funds or in-kind contributions are prioritized for funding due to their higher feasibility and potential impact."
+                                },
+                                "secondary_question": {
+                                    "type": "object",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "Provide details on the matching funds or contributions, including their source and value."
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "adoption_potential": {
+                            "type": "object",
+                            "properties": {
+                                "answer": {
+                                    "$ref": "#/definitions/yesNoChoice",
+                                    "title": "Does your proposal showcase high adoption potential with measurable outcomes?",
+                                    "x-guidance": "Proposals must drive tangible adoption with measurable results. Include metrics and methods for evaluating success.",
+                                    "description": "Projects must demonstrate high adoption potential and outline measurable outcomes. Metrics for success should be included."
+                                },
+                                "secondary_question": {
+                                    "type": "object",
+                                    "title": "If Yes",
+                                    "properties": {
+                                        "question": {
+                                            "type": "string",
+                                            "description": "What measurable outcomes do you aim to achieve, and how will you assess success?"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "x-order": [
+                        "informational_content",
+                        "foundational_rd",
+                        "financial_products",
+                        "early_stage_product",
+                        "developer_tools",
+                        "enterprise_partnership",
+                        "working_product",
+                        "timeline",
+                        "matching_funds",
+                        "adoption_potential"
+                    ]
+                }
+            },
+            "x-order": [
+                "category_questions"
             ]
         },
         "theme": {
@@ -835,8 +1015,8 @@
                     "properties": {
                         "milestone_list": {
                             "type": "array",
-                            "title": "Milestones",
-                            "description": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                            "title": "What are the key milestones you need to achieve in order to complete your project successfully?",
+                            "description": "Your requested budget requires a minimum of 3 milestones. However you can add additional milestones, please confirm how many milestones you would like to submit.",
                             "x-guidance": "**Milestone Requirements:**\n\n- For Grant Amounts of up to 75k ada: at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (**3 milestones in total**)\n- For Grant Amounts over 75k ada up to 150k ada: at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (**4 milestones in total**)\n- For Grant Amounts over 150k ada up to 300k ada: at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (**5 milestones in total**)\n- For Grant Amounts exceeding 300k ada: at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (**6 milestones in total**)",
                             "minItems": 3,
                             "maxItems": 6,
@@ -1023,6 +1203,7 @@
     "x-order": [
         "setup",
         "summary",
+        "campaign_category",
         "theme",
         "details",
         "milestones",

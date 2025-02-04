@@ -34,10 +34,6 @@ final class SessionAccount extends Equatable {
     );
   }
 
-  String get initials {
-    return displayName.isNotEmpty ? displayName.substring(0, 1) : '';
-  }
-
   @override
   List<Object?> get props => [
         catalystId,

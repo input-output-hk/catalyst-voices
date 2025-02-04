@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
+import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -21,15 +22,21 @@ class ListLengthPickerWidget extends StatelessWidget {
     final minCount = range?.min ?? 0;
     final maxCount = range?.max ?? 100;
     final currentCount = list.properties.length;
+    final title = list.schema.title;
+    final description = list.schema.description ?? MarkdownData.empty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          list.schema.formattedDescriptionOrTitle,
+          list.schema.formattedTitle,
           style: Theme.of(context).textTheme.titleSmall,
         ),
         const SizedBox(height: 8),
+        if (description.data.isNotEmpty && description.data != title) ...[
+          MarkdownText(description),
+          const SizedBox(height: 22),
+        ],
         SingleSelectDropdown(
           items: [
             for (int i = minCount; i <= maxCount; i++)
@@ -40,7 +47,7 @@ class ListLengthPickerWidget extends StatelessWidget {
           ],
           enabled: isEditMode,
           onChanged: _onChanged,
-          initialValue: currentCount,
+          value: currentCount,
           hintText: list.schema.placeholder,
         ),
       ],
