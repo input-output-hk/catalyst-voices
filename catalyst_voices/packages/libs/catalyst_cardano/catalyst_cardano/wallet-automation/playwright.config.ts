@@ -25,7 +25,7 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
-          channel: "chrome",
+          executablePath: "/user/bin/google-chrome",
           args: [
             "--unsafely-treat-insecure-origin-as-secure=http://test-app:80",
           ],
