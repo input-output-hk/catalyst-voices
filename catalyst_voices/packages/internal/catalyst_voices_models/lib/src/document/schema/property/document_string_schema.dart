@@ -307,6 +307,12 @@ final class DocumentTagGroupSchema extends DocumentStringSchema {
       pattern: pattern,
     );
   }
+
+  @override
+  DocumentValidationResult validate(String? value) {
+    // validated by its parent (DocumentSingleGroupedTagSelectorSchema)
+    return const SuccessfulDocumentValidation();
+  }
 }
 
 final class DocumentTagSelectionSchema extends DocumentStringSchema {
@@ -348,6 +354,12 @@ final class DocumentTagSelectionSchema extends DocumentStringSchema {
       strLengthRange: strLengthRange,
       pattern: pattern,
     );
+  }
+
+  @override
+  DocumentValidationResult validate(String? value) {
+    // validated by its parent (DocumentSingleGroupedTagSelectorSchema)
+    return const SuccessfulDocumentValidation();
   }
 }
 

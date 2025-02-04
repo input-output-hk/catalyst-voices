@@ -253,6 +253,45 @@ final class DocumentSingleGroupedTagSelectorSchema
     );
   }
 
+  @override
+  DocumentValidationResult validate(List<DocumentProperty> properties) {
+    final groupProperty =
+        properties.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema)
+            as DocumentValueProperty<String>?;
+
+    final tagProperty = properties
+            .firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema)
+        as DocumentValueProperty<String>?;
+
+    final group = groupProperty?.value;
+    final tag = tagProperty?.value;
+
+    if (groupProperty == null ||
+        tagProperty == null ||
+        group == null ||
+        tag == null) {
+      return MissingRequiredDocumentValue(invalidNodeId: nodeId);
+    }
+
+    final groups = groupedTags();
+    final matchingGroup = groups.firstWhereOrNull((e) => e.group == group);
+    if (matchingGroup == null) {
+      return DocumentEnumValueMismatch(
+        invalidNodeId: groupProperty.nodeId,
+        enumValues: groups.map((e) => e.group).toList(),
+      );
+    }
+
+    if (matchingGroup.tags.contains(tag)) {
+      return const SuccessfulDocumentValidation();
+    } else {
+      return DocumentEnumValueMismatch(
+        invalidNodeId: tagProperty.nodeId,
+        enumValues: matchingGroup.tags,
+      );
+    }
+  }
+
   GroupedTagsSelection? groupedTagsSelection(DocumentObjectProperty property) {
     assert(
       property.schema == this,
