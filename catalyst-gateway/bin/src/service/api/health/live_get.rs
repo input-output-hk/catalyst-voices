@@ -15,6 +15,7 @@ pub(crate) fn set_live(flag: bool) {
     IS_LIVE.store(flag, Ordering::Release);
 }
 /// Get the started flag
+#[allow(dead_code)]
 fn is_live() -> bool {
     IS_LIVE.load(Ordering::Acquire) && CassandraSession::is_ready()
 }
