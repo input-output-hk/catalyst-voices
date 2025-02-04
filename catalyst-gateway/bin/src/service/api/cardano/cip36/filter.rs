@@ -3,6 +3,7 @@
 use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
+use tracing::debug;
 
 use super::{
     cardano::{
@@ -441,6 +442,7 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36D
 pub async fn get_all_stake_addrs_and_vote_keys(
     session: &Arc<CassandraSession>,
 ) -> Result<Vec<(Ed25519HexEncodedPublicKey, Ed25519HexEncodedPublicKey)>, anyhow::Error> {
+    debug!("Before snapshot");
     let mut stake_addr_iter =
         GetAllStakesAndVoteKeysQuery::execute(session, GetAllStakesAndVoteKeysParams {}).await?;
 
@@ -454,5 +456,8 @@ pub async fn get_all_stake_addrs_and_vote_keys(
 
         vote_key_stake_addr_pair.push((stake_addr, vote_key));
     }
+
+    debug!("After snapshot");
+
     Ok(vote_key_stake_addr_pair)
 }
