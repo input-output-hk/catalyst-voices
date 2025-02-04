@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,9 @@ class SessionAccountAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<SessionCubit, SessionState, String>(
-      selector: (state) => state.account?.initials ?? '',
+      selector: (state) {
+        return state.account?.displayName.firstLetter?.capitalize() ?? '';
+      },
       builder: (context, state) {
         return _Avatar(
           letter: state,

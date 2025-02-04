@@ -109,6 +109,9 @@ final class Dependencies extends DependencyProvider {
         return DiscoveryCubit(
           get<CampaignService>(),
         );
+      })
+      ..registerFactory<AccountCubit>(() {
+        return AccountCubit(get<UserService>());
       });
   }
 
