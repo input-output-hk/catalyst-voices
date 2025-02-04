@@ -28,7 +28,6 @@ pub(crate) struct FullSignedDoc {
 
 impl FullSignedDoc {
     /// Creates a  `FullSignedDoc` instance.
-    #[allow(dead_code)]
     pub(crate) fn new(
         body: SignedDocBody, payload: Option<serde_json::Value>, raw: Vec<u8>,
     ) -> Self {
@@ -64,7 +63,6 @@ impl FullSignedDoc {
     }
 
     /// Returns the document raw bytes.
-    #[allow(dead_code)]
     pub(crate) fn raw(&self) -> &Vec<u8> {
         &self.raw
     }
@@ -86,7 +84,6 @@ impl FullSignedDoc {
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
     ///  - `doc_type` is a UUID v4
-    #[allow(dead_code)]
     pub(crate) async fn store(&self) -> anyhow::Result<bool> {
         match Self::retrieve(self.id(), Some(self.ver())).await {
             Ok(res_doc) => {
@@ -117,7 +114,6 @@ impl FullSignedDoc {
     /// # Arguments:
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
-    #[allow(dead_code)]
     pub(crate) async fn retrieve(
         id: &uuid::Uuid, ver: Option<&uuid::Uuid>,
     ) -> anyhow::Result<Self> {
