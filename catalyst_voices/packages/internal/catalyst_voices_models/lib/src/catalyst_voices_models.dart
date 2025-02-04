@@ -23,6 +23,8 @@ export 'document/validation/document_validator.dart';
 export 'document/values/grouped_tags.dart';
 export 'errors/errors.dart';
 export 'file/voices_file.dart';
+export 'hi_lo/hi_lo.dart';
+export 'hi_lo/uuid_hi_lo.dart';
 export 'markdown_data.dart';
 export 'money/money.dart';
 export 'node_id.dart';
