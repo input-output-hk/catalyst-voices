@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class VoicesDialogTheme extends DialogTheme {
   VoicesDialogTheme({
+    super.key,
     required VoicesColorScheme colors,
   }) : super(
           barrierColor: colors.overlay,

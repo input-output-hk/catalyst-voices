@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/color_ext.dart';
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
@@ -142,7 +143,7 @@ final class _ProposalBorderColor extends WidgetStateColor {
     required this.publishStage,
     required this.colors,
     required this.colorScheme,
-  }) : super(colors.outlineBorder.value);
+  }) : super(colors.outlineBorder.toARGB32());
 
   @override
   Color resolve(Set<WidgetState> states) {
@@ -291,7 +292,7 @@ class _FundsAndDuration extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: SizedBox(
