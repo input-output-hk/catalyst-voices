@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-02-04
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`catalyst_cardano` - `v0.4.1`](#catalyst_cardano---v041)
+ - [`catalyst_key_derivation` - `v0.1.3`](#catalyst_key_derivation---v013)
+ - [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
+ - [`catalyst_cardano_platform_interface` - `v0.4.0+4`](#catalyst_cardano_platform_interface---v0404)
+ - [`catalyst_cardano_web` - `v0.4.0+4`](#catalyst_cardano_web---v0404)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `catalyst_cardano_serialization` - `v0.5.0+4`
+ - `catalyst_cardano_platform_interface` - `v0.4.0+4`
+ - `catalyst_cardano_web` - `v0.4.0+4`
+
+---
+
+#### `catalyst_cardano` - `v0.4.1`
+
+ - **FEAT**(cat-gateway): Add document endpoints ([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1470)). ([f9eca949](https://github.com/input-output-hk/catalyst-voices/commit/f9eca949ca1b21e89ab5eca27ca2925687405cfa))
+
+#### `catalyst_key_derivation` - `v0.1.3`
+
+ - **FEAT**(cat-gateway): Add document endpoints ([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1470)). ([f9eca949](https://github.com/input-output-hk/catalyst-voices/commit/f9eca949ca1b21e89ab5eca27ca2925687405cfa))
+
+
 ## 2025-01-13
 
 ### Changes

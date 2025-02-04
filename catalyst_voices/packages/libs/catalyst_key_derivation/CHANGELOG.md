@@ -1,3 +1,7 @@
+## 0.1.3
+
+ - **FEAT**(cat-gateway): Add document endpoints ([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1470)). ([f9eca949](https://github.com/input-output-hk/catalyst-voices/commit/f9eca949ca1b21e89ab5eca27ca2925687405cfa))
+
 ## 0.1.2
 
  - **FIX**(general): Update cat-ci to latest version to bring in doc test fixes and latest rust compiler ([#1462](https://github.com/input-output-hk/catalyst-voices/issues/1462)). ([6ddc4c5e](https://github.com/input-output-hk/catalyst-voices/commit/6ddc4c5ea6e5e93a0042e188982505ba25cccf76))
