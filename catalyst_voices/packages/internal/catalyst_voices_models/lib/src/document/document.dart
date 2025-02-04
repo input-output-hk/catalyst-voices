@@ -69,6 +69,10 @@ sealed class DocumentProperty extends Equatable implements DocumentNode {
   /// false otherwise.
   bool get isValid;
 
+  /// Return true if the property (including children properties but excluding
+  /// children which are standalone sections) are valid, false otherwise.
+  bool get isValidExcludingSubsections;
+
   /// Returns the value related to this property.
   ///
   /// [DocumentListProperty] - returns a list of values.
@@ -111,6 +115,20 @@ final class DocumentListProperty extends DocumentProperty {
     }
 
     return properties.every((e) => e.isValid);
+  }
+
+  @override
+  bool get isValidExcludingSubsections {
+    if (validationResult.isInvalid) {
+      return false;
+    }
+
+    for (final property in properties) {
+      if (property.schema.isSectionOrSubsection) continue;
+      if (!property.isValidExcludingSubsections) return false;
+    }
+
+    return true;
   }
 
   @override
@@ -177,6 +195,20 @@ final class DocumentObjectProperty extends DocumentProperty {
 
     for (final property in properties) {
       if (!property.isValid) return false;
+    }
+
+    return true;
+  }
+
+  @override
+  bool get isValidExcludingSubsections {
+    if (validationResult.isInvalid) {
+      return false;
+    }
+
+    for (final property in properties) {
+      if (property.schema.isSectionOrSubsection) continue;
+      if (!property.isValidExcludingSubsections) return false;
     }
 
     return true;
@@ -251,6 +283,11 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
 
   @override
   bool get isValid {
+    return validationResult.isValid;
+  }
+
+  @override
+  bool get isValidExcludingSubsections {
     return validationResult.isValid;
   }
 

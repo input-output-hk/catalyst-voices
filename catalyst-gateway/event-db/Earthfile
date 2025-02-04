@@ -3,7 +3,7 @@
 # the database and its associated software.
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.31 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.34 AS postgresql-ci
 
 # cspell: words
 
@@ -24,6 +24,16 @@ build:
 
     DO postgresql-ci+BUILD --image_name=event-db
     DO postgresql-ci+DOCS
+
+docker:
+   FROM +builder
+
+   WORKDIR /build
+
+   ARG container="event-db"
+   ARG tag="latest"
+
+   DO postgresql-ci+BUILD --image_name=${container} --image_tag=${tag}
 
 # local : Make a locally run-able container that can serve the db.
 #   --push will cause this image to be pushed to the local development cluster

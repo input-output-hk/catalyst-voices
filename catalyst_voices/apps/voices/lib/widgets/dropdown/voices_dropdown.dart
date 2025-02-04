@@ -1,6 +1,9 @@
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class FilterByDropdown<T> extends StatelessWidget {
@@ -17,7 +20,7 @@ class FilterByDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ctx = Theme.of(context);
+    final theme = Theme.of(context);
     return DropdownMenu<T?>(
       dropdownMenuEntries: [
         VoicesDropdownMenuEntry<T?>(
@@ -44,12 +47,12 @@ class FilterByDropdown<T> extends StatelessWidget {
         visualDensity: VisualDensity.compact,
       ),
       trailingIcon: VoicesAssets.icons.chevronDown
-          .buildIcon(color: ctx.colorScheme.primary),
+          .buildIcon(color: theme.colorScheme.primary),
       selectedTrailingIcon: VoicesAssets.icons.chevronUp
-          .buildIcon(color: ctx.colorScheme.primary),
+          .buildIcon(color: theme.colorScheme.primary),
       textAlign: TextAlign.end,
-      textStyle:
-          ctx.textTheme.labelLarge?.copyWith(color: ctx.colorScheme.primary),
+      textStyle: theme.textTheme.labelLarge
+          ?.copyWith(color: theme.colorScheme.primary),
     );
   }
 }
@@ -70,34 +73,29 @@ class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
         textStyle: WidgetStateProperty.all(
           Theme.of(context).textTheme.labelLarge,
         ),
-        foregroundColor:
-            WidgetStateProperty.all(Theme.of(context).colorScheme.primary),
+        foregroundColor: WidgetStateProperty.all(
+          Theme.of(context).colorScheme.primary,
+        ),
         visualDensity: VisualDensity.compact,
       );
 }
 
-class SingleSelectDropdown<T> extends FormField<T> {
-  final ValueChanged<T?>? onChanged;
+class SingleSelectDropdown<T> extends VoicesFormField<T> {
   final List<DropdownMenuEntry<T>> items;
   final String? hintText;
 
   SingleSelectDropdown({
     super.key,
-    super.initialValue,
+    required this.items,
+    required super.value,
+    required super.onChanged,
     super.validator,
     super.enabled,
-    required this.onChanged,
-    required this.items,
     this.hintText,
-    AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
+    super.autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
-          autovalidateMode: autovalidateMode,
           builder: (field) {
-            final state = field as _SelectDropdownState;
-            void onChangedHandler(T? value) {
-              field.didChange(value);
-              onChanged?.call(value);
-            }
+            final state = field as _DropdownFormFieldState<T>;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,14 +104,13 @@ class SingleSelectDropdown<T> extends FormField<T> {
                 ConstrainedBox(
                   constraints: const BoxConstraints(),
                   child: DropdownMenu(
+                    controller: state._controller,
                     expandedInsets: EdgeInsets.zero,
-                    initialSelection: state._internalValue as T?,
+                    initialSelection: state.value,
                     enabled: enabled,
-                    enableSearch: false,
-                    requestFocusOnTap: false,
                     hintText: hintText,
                     dropdownMenuEntries: items,
-                    onSelected: onChangedHandler,
+                    onSelected: field.didChange,
                     inputDecorationTheme: InputDecorationTheme(
                       hintStyle: Theme.of(field.context)
                           .textTheme
@@ -129,8 +126,11 @@ class SingleSelectDropdown<T> extends FormField<T> {
                       disabledBorder: _border(field.context),
                       focusedBorder: _border(field.context),
                     ),
-                    trailingIcon: Offstage(
-                      offstage: !enabled,
+                    // using visibility so that the widget reserves
+                    // the space for the icon, otherwise when widget changes
+                    // to edits mode it expands to make space for the icon
+                    trailingIcon: Visibility.maintain(
+                      visible: enabled,
                       child: VoicesAssets.icons.chevronDown.buildIcon(),
                     ),
                     selectedTrailingIcon:
@@ -146,20 +146,7 @@ class SingleSelectDropdown<T> extends FormField<T> {
                     ),
                   ),
                 ),
-                if (field.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      field.errorText ??
-                          field.context.l10n.snackbarErrorLabelText,
-                      style: Theme.of(field.context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(
-                            color: Theme.of(field.context).colorScheme.error,
-                          ),
-                    ),
-                  ),
+                if (field.hasError) _ErrorText(text: field.errorText),
               ],
             );
           },
@@ -172,27 +159,45 @@ class SingleSelectDropdown<T> extends FormField<T> {
       );
 
   @override
-  FormFieldState<T> createState() => _SelectDropdownState<T>();
+  FormFieldState<T> createState() => _DropdownFormFieldState<T>();
 }
 
-class _SelectDropdownState<T> extends FormFieldState<T> {
-  T? _internalValue;
+class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {
+  final TextEditingController _controller = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _internalValue = widget.initialValue;
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
-  void didUpdateWidget(covariant SingleSelectDropdown<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialValue != _internalValue) {
-      _internalValue = widget.initialValue;
+  void setValue(T? value) {
+    super.setValue(value);
+    final item = _widget.items.firstWhereOrNull((e) => e.value == value);
+    if (item != null) {
+      _controller.textWithSelection = item.label;
     }
-    if (_internalValue != value) {
-      setValue(_internalValue);
-      validate();
-    }
+  }
+
+  SingleSelectDropdown<T> get _widget => widget as SingleSelectDropdown<T>;
+}
+
+class _ErrorText extends StatelessWidget {
+  final String? text;
+
+  const _ErrorText({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text(
+        text ?? context.l10n.snackbarErrorLabelText,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
+      ),
+    );
   }
 }

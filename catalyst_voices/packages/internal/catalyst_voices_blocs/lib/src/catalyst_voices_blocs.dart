@@ -1,9 +1,11 @@
+export 'account/account.dart';
 export 'admin_tools/admin_tools.dart';
 export 'bloc_error_emitter_mixin.dart';
 export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';
 export 'campaign/details/campaign_details.dart';
 export 'campaign/info/campaign_info.dart';
+export 'discovery/discovery.dart';
 export 'proposal_builder/proposal_builder.dart';
 export 'proposals/proposals.dart';
 export 'registration/registration.dart';

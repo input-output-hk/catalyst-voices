@@ -62,10 +62,10 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
           ),
           const SizedBox(height: 8),
           VoicesRadioButtonFormField(
-            selectedValue: _selectedValue,
             items: _items,
-            enabled: widget.isEditMode,
+            value: _selectedValue,
             onChanged: _handleValueChanged,
+            enabled: widget.isEditMode,
             validator: _validate,
           ),
         ],
@@ -88,15 +88,18 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
   }
 
   void _notifyChangeListener(String? value) {
+    final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
-      value: value,
+      value: normalizedValue,
     );
     widget.onChanged([change]);
   }
 
   String? _validate(String? value) {
-    final result = widget.schema.validate(value);
+    final schema = widget.schema;
+    final normalizedValue = schema.normalizeValue(value);
+    final result = widget.schema.validate(normalizedValue);
     return LocalizedDocumentValidationResult.from(result).message(context);
   }
 }

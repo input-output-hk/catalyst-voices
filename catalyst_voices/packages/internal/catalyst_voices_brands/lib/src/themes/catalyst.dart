@@ -3,6 +3,7 @@ import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/slider_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/voices_dialog_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme.dart';
@@ -351,6 +352,7 @@ ThemeData _buildThemeData(
       circularTrackColor: colorScheme.secondaryContainer,
       refreshBackgroundColor: colorScheme.secondaryContainer,
     ),
+    sliderTheme: VoicesSliderThemeData(colors: voicesColorScheme),
     textTheme: textTheme,
     colorScheme: colorScheme,
     iconTheme: IconThemeData(

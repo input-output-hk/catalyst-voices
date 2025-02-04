@@ -1,18 +1,18 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/account_role_ext.dart';
-import 'package:catalyst_voices/pages/account/account_page_header.dart';
-import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
-import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
-import 'package:catalyst_voices/widgets/list/bullet_list.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_display_name_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_header_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_page_title.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_account_avatar.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,193 +25,71 @@ final class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   @override
+  void initState() {
+    super.initState();
+
+    unawaited(context.read<AccountCubit>().loadAccountDetails());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const AccountPageHeader(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 32),
-                  const _Tab(),
-                  const SizedBox(height: 48),
-                  _KeychainCard(
-                    connectedWallet: 'Lace',
-                    roles: const [
-                      AccountRole.voter,
-                      AccountRole.proposer,
-                      AccountRole.drep,
-                    ],
-                    defaultRole: AccountRole.voter,
-                    onRemoveKeychain: () => unawaited(_removeKeychain()),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _removeKeychain() async {
-    final confirmed = await DeleteKeychainDialog.show(context);
-    if (!confirmed) {
-      return;
-    }
-
-    if (mounted) {
-      await context.read<SessionCubit>().removeKeychain();
-    }
-
-    if (mounted) {
-      await KeychainDeletedDialog.show(context);
-    }
-
-    if (mounted) {
-      const DiscoveryRoute().go(context);
-    }
-  }
-}
-
-class _Tab extends StatelessWidget {
-  const _Tab();
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 1,
-      child: TabBar(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        isScrollable: true,
-        tabs: [
-          Tab(text: context.l10n.profileAndKeychain),
+      appBar: const VoicesAppBar(
+        automaticallyImplyLeading: false,
+        actions: [
+          VoicesStartProposalButton(),
+          SessionActionHeader(),
+          SessionAccountAvatar(),
         ],
       ),
-    );
-  }
-}
-
-class _KeychainCard extends StatelessWidget {
-  final String? connectedWallet;
-  final List<AccountRole> roles;
-  final AccountRole? defaultRole;
-  final VoidCallback? onRemoveKeychain;
-
-  const _KeychainCard({
-    this.connectedWallet,
-    this.roles = const <AccountRole>[],
-    this.defaultRole,
-    this.onRemoveKeychain,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 600),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(16),
-        ),
-        border: Border.all(
-          color: Theme.of(context).colors.outlineBorderVariant,
-          width: 1,
-        ),
-        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  context.l10n.catalystKeychain,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              VoicesTextButton.custom(
-                leading: VoicesAssets.icons.x.buildIcon(),
-                color: Theme.of(context).colors.iconsError,
-                onTap: onRemoveKeychain,
-                child: Text(
-                  context.l10n.removeKeychain,
-                ),
-              ),
-            ],
-          ),
-          if (connectedWallet != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text(
-                context.l10n.walletConnected,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          if (connectedWallet != null)
-            Row(
+          const AccountStatusBanner(),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(24),
               children: [
-                VoicesIconButton.filled(
-                  style: ButtonStyle(
-                    padding: WidgetStateProperty.all(EdgeInsets.zero),
-                    foregroundColor: WidgetStateProperty.all(
-                      Theme.of(context).colors.successContainer,
-                    ),
-                    backgroundColor: WidgetStateProperty.all(
-                      Theme.of(context).colors.success,
-                    ),
-                  ),
-                  child: VoicesAssets.icons.check.buildIcon(),
+                const AccountPageTitle(),
+                const SizedBox(height: 42),
+                const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: AccountHeaderTile()),
+                    SizedBox(width: 28),
+                    Expanded(child: AccountActionTile()),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Text(
-                  connectedWallet!,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                const SizedBox(height: 40),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const <Widget>[
+                          AccountDisplayNameTile(),
+                          AccountEmailTile(),
+                        ].separatedBy(const SizedBox(height: 20)).toList(),
+                      ),
+                    ),
+                    const SizedBox(width: 28),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const <Widget>[
+                          AccountRolesTile(),
+                          AccountKeychainTile(),
+                        ].separatedBy(const SizedBox(height: 20)).toList(),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          if (roles.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 40,
-                bottom: 24,
-              ),
-              child: Text(
-                context.l10n.currentRoleRegistrations,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          if (roles.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: BulletList(
-                items: roles
-                    .map((e) => _formatRoleBullet(e, defaultRole, context))
-                    .toList(),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ),
+          ),
         ],
       ),
     );
-  }
-
-  String _formatRoleBullet(
-    AccountRole role,
-    AccountRole? defaultRole,
-    BuildContext context,
-  ) {
-    if (role == defaultRole) {
-      return '${role.getName(context)} (${context.l10n.defaultRole})';
-    } else {
-      return role.getName(context);
-    }
   }
 }

@@ -16,7 +16,7 @@ const INSERT_TXO_ASSET_QUERY: &str = include_str!("./cql/insert_txo_asset.cql");
 /// Insert TXO Asset Query Parameters
 /// (Superset of data to support both Staked and Unstaked TXO records.)
 #[derive(SerializeRow, Debug)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     stake_address: Vec<u8>,
     /// Block Slot Number
@@ -39,7 +39,7 @@ impl Params {
     /// Note Value can be either a u64 or an i64, so use a i128 to represent all possible
     /// values.
     #[allow(clippy::too_many_arguments)]
-    pub(super) fn new(
+    pub(crate) fn new(
         stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, policy_id: &[u8],
         asset_name: &[u8], value: i128,
     ) -> Self {
@@ -55,10 +55,10 @@ impl Params {
     }
 
     /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let txo_insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_TXO_ASSET_QUERY,
             cfg,
@@ -66,12 +66,8 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = txo_insert_queries {
-            error!(error=%error,"Failed to prepare Insert TXO Asset Query.");
-        };
-
-        txo_insert_queries
+        .await
+        .inspect_err(|error| error!(error=%error,"Failed to prepare Insert TXO Asset Query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_TXO_ASSET_QUERY}"))
     }
 }
