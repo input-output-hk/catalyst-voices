@@ -14,6 +14,13 @@ class TimelineToggleButtonState extends State<TimelineToggleButton> {
   Widget build(BuildContext context) {
     return VoicesIconButton.outlined(
       onTap: toggleTimelineVisibility,
+      style: ButtonStyle(
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
       child: isTimelineVisible
           ? VoicesAssets.icons.topBarFilled.buildIcon(
               color: Theme.of(context).colorScheme.primary,
