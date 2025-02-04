@@ -8,7 +8,7 @@ use tracing::error;
 
 use crate::{
     db::index::{
-        queries::rbac::get_chain_root_from_stake_addr::{self},
+        queries::rbac::get_catalyst_id_from_stake_addr::{self},
         session::CassandraSession,
     },
     service::common::{
@@ -54,9 +54,9 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
         return AllResponses::internal_error(&err);
     };
 
-    let query_res = get_chain_root_from_stake_addr::Query::execute(
+    let query_res = get_catalyst_id_from_stake_addr::Query::execute(
         &session,
-        get_chain_root_from_stake_addr::QueryParams { stake_address },
+        get_catalyst_id_from_stake_addr::QueryParams { stake_address },
     )
     .await;
 

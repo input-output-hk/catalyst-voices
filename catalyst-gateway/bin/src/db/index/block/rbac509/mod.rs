@@ -3,10 +3,10 @@
 // TODO: FIXME:
 #![allow(unused_imports)]
 
-pub(crate) mod chain_root;
-pub(crate) mod insert_chain_root_for_stake_address;
-pub(crate) mod insert_chain_root_for_txn_id;
+pub(crate) mod insert_catalyst_id_for_stake_address;
+pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
+pub(crate) mod insert_rbac509_invalid;
 
 use std::sync::{Arc, LazyLock};
 
@@ -45,6 +45,7 @@ pub const SAN_URI: u8 = 134;
 /// Subject Alternative Name OID
 pub(crate) const SUBJECT_ALT_NAME_OID: Oid = oid!(2.5.29 .17);
 
+// TODO: FIXME: Remove these typedefs?
 /// Transaction Id Hash
 type TransactionIdHash = Vec<u8>;
 
@@ -101,10 +102,12 @@ static CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, StakeAddr
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
     registrations: Vec<insert_rbac509::Params>,
+    /// Invalid RBAC Registration Data.
+    invalid: Vec<insert_rbac509_invalid::Params>,
     /// Chain Root For Transaction ID Data captured during indexing.
-    chain_root_for_txn_id: Vec<insert_chain_root_for_txn_id::Params>,
+    chain_root_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
     /// Chain Root For Stake Address Data captured during indexing.
-    chain_root_for_stake_address: Vec<insert_chain_root_for_stake_address::Params>,
+    chain_root_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -112,6 +115,7 @@ impl Rbac509InsertQuery {
     pub(crate) fn new() -> Self {
         Rbac509InsertQuery {
             registrations: Vec::new(),
+            invalid: Vec::new(),
             chain_root_for_txn_id: Vec::new(),
             chain_root_for_stake_address: Vec::new(),
         }
@@ -120,32 +124,29 @@ impl Rbac509InsertQuery {
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
+    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
-            insert_chain_root_for_txn_id::Params::prepare_batch(session, cfg).await?,
-            insert_chain_root_for_stake_address::Params::prepare_batch(session, cfg).await?,
+            insert_rbac509_invalid::Params::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_txn_id::Params::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_stake_address::Params::prepare_batch(session, cfg).await?,
         ))
     }
 
     /// Index the RBAC 509 registrations in a transaction.
     pub(crate) async fn index(
         &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionHash, index: TxnIndex,
-        slot: Slot, block: &MultiEraBlock,
+        block: &MultiEraBlock,
     ) {
+        let slot = block.slot();
+
         // TODO: FIXME: pass track_payment_addresses?..
         let track_payment_addresses = &[];
-        match Cip509::new(block, index, track_payment_addresses) {
+        let cip509 = match Cip509::new(block, index, track_payment_addresses) {
+            Ok(Some(v)) => v,
             Ok(None) => {
                 // Nothing to index.
-            },
-            Ok(Some(cip509)) if !cip509.report().is_problematic() => {
-                // TODO: FIXME: Potentially valid registration.
-                todo!();
-            },
-            Ok(Some(cip509)) => {
-                // TODO: FIXME: Use problem report!
-                todo!();
+                return;
             },
             Err(e) => {
                 error!(
@@ -153,8 +154,54 @@ impl Rbac509InsertQuery {
                     index = ?index,
                     "Invalid RBAC Registration Metadata in transaction: {e:?}"
                 );
+                return;
+            },
+        };
+
+        // This should never happen, but let's check anyway.
+        if slot != cip509.origin().point().slot_or_default() {
+            error!(
+                "Cip509 slot mismatch: expected {slot:?}, got {:?}",
+                cip509.origin().point().slot_or_default()
+            );
+        }
+        if txn_hash != cip509.txn_hash() {
+            error!(
+                "Cip509 txn hash mismatch: expected {txn_hash}, got {}",
+                cip509.txn_hash()
+            );
+        }
+
+        // TODO: FIXME:
+        let catalyst_id = "".to_string();
+
+        let previous_transaction = cip509.previous_transaction();
+        let purpose = cip509.purpose();
+        match cip509.consume() {
+            Ok((purpose, ..)) => {
+                self.registrations.push(insert_rbac509::Params::new(
+                    catalyst_id,
+                    txn_hash.into(),
+                    slot.into(),
+                    index.into(),
+                    purpose.into(),
+                    previous_transaction.map(Into::into),
+                ));
+            },
+            Err(report) => {
+                self.invalid.push(insert_rbac509_invalid::Params::new(
+                    catalyst_id,
+                    txn_hash.into(),
+                    slot.into(),
+                    index.into(),
+                    purpose.map(Into::into),
+                    previous_transaction.map(Into::into),
+                    report,
+                ));
             },
         }
+
+        // TODO: FIXME: Cache.
 
         // TODO: FIXME: Remove
         // if let Some((rbac, chain_root)) =
@@ -217,6 +264,15 @@ impl Rbac509InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(PreparedQuery::Rbac509InsertQuery, self.registrations)
+                    .await
+            }));
+        }
+
+        if !self.invalid.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                inner_session
+                    .execute_batch(PreparedQuery::Rbac509InvalidInsertQuery, self.invalid)
                     .await
             }));
         }
@@ -407,4 +463,28 @@ struct Role0CertificateData {
 //     } else {
 //         Some(stake_addresses)
 //     }
+// }
+
+// /// Return RBAC metadata if its found in the transaction, or None
+// async fn rbac_metadata(
+//     session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: usize,
+// slot_no: u64,     block: &MultiEraBlock,
+// ) -> Option<(Arc<Cip509>, ChainRoot)> {
+//     if let Some(decoded_metadata) = block.txn_metadata(txn_idx, cip509::LABEL) {
+//         if let Metadata::DecodedMetadataValues::Cip509(rbac) = &decoded_metadata.value
+// {             if let Some(chain_root) =
+//                 ChainRoot::get(session, txn_hash, txn_idx, slot_no, rbac).await
+//             {
+//                 return Some((rbac.clone(), chain_root));
+//             }
+//
+//             // TODO: Maybe Index Invalid RBAC Registrations detected.
+//             error!(
+//                 slot = slot_no,
+//                 txn_idx = txn_idx,
+//                 "Invalid RBAC Registration Metadata in transaction."
+//             );
+//         }
+//     }
+//     None
 // }

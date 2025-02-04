@@ -5,32 +5,34 @@ use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTransactionHash, DbTxnIndex},
+    },
     settings::cassandra_db::EnvVars,
 };
 
 /// Index RBAC Chain Root by TX ID.
-const INSERT_CHAIN_ROOT_FOR_TXN_ID_QUERY: &str =
-    include_str!("./cql/insert_chain_root_for_txn_id.cql");
+const INSERT_QUERY: &str = include_str!("cql/insert_catalyst_id_for_txn_id.cql");
 
 /// Insert Chain Root For Transaction ID Query Parameters
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// Transaction ID Hash. 32 bytes.
-    transaction_id: Vec<u8>,
-    /// Chain Root Hash. 32 bytes.
-    chain_root: Vec<u8>,
+    transaction_id: DbTransactionHash,
+    /// A Catalyst short identifier.
+    catalyst_id: String,
     /// Slot Number the chain root is in.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn_idx: i16,
+    txn_idx: DbTxnIndex,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("transaction_id", &self.transaction_id)
-            .field("chain_root", &self.chain_root)
+            .field("catalyst_id", &self.catalyst_id)
             .field("slot_no", &self.slot_no)
             .field("txn_idx", &self.txn_idx)
             .finish()
@@ -40,12 +42,12 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn_idx: i16,
+        catalyst_id: &str, transaction_id: DbTransactionHash, slot_no: DbSlot, txn_idx: DbTxnIndex,
     ) -> Self {
         Params {
-            transaction_id: transaction_id.to_vec(),
-            chain_root: chain_root.to_vec(),
-            slot_no: num_bigint::BigInt::from(slot_no),
+            transaction_id,
+            catalyst_id: catalyst_id.into(),
+            slot_no,
             txn_idx,
         }
     }
@@ -56,7 +58,7 @@ impl Params {
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
-            INSERT_CHAIN_ROOT_FOR_TXN_ID_QUERY,
+            INSERT_QUERY,
             cfg,
             scylla::statement::Consistency::Any,
             true,
@@ -66,6 +68,6 @@ impl Params {
         .inspect_err(
             |error| error!(error=%error,"Failed to prepare Insert Chain Root For TXN ID Query."),
         )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_CHAIN_ROOT_FOR_TXN_ID_QUERY}"))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_QUERY}"))
     }
 }

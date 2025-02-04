@@ -7,7 +7,7 @@ use futures::StreamExt;
 use super::*;
 use crate::{
     db::index::queries::{
-        rbac::{get_chain_root, get_registrations::*, get_role0_chain_root},
+        rbac::{get_chain_root, get_registrations::*},
         registrations::{
             get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*, get_invalid::*,
         },
@@ -107,25 +107,6 @@ async fn test_get_registrations_w_stake_addr() {
     })
     .await
     .unwrap();
-
-    while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
-    }
-}
-
-#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
-#[tokio::test]
-async fn test_get_role0_key_chain_root() {
-    let Ok((session, _)) = get_shared_session().await else {
-        panic!("{SESSION_ERR_MSG}");
-    };
-
-    let mut row_stream =
-        get_role0_chain_root::Query::execute(&session, get_role0_chain_root::QueryParams {
-            role0_kid: vec![],
-        })
-        .await
-        .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());

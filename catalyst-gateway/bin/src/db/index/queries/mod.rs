@@ -13,9 +13,8 @@ use std::{fmt::Debug, sync::Arc};
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use rbac::{
-    get_chain_root, get_chain_root_from_stake_addr,
+    get_catalyst_id_from_stake_addr, get_chain_root,
     get_registrations::GetRegistrationsByChainRootQuery,
-    get_role0_chain_root::Query as GetRole0ChainRootQuery,
 };
 use registrations::{
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
@@ -69,6 +68,8 @@ pub(crate) enum PreparedQuery {
     TxoSpentUpdateQuery,
     /// RBAC 509 Registration Insert query.
     Rbac509InsertQuery,
+    /// Invalid RBAC 509 registration Insert query.
+    Rbac509InvalidInsertQuery,
     /// Chain Root For Transaction ID Insert query.
     ChainRootForTxnIdInsertQuery,
     /// Chain Root For Stake Address Insert query.
@@ -95,8 +96,6 @@ pub(crate) enum PreparedSelectQuery {
     ChainRootByStakeAddress,
     /// Get registrations by chain root
     RegistrationsByChainRoot,
-    /// Get chain root by role0 key
-    ChainRootByRole0Key,
     /// Get chain root by transaction id
     ChainRootByTransactionId,
     /// Get all stake and vote keys for snapshot (`stake_pub_key,vote_key`)
@@ -138,6 +137,8 @@ pub(crate) struct PreparedQueries {
     txi_by_txn_hash_query: PreparedStatement,
     /// RBAC 509 Registrations.
     rbac509_registration_insert_queries: SizedBatch,
+    /// Invalid RBAC 509 registrations.
+    rbac509_registration_invalid_insert_queries: SizedBatch,
     /// Chain Root for TX ID Insert Query..
     chain_root_for_txn_id_insert_queries: SizedBatch,
     /// Chain Root for Stake Address Insert Query..
@@ -158,8 +159,6 @@ pub(crate) struct PreparedQueries {
     chain_root_by_stake_address_query: PreparedStatement,
     /// Get registrations by chain root
     registrations_by_chain_root_query: PreparedStatement,
-    /// Get chain root by role0 key
-    chain_root_by_role0_key_query: PreparedStatement,
     /// Get chain root by transaction ID
     chain_root_by_transaction_id_query: PreparedStatement,
     /// Get all stake and vote keys (`stake_key,vote_key`) for snapshot
@@ -199,10 +198,9 @@ impl PreparedQueries {
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await;
         let chain_root_by_stake_address =
-            get_chain_root_from_stake_addr::Query::prepare(session.clone()).await;
+            get_catalyst_id_from_stake_addr::Query::prepare(session.clone()).await;
         let registrations_by_chain_root =
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
-        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
         let chain_root_by_transaction_id = get_chain_root::Query::prepare(session.clone()).await;
         let get_all_stakes_and_vote_keys_query =
             GetAllStakesAndVoteKeysQuery::prepare(session).await;
@@ -222,6 +220,7 @@ impl PreparedQueries {
 
         let (
             rbac509_registration_insert_queries,
+            rbac509_registration_invalid_insert_queries,
             chain_root_for_txn_id_insert_queries,
             chain_root_for_stake_address_insert_queries,
         ) = all_rbac_queries?;
@@ -240,6 +239,7 @@ impl PreparedQueries {
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
             rbac509_registration_insert_queries,
+            rbac509_registration_invalid_insert_queries,
             chain_root_for_txn_id_insert_queries,
             chain_root_for_stake_address_insert_queries,
             native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
@@ -250,7 +250,6 @@ impl PreparedQueries {
             sync_status_insert: sync_status_insert?,
             chain_root_by_stake_address_query: chain_root_by_stake_address?,
             registrations_by_chain_root_query: registrations_by_chain_root?,
-            chain_root_by_role0_key_query: chain_root_by_role0_key?,
             chain_root_by_transaction_id_query: chain_root_by_transaction_id?,
             get_all_stakes_and_vote_keys_query: get_all_stakes_and_vote_keys_query?,
         })
@@ -342,7 +341,6 @@ impl PreparedQueries {
             PreparedSelectQuery::RegistrationsByChainRoot => {
                 &self.registrations_by_chain_root_query
             },
-            PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
             PreparedSelectQuery::ChainRootByTransactionId => {
                 &self.chain_root_by_transaction_id_query
             },
@@ -380,6 +378,9 @@ impl PreparedQueries {
             },
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
             PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
+            PreparedQuery::Rbac509InvalidInsertQuery => {
+                &self.rbac509_registration_invalid_insert_queries
+            },
             PreparedQuery::ChainRootForTxnIdInsertQuery => {
                 &self.chain_root_for_txn_id_insert_queries
             },

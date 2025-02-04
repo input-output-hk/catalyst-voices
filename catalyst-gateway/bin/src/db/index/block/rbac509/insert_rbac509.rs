@@ -20,8 +20,8 @@ const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
 /// Insert RBAC Registration Query Parameters
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Chain Root Hash. 32 bytes.
-    chain_root: DbTransactionHash,
+    /// A Catalyst short identifier.
+    catalyst_id: String,
     /// Transaction ID Hash. 32 bytes.
     transaction_id: DbTransactionHash,
     /// Block Slot Number
@@ -41,7 +41,7 @@ impl Debug for Params {
             MaybeUnset::Set(ref v) => format!("{v:?}"),
         };
         f.debug_struct("Params")
-            .field("chain_root", &self.chain_root)
+            .field("catalyst_id", &self.catalyst_id)
             .field("transaction_id", &self.transaction_id)
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
@@ -54,20 +54,18 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        chain_root: DbTransactionHash, transaction_id: DbTransactionHash, slot_no: DbSlot,
-        txn: DbTxnIndex, cip509: &Cip509,
+        catalyst_id: String, transaction_id: DbTransactionHash, slot_no: DbSlot, txn: DbTxnIndex,
+        purpose: DbUuidV4, prv_txn_id: Option<DbTransactionHash>,
     ) -> Self {
-        Params {
-            chain_root,
+        let prv_txn_id = prv_txn_id.map(MaybeUnset::Set).unwrap_or(MaybeUnset::Unset);
+
+        Self {
+            catalyst_id,
             transaction_id,
-            // TODO: FIXME:
-            purpose: cip509.purpose().unwrap().into(),
+            purpose,
             slot_no,
             txn,
-            prv_txn_id: cip509
-                .previous_transaction()
-                .map(|t| MaybeUnset::Set(t.into()))
-                .unwrap_or(MaybeUnset::Unset),
+            prv_txn_id,
         }
     }
 
