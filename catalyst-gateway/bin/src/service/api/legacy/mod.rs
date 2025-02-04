@@ -10,3 +10,4 @@ mod v1;
 
 /// Legacy endpoints API
 pub(crate) type LegacyApi = (RegistrationApi, V0Api, V1Api);
+
