@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/common/ext/color_ext.dart';
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
