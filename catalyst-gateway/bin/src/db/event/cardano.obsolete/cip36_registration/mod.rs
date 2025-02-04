@@ -136,7 +136,6 @@ impl IndexedVoterRegistrationParams {
 
 impl EventDB {
     /// Batch writes voter registration data.
-    #[allow(dead_code)]
     pub(crate) async fn index_many_voter_registration_data(
         values: &[IndexedVoterRegistrationParams],
     ) -> anyhow::Result<()> {
