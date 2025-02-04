@@ -18,7 +18,11 @@ class VoicesSinglePaneDialog extends StatelessWidget {
 
   const VoicesSinglePaneDialog({
     super.key,
-    this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    this.constraints = const BoxConstraints(
+      minWidth: 648,
+      maxWidth: 648,
+      minHeight: 256,
+    ),
     this.backgroundColor,
     this.showBorder = false,
     this.showClose = true,
@@ -33,14 +37,12 @@ class VoicesSinglePaneDialog extends StatelessWidget {
       showBorder: showBorder,
       constraints: constraints,
       child: Stack(
+        alignment: closeAlignment,
         children: [
           child,
           Offstage(
             offstage: !showClose,
-            child: _CloseButtonPosition(
-              alignment: closeAlignment,
-              child: const _CloseButton(),
-            ),
+            child: const _CloseButton(),
           ),
         ],
       ),
@@ -71,6 +73,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
     return _VoicesDesktopDialog(
       constraints: const BoxConstraints.tightFor(width: 900, height: 600),
       child: Stack(
+        alignment: Alignment.topRight,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -94,7 +97,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
           ),
           Offstage(
             offstage: !showCloseButton,
-            child: const _CloseButtonPosition(child: _CloseButton()),
+            child: const _CloseButton(),
           ),
         ],
       ),
@@ -109,7 +112,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
   final Widget child;
 
   const _VoicesDesktopDialog({
-    this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    required this.constraints,
     this.backgroundColor,
     this.showBorder = false,
     required this.child,
@@ -137,14 +140,8 @@ class _VoicesDesktopDialog extends StatelessWidget {
   }
 }
 
-class _CloseButtonPosition extends StatelessWidget {
-  final AlignmentGeometry alignment;
-  final Widget child;
-
-  const _CloseButtonPosition({
-    this.alignment = Alignment.topRight,
-    required this.child,
-  });
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
 
   @override
   Widget build(BuildContext context) {
@@ -152,26 +149,14 @@ class _CloseButtonPosition extends StatelessWidget {
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
     );
 
-    return Align(
-      alignment: alignment,
-      child: IconButtonTheme(
-        data: const IconButtonThemeData(style: buttonStyle),
-        child: child,
+    return IconButtonTheme(
+      data: const IconButtonThemeData(style: buttonStyle),
+      child: XButton(
+        key: const Key('DialogCloseButton'),
+        onTap: () {
+          unawaited(Navigator.of(context).maybePop());
+        },
       ),
-    );
-  }
-}
-
-class _CloseButton extends StatelessWidget {
-  const _CloseButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return XButton(
-      key: const Key('DialogCloseButton'),
-      onTap: () {
-        unawaited(Navigator.of(context).maybePop());
-      },
     );
   }
 }
