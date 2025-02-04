@@ -1,6 +1,7 @@
-part of 'category_detail_cubit.dart';
 
-@immutable
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:equatable/equatable.dart';
+
 sealed class CategoryDetailState extends Equatable {
   const CategoryDetailState();
 }

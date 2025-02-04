@@ -124,9 +124,14 @@ class _SubmissionCloseAt extends StatelessWidget {
               context.l10n.proposalsSubmissionClose,
               style: context.textTheme.bodyMedium,
             ),
-            Text(
-              _formattedDate(context),
+            TimezoneDateTimeText(
+              dateTime,
+              formatter: (context, dateTime) {
+                final date = DateFormatter.formatDateTimeParts(dateTime);
+                return context.l10n.dateAtTime(date.date, date.time);
+              },
               style: context.textTheme.titleSmall,
+              showTimezone: false,
             ),
           ],
         ),
@@ -136,6 +141,6 @@ class _SubmissionCloseAt extends StatelessWidget {
 
   String _formattedDate(BuildContext context) {
     final date = DateFormatter.formatDateTimeParts(dateTime);
-    return context.l10n.dateTimeAt(date.date, date.time);
+    return context.l10n.dateAtTime(date.date, date.time);
   }
 }

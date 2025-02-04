@@ -1,12 +1,9 @@
 import 'dart:math';
 
+import 'package:catalyst_voices_blocs/src/category/category_detail_state.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meta/meta.dart';
-
-part 'category_detail_state.dart';
 
 class CategoryDetailCubit extends Cubit<CategoryDetailState> {
   // ignore: unused_field

@@ -26,17 +26,18 @@ class VoicesLeadingIconCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: VoicesAvatar(
-                backgroundColor: context.colors.onSurfacePrimary08,
-                icon: icon.buildIcon(),
-              ),
+            child: VoicesAvatar(
+              backgroundColor: context.colors.onSurfacePrimary08,
+              icon: icon.buildIcon(),
             ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 16),
+            padding: const EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 8,
+              bottom: 16,
+            ),
             child: child,
           ),
         ],

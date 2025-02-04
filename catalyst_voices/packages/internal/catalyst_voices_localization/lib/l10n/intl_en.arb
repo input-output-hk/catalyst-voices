@@ -1424,8 +1424,8 @@
       }
     }
   },
-  "dateTimeAt": "{date} at {time}",
-  "@dateTimeAt": {
+  "dateAtTime": "{date} at {time}",
+  "@dateAtTime": {
     "placeholders": {
       "date": {
         "type": "String"
