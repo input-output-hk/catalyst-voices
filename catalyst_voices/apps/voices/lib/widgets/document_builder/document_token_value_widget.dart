@@ -81,7 +81,9 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
 
   void _handleControllerChange() {
     final value = _controller.value;
-    _notifyChangeListener(value);
+    if (value != widget.property.value) {
+      _notifyChangeListener(value);
+    }
   }
 
   void _handleEditModeChanged() {

@@ -9,10 +9,8 @@ use crate::db::event::{error::NotFoundError, EventDB};
 /// Representation of the `config` table id fields `id`, `id2`, `id3`
 enum ConfigId {
     /// `id` field
-    #[allow(dead_code)]
     Id,
     /// `id2` field
-    #[allow(dead_code)]
     Id2,
     /// `id3` field
     Id3,
@@ -54,7 +52,6 @@ const SELECT_CONFIG_SQL: &str = include_str!("select_config.sql");
 
 impl EventDB {
     /// Config query
-    #[allow(dead_code)]
     pub(crate) async fn get_follower_config() -> anyhow::Result<Vec<FollowerConfig>> {
         let id = "cardano";
         let id2 = "follower";

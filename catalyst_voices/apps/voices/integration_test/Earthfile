@@ -42,7 +42,7 @@ integration-test-web:
     IF [ -f fail ]
         RUN --no-cache echo ""$browser" integration test failed" && \
             echo "Printing "$driver" logs..." && \
-            cat $driver.log \
+            cat $driver.log && \
             exit 1
     END
 

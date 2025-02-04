@@ -189,7 +189,7 @@ class _PropertyListBuilder extends StatelessWidget {
           onChanged: onChanged,
         ),
         ...list.properties
-            .whereNot((child) => child.schema.isSubsection)
+            .whereNot((child) => child.schema.isSectionOrSubsection)
             .map<Widget>((child) {
           return _PropertyBuilder(
             key: ValueKey(child.nodeId),
@@ -234,7 +234,7 @@ class _PropertyObjectBuilder extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: property.properties
-              .whereNot((child) => child.schema.isSubsection)
+              .whereNot((child) => child.schema.isSectionOrSubsection)
               .map<Widget>((child) {
                 return _PropertyBuilder(
                   key: ValueKey(child.nodeId),

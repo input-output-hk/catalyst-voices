@@ -44,7 +44,7 @@ final class DocumentListSchemaMapper {
     final itemsSchema = schema.items!.toModel(
       definitions: definitions,
       nodeId: nodeId,
-      isRequired: isRequired,
+      isRequired: true,
     );
     final itemsRange = Range.optionalRangeOf(
       min: schema.minItems,
