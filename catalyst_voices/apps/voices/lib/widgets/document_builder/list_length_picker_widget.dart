@@ -23,6 +23,7 @@ class ListLengthPickerWidget extends StatelessWidget {
     final maxCount = range?.max ?? 100;
     final currentCount = list.properties.length;
     final title = list.schema.title;
+    final isRequired = list.schema.isRequired;
     final description = list.schema.description ?? MarkdownData.empty;
 
     return Column(
@@ -30,7 +31,7 @@ class ListLengthPickerWidget extends StatelessWidget {
       children: [
         if (title.isNotEmpty) ...[
           Text(
-            title.starred(isEnabled: list.schema.isRequired),
+            title.starred(isEnabled: isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
