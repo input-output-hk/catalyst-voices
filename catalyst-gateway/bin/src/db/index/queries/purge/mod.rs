@@ -90,7 +90,6 @@ pub(crate) enum PreparedSelectQuery {
 }
 
 /// All prepared purge queries for a session.
-#[allow(dead_code)]
 pub(crate) struct PreparedQueries {
     /// TXO ADA Primary Key Query.
     select_txo_ada: PreparedStatement,
