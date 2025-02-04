@@ -1,6 +1,6 @@
 # Permission-less Authentication for Catalyst
 
-<!-- cspell: words ftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsK -->
+<!-- cspell: words FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE -->
 
 ## Overview
 
