@@ -92,16 +92,18 @@ class _SingleDropdownSelectionWidgetState
   }
 
   void _notifyChangeListener(String? value) {
-    widget.onChanged([
-      DocumentValueChange(
-        nodeId: widget.schema.nodeId,
-        value: value,
-      ),
-    ]);
+    final normalizedValue = widget.schema.normalizeValue(value);
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: normalizedValue,
+    );
+    widget.onChanged([change]);
   }
 
   String? _validator(String? value) {
-    final result = widget.schema.validate(value);
+    final schema = widget.schema;
+    final normalizedValue = schema.normalizeValue(value);
+    final result = schema.validate(normalizedValue);
 
     return LocalizedDocumentValidationResult.from(result).message(context);
   }
