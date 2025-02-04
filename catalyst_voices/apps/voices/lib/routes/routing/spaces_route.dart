@@ -20,6 +20,83 @@ part 'spaces_route.g.dart';
 
 const _prefix = Routes.currentMilestone;
 
+final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
+  const DiscoveryRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const DiscoveryPage();
+  }
+}
+
+final class FundedProjectsRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  const FundedProjectsRoute();
+
+  @override
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
+      ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const FundedProjectsPage();
+  }
+}
+
+final class ProposalBuilderDraftRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  final String? templateId;
+
+  const ProposalBuilderDraftRoute({
+    this.templateId,
+  });
+
+  @override
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
+      ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProposalBuilderPage(templateId: templateId);
+  }
+}
+
+final class ProposalBuilderRoute extends GoRouteData
+    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+  final String proposalId;
+
+  const ProposalBuilderRoute({
+    required this.proposalId,
+  });
+
+  @override
+  List<RouteGuard> get routeGuards => const [
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
+      ];
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProposalBuilderPage(proposalId: proposalId);
+  }
+}
+
+final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
+  final String? categoryId;
+
+  const ProposalsRoute({
+    this.categoryId,
+  });
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return ProposalsPage(categoryId: categoryId);
+  }
+}
+
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(
@@ -82,80 +159,19 @@ final class SpacesShellRouteData extends ShellRouteData {
   }
 }
 
-final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
-  const DiscoveryRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const DiscoveryPage();
-  }
-}
-
-final class WorkspaceRoute extends GoRouteData
+final class TreasuryRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const WorkspaceRoute();
+  const TreasuryRoute();
 
   @override
   List<RouteGuard> get routeGuards => const [
         SessionUnlockedGuard(),
-        UserAccessGuard(),
+        AdminAccessGuard(),
       ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const WorkspacePage();
-  }
-}
-
-final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
-  final String? categoryId;
-
-  const ProposalsRoute({
-    this.categoryId,
-  });
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalsPage(categoryId: categoryId);
-  }
-}
-
-final class ProposalBuilderDraftRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? templateId;
-
-  const ProposalBuilderDraftRoute({
-    this.templateId,
-  });
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(templateId: templateId);
-  }
-}
-
-final class ProposalBuilderRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String proposalId;
-
-  const ProposalBuilderRoute({
-    required this.proposalId,
-  });
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(proposalId: proposalId);
+    return const TreasuryPage();
   }
 }
 
@@ -175,34 +191,18 @@ final class VotingRoute extends GoRouteData
   }
 }
 
-final class FundedProjectsRoute extends GoRouteData
+final class WorkspaceRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const FundedProjectsRoute();
+  const WorkspaceRoute();
 
   @override
   List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
+        // SessionUnlockedGuard(),
+        // UserAccessGuard(),
       ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const FundedProjectsPage();
-  }
-}
-
-final class TreasuryRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const TreasuryRoute();
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        AdminAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const TreasuryPage();
+    return const WorkspacePage();
   }
 }
