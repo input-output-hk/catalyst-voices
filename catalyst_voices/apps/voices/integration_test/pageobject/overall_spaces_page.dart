@@ -2,8 +2,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class OverallSpacesPage {
-  static const guestShortcutBtn = Key('GuestShortcut');
   static const visitorShortcutBtn = Key('VisitorShortcut');
+  static const guestShortcutBtn = Key('GuestShortcut');
   static const userShortcutBtn = Key('UserShortcut');
   static const spacesListView = Key('SpacesListView');
 

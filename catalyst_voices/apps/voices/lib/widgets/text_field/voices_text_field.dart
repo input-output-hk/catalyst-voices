@@ -433,7 +433,10 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       case VoicesTextFieldStatus.none:
         return null;
       case VoicesTextFieldStatus.success:
-        return VoicesAssets.icons.checkCircle.buildIcon(color: color);
+        return VoicesAssets.icons.checkCircle.buildIcon(
+          color: color,
+          fit: BoxFit.scaleDown,
+        );
       case VoicesTextFieldStatus.warning:
         // TODO(dtscalac): this is not the right icon, it should be outlined
         // & rounded, ask designers to provide it and update it
@@ -768,7 +771,7 @@ class VoicesTextFieldDecoration {
     this.suffixText,
     this.counterText,
     this.showStatusSuffixIcon = true,
-    this.filled = false,
+    this.filled = true,
     this.fillColor,
   });
 }

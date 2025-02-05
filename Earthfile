@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.2.31 AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.2.31 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.31 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.2.35 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.2.35 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.35 AS postgresql-ci
 
 FROM debian:stable-slim
 
@@ -42,3 +42,9 @@ repo-docs:
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
 
     SAVE ARTIFACT /repo repo
+
+# copy-docs : Copy the docs source folder.
+copy-docs:
+    FROM scratch
+    COPY --dir docs/src ./docs/src
+    SAVE ARTIFACT /docs docs

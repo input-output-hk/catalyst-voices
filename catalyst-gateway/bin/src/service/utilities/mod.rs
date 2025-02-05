@@ -1,6 +1,7 @@
 //! `API` Utility operations
 pub(crate) mod catch_panic;
 pub(crate) mod convert;
+pub(crate) mod json;
 pub(crate) mod middleware;
 pub(crate) mod net;
 
