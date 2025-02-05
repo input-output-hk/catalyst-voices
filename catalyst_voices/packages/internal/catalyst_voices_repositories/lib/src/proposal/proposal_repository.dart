@@ -33,7 +33,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required String campaignId,
   }) async {
     // optionally filter by status.
-    return List.filled(8, _proposal);
+    return _proposals;
   }
 }
 
@@ -64,7 +64,7 @@ final _proposal = ProposalBase(
 
 final _proposals = [
   ProposalBase(
-    id: 'f14/0',
+    id: '${Random().nextInt(100)}',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -79,7 +79,7 @@ final _proposals = [
     version: 1,
   ),
   ProposalBase(
-    id: 'f14/1',
+    id: '${Random().nextInt(100)}',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -94,7 +94,7 @@ final _proposals = [
     version: 2,
   ),
   ProposalBase(
-    id: 'f14/2',
+    id: '${Random().nextInt(100)}',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -109,7 +109,67 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: 'f14/2',
+    id: '${Random().nextInt(100)}',
+    category: 'Cardano Use Cases / MVP',
+    title: 'Proposal Title that rocks the world',
+    updateDate: DateTime.now().minusDays(2),
+    fundsRequested: Coin.fromAda(100000),
+    status: ProposalStatus.draft,
+    publish: ProposalPublish.published,
+    access: ProposalAccess.private,
+    commentsCount: 0,
+    description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 3,
+  ),
+  ProposalBase(
+    id: '${Random().nextInt(100)}',
+    category: 'Cardano Use Cases / MVP',
+    title: 'Proposal Title that rocks the world',
+    updateDate: DateTime.now().minusDays(2),
+    fundsRequested: Coin.fromAda(100000),
+    status: ProposalStatus.draft,
+    publish: ProposalPublish.published,
+    access: ProposalAccess.private,
+    commentsCount: 0,
+    description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 3,
+  ),
+  ProposalBase(
+    id: '${Random().nextInt(100)}',
+    category: 'Cardano Use Cases / MVP',
+    title: 'Proposal Title that rocks the world',
+    updateDate: DateTime.now().minusDays(2),
+    fundsRequested: Coin.fromAda(100000),
+    status: ProposalStatus.draft,
+    publish: ProposalPublish.published,
+    access: ProposalAccess.private,
+    commentsCount: 0,
+    description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 3,
+  ),
+  ProposalBase(
+    id: '${Random().nextInt(100)}',
+    category: 'Cardano Use Cases / MVP',
+    title: 'Proposal Title that rocks the world',
+    updateDate: DateTime.now().minusDays(2),
+    fundsRequested: Coin.fromAda(100000),
+    status: ProposalStatus.draft,
+    publish: ProposalPublish.published,
+    access: ProposalAccess.private,
+    commentsCount: 0,
+    description: _proposalDescription,
+    duration: 6,
+    author: 'Alex Wells',
+    version: 3,
+  ),
+  ProposalBase(
+    id: '${Random().nextInt(100)}',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),

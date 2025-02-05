@@ -4,6 +4,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
+import 'package:catalyst_voices/widgets/containers/grid_pagination_page_container.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -207,17 +208,6 @@ class _Tabs extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              const Text('1-8 of 240 proposals'),
-              VoicesIconButton(
-                child: VoicesAssets.icons.chevronLeft.buildIcon(),
-              ),
-              VoicesIconButton(
-                child: VoicesAssets.icons.chevronRight.buildIcon(),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -303,39 +293,33 @@ class _Controls extends StatelessWidget {
   }
 }
 
-class _AllProposals extends StatelessWidget {
+class _AllProposals extends StatefulWidget {
   const _AllProposals();
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProposalsCubit, ProposalsState>(
-      builder: (context, state) {
-        return switch (state) {
-          LoadedProposalsState(:final proposals) => proposals.isEmpty
-              ? const _EmptyProposals()
-              : _ProposalsList(
-                  proposals: proposals,
-                ),
-          _ => const _LoadingProposals(),
-        };
-      },
-    );
-  }
+  State<_AllProposals> createState() => _AllProposalsState();
 }
 
-class _DraftProposals extends StatelessWidget {
-  const _DraftProposals();
+class _AllProposalsState extends State<_AllProposals> {
+  int currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProposalsCubit, ProposalsState>(
       builder: (context, state) {
         return switch (state) {
-          LoadedProposalsState(:final proposals) =>
-            proposals.draftProposals.isEmpty
+          LoadedProposalsState(:final proposals, :final resultsNumber) =>
+            proposals.isEmpty
                 ? const _EmptyProposals()
-                : _ProposalsList(
-                    proposals: proposals.draftProposals,
+                : GirdPaginationPageContainer(
+                    currentPage: currentPage,
+                    items: proposals,
+                    maxResults: resultsNumber,
+                    resultsPerPage: 8,
+                    onNextPage: (value) async {
+                      currentPage = value;
+                      await context.read<ProposalsCubit>().load();
+                    },
                   ),
           _ => const _LoadingProposals(),
         };
@@ -344,9 +328,49 @@ class _DraftProposals extends StatelessWidget {
   }
 }
 
-class _FinalProposals extends StatelessWidget {
+class _DraftProposals extends StatefulWidget {
+  const _DraftProposals();
+
+  @override
+  State<_DraftProposals> createState() => _DraftProposalsState();
+}
+
+class _DraftProposalsState extends State<_DraftProposals> {
+  int currentPage = 0;
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProposalsCubit, ProposalsState>(
+      builder: (context, state) {
+        return switch (state) {
+          LoadedProposalsState(:final proposals) =>
+            proposals.draftProposals.isEmpty
+                ? const _EmptyProposals()
+                : GirdPaginationPageContainer(
+                    currentPage: currentPage,
+                    items: proposals.draftProposals,
+                    maxResults: proposals.draftProposals.length,
+                    resultsPerPage: 8,
+                    onNextPage: (value) async {
+                      currentPage = value;
+                      await context.read<ProposalsCubit>().load();
+                    },
+                  ),
+          _ => const _LoadingProposals(),
+        };
+      },
+    );
+  }
+}
+
+class _FinalProposals extends StatefulWidget {
   const _FinalProposals();
 
+  @override
+  State<_FinalProposals> createState() => _FinalProposalsState();
+}
+
+class _FinalProposalsState extends State<_FinalProposals> {
+  int currentPage = 0;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProposalsCubit, ProposalsState>(
@@ -355,8 +379,15 @@ class _FinalProposals extends StatelessWidget {
           LoadedProposalsState(:final proposals) =>
             proposals.finalProposals.isEmpty
                 ? const _EmptyProposals()
-                : _ProposalsList(
-                    proposals: proposals.finalProposals,
+                : GirdPaginationPageContainer(
+                    currentPage: currentPage,
+                    items: proposals.finalProposals,
+                    maxResults: proposals.finalProposals.length,
+                    resultsPerPage: 8,
+                    onNextPage: (value) async {
+                      currentPage = value;
+                      await context.read<ProposalsCubit>().load();
+                    },
                   ),
           _ => const _LoadingProposals(),
         };
@@ -400,6 +431,7 @@ class _ProposalsList extends StatelessWidget {
       children: [
         for (final proposal in proposals)
           ProposalCard(
+            key: UniqueKey(),
             image: _generateImageForProposal(proposal.id),
             proposal: proposal,
             showStatus: false,

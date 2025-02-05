@@ -4,36 +4,38 @@ import 'package:equatable/equatable.dart';
 /// The state of available proposals.
 sealed class ProposalsState extends Equatable {
   final List<ProposalViewModel> proposals;
-  final int pageNumber;
-  final bool reachMax;
+  final int resultsNumber;
 
   const ProposalsState({
     this.proposals = const [],
-    this.pageNumber = 1,
-    this.reachMax = false,
+    this.resultsNumber = 0,
+  });
+
+  ProposalsState copyWith({
+    List<ProposalViewModel>? proposals,
+    int? resultsNumber,
   });
 
   @override
-  List<Object?> get props => [proposals];
+  List<Object?> get props => [proposals, resultsNumber];
 }
 
 /// The proposals are loading.
 final class LoadingProposalsState extends ProposalsState {
   const LoadingProposalsState({
     super.proposals,
-    super.pageNumber,
-    super.reachMax,
+    super.resultsNumber,
   });
 
+  @override
   LoadingProposalsState copyWith({
     List<ProposalViewModel>? proposals,
-    int? pageNumber,
+    int? resultsNumber,
     bool? reachMax,
   }) {
     return LoadingProposalsState(
       proposals: proposals ?? this.proposals,
-      pageNumber: pageNumber ?? this.pageNumber,
-      reachMax: reachMax ?? this.reachMax,
+      resultsNumber: resultsNumber ?? this.resultsNumber,
     );
   }
 
@@ -45,19 +47,18 @@ final class LoadingProposalsState extends ProposalsState {
 final class LoadedProposalsState extends ProposalsState {
   const LoadedProposalsState({
     super.proposals,
-    super.pageNumber,
-    super.reachMax,
+    super.resultsNumber,
   });
 
+  @override
   LoadedProposalsState copyWith({
     List<ProposalViewModel>? proposals,
-    int? pageNumber,
+    int? resultsNumber,
     bool? reachMax,
   }) {
     return LoadedProposalsState(
       proposals: proposals ?? this.proposals,
-      pageNumber: pageNumber ?? this.pageNumber,
-      reachMax: reachMax ?? this.reachMax,
+      resultsNumber: resultsNumber ?? this.resultsNumber,
     );
   }
 
@@ -70,21 +71,20 @@ final class ErrorProposalsState extends ProposalsState {
 
   const ErrorProposalsState({
     super.proposals,
-    super.pageNumber,
-    super.reachMax,
+    super.resultsNumber,
     required this.error,
   });
 
+  @override
   ErrorProposalsState copyWith({
     List<ProposalViewModel>? proposals,
-    int? pageNumber,
+    int? resultsNumber,
     bool? reachMax,
     LocalizedException? error,
   }) {
     return ErrorProposalsState(
       proposals: proposals ?? this.proposals,
-      pageNumber: pageNumber ?? this.pageNumber,
-      reachMax: reachMax ?? this.reachMax,
+      resultsNumber: resultsNumber ?? this.resultsNumber,
       error: error ?? this.error,
     );
   }
