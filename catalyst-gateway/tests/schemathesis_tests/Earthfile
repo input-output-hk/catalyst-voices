@@ -4,7 +4,7 @@ package-schemathesis:
     FROM python:3.12-alpine3.20
     ARG api_spec
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
-    ARG version=3.39.5
+    ARG version=3.39.8
 
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
