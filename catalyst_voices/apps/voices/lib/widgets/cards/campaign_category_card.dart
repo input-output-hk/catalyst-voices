@@ -21,7 +21,7 @@ class CampaignCategoryCard extends StatelessWidget {
         color: context.colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.colors.outlineBorderVariant.withOpacity(.38),
+          color: context.colors.outlineBorderVariant.withValues(alpha: .38),
         ),
       ),
       clipBehavior: Clip.antiAlias,
