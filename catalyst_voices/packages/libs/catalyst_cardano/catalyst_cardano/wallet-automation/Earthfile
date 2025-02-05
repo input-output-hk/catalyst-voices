@@ -1,6 +1,6 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.33 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter/installer:v3.2.33 AS flutter-installer
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:temp1 AS flutter-ci
+#IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter/installer:v3.2.33 AS flutter-installer
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.31 AS playwright-ci
 
 deps:
@@ -58,17 +58,12 @@ nightly-test:
 #                    curl \
 #                    unzip
 #    DO flutter-installer+INSTALL_CHROME_LINUX64
-    WITH DOCKER \
+    WITH DOCKER --load flutter-ci+install-chrome \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
         --load test:latest=(+package-test)
 
-        RUN apt-get update --fix-missing && \
-                                apt-get install -y \
-                                apt-utils \
-                                curl \
-                                unzip && \
-            docker run --network=default_default --name=test test:latest ; \
+        RUN docker run --network=default_default --name=test test:latest ; \
             docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml ;
     END
     WAIT
