@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.24.1"
+  flutter: ">=3.27.3"
 
 dependencies:
   bloc_concurrency: ^0.2.2
@@ -25,7 +25,7 @@ dependencies:
     path: ../catalyst_voices_shared
   catalyst_voices_view_models:
     path: ../catalyst_voices_view_models
-  collection: ^1.18.0
+  collection: ^1.19.0
   equatable: ^2.0.7
   flutter:
     sdk: flutter
