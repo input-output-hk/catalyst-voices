@@ -5,6 +5,9 @@ final class DriftMigrationStrategy extends MigrationStrategy {
     required GeneratedDatabase database,
     required MigrationStrategy destructiveFallback,
   }) : super(
+          onCreate: (m) async {
+            await m.createAll();
+          },
           onUpgrade: (m, from, to) async {
             await database.customStatement('PRAGMA foreign_keys = OFF');
 
@@ -12,6 +15,9 @@ final class DriftMigrationStrategy extends MigrationStrategy {
             await destructiveFallback.onUpgrade(m, from, to);
 
             await database.customStatement('PRAGMA foreign_keys = ON;');
+          },
+          beforeOpen: (details) async {
+            await database.customStatement('PRAGMA foreign_keys = ON');
           },
         );
 }
