@@ -1,10 +1,10 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:temp1 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.31 AS flutter-ci
 #IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter/installer:v3.2.33 AS flutter-installer
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.31 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:temp1 AS playwright-ci
 
 deps:
-    DO playwright-ci+SETUP --workdir=/wallet-automation --arg1=something
+    DO playwright-ci+SETUP --workdir=/wallet-automation
 
     COPY package.json .
     COPY package-lock.json .
