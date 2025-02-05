@@ -3,9 +3,9 @@ import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.drif
 import 'package:catalyst_voices_repositories/src/database/database.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
-import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:drift/drift.dart';
 
+/// Exposes only public operation on documents, and related, tables.
 abstract interface class DocumentsDao {
   Future<List<Document>> queryAll();
 
@@ -16,7 +16,6 @@ abstract interface class DocumentsDao {
   tables: [
     Documents,
     DocumentsMetadata,
-    Drafts,
   ],
 )
 class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
