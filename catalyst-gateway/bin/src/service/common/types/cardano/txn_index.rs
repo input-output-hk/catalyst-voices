@@ -132,14 +132,6 @@ impl From<u16> for TxnIndex {
     }
 }
 
-impl TxnIndex {
-    /// Generic conversion of `Option<T>` to `Option<TxnIndex>`.
-    #[allow(dead_code)]
-    pub(crate) fn into_option<T: Into<Self>>(value: Option<T>) -> Option<Self> {
-        value.map(std::convert::Into::into)
-    }
-}
-
 impl Example for TxnIndex {
     fn example() -> Self {
         Self(EXAMPLE)
