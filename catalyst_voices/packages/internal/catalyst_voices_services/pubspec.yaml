@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.24.1"
+  flutter: ">=3.27.3"
 
 dependencies:
   catalyst_cardano: ^0.4.1
@@ -18,7 +18,7 @@ dependencies:
     path: ../catalyst_voices_repositories
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
-  collection: ^1.18.0
+  collection: ^1.19.0
   flutter:
     sdk: flutter
   flutter_driver:

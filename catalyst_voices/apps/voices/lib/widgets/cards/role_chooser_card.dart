@@ -230,6 +230,9 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
           selectedBackgroundColor: value
               ? Theme.of(context).colors.success
               : Theme.of(context).colors.iconsError,
+          iconColor: value
+              ? Theme.of(context).colors.successContainer
+              : Colors.transparent,
         ),
         showSelectedIcon: false,
         selected: {value},
