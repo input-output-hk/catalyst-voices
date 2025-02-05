@@ -13,7 +13,7 @@ const COMMENT_DOC_TYPE: &str = "0b8424d4-ebfd-46e3-9577-1775a69d290c";
 
 /// List of category templates, 12 categories for Fund 14.
 #[rustfmt::skip]
-// FIXME: Content
+// TODO: Fix Content once it is added
 const CATEGORY_TEMPLATES: [(&str, &[u8]); 12] = [
     //              ID and Version          |                    Content
     ("0194d490-30bf-7473-81c8-a0eaef369619", include_bytes!("./docs/category/f14_category_1_template.schema.json")),

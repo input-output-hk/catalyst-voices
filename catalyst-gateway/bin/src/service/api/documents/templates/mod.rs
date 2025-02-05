@@ -85,6 +85,9 @@ impl SignedDocTemplate {
     /// This function should not fail, because template details are hardcoded.
     #[allow(clippy::expect_used)]
     fn to_signed_doc(&self, sk: &SigningKey) -> CatalystSignedDocument {
+        /// ID URI network.
+        const KID_NETWORK: &str = "cardano";
+
         let metadata: Metadata = serde_json::from_value(serde_json::json!({
             "type": self.doc_type,
             "id": self.id,
@@ -97,7 +100,7 @@ impl SignedDocTemplate {
         }))
         .expect("Failed to build Metadata from template");
 
-        let kid = IdUri::new("cardano", None, sk.verifying_key());
+        let kid = IdUri::new(KID_NETWORK, None, sk.verifying_key());
         Builder::new()
             .with_metadata(metadata.clone())
             .with_decoded_content(self.content.clone())
