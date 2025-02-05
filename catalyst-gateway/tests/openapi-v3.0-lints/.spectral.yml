@@ -224,7 +224,7 @@ rules:
   api-example-properties:
     message: "Property should contain example"
     given: "$..properties.*"
-    severity: warn
+    severity: error
     then:
       field: "example"
       function: truthy
