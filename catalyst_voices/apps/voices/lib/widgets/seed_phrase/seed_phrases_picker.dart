@@ -119,7 +119,7 @@ final class _CellBackgroundColor extends WidgetStateProperty<Color> {
   @override
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.selected)) {
-      return theme.colorScheme.primary.withOpacity(0.12);
+      return theme.colorScheme.primary.withValues(alpha: 0.12);
     }
 
     return theme.colorScheme.primary;
