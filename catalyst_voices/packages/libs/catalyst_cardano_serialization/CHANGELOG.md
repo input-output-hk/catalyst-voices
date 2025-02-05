@@ -1,6 +1,8 @@
 ## 0.5.0+4
 
- - Update a dependency to the latest release.
+ - **FEAT**(dart/catalyst_cardano_serialization): initial implementation of dynamic coin selection algorithm
+ ([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1684)).
+ ([b74f3ca](https://github.com/input-output-hk/catalyst-voices/commit/b74f3cacac741371558578c312a59302144f9dcc))
 
 ## 0.5.0+3
 

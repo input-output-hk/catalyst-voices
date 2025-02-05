@@ -27,21 +27,19 @@ Packages with dependency updates only:
 > Their versions have been incremented to bump the minimum dependency versions of the packages
 > they depend upon in this project.
 
-* `catalyst_cardano_serialization` - `v0.5.0+4`
+* `catalyst_cardano` - `v0.4.1`
+* `catalyst_key_derivation` - `v0.1.3`
+* `catalyst_cardano` - `v0.4.1`
 * `catalyst_cardano_platform_interface` - `v0.4.0+4`
 * `catalyst_cardano_web` - `v0.4.0+4`
 
 ---
 
-#### `catalyst_cardano` - `v0.4.1`
+#### `catalyst_cardano_serialization` - `v0.5.0+4`
 
-* **FEAT**(cat-gateway): Add document endpoints ([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1470)).
-([f9eca949](https://github.com/input-output-hk/catalyst-voices/commit/f9eca949ca1b21e89ab5eca27ca2925687405cfa))
-
-#### `catalyst_key_derivation` - `v0.1.3`
-
-* **FEAT**(cat-gateway): Add document endpoints ([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1470)).
-([f9eca949](https://github.com/input-output-hk/catalyst-voices/commit/f9eca949ca1b21e89ab5eca27ca2925687405cfa))
+* **FEAT**(dart/catalyst_cardano_serialization): initial implementation of dynamic coin selection algorithm
+([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1684)).
+([b74f3ca](https://github.com/input-output-hk/catalyst-voices/commit/b74f3cacac741371558578c312a59302144f9dcc))
 
 
 ## 2025-01-13
@@ -108,8 +106,7 @@ Packages with other changes:
 * [Change Log](#change-log)
   * [2025-02-04](#2025-02-04)
     * [Changes](#changes)
-      * [`catalyst_cardano` - `v0.4.1`](#catalyst_cardano---v041)
-      * [`catalyst_key_derivation` - `v0.1.3`](#catalyst_key_derivation---v013)
+      * [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
   * [2025-01-13](#2025-01-13)
     * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0+3`](#catalyst_cardano---v0403)
@@ -164,8 +161,7 @@ Packages with other changes:
 * [Change Log](#change-log)
   * [2025-02-04](#2025-02-04)
     * [Changes](#changes)
-      * [`catalyst_cardano` - `v0.4.1`](#catalyst_cardano---v041)
-      * [`catalyst_key_derivation` - `v0.1.3`](#catalyst_key_derivation---v013)
+      * [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
   * [2025-01-13](#2025-01-13)
     * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0+3`](#catalyst_cardano---v0403)
@@ -229,8 +225,7 @@ Packages with other changes:
 * [Change Log](#change-log)
   * [2025-02-04](#2025-02-04)
     * [Changes](#changes)
-      * [`catalyst_cardano` - `v0.4.1`](#catalyst_cardano---v041)
-      * [`catalyst_key_derivation` - `v0.1.3`](#catalyst_key_derivation---v013)
+      * [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
   * [2025-01-13](#2025-01-13)
     * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0+3`](#catalyst_cardano---v0403)

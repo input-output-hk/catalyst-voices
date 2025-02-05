@@ -1,6 +1,6 @@
 ## 0.1.3
 
- - **FEAT**(cat-gateway): Add document endpoints ([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1470)). ([f9eca949](https://github.com/input-output-hk/catalyst-voices/commit/f9eca949ca1b21e89ab5eca27ca2925687405cfa))
+ - Update a dependency to the latest release.
 
 ## 0.1.2
 
