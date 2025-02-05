@@ -52,18 +52,23 @@ package-app:
 nightly-test:
     FROM earthly/dind:ubuntu-24.04-docker-27.3.1-1
     COPY compose.yml .
-    RUN apt-get update --fix-missing && \
-                    apt-get install -y \
-                    apt-utils \
-                    curl \
-                    unzip
-    DO flutter-installer+INSTALL_CHROME_LINUX64
+#    RUN apt-get update --fix-missing && \
+#                    apt-get install -y \
+#                    apt-utils \
+#                    curl \
+#                    unzip
+#    DO flutter-installer+INSTALL_CHROME_LINUX64
     WITH DOCKER \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
         --load test:latest=(+package-test)
 
-        RUN docker run --network=default_default --name=test test:latest ; \
+        RUN apt-get update --fix-missing && \
+                                apt-get install -y \
+                                apt-utils \
+                                curl \
+                                unzip && \
+            docker run --network=default_default --name=test test:latest ; \
             docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml ;
     END
     WAIT
