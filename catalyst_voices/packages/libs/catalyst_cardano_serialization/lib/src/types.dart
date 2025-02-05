@@ -317,6 +317,9 @@ final class MultiAsset extends Equatable implements CborEncodable {
 
 /// The hash of policy ID that minted native assets.
 extension type PolicyId(String hash) {
+  /// The fixed byte length of a policy ID hash.
+  static const hashLength = 28;
+
   /// Deserializes the type from cbor.
   factory PolicyId.fromCbor(CborValue value) {
     return PolicyId(hex.encode((value as CborBytes).bytes));

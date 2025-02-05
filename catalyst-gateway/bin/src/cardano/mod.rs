@@ -25,10 +25,6 @@ use crate::{
 // pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod util;
 
-/// Blocks batch length that will trigger the blocks buffer to be written to the database.
-#[allow(dead_code)]
-const MAX_BLOCKS_BATCH_LEN: usize = 1024;
-
 /// How long we wait between checks for connection to the indexing DB to be ready.
 const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
 
@@ -242,7 +238,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
-        CassandraSession::wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
         info!(chain=%params.chain, params=%params,"Indexing DB is ready");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
@@ -377,7 +373,7 @@ impl SyncTask {
         // Wait for indexing DB to be ready before continuing.
         // We do this after the above, because other nodes may have finished already, and we don't
         // want to wait do any work they already completed while we were fetching the blockchain.
-        CassandraSession::wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state");
         self.sync_status = get_sync_status().await;
         debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);

@@ -165,9 +165,6 @@ pub(crate) struct PreparedQueries {
     get_all_stakes_and_vote_keys_query: PreparedStatement,
 }
 
-/// An individual query response that can fail
-#[allow(dead_code)]
-pub(crate) type FallibleQueryResult = anyhow::Result<QueryResult>;
 /// A set of query responses that can fail.
 pub(crate) type FallibleQueryResults = anyhow::Result<Vec<QueryResult>>;
 /// A set of query responses from tasks that can fail.
@@ -401,9 +398,9 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
     values: Vec<T>,
 ) -> FallibleQueryResults {
     let mut results: Vec<QueryResult> = Vec::new();
+    let mut errors = Vec::new();
 
     let chunks = values.chunks(cfg.max_batch_size.try_into().unwrap_or(1));
-    let mut query_failed = false;
     let query_str = format!("{query}");
 
     for chunk in chunks {
@@ -418,14 +415,14 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
             Err(err) => {
                 let chunk_str = format!("{chunk:?}");
                 error!(error=%err, query=query_str, chunk=chunk_str, "Query Execution Failed");
-                query_failed = true;
+                errors.push(err);
                 // Defer failure until all batches have been processed.
             },
         }
     }
 
-    if query_failed {
-        bail!("Query Failed: {query_str}!");
+    if !errors.is_empty() {
+        bail!("Query Failed: {query_str}! {errors:?}");
     }
 
     Ok(results)

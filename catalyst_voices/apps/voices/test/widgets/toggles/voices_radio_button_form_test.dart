@@ -26,7 +26,7 @@ void main() {
           body: Center(
             child: VoicesRadioButtonFormField(
               items: items,
-              selectedValue: null,
+              value: null,
               onChanged: (_) {},
             ),
           ),
@@ -54,7 +54,7 @@ void main() {
           body: Center(
             child: VoicesRadioButtonFormField(
               items: items,
-              selectedValue: 'Item 1',
+              value: 'Item 1',
               onChanged: (value) {
                 selectedValue = value;
               },
@@ -78,7 +78,7 @@ void main() {
           body: Center(
             child: VoicesRadioButtonFormField(
               items: items,
-              selectedValue: null,
+              value: null,
               onChanged: (_) {},
               validator: (value) =>
                   value == null ? 'Selection is required' : null,
