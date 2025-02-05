@@ -33,9 +33,28 @@ what should be committed.
 
 ## Database
 
-TODO: describe process
+### Drift
 
-https://drift.simonbinder.eu/Platforms/web/#supported-browsers
-sqlite3.wasm https://github.com/simolus3/sqlite3.dart/releases
-drift_worker.js https://github.com/simolus3/drift/releases
- 
+#### Web
+
+Use same port while building for db to be restored. `--web-port=5555`
+
+Additional headers
+
+- `Cross-Origin-Opener-Policy`: Needs to be set to `same-origin`.
+- `Cross-Origin-Embedder-Policy`: Needs to be set to `require-corp` or `credentialless`.
+
+Read more [here](https://drift.simonbinder.eu/platforms/web/#additional-headers).
+
+Drift requires `sqlite3Wasm` and `driftWorker`. Those files can be compiles by hand or
+downloaded from [here](https://github.com/simolus3/sqlite3.dart/releases)
+and [here](https://github.com/simolus3/drift/releases).
+
+`sqlite3.wasm` file needs to be served with a `Content-Type` of `application/wasm` since browsers
+will reject the module otherwise.
+
+Read more [here](https://drift.simonbinder.eu/platforms/web/#prerequisites).
+
+#### Native
+
+TODO
