@@ -165,9 +165,6 @@ pub(crate) struct PreparedQueries {
     get_all_stakes_and_vote_keys_query: PreparedStatement,
 }
 
-/// An individual query response that can fail
-#[allow(dead_code)]
-pub(crate) type FallibleQueryResult = anyhow::Result<QueryResult>;
 /// A set of query responses that can fail.
 pub(crate) type FallibleQueryResults = anyhow::Result<Vec<QueryResult>>;
 /// A set of query responses from tasks that can fail.
