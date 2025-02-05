@@ -1,5 +1,6 @@
 VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.33 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter/installer:v3.2.33 AS flutter-installer
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.31 AS playwright-ci
 
 deps:
@@ -51,6 +52,12 @@ package-app:
 nightly-test:
     FROM earthly/dind:ubuntu-20.04-docker-27.2.1-1
     COPY compose.yml .
+    RUN apt-get update --fix-missing && \
+                    apt-get install -y \
+                    apt-utils \
+                    curl \
+                    unzip
+    DO flutter-installer+INSTALL_CHROME_LINUX64
     WITH DOCKER \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
