@@ -24,10 +24,6 @@ use crate::{
 // pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod util;
 
-/// Blocks batch length that will trigger the blocks buffer to be written to the database.
-#[allow(dead_code)]
-const MAX_BLOCKS_BATCH_LEN: usize = 1024;
-
 /// How long we wait between checks for connection to the indexing DB to be ready.
 const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
 

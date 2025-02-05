@@ -24,7 +24,6 @@ mod date_time_to_slot_number_get;
 mod rbac;
 // mod registration_get;
 pub(crate) mod staking;
-mod sync_state_get;
 pub(crate) mod types;
 
 /// Cardano Follower API Endpoints
@@ -32,29 +31,6 @@ pub(crate) struct Api;
 
 #[OpenApi(tag = "ApiTags::Cardano")]
 impl Api {
-    /// Get Cardano follower's sync state.
-    ///
-    /// This endpoint returns the current cardano follower's sync state info.
-    #[oai(
-        path = "/draft/cardano/sync_state",
-        method = "get",
-        operation_id = "syncStateGet",
-        transform = "schema_version_validation"
-    )]
-    async fn sync_state_get(
-        &self,
-        /// Cardano network type.
-        /// If omitted `mainnet` network type is defined.
-        /// As `preprod` and `preview` network types in the stake address encoded as a
-        /// `testnet`, to specify `preprod` or `preview` network type use this
-        /// query parameter.
-        network: Query<Option<Network>>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> sync_state_get::AllResponses {
-        sync_state_get::endpoint(network.0).await
-    }
-
     /// Get Cardano slot info to the provided date-time.
     ///
     /// This endpoint returns the closest cardano slot info to the provided
