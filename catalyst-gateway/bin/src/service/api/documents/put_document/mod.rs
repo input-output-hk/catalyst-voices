@@ -6,7 +6,7 @@ use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
-    db::event::signed_docs::{FullSignedDoc, SignedDocBody},
+    db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
     service::common::responses::WithErrorResponses,
 };
 
@@ -90,6 +90,13 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
             {
                 Ok(true) => Responses::Created.into(),
                 Ok(false) => Responses::NoContent.into(),
+                Err(err) if err.is::<StoreError>() => {
+                    Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                        "Document with the same `id` and `ver` already exists",
+                        None,
+                    )))
+                    .into()
+                },
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
