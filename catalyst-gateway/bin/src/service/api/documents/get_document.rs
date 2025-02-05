@@ -10,7 +10,6 @@ use crate::{
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## OK
     ///

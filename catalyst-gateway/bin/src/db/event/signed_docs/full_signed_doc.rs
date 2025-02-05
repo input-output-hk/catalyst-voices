@@ -15,6 +15,11 @@ pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplat
     source: include_str!("./sql/select_signed_documents.sql.jinja"),
 };
 
+/// `FullSignedDoc::store` method error.
+#[derive(thiserror::Error, Debug)]
+#[error("Document with the same `id` and `ver` already exists")]
+pub(crate) struct StoreError;
+
 /// Full signed doc event db struct
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct FullSignedDoc {
@@ -28,7 +33,6 @@ pub(crate) struct FullSignedDoc {
 
 impl FullSignedDoc {
     /// Creates a  `FullSignedDoc` instance.
-    #[allow(dead_code)]
     pub(crate) fn new(
         body: SignedDocBody, payload: Option<serde_json::Value>, raw: Vec<u8>,
     ) -> Self {
@@ -45,12 +49,6 @@ impl FullSignedDoc {
         self.body.ver()
     }
 
-    /// Returns the document author.
-    #[allow(dead_code)]
-    pub(crate) fn authors(&self) -> &Vec<String> {
-        self.body.authors()
-    }
-
     /// Returns the document metadata.
     #[allow(dead_code)]
     pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
@@ -64,7 +62,6 @@ impl FullSignedDoc {
     }
 
     /// Returns the document raw bytes.
-    #[allow(dead_code)]
     pub(crate) fn raw(&self) -> &Vec<u8> {
         &self.raw
     }
@@ -86,14 +83,10 @@ impl FullSignedDoc {
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
     ///  - `doc_type` is a UUID v4
-    #[allow(dead_code)]
     pub(crate) async fn store(&self) -> anyhow::Result<bool> {
         match Self::retrieve(self.id(), Some(self.ver())).await {
             Ok(res_doc) => {
-                anyhow::ensure!(
-                    &res_doc == self,
-                    "Document with the same `id` and `ver` already exists"
-                );
+                anyhow::ensure!(&res_doc == self, StoreError);
                 Ok(false)
             },
             Err(err) if err.is::<NotFoundError>() => {
@@ -117,7 +110,6 @@ impl FullSignedDoc {
     /// # Arguments:
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
-    #[allow(dead_code)]
     pub(crate) async fn retrieve(
         id: &uuid::Uuid, ver: Option<&uuid::Uuid>,
     ) -> anyhow::Result<Self> {

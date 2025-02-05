@@ -25,7 +25,9 @@ final class WalletLinkStateData extends Equatable {
   Coin get minAdaForRegistration => CardanoWalletDetails.minAdaForRegistration;
 
   /// Returns the default roles every account will have.
-  Set<AccountRole> get defaultRoles => {AccountRole.voter};
+  Set<AccountRole> get defaultRoles {
+    return AccountRole.values.where((role) => role.isDefault).toSet();
+  }
 
   WalletLinkStateData copyWith({
     Optional<Result<List<WalletMetadata>, Exception>>? wallets,

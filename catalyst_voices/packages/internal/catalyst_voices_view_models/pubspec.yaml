@@ -8,11 +8,13 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
-  catalyst_cardano: ^0.4.0+3
-  catalyst_cardano_serialization: ^0.5.0+3
-  catalyst_cardano_web: ^0.4.0+3
+  catalyst_cardano: ^0.4.1
+  catalyst_cardano_serialization: ^0.5.0+4
+  catalyst_cardano_web: ^0.4.0+4
   catalyst_voices_assets:
     path: ../catalyst_voices_assets
+  catalyst_voices_brands:
+    path: ../catalyst_voices_brands
   catalyst_voices_localization:
     path: ../catalyst_voices_localization
   catalyst_voices_models:
