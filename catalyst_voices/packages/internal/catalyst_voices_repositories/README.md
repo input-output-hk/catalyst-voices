@@ -30,3 +30,12 @@ If you are running the command on a **Linux** platform, you can omit this flag.
 In this way it's possible to locally generate the code using the same version of
 OpenAPI specs defined in the backend code and developers have full control of
 what should be committed.
+
+## Database
+
+TODO: describe process
+
+https://drift.simonbinder.eu/Platforms/web/#supported-browsers
+sqlite3.wasm https://github.com/simolus3/sqlite3.dart/releases
+drift_worker.js https://github.com/simolus3/drift/releases
+ 

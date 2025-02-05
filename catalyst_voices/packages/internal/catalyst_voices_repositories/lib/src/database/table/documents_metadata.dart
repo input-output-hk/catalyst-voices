@@ -1,7 +1,8 @@
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:drift/drift.dart';
 
-class DocumentMetadata extends Table {
+@DataClassName('DocumentMetadata')
+class DocumentsMetadata extends Table {
   // Composite key matching the Documents table over version not document fields
   Int64Column get verHi => int64().references(
         Documents,
