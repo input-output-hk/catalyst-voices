@@ -19,7 +19,6 @@ use crate::settings::Settings;
 pub(crate) mod common;
 pub(crate) mod config;
 pub(crate) mod error;
-pub(crate) mod legacy;
 pub(crate) mod schema_check;
 pub(crate) mod signed_docs;
 
@@ -150,7 +149,6 @@ impl EventDB {
     /// # Returns
     ///
     /// `anyhow::Result<()>`
-    #[allow(dead_code)]
     pub(crate) async fn modify(stmt: &str, params: &[&(dyn ToSql + Sync)]) -> anyhow::Result<()> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_commit(stmt, params).await?;
@@ -170,7 +168,6 @@ impl EventDB {
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and commit the transaction.
-    #[allow(dead_code)]
     async fn explain_analyze_commit(
         stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {

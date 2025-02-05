@@ -17,7 +17,6 @@ pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## Created
     ///
@@ -51,8 +50,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
     match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
         Ok(doc) => {
             let authors = doc
-                .signatures()
-                .kids()
+                .authors()
                 .into_iter()
                 .map(|kid| kid.to_string())
                 .collect();
