@@ -4,7 +4,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:temp1 AS flutter-c
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.31 AS playwright-ci
 
 deps:
-    DO --no-cache playwright-ci+SETUP --workdir=/wallet-automation
+    DO playwright-ci+SETUP --workdir=/wallet-automation --arg1=something
 
     COPY package.json .
     COPY package-lock.json .
