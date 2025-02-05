@@ -5,3 +5,6 @@
 .packages
 build/
 pubspec.lock
+
+# ignore generated drift files
+*.drift.dart
