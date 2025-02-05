@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-02-04
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+* There are no breaking changes in this release.
+
+Packages with other changes:
+
+* [`catalyst_cardano` - `v0.4.1`](#catalyst_cardano---v041)
+* [`catalyst_key_derivation` - `v0.1.3`](#catalyst_key_derivation---v013)
+* [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
+* [`catalyst_cardano_platform_interface` - `v0.4.0+4`](#catalyst_cardano_platform_interface---v0404)
+* [`catalyst_cardano_web` - `v0.4.0+4`](#catalyst_cardano_web---v0404)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes.
+> Their versions have been incremented to bump the minimum dependency versions of the packages
+> they depend upon in this project.
+
+* `catalyst_cardano` - `v0.4.1`
+* `catalyst_key_derivation` - `v0.1.3`
+* `catalyst_cardano` - `v0.4.1`
+* `catalyst_cardano_platform_interface` - `v0.4.0+4`
+* `catalyst_cardano_web` - `v0.4.0+4`
+
+---
+
+#### `catalyst_cardano_serialization` - `v0.5.0+4`
+
+* **FEAT**(dart/catalyst_cardano_serialization): initial implementation of dynamic coin selection algorithm
+([#1470](https://github.com/input-output-hk/catalyst-voices/issues/1684)).
+([b74f3ca](https://github.com/input-output-hk/catalyst-voices/commit/b74f3cacac741371558578c312a59302144f9dcc))
+
+
 ## 2025-01-13
 
 ### Changes
@@ -65,18 +104,21 @@ Packages with breaking changes:
 Packages with other changes:
 
 * [Change Log](#change-log)
-  * [2025-01-13](#2025-01-13)
+  * [2025-02-04](#2025-02-04)
     * [Changes](#changes)
+      * [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
+  * [2025-01-13](#2025-01-13)
+    * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0+3`](#catalyst_cardano---v0403)
       * [`catalyst_key_derivation` - `v0.1.2`](#catalyst_key_derivation---v012)
   * [2025-01-02v2](#2025-01-02v2)
-    * [Changes](#changes-1)
+    * [Changes](#changes-2)
       * [`catalyst_key_derivation` - `v0.1.1+1`](#catalyst_key_derivation---v0111)
   * [2025-01-02v1](#2025-01-02v1)
-    * [Changes](#changes-2)
+    * [Changes](#changes-3)
       * [`catalyst_key_derivation` - `v0.1.1`](#catalyst_key_derivation---v011)
   * [2025-01-02](#2025-01-02)
-    * [Changes](#changes-3)
+    * [Changes](#changes-4)
       * [`catalyst_cardano` - `v0.4.0`](#catalyst_cardano---v040)
       * [`catalyst_cardano_platform_interface` - `v0.4.0`](#catalyst_cardano_platform_interface---v040)
       * [`catalyst_cardano_serialization` - `v0.5.0`](#catalyst_cardano_serialization---v050)
@@ -117,18 +159,21 @@ Packages with breaking changes:
 Packages with other changes:
 
 * [Change Log](#change-log)
-  * [2025-01-13](#2025-01-13)
+  * [2025-02-04](#2025-02-04)
     * [Changes](#changes)
+      * [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
+  * [2025-01-13](#2025-01-13)
+    * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0+3`](#catalyst_cardano---v0403)
       * [`catalyst_key_derivation` - `v0.1.2`](#catalyst_key_derivation---v012)
   * [2025-01-02v2](#2025-01-02v2)
-    * [Changes](#changes-1)
+    * [Changes](#changes-2)
       * [`catalyst_key_derivation` - `v0.1.1+1`](#catalyst_key_derivation---v0111)
   * [2025-01-02v1](#2025-01-02v1)
-    * [Changes](#changes-2)
+    * [Changes](#changes-3)
       * [`catalyst_key_derivation` - `v0.1.1`](#catalyst_key_derivation---v011)
   * [2025-01-02](#2025-01-02)
-    * [Changes](#changes-3)
+    * [Changes](#changes-4)
       * [`catalyst_cardano` - `v0.4.0`](#catalyst_cardano---v040)
       * [`catalyst_cardano_platform_interface` - `v0.4.0`](#catalyst_cardano_platform_interface---v040)
       * [`catalyst_cardano_serialization` - `v0.5.0`](#catalyst_cardano_serialization---v050)
@@ -178,18 +223,21 @@ Packages with breaking changes:
 Packages with other changes:
 
 * [Change Log](#change-log)
-  * [2025-01-13](#2025-01-13)
+  * [2025-02-04](#2025-02-04)
     * [Changes](#changes)
+      * [`catalyst_cardano_serialization` - `v0.5.0+4`](#catalyst_cardano_serialization---v0504)
+  * [2025-01-13](#2025-01-13)
+    * [Changes](#changes-1)
       * [`catalyst_cardano` - `v0.4.0+3`](#catalyst_cardano---v0403)
       * [`catalyst_key_derivation` - `v0.1.2`](#catalyst_key_derivation---v012)
   * [2025-01-02v2](#2025-01-02v2)
-    * [Changes](#changes-1)
+    * [Changes](#changes-2)
       * [`catalyst_key_derivation` - `v0.1.1+1`](#catalyst_key_derivation---v0111)
   * [2025-01-02v1](#2025-01-02v1)
-    * [Changes](#changes-2)
+    * [Changes](#changes-3)
       * [`catalyst_key_derivation` - `v0.1.1`](#catalyst_key_derivation---v011)
   * [2025-01-02](#2025-01-02)
-    * [Changes](#changes-3)
+    * [Changes](#changes-4)
       * [`catalyst_cardano` - `v0.4.0`](#catalyst_cardano---v040)
       * [`catalyst_cardano_platform_interface` - `v0.4.0`](#catalyst_cardano_platform_interface---v040)
       * [`catalyst_cardano_serialization` - `v0.5.0`](#catalyst_cardano_serialization---v050)
