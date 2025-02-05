@@ -4,10 +4,10 @@ Version: 1.1 January 2025
 
 ---
 
-| Version | Date       | Author         | Summary of Changes       | Notes            | Diff                  |
-| ------- | ---------- | -------------- | ------------------------ | ---------------- | --------------------- |
-| 1.0     | 2025-01-27 | Neil McAuliffe | Initial draft            |                  |                       |
-| 1.1     | 2025-01-31 | Neil McAuliffe | Narrow focus for Fund 14 | Clarified scope  | [Details](#v11-changes) |
+| Version | Date       | Author         | Summary of Changes       | Notes            |
+| ------- | ---------- | -------------- | ------------------------ | ---------------- |
+| 1.0     | 2025-01-27 | Neil McAuliffe | Initial draft            |                  |
+| 1.1     | 2025-01-31 | Neil McAuliffe | Narrow focus for Fund 14 | Clarified scope  |
 
 ---
 
@@ -269,7 +269,7 @@ Int createdAt
 
 Text metadata
 
-%% Primary Key: (idHi, idLo, verIdHi, verIdLo)
+CompositeKey[] key PK "idHi, idLo, verIdHi, verIdLo"
 
 %% Index: idx_unique_ver_id UNIQUE (verIdHi, verIdLo)
 
@@ -287,7 +287,7 @@ Text fieldKey
 
 Text fieldValue
 
-%% Primary Key: (verIdHi, verIdLo, fieldKey)
+CompositeKey[] key PK "verIdHi, verIdLo, fieldKey"
 
 %% Index: idx_doc_metadata_key_value (fieldKey, fieldValue)
 
@@ -311,7 +311,7 @@ Text content
 
 Text title
 
-%% Primary Key: (idHi, idLo, verIdHi, verIdLo)
+CompositeKey[] key PK "idHi, idLo, verIdHi, verIdLo"
 
 %% Index: idx_draft_type (type)
 
@@ -513,12 +513,11 @@ Indexes can also be created declaratively in Drift.
 For instance, the following code will make queries based on `documentType` more efficient:
 
 ```dart
-@TableIndex(name: 'document_type', columns: {#documentType})
 class Documents extends Table {
   IntColumn get idHi => integer()();
   IntColumn get idLo => integer()();
-  IntColumn get versionHi => integer()();
-  IntColumn get versionLo => integer()();
+  IntColumn get verIdHi => integer()();
+  IntColumn get verIdLo => integer()();
   TextColumn get documentType => text()();
   TextColumn get content => text()();
   IntColumn get createdAt => integer()();
@@ -526,6 +525,12 @@ class Documents extends Table {
 
   @override
   Set<Column> get primaryKey => {idHi, idLo};
+
+ @override
+ List<Index> get indexes => [
+   Index('document_type_index', [documentType]),
+   Index('idx_unique_ver_id', [verIdHi, verIdLo], unique: true),
+ ];
 }
 
 ```
@@ -543,7 +548,7 @@ scanning the entire JSON document each time to filter or sort by a particular fi
 1. **Insert Document**
 
    * Insert the entire JSON-based document into the main `documents` table (which contains a composite primary key,
-   for example `(id_hi, id_lo)`).
+   for example `(idHi, idLo)`).
 
 2. **Parse JSON**
 
@@ -590,7 +595,6 @@ MigrationStrategy get migration => MigrationStrategy(
 #### 6.1.5 Example Drift definition with foreign reference and indexes
 
 ```dart
-@TableIndex(name: 'document_type', columns: {#documentType})
 class Documents extends Table {
  IntColumn get idHi => integer()();
  IntColumn get idLo => integer()();
@@ -604,11 +608,12 @@ class Documents extends Table {
  IntColumn get createdAt => integer()();
  TextColumn get metadata => text().nullable()();
 
- @override
+ @override    
  Set<Column> get primaryKey => {idHi, idLo, verIdHi, verIdLo};
 
  @override
  List<Index> get indexes => [
+   Index('document_type_index', [documentType]),
    Index('idx_unique_ver_id', [verIdHi, verIdLo], unique: true),
  ];
 }
@@ -677,9 +682,9 @@ class UuidV7Handler {
  }
 
  static DateTime extractTimestamp(int id_hi) {
-        final msTimestamp = id_hi >> 16;
-        return DateTime.fromMillisecondsSinceEpoch(msTimestamp);
-    }
+  final msTimestamp = id_hi >> 16;
+  return DateTime.fromMillisecondsSinceEpoch(msTimestamp);
+ }
 }
 ```
 
@@ -723,7 +728,7 @@ Drift as the ORM.
 Other solutions were considered for draft storage like Hive and IndexedDB however these lacked key features and
 support defined at a system level.
 
-### 7.4 Draft Workflow
+### 7.2 Draft Workflow
 
 * **Draft Creation and Editing**:
   * Draft content is kept in plaintext in memory while being edited.
@@ -736,10 +741,9 @@ support defined at a system level.
   * All drafts are stored unencrypted in local storage and are not tied to a session therefore drafts will persist across sessions,
   and are not explicitly tied to the users keychain.
 
-### 7.5 Draft Database Design
+### 7.3 Draft Database Design
 
 ```dart
-@TableIndex(name: 'idx_draft_type', columns: {#type})
 class Drafts extends Table {
   // Composite key for document identification
   IntColumn get idHi => integer()();
@@ -761,8 +765,8 @@ class Drafts extends Table {
 
   @override
   List<Index> get indexes => [
-        Index('idx_draft_type', [type]),
-      ];
+    Index('idx_draft_type', [type]),
+  ];
 }
 ```
 
@@ -774,7 +778,7 @@ and better performance by reducing reliance on external APIs.
 Synchronization with the server (index API and document API) is
 performed intelligently to maintain data consistency without compromising offline usability.
 
-### 8.1. Local-First Operations
+### 8.1 Local-First Operations
 
 * **Key Principle:** Any operation that can operate on local cached data should do so first.
 * **Operations That Should Be Supported Locally:**
