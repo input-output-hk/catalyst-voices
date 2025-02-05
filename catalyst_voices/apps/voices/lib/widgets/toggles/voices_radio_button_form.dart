@@ -1,32 +1,23 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/toggles/voices_radio.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class VoicesRadioButtonFormField extends FormField<String> {
-  final String? selectedValue;
-  final ValueChanged<String?>? onChanged;
+class VoicesRadioButtonFormField extends VoicesFormField<String> {
   final List<String> items;
 
   VoicesRadioButtonFormField({
     super.key,
     required this.items,
-    required this.onChanged,
-    required this.selectedValue,
+    required super.value,
+    required super.onChanged,
     super.enabled,
     super.validator,
-    AutovalidateMode autovalidateMode = AutovalidateMode.always,
+    super.autovalidateMode = AutovalidateMode.always,
   }) : super(
-          initialValue: selectedValue,
-          autovalidateMode: autovalidateMode,
           builder: (field) {
-            final state = field as _RadioButtonFormState;
-            void onChangedHandler(String? selected) {
-              field.didChange(selected);
-              onChanged?.call(selected);
-            }
-
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,8 +25,8 @@ class VoicesRadioButtonFormField extends FormField<String> {
                 _RadioButtonList(
                   enabled: enabled,
                   items: items,
-                  onChanged: onChangedHandler,
-                  value: state._internalValue,
+                  onChanged: field.didChange,
+                  value: field.value,
                 ),
                 if (field.hasError)
                   _ErrorText(
@@ -45,31 +36,6 @@ class VoicesRadioButtonFormField extends FormField<String> {
             );
           },
         );
-
-  @override
-  FormFieldState<String> createState() => _RadioButtonFormState();
-}
-
-class _RadioButtonFormState extends FormFieldState<String> {
-  String? _internalValue;
-
-  @override
-  void initState() {
-    super.initState();
-    _internalValue = widget.initialValue;
-  }
-
-  @override
-  void didUpdateWidget(VoicesRadioButtonFormField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialValue != _internalValue) {
-      _internalValue = widget.initialValue;
-    }
-    if (_internalValue != value) {
-      setValue(_internalValue);
-      validate();
-    }
-  }
 }
 
 class _RadioButtonList extends StatelessWidget {

@@ -1431,5 +1431,17 @@
   "submitSupportRequest": "Submit support request",
   "catalystKnowledgeBase": "Catalyst knowledge base",
   "lockAccount": "Lock account",
-  "timezone": "Timezone"
+  "timezone": "Timezone",
+  "displayName": "Display Name",
+  "emailAddress": "Email address",
+  "myAccount": "My account",
+  "myRoles": "My Roles",
+  "addRole": "Add role",
+  "accountFinishedNotificationTitle": "Account Finalized",
+  "accountFinishedNotificationTitleDesc": "Account blockchain verified",
+  "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and…",
+  "startProposal": "Start Proposal",
+  "editRolesDialogTitle": "Editing Roles",
+  "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
+  "continueText": "Continue"
 }

@@ -17,7 +17,6 @@ pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## Created
     ///
