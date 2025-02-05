@@ -1,7 +1,7 @@
 part of 'workspace_header.dart';
 
 class ProjectText extends StatelessWidget {
-  const ProjectText();
+  const ProjectText({super.key});
 
   @override
   Widget build(BuildContext context) {

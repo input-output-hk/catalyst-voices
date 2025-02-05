@@ -6,7 +6,7 @@ export 'campaign/campaign_category_section.dart';
 export 'campaign/campaign_info.dart';
 export 'campaign/campaign_list_item.dart';
 export 'campaign/campaign_stage.dart';
-export 'campaign/campaign_timeline.dart';
+export 'campaign/campaign_timeline_view_model.dart';
 export 'campaign/current_campaign_info_view_model.dart';
 export 'campaign/exception/active_campaign_not_found_exception.dart';
 export 'document/validation/localized_document_validation_result.dart';

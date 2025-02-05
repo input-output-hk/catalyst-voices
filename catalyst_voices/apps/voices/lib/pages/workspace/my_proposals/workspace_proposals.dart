@@ -23,6 +23,32 @@ class WorkspaceProposalsSelector extends StatelessWidget {
   }
 }
 
+class _ProposalListTile extends StatelessWidget {
+  final WorkspaceProposalListItem item;
+  final VoidCallback? onTap;
+
+  const _ProposalListTile({
+    super.key,
+    required this.item,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Material(
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          child: Text(item.name),
+        ),
+      ),
+    );
+  }
+}
+
 class _WorkspaceProposals extends StatelessWidget {
   final List<WorkspaceProposalListItem> items;
 
@@ -47,33 +73,6 @@ class _WorkspaceProposals extends StatelessWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: items.length,
       padding: const EdgeInsets.all(32),
-    );
-  }
-}
-
-// TODO(damian-molinski): Looks is not final
-class _ProposalListTile extends StatelessWidget {
-  final WorkspaceProposalListItem item;
-  final VoidCallback? onTap;
-
-  const _ProposalListTile({
-    super.key,
-    required this.item,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Material(
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          child: Text(item.name),
-        ),
-      ),
     );
   }
 }

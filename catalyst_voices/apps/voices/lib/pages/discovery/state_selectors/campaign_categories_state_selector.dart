@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/common/typedefs.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_categories.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -7,7 +8,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef _StateData = ({bool show, LocalizedException? error});
 typedef _ListItems = List<CampaignCategoryCardViewModel>;
 
 class CampaignCategoriesStateSelector extends StatelessWidget {
@@ -39,29 +39,6 @@ class CampaignCategoriesStateSelector extends StatelessWidget {
   }
 }
 
-class _CampaignCategoriesLoading extends StatelessWidget {
-  const _CampaignCategoriesLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
-      selector: (state) {
-        return state.campaignCategories.isLoading;
-      },
-      builder: (context, state) {
-        final dummyCategories = List.filled(
-          6,
-          CampaignCategoryCardViewModel.dummy(),
-        );
-        return Offstage(
-          offstage: !state,
-          child: CampaignCategories(dummyCategories, isLoading: state),
-        );
-      },
-    );
-  }
-}
-
 class _CampaignCategoriesData extends StatelessWidget {
   const _CampaignCategoriesData();
 
@@ -88,7 +65,7 @@ class _CampaignCategoriesError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, _StateData>(
+    return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
       selector: (state) => (
         show: state.campaignCategories.showError,
         error: state.campaignCategories.error
@@ -108,6 +85,29 @@ class _CampaignCategoriesError extends StatelessWidget {
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class _CampaignCategoriesLoading extends StatelessWidget {
+  const _CampaignCategoriesLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
+      selector: (state) {
+        return state.campaignCategories.isLoading;
+      },
+      builder: (context, state) {
+        final dummyCategories = List.filled(
+          6,
+          CampaignCategoryCardViewModel.dummy(),
+        );
+        return Offstage(
+          offstage: !state,
+          child: CampaignCategories(dummyCategories, isLoading: state),
         );
       },
     );

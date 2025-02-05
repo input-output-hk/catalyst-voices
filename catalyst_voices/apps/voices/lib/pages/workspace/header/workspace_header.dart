@@ -25,18 +25,18 @@ class WorkspaceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
+    return DefaultTabController(
       length: 2,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 32),
-            ProjectText(),
-            SizedBox(height: 8),
-            Row(
+            const SizedBox(height: 32),
+            const ProjectText(),
+            const SizedBox(height: 8),
+            const Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -49,35 +49,54 @@ class WorkspaceHeader extends StatelessWidget {
                 TimelineToggleButton(),
               ],
             ),
-            SizedBox(height: 48),
+            const SizedBox(height: 24),
             Row(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SubTitleText(),
-                      SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SearchTextField(),
-                    ],
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.grey.withAlpha(51),
+                      ),
+                    ),
+                    child:
+                        CampaignTimeline(CampaignTimelineViewModelX.mockData),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            WorkspaceTabSelector(),
+            const SizedBox(height: 48),
+            // const Row(
+            //   mainAxisSize: MainAxisSize.max,
+            //   crossAxisAlignment: CrossAxisAlignment.end,
+            //   children: [
+            //     Expanded(
+            //       child: Column(
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           SubTitleText(),
+            //           SizedBox(height: 16),
+            //         ],
+            //       ),
+            //     ),
+            //     SizedBox(width: 20),
+            //     Expanded(
+            //       child: Column(
+            //         mainAxisAlignment: MainAxisAlignment.end,
+            //         crossAxisAlignment: CrossAxisAlignment.end,
+            //         children: [
+            //           SearchTextField(),
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 16),
+            // const WorkspaceTabSelector(),
           ],
         ),
       ),

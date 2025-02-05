@@ -12,6 +12,8 @@ class TimelineToggleButtonState extends State<TimelineToggleButton> {
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = Theme.of(context).colorScheme.primary;
+
     return VoicesIconButton.outlined(
       onTap: toggleTimelineVisibility,
       style: ButtonStyle(
@@ -23,10 +25,10 @@ class TimelineToggleButtonState extends State<TimelineToggleButton> {
       ),
       child: isTimelineVisible
           ? VoicesAssets.icons.topBarFilled.buildIcon(
-              color: Theme.of(context).colorScheme.primary,
+              color: iconColor,
             )
           : VoicesAssets.icons.topBar.buildIcon(
-              color: Theme.of(context).colorScheme.primary,
+              color: iconColor,
             ),
     );
   }
