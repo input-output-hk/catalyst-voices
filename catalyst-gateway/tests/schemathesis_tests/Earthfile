@@ -13,7 +13,8 @@ package-schemathesis:
     VOLUME /results
 
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                && st run --exclude-path-regex 'draft' \
+                && st run \
+                    --exclude-path-regex 'draft' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
                     --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
@@ -66,18 +67,21 @@ test-fuzzer-api:
 
 nightly-package-schemathesis:
     FROM python:3.12-alpine3.20
-    # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
     ARG api_spec
     # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG seed
-    ARG version=3.39.5
+    ARG version=3.39.8
 
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
     RUN mkdir /results
     COPY ./hooks/hooks.py .
     VOLUME /results
-    ENTRYPOINT st run --checks=all $api_spec \
+    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
+                st run \
+                    --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
+                    --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
+                    --checks=all $api_spec \
                     --workers=2 \
                     --wait-for-schema=120 \
                     --max-response-time=300 \
