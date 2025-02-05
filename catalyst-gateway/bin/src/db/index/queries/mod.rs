@@ -12,10 +12,7 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
-use rbac::{
-    get_catalyst_id_from_stake_addr, get_chain_root,
-    get_registrations::GetRegistrationsByChainRootQuery,
-};
+use rbac::{get_catalyst_id_from_stake_addr, get_registrations::GetRegistrationsByChainRootQuery};
 use registrations::{
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
     get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
@@ -156,11 +153,11 @@ pub(crate) struct PreparedQueries {
     /// Insert Sync Status update.
     sync_status_insert: PreparedStatement,
     /// Get chain root by stake address
-    chain_root_by_stake_address_query: PreparedStatement,
+    catalyst_id_by_stake_address_query: PreparedStatement,
     /// Get registrations by chain root
     registrations_by_chain_root_query: PreparedStatement,
     /// Get chain root by transaction ID
-    chain_root_by_transaction_id_query: PreparedStatement,
+    catalyst_id_by_transaction_id_query: PreparedStatement,
     /// Get all stake and vote keys (`stake_key,vote_key`) for snapshot
     get_all_stakes_and_vote_keys_query: PreparedStatement,
 }

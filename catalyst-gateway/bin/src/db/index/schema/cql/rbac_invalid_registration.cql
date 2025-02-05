@@ -1,5 +1,5 @@
 -- Index of RBAC 509 registrations. Valid. 
-CREATE TABLE IF NOT EXISTS rbac_registration (
+CREATE TABLE IF NOT EXISTS rbac_invalid_registration (
     -- Primary Key Data
     catalyst_id         text,           -- Short Catalyst id
     transaction_id      blob,           -- 32 Bytes of Transaction Hash. (TransactionHash)

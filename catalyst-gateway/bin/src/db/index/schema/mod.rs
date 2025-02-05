@@ -72,7 +72,7 @@ const SCHEMAS: &[(&str, &str)] = &[
     ),
     (
         // Invalid RBAC Registration Table Schema
-        include_str!("./cql/rbac_registration_invalid.cql"),
+        include_str!("cql/rbac_invalid_registration.cql"),
         "Create Table Invalid RBAC Registration",
     ),
     (

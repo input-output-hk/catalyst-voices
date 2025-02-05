@@ -7,7 +7,7 @@ use futures::StreamExt;
 use super::*;
 use crate::{
     db::index::queries::{
-        rbac::{get_chain_root, get_registrations::*},
+        rbac::get_registrations::*,
         registrations::{
             get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*, get_invalid::*,
         },

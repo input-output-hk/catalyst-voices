@@ -19,7 +19,7 @@ use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionHash, TxnIndex};
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use rbac_registration::cardano::cip509::{
-    C509Cert, Cip509, Cip509RbacMetadata, KeyLocalRef, LocalRefInt, X509DerCert,
+    C509Cert, Cip509, Cip509RbacMetadata, KeyLocalRef, LocalRefInt, RoleNumber, X509DerCert,
 };
 use scylla::Session;
 use tracing::error;
@@ -139,10 +139,7 @@ impl Rbac509InsertQuery {
         block: &MultiEraBlock,
     ) {
         let slot = block.slot();
-
-        // TODO: FIXME: pass track_payment_addresses?..
-        let track_payment_addresses = &[];
-        let cip509 = match Cip509::new(block, index, track_payment_addresses) {
+        let cip509 = match Cip509::new(block, index, &[]) {
             Ok(Some(v)) => v,
             Ok(None) => {
                 // Nothing to index.
@@ -172,8 +169,10 @@ impl Rbac509InsertQuery {
             );
         }
 
-        // TODO: FIXME:
-        let catalyst_id = "".to_string();
+        let Some(catalyst_id) = catalyst_id(&cip509) else {
+            error!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
+            return;
+        };
 
         let previous_transaction = cip509.previous_transaction();
         let purpose = cip509.purpose();
@@ -305,13 +304,24 @@ impl Rbac509InsertQuery {
     }
 }
 
-/// Role0 Certificate Data.
-struct Role0CertificateData {
-    /// Role0 Key
-    role0_key: Role0Key,
-    /// Stake Addresses
-    stake_addresses: Option<Vec<StakeAddress>>,
+/// Gets a catalyst id of the given registration.
+fn catalyst_id(cip509: &Cip509) -> Option<String> {
+    match cip509.previous_transaction() {
+        Some(previous) => {
+            // TODO: FIXME: Query from database and cache.
+            None
+        },
+        None => cip509.catalyst_id().map(|id| id.as_short_id().to_string()),
+    }
 }
+
+// /// Role0 Certificate Data.
+// struct Role0CertificateData {
+//     /// Role0 Key
+//     role0_key: Role0Key,
+//     /// Stake Addresses
+//     stake_addresses: Option<Vec<StakeAddress>>,
+// }
 
 // /// Get Role0 X509 Certificate from `KeyReference`
 // fn get_role0_x509_certs_from_reference(
