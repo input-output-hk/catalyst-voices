@@ -17,7 +17,7 @@ pub(crate) static PROPOSAL: LazyLock<SignedDocTemplate> = LazyLock::new(|| {
         content: include_bytes!(
             "../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
         ).to_vec(),
-        content_type: "json".to_owned(),
+        content_type: "application/json".to_owned(),
         content_encoding: "br".to_owned(),
     }
 });
