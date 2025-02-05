@@ -12,6 +12,6 @@ pub(crate) enum ApiTags {
     // Registration,
     /// Service Configuration and Status.
     Config,
-    /// Legacy Mobile App Support.
-    Legacy,
+    /// Signed Document endpoints
+    Documents,
 }

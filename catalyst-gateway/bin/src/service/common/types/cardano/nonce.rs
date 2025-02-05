@@ -39,7 +39,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Value of a Nonce.
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub(crate) struct Nonce(u64);
 
 /// Is the Nonce valid?
@@ -108,14 +108,6 @@ impl ToJSON for Nonce {
 impl From<u64> for Nonce {
     fn from(value: u64) -> Self {
         Self(value)
-    }
-}
-
-impl Nonce {
-    /// Generic conversion of `Option<T>` to `Option<Self>`.
-    #[allow(dead_code)]
-    pub(crate) fn into_option<T: Into<Self>>(value: Option<T>) -> Option<Self> {
-        value.map(std::convert::Into::into)
     }
 }
 

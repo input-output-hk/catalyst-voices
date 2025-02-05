@@ -39,17 +39,20 @@ class VoicesRadio<T extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onChanged != null ? _changeGroupValue : null,
-      behavior: HitTestBehavior.opaque,
-      child: LabelDecorator(
-        label: label,
-        note: note,
-        child: Radio(
-          value: value,
-          groupValue: groupValue,
-          onChanged: onChanged,
-          toggleable: toggleable,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onChanged != null ? _changeGroupValue : null,
+        behavior: HitTestBehavior.opaque,
+        child: LabelDecorator(
+          label: label,
+          note: note,
+          child: Radio(
+            value: value,
+            groupValue: groupValue,
+            onChanged: onChanged,
+            toggleable: toggleable,
+          ),
         ),
       ),
     );

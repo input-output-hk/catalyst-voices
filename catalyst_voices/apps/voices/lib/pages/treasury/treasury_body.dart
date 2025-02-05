@@ -1,4 +1,8 @@
-import 'package:catalyst_voices/pages/treasury/treasury_dummy_topic_step.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_categories_step.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_details_tile.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_stages_edit_tile.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_stages_view_tile.dart';
+import 'package:catalyst_voices/pages/treasury/sections/treasury_proposal_template_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -14,18 +18,43 @@ class TreasuryBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SectionsListViewBuilder(
+    return SegmentsListViewBuilder(
       builder: (context, value, child) {
-        return SectionsListView<TreasurySection, TreasurySectionStep>(
+        return SegmentsListView<TreasurySegment, TreasurySection>(
           itemScrollController: itemScrollController,
           items: value,
-          stepBuilder: (context, step) {
-            switch (step) {
-              case DummyTopicStep():
-                return TreasuryDummyTopicStep(step: step);
+          sectionBuilder: (context, data) {
+            switch (data) {
+              case SetupCampaignDetails():
+                return TreasuryCampaignDetailsTile(data);
+              case SetupCampaignStages():
+                return _TreasuryCampaignStagesSection(data);
+              case SetupProposalTemplate():
+                return TreasuryProposalTemplateTile(data);
+              case SetupCampaignCategories():
+                return TreasuryCampaignCategoriesTile(data);
             }
           },
         );
+      },
+    );
+  }
+}
+
+class _TreasuryCampaignStagesSection extends StatelessWidget {
+  final TreasurySection data;
+
+  const _TreasuryCampaignStagesSection(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: SegmentsControllerScope.of(context),
+      builder: (context, sectionsState, child) {
+        final isEditing = sectionsState.isEditing(data.id);
+        return isEditing
+            ? TreasuryCampaignStagesEditTile(data)
+            : TreasuryCampaignStagesViewTile(data);
       },
     );
   }

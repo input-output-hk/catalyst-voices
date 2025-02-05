@@ -20,3 +20,4 @@
 # Rust related
 
 **/target
+**/Cargo.lock

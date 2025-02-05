@@ -12,7 +12,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::{
     db::index::{
-        block::index_block,
+        block::{index_block, roll_forward},
         queries::sync_status::{
             get::{get_sync_status, SyncStatus},
             update::update_sync_status,
@@ -24,10 +24,6 @@ use crate::{
 
 // pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod util;
-
-/// Blocks batch length that will trigger the blocks buffer to be written to the database.
-#[allow(dead_code)]
-const MAX_BLOCKS_BATCH_LEN: usize = 1024;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
 const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
@@ -158,7 +154,7 @@ impl SyncParams {
 
     /// Convert a result back into parameters for a retry.
     fn retry(&self) -> Self {
-        let retry_count = self.retries + 1;
+        let retry_count = self.retries.saturating_add(1);
 
         let mut backoff = None;
 
@@ -200,7 +196,7 @@ impl SyncParams {
         done.first_is_immutable = first_immutable;
         done.last_indexed_block = last;
         done.last_is_immutable = last_immutable;
-        done.total_blocks_synced += synced;
+        done.total_blocks_synced = done.total_blocks_synced.saturating_add(synced);
         done.last_blocks_synced = synced;
 
         done.result = Arc::new(Some(result));
@@ -242,7 +238,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
-        CassandraSession::wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
         info!(chain=%params.chain, params=%params,"Indexing DB is ready");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
@@ -298,7 +294,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
                         first_immutable = last_immutable;
                         first_indexed_block = Some(block.point());
                     }
-                    blocks_synced += 1;
+                    blocks_synced = blocks_synced.saturating_add(1);
                 },
                 cardano_chain_follower::Kind::Rollback => {
                     warn!("TODO: Live Chain rollback");
@@ -377,7 +373,7 @@ impl SyncTask {
         // Wait for indexing DB to be ready before continuing.
         // We do this after the above, because other nodes may have finished already, and we don't
         // want to wait do any work they already completed while we were fetching the blockchain.
-        CassandraSession::wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state");
         self.sync_status = get_sync_status().await;
         debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
@@ -423,7 +419,11 @@ impl SyncTask {
                     } else if let Some(result) = finished.result.as_ref() {
                         match result {
                             Ok(()) => {
-                                self.current_sync_tasks -= 1;
+                                self.current_sync_tasks =
+                                    self.current_sync_tasks.checked_sub(1).unwrap_or_else(|| {
+                                        error!("current_sync_tasks -= 1 overflow");
+                                        0
+                                    });
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
@@ -449,7 +449,7 @@ impl SyncTask {
                 },
             }
 
-            // TODO: IF there is only 1 chain follower left in sync_tasks, then all
+            // IF there is only 1 chain follower left in sync_tasks, then all
             // immutable followers have finished.
             // When this happens we need to purge the live index of any records that exist
             // before the current immutable tip.
@@ -457,6 +457,11 @@ impl SyncTask {
             // want to put a gap in this, so that there are X slots of overlap
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
+            if self.sync_tasks.len() == 1 {
+                if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
+                    error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
+                }
+            }
         }
 
         error!(chain=%self.cfg.chain,"BUG: Sync tasks have all stopped.  This is an unexpected error!");
@@ -472,9 +477,10 @@ impl SyncTask {
         if self.start_slot < self.immutable_tip_slot {
             // Will also break if there are no more slots left to sync.
             while self.current_sync_tasks < self.cfg.sync_tasks {
-                let end_slot = self
-                    .immutable_tip_slot
-                    .min(self.start_slot + self.cfg.sync_chunk_max_slots);
+                let end_slot = self.immutable_tip_slot.min(
+                    self.start_slot
+                        .saturating_add(self.cfg.sync_chunk_max_slots),
+                );
 
                 if let Some((first_point, last_point)) =
                     self.get_syncable_range(self.start_slot, end_slot)
@@ -484,7 +490,7 @@ impl SyncTask {
                         first_point,
                         last_point.clone(),
                     )));
-                    self.current_sync_tasks += 1;
+                    self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
                 }
 
                 // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off

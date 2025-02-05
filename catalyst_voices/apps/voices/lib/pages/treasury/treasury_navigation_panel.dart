@@ -16,8 +16,8 @@ class TreasuryNavigationPanel extends StatelessWidget {
       tabs: [
         SpaceSidePanelTab(
           name: context.l10n.treasuryCampaignBuilderSegments,
-          body: SectionsMenuListener(
-            controller: SectionsControllerScope.of(context),
+          body: SegmentsMenuListener(
+            controller: SegmentsControllerScope.of(context),
           ),
         ),
       ],

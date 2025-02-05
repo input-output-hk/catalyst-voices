@@ -2,7 +2,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_button_affix_decoration.d
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-enum _Variant { primary, neutral, secondary, custom }
+enum _Variant { primary, neutral, secondary, danger, custom }
 
 /// A button that combines a `TextButton` with optional leading and trailing
 /// elements.
@@ -22,8 +22,7 @@ class VoicesTextButton extends StatelessWidget {
   /// The main content of the button.
   final Widget child;
 
-  /// The foreground color of the button.
-  final Color? color;
+  final ButtonStyle? style;
 
   final _Variant _variant;
 
@@ -32,7 +31,7 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.color,
+    this.style,
     required this.child,
   }) : _variant = _Variant.primary;
 
@@ -41,7 +40,7 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.color,
+    this.style,
     required this.child,
   }) : _variant = _Variant.neutral;
 
@@ -50,16 +49,25 @@ class VoicesTextButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.color,
+    this.style,
     required this.child,
   }) : _variant = _Variant.secondary;
+
+  const VoicesTextButton.danger({
+    super.key,
+    this.onTap,
+    this.leading,
+    this.trailing,
+    this.style,
+    required this.child,
+  }) : _variant = _Variant.danger;
 
   const VoicesTextButton.custom({
     super.key,
     this.onTap,
     this.leading,
     this.trailing,
-    required this.color,
+    required this.style,
     required this.child,
   }) : _variant = _Variant.custom;
 
@@ -67,7 +75,7 @@ class VoicesTextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: onTap,
-      style: _buildVariantStyle(context),
+      style: (_buildVariantStyle(context) ?? const ButtonStyle()).merge(style),
       child: VoicesButtonAffixDecoration(
         leading: leading,
         trailing: trailing,
@@ -90,9 +98,10 @@ class VoicesTextButton extends StatelessWidget {
       _Variant.secondary => TextButton.styleFrom(
           foregroundColor: Theme.of(context).colorScheme.secondary,
         ),
-      _Variant.custom => TextButton.styleFrom(
-          foregroundColor: color,
+      _Variant.danger => TextButton.styleFrom(
+          foregroundColor: Theme.of(context).colors.iconsError,
         ),
+      _Variant.custom => null,
     };
   }
 }

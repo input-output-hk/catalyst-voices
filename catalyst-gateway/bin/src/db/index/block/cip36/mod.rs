@@ -1,8 +1,8 @@
 //! Index CIP-36 Registrations.
 
-mod insert_cip36;
-mod insert_cip36_for_vote_key;
-mod insert_cip36_invalid;
+pub(crate) mod insert_cip36;
+pub(crate) mod insert_cip36_for_vote_key;
+pub(crate) mod insert_cip36_invalid;
 
 use std::sync::Arc;
 

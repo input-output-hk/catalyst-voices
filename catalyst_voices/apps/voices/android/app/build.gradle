@@ -30,6 +30,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdkVersion flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -46,7 +47,7 @@ android {
 
     defaultConfig {
         applicationId "io.projectcatalyst.catalyst_voices"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 23 // required by super_native_extensions
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

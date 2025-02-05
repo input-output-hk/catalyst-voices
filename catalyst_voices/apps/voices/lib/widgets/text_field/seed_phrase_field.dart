@@ -92,7 +92,7 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(
-            color: theme.colors.outlineBorder!,
+            color: theme.colors.outlineBorder,
             width: 1.5,
           ),
           borderRadius: BorderRadius.circular(12),

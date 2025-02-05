@@ -3,7 +3,12 @@ import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/slider_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_dialog_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_popup_menu_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_segmented_button_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -84,6 +89,9 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   onErrorVariant: VoicesColors.darkOnErrorVariant,
   errorContainer: VoicesColors.darkErrorContainer,
   onErrorContainer: VoicesColors.darkOnErrorContainer,
+  overlay: Color(0xA610141C),
+  dropShadow: Color(0xA610141C),
+  sysColorsNeutralN60: Color(0xFF7F90B3),
 );
 
 const ColorScheme lightColorScheme = ColorScheme.light(
@@ -166,6 +174,9 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   onErrorVariant: VoicesColors.lightOnErrorVariant,
   errorContainer: VoicesColors.lightErrorContainer,
   onErrorContainer: VoicesColors.lightOnErrorContainer,
+  overlay: Color(0x9904080F),
+  dropShadow: Color(0x9904080F),
+  sysColorsNeutralN60: Color(0xFF7F90B3),
 );
 
 /// [ThemeData] for the `catalyst` brand.
@@ -314,12 +325,12 @@ ThemeData _buildThemeData(
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
-    dialogTheme: DialogTheme(
-      // N10-38
-      barrierColor: const Color(0x212A3D61),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.hardEdge,
-      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv1White,
+    popupMenuTheme: VoicesPopupMenuThemeData(colors: voicesColorScheme),
+    dialogTheme: VoicesDialogTheme(colors: voicesColorScheme),
+    segmentedButtonTheme: VoicesSegmentedButtonTheme(
+      colors: colorScheme,
+      voicesColors: voicesColorScheme,
+      textTheme: textTheme,
     ),
     listTileTheme: ListTileThemeData(
       shape: const StadiumBorder(),
@@ -341,6 +352,7 @@ ThemeData _buildThemeData(
       circularTrackColor: colorScheme.secondaryContainer,
       refreshBackgroundColor: colorScheme.secondaryContainer,
     ),
+    sliderTheme: VoicesSliderThemeData(colors: voicesColorScheme),
     textTheme: textTheme,
     colorScheme: colorScheme,
     iconTheme: IconThemeData(
@@ -356,6 +368,11 @@ ThemeData _buildThemeData(
     ],
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: voicesColorScheme.textPrimary,
+    ),
+    inputDecorationTheme: VoicesInputDecorationTheme(
+      textTheme: textTheme,
+      colorsSchema: colorScheme,
+      colors: voicesColorScheme,
     ),
   ).copyWithButtonsTheme().copyWithTogglesTheme();
 }

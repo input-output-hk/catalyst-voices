@@ -4,15 +4,21 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 extension AccountRoleExt on AccountRole {
-  String getName(BuildContext context) {
-    switch (this) {
-      case AccountRole.voter:
-        return context.l10n.voter;
-      case AccountRole.proposer:
-        return context.l10n.proposer;
-      case AccountRole.drep:
-        return context.l10n.drep;
+  String getName(
+    BuildContext context, {
+    bool addDefaultState = false,
+  }) {
+    var name = switch (this) {
+      AccountRole.voter => context.l10n.voter,
+      AccountRole.proposer => context.l10n.proposer,
+      AccountRole.drep => context.l10n.drep,
+    };
+
+    if (addDefaultState && isDefault) {
+      name = '$name (${context.l10n.defaultRole})';
     }
+
+    return name;
   }
 
   String getVerboseName(BuildContext context) {
@@ -63,20 +69,19 @@ extension AccountRoleExt on AccountRole {
     }
   }
 
-  String get avatarPath {
-    switch (this) {
-      case AccountRole.voter:
-        return VoicesAssets.images.roleInfoVoter.path;
-      case AccountRole.proposer:
-        return VoicesAssets.images.roleInfoProposer.path;
-      case AccountRole.drep:
-        return VoicesAssets.images.roleInfoDrep.path;
-    }
+  SvgGenImage get icon {
+    return switch (this) {
+      AccountRole.voter => VoicesAssets.images.roleVoter,
+      AccountRole.drep => VoicesAssets.images.roleDrep,
+      AccountRole.proposer => VoicesAssets.images.roleProposer,
+    };
   }
 
-  String get icon => switch (this) {
-        AccountRole.voter => VoicesAssets.images.roleVoter.path,
-        AccountRole.proposer => VoicesAssets.images.roleProposer.path,
-        AccountRole.drep => VoicesAssets.images.roleDrep.path,
-      };
+  SvgGenImage get smallIcon {
+    return switch (this) {
+      AccountRole.voter => VoicesAssets.icons.vote,
+      AccountRole.drep => VoicesAssets.icons.documentText,
+      AccountRole.proposer => VoicesAssets.icons.badgeCheck,
+    };
+  }
 }

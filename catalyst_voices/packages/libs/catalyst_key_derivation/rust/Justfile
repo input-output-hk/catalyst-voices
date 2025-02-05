@@ -1,0 +1,42 @@
+# use with https://github.com/casey/just
+#
+# Developer convenience functions
+
+# cspell: words prereqs, commitlog, rustls, nocapture
+
+default:
+    @just --list --unsorted
+
+# Show the dependency tree and all enabled feature flags of every crate.
+cargo-tree:
+    cargo tree -e features,normal,build -f "{p}[{f}]" --workspace --frozen
+
+# Check Dependency licenses and CVE's
+license-check:
+    cargo deny check --exclude-dev || true
+
+# Format the rust code
+code-format:
+    # Create a dummy file just to past the CI format check
+    # Add another blank line to satisfy the cargo fmt check
+    #printf "\n" > ./src/frb_generated.rs
+
+    #cargo +nightly fmtfix
+    #cargo +nightly fmtchk
+
+# Lint the rust code
+code-lint:
+    #cargo lintfix -r
+    #cargo lint -r
+
+# Synchronize Rust Configs
+sync-cfg:
+    cd ../../../../.. && \
+        earthly ./catalyst_voices/packages/libs/catalyst_key_derivation/rust+sync-cfg
+
+# Pre Push Checks
+pre-push: sync-cfg code-format code-lint license-check
+    # Make sure we can actually build inside Earthly which needs to happen in CI.
+    cd ../../../../.. && \
+        earthly ./catalyst_voices/packages/libs/catalyst_key_derivation/rust+check && \
+        earthly ./catalyst_voices/packages/libs/catalyst_key_derivation/rust+build

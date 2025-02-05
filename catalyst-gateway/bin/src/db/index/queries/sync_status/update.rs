@@ -20,7 +20,7 @@ use crate::{
 const INSERT_SYNC_STATUS_QUERY: &str = include_str!("../cql/insert_sync_status.cql");
 
 /// Sync Status Row Record Module
-pub(super) mod row {
+pub(crate) mod row {
     use scylla::{frame::value::CqlTimestamp, DeserializeRow, SerializeRow};
 
     /// Sync Status Record Row (used for both Insert and Query response)
@@ -60,19 +60,17 @@ pub(crate) struct SyncStatusInsertQuery;
 impl SyncStatusInsertQuery {
     /// Prepares a Sync Status Insert query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let sync_status_insert_query = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session,
             INSERT_SYNC_STATUS_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = sync_status_insert_query {
-            error!(error=%error, "Failed to prepare get Sync Status Insert query.");
-        };
-
-        sync_status_insert_query
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare get Sync Status Insert query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_SYNC_STATUS_QUERY}"))
     }
 
     /// Executes a sync status insert query.

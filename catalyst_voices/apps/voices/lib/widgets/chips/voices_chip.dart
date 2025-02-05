@@ -70,7 +70,7 @@ class VoicesChip extends StatelessWidget {
         border: backgroundColor != null
             ? null
             : Border.all(
-                color: Theme.of(context).colors.outlineBorderVariant!,
+                color: Theme.of(context).colors.outlineBorderVariant,
               ),
         borderRadius: borderRadius,
       ),

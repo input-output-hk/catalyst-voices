@@ -47,6 +47,7 @@ class VoicesTextDivider extends StatelessWidget {
           Expanded(child: Divider(indent: indent)),
           SizedBox(width: nameGap),
           DefaultTextStyle(
+            key: const Key('NextStepTitle'),
             style: (theme.textTheme.bodyLarge ?? const TextStyle())
                 .copyWith(color: theme.colors.textOnPrimary),
             child: child,

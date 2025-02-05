@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
-import 'package:catalyst_voices/widgets/common/link_text.dart';
 import 'package:catalyst_voices/widgets/footers/links_page_footer.dart';
+import 'package:catalyst_voices/widgets/text/link_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 

@@ -41,6 +41,7 @@ class SeedPhrasesSequencer extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         SeedPhrasesPicker(
+          key: const Key('SeedPhrasesPicker'),
           words: words,
           selectedWords: selectedWords,
           onWordTap: _selectWord,

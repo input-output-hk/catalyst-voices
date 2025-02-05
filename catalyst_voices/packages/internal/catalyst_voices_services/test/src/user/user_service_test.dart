@@ -1,98 +1,140 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
-  final KeychainProvider provider = VaultKeychainProvider();
-  final UserStorage storage = SecureUserStorage();
+  late final KeychainProvider keychainProvider;
+  late final UserRepository userRepository;
 
   late UserService service;
 
-  setUp(() {
+  setUpAll(() {
+    final store = InMemorySharedPreferencesAsync.empty();
+    SharedPreferencesAsyncPlatform.instance = store;
     FlutterSecureStorage.setMockInitialValues({});
 
-    service = UserService(keychainProvider: provider, userStorage: storage);
+    keychainProvider = VaultKeychainProvider(
+      secureStorage: const FlutterSecureStorage(),
+      sharedPreferences: SharedPreferencesAsync(),
+      cacheConfig: const CacheConfig(),
+    );
+    userRepository = UserRepository(SecureUserStorage(), keychainProvider);
   });
 
-  group('Keychain', () {
-    test('when using keychain getter returns that keychain', () async {
+  setUp(() {
+    service = UserService(
+      userRepository: userRepository,
+    );
+  });
+
+  tearDown(() async {
+    await const FlutterSecureStorage().deleteAll();
+    await SharedPreferencesAsync().clear();
+  });
+
+  group(UserService, () {
+    test('when using account getter returns that account', () async {
       // Given
       final keychainId = const Uuid().v4();
 
       // When
-      final keychain = await provider.create(keychainId);
+      final keychain = await keychainProvider.create(keychainId);
+      final account = Account.dummy(keychain: keychain);
 
-      await service.useKeychain(keychain.id);
+      await service.useAccount(account);
 
       // Then
-      final currentKeychain = service.keychain;
+      final currentAccount = service.account;
 
-      expect(currentKeychain?.id, keychain.id);
+      expect(currentAccount?.catalystId, account.catalystId);
+      expect(currentAccount?.isActive, isTrue);
     });
 
-    test('using different keychain emits update in stream', () async {
+    test('using different account emits update in stream', () async {
       // Given
       final keychainIdOne = const Uuid().v4();
       final keychainIdTwo = const Uuid().v4();
 
       // When
-      final keychainOne = await provider.create(keychainIdOne);
-      final keychainTwo = await provider.create(keychainIdTwo);
+      final keychainOne = await keychainProvider.create(keychainIdOne);
+      final keychainTwo = await keychainProvider.create(keychainIdTwo);
+      final accountOne = Account.dummy(keychain: keychainOne);
+      final accountTwo = Account.dummy(keychain: keychainTwo);
 
-      final keychainStream = service.watchKeychain;
+      final accountStream = service.watchAccount;
 
       // Then
       expect(
-        keychainStream,
+        accountStream,
         emitsInOrder([
           isNull,
-          predicate<Keychain>((e) => e.id == keychainOne.id),
-          predicate<Keychain>((e) => e.id == keychainTwo.id),
+          predicate<Account?>((e) => e?.catalystId == accountOne.catalystId),
+          predicate<Account?>((e) => e?.catalystId == accountTwo.catalystId),
+          predicate<Account?>((e) => e?.catalystId == accountOne.catalystId),
           isNull,
         ]),
       );
 
-      await service.useKeychain(keychainOne.id);
-      await service.useKeychain(keychainTwo.id);
-      await service.removeCurrentKeychain();
+      await service.useAccount(accountOne);
+      await service.useAccount(accountTwo);
+
+      await service.removeAccount(accountTwo);
+      await service.removeAccount(accountOne);
 
       await service.dispose();
     });
 
-    test('keychains getter returns all initialized local instances', () async {
+    test('accounts getter returns all keychains initialized local instances',
+        () async {
       // Given
       final ids = List.generate(5, (_) => const Uuid().v4());
 
       // When
-      final keychains = <Keychain>[];
+      final accounts = <Account>[];
       for (final id in ids) {
-        final keychain = await provider.create(id);
-        keychains.add(keychain);
+        final keychain = await keychainProvider.create(id);
+        final account = Account.dummy(keychain: keychain);
+
+        accounts.add(account);
       }
 
+      await userRepository.saveUser(User.optional(accounts: accounts));
+
       // Then
-      final serviceKeychains = await service.keychains;
+      final user = await service.getUser();
 
-      expect(serviceKeychains.map((e) => e.id), keychains.map((e) => e.id));
+      expect(
+        user.accounts.map((e) => e.catalystId),
+        accounts.map((e) => e.catalystId),
+      );
     });
-  });
 
-  group('Account', () {
-    test('use last account restores previously stored keychain', () async {
+    test('use last account restores previously stored', () async {
       // Given
       final keychainId = const Uuid().v4();
 
       // When
-      final expectedKeychain = await provider.create(keychainId);
+      final keychain = await keychainProvider.create(keychainId);
+      final lastAccount = Account.dummy(
+        keychain: keychain,
+        isActive: true,
+      );
 
-      await storage.setUsedKeychainId(expectedKeychain.id);
+      final user = User.optional(accounts: [lastAccount]);
+      await userRepository.saveUser(user);
 
       await service.useLastAccount();
 
       // Then
-      expect(service.keychain?.id, expectedKeychain.id);
+      expect(service.account, lastAccount);
     });
 
     test('use last account does nothing on clear instance', () async {
@@ -102,7 +144,6 @@ void main() {
       await service.useLastAccount();
 
       // Then
-      expect(service.keychain, isNull);
       expect(service.account, isNull);
     });
 
@@ -111,20 +152,81 @@ void main() {
       final keychainId = const Uuid().v4();
 
       // When
-      final currentKeychain = await provider.create(keychainId);
+      final keychain = await keychainProvider.create(keychainId);
+      final account = Account.dummy(
+        keychain: keychain,
+        isActive: true,
+      );
 
-      await storage.setUsedKeychainId(currentKeychain.id);
+      final user = User.optional(accounts: [account]);
+      await userRepository.saveUser(user);
 
       await service.useLastAccount();
 
       // Then
-      expect(service.keychain, isNotNull);
+      expect(service.account, isNotNull);
 
-      await service.removeCurrentKeychain();
+      await service.removeAccount(account);
 
-      expect(service.keychain, isNull);
-      expect(await currentKeychain.isEmpty, isTrue);
-      expect(await provider.exists(keychainId), isFalse);
+      expect(service.account, isNull);
+      expect(await keychain.isEmpty, isTrue);
+      expect(await keychainProvider.exists(keychainId), isFalse);
+    });
+
+    group('updateSettings', () {
+      test('value is different user is updated correctly', () async {
+        // Given
+        const initialUser = User.empty();
+        const settings = UserSettings(
+          theme: ThemePreferences.dark,
+          timezone: TimezonePreferences.utc,
+        );
+
+        const expectedUser = User(accounts: [], settings: settings);
+
+        // When
+        await userRepository.saveUser(initialUser);
+
+        await service.useLastAccount();
+
+        await service.updateSettings(settings);
+
+        // Then
+        final user = service.user;
+
+        expect(user, expectedUser);
+      });
+
+      test('value is different new user is emitted by stream', () async {
+        // Given
+        const initialUser = User.empty();
+        const settings = UserSettings(
+          theme: ThemePreferences.dark,
+          timezone: TimezonePreferences.utc,
+        );
+
+        const expectedUser = User(accounts: [], settings: settings);
+
+        // When
+        await userRepository.saveUser(initialUser);
+
+        final userStream = service.watchUser;
+
+        expect(
+          userStream,
+          emitsInOrder([
+            initialUser,
+            expectedUser,
+          ]),
+        );
+
+        // Then
+        await service.useLastAccount();
+
+        await service.updateSettings(settings);
+
+        await service.dispose();
+      });
     });
   });
 }

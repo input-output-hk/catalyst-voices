@@ -18,18 +18,20 @@ class RegistrationStageMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final textColor = this.textColor ?? theme.colors.textOnPrimaryLevel0;
+    final textColor = this.textColor ?? theme.colors.textOnPrimaryLevel1;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         DefaultTextStyle(
+          key: const Key('RegistrationDetailsTitle'),
           style: theme.textTheme.titleMedium!.copyWith(color: textColor),
           child: title,
         ),
         SizedBox(height: spacing),
         DefaultTextStyle(
+          key: const Key('RegistrationDetailsBody'),
           style: theme.textTheme.bodyMedium!.copyWith(color: textColor),
           child: subtitle,
         ),

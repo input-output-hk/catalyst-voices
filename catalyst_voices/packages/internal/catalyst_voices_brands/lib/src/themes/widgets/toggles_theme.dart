@@ -12,7 +12,7 @@ extension TogglesTheme on ThemeData {
         fillColor: WidgetStateProperty.resolveWith(
           (states) {
             if (states.contains(WidgetState.disabled)) {
-              return colors.iconsDisabled?.withOpacity(0.32);
+              return colors.iconsDisabled.withOpacity(0.32);
             }
 
             if (states.contains(WidgetState.selected)) {
@@ -78,7 +78,7 @@ extension TogglesTheme on ThemeData {
           (states) {
             if (states.contains(WidgetState.disabled)) {
               return BorderSide(
-                color: colors.onSurfaceNeutral012!,
+                color: colors.onSurfaceNeutral012,
                 width: 2,
               );
             }
@@ -98,7 +98,7 @@ extension TogglesTheme on ThemeData {
             }
 
             return BorderSide(
-              color: colors.outlineBorder!,
+              color: colors.outlineBorder,
               width: 2,
             );
           },
@@ -114,7 +114,7 @@ extension TogglesTheme on ThemeData {
               return colorScheme.primary;
             }
 
-            return colors.outlineBorderVariant?.withOpacity(0.38);
+            return colors.outlineBorderVariant.withOpacity(0.38);
           },
         ),
         trackOutlineColor: WidgetStateProperty.resolveWith(

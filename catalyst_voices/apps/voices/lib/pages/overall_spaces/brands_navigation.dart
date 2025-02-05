@@ -166,7 +166,7 @@ final class _BackgroundColor implements WidgetStateProperty<Color?> {
   @override
   Color? resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.selected)) {
-      return colors.onSurfacePrimaryContainer?.withOpacity(0.12);
+      return colors.onSurfacePrimaryContainer.withOpacity(0.12);
     }
 
     return Colors.transparent;
@@ -181,7 +181,7 @@ final class _ForegroundColor implements WidgetStateProperty<Color?> {
   @override
   Color? resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.disabled)) {
-      return colors.textOnPrimaryLevel0?.withOpacity(0.3);
+      return colors.textOnPrimaryLevel0.withOpacity(0.3);
     }
 
     return colors.textOnPrimaryLevel0;

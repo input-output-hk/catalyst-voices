@@ -47,6 +47,7 @@ class RegistrationTile extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
+                        key: const Key('RegistrationTileTitle'),
                         title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -63,6 +64,10 @@ class RegistrationTile extends StatelessWidget {
                         ),
                     ],
                   ),
+                ),
+                const SizedBox(width: 10),
+                VoicesAssets.icons.chevronRight.buildIcon(
+                  color: foregroundColor,
                 ),
               ],
             ),

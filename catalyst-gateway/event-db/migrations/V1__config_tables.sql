@@ -113,6 +113,24 @@ COMMENT ON INDEX config_idx IS
 'We use three keys combined uniquely rather than forcing string concatenation 
 at the app level to allow for querying groups of data.';
 
+
+-- TODO - Testing purpose, DELETE this part
+
+INSERT INTO config (id1, id2, id3, value)
+VALUES
+(
+  'frontend',
+  '',
+  '',
+  '{
+    "sentry": {
+      "dsn": "https://example.com",
+      "release": "1.0.0",
+      "environment": "dev"
+    }
+  }'
+);
+
 -- -------------------------------------------------------------------------------------------------
 
 -- * Temporary.  

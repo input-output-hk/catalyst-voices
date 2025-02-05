@@ -16,7 +16,7 @@ const INSERT_CIP36_REGISTRATION_QUERY: &str = include_str!("./cql/insert_cip36.c
 
 /// Insert CIP-36 Registration Query Parameters
 #[derive(SerializeRow, Clone)]
-pub(super) struct Params {
+pub(crate) struct Params {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     stake_address: Vec<u8>,
     /// Nonce value after normalization.
@@ -81,10 +81,10 @@ impl Params {
     }
 
     /// Prepare Batch of Insert CIP-36 Registration Index Data Queries
-    pub(super) async fn prepare_batch(
+    pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        let insert_queries = PreparedQueries::prepare_batch(
+        PreparedQueries::prepare_batch(
             session.clone(),
             INSERT_CIP36_REGISTRATION_QUERY,
             cfg,
@@ -92,12 +92,10 @@ impl Params {
             true,
             false,
         )
-        .await;
-
-        if let Err(ref error) = insert_queries {
-            error!(error=%error,"Failed to prepare Insert CIP-36 Registration Query.");
-        };
-
-        insert_queries
+        .await
+        .inspect_err(
+            |error| error!(error=%error,"Failed to prepare Insert CIP-36 Registration Query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_CIP36_REGISTRATION_QUERY}"))
     }
 }

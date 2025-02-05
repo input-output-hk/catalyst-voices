@@ -9,6 +9,8 @@ extension PumpApp on WidgetTester {
     Widget widget, {
     ThemeData? theme,
     VoicesColorScheme voicesColors = const VoicesColorScheme.optional(),
+    Locale? locale,
+    GlobalKey<NavigatorState>? navigatorKey,
   }) {
     final effectiveTheme = (theme ?? ThemeData()).copyWith(
       extensions: [
@@ -18,11 +20,13 @@ extension PumpApp on WidgetTester {
 
     return pumpWidget(
       MaterialApp(
+        navigatorKey: navigatorKey,
         localizationsDelegates: const [
           ...VoicesLocalizations.localizationsDelegates,
           LocaleNamesLocalizationsDelegate(),
         ],
         supportedLocales: VoicesLocalizations.supportedLocales,
+        locale: locale,
         localeListResolutionCallback: basicLocaleListResolution,
         theme: effectiveTheme,
         home: widget,

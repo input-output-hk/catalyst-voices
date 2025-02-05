@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/routes/routing/account_route.dart' as account;
 import 'package:catalyst_voices/routes/routing/coming_soon_route.dart'
     as coming_soon;
-import 'package:catalyst_voices/routes/routing/login_route.dart' as login;
 import 'package:catalyst_voices/routes/routing/overall_spaces_route.dart'
     as overall_spaces;
 import 'package:catalyst_voices/routes/routing/spaces_route.dart' as spaces;
@@ -15,7 +14,6 @@ abstract final class Routes {
   static final List<RouteBase> routes = [
     ...account.$appRoutes,
     ...coming_soon.$appRoutes,
-    ...login.$appRoutes,
     ...spaces.$appRoutes,
     ...overall_spaces.$appRoutes,
   ];

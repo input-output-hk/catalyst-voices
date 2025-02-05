@@ -15,6 +15,7 @@ class GuestMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: const ValueKey('GuestMenuItems'),
       mainAxisSize: MainAxisSize.min,
       children: [
         VoicesNavTile(

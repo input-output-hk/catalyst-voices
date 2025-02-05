@@ -12,15 +12,21 @@ class VoicesSinglePaneDialog extends StatelessWidget {
   final BoxConstraints constraints;
   final Color? backgroundColor;
   final bool showBorder;
-  final VoidCallback? onCancel;
+  final bool showClose;
+  final Alignment closeAlignment;
   final Widget child;
 
   const VoicesSinglePaneDialog({
     super.key,
-    this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    this.constraints = const BoxConstraints(
+      minWidth: 648,
+      maxWidth: 648,
+      minHeight: 256,
+    ),
     this.backgroundColor,
     this.showBorder = false,
-    this.onCancel,
+    this.showClose = true,
+    this.closeAlignment = Alignment.topRight,
     required this.child,
   });
 
@@ -31,10 +37,12 @@ class VoicesSinglePaneDialog extends StatelessWidget {
       showBorder: showBorder,
       constraints: constraints,
       child: Stack(
+        alignment: closeAlignment,
         children: [
           child,
-          _DialogCloseButton(
-            onCancel: onCancel,
+          Offstage(
+            offstage: !showClose,
+            child: const _CloseButton(),
           ),
         ],
       ),
@@ -65,6 +73,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
     return _VoicesDesktopDialog(
       constraints: const BoxConstraints.tightFor(width: 900, height: 600),
       child: Stack(
+        alignment: Alignment.topRight,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -86,7 +95,10 @@ class VoicesTwoPaneDialog extends StatelessWidget {
               ),
             ],
           ),
-          if (showCloseButton) const _DialogCloseButton(),
+          Offstage(
+            offstage: !showCloseButton,
+            child: const _CloseButton(),
+          ),
         ],
       ),
     );
@@ -100,7 +112,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
   final Widget child;
 
   const _VoicesDesktopDialog({
-    this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    required this.constraints,
     this.backgroundColor,
     this.showBorder = false,
     required this.child,
@@ -113,7 +125,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
           ? RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(
-                color: Theme.of(context).colors.outlineBorderVariant!,
+                color: Theme.of(context).colors.outlineBorderVariant,
               ),
             )
           : Theme.of(context).dialogTheme.shape,
@@ -128,12 +140,8 @@ class _VoicesDesktopDialog extends StatelessWidget {
   }
 }
 
-class _DialogCloseButton extends StatelessWidget {
-  final VoidCallback? onCancel;
-
-  const _DialogCloseButton({
-    this.onCancel,
-  });
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
 
   @override
   Widget build(BuildContext context) {
@@ -141,16 +149,13 @@ class _DialogCloseButton extends StatelessWidget {
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
     );
 
-    return Align(
-      alignment: Alignment.topRight,
-      child: IconButtonTheme(
-        data: const IconButtonThemeData(style: buttonStyle),
-        child: XButton(
-          onTap: () {
-            onCancel?.call();
-            unawaited(Navigator.of(context).maybePop());
-          },
-        ),
+    return IconButtonTheme(
+      data: const IconButtonThemeData(style: buttonStyle),
+      child: XButton(
+        key: const Key('DialogCloseButton'),
+        onTap: () {
+          unawaited(Navigator.of(context).maybePop());
+        },
       ),
     );
   }

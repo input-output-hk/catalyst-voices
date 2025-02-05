@@ -39,33 +39,49 @@ abstract class DependencyProvider {
   }
 
   @protected
-  void registerFactory<T extends Object>(ValueGetter<T> factoryFunc) {
-    _getIt.registerFactory(factoryFunc);
+  void registerFactory<T extends Object>(
+    ValueGetter<T> factoryFunc, {
+    String? instanceName,
+  }) {
+    _getIt.registerFactory(
+      factoryFunc,
+      instanceName: instanceName,
+    );
   }
 
   @protected
   void registerLazySingleton<T extends Object>(
     ValueGetter<T> factoryFunc, {
+    String? instanceName,
     DisposingFunc<T>? dispose,
   }) {
     _getIt.registerLazySingleton(
       factoryFunc,
+      instanceName: instanceName,
       dispose: dispose,
     );
   }
 
   @protected
-  void registerSingleton<T extends Object>(T instance) {
-    _getIt.registerSingleton(instance);
+  void registerSingleton<T extends Object>(
+    T instance, {
+    String? instanceName,
+  }) {
+    _getIt.registerSingleton(
+      instance,
+      instanceName: instanceName,
+    );
   }
 
   @protected
   void registerSingletonAsync<T extends Object>(
     ValueGetter<Future<T>> factoryFunc, {
+    String? instanceName,
     Iterable<Type>? dependsOn,
   }) {
     _getIt.registerSingletonAsync(
       factoryFunc,
+      instanceName: instanceName,
       dependsOn: dependsOn,
     );
   }
@@ -73,10 +89,12 @@ abstract class DependencyProvider {
   @protected
   void registerSingletonWithDependencies<T extends Object>(
     FactoryFunc<T> factoryFunc, {
+    String? instanceName,
     required List<Type> dependsOn,
   }) {
     _getIt.registerSingletonWithDependencies(
       factoryFunc,
+      instanceName: instanceName,
       dependsOn: dependsOn,
     );
   }

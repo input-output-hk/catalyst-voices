@@ -25,6 +25,7 @@ class NextStep extends StatelessWidget {
         const SizedBox(height: 12),
         if (data != null) ...[
           Text(
+            key: const Key('NextStepBody'),
             data,
             style: theme.textTheme.bodySmall?.copyWith(color: textColor),
             textAlign: TextAlign.center,

@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/pages/registration/wallet_link/account_role_dialog.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/containers/roles_chooser_container.dart';
@@ -38,7 +37,7 @@ class _BlocRolesChooserContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<
+    return BlocWalletLinkSelector<
         ({
           Set<AccountRole> selected,
           Set<AccountRole> defaultRoles,

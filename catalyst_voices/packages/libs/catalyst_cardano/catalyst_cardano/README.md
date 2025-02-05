@@ -32,6 +32,7 @@ dependencies:
     catalyst_cardano_serialization: any # or the latest version on Pub
     catalyst_cardano: any # or the latest version on Pub
     catalyst_cardano_web: any # or the latest version on Pub
+    catalyst_key_derivation: any # or the latest version on Pub
 ```
 
 ## Web setup
@@ -58,8 +59,11 @@ import 'dart:async';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 
 Future<void> main() async {
+  await CatalystKeyDerivation.init();
+
   final wallets = await CatalystCardano.instance.getWallets();
   if (wallets.isEmpty) {
     // no wallet extension found, please install in your browser

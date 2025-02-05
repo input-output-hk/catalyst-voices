@@ -93,10 +93,10 @@ class VoicesIconButton extends StatelessWidget {
           side: WidgetStateProperty.resolveWith(
             (states) {
               if (states.contains(WidgetState.disabled)) {
-                return BorderSide(color: colors.onSurfaceNeutral012!);
+                return BorderSide(color: colors.onSurfaceNeutral012);
               }
 
-              return BorderSide(color: colors.outlineBorderVariant!);
+              return BorderSide(color: colors.outlineBorderVariant);
             },
           ),
         ),

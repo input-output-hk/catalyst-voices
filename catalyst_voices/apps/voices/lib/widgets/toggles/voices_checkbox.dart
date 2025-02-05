@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/common/label_decorator.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 /// A checkbox widget with optional label, note, and error state.
@@ -26,6 +27,8 @@ class VoicesCheckbox extends StatelessWidget {
   /// An optional widget to display the note text.
   final Widget? note;
 
+  final bool isDisabled;
+
   const VoicesCheckbox({
     super.key,
     required this.value,
@@ -33,23 +36,38 @@ class VoicesCheckbox extends StatelessWidget {
     this.isError = false,
     this.label,
     this.note,
+    this.isDisabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final onChanged = this.onChanged;
 
-    return GestureDetector(
-      onTap: onChanged != null ? () => onChanged(!value) : null,
-      behavior: HitTestBehavior.opaque,
-      child: LabelDecorator(
-        label: label,
-        note: note,
-        child: Checkbox(
-          value: value,
-          // forcing null unwrapping because we're not allowing null value
-          onChanged: onChanged != null ? (value) => onChanged(value!) : null,
-          isError: isError,
+    return AbsorbPointer(
+      absorbing: isDisabled,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: onChanged != null ? () => onChanged(!value) : null,
+          behavior: HitTestBehavior.opaque,
+          child: LabelDecorator(
+            label: label,
+            note: note,
+            spacings: const [12, 8],
+            child: Checkbox(
+              value: value,
+              // forcing null unwrapping because we're not allowing null value
+              onChanged:
+                  onChanged != null ? (value) => onChanged(value!) : null,
+              isError: isError,
+              side: isDisabled
+                  ? BorderSide(
+                      width: 2,
+                      color: Theme.of(context).colors.onSurfaceNeutral012,
+                    )
+                  : null,
+            ),
+          ),
         ),
       ),
     );

@@ -13,6 +13,7 @@ class IndividualPrivateCampaigns extends StatelessWidget {
       children: [
         const SpaceHeader(Space.treasury),
         const SectionHeader(
+          key: ValueKey('Header.treasury'),
           leading: SizedBox(width: 12),
           title: Text('Individual private campaigns'),
         ),

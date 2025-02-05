@@ -8,7 +8,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class RecoverSeedPhrasePanel extends StatelessWidget {
-  final RecoverSeedPhraseStage stage;
+  final RecoverWithSeedPhraseStage stage;
 
   const RecoverSeedPhrasePanel({
     super.key,
@@ -18,14 +18,14 @@ class RecoverSeedPhrasePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (stage) {
-      RecoverSeedPhraseStage.seedPhraseInstructions =>
+      RecoverWithSeedPhraseStage.seedPhraseInstructions =>
         const SeedPhraseInstructionsPanel(),
-      RecoverSeedPhraseStage.seedPhrase => const SeedPhraseInputPanel(),
-      RecoverSeedPhraseStage.accountDetails => const AccountDetailsPanel(),
-      RecoverSeedPhraseStage.unlockPasswordInstructions =>
+      RecoverWithSeedPhraseStage.seedPhrase => const SeedPhraseInputPanel(),
+      RecoverWithSeedPhraseStage.accountDetails => const AccountDetailsPanel(),
+      RecoverWithSeedPhraseStage.unlockPasswordInstructions =>
         const UnlockPasswordInstructionsPanel(),
-      RecoverSeedPhraseStage.unlockPassword => const UnlockPasswordPanel(),
-      RecoverSeedPhraseStage.success => const RestoredPanel(),
+      RecoverWithSeedPhraseStage.unlockPassword => const UnlockPasswordPanel(),
+      RecoverWithSeedPhraseStage.success => const RestoredPanel(),
     };
   }
 }

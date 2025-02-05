@@ -127,8 +127,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                     child: Text(context.l10n.delete),
                   ),
                   const SizedBox(width: 8),
-                  VoicesTextButton.custom(
-                    color: Theme.of(context).colors.iconsError,
+                  VoicesTextButton.danger(
                     onTap: () => Navigator.of(context).pop(),
                     child: Text(context.l10n.cancelButtonText),
                   ),

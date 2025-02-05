@@ -8,9 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    service::common::types::cardano::slot_no::SlotNo,
 };
 
 /// Get invalid registrations from stake addr query.
@@ -28,12 +31,10 @@ pub(crate) struct GetInvalidRegistrationParams {
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(
-        stake_address: Vec<u8>, slot_no: num_bigint::BigInt,
-    ) -> GetInvalidRegistrationParams {
+    pub(crate) fn new(stake_address: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
         Self {
             stake_address,
-            slot_no,
+            slot_no: slot_no.into(),
         }
     }
 }
@@ -58,19 +59,17 @@ pub(crate) struct GetInvalidRegistrationQuery {
 impl GetInvalidRegistrationQuery {
     /// Prepares a get invalid registration query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_invalid_registration_query = PreparedQueries::prepare(
+        PreparedQueries::prepare(
             session,
             GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
-        .await;
-
-        if let Err(ref error) = get_invalid_registration_query {
-            error!(error=%error, "Failed to prepare get registration query.");
-        };
-
-        get_invalid_registration_query
+        .await
+        .inspect_err(|error| error!(error=%error, "Failed to prepare get invalid registration from stake address query."))
+        .map_err(|error| {
+            anyhow::anyhow!("{error}\n--\n{GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY}")
+        })
     }
 
     /// Executes get invalid registration info for given stake addr query.

@@ -1,6 +1,6 @@
 include: package:catalyst_analysis/analysis_options.yaml
 
 analyzer:
-  exclude: [build/**, lib/*.g.dart, lib/generated/**]
+  exclude: [build/**, lib/**.g.dart, lib/generated/**]
   errors:
     public_member_api_docs: ignore

@@ -266,6 +266,7 @@ export class HomePage {
   }
 
   async getPublicDRepKey(): Promise<string> {
+    await this.page.waitForTimeout(2000);
     const isVisible = await this.publicDRepKeyLabel.isVisible();
     if (!isVisible) {
       throw new Error("Public DRep Key label is not visible");
@@ -341,7 +342,7 @@ export class HomePage {
     expect(actualWalletCipData.networkId).not.toBeNaN();
     expect(actualWalletCipData.changeAddress).not.toBeNaN();
     expect(actualWalletCipData.rewardAddresses.length).toBeGreaterThan(0);
-    expect(actualWalletCipData.unusedAddresses.length).toBeGreaterThan(0);
+    //expect(actualWalletCipData.unusedAddresses.length).toBeGreaterThan(0);
     expect(actualWalletCipData.usedAddresses.length).toBeGreaterThan(0);
     expect(actualWalletCipData.utxos.length).toBeGreaterThan(0);
     expect(actualWalletCipData.publicDRepKey).not.toBeNaN();

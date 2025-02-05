@@ -36,7 +36,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Transaction Index within a block.
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub(crate) struct TxnIndex(u16);
 
 /// Is the Slot Number valid?
@@ -129,14 +129,6 @@ impl TryFrom<i16> for TxnIndex {
 impl From<u16> for TxnIndex {
     fn from(value: u16) -> Self {
         Self(value)
-    }
-}
-
-impl TxnIndex {
-    /// Generic conversion of `Option<T>` to `Option<TxnIndex>`.
-    #[allow(dead_code)]
-    pub(crate) fn into_option<T: Into<Self>>(value: Option<T>) -> Option<Self> {
-        value.map(std::convert::Into::into)
     }
 }
 

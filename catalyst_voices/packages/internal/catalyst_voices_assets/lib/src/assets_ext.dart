@@ -144,3 +144,10 @@ extension AssetGenImageExt on AssetGenImage {
     );
   }
 }
+
+extension AssetsIconsGenExt on $AssetsIconsGen {
+  /// Returns the [SvgGenImage] by the asset [name].
+  SvgGenImage getIcon(String name) {
+    return SvgGenImage('assets/icons/$name.svg');
+  }
+}

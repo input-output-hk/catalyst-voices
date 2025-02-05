@@ -10,6 +10,7 @@ class ResizableBoxParent extends StatelessWidget {
   final Widget child;
   final double minWidth;
   final double minHeight;
+  final double iconBottomSpacing;
 
   const ResizableBoxParent({
     super.key,
@@ -18,6 +19,7 @@ class ResizableBoxParent extends StatelessWidget {
     required this.child,
     this.minWidth = 40,
     this.minHeight = 40,
+    this.iconBottomSpacing = 0,
   });
 
   @override
@@ -34,6 +36,7 @@ class ResizableBoxParent extends StatelessWidget {
           minHeight: minHeight,
           resizableHorizontally: resizableHorizontally,
           resizableVertically: resizableVertically,
+          iconBottomSpacing: iconBottomSpacing,
           child: child,
         );
       },
@@ -48,6 +51,7 @@ class _ResizableBox extends StatefulWidget {
   final double minHeight;
   final bool resizableVertically;
   final bool resizableHorizontally;
+  final double iconBottomSpacing;
 
   const _ResizableBox({
     required this.constraints,
@@ -56,6 +60,7 @@ class _ResizableBox extends StatefulWidget {
     required this.minHeight,
     required this.resizableVertically,
     required this.resizableHorizontally,
+    required this.iconBottomSpacing,
   });
 
   @override
@@ -91,7 +96,7 @@ class _ResizableBoxState extends State<_ResizableBox> {
           child: widget.child,
         ),
         Positioned(
-          bottom: 0,
+          bottom: widget.iconBottomSpacing,
           right: 0,
           child: MouseRegion(
             cursor: SystemMouseCursors.resizeDownRight,

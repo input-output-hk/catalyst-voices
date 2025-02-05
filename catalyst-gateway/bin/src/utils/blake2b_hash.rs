@@ -40,6 +40,7 @@ pub(crate) fn generate_uuid_string_from_data(key: &str, data: &[String]) -> Stri
 }
 
 /// 224 Byte Blake2b Hash
+#[allow(dead_code)]
 pub(crate) type Blake2b224 = [u8; 28];
 
 /// Computes a BLAKE2b-224 hash of the input bytes.
@@ -49,6 +50,7 @@ pub(crate) type Blake2b224 = [u8; 28];
 ///
 /// # Returns
 /// An array containing the BLAKE2b-224 hash of the input bytes.
+#[allow(dead_code)]
 pub(crate) fn blake2b_224(input_bytes: &[u8]) -> Blake2b224 {
     // Where we will actually store the bytes we derive the UUID from.
     let mut bytes: Blake2b224 = Blake2b224::default();

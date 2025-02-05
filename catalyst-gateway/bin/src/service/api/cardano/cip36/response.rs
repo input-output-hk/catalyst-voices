@@ -8,7 +8,6 @@ use crate::service::common;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)] // TODO: Remove once endpoint fully implemented
 pub(crate) enum Cip36Registration {
     /// All CIP36 registrations associated with the same Voting Key.
     #[oai(status = 200)]
@@ -31,15 +30,15 @@ pub(crate) struct Cip36RegistrationList {
     /// Errors are reported only if they fall between the last valid registration and this
     /// slot number.
     /// Earlier errors are never reported.
-    slot: common::types::cardano::slot_no::SlotNo,
+    pub slot: common::types::cardano::slot_no::SlotNo,
     /// List of registrations associated with the query.
     #[oai(validator(max_items = "100"))]
-    voting_key: Vec<Cip36RegistrationsForVotingPublicKey>,
+    pub voting_key: Vec<Cip36RegistrationsForVotingPublicKey>,
     /// List of latest invalid registrations that were found, for the requested filter.
     #[oai(skip_serializing_if_is_empty, validator(max_items = "10"))]
-    invalid: Vec<Cip36Details>,
+    pub invalid: Vec<Cip36Details>,
     /// Current Page
-    page: common::objects::generic::pagination::CurrentPage,
+    pub page: Option<common::objects::generic::pagination::CurrentPage>,
 }
 
 impl Example for Cip36RegistrationList {
@@ -48,7 +47,7 @@ impl Example for Cip36RegistrationList {
             slot: (common::types::cardano::slot_no::EXAMPLE + 635).into(),
             voting_key: vec![Cip36RegistrationsForVotingPublicKey::example()],
             invalid: vec![Cip36Details::invalid_example()],
-            page: common::objects::generic::pagination::CurrentPage::example(),
+            page: Some(common::objects::generic::pagination::CurrentPage::example()),
         }
     }
 }
@@ -75,7 +74,7 @@ impl Example for Cip36RegistrationsForVotingPublicKey {
 }
 
 /// CIP36 Registration Data as found on-chain.
-#[derive(Object)]
+#[derive(Object, Clone)]
 #[oai(example = true)]
 pub(crate) struct Cip36Details {
     /// Blocks Slot Number that the registration certificate is in.

@@ -106,7 +106,9 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: VoicesTextFieldValidationResult.success(),
+            validator: (value) {
+              return const VoicesTextFieldValidationResult.success();
+            },
             onFieldSubmitted: (value) {},
           ),
         ),

@@ -2,6 +2,9 @@
 final class CborCustomTags {
   const CborCustomTags._();
 
+  /// A cbor tag describing a uuid.
+  static const int uuid = 37;
+
   /// A cbor tag describing a key-value pairs data.
   static const int map = 259;
 

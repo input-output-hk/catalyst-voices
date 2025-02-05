@@ -41,19 +41,19 @@ extension SpaceExt on Space {
 
   Color backgroundColor(BuildContext context) => switch (this) {
         Space.discovery =>
-          Theme.of(context).colors.iconsSecondary!.withOpacity(0.16),
+          Theme.of(context).colors.iconsSecondary.withOpacity(0.16),
         Space.workspace => Theme.of(context).colorScheme.primaryContainer,
-        Space.voting => Theme.of(context).colors.warningContainer!,
+        Space.voting => Theme.of(context).colors.warningContainer,
         Space.fundedProjects =>
-          Theme.of(context).colors.iconsSecondary!.withOpacity(0.16),
-        Space.treasury => Theme.of(context).colors.successContainer!,
+          Theme.of(context).colors.iconsSecondary.withOpacity(0.16),
+        Space.treasury => Theme.of(context).colors.successContainer,
       };
 
   Color foregroundColor(BuildContext context) => switch (this) {
-        Space.discovery => Theme.of(context).colors.iconsSecondary!,
+        Space.discovery => Theme.of(context).colors.iconsSecondary,
         Space.workspace => Theme.of(context).colorScheme.primary,
-        Space.voting => Theme.of(context).colors.iconsWarning!,
-        Space.fundedProjects => Theme.of(context).colors.iconsSecondary!,
-        Space.treasury => Theme.of(context).colors.iconsSuccess!,
+        Space.voting => Theme.of(context).colors.iconsWarning,
+        Space.fundedProjects => Theme.of(context).colors.iconsSecondary,
+        Space.treasury => Theme.of(context).colors.iconsSuccess,
       };
 }

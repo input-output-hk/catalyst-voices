@@ -33,9 +33,6 @@ class VoicesModalsExample extends StatelessWidget {
                   onUpload: (_) async {
                     await Future<void>.delayed(const Duration(seconds: 2));
                   },
-                  onCancel: () => debugPrint(
-                    'onCancel, we can cancel upload here',
-                  ),
                 );
                 if (file != null) {
                   debugPrint('uploaded file: ${file.name}');
@@ -48,8 +45,14 @@ class VoicesModalsExample extends StatelessWidget {
                 await VoicesDialog.show<void>(
                   context: context,
                   builder: (context) {
-                    return const VoicesDesktopInfoDialog(
-                      title: Text('Desktop modal'),
+                    return VoicesDesktopInfoDialog(
+                      icon: VoicesAssets.icons.x.buildIcon(),
+                      title: const Text('Desktop modal'),
+                      message: const Text('Message'),
+                      action: VoicesFilledButton(
+                        onTap: () {},
+                        child: const Text('Continue'),
+                      ),
                     );
                   },
                 );
@@ -71,7 +74,7 @@ class VoicesModalsExample extends StatelessWidget {
                           color: Theme.of(context).colors.iconsError,
                         ),
                         border: Border.all(
-                          color: Theme.of(context).colors.iconsError!,
+                          color: Theme.of(context).colors.iconsError,
                           width: 3,
                         ),
                       ),

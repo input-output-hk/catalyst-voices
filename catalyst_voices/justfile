@@ -12,6 +12,7 @@ setup-code:
 generate-code: setup-code
     melos l10n
     melos build_runner
+    melos build_runner_repository
     just generate-gateway-services
 
 # Syntax sugar for linking packages and building generated code
@@ -27,13 +28,9 @@ check-code:
 test-code:
     earthly +test-unit
 
-# Generates gateway services in packages/internal/catalyst_voices_services
+# Generates gateway services in packages/internal/catalyst_voices_repositories
 generate-gateway-services:
     cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
-
-# Test generated gateway services
-test-gateway-services:
-    cd .. && earthly ./catalyst_voices+test-flutter-code-generator --platform=linux/amd64
 
 # Pre Push Checks
 pre-push: check-code

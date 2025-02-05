@@ -107,7 +107,6 @@ impl_string_types!(
 
 impl Cip19ShelleyAddress {
     /// Create a new `PaymentAddress`.
-    #[allow(dead_code)]
     pub fn new(address: String) -> Self {
         Cip19ShelleyAddress(address)
     }

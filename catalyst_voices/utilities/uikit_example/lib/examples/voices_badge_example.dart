@@ -10,7 +10,7 @@ class VoicesBadgeExample extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = [
       Theme.of(context).colorScheme.error,
-      Theme.of(context).colors.success!,
+      Theme.of(context).colors.success,
     ];
 
     return Scaffold(

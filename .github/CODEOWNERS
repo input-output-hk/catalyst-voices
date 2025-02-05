@@ -1,9 +1,13 @@
-/athena/ @stevenj @Mr-Leshiy @FelipeRosa @cong-or @saibatizoku
+/athena/ @stevenj @Mr-Leshiy @cong-or @saibatizoku @bkioshn @stanislav-tkach
 
-/catalyst_voices/ @minikin
+/catalyst_voices/ @dtscalac @damian-molinski @LynxLynxx
 
-/catalyst_voices/packages/libs/ @minikin @stevenj
+/catalyst_voices_packages/ @dtscalac @damian-molinski @LynxLynxx
 
-/catalyst-gateway/ @stevenj @Mr-Leshiy @FelipeRosa @cong-or @saibatizoku @minikin
+/catalyst-gateway/ @stevenj @Mr-Leshiy @cong-or @saibatizoku @bkioshn @stanislav-tkach
+
+/catalyst-gateway-crates/ @stevenj @Mr-Leshiy @cong-or @saibatizoku @bkioshn @stanislav-tkach
+
+/docs/ @stevenj @neil-iohk @nathanbogale @minikin
 
 .md  @stevenj @minikin

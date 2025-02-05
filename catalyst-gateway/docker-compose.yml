@@ -1,10 +1,7 @@
-version: "3"
-
 services:
   event-db:
     image: event-db:latest
     environment:
-      # Required environment variables for migrations
       - DB_HOST=localhost
       - DB_PORT=5432
       - DB_NAME=CatalystEventDev
@@ -16,7 +13,6 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
-      - WITH_SEED_DATA=true
     ports:
       - 5432:5432
     healthcheck:

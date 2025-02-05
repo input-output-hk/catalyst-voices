@@ -54,13 +54,9 @@ class AccountRoleDialog extends StatelessWidget {
                     _InfoContainer(
                       child: Column(
                         children: [
-                          ClipOval(
-                            child: CatalystImage.asset(
-                              role.avatarPath,
-                              height: 130,
-                              width: 130,
-                              fit: BoxFit.cover,
-                            ),
+                          role.icon.buildIcon(
+                            size: 120,
+                            allowColorFilter: false,
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -134,7 +130,7 @@ class _InfoContainer extends StatelessWidget {
           color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: Theme.of(context).colors.outlineBorderVariant!,
+            color: Theme.of(context).colors.outlineBorderVariant,
           ),
         ),
         child: child,

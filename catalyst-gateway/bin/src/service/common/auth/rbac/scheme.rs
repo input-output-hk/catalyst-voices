@@ -1,5 +1,5 @@
 //! Catalyst RBAC Security Scheme
-use std::{error::Error, sync::LazyLock, time::Duration};
+use std::{env, error::Error, sync::LazyLock, time::Duration};
 
 use dashmap::DashMap;
 use ed25519_dalek::{VerifyingKey, PUBLIC_KEY_LENGTH};
@@ -48,8 +48,7 @@ static CERTS: LazyLock<DashMap<String, [u8; PUBLIC_KEY_LENGTH]>> = LazyLock::new
     bearer_format = "catalyst-rbac-token",
     checker = "checker_api_catalyst_auth"
 )]
-#[allow(clippy::module_name_repetitions)]
-#[allow(dead_code)]
+#[allow(dead_code, clippy::module_name_repetitions)]
 pub struct CatalystRBACSecurityScheme(pub CatalystRBACTokenV1);
 
 /// Error with the Authorization Token
@@ -102,6 +101,9 @@ const MAX_TOKEN_SKEW: Duration = Duration::from_secs(5 * 60); // 5 minutes
 async fn checker_api_catalyst_auth(
     _req: &Request, bearer: Bearer,
 ) -> poem::Result<CatalystRBACTokenV1> {
+    /// Temporary: Conditional RBAC for testing
+    const RBAC_OFF: &str = "RBAC_OFF";
+
     // First check the token can be deserialized.
     let token = match CatalystRBACTokenV1::decode(&bearer.token) {
         Ok(token) => token,
@@ -110,6 +112,11 @@ async fn checker_api_catalyst_auth(
             error!("Corrupt auth token: {:?}", err);
             Err(AuthTokenError)?
         },
+    };
+
+    // If env var explicitly set by SRE, switch off full verification
+    if env::var(RBAC_OFF).is_ok() {
+        return Ok(token);
     };
 
     // Check if the token is young enough.

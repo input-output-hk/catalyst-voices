@@ -10,10 +10,11 @@
   "ignores": [
     ".config/dictionaries/**",
     "catalyst-gateway/target/**",
-    "CHANGELOG.md",
+    "catalyst_voices/CHANGELOG.md",
     "catalyst_voices/packages/libs/**/CHANGELOG.md",
     "catalyst_voices/packages/libs/**/cargokit/**",
     "catalyst_voices/apps/voices/macos/Pods/**",
+    "catalyst_voices/apps/voices/ios/Pods/**",
     "**/node_modules/**",
     "**/.dart_tool/**"
   ],

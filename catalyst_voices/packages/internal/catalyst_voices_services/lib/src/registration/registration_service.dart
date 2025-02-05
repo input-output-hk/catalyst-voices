@@ -6,7 +6,7 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:logging/logging.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid/uuid.dart';
 
 // TODO(damian-molinski): remove once recover account is implemented
@@ -20,19 +20,12 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 final _logger = Logger('RegistrationService');
 
 abstract interface class RegistrationService {
-  factory RegistrationService({
-    required TransactionConfigRepository transactionConfigRepository,
-    required KeychainProvider keychainProvider,
-    required CatalystCardano cardano,
-    required KeyDerivation keyDerivation,
-  }) {
-    return RegistrationServiceImpl(
-      transactionConfigRepository,
-      keychainProvider,
-      cardano,
-      keyDerivation,
-    );
-  }
+  factory RegistrationService(
+    TransactionConfigRepository transactionConfigRepository,
+    KeychainProvider keychainProvider,
+    CatalystCardano cardano,
+    KeyDerivation keyDerivation,
+  ) = RegistrationServiceImpl;
 
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
@@ -51,13 +44,6 @@ abstract interface class RegistrationService {
   /// Loads account related to this [seedPhrase]. Throws exception if non found.
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
-  });
-
-  /// Creates [Keychain] for given [account] with [lockFactor].
-  Future<Keychain> createKeychainFor({
-    required Account account,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
   });
 
   /// Builds an unsigned registration transaction from given parameters.
@@ -80,6 +66,8 @@ abstract interface class RegistrationService {
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Account> register({
+    required String displayName,
+    required String email,
     required CardanoWallet wallet,
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
@@ -148,13 +136,27 @@ final class RegistrationServiceImpl implements RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    // TODO(dtscalac): support more roles when backend is ready
+    // TODO(damian-molinski): should come from backend
+    const displayName = 'Recovered';
+    const email = 'recovered@iohk.com';
+
+    // TODO(dtscalac): derive a key from the seed phrase and fetch
+    // from the backend info about the registration (roles, wallet, etc).
     final roles = {AccountRole.root};
+
     final keychainId = const Uuid().v4();
+    final keychain = await _keychainProvider.create(keychainId);
+
+    // TODO(damian-molinski): should extracted from role0.
+    //  See [Account.catalystId]
+    final catalystId = 'cardano/$keychainId';
 
     // Note. with rootKey query backend for account details.
     return Account(
-      keychainId: keychainId,
+      catalystId: catalystId,
+      displayName: displayName,
+      email: email,
+      keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),
@@ -162,23 +164,6 @@ final class RegistrationServiceImpl implements RegistrationService {
         address: _testNetAddress,
       ),
     );
-  }
-
-  @override
-  Future<Keychain> createKeychainFor({
-    required Account account,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  }) async {
-    final keychainId = account.keychainId;
-    final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
-
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
-
-    return keychain;
   }
 
   @override
@@ -200,15 +185,10 @@ final class RegistrationServiceImpl implements RegistrationService {
         ),
       );
 
-      final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
-        masterKey: masterKey,
-        // TODO(dtscalac): support more roles when backend is ready
-        role: AccountRole.root,
-      );
-
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: config,
-        keyPair: keyPair,
+        keyDerivation: _keyDerivation,
+        masterKey: masterKey,
         networkId: networkId,
         roles: roles,
         changeAddress: changeAddress,
@@ -226,6 +206,8 @@ final class RegistrationServiceImpl implements RegistrationService {
 
   @override
   Future<Account> register({
+    required String displayName,
+    required String email,
     required CardanoWallet wallet,
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
@@ -256,8 +238,15 @@ final class RegistrationServiceImpl implements RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
+      // TODO(damian-molinski): should extracted from role0.
+      //  See [Account.catalystId]
+      final catalystId = 'cardano/$keychainId';
+
       return Account(
-        keychainId: keychainId,
+        catalystId: catalystId,
+        displayName: displayName,
+        email: email,
+        keychain: keychain,
         roles: roles,
         walletInfo: WalletInfo(
           metadata: WalletMetadata.fromCardanoWallet(wallet),
@@ -278,7 +267,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     required SeedPhrase seedPhrase,
     required LockFactor lockFactor,
   }) async {
-    final roles = {AccountRole.root};
+    final roles = {AccountRole.voter, AccountRole.proposer};
     final masterKey = await deriveMasterKey(seedPhrase: seedPhrase);
 
     final keychain = await _keychainProvider.create(keychainId);
@@ -286,8 +275,13 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
 
+    final catalystId = 'cardano/$keychain';
+
     return Account(
-      keychainId: keychainId,
+      catalystId: catalystId,
+      displayName: 'Dummy',
+      email: 'dummy@iohk.com',
+      keychain: keychain,
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),

@@ -24,11 +24,13 @@ class RegistrationBackNextNavigation extends StatelessWidget {
       spacing: 10,
       children: [
         VoicesBackButton(
+          key: const Key('BackButton'),
           onTap: isBackEnabled
               ? onBackTap ?? () => RegistrationCubit.of(context).previousStep()
               : null,
         ),
         VoicesNextButton(
+          key: const Key('NextButton'),
           onTap: isNextEnabled
               ? onNextTap ?? () => RegistrationCubit.of(context).nextStep()
               : null,

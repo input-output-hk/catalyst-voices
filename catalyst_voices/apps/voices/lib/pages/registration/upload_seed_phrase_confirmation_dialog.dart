@@ -34,7 +34,7 @@ class UploadSeedPhraseConfirmationDialog extends StatelessWidget {
           color: Theme.of(context).colors.iconsError,
         ),
         border: Border.all(
-          color: Theme.of(context).colors.iconsError!,
+          color: Theme.of(context).colors.iconsError,
           width: 3,
         ),
       ),

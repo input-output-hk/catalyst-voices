@@ -1,7 +1,0 @@
-registration_witness = {
-  1 : $stake_witness
-}
-
-$stake_witness /= $ed25519_signature
-; Witness for a stake key credential, not tagged for backward compatibility
-$ed25519_signature /= bytes .size 64

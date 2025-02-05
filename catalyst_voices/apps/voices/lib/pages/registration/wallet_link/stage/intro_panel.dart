@@ -20,6 +20,7 @@ class IntroPanel extends StatelessWidget {
         ),
         const Spacer(),
         VoicesFilledButton(
+          key: const Key('ChooseCardanoWalletButton'),
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
             RegistrationCubit.of(context).nextStep();

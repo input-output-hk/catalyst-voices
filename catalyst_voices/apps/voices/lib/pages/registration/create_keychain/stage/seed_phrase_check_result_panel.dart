@@ -1,7 +1,7 @@
-import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +34,7 @@ class _BlocRegistrationStageMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
         // TODO(damian-molinski): use correct strings when available.
@@ -60,7 +60,7 @@ class _BlocNextStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
         return Offstage(
@@ -79,7 +79,7 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<bool>(
+    return BlocSeedPhraseSelector<bool>(
       selector: (state) => state.areUserWordsCorrect,
       builder: (context, state) {
         return RegistrationBackNextNavigation(

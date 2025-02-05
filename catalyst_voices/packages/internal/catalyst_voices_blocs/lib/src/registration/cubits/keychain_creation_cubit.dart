@@ -4,7 +4,6 @@ import 'dart:convert' show utf8;
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/unlock_password_manager.dart';
-import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -24,7 +23,7 @@ abstract interface class KeychainCreationManager
 
   void setUserSeedPhraseWords(List<SeedPhraseWord> words);
 
-  Future<void> downloadSeedPhrase();
+  Future<void> exportSeedPhrase();
 
   bool areWordsMatching(List<SeedPhraseWord> words);
 }
@@ -33,15 +32,12 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
   final Downloader _downloader;
-  final RegistrationProgressNotifier _progressNotifier;
 
   SeedPhrase? _seedPhrase;
 
   KeychainCreationCubit({
     required Downloader downloader,
-    required RegistrationProgressNotifier progressNotifier,
   })  : _downloader = downloader,
-        _progressNotifier = progressNotifier,
         super(const KeychainStateData());
 
   SeedPhrase? get seedPhrase => _seedPhrase;
@@ -104,7 +100,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   @override
-  Future<void> downloadSeedPhrase() async {
+  Future<void> exportSeedPhrase() async {
     final mnemonic = _seedPhrase?.mnemonic;
     if (mnemonic == null) {
       emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
@@ -139,19 +135,14 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   @override
   void onUnlockPasswordStateChanged(UnlockPasswordState data) {
-    final isPasswordCorrect = data.isNextEnabled;
-    final keychainProgress = isPasswordCorrect
-        ? KeychainProgress(
-            seedPhrase: _seedPhrase!,
-            password: password.value,
-          )
-        : null;
-
-    _progressNotifier.value = _progressNotifier.value.copyWith(
-      keychainProgress: Optional(keychainProgress),
-    );
-
     emit(state.copyWith(unlockPasswordState: data));
+  }
+
+  KeychainProgress createRecoverProgress() {
+    return KeychainProgress(
+      seedPhrase: _seedPhrase!,
+      password: password.value,
+    );
   }
 
   void _buildSeedPhrase() {

@@ -1,43 +1,88 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 /// Determines the state of the user session.
-sealed class SessionState extends Equatable {
-  const SessionState();
-}
+final class SessionState extends Equatable {
+  final SessionStatus status;
 
-/// The user hasn't registered yet nor setup the keychain.
-final class VisitorSessionState extends SessionState {
+  /// Currently used account by this session. Null when not active.
+  final SessionAccount? account;
+
+  /// Whether has unfinished registration.
   final bool isRegistrationInProgress;
 
-  const VisitorSessionState({
-    required this.isRegistrationInProgress,
-  });
+  /// Returns a list of all available spaces
+  /// corresponding to the current session state.
+  final List<Space> spaces;
 
-  @override
-  List<Object?> get props => [
-        isRegistrationInProgress,
-      ];
-}
+  /// Returns a list of [spaces] that should be shown in overall spaces menu.
+  final List<Space> overallSpaces;
 
-/// The user has registered the keychain but it's locked.
-final class GuestSessionState extends SessionState {
-  const GuestSessionState();
+  /// Drawer shortcuts available.
+  final Map<Space, ShortcutActivator> spacesShortcuts;
 
-  @override
-  List<Object?> get props => [];
-}
+  /// On Web it can mean that user don't have valid extensions installed.
+  final bool canCreateAccount;
 
-/// The user has registered and unlocked the keychain.
-final class ActiveAccountSessionState extends SessionState {
-  final Account? account;
+  /// Hold current session settings.
+  final SessionSettings settings;
 
-  const ActiveAccountSessionState({
+  const SessionState({
+    required this.status,
     this.account,
+    this.isRegistrationInProgress = false,
+    required this.spaces,
+    this.overallSpaces = const [],
+    this.spacesShortcuts = const {},
+    this.canCreateAccount = false,
+    this.settings = const SessionSettings.fallback(),
   });
+
+  bool get isVisitor => status == SessionStatus.visitor;
+
+  bool get isGuest => status == SessionStatus.guest;
+
+  bool get isActive => status == SessionStatus.actor;
+
+  const SessionState.initial()
+      : this(
+          status: SessionStatus.visitor,
+          spaces: const [Space.discovery],
+        );
+
+  const SessionState.visitor({
+    required bool canCreateAccount,
+    required bool isRegistrationInProgress,
+    SessionSettings settings = const SessionSettings.fallback(),
+  }) : this(
+          status: SessionStatus.visitor,
+          canCreateAccount: canCreateAccount,
+          isRegistrationInProgress: isRegistrationInProgress,
+          spaces: const [Space.discovery],
+          settings: settings,
+        );
+
+  const SessionState.guest({
+    required bool canCreateAccount,
+    SessionSettings settings = const SessionSettings.fallback(),
+  }) : this(
+          status: SessionStatus.guest,
+          canCreateAccount: canCreateAccount,
+          spaces: const [Space.discovery],
+          settings: settings,
+        );
 
   @override
   List<Object?> get props => [
+        status,
         account,
+        isRegistrationInProgress,
+        spaces,
+        overallSpaces,
+        spacesShortcuts,
+        canCreateAccount,
+        settings,
       ];
 }

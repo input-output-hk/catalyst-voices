@@ -14,6 +14,7 @@ class VotingRounds extends StatelessWidget {
       children: [
         const SpaceHeader(Space.voting),
         const SectionHeader(
+          key: ValueKey('Header.voting'),
           leading: SizedBox(width: 12),
           title: Text('Active funding rounds'),
         ),
