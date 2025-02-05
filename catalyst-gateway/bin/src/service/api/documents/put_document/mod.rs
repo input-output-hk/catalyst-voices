@@ -92,7 +92,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Ok(true) => Responses::Created.into(),
                 Ok(false) => Responses::NoContent.into(),
                 Err(err) if err.is::<StoreError>() => {
-                    Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                    Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                         "Document with the same `id` and `ver` already exists",
                         None,
                     )))
