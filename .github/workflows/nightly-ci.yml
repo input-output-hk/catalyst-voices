@@ -57,13 +57,21 @@ jobs:
             command: run
             args: ./catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/wallet-automation+nightly-test
 
-      - name: Get schemathesis test report
+      - name: Get schemathesis nightly test report
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
         if: always()
         continue-on-error: true
         with:
             command: run
             args: ./catalyst-gateway/tests/schemathesis_tests+nightly-test-draft-schemathesis
+
+      - name: Get schemathesis nightly dev test report
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
+        if: always()
+        continue-on-error: true
+        with:
+            command: run
+            args: ./catalyst-gateway/tests/schemathesis_tests+nightly-test-dev-schemathesis
 
       - name: Get integration tests report
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.1
