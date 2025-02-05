@@ -1,5 +1,5 @@
 version: "3"
-
+name: myproject
 services:
   event-db:
     image: event-db:latest
@@ -27,13 +27,6 @@ services:
 
   cat-gateway:
     image: cat-gateway:latest
-    environment:
-      - DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CAT_ADDRESS=0.0.0.0:3030
-      - LOG_LEVEL=error
-      - DATA_REFRESH_TICK=5
-      - CHECK_CONFIG_TICK=5
-      - MACHINE_ID="UID"
     ports:
       - 3030:3030
     depends_on:

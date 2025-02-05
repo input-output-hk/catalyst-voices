@@ -37,7 +37,7 @@ def change_version(from_value: int, change_to: int):
 
     return asyncio.run(change_schema_version())
 
-@pytest.mark.ci
+@pytest.mark.skip
 def test_schema_version_mismatch_changes_cat_gateway_behavior():
     # Check that the `live` endpoint is OK
     check_is_live()

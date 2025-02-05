@@ -15,11 +15,11 @@ test:
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     COPY ./docker-compose.yml .
-
-    WITH DOCKER \
+    ENV CAT_GATEWAY_URL="https://gateway.dev.projectcatalyst.io/"
+       WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway) \
+        --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest -s -m ci --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
@@ -38,7 +38,7 @@ disabled-nightly-test:
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway) \
+        --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest -s -m nightly --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
