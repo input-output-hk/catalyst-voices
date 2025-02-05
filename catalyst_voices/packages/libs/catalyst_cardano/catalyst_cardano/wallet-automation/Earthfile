@@ -58,7 +58,7 @@ nightly-test:
 #                    curl \
 #                    unzip
 #    DO flutter-installer+INSTALL_CHROME_LINUX64
-    WITH DOCKER --load flutter-ci+install-chrome \
+    WITH DOCKER \
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
         --load test:latest=(+package-test)
