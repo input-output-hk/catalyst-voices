@@ -138,9 +138,4 @@ class _SubmissionCloseAt extends StatelessWidget {
       ],
     );
   }
-
-  String _formattedDate(BuildContext context) {
-    final date = DateFormatter.formatDateTimeParts(dateTime);
-    return context.l10n.dateAtTime(date.date, date.time);
-  }
 }
