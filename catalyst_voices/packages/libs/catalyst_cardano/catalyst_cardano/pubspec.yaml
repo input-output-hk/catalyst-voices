@@ -3,7 +3,7 @@ description: A Flutter plugin exposing the CIP-30 and CIP-95 APIs. Allows to com
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
-version: 0.4.1
+version: 1.0.0
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -16,14 +16,14 @@ flutter:
         default_package: catalyst_cardano_web
 
 dependencies:
-  catalyst_cardano_platform_interface: ^0.4.0+4
-  catalyst_cardano_serialization: ^0.5.0+4
-  catalyst_cardano_web: ^0.4.0+4
+  catalyst_cardano_platform_interface: ^1.0.0
+  catalyst_cardano_serialization: ^1.0.0
+  catalyst_cardano_web: ^1.0.0
   flutter:
     sdk: flutter
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.1
+  catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter
   plugin_platform_interface: ^2.1.7

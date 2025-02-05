@@ -3,6 +3,72 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-02-05
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`catalyst_cardano_serialization` - `v1.0.0`](#catalyst_cardano_serialization---v100)
+ - [`catalyst_analysis` - `v3.0.0`](#catalyst_analysis---v300)
+ - [`catalyst_cardano` - `v1.0.0`](#catalyst_cardano---v100)
+ - [`catalyst_cardano_platform_interface` - `v1.0.0`](#catalyst_cardano_platform_interface---v100)
+ - [`catalyst_cardano_web` - `v1.0.0`](#catalyst_cardano_web---v100)
+ - [`catalyst_compression` - `v1.0.0`](#catalyst_compression---v100)
+ - [`catalyst_compression_platform_interface` - `v1.0.0`](#catalyst_compression_platform_interface---v100)
+ - [`catalyst_compression_web` - `v1.0.0`](#catalyst_compression_web---v100)
+ - [`catalyst_cose` - `v1.0.0`](#catalyst_cose---v100)
+ - [`catalyst_key_derivation` - `v1.0.0`](#catalyst_key_derivation---v100)
+
+---
+
+#### `catalyst_cardano_serialization` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_analysis` - `v3.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_cardano` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_cardano_platform_interface` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_cardano_web` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_compression` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_compression_platform_interface` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_compression_web` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_cose` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+#### `catalyst_key_derivation` - `v1.0.0`
+
+ - Upgrade flutter version to 3.27.3
+
+
 ## 2025-02-04
 
 ### Changes
