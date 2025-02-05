@@ -6,19 +6,11 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::utils::blake2b_hash::blake2b_224;
-
 /// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct PubKey(Vec<u8>);
 
 impl PubKey {
-    /// Get credentials, a blake2b 28 bytes hash of the pub key
-    #[allow(dead_code)]
-    pub(crate) fn get_credentials(&self) -> [u8; 28] {
-        blake2b_224(&self.0)
-    }
-
     /// Get bytes
     pub(crate) fn bytes(&self) -> &[u8] {
         &self.0
@@ -51,21 +43,12 @@ pub(crate) type DateTime = chrono::DateTime<chrono::offset::Utc>;
 /// Slot
 pub(crate) type SlotNumber = i64;
 /// Transaction id
-#[allow(dead_code)]
 pub(crate) type TxId = Vec<u8>;
-/// Stake credential
-#[allow(dead_code)]
-pub(crate) type StakeCredential = Vec<u8>;
 /// Public voting key
-#[allow(dead_code)]
 pub(crate) type PublicVotingInfo = VotingInfo;
 /// Payment address
-#[allow(dead_code)]
 pub(crate) type PaymentAddress = Vec<u8>;
 /// Nonce
 pub(crate) type Nonce = i64;
-/// Metadata 61284
-#[allow(dead_code)]
-pub(crate) type MetadataCip36 = Vec<u8>;
 /// Stake amount.
 pub(crate) type StakeAmount = i64;

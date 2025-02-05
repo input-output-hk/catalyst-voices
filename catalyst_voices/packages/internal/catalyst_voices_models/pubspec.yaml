@@ -8,9 +8,9 @@ environment:
 
 dependencies:
   bip39: ^1.0.6
-  catalyst_cardano: ^0.4.0+3
-  catalyst_cardano_serialization: ^0.5.0+3
-  catalyst_cardano_web: ^0.4.0+3
+  catalyst_cardano: ^0.4.1
+  catalyst_cardano_serialization: ^0.5.0+4
+  catalyst_cardano_web: ^0.4.0+4
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
   collection: ^1.18.0
