@@ -115,7 +115,7 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   }
 
   @override
-  int get hashCode => toBech32().hashCode;
+  int get hashCode => Object.hashAll([...bytes, hrp]);
 
   @override
   bool operator ==(Object other) {
