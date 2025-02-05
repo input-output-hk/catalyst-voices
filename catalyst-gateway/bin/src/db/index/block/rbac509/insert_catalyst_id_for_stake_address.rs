@@ -29,10 +29,6 @@ pub(crate) struct Params {
     txn: DbTxnIndex,
     /// A Catalyst short identifier.
     catalyst_id: String,
-    /// Chain root slot number
-    chain_root_slot: DbSlot,
-    /// Chain root transaction index
-    chain_root_txn: DbTxnIndex,
 }
 
 impl Debug for Params {
@@ -42,8 +38,6 @@ impl Debug for Params {
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .field("catalyst_id", &self.catalyst_id)
-            .field("chain_root_slot", &self.chain_root_slot)
-            .field("chain_root_txn", &self.chain_root_txn)
             .finish()
     }
 }
@@ -52,15 +46,12 @@ impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         stake_addr: DbStakeAddress, slot_no: DbSlot, txn: DbTxnIndex, catalyst_id: String,
-        chain_root_slot: DbSlot, chain_root_txn: DbTxnIndex,
     ) -> Self {
         Params {
             stake_addr,
             slot_no,
             txn,
             catalyst_id,
-            chain_root_slot,
-            chain_root_txn,
         }
     }
 

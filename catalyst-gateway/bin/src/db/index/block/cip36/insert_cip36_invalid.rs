@@ -72,7 +72,6 @@ impl Params {
     /// Create a new Insert Query.
     pub fn new(
         vote_key: Option<&VotingPubKey>, slot_no: DbSlot, txn: DbTxnIndex, cip36: &Cip36,
-        error_report: Vec<String>,
     ) -> Self {
         let stake_address = cip36
             .stake_pk()
@@ -84,6 +83,15 @@ impl Params {
         let payment_address = cip36
             .payment_address()
             .map_or(Vec::new(), ShelleyAddress::to_vec);
+        let error_report = serde_json::to_string(cip36.err_report())
+            .map(|v| vec![v])
+            .unwrap_or_else(|e| {
+                error!(
+                    "Failed to serialize problem report: {e:?}. Report = {:?}",
+                    cip36.err_report()
+                );
+                Vec::new()
+            });
 
         Params {
             stake_address,

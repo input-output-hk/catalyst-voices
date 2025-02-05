@@ -73,6 +73,8 @@ impl Api {
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::chain_root_get::AllResponses {
+        // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
+        // or removed.
         rbac::chain_root_get::endpoint(stake_address).await
     }
 
@@ -107,11 +109,13 @@ impl Api {
         &self,
         /// Role0 key to get the chain root for.
         #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
-        Path(role0_key): Path<String>,
+        Path(_role0_key): Path<String>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
-    ) -> rbac::role0_chain_root_get::AllResponses {
-        rbac::role0_chain_root_get::endpoint(role0_key).await
+    ) -> rbac::chain_root_get::AllResponses {
+        // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
+        // or removed.
+        rbac::chain_root_get::AllResponses::internal_error(&anyhow::anyhow!("Removed"))
     }
 }
 

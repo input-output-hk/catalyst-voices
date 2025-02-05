@@ -3,14 +3,10 @@ INSERT INTO rbac_catalyst_id_for_stake_addr (
     stake_addr,
     slot_no,
     txn,
-    catalyst_id,
-    chain_root_slot,
-    chain_root_txn
+    catalyst_id
 ) VALUES (
     :stake_addr,
     :slot_no,
     :txn,
-    :catalyst_id,
-    :chain_root_slot,
-    :chain_root_txn
+    :catalyst_id
 );

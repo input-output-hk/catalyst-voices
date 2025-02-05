@@ -90,7 +90,6 @@ impl Cip36InsertQuery {
                             slot_no.into(),
                             index.into(),
                             &cip36,
-                            Vec::new(),
                         ));
                     } else {
                         for voting_key in cip36.voting_pks() {
@@ -99,7 +98,6 @@ impl Cip36InsertQuery {
                                 slot_no.into(),
                                 index.into(),
                                 &cip36,
-                                Vec::new(),
                             ));
                             self.for_vote_key
                                 .push(insert_cip36_for_vote_key::Params::new(
