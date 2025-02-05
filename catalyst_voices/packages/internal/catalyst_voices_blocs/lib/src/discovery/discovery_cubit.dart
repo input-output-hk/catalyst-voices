@@ -71,7 +71,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
 
     final categories = isSuccess
         ? List.generate(
-            6, (index) => CampaignCategoryViewModel.dummy(id: index.toString()))
+            6,
+            (index) => CampaignCategoryViewModel.dummy(id: index.toString()),
+          )
         : <CampaignCategoryViewModel>[];
 
     final error = isSuccess ? null : const LocalizedUnknownException();
