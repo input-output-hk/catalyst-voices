@@ -2,6 +2,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.drif
 import 'package:catalyst_voices_repositories/src/database/catalyst_database_config.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
@@ -20,7 +21,7 @@ abstract interface class CatalystDatabase {
   /// itself is not public.
   factory CatalystDatabase.drift({
     required CatalystDriftDatabaseConfig config,
-  }) = DriftCatalystDatabase;
+  }) = DriftCatalystDatabase.withConfig;
 
   /// Contains all operations related to [Document] which is db specific.
   /// Do not confuse it with other documents.
@@ -47,9 +48,12 @@ abstract interface class CatalystDatabase {
 )
 class DriftCatalystDatabase extends $DriftCatalystDatabase
     implements CatalystDatabase {
-  DriftCatalystDatabase({
+  @visibleForTesting
+  DriftCatalystDatabase(super.connection);
+
+  DriftCatalystDatabase.withConfig({
     required CatalystDriftDatabaseConfig config,
-  }) : this._(
+  }) : this(
           driftDatabase(
             name: config.name,
             web: DriftWebOptions(
@@ -62,11 +66,6 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
           ),
         );
 
-  DriftCatalystDatabase._(super.connection);
-
-  @visibleForTesting
-  DriftCatalystDatabase.fromExecutor(QueryExecutor executor) : this._(executor);
-
   @override
   DocumentsDao get documentsDao => driftDocumentsDao;
 
@@ -77,5 +76,10 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
   int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration => destructiveFallback;
+  MigrationStrategy get migration {
+    return DriftMigrationStrategy(
+      database: this,
+      destructiveFallback: destructiveFallback,
+    );
+  }
 }

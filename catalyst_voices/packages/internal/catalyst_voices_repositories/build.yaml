@@ -56,6 +56,15 @@ targets:
               # See modules here https://drift.simonbinder.eu/generation_options/?h=dialect#multi-dialect-code-generation
               modules:
                 - json1
+
+          # To use the make-migrations command
+          databases:
+            catalyst_database: lib/src/database/catalyst_database.dart
+
+          # The directory where the test files are stored:
+          test_dir: test/src/database/migration/
+          # The directory where the schema files are stored:
+          schema_dir: drift_schemas/
       drift_dev:modular:
         enabled: true
         # We use yaml anchors to give the two builders the same options
