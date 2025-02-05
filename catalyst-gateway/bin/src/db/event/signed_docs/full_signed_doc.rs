@@ -49,18 +49,6 @@ impl FullSignedDoc {
         self.body.ver()
     }
 
-    /// Returns the document author.
-    #[allow(dead_code)]
-    pub(crate) fn authors(&self) -> &Vec<String> {
-        self.body.authors()
-    }
-
-    /// Returns the document metadata.
-    #[allow(dead_code)]
-    pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
-        self.body.metadata()
-    }
-
     /// Returns the `SignedDocBody`.
     #[allow(dead_code)]
     pub(crate) fn body(&self) -> &SignedDocBody {
