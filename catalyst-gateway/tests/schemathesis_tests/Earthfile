@@ -1,12 +1,12 @@
 VERSION 0.8
 
-# schemathesis image that targets only production ready endpoints
+# schemathesis image that targets only versioned endpoints
 package-schemathesis:
     FROM python:3.12-alpine3.20
     ARG api_spec
-    ARG wait_for_schema=500
-    ARG max_response_time=5000
-    ARG hypothesis_max_examples=1000
+    ARG wait_for_schema
+    ARG max_response_time
+    ARG hypothesis_max_examples
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG version=3.39.5
     ARG tag="latest"
@@ -34,13 +34,13 @@ package-schemathesis:
 
     SAVE IMAGE schemathesis:$tag
 
-# schemathesis image that targets all the endpoints (draft ones too)
+# schemathesis image that targets all the endpoints in the schema
 package-draft-schemathesis:
     FROM python:3.12-alpine3.20
     ARG api_spec
-    ARG wait_for_schema=120
-    ARG max_response_time=300
-    ARG hypothesis_max_examples=1000
+    ARG wait_for_schema
+    ARG max_response_time
+    ARG hypothesis_max_examples
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG version=3.39.5
     ARG tag="draft-latest"
@@ -66,17 +66,22 @@ package-draft-schemathesis:
 
     SAVE IMAGE schemathesis:$tag
 
-# test-ci-schemathesis - Fuzzy test cat-gateway using openapi specs.
+# test-ci-schemathesis - Runs schemathesis in CI only on versioned endpoints
 test-ci-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG wait_for_schema=500
+    ARG max_response_time=5000
+    ARG hypothesis_max_examples=1000
     ARG seed
 
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
+        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed \
+                                    --wait-for-schema=$wait_for_schema --max-response-time=$max_response_time \
+                                    --hypothesis-max-examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
@@ -96,23 +101,28 @@ test-ci-schemathesis:
             exit 1
     END
 
-# nightly-test-draft-schemathesis - Testing all the endpoints in the api doc
+# nightly-test-draft-schemathesis - Runs schemathesis on nightly testing all the endpoints in the api doc
 nightly-test-draft-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
     COPY schemathesis-docker-compose.yml .
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG wait_for_schema=120
+    ARG max_response_time=300
+    ARG hypothesis_max_examples=1000
     ARG seed
 
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
-        --load schemathesis:latest=(+package-draft-schemathesis --api_spec=$api_spec --seed=$seed) \
+        --load schemathesis:latest=(+package-draft-schemathesis --api_spec=$api_spec --seed=$seed \
+                                    --wait-for-schema=$wait_for_schema --max-response-time=$max_response_time \
+                                    --hypothesis-max-examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-
+        # --no-cache is only for running in nightly - DO NOT use this in CI
         RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
@@ -128,7 +138,7 @@ nightly-test-draft-schemathesis:
             exit 1
     END
 
-# nightly-test-dev-schemathesis - Testing the prod endpoints on dev envrionment
+# nightly-test-dev-schemathesis - Runs schemathesis on nightly testing the versioned endpoints on dev envrionment
 nightly-test-dev-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
@@ -144,7 +154,7 @@ nightly-test-dev-schemathesis:
                                     --wait-for-schema=$wait_for_schema --max-response-time=$max_response_time \
                                     --hypothesis-max-examples=$hypothesis_max_examples) \
                                     --allow-privileged
-
+        # --no-cache is only for running in nightly - DO NOT use this in CI
         RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
