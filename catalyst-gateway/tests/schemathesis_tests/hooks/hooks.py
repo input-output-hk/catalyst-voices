@@ -45,11 +45,11 @@ def negative_data_rejection_custom(ctx, response, case):
     if case.data_generation_method and case.data_generation_method.is_negative:
         # if only headers are included
         if (
-            case.headers
+            case.headers != None
             and case.path_parameters == None
             and case.cookies == None
             and case.query == None
-            and case.body == schemathesis.types.NotSet
+            and isinstance(case.body, schemathesis.types.NotSet)
         ):
             isValid = True
             for name, value in case.headers.items():
