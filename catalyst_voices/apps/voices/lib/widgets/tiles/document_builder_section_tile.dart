@@ -297,9 +297,11 @@ class _PropertyValueBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case DocumentYesNoChoiceSchema():
+      case DocumentGenericBooleanSchema():
+        final castSchema = schema as DocumentBooleanSchema;
         return YesNoChoiceWidget(
-          property: schema.castProperty(property),
-          schema: schema,
+          property: castSchema.castProperty(property),
+          schema: castSchema,
           onChanged: onChanged,
           isEditMode: isEditMode,
         );
@@ -351,28 +353,24 @@ class _PropertyValueBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
-      case DocumentSpdxLicenseOrUrlSchema():
       case DocumentGenericIntegerSchema():
       case DocumentGenericNumberSchema():
-      case DocumentGenericBooleanSchema():
-        return _UnimplementedWidget(schema: schema);
+        return _UnimplementedSchemaWidget(schema: schema);
 
       case DocumentTagGroupSchema():
       case DocumentTagSelectionSchema():
         // DocumentTagGroupSchema and DocumentTagSelectionSchema should
         // be handled by their parent (DocumentSingleGroupedTagSelectorSchema)
         // so the code here should never be executed
-        return _UnimplementedWidget(schema: schema);
+        return _UnimplementedSchemaWidget(schema: schema);
     }
   }
 }
 
-// TODO(dtscalac): remove this widget when all document properties
-// are implemented
-class _UnimplementedWidget extends StatelessWidget {
+class _UnimplementedSchemaWidget extends StatelessWidget {
   final DocumentPropertySchema schema;
 
-  const _UnimplementedWidget({
+  const _UnimplementedSchemaWidget({
     required this.schema,
   });
 

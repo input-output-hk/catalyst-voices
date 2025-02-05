@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 class YesNoChoiceWidget extends StatefulWidget {
   final DocumentValueProperty<bool> property;
-  final DocumentYesNoChoiceSchema schema;
+  final DocumentBooleanSchema schema;
   final ValueChanged<List<DocumentChange>> onChanged;
   final bool isEditMode;
 
