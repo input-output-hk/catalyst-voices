@@ -82,7 +82,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
         ],
         SingleSelectDropdown(
           items: _dropdownMenuEntries,
-          initialValue: _selectedValue,
+          value: _selectedValue,
           onChanged: _handleValueChanged,
           enabled: widget.isEditMode,
         ),
