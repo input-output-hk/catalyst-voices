@@ -1,6 +1,6 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use std::{cmp::Reverse, sync::Arc};
+use std::{cmp::Reverse, sync::Arc, time::Instant};
 
 use futures::StreamExt;
 use tracing::debug;
@@ -345,6 +345,7 @@ pub(crate) async fn get_registration_given_vote_key(
 /// ALL
 /// Get all registrations or constrain if slot# given.
 pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
+    debug!("Time snapshot");
     let all_stakes_and_vote_keys = match get_all_stake_addrs_and_vote_keys(&session.clone()).await {
         Ok(key_pairs) => key_pairs,
         Err(err) => {
@@ -359,6 +360,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     // Iterate through them and individually get all valid and invalid registrations.
     // Compose the result into a snapshot.
     // TODO: Optimize: Can be done parallel.
+    let start = Instant::now();
     for (stake_public_key, vote_pub_key) in &all_stakes_and_vote_keys {
         let mut registrations_for_given_stake_pub_key =
             match get_all_registrations_from_stake_pub_key(&session, stake_public_key.clone()).await
@@ -418,6 +420,8 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         };
         all_invalids_after_filtering.push(invalids_report);
     }
+    let duration = start.elapsed();
+    debug!("Time elapsed in snapshot_function() is: {:?}", duration);
 
     AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
@@ -442,7 +446,6 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36D
 pub async fn get_all_stake_addrs_and_vote_keys(
     session: &Arc<CassandraSession>,
 ) -> Result<Vec<(Ed25519HexEncodedPublicKey, Ed25519HexEncodedPublicKey)>, anyhow::Error> {
-    debug!("Before snapshot");
     let mut stake_addr_iter =
         GetAllStakesAndVoteKeysQuery::execute(session, GetAllStakesAndVoteKeysParams {}).await?;
 
@@ -456,8 +459,6 @@ pub async fn get_all_stake_addrs_and_vote_keys(
 
         vote_key_stake_addr_pair.push((stake_addr, vote_key));
     }
-
-    debug!("After snapshot");
 
     Ok(vote_key_stake_addr_pair)
 }
