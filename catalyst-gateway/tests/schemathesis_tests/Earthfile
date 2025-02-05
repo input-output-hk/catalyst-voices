@@ -80,8 +80,8 @@ test-ci-schemathesis:
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed \
-                                    --wait-for-schema=$wait_for_schema --max-response-time=$max_response_time \
-                                    --hypothesis-max-examples=$hypothesis_max_examples) \
+                                    --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
+                                    --hypothesis_max_examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
@@ -115,8 +115,8 @@ nightly-test-draft-schemathesis:
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-draft-schemathesis --api_spec=$api_spec --seed=$seed \
-                                    --wait-for-schema=$wait_for_schema --max-response-time=$max_response_time \
-                                    --hypothesis-max-examples=$hypothesis_max_examples) \
+                                    --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
+                                    --hypothesis_max_examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
         --service event-db \
@@ -151,8 +151,8 @@ nightly-test-dev-schemathesis:
 
     WITH DOCKER \
         --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed \
-                                    --wait-for-schema=$wait_for_schema --max-response-time=$max_response_time \
-                                    --hypothesis-max-examples=$hypothesis_max_examples) \
+                                    --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
+                                    --hypothesis_max_examples=$hypothesis_max_examples) \
                                     --allow-privileged
         # --no-cache is only for running in nightly - DO NOT use this in CI
         RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
