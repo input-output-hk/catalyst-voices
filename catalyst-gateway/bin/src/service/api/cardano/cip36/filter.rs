@@ -22,9 +22,6 @@ use super::{
 use crate::db::index::{
     queries::registrations::{
         get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
-        get_all_stakes_and_vote_keys::{
-            GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
-        },
         get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
         get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
         get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
@@ -356,51 +353,30 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         },
     };
 
-    let all_stakes_and_vote_keys = match get_all_stake_addrs_and_vote_keys(&session.clone()).await {
-        Ok(key_pairs) => key_pairs,
-        Err(err) => {
-            return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
-        },
-    };
-
     let mut all_registrations_after_filtering = Vec::new();
     let mut all_invalids_after_filtering = Vec::new();
 
     let start = Instant::now();
-    for (stake_public_key, vote_pub_key) in &all_stakes_and_vote_keys {
-        // Collect registrations for given stake pub key
-        let mut registrations_for_given_stake_pub_key =
-            match all_registrations.get(stake_public_key) {
-                Some(r) => r.clone(),
-                None => continue,
-            };
 
-        // check the registrations stake pub key are still actively associated with the voting
-        // key, and have not been registered to another voting key.
-        registrations_for_given_stake_pub_key = check_stake_addr_voting_key_association(
-            registrations_for_given_stake_pub_key,
-            vote_pub_key,
-        );
-
+    for (stake_public_key, registrations) in all_registrations {
         // ALL: Snapshot can be constrained into a subset with a time constraint or NOT.
         if let Some(ref slot_no) = slot_no {
             // Any registrations that occurred after this Slot are not included in the list.
-            let filtered_registrations =
-                slot_filter(registrations_for_given_stake_pub_key, slot_no);
+            let filtered_registrations = slot_filter(registrations, slot_no);
 
             if filtered_registrations.is_empty() {
                 continue;
             }
 
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
-                vote_pub_key: vote_pub_key.clone(),
+                vote_pub_key: stake_public_key.clone(),
                 registrations: filtered_registrations,
             });
         } else {
             // No slot filtering, return ALL registrations without constraints.
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
-                vote_pub_key: vote_pub_key.clone(),
-                registrations: registrations_for_given_stake_pub_key,
+                vote_pub_key: stake_public_key.clone(),
+                registrations,
             });
         }
 
@@ -442,28 +418,6 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36D
         .into_par_iter()
         .filter(|registration| registration.slot_no < *slot_no)
         .collect()
-}
-
-/// Get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)] from cip36
-/// registrations.
-pub async fn get_all_stake_addrs_and_vote_keys(
-    session: &Arc<CassandraSession>,
-) -> Result<Vec<(Ed25519HexEncodedPublicKey, Ed25519HexEncodedPublicKey)>, anyhow::Error> {
-    let mut stake_addr_iter =
-        GetAllStakesAndVoteKeysQuery::execute(session, GetAllStakesAndVoteKeysParams {}).await?;
-
-    let mut vote_key_stake_addr_pair = Vec::new();
-
-    while let Some(row) = stake_addr_iter.next().await {
-        let row = row?;
-
-        let stake_addr = Ed25519HexEncodedPublicKey::try_from(row.stake_address)?;
-        let vote_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key)?;
-
-        vote_key_stake_addr_pair.push((stake_addr, vote_key));
-    }
-
-    Ok(vote_key_stake_addr_pair)
 }
 
 /// Get all cip36 registrations.

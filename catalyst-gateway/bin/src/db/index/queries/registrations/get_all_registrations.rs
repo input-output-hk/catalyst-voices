@@ -20,7 +20,7 @@ const GET_ALL_REGISTRATIONS: &str = include_str!("../cql/get_all_registrations.c
 #[derive(SerializeRow)]
 pub(crate) struct GetAllRegistrationsParams {}
 
-/// Get stakes and vote keys for snapshot.
+/// Get all registration details for snapshot.
 #[derive(DeserializeRow)]
 pub(crate) struct GetAllRegistrationsQuery {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
@@ -42,7 +42,7 @@ pub(crate) struct GetAllRegistrationsQuery {
 }
 
 impl GetAllRegistrationsQuery {
-    /// Prepares get all `stake_addr` paired with vote keys [(`stake_addr,vote_key`)]
+    /// Prepares get all registrations
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session,
