@@ -283,12 +283,12 @@ class _GenericPropertyObjectBuilder extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: showBorder ? const EdgeInsets.all(16) : null,
-      decoration: BoxDecoration(
-        border: showBorder
-            ? Border.all(color: Theme.of(context).dividerColor)
-            : null,
-        borderRadius: showBorder ? BorderRadius.circular(8) : null,
-      ),
+      decoration: showBorder
+          ? BoxDecoration(
+              border: Border.all(color: Theme.of(context).dividerColor),
+              borderRadius: BorderRadius.circular(8),
+            )
+          : null,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

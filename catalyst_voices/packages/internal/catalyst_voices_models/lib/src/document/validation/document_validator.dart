@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_models/src/document/validation/document_validation_result.dart';
+import 'package:collection/collection.dart';
 
 /// Validates [DocumentProperty].
 final class DocumentValidator {
@@ -108,9 +109,15 @@ final class DocumentValidator {
     List<dynamic>? value,
   ) {
     if (schema.uniqueItems && value != null) {
-      final unique = value.length == value.toSet().length;
-      if (!unique) {
-        return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
+      const equality = DeepCollectionEquality();
+      for (var i = 0; i < value.length; i++) {
+        // for every list item lets check if there
+        // are duplicates further in the list
+        for (var j = i + 1; j < value.length; j++) {
+          if (equality.equals(value[i], value[j])) {
+            return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
+          }
+        }
       }
     }
 
