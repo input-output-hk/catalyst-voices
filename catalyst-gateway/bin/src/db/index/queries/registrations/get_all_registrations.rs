@@ -55,7 +55,7 @@ impl GetAllRegistrationsQuery {
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_ALL_REGISTRATIONS}"))
     }
 
-    /// Executes get registration info for given stake addr query.
+    /// Executes get all registrations for snapshot
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetAllRegistrationsParams,
     ) -> anyhow::Result<TypedRowStream<GetAllRegistrationsQuery>> {
