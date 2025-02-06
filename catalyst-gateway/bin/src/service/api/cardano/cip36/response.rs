@@ -77,7 +77,7 @@ impl Example for Cip36RegistrationsForVotingPublicKey {
 }
 
 /// CIP36 Registration Data as found on-chain.
-#[derive(Object, Clone)]
+#[derive(Object, Clone, Debug)]
 #[oai(example = true)]
 pub(crate) struct Cip36Details {
     /// Blocks Slot Number that the registration certificate is in.

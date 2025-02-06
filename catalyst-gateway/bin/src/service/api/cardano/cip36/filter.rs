@@ -2,6 +2,7 @@
 
 use std::{cmp::Reverse, sync::Arc, time::Instant};
 
+use dashmap::DashMap;
 use futures::StreamExt;
 use rayon::prelude::*;
 use tracing::debug;
@@ -368,17 +369,11 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     let start = Instant::now();
     for (stake_public_key, vote_pub_key) in &all_stakes_and_vote_keys {
         // Collect registrations for given stake pub key
-        let mut registrations_for_given_stake_pub_key = all_registrations
-            .clone()
-            .into_par_iter()
-            .filter(|registration| {
-                if let Some(stake_pub_key) = &registration.stake_pub_key {
-                    stake_pub_key == stake_public_key
-                } else {
-                    false
-                }
-            })
-            .collect();
+        let mut registrations_for_given_stake_pub_key =
+            match all_registrations.get(stake_public_key) {
+                Some(r) => r.clone(),
+                None => continue,
+            };
 
         // check the registrations stake pub key are still actively associated with the voting
         // key, and have not been registered to another voting key.
@@ -474,11 +469,12 @@ pub async fn get_all_stake_addrs_and_vote_keys(
 /// Get all cip36 registrations.
 pub async fn get_all_registrations(
     session: &Arc<CassandraSession>,
-) -> Result<Vec<Cip36Details>, anyhow::Error> {
+) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let mut registrations_iter =
         GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams {}).await?;
 
-    let mut registrations = Vec::new();
+    let registrations_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
+
     while let Some(row) = registrations_iter.next().await {
         let row = row?;
 
@@ -496,7 +492,9 @@ pub async fn get_all_registrations(
 
         let cip36 = Cip36Details {
             slot_no: SlotNo::from(slot_no),
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
+            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(
+                row.stake_address.clone(),
+            )?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
             txn: Some(TxnIndex::try_from(row.txn)?),
@@ -506,8 +504,18 @@ pub async fn get_all_registrations(
             errors: vec![],
         };
 
-        registrations.push(cip36);
+        if let Some(mut v) = registrations_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(
+            row.stake_address.clone(),
+        )?) {
+            v.push(cip36);
+            continue;
+        };
+
+        registrations_map.insert(
+            Ed25519HexEncodedPublicKey::try_from(row.stake_address)?,
+            vec![cip36],
+        );
     }
 
-    Ok(registrations)
+    Ok(registrations_map)
 }
