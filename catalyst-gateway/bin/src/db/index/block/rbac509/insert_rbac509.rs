@@ -9,7 +9,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4},
+        types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -21,7 +21,7 @@ const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A Catalyst short identifier.
-    catalyst_id: String,
+    catalyst_id: DbCatalystId,
     /// Transaction ID Hash. 32 bytes.
     transaction_id: DbTransactionHash,
     /// Block Slot Number
@@ -54,8 +54,8 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: String, transaction_id: DbTransactionHash, slot_no: DbSlot, txn: DbTxnIndex,
-        purpose: DbUuidV4, prv_txn_id: Option<DbTransactionHash>,
+        catalyst_id: DbCatalystId, transaction_id: DbTransactionHash, slot_no: DbSlot,
+        txn: DbTxnIndex, purpose: DbUuidV4, prv_txn_id: Option<DbTransactionHash>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map(MaybeUnset::Set).unwrap_or(MaybeUnset::Unset);
 

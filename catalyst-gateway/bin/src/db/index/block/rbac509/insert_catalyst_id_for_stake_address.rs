@@ -10,7 +10,7 @@ use super::TransactionHash;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbStakeAddress, DbTransactionHash, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionHash, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -28,7 +28,7 @@ pub(crate) struct Params {
     /// Transaction Offset inside the block.
     txn: DbTxnIndex,
     /// A Catalyst short identifier.
-    catalyst_id: String,
+    catalyst_id: DbCatalystId,
 }
 
 impl Debug for Params {
@@ -45,7 +45,7 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_addr: DbStakeAddress, slot_no: DbSlot, txn: DbTxnIndex, catalyst_id: String,
+        stake_addr: DbStakeAddress, slot_no: DbSlot, txn: DbTxnIndex, catalyst_id: DbCatalystId,
     ) -> Self {
         Params {
             stake_addr,

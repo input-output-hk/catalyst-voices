@@ -7,9 +7,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::DbCatalystId,
 };
 
 /// Get get chain root by stake address query string.
@@ -20,7 +23,7 @@ const GET_REGISTRATIONS_BY_CHAIN_ROOT_CQL: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetRegistrationsByChainRootQueryParams {
     /// Chain root to get registrations for.
-    pub(crate) chain_root: Vec<u8>,
+    pub(crate) catalyst_id: DbCatalystId,
 }
 
 /// Get chain root by stake address query.

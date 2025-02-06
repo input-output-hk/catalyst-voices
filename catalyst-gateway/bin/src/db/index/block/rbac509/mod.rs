@@ -15,9 +15,11 @@ use c509_certificate::{
     extensions::{alt_name::GeneralNamesOrText, extension::ExtensionValue},
     general_names::general_name::{GeneralNameTypeRegistry, GeneralNameValue},
 };
-use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{MultiEraBlock, Slot, StakeAddress, TransactionHash, TxnIndex};
+use catalyst_types::id_uri::IdUri;
 use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
+use pallas::ledger::addresses::Address;
 use rbac_registration::cardano::cip509::{
     C509Cert, Cip509, Cip509RbacMetadata, KeyLocalRef, LocalRefInt, RoleNumber, X509DerCert,
 };
@@ -45,58 +47,14 @@ pub const SAN_URI: u8 = 134;
 /// Subject Alternative Name OID
 pub(crate) const SUBJECT_ALT_NAME_OID: Oid = oid!(2.5.29 .17);
 
-// TODO: FIXME: Remove these typedefs?
-/// Transaction Id Hash
-type TransactionIdHash = Vec<u8>;
-
-/// Chain Root Hash
-type ChainRootHash = TransactionIdHash;
-
-/// Slot Number
-type SlotNumber = u64;
-
-/// TX Index
-type TxIndex = i16;
-
-/// Role 0 Key
-type Role0Key = Vec<u8>;
-
-/// Stake Address
-type StakeAddress = Vec<u8>;
-
-/// Cached Values for `Role0Key` lookups.
-type Role0KeyValue = (ChainRootHash, SlotNumber, TxIndex);
-
-/// Cached Values for `StakeAddress` lookups.
-type StakeAddressValue = (ChainRootHash, SlotNumber, TxIndex);
-
-/// Cached Chain Root By Transaction ID.
-static CHAIN_ROOT_BY_TXN_ID_CACHE: LazyLock<Cache<TransactionIdHash, ChainRootHash>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            // Set Eviction Policy to `LRU`
-            .eviction_policy(EvictionPolicy::lru())
-            // Create the cache.
-            .build()
-    });
-/// Cached Chain Root By Role 0 Key.
-static CHAIN_ROOT_BY_ROLE0_KEY_CACHE: LazyLock<Cache<Role0Key, Role0KeyValue>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            // Set Eviction Policy to `LRU`
-            .eviction_policy(EvictionPolicy::lru())
-            // Create the cache.
-            .build()
-    });
-/// Cached Chain Root By Stake Address.
-static CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, StakeAddressValue>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            // Set Eviction Policy to `LRU`
-            .eviction_policy(EvictionPolicy::lru())
-            // Create the cache.
-            .build()
-    });
+/// A Catalyst ID by transaction ID cache.
+static CATALYST_ID_BY_TXN_ID_CACHE: LazyLock<Cache<TransactionHash, IdUri>> = LazyLock::new(|| {
+    Cache::builder()
+        // Set Eviction Policy to `LRU`
+        .eviction_policy(EvictionPolicy::lru())
+        // Create the cache.
+        .build()
+});
 
 /// Index RBAC 509 Registration Query Parameters
 pub(crate) struct Rbac509InsertQuery {
@@ -105,9 +63,9 @@ pub(crate) struct Rbac509InsertQuery {
     /// Invalid RBAC Registration Data.
     invalid: Vec<insert_rbac509_invalid::Params>,
     /// Chain Root For Transaction ID Data captured during indexing.
-    chain_root_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
+    catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
     /// Chain Root For Stake Address Data captured during indexing.
-    chain_root_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -116,8 +74,8 @@ impl Rbac509InsertQuery {
         Rbac509InsertQuery {
             registrations: Vec::new(),
             invalid: Vec::new(),
-            chain_root_for_txn_id: Vec::new(),
-            chain_root_for_stake_address: Vec::new(),
+            catalyst_id_for_txn_id: Vec::new(),
+            catalyst_id_for_stake_address: Vec::new(),
         }
     }
 
@@ -169,7 +127,7 @@ impl Rbac509InsertQuery {
             );
         }
 
-        let Some(catalyst_id) = catalyst_id(&cip509) else {
+        let Some(catalyst_id) = catalyst_id(&cip509, txn_hash) else {
             error!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
             return;
         };
@@ -177,19 +135,36 @@ impl Rbac509InsertQuery {
         let previous_transaction = cip509.previous_transaction();
         let purpose = cip509.purpose();
         match cip509.consume() {
-            Ok((purpose, ..)) => {
+            Ok((purpose, metadata, _)) => {
                 self.registrations.push(insert_rbac509::Params::new(
-                    catalyst_id,
+                    catalyst_id.clone().into(),
                     txn_hash.into(),
                     slot.into(),
                     index.into(),
                     purpose.into(),
                     previous_transaction.map(Into::into),
                 ));
+                self.catalyst_id_for_txn_id
+                    .push(insert_catalyst_id_for_txn_id::Params::new(
+                        catalyst_id.clone().into(),
+                        txn_hash.into(),
+                        slot.into(),
+                        index.into(),
+                    ));
+                for address in stake_addresses(&metadata) {
+                    self.catalyst_id_for_stake_address.push(
+                        insert_catalyst_id_for_stake_address::Params::new(
+                            address,
+                            slot.into(),
+                            index.into(),
+                            catalyst_id.clone().into(),
+                        ),
+                    );
+                }
             },
             Err(report) => {
                 self.invalid.push(insert_rbac509_invalid::Params::new(
-                    catalyst_id,
+                    catalyst_id.into(),
                     txn_hash.into(),
                     slot.into(),
                     index.into(),
@@ -199,57 +174,6 @@ impl Rbac509InsertQuery {
                 ));
             },
         }
-
-        // TODO: FIXME: Cache.
-
-        // TODO: FIXME: Remove
-        // if let Some((rbac, chain_root)) =
-        //     rbac_metadata(session, txn_hash, txn_idx, slot_no, block).await
-        // {
-        //     self.registrations.push(insert_rbac509::Params::new(
-        //         chain_root.txn_hash,
-        //         txn_hash,
-        //         slot_no,
-        //         txn_idx,
-        //         &rbac.cip509,
-        //     ));
-        //
-        //     // TODO: Create a getter, should not need to access public properties like
-        // this.     let rbac_metadata = &rbac.cip509.x509_chunks.0;
-        //     if let Some(role_set) = &rbac_metadata.role_set {
-        //         // TODO: Change RoleSet to be a map, so we don't have to iterate here.
-        //         for role in role_set.iter().filter(|role| role.role_number == 0) {
-        //             // Index Role 0 data
-        //             if let Some(Role0CertificateData {
-        //                 role0_key,
-        //                 stake_addresses,
-        //             }) = role
-        //                 .role_signing_key
-        //                 .as_ref()
-        //                 .and_then(|key_reference| extract_role0_data(key_reference,
-        // rbac_metadata))             {
-        //                 CHAIN_ROOT_BY_ROLE0_KEY_CACHE
-        //                     .insert(role0_key.clone(), (chain_root.clone(), slot_no,
-        // txn_idx));                 if let Some(stake_addresses) =
-        // stake_addresses {                     for stake_address in
-        // stake_addresses {
-        // CHAIN_ROOT_BY_STAKE_ADDRESS_CACHE.insert(
-        // stake_address.clone(),                             (chain_root.clone(),
-        // slot_no, txn_idx),                         );
-        //                         self.chain_root_for_stake_address.push(
-        //                             insert_chain_root_for_stake_address::Params::new(
-        //                                 &stake_address,
-        //                                 &chain_root,
-        //                                 slot_no,
-        //                                 txn_idx,
-        //                             ),
-        //                         );
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
     }
 
     /// Execute the RBAC 509 Registration Indexing Queries.
@@ -276,25 +200,25 @@ impl Rbac509InsertQuery {
             }));
         }
 
-        if !self.chain_root_for_txn_id.is_empty() {
+        if !self.catalyst_id_for_txn_id.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::ChainRootForTxnIdInsertQuery,
-                        self.chain_root_for_txn_id,
+                        PreparedQuery::CatalystIdForTxnIdInsertQuery,
+                        self.catalyst_id_for_txn_id,
                     )
                     .await
             }));
         }
 
-        if !self.chain_root_for_stake_address.is_empty() {
+        if !self.catalyst_id_for_stake_address.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::ChainRootForStakeAddressInsertQuery,
-                        self.chain_root_for_stake_address,
+                        PreparedQuery::CatalystIdForStakeAddressInsertQuery,
+                        self.catalyst_id_for_stake_address,
                     )
                     .await
             }));
@@ -304,15 +228,50 @@ impl Rbac509InsertQuery {
     }
 }
 
-/// Gets a catalyst id of the given registration.
-fn catalyst_id(cip509: &Cip509) -> Option<String> {
-    match cip509.previous_transaction() {
-        Some(previous) => {
-            // TODO: FIXME: Query from database and cache.
-            None
-        },
-        None => cip509.catalyst_id().map(|id| id.as_short_id().to_string()),
+/// Returns a Catalyst ID of the given registration.
+fn catalyst_id(cip509: &Cip509, txn_hash: TransactionHash) -> Option<IdUri> {
+    let id = match cip509.previous_transaction() {
+        Some(previous) => catalyst_id_from_tx(&previous)?,
+        None => cip509.catalyst_id()?.as_short_id(),
+    };
+
+    CATALYST_ID_BY_TXN_ID_CACHE.insert(txn_hash, id.clone());
+    Some(id)
+}
+
+/// Finds a Catalyst ID of the given transaction in the cache or database.
+fn catalyst_id_from_tx(txn_hash: &TransactionHash) -> Option<IdUri> {
+    if let Some(id) = CATALYST_ID_BY_TXN_ID_CACHE.get(txn_hash) {
+        return Some(id);
+    };
+
+    // TODO: FIXME: Try to get from database.
+
+    todo!()
+}
+
+// TODO: FIXME: Fix stake address type
+fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<StakeAddress> {
+    let mut result = Vec::new();
+
+    if let Some(uris) = metadata.certificate_uris.x_uris().get(&0) {
+        result.extend(uris.into_iter().filter_map(|uri| {
+            match uri.address() {
+                Address::Stake(a) => Some(a.to_owned()),
+                _ => None,
+            }
+        }));
     }
+    if let Some(uris) = metadata.certificate_uris.c_uris().get(&0) {
+        result.extend(uris.into_iter().filter_map(|uri| {
+            match uri.address() {
+                Address::Stake(a) => Some(a.to_owned()),
+                _ => None,
+            }
+        }));
+    }
+
+    result
 }
 
 // /// Role0 Certificate Data.

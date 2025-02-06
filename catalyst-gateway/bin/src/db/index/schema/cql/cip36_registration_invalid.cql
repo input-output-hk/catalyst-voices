@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS cip36_registration_invalid (
     nonce               varint,     -- Nonce that has been slot corrected.
     cip36               boolean,    -- True if CIP-36 Registration format used. CIP-15 = False.
     signed              boolean,    -- Signature validates.
-    error_report        list<text>, -- List of serialization errors in the registration.
+    error_report        text,       -- JSON encoded string of errors in the registration.
 
     PRIMARY KEY (stake_address, slot_no, txn)
 )

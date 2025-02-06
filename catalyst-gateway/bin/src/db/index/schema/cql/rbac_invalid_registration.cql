@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS rbac_invalid_registration (
     -- Non-Key Data
     prv_txn_id          blob,           -- 32 Bytes from Previous Transaction Hash.
     purpose             uuid,           -- 16 Bytes of UUIDv4 Purpose.
-    problem_report      text,           -- List of errors in the registration.
+    problem_report      text,           -- JSON encoded string of errors in the registration.
 
     PRIMARY KEY (catalyst_id, transaction_id, slot_no, txn)
 )

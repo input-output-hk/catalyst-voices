@@ -22,7 +22,7 @@ use crate::{
 };
 
 pub(crate) mod result {
-    //! Return values for RBAC 509 registration purge queries.
+    //! Return values for RBAC 509 invalid registration purge queries.
 
     use crate::db::types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4};
 
@@ -36,8 +36,8 @@ pub(crate) mod result {
     );
 }
 
-/// Select primary keys for RBAC 509 registration.
-const SELECT_QUERY: &str = include_str!("./cql/get_rbac509_registration.cql");
+/// Select primary keys for RBAC 509 invalid registration.
+const SELECT_QUERY: &str = include_str!("./cql/get_rbac509_invalid_registration.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
@@ -77,11 +77,11 @@ impl From<result::PrimaryKey> for Params {
         }
     }
 }
-/// Get primary key for RBAC 509 registration query.
+/// Get primary key for RBAC 509 invalid registration query.
 pub(crate) struct PrimaryKeyQuery;
 
 impl PrimaryKeyQuery {
-    /// Prepares a query to get all RBAC 509 registration primary keys.
+    /// Prepares a query to get all RBAC 509 invalid registration primary keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session.clone(),
@@ -89,14 +89,14 @@ impl PrimaryKeyQuery {
             scylla::statement::Consistency::All,
             true,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get RBAC 509 registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare get RBAC 509 invalid registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
-    /// Executes a query to get all RBAC 509 registration primary keys.
+    /// Executes a query to get all RBAC 509 invalid registration primary keys.
     pub(crate) async fn execute(
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
@@ -109,10 +109,10 @@ impl PrimaryKeyQuery {
     }
 }
 
-/// Delete RBAC 509 registration
-const DELETE_QUERY: &str = include_str!("./cql/delete_rbac509_registration.cql");
+/// Delete RBAC 509 invalid registration
+const DELETE_QUERY: &str = include_str!("./cql/delete_rbac509_invalid_registration.cql");
 
-/// Delete RBAC 509 registration Query
+/// Delete RBAC 509 invalid registration Query
 pub(crate) struct DeleteQuery;
 
 impl DeleteQuery {
@@ -128,11 +128,11 @@ impl DeleteQuery {
             true,
             false,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare delete RBAC 509 registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare delete RBAC 509 invalid registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query

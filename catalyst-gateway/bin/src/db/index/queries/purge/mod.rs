@@ -5,6 +5,7 @@ pub(crate) mod chain_root_for_txn_id;
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod cip36_registration_invalid;
+pub(crate) mod rbac509_invalid_registration;
 pub(crate) mod rbac509_registration;
 pub(crate) mod stake_registration;
 pub(crate) mod txi_by_hash;

@@ -7,7 +7,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbTransactionHash, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -21,7 +21,7 @@ pub(crate) struct Params {
     /// Transaction ID Hash. 32 bytes.
     transaction_id: DbTransactionHash,
     /// A Catalyst short identifier.
-    catalyst_id: String,
+    catalyst_id: DbCatalystId,
     /// Slot Number the chain root is in.
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -42,7 +42,8 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: &str, transaction_id: DbTransactionHash, slot_no: DbSlot, txn_idx: DbTxnIndex,
+        catalyst_id: DbCatalystId, transaction_id: DbTransactionHash, slot_no: DbSlot,
+        txn_idx: DbTxnIndex,
     ) -> Self {
         Params {
             transaction_id,

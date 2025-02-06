@@ -68,9 +68,9 @@ pub(crate) enum PreparedQuery {
     /// Invalid RBAC 509 registration Insert query.
     Rbac509InvalidInsertQuery,
     /// Chain Root For Transaction ID Insert query.
-    ChainRootForTxnIdInsertQuery,
+    CatalystIdForTxnIdInsertQuery,
     /// Chain Root For Stake Address Insert query.
-    ChainRootForStakeAddressInsertQuery,
+    CatalystIdForStakeAddressInsertQuery,
 }
 
 /// All prepared SELECT query statements (return data).
@@ -135,11 +135,11 @@ pub(crate) struct PreparedQueries {
     /// RBAC 509 Registrations.
     rbac509_registration_insert_queries: SizedBatch,
     /// Invalid RBAC 509 registrations.
-    rbac509_registration_invalid_insert_queries: SizedBatch,
+    rbac509_invalid_registration_insert_queries: SizedBatch,
     /// Chain Root for TX ID Insert Query..
-    chain_root_for_txn_id_insert_queries: SizedBatch,
+    catalyst_id_for_txn_id_insert_queries: SizedBatch,
     /// Chain Root for Stake Address Insert Query..
-    chain_root_for_stake_address_insert_queries: SizedBatch,
+    catalyst_id_for_stake_address_insert_queries: SizedBatch,
     /// Get native assets by stake address query.
     native_assets_by_stake_address_query: PreparedStatement,
     /// Get registrations
@@ -214,7 +214,7 @@ impl PreparedQueries {
 
         let (
             rbac509_registration_insert_queries,
-            rbac509_registration_invalid_insert_queries,
+            rbac509_invalid_registration_insert_queries,
             chain_root_for_txn_id_insert_queries,
             chain_root_for_stake_address_insert_queries,
         ) = all_rbac_queries?;
@@ -233,7 +233,7 @@ impl PreparedQueries {
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
             rbac509_registration_insert_queries,
-            rbac509_registration_invalid_insert_queries,
+            rbac509_invalid_registration_insert_queries,
             chain_root_for_txn_id_insert_queries,
             chain_root_for_stake_address_insert_queries,
             native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
@@ -373,13 +373,13 @@ impl PreparedQueries {
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
             PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
             PreparedQuery::Rbac509InvalidInsertQuery => {
-                &self.rbac509_registration_invalid_insert_queries
+                &self.rbac509_invalid_registration_insert_queries
             },
-            PreparedQuery::ChainRootForTxnIdInsertQuery => {
-                &self.chain_root_for_txn_id_insert_queries
+            PreparedQuery::CatalystIdForTxnIdInsertQuery => {
+                &self.catalyst_id_for_txn_id_insert_queries
             },
-            PreparedQuery::ChainRootForStakeAddressInsertQuery => {
-                &self.chain_root_for_stake_address_insert_queries
+            PreparedQuery::CatalystIdForStakeAddressInsertQuery => {
+                &self.catalyst_id_for_stake_address_insert_queries
             },
         };
         session_execute_batch(session, query_map, cfg, query, values).await
