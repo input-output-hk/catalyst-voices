@@ -3,6 +3,7 @@
 use std::{cmp::Reverse, sync::Arc, time::Instant};
 
 use futures::StreamExt;
+use rayon::prelude::*;
 use tracing::debug;
 
 use super::{
@@ -168,7 +169,7 @@ fn check_stake_addr_voting_key_association(
     registrations: Vec<Cip36Details>, associated_voting_key: &Ed25519HexEncodedPublicKey,
 ) -> Vec<Cip36Details> {
     registrations
-        .into_iter()
+        .into_par_iter()
         .filter(|registration| cross_reference_key(associated_voting_key, registration))
         .collect()
 }
@@ -436,7 +437,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
 /// Filter out any registrations that occurred after this Slot no
 fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36Details> {
     registrations
-        .into_iter()
+        .into_par_iter()
         .filter(|registration| registration.slot_no < *slot_no)
         .collect()
 }

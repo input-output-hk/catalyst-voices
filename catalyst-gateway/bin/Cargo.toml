@@ -98,6 +98,7 @@ mime = "0.3.17"
 stats_alloc = "0.1.10"
 memory-stats = "1.0.0"
 minicbor = "0.25.1"
+rayon = "1.10"
 
 [dev-dependencies]
 proptest = "1.5.0"
