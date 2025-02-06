@@ -88,15 +88,15 @@ final class DocumentValidator {
 
   static DocumentValidationResult validateListItemsRange(
     DocumentListSchema schema,
-    List<dynamic>? value,
+    List<dynamic>? values,
   ) {
     final itemsRange = schema.itemsRange;
-    if (itemsRange != null && value != null) {
-      if (!itemsRange.contains(value.length)) {
+    if (itemsRange != null && values != null) {
+      if (!itemsRange.contains(values.length)) {
         return DocumentItemsOutOfRange(
           invalidNodeId: schema.nodeId,
           expectedRange: itemsRange,
-          actualItems: value.length,
+          actualItems: values.length,
         );
       }
     }
@@ -106,15 +106,15 @@ final class DocumentValidator {
 
   static DocumentValidationResult validateListItemsUnique(
     DocumentListSchema schema,
-    List<dynamic>? value,
+    List<dynamic>? values,
   ) {
-    if (schema.uniqueItems && value != null) {
+    if (schema.uniqueItems && values != null) {
       const equality = DeepCollectionEquality();
-      for (var i = 0; i < value.length; i++) {
+      for (var i = 0; i < values.length; i++) {
         // for every list item lets check if there
         // are duplicates further in the list
-        for (var j = i + 1; j < value.length; j++) {
-          if (equality.equals(value[i], value[j])) {
+        for (var j = i + 1; j < values.length; j++) {
+          if (equality.equals(values[i], values[j])) {
             return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
           }
         }

@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
-import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -98,57 +97,48 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
           builder: (field) {
             final state = field as _DropdownFormFieldState<T>;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(),
-                  child: DropdownMenu(
-                    controller: state._controller,
-                    expandedInsets: EdgeInsets.zero,
-                    initialSelection: state.value,
-                    enabled: enabled,
-                    hintText: hintText,
-                    dropdownMenuEntries: items,
-                    onSelected: field.didChange,
-                    inputDecorationTheme: InputDecorationTheme(
-                      hintStyle: Theme.of(field.context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(
+            return ConstrainedBox(
+              constraints: const BoxConstraints(),
+              child: DropdownMenu(
+                controller: state._controller,
+                expandedInsets: EdgeInsets.zero,
+                initialSelection: state.value,
+                enabled: enabled,
+                hintText: hintText,
+                dropdownMenuEntries: items,
+                onSelected: field.didChange,
+                inputDecorationTheme: InputDecorationTheme(
+                  hintStyle:
+                      Theme.of(field.context).textTheme.bodyLarge?.copyWith(
                             color: Theme.of(field.context).colors.textDisabled,
                           ),
-                      fillColor: Theme.of(field.context)
-                          .colors
-                          .elevationsOnSurfaceNeutralLv1Grey,
-                      filled: true,
-                      enabledBorder: _border(field.context),
-                      disabledBorder: _border(field.context),
-                      focusedBorder: _border(field.context),
-                    ),
-                    // using visibility so that the widget reserves
-                    // the space for the icon, otherwise when widget changes
-                    // to edits mode it expands to make space for the icon
-                    trailingIcon: Visibility.maintain(
-                      visible: enabled,
-                      child: VoicesAssets.icons.chevronDown.buildIcon(),
-                    ),
-                    selectedTrailingIcon:
-                        VoicesAssets.icons.chevronUp.buildIcon(),
-                    menuStyle: MenuStyle(
-                      backgroundColor: WidgetStatePropertyAll(
-                        Theme.of(field.context)
-                            .colors
-                            .elevationsOnSurfaceNeutralLv1Grey,
-                      ),
-                      maximumSize:
-                          const WidgetStatePropertyAll(Size.fromHeight(350)),
-                    ),
-                  ),
+                  fillColor: Theme.of(field.context)
+                      .colors
+                      .elevationsOnSurfaceNeutralLv1Grey,
+                  filled: true,
+                  enabledBorder: _border(field.context),
+                  disabledBorder: _border(field.context),
+                  focusedBorder: _border(field.context),
                 ),
-                if (field.hasError) DocumentErrorText(text: field.errorText),
-              ],
+                errorText: enabled ? field.errorText : null,
+                // using visibility so that the widget reserves
+                // the space for the icon, otherwise when widget changes
+                // to edits mode it expands to make space for the icon
+                trailingIcon: Visibility.maintain(
+                  visible: enabled,
+                  child: VoicesAssets.icons.chevronDown.buildIcon(),
+                ),
+                selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
+                menuStyle: MenuStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(field.context)
+                        .colors
+                        .elevationsOnSurfaceNeutralLv1Grey,
+                  ),
+                  maximumSize:
+                      const WidgetStatePropertyAll(Size.fromHeight(350)),
+                ),
+              ),
             );
           },
         );

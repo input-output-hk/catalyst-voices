@@ -15,6 +15,7 @@ class TokenField extends StatelessWidget {
   final Range<int>? range;
   final Currency currency;
   final bool showHelper;
+  final bool enabled;
   final bool readOnly;
   final bool? ignorePointers;
 
@@ -29,6 +30,7 @@ class TokenField extends StatelessWidget {
     this.range,
     this.currency = const Currency.ada(),
     this.showHelper = true,
+    this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
   }) : assert(
@@ -58,6 +60,7 @@ class TokenField extends StatelessWidget {
       ),
       validator: (int? value, text) => _validate(context, value, text),
       onFieldSubmitted: onFieldSubmitted,
+      enabled: enabled,
       readOnly: readOnly,
       ignorePointers: ignorePointers,
     );

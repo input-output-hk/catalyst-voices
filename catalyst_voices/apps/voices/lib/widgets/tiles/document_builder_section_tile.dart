@@ -85,9 +85,6 @@ class _DocumentBuilderSectionTileState
       onChanged: _handleEditModeChange,
       child: Form(
         key: _formKey,
-        autovalidateMode: _isEditMode
-            ? AutovalidateMode.onUserInteraction
-            : AutovalidateMode.disabled,
         child: _PropertyBuilder(
           key: ValueKey(_editedSection.schema.nodeId),
           property: _editedSection,

@@ -554,6 +554,11 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
   }
 
   void _validateIfValidationModeAllows(String? value) {
+    if (!widget.enabled) {
+      _validation = const VoicesTextFieldValidationResult.none();
+      return;
+    }
+
     switch (widget.autovalidateMode) {
       case AutovalidateMode.disabled:
       case AutovalidateMode.onUnfocus:
@@ -575,9 +580,11 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
     final errorText = widget.decoration?.errorText;
     if (errorText != null) {
       _validation = VoicesTextFieldValidationResult.error(errorText);
-    } else {
+    } else if (widget.enabled) {
       final result = widget.textValidator?.call(value ?? '');
       _validation = result ?? const VoicesTextFieldValidationResult.none();
+    } else {
+      _validation = const VoicesTextFieldValidationResult.none();
     }
   }
 }
