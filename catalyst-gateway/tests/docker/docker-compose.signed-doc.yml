@@ -1,0 +1,44 @@
+services:
+  event-db:
+    image: event-db:latest
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_NAME=CatalystEventDev
+      - DB_DESCRIPTION="Catalyst Event DB"
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=catalyst-event-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+
+      - INIT_AND_DROP_DB=true
+      - WITH_MIGRATIONS=true
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB_SUPERUSER} -d $${DB_SUPERUSER_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  cat-gateway:
+    image: cat-gateway:latest
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - CAT_ADDRESS=0.0.0.0:3030
+      - LOG_LEVEL=info
+      - DATA_REFRESH_TICK=5
+      - CHECK_CONFIG_TICK=5
+      - MACHINE_ID="UID"
+      - RBAC_OFF=true
+    hostname: 127.0.0.1
+    ports:
+      - 3030:3030
+
+  cat-gateway-is-running:
+    image: alpine:3.20.3
+    depends_on:
+      event-db:
+        condition: service_healthy
+      cat-gateway:
+        condition: service_started

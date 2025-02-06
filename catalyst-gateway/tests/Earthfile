@@ -81,3 +81,21 @@ test-scylla:
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         scylla --options-file /etc/scylla/scylla.yaml --smp=2 --memory=4G --overprovisioned --developer-mode=1 & \
         cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge --no-fail-fast
+
+# test-signed-docs - Runs the integration test for signed documents.
+test-signed-docs:
+    FROM gateway+builder-src
+
+    COPY ./docker/docker-compose.signed-doc.yml ./docker-compose.yml
+    COPY ./api_tests/api_tests/signed_document.hurl signed_document.hurl
+
+    WITH DOCKER \
+        --compose "./docker-compose.yml" \
+        --load ../event-db+build \
+        --load ../+docker \
+        --pull alpine:3.20.3 \
+        --service cat-gateway-is-running
+
+        RUN hurl signed_document.hurl
+
+    END
