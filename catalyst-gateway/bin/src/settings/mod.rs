@@ -42,9 +42,9 @@ const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.yml";
 /// Default `CLIENT_ID_KEY` used in development.
 const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
 
-/// Default `API_HOST_NAME/S` used in production.  This can be a single hostname, or a
+/// Default `API_HOST_NAME/S` used in dev. This can be a single hostname, or a
 /// list of them.
-const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
+const API_HOST_NAMES_DEFAULT: &str = "https://gateway.dev.projectcatalyst.io";
 
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
