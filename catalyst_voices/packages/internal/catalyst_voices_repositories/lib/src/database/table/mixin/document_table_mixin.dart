@@ -4,7 +4,7 @@ import 'package:drift/drift.dart';
 
 mixin DocumentTableMixin on Table {
   /// Refers to [SignedDocumentType] uuid.
-  TextColumn get type => text()();
+  TextColumn get type => text().map(DocumentConverters.type)();
 
   /// Encoded version of [SignedDocumentData.content]
   ///

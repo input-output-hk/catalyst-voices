@@ -9,6 +9,9 @@ typedef DocumentMetadataJsonBConverter
     = JsonTypeConverter2<SignedDocumentMetadata, Uint8List, Object?>;
 
 abstract final class DocumentConverters {
+  static const TypeConverter<SignedDocumentType, String> type =
+      _DocumentTypeConverter();
+
   static final DocumentContentJsonBConverter content = TypeConverter.jsonb(
     fromJson: (json) => SignedDocumentContent(json! as Map<String, Object?>),
     toJson: (content) => content.data,
@@ -21,4 +24,19 @@ abstract final class DocumentConverters {
     toJson: (metadata) =>
         SignedDocumentMetadataDto.fromModel(metadata).toJson(),
   );
+}
+
+final class _DocumentTypeConverter
+    extends TypeConverter<SignedDocumentType, String> {
+  const _DocumentTypeConverter();
+
+  @override
+  SignedDocumentType fromSql(String fromDb) {
+    return SignedDocumentType.fromJson(fromDb);
+  }
+
+  @override
+  String toSql(SignedDocumentType value) {
+    return SignedDocumentType.toJson(value);
+  }
 }
