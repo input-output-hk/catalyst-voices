@@ -42,6 +42,14 @@ def ignored_auth_custom(ctx, response, case):
 
 @schemathesis.check
 def negative_data_rejection_custom(ctx, response, case):
+    responses = case.operation.definition.raw.get("responses", {})
+    status_codes = responses.keys()
+
+    # correctly setup allowed status codes for negative_data_rejection check
+    ctx.config.negative_data_rejection.allowed_statuses = list(
+        [code for code in status_codes if code.startswith("4")]
+    )
+
     if case.data_generation_method and case.data_generation_method.is_negative:
         # if only headers are included
         if (
