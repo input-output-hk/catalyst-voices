@@ -1,4 +1,4 @@
-part of 'workspace_header.dart';
+part of 'my_proposals.dart';
 
 class WorkspaceTabs extends StatelessWidget {
   final int draftProposalCount;

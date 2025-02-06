@@ -29,11 +29,7 @@ class CampaignTimelineState extends State<CampaignTimeline> {
       child: SizedBox(
         height: _expandedIndices.isNotEmpty ? 300 : 150,
         child: GestureDetector(
-          onHorizontalDragUpdate: (details) {
-            _scrollController.jumpTo(
-              _scrollController.offset - details.delta.dx,
-            );
-          },
+          onHorizontalDragUpdate: _handleHorizontalScroll,
           // Why not ListView? It forces children to full height
           // (parent constraint).The SingleChildScrollView+Row
           // reserves natural card heights from content.
@@ -76,6 +72,12 @@ class CampaignTimelineState extends State<CampaignTimeline> {
         _scrollController.jumpTo(0);
       }
     });
+  }
+
+  void _handleHorizontalScroll(DragUpdateDetails details) {
+    _scrollController.jumpTo(
+      _scrollController.offset - details.delta.dx,
+    );
   }
 
   void _onCardExpanded(
