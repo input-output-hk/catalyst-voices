@@ -28,7 +28,7 @@ services:
   cat-gateway:
     image: cat-gateway:latest
     environment:
-      - DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CAT_ADDRESS=0.0.0.0:3030
       - LOG_LEVEL=error
       - DATA_REFRESH_TICK=5
