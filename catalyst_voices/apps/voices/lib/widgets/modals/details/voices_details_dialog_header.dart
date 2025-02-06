@@ -38,9 +38,9 @@ class _Background extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.black.withOpacity(0),
-            Colors.black.withOpacity(0.4),
-            Colors.black.withOpacity(0.4),
+            Colors.black.withValues(alpha: 0),
+            Colors.black.withValues(alpha: 0.4),
+            Colors.black.withValues(alpha: 0.4),
           ],
           stops: const [
             0,

@@ -164,7 +164,7 @@ final class _CellBackgroundColor extends WidgetStateProperty<Color?> {
   @override
   Color? resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.disabled)) {
-      return theme.colorScheme.onSurface.withOpacity(0.08);
+      return theme.colorScheme.onSurface.withValues(alpha: 0.08);
     }
 
     if (states.contains(WidgetState.focused)) {
