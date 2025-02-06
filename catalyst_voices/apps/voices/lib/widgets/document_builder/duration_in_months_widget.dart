@@ -23,43 +23,12 @@ class DurationInMonthsWidget extends StatefulWidget {
 }
 
 class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
-  late List<DropdownMenuEntry<int>> _dropdownMenuEntries;
-  late int? _selectedValue;
-
+  int? get _value => widget.property.value ?? widget.schema.defaultValue;
   String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
   String? get _placeholder => widget.schema.placeholder;
   int get _min => widget.schema.numRange?.min ?? 0;
   int get _max => widget.schema.numRange?.max ?? 0;
-
-  List<DropdownMenuEntry<int>> get _mapItems {
-    final items = <DropdownMenuEntry<int>>[];
-    for (var i = _min; i <= _max; i++) {
-      items.add(DropdownMenuEntry(value: i, label: '$i'));
-    }
-
-    return items;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _handleInitialValue();
-  }
-
-  @override
-  void didUpdateWidget(DurationInMonthsWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.isEditMode != widget.isEditMode &&
-        widget.isEditMode == false) {
-      _handleInitialValue();
-    }
-
-    if (oldWidget.property.value != widget.property.value) {
-      _handleInitialValue();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,11 +43,11 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
           ),
           const SizedBox(height: 8),
           SingleSelectDropdown(
-            items: _dropdownMenuEntries,
-            onChanged: _handleValueChanged,
+            items: _buildMenuEntries().toList(),
+            onChanged: _onChanged,
             validator: _validator,
-            value: _selectedValue,
-            enabled: widget.isEditMode,
+            value: _value,
+            readOnly: !widget.isEditMode,
             hintText: _placeholder,
           ),
         ],
@@ -86,22 +55,13 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
     );
   }
 
-  void _handleInitialValue() {
-    _selectedValue = widget.property.value;
-    _dropdownMenuEntries = _mapItems;
-  }
-
-  void _handleValueChanged(int? value) {
-    setState(() {
-      _selectedValue = value;
-    });
-
-    if (widget.property.value != value) {
-      _notifyChangeListener(value);
+  Iterable<DropdownMenuEntry<int>> _buildMenuEntries() sync* {
+    for (var i = _min; i <= _max; i++) {
+      yield DropdownMenuEntry(value: i, label: '$i');
     }
   }
 
-  void _notifyChangeListener(int? value) {
+  void _onChanged(int? value) {
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
       value: value,

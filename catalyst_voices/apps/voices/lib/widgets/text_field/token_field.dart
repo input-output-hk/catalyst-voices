@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 class TokenField extends StatelessWidget {
   final VoicesIntFieldController? controller;
+  final ValueChanged<int?>? onChanged;
   final ValueChanged<int?>? onFieldSubmitted;
   final VoicesNumFieldValidator<int>? validator;
   final String? labelText;
@@ -22,6 +23,7 @@ class TokenField extends StatelessWidget {
   const TokenField({
     super.key,
     this.controller,
+    this.onChanged,
     required this.onFieldSubmitted,
     this.validator,
     this.labelText,
@@ -59,6 +61,7 @@ class TokenField extends StatelessWidget {
             : null,
       ),
       validator: (int? value, text) => _validate(context, value, text),
+      onChanged: onChanged,
       onFieldSubmitted: onFieldSubmitted,
       enabled: enabled,
       readOnly: readOnly,

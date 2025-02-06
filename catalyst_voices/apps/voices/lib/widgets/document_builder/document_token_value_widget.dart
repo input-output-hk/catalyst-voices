@@ -32,25 +32,29 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   late final VoicesIntFieldController _controller;
   late final FocusNode _focusNode;
 
+  int? get _value => widget.property.value ?? widget.schema.defaultValue;
+
   @override
   void initState() {
     super.initState();
 
-    _controller = VoicesIntFieldController(widget.property.value);
-    _controller.addListener(_handleControllerChange);
+    _controller = VoicesIntFieldController(_value);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
   @override
-  void didUpdateWidget(covariant DocumentTokenValueWidget oldWidget) {
+  void didUpdateWidget(DocumentTokenValueWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.property.value != oldWidget.property.value) {
-      _controller.value = widget.property.value;
+    final oldValue = oldWidget.property.value ?? oldWidget.schema.defaultValue;
+    final newValue = widget.property.value ?? widget.schema.defaultValue;
+
+    if (oldValue != newValue) {
+      _controller.value = newValue;
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
-      _handleEditModeChanged();
+      _onEditModeChanged();
     }
   }
 
@@ -68,8 +72,9 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     return TokenField(
       controller: _controller,
       focusNode: _focusNode,
-      onFieldSubmitted: _notifyChangeListener,
-      validator: _validate,
+      onChanged: _onChanged,
+      onFieldSubmitted: _onChanged,
+      validator: _validator,
       labelText: schema.title.isEmpty ? null : schema.formattedTitle,
       range: schema.numRange,
       currency: widget.currency,
@@ -80,14 +85,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     );
   }
 
-  void _handleControllerChange() {
-    final value = _controller.value;
-    if (value != widget.property.value) {
-      _notifyChangeListener(value);
-    }
-  }
-
-  void _handleEditModeChanged() {
+  void _onEditModeChanged() {
     _focusNode.canRequestFocus = widget.isEditMode;
 
     if (widget.isEditMode) {
@@ -97,7 +95,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     }
   }
 
-  void _notifyChangeListener(int? value) {
+  void _onChanged(int? value) {
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
       value: value,
@@ -106,7 +104,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     widget.onChanged([change]);
   }
 
-  VoicesTextFieldValidationResult _validate(int? value, String text) {
+  VoicesTextFieldValidationResult _validator(int? value, String text) {
     final result = widget.schema.validate(value);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();

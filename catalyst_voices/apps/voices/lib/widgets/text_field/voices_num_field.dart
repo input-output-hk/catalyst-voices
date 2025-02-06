@@ -75,7 +75,7 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
   }
 
   @override
-  void didUpdateWidget(covariant VoicesNumField<T> oldWidget) {
+  void didUpdateWidget(VoicesNumField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller != oldWidget.controller) {

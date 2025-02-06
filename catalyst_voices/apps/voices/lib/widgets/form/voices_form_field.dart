@@ -8,14 +8,16 @@ import 'package:flutter/material.dart';
 class VoicesFormField<T> extends FormField<T> {
   final T? value;
   final ValueChanged<T?>? onChanged;
+  final bool readOnly;
 
   const VoicesFormField({
     super.key,
     required this.value,
     this.onChanged,
+    this.readOnly = false,
+    super.enabled = true,
     required super.builder,
     super.validator,
-    super.enabled,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
   });
 

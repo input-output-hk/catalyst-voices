@@ -7,6 +7,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+// TODO(dtscalac): convert to form field
 class SingleGroupedTagSelectorWidget extends StatefulWidget {
   final DocumentSingleGroupedTagSelectorSchema schema;
   final DocumentObjectProperty property;
@@ -39,7 +40,7 @@ class _SingleGroupedTagSelectorWidgetState
   }
 
   @override
-  void didUpdateWidget(covariant SingleGroupedTagSelectorWidget oldWidget) {
+  void didUpdateWidget(SingleGroupedTagSelectorWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     final oldSelection = _getInitialSelection(oldWidget);

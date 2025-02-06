@@ -48,7 +48,7 @@ class ListLengthPickerWidget extends StatelessWidget {
                 label: _formatAsPlural(list.schema.itemsSchema.title, i),
               ),
           ],
-          enabled: isEditMode,
+          readOnly: !isEditMode,
           onChanged: _onChanged,
           value: currentCount,
           hintText: list.schema.placeholder,

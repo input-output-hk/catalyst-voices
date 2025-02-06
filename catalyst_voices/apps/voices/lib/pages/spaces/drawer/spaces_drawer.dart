@@ -40,7 +40,7 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
   }
 
   @override
-  void didUpdateWidget(covariant SpacesDrawer oldWidget) {
+  void didUpdateWidget(SpacesDrawer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.space != oldWidget.space) {

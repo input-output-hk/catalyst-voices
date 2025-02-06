@@ -13,19 +13,24 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
     required this.items,
     required super.value,
     required super.onChanged,
-    super.enabled,
+    super.readOnly,
     super.validator,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
           builder: (field) {
+            void onChangedHandler(String? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _RadioButtonList(
-                  enabled: enabled,
+                  enabled: !readOnly,
                   items: items,
-                  onChanged: field.didChange,
+                  onChanged: onChangedHandler,
                   value: field.value,
                 ),
                 if (field.hasError) DocumentErrorText(text: field.errorText),

@@ -56,7 +56,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
   Widget build(BuildContext context) {
     return EditableTile(
       title: context.l10n.emailAddress,
-      onChanged: _handleEditModeChange,
+      onChanged: _onEditModeChange,
       isEditMode: _isEditMode,
       isSaveEnabled: _email.isValid,
       child: VoicesEmailTextField(
@@ -73,7 +73,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
     );
   }
 
-  void _handleEditModeChange(EditableTileChange value) {
+  void _onEditModeChange(EditableTileChange value) {
     setState(() {
       _isEditMode = value.isEditMode;
 

@@ -29,6 +29,8 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
+  String get _value =>
+      widget.property.value ?? widget.schema.defaultValue ?? '';
   String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
 
@@ -36,8 +38,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   void initState() {
     super.initState();
 
-    final textValue =
-        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+    final textValue = TextEditingValueExt.collapsedAtEndOf(_value);
 
     _textEditingController = TextEditingController.fromValue(textValue)
       ..addListener(_handleControllerChange);
@@ -46,16 +47,16 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant SingleLineHttpsUrlWidget oldWidget) {
+  void didUpdateWidget(SingleLineHttpsUrlWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
-      _textEditingController.textWithSelection = widget.property.value ?? '';
+      _textEditingController.textWithSelection = _value;
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
-      _handleEditModeChanged();
+      _onEditModeChanged();
     }
   }
 
@@ -81,8 +82,9 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
         VoicesHttpsTextField(
           controller: _textEditingController,
           focusNode: _focusNode,
+          
           onFieldSubmitted: _notifyChangeListener,
-          validator: _validate,
+          validator: _validator,
           enabled: widget.isEditMode,
         ),
       ],
@@ -106,7 +108,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     widget.onChanged([change]);
   }
 
-  VoicesTextFieldValidationResult _validate(String? value) {
+  VoicesTextFieldValidationResult _validator(String? value) {
     final schema = widget.schema;
     final normalizedValue = schema.normalizeValue(value);
     final result = schema.validate(normalizedValue);
@@ -122,7 +124,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     }
   }
 
-  void _handleEditModeChanged() {
+  void _onEditModeChanged() {
     _focusNode.canRequestFocus = widget.isEditMode;
 
     if (widget.isEditMode) {

@@ -54,9 +54,6 @@ class VoicesTextField extends VoicesFormField<String> {
   /// [TextField.maxLength].
   final int? maxLength;
 
-  /// [TextField.readOnly].
-  final bool readOnly;
-
   /// [TextField.ignorePointers].
   final bool? ignorePointers;
 
@@ -109,7 +106,6 @@ class VoicesTextField extends VoicesFormField<String> {
     this.maxLength,
     this.maxLines = 1,
     this.minLines,
-    this.readOnly = false,
     this.ignorePointers,
     this.textValidator,
     this.resizableVertically,
@@ -122,6 +118,7 @@ class VoicesTextField extends VoicesFormField<String> {
     this.inputFormatters,
     this.maxLengthEnforcement,
     this.mouseCursor,
+    super.readOnly,
   }) : super(
           value: controller?.text ?? initialText,
           validator: (value) {
@@ -187,9 +184,9 @@ class VoicesTextField extends VoicesFormField<String> {
                     minLines: minLines,
                     maxLength: maxLength,
                     maxLengthEnforcement: maxLengthEnforcement,
+                    enabled: enabled,
                     readOnly: readOnly,
                     ignorePointers: ignorePointers,
-                    enabled: enabled,
                     onChanged: onChangedHandler,
                     mouseCursor: mouseCursor,
                   ),

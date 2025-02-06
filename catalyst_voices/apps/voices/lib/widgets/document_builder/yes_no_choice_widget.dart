@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -25,31 +26,9 @@ class YesNoChoiceWidget extends StatefulWidget {
 }
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
-  late bool? _selectedValue;
-
+  bool? get _value => widget.property.value ?? widget.schema.defaultValue;
   String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _handleInitialValue();
-  }
-
-  @override
-  void didUpdateWidget(covariant YesNoChoiceWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.property.value != widget.property.value) {
-      _handleInitialValue();
-    }
-
-    if (oldWidget.isEditMode != widget.isEditMode &&
-        widget.isEditMode == false) {
-      _handleInitialValue();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,40 +44,26 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
-          value: _selectedValue,
-          enabled: widget.isEditMode,
-          onChanged: _handleValueChanged,
-          validator: (value) {
-            final result = widget.schema.validate(value);
-
-            return LocalizedDocumentValidationResult.from(result)
-                .message(context);
-          },
+          value: _value,
+          readOnly: !widget.isEditMode,
+          onChanged: _onChanged,
+          validator: _validate,
         ),
       ],
     );
   }
 
-  void _handleInitialValue() {
-    _selectedValue = widget.property.value;
-  }
-
-  void _handleValueChanged(bool? value) {
-    setState(() {
-      _selectedValue = value;
-    });
-
-    if (widget.property.value != value) {
-      _notifyChangeListener(value);
-    }
-  }
-
-  void _notifyChangeListener(bool? value) {
+  void _onChanged(bool? value) {
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
       value: value,
     );
     widget.onChanged([change]);
+  }
+
+  String? _validate(bool? value) {
+    final result = widget.schema.validate(value);
+    return LocalizedDocumentValidationResult.from(result).message(context);
   }
 }
 
@@ -107,8 +72,8 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
     super.key,
     required super.value,
     required super.onChanged,
+    super.readOnly,
     super.validator,
-    super.enabled,
   }) : super(
           builder: (field) {
             final state = field as VoicesFormFieldState<bool?>;
@@ -125,7 +90,7 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IgnorePointer(
-                  ignoring: !enabled,
+                  ignoring: readOnly,
                   child: VoicesSegmentedButton<bool>(
                     key: key,
                     segments: [
@@ -146,20 +111,7 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
                     style: _getButtonStyle(field),
                   ),
                 ),
-                if (field.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      field.errorText ??
-                          field.context.l10n.snackbarErrorLabelText,
-                      style: Theme.of(field.context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(
-                            color: Theme.of(field.context).colorScheme.error,
-                          ),
-                    ),
-                  ),
+                if (field.hasError) DocumentErrorText(text: field.errorText),
               ],
             );
           },

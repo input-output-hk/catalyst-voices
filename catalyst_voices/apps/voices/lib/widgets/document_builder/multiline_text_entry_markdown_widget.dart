@@ -8,6 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
+// TODO(dtscalac): convert to form field
 class MultilineTextEntryMarkdownWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
   final DocumentMultiLineTextEntryMarkdownSchema schema;
@@ -83,7 +84,7 @@ class _MultilineTextEntryMarkdownWidgetState
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,
-      validator: _validate,
+      validator: _validator,
     );
   }
 
@@ -125,7 +126,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
   }
 
-  String? _validate(quill.Document? document) {
+  String? _validator(quill.Document? document) {
     final delta = document?.toDelta();
     final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
     final markdownValue = markdownData?.data;

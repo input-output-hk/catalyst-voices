@@ -82,7 +82,7 @@ class _DocumentBuilderSectionTileState
       title: title,
       isEditMode: _isEditMode,
       isSaveEnabled: true,
-      onChanged: _handleEditModeChange,
+      onChanged: _onEditModeChange,
       child: Form(
         key: _formKey,
         child: _PropertyBuilder(
@@ -95,7 +95,7 @@ class _DocumentBuilderSectionTileState
     );
   }
 
-  void _handleEditModeChange(EditableTileChange value) {
+  void _onEditModeChange(EditableTileChange value) {
     switch (value.source) {
       case EditableTileChangeSource.cancel:
         if (!value.isEditMode) {
