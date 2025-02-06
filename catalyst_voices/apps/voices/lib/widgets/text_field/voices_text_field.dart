@@ -123,7 +123,7 @@ class VoicesTextField extends VoicesFormField<String> {
     this.maxLengthEnforcement,
     this.mouseCursor,
   }) : super(
-          value: initialText ?? controller?.text,
+          value: controller?.text ?? initialText,
           validator: (value) {
             final errorText = decoration?.errorText;
             if (errorText != null) {
@@ -142,6 +142,11 @@ class VoicesTextField extends VoicesFormField<String> {
             final labelText = decoration?.labelText ?? '';
             final resizableVertically = state._isResizableVertically;
             final resizableHorizontally = state._isResizableHorizontally;
+
+            void onChangedHandler(String? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,7 +190,7 @@ class VoicesTextField extends VoicesFormField<String> {
                     readOnly: readOnly,
                     ignorePointers: ignorePointers,
                     enabled: enabled,
-                    onChanged: field.didChange,
+                    onChanged: onChangedHandler,
                     mouseCursor: mouseCursor,
                   ),
                 ),
@@ -235,7 +240,7 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
 
     _obtainController()
       ..textWithSelection = text
-      ..addListener(_onChanged);
+      ..addListener(_handleControllerChanged);
   }
 
   @override
@@ -245,8 +250,8 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
     final newController = _obtainController();
 
     // unregister listener from potentially old controllers
-    _customController?.removeListener(_onChanged);
-    oldWidget.controller?.removeListener(_onChanged);
+    _customController?.removeListener(_handleControllerChanged);
+    oldWidget.controller?.removeListener(_handleControllerChanged);
 
     // the widget got controller from the parent, lets dispose our own
     if (widget.controller != null) {
@@ -255,7 +260,7 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
     }
 
     // register for a new one
-    newController.addListener(_onChanged);
+    newController.addListener(_handleControllerChanged);
 
     if (oldWidget.decoration?.errorText != widget.decoration?.errorText ||
         oldWidget.textValidator != widget.textValidator ||
@@ -268,7 +273,7 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
   void dispose() {
     _customController?.dispose();
     _customController = null;
-    widget.controller?.removeListener(_onChanged);
+    widget.controller?.removeListener(_handleControllerChanged);
     super.dispose();
   }
 
@@ -279,11 +284,32 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
   }
 
   @override
+  void didChange(String? value) {
+    super.didChange(value);
+
+    final controller = _obtainController();
+    if (controller.text != value) {
+      controller.textWithSelection = value ?? '';
+    }
+  }
+
+  @override
+  void reset() {
+    // Set the controller value before calling super.reset() to let
+    // _handleControllerChanged suppress the change.
+    _obtainController().text = widget.initialValue ?? '';
+    super.reset();
+    widget.onChanged?.call(_obtainController().text);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Validating in build(), similar workaround is done in the
     // original FormField build method to make sure validation
     // errors are shown when needed.
-    _validateIfValidationModeAllows(_obtainController().text);
+    if (widget.enabled) {
+      _validateIfValidationModeAllows(_obtainController().text);
+    }
 
     return super.build(context);
   }
@@ -549,24 +575,18 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
         : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
   }
 
-  void _onChanged() {
-    setValue(_obtainController().text);
+  void _handleControllerChanged() {
+    final text = _obtainController().text;
+    if (text != value) {
+      setValue(text);
+    }
   }
 
   void _validateIfValidationModeAllows(String? value) {
-    if (!widget.enabled) {
-      _validation = const VoicesTextFieldValidationResult.none();
-      return;
-    }
-
     switch (widget.autovalidateMode) {
       case AutovalidateMode.disabled:
       case AutovalidateMode.onUnfocus:
-        final errorText = widget.decoration?.errorText;
-        _validation = errorText != null
-            ? VoicesTextFieldValidationResult.error(errorText)
-            : const VoicesTextFieldValidationResult.none();
-
+        _validation = const VoicesTextFieldValidationResult.none();
       case AutovalidateMode.always:
         _validate(value);
       case AutovalidateMode.onUserInteraction:
@@ -577,15 +597,8 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
   }
 
   void _validate(String? value) {
-    final errorText = widget.decoration?.errorText;
-    if (errorText != null) {
-      _validation = VoicesTextFieldValidationResult.error(errorText);
-    } else if (widget.enabled) {
-      final result = widget.textValidator?.call(value ?? '');
-      _validation = result ?? const VoicesTextFieldValidationResult.none();
-    } else {
-      _validation = const VoicesTextFieldValidationResult.none();
-    }
+    final result = widget.textValidator?.call(value ?? '');
+    _validation = result ?? const VoicesTextFieldValidationResult.none();
   }
 }
 

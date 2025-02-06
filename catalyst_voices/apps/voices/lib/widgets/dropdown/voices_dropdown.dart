@@ -97,6 +97,11 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
           builder: (field) {
             final state = field as _DropdownFormFieldState<T>;
 
+            void onChangedHandler(T? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
             return ConstrainedBox(
               constraints: const BoxConstraints(),
               child: DropdownMenu(
@@ -106,7 +111,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                 enabled: enabled,
                 hintText: hintText,
                 dropdownMenuEntries: items,
-                onSelected: field.didChange,
+                onSelected: onChangedHandler,
                 inputDecorationTheme: InputDecorationTheme(
                   hintStyle:
                       Theme.of(field.context).textTheme.bodyLarge?.copyWith(

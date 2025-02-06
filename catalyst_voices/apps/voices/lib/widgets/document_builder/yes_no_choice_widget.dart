@@ -117,6 +117,7 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
             void onChangedHandler(Set<bool> selected) {
               final newValue = selected.isEmpty ? null : selected.first;
               field.didChange(newValue);
+              onChanged?.call(newValue);
             }
 
             return Column(

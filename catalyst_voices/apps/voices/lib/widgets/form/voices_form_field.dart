@@ -45,10 +45,4 @@ class VoicesFormFieldState<T> extends FormFieldState<T> {
       setValue(widget.value);
     }
   }
-
-  @override
-  void didChange(T? value) {
-    super.didChange(value);
-    widget.onChanged?.call(value);
-  }
 }
