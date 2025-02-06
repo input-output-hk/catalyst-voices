@@ -14,6 +14,8 @@ use crate::service::common::{
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## Ok
+    ///
     /// Returns the slot info.
     #[oai(status = 200)]
     Ok(Json<SlotInfo>),

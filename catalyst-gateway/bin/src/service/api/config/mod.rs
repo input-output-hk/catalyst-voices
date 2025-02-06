@@ -15,7 +15,7 @@ use crate::{
     db::event::config::{key::ConfigKey, Config},
     service::common::{
         auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
-        objects::config::{frontend_config::FrontendConfig, ConfigBadRequest},
+        objects::config::{frontend_config::FrontendConfig, ConfigUnprocessableContent},
         responses::WithErrorResponses,
         tags::ApiTags,
     },
@@ -50,9 +50,9 @@ enum SetConfigResponse {
     /// Configuration Update Successful.
     #[oai(status = 204)]
     Ok,
-    /// Set configuration bad request.
-    #[oai(status = 400)]
-    BadRequest(Json<ConfigBadRequest>),
+    /// Set configuration unprocessable content.
+    #[oai(status = 422)]
+    UnprocessableContent(Json<ConfigUnprocessableContent>),
 }
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
@@ -177,7 +177,7 @@ impl ConfigApi {
                 }
             },
             None => {
-                SetConfigResponse::BadRequest(Json(ConfigBadRequest::new(
+                SetConfigResponse::UnprocessableContent(Json(ConfigUnprocessableContent::new(
                     "Invalid JSON data".to_string(),
                     None,
                 )))
@@ -217,7 +217,7 @@ async fn set(key: ConfigKey, value: Value) -> SetConfigAllResponses {
                         .iter()
                         .map(|error| error.error_description().clone().into_inner())
                         .collect();
-                    SetConfigResponse::BadRequest(Json(ConfigBadRequest::new(
+                    SetConfigResponse::UnprocessableContent(Json(ConfigUnprocessableContent::new(
                         "Invalid JSON data validating against JSON schema".to_string(),
                         Some(schema_errors),
                     )))
