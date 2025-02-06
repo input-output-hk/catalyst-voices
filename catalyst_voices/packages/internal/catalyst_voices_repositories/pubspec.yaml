@@ -5,10 +5,10 @@ publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.24.1"
+  flutter: ">=3.27.3"
 
 dependencies:
-  catalyst_cardano_serialization: ^0.5.0+4
+  catalyst_cardano_serialization: ^1.0.0
   # using for document json assets
   catalyst_voices_assets:
     path: ../catalyst_voices_assets
@@ -17,7 +17,7 @@ dependencies:
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
   chopper: ^8.0.3
-  collection: ^1.18.0
+  collection: ^1.19.0
   equatable: ^2.0.7
   flutter:
     sdk: flutter
@@ -30,7 +30,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.12
-  catalyst_analysis: ^2.0.1
+  catalyst_analysis: ^3.0.0
   chopper_generator: ^8.0.3
   flutter_test:
     sdk: flutter
