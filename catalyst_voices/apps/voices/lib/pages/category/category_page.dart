@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/category/category_detail_view.dart';
 import 'package:catalyst_voices/widgets/cards/category_proposals_details_card.dart';
 import 'package:catalyst_voices/widgets/cards/create_proposal_card.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -24,7 +24,10 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<CategoryDetailCubit>().init(widget.categoryId));
+    unawaited(context.read<CategoryDetailCubit>().getCategories());
+    unawaited(
+      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
+    );
   }
 
   @override
@@ -32,7 +35,11 @@ class _CategoryPageState extends State<CategoryPage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.categoryId != oldWidget.categoryId) {
-      unawaited(context.read<CategoryDetailCubit>().init(widget.categoryId));
+      unawaited(
+        context
+            .read<CategoryDetailCubit>()
+            .getCategoryDetail(widget.categoryId),
+      );
     }
   }
 
@@ -45,30 +52,77 @@ class _CategoryPageState extends State<CategoryPage> {
         md: const EdgeInsets.symmetric(horizontal: 120),
         lg: const EdgeInsets.symmetric(horizontal: 120),
         other: const EdgeInsets.symmetric(horizontal: 120),
-        child: BlocBuilder<CategoryDetailCubit, CategoryDetailState>(
-          builder: (context, state) {
-            return switch (state) {
-              final CategoryDetailData state => _Body(
-                  category: state.category,
-                ),
-              final CategoryDetailError state => Center(
-                  child: VoicesErrorIndicator(
-                    message: state.error.message(context),
-                    onRetry: () async {
-                      await context
-                          .read<CategoryDetailCubit>()
-                          .getCategoryDetail(widget.categoryId);
-                    },
-                  ),
-                ),
-              final CategoryDetailLoading _ => _Body(
-                  category: CampaignCategoryViewModel.dummy(),
-                  isLoading: true,
-                ),
-            };
-          },
+        child: Stack(
+          children: [
+            const _CategoryDetailLoadingOrDataSelector(),
+            _CategoryDetailErrorSelector(
+              categoryId: widget.categoryId,
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+typedef _StateData = ({bool show, CampaignCategoryViewModel data});
+
+class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
+  const _CategoryDetailLoadingOrDataSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateData>(
+      selector: (state) {
+        return (
+          show: state.isLoading || state.error != null,
+          data: state.category ?? CampaignCategoryViewModel.dummy()
+        );
+      },
+      builder: (context, state) {
+        return _Body(
+          category: CampaignCategoryViewModel.dummy(),
+          isLoading: state.show,
+        );
+      },
+    );
+  }
+}
+
+typedef _StateError = ({bool show, LocalizedException? error});
+
+class _CategoryDetailErrorSelector extends StatelessWidget {
+  final String categoryId;
+  const _CategoryDetailErrorSelector({required this.categoryId});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateError>(
+      selector: (state) {
+        return (
+          show: state.isLoading == false && state.error != null,
+          error: state.error,
+        );
+      },
+      builder: (context, state) {
+        final error = state.error ?? const LocalizedUnknownException();
+        return Offstage(
+          offstage: !state.show,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 60),
+            child: Center(
+              child: VoicesErrorIndicator(
+                message: error.message(context),
+                onRetry: () async {
+                  await context
+                      .read<CategoryDetailCubit>()
+                      .getCategoryDetail(categoryId);
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

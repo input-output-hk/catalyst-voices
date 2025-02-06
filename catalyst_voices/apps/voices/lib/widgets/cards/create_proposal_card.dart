@@ -51,7 +51,7 @@ class CreateProposalCard extends StatelessWidget {
               context.l10n.startProposal,
             ),
             onTap: () {
-              //TODO(LynxLynxx) Pass categoryId when implemented
+              // TODO(LynxLynxx): Pass categoryId when implemented
               const ProposalBuilderDraftRoute().go(context);
             },
           ),

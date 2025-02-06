@@ -1,70 +1,39 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-sealed class CategoryDetailState extends Equatable {
+class CategoryDetailState extends Equatable {
+  final CampaignCategoryViewModel? category;
   final List<CampaignCategoryViewModel> categories;
+  final bool isLoading;
+  final LocalizedException? error;
+
   const CategoryDetailState({
+    this.category,
     this.categories = const [],
+    this.isLoading = false,
+    this.error,
   });
 
-  CategoryDetailState copyWith({List<CampaignCategoryViewModel>? categories});
-
-  @override
-  List<Object?> get props => [categories];
-}
-
-final class CategoryDetailLoading extends CategoryDetailState {
-  const CategoryDetailLoading({super.categories});
-
-  @override
-  CategoryDetailLoading copyWith({
-    List<CampaignCategoryViewModel>? categories,
-  }) {
-    return CategoryDetailLoading(
-      categories: categories ?? this.categories,
-    );
-  }
-
-  @override
-  List<Object?> get props => [...super.props];
-}
-
-final class CategoryDetailData extends CategoryDetailState {
-  final CampaignCategoryViewModel category;
-
-  const CategoryDetailData({required this.category, super.categories});
-
-  @override
-  CategoryDetailData copyWith({
-    List<CampaignCategoryViewModel>? categories,
+  CategoryDetailState copyWith({
     CampaignCategoryViewModel? category,
-  }) {
-    return CategoryDetailData(
-      categories: categories ?? this.categories,
-      category: category ?? this.category,
-    );
-  }
-
-  @override
-  List<Object?> get props => [...super.props, category];
-}
-
-final class CategoryDetailError extends CategoryDetailState {
-  final LocalizedException error;
-
-  const CategoryDetailError({required this.error, super.categories});
-
-  @override
-  CategoryDetailError copyWith({
     List<CampaignCategoryViewModel>? categories,
-    LocalizedException? error,
+    bool? isLoading,
+    Optional<LocalizedException>? error,
   }) {
-    return CategoryDetailError(
+    return CategoryDetailState(
+      category: category ?? this.category,
       categories: categories ?? this.categories,
-      error: error ?? this.error,
+      isLoading: isLoading ?? this.isLoading,
+      error: error.dataOr(this.error),
     );
   }
 
   @override
-  List<Object?> get props => [...super.props, error];
+  List<Object?> get props => [
+        category,
+        categories,
+        isLoading,
+        error,
+      ];
 }

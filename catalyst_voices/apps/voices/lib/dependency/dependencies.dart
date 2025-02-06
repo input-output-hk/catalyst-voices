@@ -113,7 +113,6 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<CategoryDetailCubit>(() {
         return CategoryDetailCubit(
           get<CampaignService>(),
-          get<DiscoveryCubit>(),
         );
       })
       ..registerFactory<AccountCubit>(() {

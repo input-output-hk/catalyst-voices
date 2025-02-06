@@ -24,10 +24,7 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
     return BlocSelector<CategoryDetailCubit, CategoryDetailState,
         List<CategoryChangeViewModel>>(
       selector: (state) {
-        var selectedCategory = '';
-        if (state is CategoryDetailData) {
-          selectedCategory = state.category.id;
-        }
+        final selectedCategory = state.category?.id ?? '';
         return state.categories
             .map(
               (e) => CategoryChangeViewModel(
@@ -92,7 +89,7 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
   }
 
   Future<void> _changeCategory(String categoryId) async {
-    await context.read<CategoryDetailCubit>().changeCategory(categoryId);
+    await context.read<CategoryDetailCubit>().getCategoryDetail(categoryId);
   }
 }
 
