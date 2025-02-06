@@ -14,7 +14,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.12
-  catalyst_analysis: ^2.0.1
+  catalyst_analysis: ^3.0.0
   flutter_gen_runner: ^5.3.2
   flutter_test:
     sdk: flutter

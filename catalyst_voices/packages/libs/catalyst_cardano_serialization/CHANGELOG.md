@@ -1,3 +1,7 @@
+## 1.0.0
+
+ - Upgrade flutter version to 3.27.3
+
 ## 0.5.0+4
 
  - **FEAT**(dart/catalyst_cardano_serialization): initial implementation of dynamic coin selection algorithm
