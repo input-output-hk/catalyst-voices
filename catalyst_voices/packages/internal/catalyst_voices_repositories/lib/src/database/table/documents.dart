@@ -1,14 +1,18 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/database/table/mixin/document_table_mixin.dart';
+import 'package:catalyst_voices_repositories/src/database/table/mixin/id_table_mixin.dart';
+import 'package:catalyst_voices_repositories/src/database/table/mixin/ver_table_mixin.dart';
 import 'package:drift/drift.dart';
 
-// TODO(damian-molinski): use mixins for ids
-class Documents extends Table {
-  Int64Column get idHi => int64()();
-
-  Int64Column get idLo => int64()();
-
-  Int64Column get verHi => int64()();
-
-  Int64Column get verLo => int64()();
+/// This table stores a record of each document (including its content and
+/// related metadata).
+///
+/// Its representation of [SignedDocumentData] class.
+@TableIndex(name: 'idx_doc_type', columns: {#type})
+@TableIndex(name: 'idx_unique_ver', columns: {#verHi, #verLo}, unique: true)
+class Documents extends Table
+    with IdTableMixin, VerTableMixin, DocumentTableMixin {
+  DateTimeColumn get createdAt => dateTime()();
 
   @override
   Set<Column<Object>>? get primaryKey => {
