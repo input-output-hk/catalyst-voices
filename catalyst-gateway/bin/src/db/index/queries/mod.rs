@@ -17,6 +17,7 @@ use rbac::{
     get_role0_chain_root::GetRole0ChainRootQuery,
 };
 use registrations::{
+    get_all_registrations::GetAllRegistrationsQuery,
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
     get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
     get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
@@ -100,6 +101,8 @@ pub(crate) enum PreparedSelectQuery {
     ChainRootByRole0Key,
     /// Get all stake and vote keys for snapshot (`stake_pub_key,vote_key`)
     GetAllStakesAndVoteKeys,
+    /// Get all registrations for snapshot
+    GetAllRegistrations,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -163,6 +166,8 @@ pub(crate) struct PreparedQueries {
     chain_root_by_role0_key_query: PreparedStatement,
     /// Get all stake and vote keys (`stake_key,vote_key`) for snapshot
     get_all_stakes_and_vote_keys_query: PreparedStatement,
+    /// Get all registrations for snapshot
+    get_all_registrations_query: PreparedStatement,
 }
 
 /// A set of query responses that can fail.
@@ -199,7 +204,8 @@ impl PreparedQueries {
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
         let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
         let get_all_stakes_and_vote_keys_query =
-            GetAllStakesAndVoteKeysQuery::prepare(session).await;
+            GetAllStakesAndVoteKeysQuery::prepare(session.clone()).await;
+        let get_all_registrations_query = GetAllRegistrationsQuery::prepare(session.clone()).await;
 
         let (
             txo_insert_queries,
@@ -248,6 +254,7 @@ impl PreparedQueries {
             registrations_by_chain_root_query: registrations_by_chain_root?,
             chain_root_by_role0_key_query: chain_root_by_role0_key?,
             get_all_stakes_and_vote_keys_query: get_all_stakes_and_vote_keys_query?,
+            get_all_registrations_query: get_all_registrations_query?,
         })
     }
 
@@ -341,6 +348,7 @@ impl PreparedQueries {
             PreparedSelectQuery::GetAllStakesAndVoteKeys => {
                 &self.get_all_stakes_and_vote_keys_query
             },
+            PreparedSelectQuery::GetAllRegistrations => &self.get_all_registrations_query,
         };
         session_execute_iter(session, prepared_stmt, params).await
     }

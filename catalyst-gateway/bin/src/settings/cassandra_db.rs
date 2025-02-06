@@ -9,13 +9,13 @@ use crate::db::{
 };
 
 /// Default Cassandra DB URL for the Persistent DB.
-pub(super) const PERSISTENT_URL_DEFAULT: &str = "127.0.0.1:9042";
+pub(super) const PERSISTENT_URL_DEFAULT: &str = "172.17.0.2:9042";
 
 /// Default Cassandra DB URL for the Persistent DB.
 pub(super) const PERSISTENT_NAMESPACE_DEFAULT: &str = "persistent";
 
 /// Default Cassandra DB URL for the Persistent DB.
-pub(super) const VOLATILE_URL_DEFAULT: &str = "127.0.0.1:9042";
+pub(super) const VOLATILE_URL_DEFAULT: &str = "172.17.0.2:9042";
 
 /// Default Cassandra DB URL for the Persistent DB.
 pub(super) const VOLATILE_NAMESPACE_DEFAULT: &str = "volatile";

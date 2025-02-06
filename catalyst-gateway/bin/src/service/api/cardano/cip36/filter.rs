@@ -20,6 +20,7 @@ use super::{
 };
 use crate::db::index::{
     queries::registrations::{
+        get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
         get_all_stakes_and_vote_keys::{
             GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
         },
@@ -347,6 +348,13 @@ pub(crate) async fn get_registration_given_vote_key(
 /// Get all registrations or constrain if slot# given.
 pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
     debug!("Time snapshot");
+    let all_registrations = match get_all_registrations(&session.clone()).await {
+        Ok(all_registrations) => all_registrations,
+        Err(err) => {
+            return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
+        },
+    };
+
     let all_stakes_and_vote_keys = match get_all_stake_addrs_and_vote_keys(&session.clone()).await {
         Ok(key_pairs) => key_pairs,
         Err(err) => {
@@ -357,22 +365,20 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     let mut all_registrations_after_filtering = Vec::new();
     let mut all_invalids_after_filtering = Vec::new();
 
-    // We now have all stake pub keys and vote keys for cip36 registrations.
-    // Iterate through them and individually get all valid and invalid registrations.
-    // Compose the result into a snapshot.
-    // TODO: Optimize: Can be done parallel.
     let start = Instant::now();
     for (stake_public_key, vote_pub_key) in &all_stakes_and_vote_keys {
-        let mut registrations_for_given_stake_pub_key =
-            match get_all_registrations_from_stake_pub_key(&session, stake_public_key.clone()).await
-            {
-                Ok(registrations) => registrations,
-                Err(err) => {
-                    return AllRegistration::handle_error(&anyhow::anyhow!(
-                        "Failed to query ALL {err:?}",
-                    ));
-                },
-            };
+        // Collect registrations for given stake pub key
+        let mut registrations_for_given_stake_pub_key = all_registrations
+            .clone()
+            .into_par_iter()
+            .filter(|registration| {
+                if let Some(stake_pub_key) = &registration.stake_pub_key {
+                    stake_pub_key == stake_public_key
+                } else {
+                    false
+                }
+            })
+            .collect();
 
         // check the registrations stake pub key are still actively associated with the voting
         // key, and have not been registered to another voting key.
@@ -421,6 +427,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         };
         all_invalids_after_filtering.push(invalids_report);
     }
+
     let duration = start.elapsed();
     debug!("Time elapsed in snapshot_function() is: {:?}", duration);
 
@@ -462,4 +469,45 @@ pub async fn get_all_stake_addrs_and_vote_keys(
     }
 
     Ok(vote_key_stake_addr_pair)
+}
+
+/// Get all cip36 registrations.
+pub async fn get_all_registrations(
+    session: &Arc<CassandraSession>,
+) -> Result<Vec<Cip36Details>, anyhow::Error> {
+    let mut registrations_iter =
+        GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams {}).await?;
+
+    let mut registrations = Vec::new();
+    while let Some(row) = registrations_iter.next().await {
+        let row = row?;
+
+        let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
+            *nonce
+        } else {
+            continue;
+        };
+
+        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
+            *slot_no
+        } else {
+            continue;
+        };
+
+        let cip36 = Cip36Details {
+            slot_no: SlotNo::from(slot_no),
+            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
+            vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
+            nonce: Some(Nonce::from(nonce)),
+            txn: Some(TxnIndex::try_from(row.txn)?),
+            payment_address: Some(Cip19ShelleyAddress::new(hex::encode(row.payment_address))),
+            is_payable: row.is_payable,
+            cip15: !row.cip36,
+            errors: vec![],
+        };
+
+        registrations.push(cip36);
+    }
+
+    Ok(registrations)
 }
