@@ -46,6 +46,8 @@ class DocumentBuilderSectionTile extends StatefulWidget {
 
 class _DocumentBuilderSectionTileState
     extends State<DocumentBuilderSectionTile> {
+  final _formKey = GlobalKey<FormState>();
+
   late DocumentProperty _editedSection;
   late DocumentPropertyBuilder _builder;
 
@@ -78,44 +80,57 @@ class _DocumentBuilderSectionTileState
 
     return EditableTile(
       title: title,
-      initialEditMode: _isEditMode,
-      isSaveEnabled: _editedSection.isValidExcludingSubsections,
+      isEditMode: _isEditMode,
+      isSaveEnabled: true,
       onChanged: _handleEditModeChange,
-      child: _PropertyBuilder(
-        key: ValueKey(_editedSection.schema.nodeId),
-        property: _editedSection,
-        isEditMode: _isEditMode,
-        onChanged: _handlePropertyChanges,
+      child: Form(
+        key: _formKey,
+        autovalidateMode: _isEditMode
+            ? AutovalidateMode.onUserInteraction
+            : AutovalidateMode.disabled,
+        child: _PropertyBuilder(
+          key: ValueKey(_editedSection.schema.nodeId),
+          property: _editedSection,
+          isEditMode: _isEditMode,
+          onChanged: _handlePropertyChanges,
+        ),
       ),
     );
   }
 
   void _handleEditModeChange(EditableTileChange value) {
-    setState(() {
-      _isEditMode = value.isEditMode;
+    switch (value.source) {
+      case EditableTileChangeSource.cancel:
+        if (!value.isEditMode) {
+          _onCancel();
+        } else {
+          setState(() {
+            _isEditMode = value.isEditMode;
+          });
+        }
 
-      switch (value.source) {
-        case EditableTileChangeSource.cancel:
-          if (!value.isEditMode) {
-            _onCancel();
-          }
-        case EditableTileChangeSource.save:
+      case EditableTileChangeSource.save:
+        if (_formKey.currentState!.validate()) {
           _onSave();
-      }
+        }
+    }
+  }
+
+  void _onCancel() {
+    setState(() {
+      _pendingChanges.clear();
+      _editedSection = widget.section;
+      _builder = _editedSection.toBuilder();
+      _isEditMode = false;
     });
   }
 
   void _onSave() {
-    widget.onChanged(List.of(_pendingChanges));
-
-    _pendingChanges.clear();
-    _isEditMode = false;
-  }
-
-  void _onCancel() {
-    _pendingChanges.clear();
-    _editedSection = widget.section;
-    _builder = _editedSection.toBuilder();
+    setState(() {
+      widget.onChanged(List.of(_pendingChanges));
+      _pendingChanges.clear();
+      _isEditMode = false;
+    });
   }
 
   void _handlePropertyChanges(List<DocumentChange> changes) {

@@ -48,7 +48,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
         controller: _effectiveController,
         focusNode: widget.focusNode,
         onFieldSubmitted: widget.onFieldSubmitted,
-        validator: widget.validator,
+        textValidator: widget.validator,
         decoration: VoicesTextFieldDecoration(
           hintText:
               widget.enabled ? context.l10n.noUrlAdded : context.l10n.addUrl,

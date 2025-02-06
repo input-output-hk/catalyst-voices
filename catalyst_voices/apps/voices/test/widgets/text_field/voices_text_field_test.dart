@@ -81,7 +81,7 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: (value) => const VoicesTextFieldValidationResult(
+            textValidator: (value) => const VoicesTextFieldValidationResult(
               status: VoicesTextFieldStatus.error,
               errorMessage: errorText,
             ),
@@ -106,7 +106,7 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: (value) {
+            textValidator: (value) {
               return const VoicesTextFieldValidationResult.success();
             },
             onFieldSubmitted: (value) {},
@@ -165,7 +165,7 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: validator,
+            textValidator: validator,
             onFieldSubmitted: (value) {},
           ),
         ),
@@ -197,7 +197,7 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: validator,
+            textValidator: validator,
             onFieldSubmitted: (value) {},
           ),
         ),
@@ -234,7 +234,7 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: validator,
+            textValidator: validator,
             onFieldSubmitted: (value) {},
           ),
         ),

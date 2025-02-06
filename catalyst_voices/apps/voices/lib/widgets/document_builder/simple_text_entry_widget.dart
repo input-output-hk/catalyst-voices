@@ -163,7 +163,7 @@ class _SimpleDocumentTextField extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       onFieldSubmitted: onFieldSubmitted,
-      validator: validator,
+      textValidator: validator,
       decoration: VoicesTextFieldDecoration(
         hintText: hintText,
       ),
@@ -171,7 +171,6 @@ class _SimpleDocumentTextField extends StatelessWidget {
       resizableVertically: resizable,
       resizableHorizontally: false,
       maxLengthEnforcement: MaxLengthEnforcement.none,
-      autovalidateMode: AutovalidateMode.disabled,
       maxLines: resizable ? null : 1,
       maxLength: maxLength,
     );

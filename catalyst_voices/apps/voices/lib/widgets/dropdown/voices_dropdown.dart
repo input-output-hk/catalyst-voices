@@ -167,6 +167,9 @@ class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {
   final TextEditingController _controller = TextEditingController();
 
   @override
+  SingleSelectDropdown<T> get widget => super.widget as SingleSelectDropdown<T>;
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -175,11 +178,9 @@ class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {
   @override
   void setValue(T? value) {
     super.setValue(value);
-    final item = _widget.items.firstWhereOrNull((e) => e.value == value);
+    final item = widget.items.firstWhereOrNull((e) => e.value == value);
     if (item != null) {
       _controller.textWithSelection = item.label;
     }
   }
-
-  SingleSelectDropdown<T> get _widget => widget as SingleSelectDropdown<T>;
 }

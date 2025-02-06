@@ -59,7 +59,7 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
     return EditableTile(
       title: context.l10n.displayName,
       onChanged: _handleEditModeChange,
-      initialEditMode: _isEditMode,
+      isEditMode: _isEditMode,
       isSaveEnabled: _displayName.isValid,
       child: VoicesDisplayNameTextField(
         controller: _controller,

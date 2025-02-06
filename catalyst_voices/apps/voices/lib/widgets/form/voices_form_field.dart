@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 /// can be set once, here the value can be updated as many times as needed.
 class VoicesFormField<T> extends FormField<T> {
   final T? value;
-  final ValueChanged<T?> onChanged;
+  final ValueChanged<T?>? onChanged;
 
   const VoicesFormField({
     super.key,
     required this.value,
-    required this.onChanged,
+    this.onChanged,
     required super.builder,
     super.validator,
     super.enabled,
@@ -25,26 +25,30 @@ class VoicesFormField<T> extends FormField<T> {
 
 class VoicesFormFieldState<T> extends FormFieldState<T> {
   @override
+  VoicesFormField<T> get widget => super.widget as VoicesFormField<T>;
+
+  @override
   void initState() {
     super.initState();
 
-    setValue(_widget.value);
+    final value = widget.value;
+    if (value != null) {
+      setValue(value);
+    }
   }
 
   @override
   void didUpdateWidget(VoicesFormField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (_widget.value != oldWidget.value) {
-      setValue(_widget.value);
+    if (widget.value != oldWidget.value) {
+      setValue(widget.value);
     }
   }
 
   @override
   void didChange(T? value) {
     super.didChange(value);
-    _widget.onChanged(value);
+    widget.onChanged?.call(value);
   }
-
-  VoicesFormField<T> get _widget => widget as VoicesFormField<T>;
 }

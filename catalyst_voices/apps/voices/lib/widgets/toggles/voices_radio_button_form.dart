@@ -15,7 +15,7 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
     required super.onChanged,
     super.enabled,
     super.validator,
-    super.autovalidateMode = AutovalidateMode.always,
+    super.autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
           builder: (field) {
             return Column(

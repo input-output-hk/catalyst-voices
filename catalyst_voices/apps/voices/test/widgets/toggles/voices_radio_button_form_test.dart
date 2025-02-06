@@ -82,7 +82,7 @@ void main() {
               onChanged: (_) {},
               validator: (value) =>
                   value == null ? 'Selection is required' : null,
-              autovalidateMode: AutovalidateMode.always,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
             ),
           ),
         ),

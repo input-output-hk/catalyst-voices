@@ -57,7 +57,7 @@ class _AccountEmailTileState extends State<AccountEmailTile> {
     return EditableTile(
       title: context.l10n.emailAddress,
       onChanged: _handleEditModeChange,
-      initialEditMode: _isEditMode,
+      isEditMode: _isEditMode,
       isSaveEnabled: _email.isValid,
       child: VoicesEmailTextField(
         controller: _controller,
