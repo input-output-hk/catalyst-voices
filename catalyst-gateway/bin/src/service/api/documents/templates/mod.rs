@@ -127,3 +127,25 @@ pub(crate) fn get_doc_static_template(document_id: uuid::Uuid) -> Option<Vec<u8>
     }
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use std::env;
+
+    use rand::rngs::OsRng;
+
+    use super::*;
+
+    #[test]
+    fn templates() {
+        let mut rand = OsRng;
+        let sk_bytes: SigningKey = SigningKey::generate(&mut rand);
+        let sk_hex = format!("0x{}", hex::encode(sk_bytes.to_bytes()).as_str());
+        unsafe {
+            env::set_var("SIGNED_DOC_SK", sk_hex);
+        }
+        for value in TEMPLATES.as_ref().unwrap().values() {
+            assert!(value.doc_content().is_json());
+        }
+    }
+}
