@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/cards/voices_leading_icon_card.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices/widgets/text/day_at_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -51,7 +51,7 @@ class CreateProposalCard extends StatelessWidget {
               context.l10n.startProposal,
             ),
             onTap: () {
-              //TODO Pass categoryId when implemented
+              //TODO(LynxLynxx) Pass categoryId when implemented
               const ProposalBuilderDraftRoute().go(context);
             },
           ),
@@ -124,13 +124,8 @@ class _SubmissionCloseAt extends StatelessWidget {
               context.l10n.proposalsSubmissionClose,
               style: context.textTheme.bodyMedium,
             ),
-            TimezoneDateTimeText(
-              dateTime,
-              formatter: (context, dateTime) {
-                final date = DateFormatter.formatDateTimeParts(dateTime);
-                return context.l10n.dateAtTime(date.date, date.time);
-              },
-              style: context.textTheme.titleSmall,
+            DayAtTimeText(
+              dateTime: dateTime,
               showTimezone: false,
             ),
           ],
