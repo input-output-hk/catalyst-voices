@@ -79,7 +79,7 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
             items: _dropdownMenuEntries,
             onChanged: _handleValueChanged,
             validator: _validator,
-            initialValue: _selectedValue,
+            value: _selectedValue,
             enabled: widget.isEditMode,
             hintText: _placeholder,
           ),

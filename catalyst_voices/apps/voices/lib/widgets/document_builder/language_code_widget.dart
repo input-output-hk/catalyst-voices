@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
@@ -38,7 +37,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
               ? DropdownMenuEntry(value: e, label: label)
               : null;
         })
-        .whereNotNull()
+        .nonNulls
         .toList();
   }
 
@@ -83,7 +82,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
         ],
         SingleSelectDropdown(
           items: _dropdownMenuEntries,
-          initialValue: _selectedValue,
+          value: _selectedValue,
           onChanged: _handleValueChanged,
           enabled: widget.isEditMode,
         ),

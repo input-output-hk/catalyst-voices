@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -100,26 +101,21 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   }
 }
 
-class _YesNoChoiceSegmentButton extends FormField<bool?> {
-  final bool? value;
-  final ValueChanged<bool?>? onChanged;
-
+class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
   _YesNoChoiceSegmentButton({
     super.key,
-    required this.value,
-    required this.onChanged,
+    required super.value,
+    required super.onChanged,
     super.validator,
     super.enabled,
-    AutovalidateMode autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
-          initialValue: value,
-          autovalidateMode: autovalidateMode,
           builder: (field) {
-            final state = field as _YesNoChoiceSegmentButtonState;
+            final state = field as VoicesFormFieldState<bool?>;
+            final value = state.value;
+
             void onChangedHandler(Set<bool> selected) {
               final newValue = selected.isEmpty ? null : selected.first;
               field.didChange(newValue);
-              onChanged?.call(newValue);
             }
 
             return Column(
@@ -140,9 +136,9 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
                         label: Text(field.context.l10n.no),
                       ),
                     ],
-                    selected: state._internalValue != null
-                        ? {state._internalValue!}
-                        : {},
+                    selected: {
+                      if (value != null) value,
+                    },
                     onChanged: onChangedHandler,
                     emptySelectionAllowed: true,
                     style: _getButtonStyle(field),
@@ -177,30 +173,5 @@ class _YesNoChoiceSegmentButton extends FormField<bool?> {
         ),
       ),
     );
-  }
-
-  @override
-  FormFieldState<bool?> createState() => _YesNoChoiceSegmentButtonState();
-}
-
-class _YesNoChoiceSegmentButtonState extends FormFieldState<bool?> {
-  bool? _internalValue;
-
-  @override
-  void initState() {
-    super.initState();
-    _internalValue = widget.initialValue;
-  }
-
-  @override
-  void didUpdateWidget(_YesNoChoiceSegmentButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialValue != _internalValue) {
-      _internalValue = widget.initialValue;
-    }
-    if (_internalValue != value) {
-      setValue(_internalValue);
-      validate();
-    }
   }
 }

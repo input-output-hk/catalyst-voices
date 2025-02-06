@@ -46,7 +46,7 @@ impl SignedDocTemplate {
 
         Builder::new()
             .with_metadata(metadata.clone())
-            .with_content(self.content.clone())
+            .with_decoded_content(self.content.clone())
             .build()
             // This should not happen
             .expect("Failed to build CatalystSignedDocument from template")
