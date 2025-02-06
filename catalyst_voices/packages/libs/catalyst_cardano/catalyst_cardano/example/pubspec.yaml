@@ -6,15 +6,15 @@ version: 1.0.0+1
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.24.1"
+  flutter: ">=3.27.3"
 
 dependencies:
-  catalyst_cardano: ^0.4.0+3
-  catalyst_cardano_serialization: ^0.5.0+3
-  catalyst_cardano_web: ^0.4.0+3
-  catalyst_compression: ^0.4.0
-  catalyst_compression_web: ^0.4.0
-  catalyst_key_derivation: ^0.1.2
+  catalyst_cardano: ^1.0.0
+  catalyst_cardano_serialization: ^1.0.0
+  catalyst_cardano_web: ^1.0.0
+  catalyst_compression: ^1.0.0
+  catalyst_compression_web: ^1.0.0
+  catalyst_key_derivation: ^1.0.0
   catalyst_voices_driver:
     path: ../../../../internal/catalyst_voices_driver
   cbor: ^6.2.0
@@ -31,7 +31,7 @@ dependencies:
   webdriver: ^3.0.3
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.1
+  catalyst_analysis: ^3.0.0
 
 flutter:
   uses-material-design: true

@@ -11,13 +11,13 @@ use poem_openapi::{auth::ApiKey, SecurityScheme};
 use crate::settings::Settings;
 
 /// The header name that holds the API Key
-const API_KEY_HEADER: &str = "X-API-Key";
+pub(crate) const API_KEY_HEADER: &str = "X-API-Key";
 
 /// `ApiKey` authorization for Internal Endpoints
 #[derive(SecurityScheme)]
 #[oai(
     ty = "api_key",
-    key_name = "X-API-Key", // MUST match the above constant.
+    key_name = "X-API-Key", // MUST match the `API_KEY_HEADER` constant.
     key_in = "header",
     checker = "api_checker"
 )]

@@ -15,6 +15,9 @@ pub(crate) enum Cip36Registration {
     /// No valid registration.
     #[oai(status = 404)]
     NotFound,
+    /// Response for unprocessable content.
+    #[oai(status = 422)]
+    UnprocessableContent(Json<Cip36RegistrationUnprocessableContent>),
 }
 
 /// All responses to a cip36 registration query
@@ -161,5 +164,29 @@ impl Cip36Details {
             cip15: true,
             errors: vec!["Stake Public Key is required".into()],
         }
+    }
+}
+
+/// Cip36 Registration Validation Error.
+#[derive(Object, Default)]
+#[oai(example = true)]
+pub(crate) struct Cip36RegistrationUnprocessableContent {
+    /// Error messages.
+    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
+    error: String,
+}
+
+impl Cip36RegistrationUnprocessableContent {
+    /// Create a new instance of `Cip36RegistrationUnprocessableContent`.
+    pub(crate) fn new(error: &(impl ToString + ?Sized)) -> Self {
+        Self {
+            error: error.to_string(),
+        }
+    }
+}
+
+impl Example for Cip36RegistrationUnprocessableContent {
+    fn example() -> Self {
+        Cip36RegistrationUnprocessableContent::new("Cip36 Registration in request body")
     }
 }
