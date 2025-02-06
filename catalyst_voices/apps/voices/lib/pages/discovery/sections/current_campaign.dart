@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/amount_formatter.dart';
+import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -44,7 +45,12 @@ class CurrentCampaign extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-        CampaignTimeline(CampaignTimelineViewModelX.mockData),
+        // TODO(minikin): fix padding
+        CampaignTimeline(
+          timelineItems: CampaignTimelineViewModelX.mockData,
+          placement: CampaignTimelinePlacement.discovery,
+        ),
+        const SizedBox(height: 32),
       ],
     );
   }

@@ -1,7 +1,12 @@
 part of 'workspace_header.dart';
 
 class TimelineToggleButton extends StatefulWidget {
-  const TimelineToggleButton({super.key});
+  final VoidCallback? onPressed;
+
+  const TimelineToggleButton({
+    super.key,
+    this.onPressed,
+  });
 
   @override
   State<TimelineToggleButton> createState() => TimelineToggleButtonState();
@@ -34,8 +39,7 @@ class TimelineToggleButtonState extends State<TimelineToggleButton> {
   }
 
   void toggleTimelineVisibility() {
-    setState(() {
-      isTimelineVisible = !isTimelineVisible;
-    });
+    setState(() => isTimelineVisible = !isTimelineVisible);
+    widget.onPressed?.call();
   }
 }

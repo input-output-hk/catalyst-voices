@@ -2,14 +2,22 @@ import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignTimelineCard extends StatefulWidget {
   final CampaignTimelineViewModel timelineItem;
+  final CampaignTimelinePlacement placement;
+  final ValueChanged<bool>? onExpandedChanged;
 
-  const CampaignTimelineCard(this.timelineItem, {super.key});
+  const CampaignTimelineCard({
+    super.key,
+    required this.timelineItem,
+    required this.placement,
+    this.onExpandedChanged,
+  });
 
   @override
   State<CampaignTimelineCard> createState() => CampaignTimelineCardState();
@@ -25,14 +33,19 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colorScheme;
+
     return GestureDetector(
       onTap: _toggleExpanded,
       child: SizedBox(
-        width: 280,
+        width: 288,
+        height: isExpanded ? 300 : 150,
         child: Card(
+          color:
+              widget.placement.backgroundColor(context, isOngoing: isOngoing),
           shape: OutlineInputBorder(
             borderSide: BorderSide(
-              color: isOngoing ? context.colorScheme.primary : Colors.white,
+              color: isOngoing ? colors.primary : Colors.white,
               width: isOngoing ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(8),
@@ -47,10 +60,10 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     VoicesAssets.icons.calendar.buildIcon(
-                      color: context.colorScheme.primary,
+                      color: colors.primary,
                     ),
                     _expandedIcon.buildIcon(
-                      color: context.colorScheme.primaryContainer,
+                      color: colors.primaryContainer,
                     ),
                   ],
                 ),
@@ -83,7 +96,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                             color: Colors.white,
                           ),
                         ),
-                        backgroundColor: context.colorScheme.primary,
+                        backgroundColor: colors.primary,
                       ),
                     ),
                   ],
@@ -111,6 +124,28 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
   void _toggleExpanded() {
     setState(() {
       isExpanded = !isExpanded;
+      widget.onExpandedChanged?.call(isExpanded);
     });
+  }
+}
+
+enum CampaignTimelinePlacement {
+  discovery,
+  workspace;
+
+  Color backgroundColor(
+    BuildContext context, {
+    required bool isOngoing,
+  }) {
+    final colorScheme = context.colorScheme;
+    final colors = Theme.of(context).colors;
+
+    return switch ((this, isOngoing)) {
+      (discovery, true) => colorScheme.onPrimary,
+      // TODO(minikin): chat with design about colors inconsistency.
+      (workspace, true) => colors.onSurfacePrimary016.withAlpha(1),
+      (discovery, false) => colorScheme.onPrimary,
+      (workspace, false) => colors.iconsBackgroundVariant,
+    };
   }
 }

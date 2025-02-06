@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -20,8 +21,16 @@ part 'title_text.dart';
 part 'workspace_tab_selector.dart';
 part 'workspace_tabs.dart';
 
-class WorkspaceHeader extends StatelessWidget {
+class WorkspaceHeader extends StatefulWidget {
   const WorkspaceHeader({super.key});
+
+  @override
+  State<WorkspaceHeader> createState() => _WorkspaceHeaderState();
+}
+
+class _WorkspaceHeaderState extends State<WorkspaceHeader> {
+  bool isTimelineExpanded = false;
+  bool isTimelineVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -36,38 +45,49 @@ class WorkspaceHeader extends StatelessWidget {
             const SizedBox(height: 32),
             const ProjectText(),
             const SizedBox(height: 8),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TitleText(),
-                Spacer(),
-                CreateProposalButton(),
-                SizedBox(width: 8),
-                ImportProposalButton(),
-                SizedBox(width: 8),
-                TimelineToggleButton(),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.withAlpha(51),
-                      ),
-                    ),
-                    child:
-                        CampaignTimeline(CampaignTimelineViewModelX.mockData),
-                  ),
+                const TitleText(),
+                const Spacer(),
+                const CreateProposalButton(),
+                const SizedBox(width: 8),
+                const ImportProposalButton(),
+                const SizedBox(width: 8),
+                TimelineToggleButton(
+                  onPressed: _toggleTimelineVisibility,
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+            if (isTimelineVisible)
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: isTimelineExpanded ? 340 : 190,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.grey.withAlpha(51),
+                        ),
+                      ),
+                      child: CampaignTimeline(
+                        timelineItems: CampaignTimelineViewModelX.mockData,
+                        placement: CampaignTimelinePlacement.workspace,
+                        onExpandedChanged: (isExpanded) {
+                          setState(() {
+                            isTimelineExpanded = isExpanded;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             const SizedBox(height: 48),
             // const Row(
             //   mainAxisSize: MainAxisSize.max,
@@ -101,5 +121,14 @@ class WorkspaceHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _toggleTimelineVisibility() {
+    setState(() {
+      isTimelineVisible = !isTimelineVisible;
+      if (!isTimelineVisible) {
+        isTimelineExpanded = false;
+      }
+    });
   }
 }
