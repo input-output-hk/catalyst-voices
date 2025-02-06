@@ -1,16 +1,16 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
-use bad_put_request::PutDocumentBadRequest;
 use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::{payload::Json, ApiResponse};
+use unprocessable_content_request::PutDocumentUnprocessableContent;
 
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
     service::common::responses::WithErrorResponses,
 };
 
-pub(crate) mod bad_put_request;
+pub(crate) mod unprocessable_content_request;
 
 /// Maximum size of a Signed Document (1MB)
 pub(crate) const MAXIMUM_DOCUMENT_SIZE: usize = 1_048_576;
@@ -28,11 +28,11 @@ pub(crate) enum Responses {
     /// The Document was already stored, and has not changed.
     #[oai(status = 204)]
     NoContent,
-    /// ## Bad Request
+    /// ## Unprocessable Content
     ///
     /// Error Response. The document submitted is invalid.
-    #[oai(status = 400)]
-    BadRequest(Json<PutDocumentBadRequest>),
+    #[oai(status = 422)]
+    UnprocessableContent(Json<PutDocumentUnprocessableContent>),
     /// ## Content Too Large
     ///
     /// Payload Too Large. The document exceeds the maximum size of a legitimate single
@@ -92,7 +92,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Ok(true) => Responses::Created.into(),
                 Ok(false) => Responses::NoContent.into(),
                 Err(err) if err.is::<StoreError>() => {
-                    Responses::BadRequest(Json(PutDocumentBadRequest::new(
+                    Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                         "Document with the same `id` and `ver` already exists",
                         None,
                     )))
@@ -110,7 +110,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                     ))
                 },
             };
-            Responses::BadRequest(Json(PutDocumentBadRequest::new(
+            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Invalid CBOR encoded document",
                 Some(json_report),
             )))

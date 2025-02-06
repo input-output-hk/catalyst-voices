@@ -1,7 +1,8 @@
 //! CIP36 Registration Endpoints
 
-use poem::http::{HeaderMap, StatusCode};
-use poem_openapi::{param::Query, OpenApi};
+use poem::http::HeaderMap;
+use poem_openapi::{param::Query, payload::Json, OpenApi};
+use response::Cip36RegistrationUnprocessableContent;
 
 use self::{cardano::slot_no::SlotNo, common::auth::none::NoAuthorization};
 use super::Ed25519HexEncodedPublicKey;
@@ -57,12 +58,12 @@ impl Api {
         // is invalid.
         if let Some(lookup) = lookup.0.clone() {
             if lookup.is_all(headers).is_err() {
-                return response::AllRegistration::unprocessable_content(vec![
-                    poem::Error::from_string(
+                return response::Cip36Registration::UnprocessableContent(Json(
+                    Cip36RegistrationUnprocessableContent::new(
                         "Invalid Stake Address or Voter key",
-                        StatusCode::UNPROCESSABLE_ENTITY,
                     ),
-                ]);
+                ))
+                .into();
             }
         }
 
