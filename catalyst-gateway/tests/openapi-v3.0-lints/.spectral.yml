@@ -217,7 +217,7 @@ rules:
   api-example-schema:
     message: "Schema should contain example"
     given: "$..schema"
-    severity: warn
+    severity: error
     then:
       field: "example"
       function: truthy
