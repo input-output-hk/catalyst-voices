@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.24.1"
+  flutter: ">=3.27.3"
 
 dependencies:
   catalyst_voices_assets:
@@ -15,7 +15,7 @@ dependencies:
   google_fonts: ^6.2.1
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.1
+  catalyst_analysis: ^3.0.0
   catalyst_voices_blocs:
     path: ../catalyst_voices_blocs
   flutter_bloc: ^8.1.5

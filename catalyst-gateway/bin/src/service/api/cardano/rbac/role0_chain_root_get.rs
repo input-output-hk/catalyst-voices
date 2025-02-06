@@ -27,15 +27,20 @@ pub(crate) struct RbacRole0ChainRootResponse {
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## Ok
+    ///
     /// Success returns the chain root hash.
     #[oai(status = 200)]
     Ok(Json<RbacRole0ChainRootResponse>),
+    /// ## Not Found
     /// No chain root found for the given stake address.
     #[oai(status = 404)]
     NotFound,
-    /// Response for bad requests.
-    #[oai(status = 400)]
-    BadRequest,
+    /// ## Unprocessable Content
+    ///
+    /// Response for unprocessable content.
+    #[oai(status = 422)]
+    UnprocessableContent,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
@@ -49,7 +54,7 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
     };
 
     let Ok(decoded_role0_key) = hex::decode(role0_key) else {
-        return Responses::BadRequest.into();
+        return Responses::UnprocessableContent.into();
     };
 
     let query_res = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {

@@ -38,7 +38,9 @@ class VoicesAvatarExample extends StatelessWidget {
               icon: VoicesAssets.icons.lightBulb.buildIcon(),
               foregroundColor: Theme.of(context).colors.iconsSecondary,
               backgroundColor:
-                  Theme.of(context).colors.iconsSecondary.withOpacity(0.16),
+                  Theme.of(context).colors.iconsSecondary.withValues(
+                        alpha: 0.16,
+                      ),
             ),
             VoicesAvatar(
               icon: Image.asset(UiKitAssets.images.robotAvatar.path),

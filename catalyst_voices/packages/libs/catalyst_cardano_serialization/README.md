@@ -24,7 +24,7 @@ and submission are outside of scope of this package.
 ## Requirements
 
 * Dart: 3.5.0+
-* Flutter: 3.24.1+
+* Flutter: 3.27.3+
 
 ## Install
 
