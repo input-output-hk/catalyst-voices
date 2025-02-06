@@ -344,6 +344,48 @@ final class DocumentSingleGroupedTagSelectorSchema
   }
 }
 
+final class DocumentBorderGroupSchema extends DocumentObjectSchema {
+  const DocumentBorderGroupSchema({
+    required super.nodeId,
+    required super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.properties,
+    required super.oneOf,
+    required super.order,
+  });
+
+  @override
+  DocumentBorderGroupSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
+    return DocumentBorderGroupSchema(
+      nodeId: newNodeId,
+      format: format,
+      title: newTitle,
+      description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isRequired: isRequired,
+      isSubsection: isSubsection,
+      properties: properties
+          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
+          .toList(),
+      oneOf: oneOf,
+      order: order,
+    );
+  }
+}
+
+
 final class DocumentGenericObjectSchema extends DocumentObjectSchema {
   const DocumentGenericObjectSchema({
     required super.nodeId,

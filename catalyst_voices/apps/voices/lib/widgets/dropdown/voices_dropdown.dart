@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -146,7 +147,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                     ),
                   ),
                 ),
-                if (field.hasError) _ErrorText(text: field.errorText),
+                if (field.hasError) DocumentErrorText(text: field.errorText),
               ],
             );
           },
@@ -181,23 +182,4 @@ class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {
   }
 
   SingleSelectDropdown<T> get _widget => widget as SingleSelectDropdown<T>;
-}
-
-class _ErrorText extends StatelessWidget {
-  final String? text;
-
-  const _ErrorText({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Text(
-        text ?? context.l10n.snackbarErrorLabelText,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.error,
-            ),
-      ),
-    );
-  }
 }
