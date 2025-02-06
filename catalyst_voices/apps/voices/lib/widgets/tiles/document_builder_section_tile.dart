@@ -146,8 +146,8 @@ class _PropertyBuilder extends StatelessWidget {
     final property = this.property;
     switch (property) {
       case DocumentListProperty():
-        return DocumentPropertyListBuilderWidget(
-          list: property,
+        return _PropertyListBuilder(
+          property: property,
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
@@ -167,41 +167,51 @@ class _PropertyBuilder extends StatelessWidget {
   }
 }
 
-class DocumentPropertyListBuilderWidget extends StatelessWidget {
-  final DocumentListProperty list;
+class _PropertyListBuilder extends StatelessWidget {
+  final DocumentListProperty property;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
 
-  const DocumentPropertyListBuilderWidget({
-    super.key,
-    required this.list,
+  const _PropertyListBuilder({
+    required this.property,
     required this.isEditMode,
     required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    final properties = property.properties
+        .whereNot((child) => child.schema.isSectionOrSubsection);
+
+    final error =
+        LocalizedDocumentValidationResult.from(property.validationResult)
+            .message(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListLengthPickerWidget(
-          key: ValueKey(list.nodeId),
-          list: list,
-          isEditMode: isEditMode,
-          onChanged: onChanged,
-        ),
-        ...list.properties
-            .whereNot((child) => child.schema.isSectionOrSubsection)
-            .map<Widget>((child) {
-          return _PropertyBuilder(
-            key: ValueKey(child.nodeId),
-            property: child,
+        ...[
+          ListLengthPickerWidget(
+            key: ValueKey(property.nodeId),
+            list: property,
             isEditMode: isEditMode,
             onChanged: onChanged,
-          );
-        }),
-      ].separatedBy(const SizedBox(height: 24)).toList(),
+          ),
+          ...properties.map<Widget>((child) {
+            return _PropertyBuilder(
+              key: ValueKey(child.nodeId),
+              property: child,
+              isEditMode: isEditMode,
+              onChanged: onChanged,
+            );
+          }),
+        ].separatedBy(const SizedBox(height: 24)),
+        if (error != null) ...[
+          const SizedBox(height: 4),
+          DocumentErrorText(text: error),
+        ],
+      ],
     );
   }
 }
@@ -299,7 +309,7 @@ class _GenericPropertyObjectBuilder extends StatelessWidget {
             );
           }).separatedBy(const SizedBox(height: 24)),
           if (error != null) ...[
-            if (properties.isNotEmpty) const SizedBox(height: 8),
+            if (properties.isNotEmpty) const SizedBox(height: 4),
             DocumentErrorText(text: error),
           ],
         ],
