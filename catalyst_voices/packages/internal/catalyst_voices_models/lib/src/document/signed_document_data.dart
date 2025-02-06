@@ -1,17 +1,26 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-// List of types and metadata fields is here
-// https://input-output-hk.github.io/catalyst-libs/branch/feat_signed_object/architecture/08_concepts/signed_doc/types/
-
-extension type const SignedDocumentDataPayload(Map<String, dynamic> data)
+extension type const SignedDocumentContent(Map<String, dynamic> data)
     implements Object {}
 
+// List of types and metadata fields is here
+// https://input-output-hk.github.io/catalyst-libs/branch/feat_signed_object/architecture/08_concepts/signed_doc/types/
 enum SignedDocumentType {
   proposalDocument(uuid: '7808d2ba-d511-40af-84e8-c0d1625fdfdc'),
-  proposalTemplate(uuid: '0ce8ab38-9258-4fbc-a62e-7faa6e58318f');
+  proposalTemplate(uuid: '0ce8ab38-9258-4fbc-a62e-7faa6e58318f'),
+  unknown(uuid: '');
 
   final String uuid;
+
+  static String toJson(SignedDocumentType type) => type.uuid;
+
+  static SignedDocumentType fromJson(String data) {
+    return SignedDocumentType.values.firstWhere(
+      (element) => element.uuid == data,
+      orElse: () => SignedDocumentType.unknown,
+    );
+  }
 
   const SignedDocumentType({
     required this.uuid,
@@ -20,17 +29,17 @@ enum SignedDocumentType {
 
 final class SignedDocumentData extends Equatable {
   final SignedDocumentMetadata metadata;
-  final SignedDocumentDataPayload payload;
+  final SignedDocumentContent content;
 
   const SignedDocumentData({
     required this.metadata,
-    required this.payload,
+    required this.content,
   });
 
   @override
   List<Object?> get props => [
         metadata,
-        payload,
+        content,
       ];
 }
 
