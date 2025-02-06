@@ -5,12 +5,12 @@ publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
-  flutter: ">=3.24.1"
+  flutter: ">=3.27.3"
 
 dependencies:
-  catalyst_cardano: ^0.4.1
-  catalyst_cardano_serialization: ^0.5.0+4
-  catalyst_cardano_web: ^0.4.0+4
+  catalyst_cardano: ^1.0.0
+  catalyst_cardano_serialization: ^1.0.0
+  catalyst_cardano_web: ^1.0.0
   catalyst_voices_assets:
     path: ../catalyst_voices_assets
   catalyst_voices_brands:
@@ -30,5 +30,5 @@ dependencies:
   uuid: ^4.5.1
 
 dev_dependencies:
-  catalyst_analysis: ^2.0.1
+  catalyst_analysis: ^3.0.0
   test: ^1.24.9

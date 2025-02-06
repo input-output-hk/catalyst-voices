@@ -86,13 +86,13 @@ command:
     runPubGetInParallel: true
     environment:
       sdk: ">=3.5.0 <4.0.0"
-      flutter: ">=3.24.1"
+      flutter: ">=3.27.3"
     dependencies:
       asn1lib: ^1.5.3
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
       chopper: ^8.0.3
-      collection: ^1.18.0
+      collection: ^1.19.0
       cryptography: ^2.7.0
       dotted_border: ^2.1.0
       ed25519_hd_key: ^2.3.0
