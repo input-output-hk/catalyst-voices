@@ -24,12 +24,11 @@ fn is_live() -> bool {
 #[derive(ApiResponse)]
 #[allow(dead_code)]
 pub(crate) enum Responses {
+    /// ## No Content
+    ///
     /// Service is OK and can keep running.
     #[oai(status = 204)]
     NoContent,
-    /// Service is possibly not running reliably.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
 
 /// All responses.

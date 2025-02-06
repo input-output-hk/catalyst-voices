@@ -7,7 +7,7 @@ use poem_openapi::{types::Example, Object};
 /// Configuration Data Validation Error.
 #[derive(Object, Default)]
 #[oai(example = true)]
-pub(crate) struct ConfigBadRequest {
+pub(crate) struct ConfigUnprocessableContent {
     /// Error messages.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
     error: String,
@@ -16,7 +16,7 @@ pub(crate) struct ConfigBadRequest {
     schema_validation_errors: Option<Vec<String>>,
 }
 
-impl ConfigBadRequest {
+impl ConfigUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
     pub(crate) fn new(error: String, schema_validation_errors: Option<Vec<String>>) -> Self {
         Self {
@@ -26,9 +26,9 @@ impl ConfigBadRequest {
     }
 }
 
-impl Example for ConfigBadRequest {
+impl Example for ConfigUnprocessableContent {
     fn example() -> Self {
-        ConfigBadRequest {
+        ConfigUnprocessableContent {
             error: "Invalid Data".to_string(),
             schema_validation_errors: Some(vec!["Error message".to_string()]),
         }
