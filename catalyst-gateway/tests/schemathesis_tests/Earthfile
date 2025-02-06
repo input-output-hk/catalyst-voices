@@ -8,17 +8,22 @@ package-schemathesis:
     ARG max_response_time
     ARG hypothesis_max_examples
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
-    ARG version=3.39.5
+    ARG version=3.39.8
     ARG tag="latest"
+
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
     RUN mkdir /results
     COPY ./hooks/hooks.py .
     VOLUME /results
 
-    ENTRYPOINT st run --exclude-path-regex 'draft' \
+    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
+                && st run --checks=all \
+                    --exclude-path-regex 'draft' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
-                    $api_spec \
+                    --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
+                    --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
+                    --checks=all $api_spec \
                     --workers=2 \
                     --wait-for-schema=$wait_for_schema \
                     --max-response-time=$max_response_time \
@@ -42,7 +47,7 @@ package-draft-schemathesis:
     ARG max_response_time
     ARG hypothesis_max_examples
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
-    ARG version=3.39.5
+    ARG version=3.39.8
     ARG tag="draft-latest"
 
     RUN apk add --no-cache gcc musl-dev

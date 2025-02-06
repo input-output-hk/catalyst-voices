@@ -17,7 +17,7 @@ class CommentCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(.38),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: .38),
           width: 1,
         ),
       ),

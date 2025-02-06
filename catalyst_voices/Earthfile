@@ -1,7 +1,8 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.33 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.35 AS flutter-ci
+
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -75,7 +76,6 @@ code-generator:
 
     # restore current working directory to the root of the project
     WORKDIR /frontend
-
 
 # Runs static analysis on the code.
 check-static-analysis:
