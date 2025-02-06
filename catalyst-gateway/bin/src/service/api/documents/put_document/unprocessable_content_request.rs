@@ -2,10 +2,10 @@
 
 use poem_openapi::{types::Example, Object};
 
-/// Configuration Data Validation Error.
+/// Put Document Validation Error.
 #[derive(Object, Default)]
 #[oai(example = true)]
-pub(crate) struct PutDocumentBadRequest {
+pub(crate) struct PutDocumentUnprocessableContent {
     /// Error messages.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
     error: String,
@@ -14,7 +14,7 @@ pub(crate) struct PutDocumentBadRequest {
     report: Option<serde_json::Value>,
 }
 
-impl PutDocumentBadRequest {
+impl PutDocumentUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
     pub(crate) fn new(error: &(impl ToString + ?Sized), report: Option<serde_json::Value>) -> Self {
         Self {
@@ -24,8 +24,8 @@ impl PutDocumentBadRequest {
     }
 }
 
-impl Example for PutDocumentBadRequest {
+impl Example for PutDocumentUnprocessableContent {
     fn example() -> Self {
-        PutDocumentBadRequest::new("Missing Document in request body", None)
+        PutDocumentUnprocessableContent::new("Missing Document in request body", None)
     }
 }

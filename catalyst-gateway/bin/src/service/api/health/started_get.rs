@@ -4,7 +4,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use poem_openapi::ApiResponse;
 
-use crate::service::common::responses::WithErrorResponses;
+use crate::service::common::{
+    responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption,
+};
 
 /// Flag to determine if the service has started
 static IS_STARTED: AtomicBool = AtomicBool::new(false);
@@ -21,12 +23,11 @@ fn is_started() -> bool {
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## No Content
+    ///
     /// Service is Started and can serve requests.
     #[oai(status = 204)]
     NoContent,
-    /// Service is not ready, do not send other requests.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
 
 /// All responses.
@@ -54,6 +55,9 @@ pub(crate) async fn endpoint() -> AllResponses {
     if is_started() {
         Responses::NoContent.into()
     } else {
-        Responses::ServiceUnavailable.into()
+        AllResponses::service_unavailable(
+            &anyhow::anyhow!("Service is not ready, do not send other requests."),
+            RetryAfterOption::Default,
+        )
     }
 }
