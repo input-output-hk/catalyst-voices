@@ -606,7 +606,7 @@ class OnboardingPage {
 
   static Future<void> enterStoredSeedPhrases(PatrolTester $) async {
     for (var i = 0; i < 12; i++) {
-      await inputSeedPhrasePicker($, TestContext.get(key: 'word$i')).tap();
+      await inputSeedPhrasePicker($, TestContext.get('word$i')).tap();
     }
   }
 

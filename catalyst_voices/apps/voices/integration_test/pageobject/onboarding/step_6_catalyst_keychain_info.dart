@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import 'onboarding_page_interface.dart';
-import 'step_4_acknowledgments.dart';
+import 'step_5_base_profile_final.dart';
 
-class BaseProfileFinalPanel implements OnboardingPage {
+class CatalystKeychainInfoPanel implements OnboardingPage {
   PatrolTester $;
-  BaseProfileFinalPanel(this.$);
+  CatalystKeychainInfoPanel(this.$);
 
   static const createKeychainButton = Key('CreateKeychainButton');
 
@@ -16,8 +16,8 @@ class BaseProfileFinalPanel implements OnboardingPage {
 
   @override
   Future<void> goto() async {
-    await AcknowledgmentsPanel($).goto();
-    await AcknowledgmentsPanel($).clickNext();
+    await BaseProfileFinalPanel($).goto();
+    await BaseProfileFinalPanel($).clickCreateKeychain();
   }
 
   @override

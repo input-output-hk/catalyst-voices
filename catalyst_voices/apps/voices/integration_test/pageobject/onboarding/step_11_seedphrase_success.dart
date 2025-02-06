@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import 'onboarding_page_interface.dart';
-import 'step_2_base_profile_info.dart';
+import 'step_10_input_seedphrase.dart';
 
-class SetupBaseProfilePanel implements OnboardingPage{
+class SeedphraseSuccessPanel implements OnboardingPage {
   PatrolTester $;
-  SetupBaseProfilePanel(this.$);
+  SeedphraseSuccessPanel(this.$);
 
   static const nextButton = Key('NextButton');
-  
-  @override
-  Future<void> goto() async {
-    await BaseProfileInfoPanel($).goto();
-    await BaseProfileInfoPanel($).clickCreateBaseProfile();
-  }
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
+  }
+
+  @override
+  Future<void> goto() async {
+    await InputSeedphrasePanel($).goto();
+    await InputSeedphrasePanel($).inputSeedPhraseWords();
+    await InputSeedphrasePanel($).clickNext();
   }
 
   @override

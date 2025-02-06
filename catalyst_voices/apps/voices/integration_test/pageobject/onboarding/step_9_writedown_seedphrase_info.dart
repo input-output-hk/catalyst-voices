@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import 'onboarding_page_interface.dart';
-import 'step_3_setup_base_profile.dart';
+import 'step_8_writedown_seedphrase.dart';
 
-class AcknowledgmentsPanel implements OnboardingPage {
+class WritedownSeedphraseInfoPanel implements OnboardingPage {
   PatrolTester $;
-  AcknowledgmentsPanel(this.$);
+  WritedownSeedphraseInfoPanel(this.$);
 
   static const nextButton = Key('NextButton');
 
@@ -16,8 +16,10 @@ class AcknowledgmentsPanel implements OnboardingPage {
 
   @override
   Future<void> goto() async {
-    await SetupBaseProfilePanel($).goto();
-    await SetupBaseProfilePanel($).clickNext();
+    await WriteDownSeedphrasePanel($).goto();
+    await WriteDownSeedphrasePanel($).storeSeedPhraseWords();
+    await WriteDownSeedphrasePanel($).clickSeedPhraseStoredCheckbox();
+    await WriteDownSeedphrasePanel($).clickNext();
   }
 
   @override

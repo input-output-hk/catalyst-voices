@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
+import '../../utils/constants.dart';
 import '../../utils/translations_utils.dart';
 import '../app_bar_page.dart';
 import 'onboarding_page_interface.dart';
@@ -20,9 +21,13 @@ class GetStartedPanel implements OnboardingPage {
   static const createNewKeychain = Key('CreateAccountType.createNew');
   static const recoverKeychain = Key('CreateAccountType.recover');
 
+  Future<void> clickCreateNewKeychain() async {
+    await $(createNewKeychain).tap();
+  }
+
   @override
   Future<void> goto() async {
-    await $(AppBarPage.getStartedBtn).tap();
+    await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
   }
 
   @override
