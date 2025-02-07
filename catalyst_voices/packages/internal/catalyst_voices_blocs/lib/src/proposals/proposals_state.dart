@@ -5,26 +5,19 @@ import 'package:equatable/equatable.dart';
 sealed class ProposalsState extends Equatable {
   final List<ProposalViewModel> proposals;
   final int resultsNumber;
-  final int pageKey;
 
   const ProposalsState({
     this.proposals = const [],
     this.resultsNumber = 0,
-    this.pageKey = 0,
   });
 
   ProposalsState copyWith({
     List<ProposalViewModel>? proposals,
     int? resultsNumber,
-    int? pageKey,
   });
 
   @override
-  List<Object?> get props => [
-        proposals,
-        resultsNumber,
-        pageKey,
-      ];
+  List<Object?> get props => [proposals, resultsNumber];
 }
 
 /// The proposals are loading.
@@ -32,19 +25,17 @@ final class LoadingProposalsState extends ProposalsState {
   const LoadingProposalsState({
     super.proposals,
     super.resultsNumber,
-    super.pageKey,
   });
 
   @override
   LoadingProposalsState copyWith({
     List<ProposalViewModel>? proposals,
     int? resultsNumber,
-    int? pageKey,
+    bool? reachMax,
   }) {
     return LoadingProposalsState(
       proposals: proposals ?? this.proposals,
       resultsNumber: resultsNumber ?? this.resultsNumber,
-      pageKey: pageKey ?? this.pageKey,
     );
   }
 
@@ -57,24 +48,22 @@ final class LoadedProposalsState extends ProposalsState {
   const LoadedProposalsState({
     super.proposals,
     super.resultsNumber,
-    super.pageKey,
   });
 
   @override
   LoadedProposalsState copyWith({
     List<ProposalViewModel>? proposals,
     int? resultsNumber,
-    int? pageKey,
+    bool? reachMax,
   }) {
     return LoadedProposalsState(
       proposals: proposals ?? this.proposals,
       resultsNumber: resultsNumber ?? this.resultsNumber,
-      pageKey: pageKey ?? this.pageKey,
     );
   }
 
   @override
-  List<Object?> get props => [...super.props];
+  List<Object?> get props => [...super.proposals];
 }
 
 final class ErrorProposalsState extends ProposalsState {
@@ -83,7 +72,6 @@ final class ErrorProposalsState extends ProposalsState {
   const ErrorProposalsState({
     super.proposals,
     super.resultsNumber,
-    super.pageKey,
     required this.error,
   });
 
@@ -91,14 +79,13 @@ final class ErrorProposalsState extends ProposalsState {
   ErrorProposalsState copyWith({
     List<ProposalViewModel>? proposals,
     int? resultsNumber,
+    bool? reachMax,
     LocalizedException? error,
-    int? pageKey,
   }) {
     return ErrorProposalsState(
       proposals: proposals ?? this.proposals,
       resultsNumber: resultsNumber ?? this.resultsNumber,
       error: error ?? this.error,
-      pageKey: pageKey ?? this.pageKey,
     );
   }
 

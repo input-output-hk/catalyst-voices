@@ -47,6 +47,7 @@ class ProposalCard extends StatelessWidget {
           isFavorite: isFavorite,
           onFavoriteChanged: onFavoriteChanged,
         ),
+      (_) => const Offstage(),
     };
   }
 }

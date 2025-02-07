@@ -45,6 +45,23 @@ and PRISM, but its potential is only barely exploited.
 """
     .replaceAll('\n', ' ');
 
+final _proposal = ProposalBase(
+  id: 'f14/0',
+  category: 'Cardano Use Cases / MVP',
+  title: 'Proposal Title that rocks the world',
+  updateDate: DateTime.now().minusDays(2),
+  fundsRequested: Coin.fromAda(100000),
+  status: ProposalStatus.draft,
+  publish:
+      Random().nextBool() ? ProposalPublish.draft : ProposalPublish.published,
+  access: ProposalAccess.private,
+  commentsCount: 0,
+  description: _proposalDescription,
+  duration: 6,
+  author: 'Alex Wells',
+  version: 1,
+);
+
 final _proposals = [
   ProposalBase(
     id: '${Random().nextInt(100)}',
