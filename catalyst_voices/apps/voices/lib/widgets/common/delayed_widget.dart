@@ -27,7 +27,7 @@ class _DelayedWidgetState extends State<DelayedWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant DelayedWidget oldWidget) {
+  void didUpdateWidget(DelayedWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.delay != oldWidget.delay) {
       _future = Future.delayed(widget.delay);

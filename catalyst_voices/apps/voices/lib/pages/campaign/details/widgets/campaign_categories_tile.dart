@@ -30,7 +30,7 @@ class _CampaignCategoriesTileState extends State<CampaignCategoriesTile> {
   }
 
   @override
-  void didUpdateWidget(covariant CampaignCategoriesTile oldWidget) {
+  void didUpdateWidget(CampaignCategoriesTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (!listEquals(widget.sections, oldWidget.sections)) {

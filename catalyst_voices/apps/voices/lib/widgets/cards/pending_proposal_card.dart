@@ -51,7 +51,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   }
 
   @override
-  void didUpdateWidget(covariant PendingProposalCard oldWidget) {
+  void didUpdateWidget(PendingProposalCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
       _border = _ProposalBorderColor(
