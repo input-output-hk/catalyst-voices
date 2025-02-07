@@ -1,11 +1,11 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use std::{cmp::Reverse, sync::Arc, time::Instant};
+use std::{cmp::Reverse, sync::Arc};
 
 use dashmap::DashMap;
 use futures::StreamExt;
 use rayon::prelude::*;
-use tracing::debug;
+use tracing::error;
 
 use super::{
     cardano::{
@@ -346,7 +346,7 @@ pub(crate) async fn get_registration_given_vote_key(
 /// ALL
 /// Get all registrations or constrain if slot# given.
 pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
-    debug!("Time snapshot");
+    // Get ALL registrations
     let all_registrations = match get_all_registrations(&session.clone()).await {
         Ok(all_registrations) => all_registrations,
         Err(err) => {
@@ -354,6 +354,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         },
     };
 
+    // Get all invalids
     let all_invalid_registrations = match get_all_invalid_registrations(session.clone()).await {
         Ok(invalids) => invalids,
         Err(err) => {
@@ -364,9 +365,16 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     let mut all_registrations_after_filtering = Vec::new();
     let mut all_invalids_after_filtering = Vec::new();
 
-    let start = Instant::now();
-
     for (stake_public_key, registrations) in all_registrations {
+        // latest vote key
+        let vote_pub_key = match latest_vote_key(registrations.clone()) {
+            Ok(vote_key) => vote_key,
+            Err(err) => {
+                error!("Snapshot: no voting keys with any registration {:?}", err);
+                continue;
+            },
+        };
+
         // ALL: Snapshot can be constrained into a subset with a time constraint or NOT.
         if let Some(ref slot_no) = slot_no {
             // Any registrations that occurred after this Slot are not included in the list.
@@ -377,13 +385,13 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
             }
 
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
-                vote_pub_key: stake_public_key.clone(),
+                vote_pub_key,
                 registrations: filtered_registrations,
             });
         } else {
             // No slot filtering, return ALL registrations without constraints.
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
-                vote_pub_key: stake_public_key.clone(),
+                vote_pub_key,
                 registrations,
             });
         }
@@ -405,9 +413,6 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         }
     }
 
-    let duration = start.elapsed();
-    debug!("Time elapsed in snapshot_function() is: {:?}", duration);
-
     AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             slot: slot_no.unwrap_or(SlotNo::from(0)),
@@ -424,6 +429,23 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36D
         .into_par_iter()
         .filter(|registration| registration.slot_no < *slot_no)
         .collect()
+}
+
+/// Stake addr may have multiple registrations and multiple vote key associations, filter
+/// out latets vote key.
+fn latest_vote_key(
+    mut registrations: Vec<Cip36Details>,
+) -> anyhow::Result<Ed25519HexEncodedPublicKey> {
+    registrations.sort_by_key(|registration| Reverse(registration.slot_no.clone()));
+    for registration in registrations {
+        if let Some(vote_key) = registration.vote_pub_key {
+            return Ok(vote_key);
+        }
+    }
+
+    Err(anyhow::anyhow!(
+        "No vote keys associated with any registration"
+    ))
 }
 
 /// Filter out any invalid registrations that occurred before this Slot no
