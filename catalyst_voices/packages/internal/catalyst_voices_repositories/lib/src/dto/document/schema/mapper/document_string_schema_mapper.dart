@@ -11,7 +11,6 @@ enum _DocumentStringDefinition {
   dropDownSingleSelect('dropDownSingleSelect'),
   tagGroup('tagGroup'),
   tagSelection('tagSelection'),
-  spdxLicenseOrUrl('spdxLicenseOrURL'),
   languageCode('languageCode'),
   radioButtonSelect('radioButtonSelect'),
   unknown('unknown');
@@ -177,23 +176,7 @@ final class DocumentStringSchemaMapper {
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
         );
-      case _DocumentStringDefinition.spdxLicenseOrUrl:
-        return DocumentSpdxLicenseOrUrlSchema(
-          nodeId: nodeId,
-          format: format,
-          contentMediaType: contentMediaType,
-          title: title,
-          description: descriptionMarkdown,
-          placeholder: placeholder,
-          guidance: guidance,
-          isSubsection: isSubsection,
-          isRequired: isRequired,
-          defaultValue: defaultValue,
-          constValue: constValue,
-          enumValues: enumValues,
-          strLengthRange: strLengthRange,
-          pattern: patternRegExp,
-        );
+
       case _DocumentStringDefinition.languageCode:
         return DocumentLanguageCodeSchema(
           nodeId: nodeId,

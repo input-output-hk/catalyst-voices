@@ -24,7 +24,6 @@ class VoicesNumField<T extends num> extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<T?>? onChanged;
   final VoicesNumFieldValidator<T>? validator;
-  final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
   final bool enabled;
   final bool readOnly;
   final bool? ignorePointers;
@@ -42,7 +41,6 @@ class VoicesNumField<T extends num> extends StatefulWidget {
     this.inputFormatters,
     this.onChanged,
     this.validator,
-    this.onStatusChanged,
     this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
@@ -77,7 +75,7 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
   }
 
   @override
-  void didUpdateWidget(covariant VoicesNumField<T> oldWidget) {
+  void didUpdateWidget(VoicesNumField<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller != oldWidget.controller) {
@@ -122,10 +120,10 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
       inputFormatters: [
         ...?widget.inputFormatters,
       ],
-      onChanged: onChanged != null ? (value) => onChanged(_toNum(value)) : null,
-      validator:
+      onChanged:
+          onChanged != null ? (value) => onChanged(_toNum(value ?? '')) : null,
+      textValidator:
           validator != null ? (value) => validator(_toNum(value), value) : null,
-      onStatusChanged: widget.onStatusChanged,
       onFieldSubmitted: onFieldSubmitted != null
           ? (value) => onFieldSubmitted(_toNum(value))
           : null,
