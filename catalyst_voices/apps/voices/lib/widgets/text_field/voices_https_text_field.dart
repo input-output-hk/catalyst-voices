@@ -29,6 +29,8 @@ class VoicesHttpsTextField extends StatefulWidget {
 
 class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
     with LaunchUrlMixin {
+  final _textFieldKey = GlobalKey<VoicesTextFieldState>();
+
   TextEditingController? _controller;
   TextEditingController get _effectiveController {
     return widget.controller ?? (_controller ??= TextEditingController());
@@ -47,6 +49,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
     return GestureDetector(
       onTap: widget.enabled ? null : _launchUrl,
       child: VoicesTextField(
+        key: _textFieldKey,
         controller: _effectiveController,
         focusNode: widget.focusNode,
         onChanged: widget.onChanged,
@@ -113,7 +116,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
   }
 
   void _onClearTap() {
-    _effectiveController.clear();
+    _textFieldKey.currentState?.clear();
   }
 }
 

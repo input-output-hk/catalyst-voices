@@ -132,7 +132,7 @@ class VoicesTextField extends VoicesFormField<String> {
           },
           builder: (field) {
             final context = field.context;
-            final state = field as _VoicesTextFieldState;
+            final state = field as VoicesTextFieldState;
             final theme = Theme.of(context);
             final textTheme = theme.textTheme;
 
@@ -197,10 +197,10 @@ class VoicesTextField extends VoicesFormField<String> {
         );
 
   @override
-  VoicesFormFieldState<String> createState() => _VoicesTextFieldState();
+  VoicesFormFieldState<String> createState() => VoicesTextFieldState();
 }
 
-class _VoicesTextFieldState extends VoicesFormFieldState<String> {
+class VoicesTextFieldState extends VoicesFormFieldState<String> {
   TextEditingController? _customController;
 
   VoicesTextFieldValidationResult _validation =
@@ -296,6 +296,12 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
     _obtainController().text = widget.initialValue ?? '';
     super.reset();
     widget.onChanged?.call(_obtainController().text);
+  }
+
+  /// Clears the text field.
+  void clear() {
+    didChange(null);
+    widget.onChanged?.call(null);
   }
 
   @override
