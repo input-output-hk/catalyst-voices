@@ -27,91 +27,60 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 32),
-            const ProjectText(),
-            const SizedBox(height: 8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 32),
+          const ProjectText(),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const TitleText(),
+              const Spacer(),
+              const CreateProposalButton(),
+              const SizedBox(width: 8),
+              const ImportProposalButton(),
+              const SizedBox(width: 8),
+              TimelineToggleButton(
+                onPressed: _toggleTimelineVisibility,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          if (isTimelineVisible)
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const TitleText(),
-                const Spacer(),
-                const CreateProposalButton(),
-                const SizedBox(width: 8),
-                const ImportProposalButton(),
-                const SizedBox(width: 8),
-                TimelineToggleButton(
-                  onPressed: _toggleTimelineVisibility,
+                Expanded(
+                  child: Container(
+                    height: isTimelineExpanded ? 340 : 190,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.grey.withAlpha(51),
+                      ),
+                    ),
+                    child: CampaignTimeline(
+                      timelineItems: CampaignTimelineViewModelX.mockData,
+                      placement: CampaignTimelinePlacement.workspace,
+                      onExpandedChanged: (isExpanded) {
+                        setState(() {
+                          isTimelineExpanded = isExpanded;
+                        });
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            if (isTimelineVisible)
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: isTimelineExpanded ? 340 : 190,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.grey.withAlpha(51),
-                        ),
-                      ),
-                      child: CampaignTimeline(
-                        timelineItems: CampaignTimelineViewModelX.mockData,
-                        placement: CampaignTimelinePlacement.workspace,
-                        onExpandedChanged: (isExpanded) {
-                          setState(() {
-                            isTimelineExpanded = isExpanded;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            const SizedBox(height: 48),
-            // const Row(
-            //   mainAxisSize: MainAxisSize.max,
-            //   crossAxisAlignment: CrossAxisAlignment.end,
-            //   children: [
-            //     Expanded(
-            //       child: Column(
-            //         mainAxisAlignment: MainAxisAlignment.start,
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: [
-            //           SubTitleText(),
-            //           SizedBox(height: 16),
-            //         ],
-            //       ),
-            //     ),
-            //     SizedBox(width: 20),
-            //     Expanded(
-            //       child: Column(
-            //         mainAxisAlignment: MainAxisAlignment.end,
-            //         crossAxisAlignment: CrossAxisAlignment.end,
-            //         children: [
-            //           SearchTextField(),
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // const SizedBox(height: 16),
-            // const WorkspaceTabSelector(),
-          ],
-        ),
+          const SizedBox(height: 48),
+        ],
       ),
     );
   }

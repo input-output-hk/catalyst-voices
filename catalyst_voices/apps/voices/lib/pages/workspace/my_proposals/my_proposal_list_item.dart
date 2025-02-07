@@ -1,10 +1,10 @@
 part of 'my_proposals.dart';
 
-class ProposalListTile extends StatelessWidget {
+class ProposalListItem extends StatelessWidget {
   final WorkspaceProposalListItem item;
   final VoidCallback? onTap;
 
-  const ProposalListTile({
+  const ProposalListItem({
     super.key,
     required this.item,
     this.onTap,

@@ -1,7 +1,7 @@
 part of 'my_proposals.dart';
 
-class WorkspaceTabSelector extends StatelessWidget {
-  const WorkspaceTabSelector({super.key});
+class MyProposalsTabSelector extends StatelessWidget {
+  const MyProposalsTabSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class WorkspaceTabSelector extends StatelessWidget {
             );
           },
           builder: (context, state) {
-            return WorkspaceTabs(
+            return MyProposalsTabs(
               draftProposalCount: state.draftProposalCount,
               finalProposalCount: state.finalProposalCount,
             );

@@ -1,10 +1,10 @@
 part of 'my_proposals.dart';
 
-class WorkspaceTabs extends StatelessWidget {
+class MyProposalsTabs extends StatelessWidget {
   final int draftProposalCount;
   final int finalProposalCount;
 
-  const WorkspaceTabs({
+  const MyProposalsTabs({
     super.key,
     required this.draftProposalCount,
     required this.finalProposalCount,
@@ -15,6 +15,7 @@ class WorkspaceTabs extends StatelessWidget {
     return TabBar(
       isScrollable: true,
       tabAlignment: TabAlignment.start,
+      dividerColor: Theme.of(context).colorScheme.primaryContainer,
       onTap: (index) {
         final tab = WorkspaceTabType.values[index];
         final event = TabChangedEvent(tab);
