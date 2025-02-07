@@ -64,7 +64,7 @@ Additional headers
 
 Read more [here](https://drift.simonbinder.eu/platforms/web/#additional-headers).
 
-Drift requires **driftWorker** and **driftWorker**. 
+Drift requires **driftWorker** and **driftWorker** 
 Those files can be compiles by hand or downloaded from
 
 * [sqlite3Wasm](https://github.com/simolus3/sqlite3.dart/releases)
