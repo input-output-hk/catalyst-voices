@@ -611,8 +611,7 @@ class OnboardingPage {
   }
 
   static Future<void> enterPassword(PatrolTester $, String password) async {
-    await Future<void>.delayed(const Duration(seconds: 1));
-    await $(passwordInputField).enterText(password);
+    await $(passwordInputField).waitUntilVisible().enterText(password);
   }
 
   static Future<void> enterPasswordConfirm(

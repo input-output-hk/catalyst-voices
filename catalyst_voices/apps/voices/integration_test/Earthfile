@@ -27,7 +27,7 @@ integration-test-web:
     RUN ($driver --port=$driver_port > $driver.log &) && \
         sleep 5 && \
         flutter drive --verbose --driver=test_driver/integration_tests.dart \
-            --target=integration_test/app_test.dart \
+            --target=integration_test/all_test.dart \
             -d web-server --browser-name=$browser --driver-port=$driver_port \
             # https://github.com/flutter/flutter/issues/154727
             --web-browser-flag=--disable-web-security \
