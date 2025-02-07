@@ -59,7 +59,7 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 final class DiscoveryCampaignCategoriesState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final List<CampaignCategoryCardViewModel> categories;
+  final List<CampaignCategoryViewModel> categories;
 
   const DiscoveryCampaignCategoriesState({
     this.isLoading = true,
