@@ -21,6 +21,8 @@ void main() {
     test(
       'clear removes all documents and drafts',
       () async {
+        expect(false, isTrue);
+        return;
         // Given
         final drafts = List.generate(5, (index) => DraftFactory.build());
         final documents = List.generate(

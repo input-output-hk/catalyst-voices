@@ -233,6 +233,8 @@ scripts:
       find . -type d -name coverage -prune -exec rm -rf {} \;
       mkdir $MELOS_ROOT_PATH/coverage
 
+      melos exec -c 1 --dir-exists="test" -- flutter test
+
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
           'OUTPUT=$(flutter test --reporter expanded --coverage --machine) ; \
