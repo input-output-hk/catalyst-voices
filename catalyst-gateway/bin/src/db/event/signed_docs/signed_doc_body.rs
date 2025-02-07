@@ -51,11 +51,6 @@ impl SignedDocBody {
         &self.doc_type
     }
 
-    /// Returns the document authors.
-    pub(crate) fn authors(&self) -> &Vec<String> {
-        &self.authors
-    }
-
     /// Returns the document metadata.
     pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
         self.metadata.as_ref()
@@ -87,7 +82,6 @@ impl SignedDocBody {
     }
 
     /// Loads a async stream of `SignedDocBody` from the event db.
-    #[allow(dead_code)]
     pub(crate) async fn retrieve(
         conditions: &DocsQueryFilter, query_limits: &QueryLimits,
     ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
