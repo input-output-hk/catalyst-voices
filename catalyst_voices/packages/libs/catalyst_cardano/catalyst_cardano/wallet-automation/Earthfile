@@ -20,7 +20,7 @@ src:
     COPY test-fixtures.ts .
     COPY setup.ts .
 
-package-test:
+nightly-package-test:
     FROM +src
     ENV APP_URL http://test-app:80
     RUN mkdir /results
@@ -40,7 +40,7 @@ build-web:
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
-package-app:
+nightly-package-app:
     FROM nginx:alpine3.20-slim
     ARG tag='latest'
     COPY +build-web/web /app
