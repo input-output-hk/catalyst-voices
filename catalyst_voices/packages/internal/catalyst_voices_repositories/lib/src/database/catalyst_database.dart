@@ -30,6 +30,9 @@ abstract interface class CatalystDatabase {
   /// Contains all operations related to [Draft] which is db specific.
   /// Do not confuse it with other documents / drafts.
   DraftsDao get draftsDao;
+
+  /// Removes all data from this db.
+  Future<void> clear();
 }
 
 @DriftDatabase(
@@ -81,5 +84,19 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
       database: this,
       destructiveFallback: destructiveFallback,
     );
+  }
+
+  @override
+  Future<void> clear() async {
+    try {
+      await customStatement('PRAGMA foreign_keys = OFF');
+      await transaction(() async {
+        for (final table in allTables) {
+          await delete(table).go();
+        }
+      });
+    } finally {
+      await customStatement('PRAGMA foreign_keys = ON');
+    }
   }
 }
