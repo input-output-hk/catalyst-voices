@@ -20,6 +20,7 @@ class SearchTextField extends StatelessWidget {
       child: VoicesTextField(
         decoration: VoicesTextFieldDecoration(
           hintText: hintText,
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
           prefixIcon: VoicesAssets.icons.search.buildIcon(
             color: Theme.of(context).colors.iconsForeground,
           ),
