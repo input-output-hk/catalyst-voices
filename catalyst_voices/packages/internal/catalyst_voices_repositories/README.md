@@ -64,9 +64,11 @@ Additional headers
 
 Read more [here](https://drift.simonbinder.eu/platforms/web/#additional-headers).
 
-Drift requires `sqlite3Wasm` and `driftWorker`. Those files can be compiles by hand or
-downloaded from [here](https://github.com/simolus3/sqlite3.dart/releases)
-and [here](https://github.com/simolus3/drift/releases).
+Drift requires **driftWorker** and **driftWorker**. Those files can be compiles by hand or
+downloaded from
+
+* [sqlite3Wasm](https://github.com/simolus3/sqlite3.dart/releases)
+* [driftWorker](https://github.com/simolus3/drift/releases).
 
 `sqlite3.wasm` file needs to be served with a `Content-Type` of `application/wasm` since browsers
 will reject the module otherwise.
