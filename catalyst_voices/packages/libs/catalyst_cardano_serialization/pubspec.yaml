@@ -24,7 +24,7 @@ dependencies:
   uuid: ^4.5.1
 
 dev_dependencies:
-  build_runner: ^2.4.14
+  build_runner: ^2.4.12
   catalyst_analysis: ^3.0.0
   kiri_check: ^1.2.0
   mockito: ^5.4.4

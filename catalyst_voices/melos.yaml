@@ -143,7 +143,7 @@ command:
       webdriver: ^3.0.3
     dev_dependencies:
       test: ^1.24.9
-      build_runner: ^2.4.14
+      build_runner: ^2.4.12
       chopper_generator: ^8.0.3
       mocktail: ^1.0.1
 
