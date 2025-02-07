@@ -9,7 +9,7 @@ import os
 
 DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 DEFAULT_TIMEOUT = 10
-CAT_GATEWAY_URL = os.environ["CAT_GATEWAY_URL"]
+CAT_GATEWAY_HOST = "127.0.0.1"
 CAT_GATEWAY_PORT = 3030
 
 
@@ -18,8 +18,7 @@ def printable_time(time: float):
 
 
 def cat_gateway_endpoint_url(endpoint: str):
-    return f"{CAT_GATEWAY_URL}{endpoint}"
-
+    return f"http://{CAT_GATEWAY_HOST}:{CAT_GATEWAY_PORT}/{endpoint}"
 
 def check_is_live():
     resp = requests.get(cat_gateway_endpoint_url("api/health/live"))

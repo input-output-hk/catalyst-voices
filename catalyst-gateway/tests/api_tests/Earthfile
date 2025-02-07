@@ -15,7 +15,6 @@ test:
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     COPY ./docker-compose.yml .
-    ENV CAT_GATEWAY_URL="https://gateway.dev.projectcatalyst.io/"
        WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build) \
