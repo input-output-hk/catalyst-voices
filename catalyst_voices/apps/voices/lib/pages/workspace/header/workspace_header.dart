@@ -10,9 +10,7 @@ import 'package:flutter/material.dart';
 
 part 'create_proposal_button.dart';
 part 'import_proposal_button.dart';
-part 'project_text.dart';
 part 'timeline_toggle_button.dart';
-part 'title_text.dart';
 
 class WorkspaceHeader extends StatefulWidget {
   const WorkspaceHeader({super.key});
@@ -27,6 +25,8 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
@@ -34,13 +34,23 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 32),
-          const ProjectText(),
+          Text(
+            context.l10n.catalyst,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: VoicesColors.lightTextOnPrimaryLevel1,
+            ),
+          ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const TitleText(),
+              Text(
+                Space.workspace.localizedName(context.l10n),
+                style: theme.textTheme.headlineLarge?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
               const Spacer(),
               const CreateProposalButton(),
               const SizedBox(width: 8),
