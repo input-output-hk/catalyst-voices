@@ -8,7 +8,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
-// TODO(dtscalac): convert to form field !!!
 class MultilineTextEntryMarkdownWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
   final DocumentMultiLineTextEntryMarkdownSchema schema;
