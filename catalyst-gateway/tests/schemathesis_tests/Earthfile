@@ -51,7 +51,7 @@ test-fuzzer-api:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-
+        # Need to wait until cat-gateway will successfully connect to the scylladb
         RUN sleep 5; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
@@ -114,8 +114,8 @@ nightly-test-fuzzer-api:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-
-        RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        # Need to wait until cat-gateway will successfully connect to the scylladb
+        RUN --no-cache sleep 5; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
             docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log
