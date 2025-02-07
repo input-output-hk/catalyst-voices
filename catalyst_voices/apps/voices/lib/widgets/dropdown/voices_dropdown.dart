@@ -176,6 +176,8 @@ class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {
     final item = widget.items.firstWhereOrNull((e) => e.value == value);
     if (item != null) {
       _controller.textWithSelection = item.label;
+    } else {
+      _controller.textWithSelection = '';
     }
   }
 }
