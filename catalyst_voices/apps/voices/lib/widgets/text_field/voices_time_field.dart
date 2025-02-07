@@ -73,7 +73,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
   }
 
   @override
-  void didUpdateWidget(covariant VoicesTimeField oldWidget) {
+  void didUpdateWidget(VoicesTimeField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
       (oldWidget.controller ?? _controller)?.removeListener(_handleDateChanged);
@@ -104,7 +104,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
       onChanged: onChanged != null
           ? (value) => onChanged(_convertTextToTime(value))
           : null,
-      validator: _validate,
+      validator: _validator,
       hintText: '${_pattern.toUpperCase()} $timeZone',
       onFieldSubmitted: onFieldSubmitted != null
           ? (value) => onFieldSubmitted(_convertTextToTime(value))
@@ -143,7 +143,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
 
   TimeOfDay? _convertTextToTime(String value) {
     if (value.isEmpty) return null;
-    if (_validate(value).status != VoicesTextFieldStatus.success) {
+    if (_validator(value).status != VoicesTextFieldStatus.success) {
       return null;
     }
 
@@ -161,7 +161,7 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
     }
   }
 
-  VoicesTextFieldValidationResult _validate(String value) {
+  VoicesTextFieldValidationResult _validator(String value) {
     if (value.isEmpty) {
       return const VoicesTextFieldValidationResult.success();
     }

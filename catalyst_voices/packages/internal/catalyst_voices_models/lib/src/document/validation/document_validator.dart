@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_models/src/document/validation/document_validation_result.dart';
+import 'package:collection/collection.dart';
 
 /// Validates [DocumentProperty].
 final class DocumentValidator {
@@ -87,15 +88,15 @@ final class DocumentValidator {
 
   static DocumentValidationResult validateListItemsRange(
     DocumentListSchema schema,
-    List<dynamic>? value,
+    List<dynamic>? values,
   ) {
     final itemsRange = schema.itemsRange;
-    if (itemsRange != null && value != null) {
-      if (!itemsRange.contains(value.length)) {
+    if (itemsRange != null && values != null) {
+      if (!itemsRange.contains(values.length)) {
         return DocumentItemsOutOfRange(
           invalidNodeId: schema.nodeId,
           expectedRange: itemsRange,
-          actualItems: value.length,
+          actualItems: values.length,
         );
       }
     }
@@ -105,12 +106,18 @@ final class DocumentValidator {
 
   static DocumentValidationResult validateListItemsUnique(
     DocumentListSchema schema,
-    List<dynamic>? value,
+    List<dynamic>? values,
   ) {
-    if (schema.uniqueItems && value != null) {
-      final unique = value.length == value.toSet().length;
-      if (!unique) {
-        return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
+    if (schema.uniqueItems && values != null) {
+      const equality = DeepCollectionEquality();
+      for (var i = 0; i < values.length; i++) {
+        // for every list item lets check if there
+        // are duplicates further in the list
+        for (var j = i + 1; j < values.length; j++) {
+          if (equality.equals(values[i], values[j])) {
+            return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
+          }
+        }
       }
     }
 
