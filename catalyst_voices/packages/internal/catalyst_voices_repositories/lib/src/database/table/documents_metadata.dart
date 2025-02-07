@@ -17,7 +17,7 @@ enum DocumentMetadataFieldKey {
   name: 'idx_doc_metadata_key_value',
   columns: {#fieldKey, #fieldValue},
 )
-class DocumentsMetadata extends Table with VerTableMixin {
+class DocumentsMetadata extends Table with VerHiLoTableMixin {
   /// e.g. 'category', 'title', 'description'
   TextColumn get fieldKey => textEnum<DocumentMetadataFieldKey>()();
 

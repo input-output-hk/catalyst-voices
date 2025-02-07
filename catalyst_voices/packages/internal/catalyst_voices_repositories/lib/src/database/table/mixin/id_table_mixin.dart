@@ -4,7 +4,7 @@ import 'package:drift/drift.dart';
 /// Commonly used pattern for representing uuid as id.
 ///
 /// See [UuidHiLo].
-mixin IdTableMixin on Table {
+mixin IdHiLoTableMixin on Table {
   Int64Column get idHi => int64()();
 
   Int64Column get idLo => int64()();

@@ -11,7 +11,7 @@ import 'package:drift/drift.dart';
 @TableIndex(name: 'idx_doc_type', columns: {#type})
 @TableIndex(name: 'idx_unique_ver', columns: {#verHi, #verLo}, unique: true)
 class Documents extends Table
-    with IdTableMixin, VerTableMixin, DocumentTableMixin {
+    with IdHiLoTableMixin, VerHiLoTableMixin, DocumentTableMixin {
   DateTimeColumn get createdAt => dateTime()();
 
   @override
