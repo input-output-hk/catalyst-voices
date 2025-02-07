@@ -16,7 +16,7 @@ void main() {
       );
 
       // Verify the TextField is rendered
-      expect(find.byType(TextFormField), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
     });
 
     testWidgets('displays label text when provided', (tester) async {
@@ -48,7 +48,7 @@ void main() {
       );
 
       // Enter text into the TextField
-      await tester.enterText(find.byType(TextFormField), 'Hello World');
+      await tester.enterText(find.byType(TextField), 'Hello World');
 
       // Verify that the controller's text is updated
       expect(controller.text, 'Hello World');
@@ -81,7 +81,7 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: (value) => const VoicesTextFieldValidationResult(
+            textValidator: (value) => const VoicesTextFieldValidationResult(
               status: VoicesTextFieldStatus.error,
               errorMessage: errorText,
             ),
@@ -91,10 +91,10 @@ void main() {
       );
 
       // Enter invalid text into the TextField
-      await tester.enterText(find.byType(TextFormField), 'Invalid');
+      await tester.enterText(find.byType(TextField), 'Invalid');
 
       // Trigger validation by losing focus
-      await tester.tap(find.byType(TextFormField));
+      await tester.tap(find.byType(TextField));
       await tester.pump();
 
       // Verify that the error message is displayed
@@ -106,7 +106,7 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: (value) {
+            textValidator: (value) {
               return const VoicesTextFieldValidationResult.success();
             },
             onFieldSubmitted: (value) {},
@@ -115,7 +115,7 @@ void main() {
       );
 
       // Enter valid text into the TextField
-      await tester.enterText(find.byType(TextFormField), 'Valid');
+      await tester.enterText(find.byType(TextField), 'Valid');
       await tester.pump();
 
       // Verify that the success icon is displayed
@@ -139,8 +139,7 @@ void main() {
       );
 
       // Verify that the TextField is rendered as disabled
-      final textField =
-          tester.widget<TextFormField>(find.byType(TextFormField));
+      final textField = tester.widget<TextField>(find.byType(TextField));
       expect(textField.enabled, isFalse);
     });
   });
@@ -165,21 +164,22 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: validator,
+            textValidator: validator,
+            autovalidateMode: AutovalidateMode.always,
             onFieldSubmitted: (value) {},
           ),
         ),
       );
 
       // Enter empty text into the TextField to trigger validation
-      await tester.enterText(find.byType(TextFormField), '');
+      await tester.enterText(find.byType(TextField), '');
       await tester.pump();
 
       // Verify that the error message is displayed
       expect(find.text(errorMessage), findsOneWidget);
 
       // Enter valid text into the TextField
-      await tester.enterText(find.byType(TextFormField), 'Valid input');
+      await tester.enterText(find.byType(TextField), 'Valid input');
       await tester.pump();
 
       // Verify that the error message is no longer displayed
@@ -197,14 +197,14 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: validator,
+            textValidator: validator,
             onFieldSubmitted: (value) {},
           ),
         ),
       );
 
       // Enter text into the TextField to trigger validation
-      await tester.enterText(find.byType(TextFormField), 'Valid input');
+      await tester.enterText(find.byType(TextField), 'Valid input');
       await tester.pump();
 
       // Verify that the success icon is displayed
@@ -234,14 +234,14 @@ void main() {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
-            validator: validator,
+            textValidator: validator,
             onFieldSubmitted: (value) {},
           ),
         ),
       );
 
       // Enter the text that triggers a warning
-      await tester.enterText(find.byType(TextFormField), 'warning');
+      await tester.enterText(find.byType(TextField), 'warning');
       await tester.pump();
 
       // Verify that the warning message is displayed

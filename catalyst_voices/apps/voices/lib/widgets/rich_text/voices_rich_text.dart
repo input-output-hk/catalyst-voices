@@ -24,7 +24,7 @@ class VoicesRichText extends FormField<Document> {
   VoicesRichText({
     super.key,
     super.enabled,
-    super.autovalidateMode = AutovalidateMode.always,
+    super.autovalidateMode = AutovalidateMode.onUserInteraction,
     required this.controller,
     required this.title,
     required this.focusNode,

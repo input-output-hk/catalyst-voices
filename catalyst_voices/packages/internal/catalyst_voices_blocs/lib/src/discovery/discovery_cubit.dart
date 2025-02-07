@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -64,8 +65,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     if (isClosed) return;
 
     final categories = isSuccess
-        ? List.filled(6, CampaignCategoryCardViewModel.dummy())
-        : <CampaignCategoryCardViewModel>[];
+        ? List.generate(
+            6,
+            (index) => CampaignCategoryViewModel.dummy(id: index.toString()),
+          )
+        : <CampaignCategoryViewModel>[];
 
     final error = isSuccess ? null : const LocalizedUnknownException();
 
@@ -113,5 +117,10 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     );
 
     emit(newState);
+  }
+
+  CampaignCategoryViewModel? localCategory(String id) {
+    return state.campaignCategories.categories
+        .firstWhereOrNull((e) => e.id == id);
   }
 }

@@ -307,6 +307,12 @@ final class DocumentTagGroupSchema extends DocumentStringSchema {
       pattern: pattern,
     );
   }
+
+  @override
+  DocumentValidationResult validate(String? value) {
+    // validated by its parent (DocumentSingleGroupedTagSelectorSchema)
+    return const SuccessfulDocumentValidation();
+  }
 }
 
 final class DocumentTagSelectionSchema extends DocumentStringSchema {
@@ -349,47 +355,11 @@ final class DocumentTagSelectionSchema extends DocumentStringSchema {
       pattern: pattern,
     );
   }
-}
-
-final class DocumentSpdxLicenseOrUrlSchema extends DocumentStringSchema {
-  const DocumentSpdxLicenseOrUrlSchema({
-    required super.nodeId,
-    required super.format,
-    required super.contentMediaType,
-    required super.title,
-    required super.description,
-    required super.placeholder,
-    required super.guidance,
-    required super.isSubsection,
-    required super.isRequired,
-    required super.defaultValue,
-    required super.constValue,
-    required super.enumValues,
-    required super.strLengthRange,
-    required super.pattern,
-  });
 
   @override
-  DocumentSpdxLicenseOrUrlSchema copyWith({
-    DocumentNodeId? nodeId,
-    String? title,
-  }) {
-    return DocumentSpdxLicenseOrUrlSchema(
-      nodeId: nodeId ?? this.nodeId,
-      format: format,
-      contentMediaType: contentMediaType,
-      title: title ?? this.title,
-      description: description,
-      placeholder: placeholder,
-      guidance: guidance,
-      isSubsection: isSubsection,
-      isRequired: isRequired,
-      defaultValue: defaultValue,
-      constValue: constValue,
-      enumValues: enumValues,
-      strLengthRange: strLengthRange,
-      pattern: pattern,
-    );
+  DocumentValidationResult validate(String? value) {
+    // validated by its parent (DocumentSingleGroupedTagSelectorSchema)
+    return const SuccessfulDocumentValidation();
   }
 }
 

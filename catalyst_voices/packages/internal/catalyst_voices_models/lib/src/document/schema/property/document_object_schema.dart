@@ -67,7 +67,7 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
   }
 
   DocumentPropertySchema?
-      getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
+      getPropertySchemaOfType<T extends DocumentPropertySchema>() {
     return properties.firstWhereOrNull((e) => e is T);
   }
 
@@ -253,6 +253,55 @@ final class DocumentSingleGroupedTagSelectorSchema
     );
   }
 
+  @override
+  DocumentValidationResult validate(List<DocumentProperty> properties) {
+    final groupProperty =
+        properties.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema)
+            as DocumentValueProperty<String>?;
+
+    final tagProperty = properties
+            .firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema)
+        as DocumentValueProperty<String>?;
+
+    return validateGroupedTagsSelection(
+      GroupedTagsSelection(
+        group: groupProperty?.value,
+        tag: tagProperty?.value,
+      ),
+    );
+  }
+
+  DocumentValidationResult validateGroupedTagsSelection(
+    GroupedTagsSelection? selection,
+  ) {
+    final group = selection?.group;
+    final tag = selection?.tag;
+
+    if (group == null || tag == null) {
+      return MissingRequiredDocumentValue(invalidNodeId: nodeId);
+    }
+
+    final groups = groupedTags();
+    final matchingGroup = groups.firstWhereOrNull((e) => e.group == group);
+    if (matchingGroup == null) {
+      final groupProperty = getPropertySchemaOfType<DocumentTagGroupSchema>();
+      return DocumentEnumValueMismatch(
+        invalidNodeId: groupProperty!.nodeId,
+        enumValues: groups.map((e) => e.group).toList(),
+      );
+    }
+
+    if (matchingGroup.tags.contains(tag)) {
+      return const SuccessfulDocumentValidation();
+    } else {
+      final tagProperty = getPropertySchemaOfType<DocumentTagSelectionSchema>();
+      return DocumentEnumValueMismatch(
+        invalidNodeId: tagProperty!.nodeId,
+        enumValues: matchingGroup.tags,
+      );
+    }
+  }
+
   GroupedTagsSelection? groupedTagsSelection(DocumentObjectProperty property) {
     assert(
       property.schema == this,
@@ -281,20 +330,19 @@ final class DocumentSingleGroupedTagSelectorSchema
     );
   }
 
-  List<DocumentChange> buildDocumentChanges(GroupedTagsSelection selection) {
-    final groupProperty = getPropertyWithSchemaType<DocumentTagGroupSchema>()!;
+  List<DocumentChange> buildDocumentChanges(GroupedTagsSelection? selection) {
+    final groupProperty = getPropertySchemaOfType<DocumentTagGroupSchema>()!;
 
-    final tagProperty =
-        getPropertyWithSchemaType<DocumentTagSelectionSchema>()!;
+    final tagProperty = getPropertySchemaOfType<DocumentTagSelectionSchema>()!;
 
     return [
       DocumentValueChange(
         nodeId: groupProperty.nodeId,
-        value: selection.group,
+        value: selection?.group,
       ),
       DocumentValueChange(
         nodeId: tagProperty.nodeId,
-        value: selection.tag,
+        value: selection?.tag,
       ),
     ];
   }
@@ -302,6 +350,47 @@ final class DocumentSingleGroupedTagSelectorSchema
   List<GroupedTags> groupedTags() {
     final oneOf = this.oneOf ?? const [];
     return GroupedTags.fromLogicalGroups(oneOf);
+  }
+}
+
+final class DocumentBorderGroupSchema extends DocumentObjectSchema {
+  const DocumentBorderGroupSchema({
+    required super.nodeId,
+    required super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.properties,
+    required super.oneOf,
+    required super.order,
+  });
+
+  @override
+  DocumentBorderGroupSchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    final newNodeId = nodeId ?? this.nodeId;
+    final newTitle = title ?? this.title;
+
+    return DocumentBorderGroupSchema(
+      nodeId: newNodeId,
+      format: format,
+      title: newTitle,
+      description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isRequired: isRequired,
+      isSubsection: isSubsection,
+      properties: properties
+          .map((e) => e.copyWith(nodeId: newNodeId.child(e.id)))
+          .toList(),
+      oneOf: oneOf,
+      order: order,
+    );
   }
 }
 

@@ -71,7 +71,7 @@ class _AppPrecacheImageAssetsState extends State<AppPrecacheImageAssets> {
   late Future<void> _cacheFuture;
 
   @override
-  void didUpdateWidget(covariant AppPrecacheImageAssets oldWidget) {
+  void didUpdateWidget(AppPrecacheImageAssets oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (_areImagesDifferent()) {
