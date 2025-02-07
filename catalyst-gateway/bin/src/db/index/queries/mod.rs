@@ -17,6 +17,7 @@ use rbac::{
     get_role0_chain_root::GetRole0ChainRootQuery,
 };
 use registrations::{
+    get_all_invalids::GetAllInvalidRegistrationsQuery,
     get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
     get_from_stake_hash::GetStakeAddrQuery, get_from_vote_key::GetStakeAddrFromVoteKeyQuery,
     get_invalid::GetInvalidRegistrationQuery,
@@ -100,6 +101,8 @@ pub(crate) enum PreparedSelectQuery {
     ChainRootByRole0Key,
     /// Get all registrations for snapshot
     GetAllRegistrations,
+    /// Get all invalid registrations for snapshot
+    GetAllInvalidRegistrations,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -163,6 +166,8 @@ pub(crate) struct PreparedQueries {
     chain_root_by_role0_key_query: PreparedStatement,
     /// Get all registrations for snapshot
     get_all_registrations_query: PreparedStatement,
+    /// Get all invalid registrations for snapshot
+    get_all_invalid_registrations_query: PreparedStatement,
 }
 
 /// A set of query responses that can fail.
@@ -199,6 +204,8 @@ impl PreparedQueries {
             GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
         let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session.clone()).await;
         let get_all_registrations_query = GetAllRegistrationsQuery::prepare(session.clone()).await;
+        let get_all_invalid_registrations_query =
+            GetAllInvalidRegistrationsQuery::prepare(session.clone()).await;
 
         let (
             txo_insert_queries,
@@ -247,6 +254,7 @@ impl PreparedQueries {
             registrations_by_chain_root_query: registrations_by_chain_root?,
             chain_root_by_role0_key_query: chain_root_by_role0_key?,
             get_all_registrations_query: get_all_registrations_query?,
+            get_all_invalid_registrations_query: get_all_invalid_registrations_query?,
         })
     }
 
@@ -338,6 +346,9 @@ impl PreparedQueries {
             },
             PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
             PreparedSelectQuery::GetAllRegistrations => &self.get_all_registrations_query,
+            PreparedSelectQuery::GetAllInvalidRegistrations => {
+                &self.get_all_invalid_registrations_query
+            },
         };
         session_execute_iter(session, prepared_stmt, params).await
     }
