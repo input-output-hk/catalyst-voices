@@ -6,7 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class NavigationBack extends StatelessWidget {
-  const NavigationBack({super.key});
+  final String? label;
+  const NavigationBack({
+    super.key,
+    this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,7 @@ class NavigationBack extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              context.l10n.back,
+              label ?? context.l10n.back,
               style: context.textTheme.labelLarge?.copyWith(
                 color: context.colors.textOnPrimaryLevel1,
               ),

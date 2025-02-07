@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 typedef _StateData = ({bool show, LocalizedException? error});
-typedef _ListItems = List<CampaignCategoryCardViewModel>;
+typedef _ListItems = List<CampaignCategoryViewModel>;
 
 class CampaignCategoriesStateSelector extends StatelessWidget {
   const CampaignCategoriesStateSelector({super.key});
@@ -51,7 +51,7 @@ class _CampaignCategoriesLoading extends StatelessWidget {
       builder: (context, state) {
         final dummyCategories = List.filled(
           6,
-          CampaignCategoryCardViewModel.dummy(),
+          CampaignCategoryViewModel.dummy(),
         );
         return Offstage(
           offstage: !state,
