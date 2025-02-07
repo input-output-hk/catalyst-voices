@@ -3,6 +3,8 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'test_factories.dart';
+
 void main() {
   late DriftCatalystDatabase database;
 
@@ -19,8 +21,6 @@ void main() {
     test(
       'clear removes all documents and drafts',
       () async {
-        expect(false, isTrue);
-        /*return;
         // Given
         final drafts = List.generate(5, (index) => DraftFactory.build());
         final documents = List.generate(
@@ -45,7 +45,7 @@ void main() {
         final documentsCountAfter = await database.documentsDao.countAll();
 
         expect(draftsCountAfter, isZero);
-        expect(documentsCountAfter, isZero);*/
+        expect(documentsCountAfter, isZero);
       },
     );
   });

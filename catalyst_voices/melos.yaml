@@ -261,6 +261,7 @@ scripts:
 
       # merges all coverage reports into a single one and puts it in /coverage/lcov.info
       dart pub global run combine_coverage --repo-path=.
+      
       exit $EXIT_CODE
 
     description: |
