@@ -26,12 +26,12 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   }
 
   /// Loads the proposals.
-  Future<void> load() async {
+  Future<void> load({int pageKey = 0}) async {
     emit(LoadingProposalsState(proposals: state.proposals));
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1), () {});
     final campaign = await _campaignService.getActiveCampaign();
     if (campaign == null) {
-      emit(LoadedProposalsState(proposals: state.proposals));
+      emit(LoadedProposalsState(proposals: state.proposals, pageKey: pageKey));
       return;
     }
 
@@ -39,8 +39,9 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     proposals.shuffle();
     emit(
       LoadedProposalsState(
-        proposals: [...state.proposals, ...proposals],
+        proposals: proposals,
         resultsNumber: 32,
+        pageKey: pageKey,
       ),
     );
   }
@@ -59,8 +60,12 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     proposals[favoriteProposal] =
         proposals[favoriteProposal].copyWith(isFavorite: isFavorite);
 
-    emit(LoadedProposalsState(
-        proposals: proposals, resultsNumber: state.resultsNumber));
+    emit(
+      LoadedProposalsState(
+        proposals: proposals,
+        resultsNumber: state.resultsNumber,
+      ),
+    );
   }
 
   @override

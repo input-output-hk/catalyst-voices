@@ -1,0 +1,122 @@
+import 'package:catalyst_voices/widgets/pagination/paging_status.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:equatable/equatable.dart';
+
+/// A class that manages pagination state for a list of items.
+///
+/// [PagingState] handles all the logic related to pagination including:
+/// * Current page tracking
+/// * Loading states
+/// * Error states
+/// * Page boundaries calculations
+/// * Item list management
+///
+/// Parameters:
+/// * [currentPage]: The zero-based index of the current page
+/// * [maxResults]: The total number of items available
+/// * [itemsPerPage]: Number of items to display per page
+/// * [itemList]: The current list of loaded items
+/// * [error]: Any error that occurred during pagination
+/// * [isLoading]: Whether the page is currently loading
+///
+/// Usage:
+/// ```dart
+/// final pagingState = PagingState<String>(
+///   currentPage: 0,
+///   maxResults: 100,
+///   itemsPerPage: 20,
+/// );
+/// ```
+class PagingState<ItemType> extends Equatable {
+  final int currentPage;
+  final int maxResults;
+  final int itemsPerPage;
+  final List<ItemType> itemList;
+  final LocalizedException? error;
+  final bool isLoading;
+
+  PagingState({
+    required this.maxResults,
+    required this.currentPage,
+    required this.itemsPerPage,
+    List<ItemType>? itemList,
+    this.error,
+    this.isLoading = false,
+  }) : itemList = itemList ?? <ItemType>[];
+
+  PagingState<ItemType> copyWith({
+    int? currentPage,
+    int? currentLastPage,
+    int? maxResults,
+    int? itemsPerPage,
+    List<ItemType>? itemList,
+    LocalizedException? error,
+    bool isLoading = false,
+  }) {
+    return PagingState<ItemType>(
+      currentPage: currentPage ?? this.currentPage,
+      maxResults: maxResults ?? this.maxResults,
+      itemsPerPage: itemsPerPage ?? this.itemsPerPage,
+      itemList: itemList ?? this.itemList,
+      error: error ?? this.error,
+      isLoading: isLoading,
+    );
+  }
+
+  PagingStatus get status {
+    if (isLoading) {
+      return PagingStatus.loading;
+    } else if (_isOngoing) {
+      return PagingStatus.ongoing;
+    } else if (isCompleted) {
+      return PagingStatus.completed;
+    } else if (_hasError) {
+      return PagingStatus.error;
+    } else if (_isLoadingFirstPage) {
+      return PagingStatus.loadingFirstPage;
+    }
+    return PagingStatus.ongoing;
+  }
+
+  int get _itemCount => itemList.length;
+
+  bool get _hasItems => itemList.isNotEmpty;
+
+  bool get _isListingUnfinished => _hasItems && _itemCount < maxResults;
+
+  bool get _isOngoing => _isListingUnfinished && !_hasError;
+
+  bool get _isLoadingFirstPage => _itemCount == 0 && !_hasError;
+
+  bool get _hasError => error != null;
+
+  bool get isCompleted => _hasItems && !_isListingUnfinished;
+
+  bool get isLastPage => currentTo >= maxResults - 1;
+
+  bool get isFirstPage => currentPage == 0;
+
+  int get currentLastPage => (_itemCount / itemsPerPage).ceil() - 1;
+
+  int get currentFrom {
+    return currentPage * itemsPerPage;
+  }
+
+  int get fromValue => currentFrom + 1;
+
+  int get currentTo {
+    return currentFrom + itemsPerPage - 1;
+  }
+
+  int get toValue => currentTo + 1;
+
+  @override
+  List<Object?> get props => [
+        currentPage,
+        itemsPerPage,
+        maxResults,
+        itemList,
+        error,
+        isLoading,
+      ];
+}
