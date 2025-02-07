@@ -41,7 +41,7 @@ class _AccountStatusBannerState extends State<_AccountStatusBanner> {
   }
 
   @override
-  void didUpdateWidget(covariant _AccountStatusBanner oldWidget) {
+  void didUpdateWidget(_AccountStatusBanner oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.status != oldWidget.status) {

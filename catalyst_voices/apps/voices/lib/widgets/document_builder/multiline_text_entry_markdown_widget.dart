@@ -83,7 +83,7 @@ class _MultilineTextEntryMarkdownWidgetState
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,
-      validator: _validate,
+      validator: _validator,
     );
   }
 
@@ -125,7 +125,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
   }
 
-  String? _validate(quill.Document? document) {
+  String? _validator(quill.Document? document) {
     final delta = document?.toDelta();
     final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
     final markdownValue = markdownData?.data;

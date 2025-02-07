@@ -40,7 +40,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   }
 
   @override
-  void didUpdateWidget(covariant CatalystIdText oldWidget) {
+  void didUpdateWidget(CatalystIdText oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.data != oldWidget.data ||
