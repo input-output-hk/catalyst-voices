@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
-import 'package:catalyst_voices/common/formatters/amount_formatter.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
@@ -51,196 +50,168 @@ class CurrentCampaign extends StatelessWidget {
           timelineItems: CampaignTimelineViewModelX.mockData,
           placement: CampaignTimelinePlacement.discovery,
         ),
-        const SizedBox(height: 32),
       ],
     );
   }
 }
 
-class _CampaignFundsDetail extends StatelessWidget {
-  final String title;
-  final String description;
-  final int funds;
-  final bool largeFundsText;
+class _CampaignTimeline extends StatefulWidget {
+  final List<CampaignTimelineViewModel> timelineItems;
 
-  const _CampaignFundsDetail({
-    required this.title,
-    required this.description,
-    required this.funds,
-    this.largeFundsText = true,
-  });
-
-  String get _formattedFunds => AmountFormatter.decimalFormat(funds);
+  const _CampaignTimeline(this.timelineItems);
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Skeleton.keep(
-          child: Text(
-            title,
-            style: context.textTheme.titleMedium?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
-          ),
-        ),
-        Skeleton.keep(
-          child: Text(
-            description,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.sysColorsNeutralN60,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          '${const Currency.ada().symbol} $_formattedFunds',
-          style: _foundsTextStyle(context)?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-        ),
-      ],
-    );
-  }
-
-  TextStyle? _foundsTextStyle(BuildContext context) {
-    if (largeFundsText) {
-      return context.textTheme.headlineLarge;
-    } else {
-      return context.textTheme.headlineSmall;
-    }
-  }
+  State<_CampaignTimeline> createState() => _CampaignTimelineState();
 }
 
-class _CurrentCampaignDetails extends StatelessWidget {
-  final int allFunds;
-  final int totalAsk;
-  final Range<int> askRange;
+class _CampaignTimelineCard extends StatefulWidget {
+  final CampaignTimelineViewModel timelineItem;
 
-  const _CurrentCampaignDetails({
-    required this.allFunds,
-    required this.totalAsk,
-    required this.askRange,
-  });
+  const _CampaignTimelineCard(this.timelineItem);
+
+  @override
+  State<_CampaignTimelineCard> createState() => _CampaignTimelineCardState();
+}
+
+class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
+  bool isExpanded = false;
+
+  bool get isOngoing => widget.timelineItem.timeline.isTodayInRange();
+  SvgGenImage get _expandedIcon => isExpanded
+      ? VoicesAssets.icons.chevronDown
+      : VoicesAssets.icons.chevronRight;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        color: context.colors.elevationsOnSurfaceNeutralLv2,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.colors.outlineBorder,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          VoicesAssets.icons.library.buildIcon(),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              spacing: 10,
-              runSpacing: 10,
+    return GestureDetector(
+      onTap: _toggleExpanded,
+      child: SizedBox(
+        width: 280,
+        child: Card(
+          shape: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: isOngoing ? context.colorScheme.primary : Colors.white,
+              width: isOngoing ? 2 : 1,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _CampaignFundsDetail(
-                  title: context.l10n.campaignTreasury,
-                  description: context.l10n.campaignTreasuryDescription,
-                  funds: allFunds,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    VoicesAssets.icons.calendar.buildIcon(
+                      color: context.colorScheme.primary,
+                    ),
+                    _expandedIcon.buildIcon(
+                      color: context.colorScheme.primaryContainer,
+                    ),
+                  ],
                 ),
-                _CampaignFundsDetail(
-                  title: context.l10n.campaignTotalAsk,
-                  description: context.l10n.campaignTotalAskDescription,
-                  funds: totalAsk,
-                  largeFundsText: false,
+                const SizedBox(height: 16),
+                Text(
+                  widget.timelineItem.title,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: context.colors.textOnPrimaryLevel1,
+                  ),
                 ),
-                _RangeAsk(range: askRange),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      DateFormatter.formatDateRange(
+                        MaterialLocalizations.of(context),
+                        context.l10n,
+                        widget.timelineItem.timeline,
+                      ),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.colors.sysColorsNeutralN60,
+                      ),
+                    ),
+                    Offstage(
+                      offstage: !isOngoing,
+                      child: VoicesChip.round(
+                        content: Text(
+                          context.l10n.ongoing,
+                          style: context.textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                        backgroundColor: context.colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                AnimatedSwitcher(
+                  duration: Durations.medium4,
+                  child: isExpanded
+                      ? Text(
+                          widget.timelineItem.description,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.colors.sysColorsNeutralN60,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RangeAsk extends StatelessWidget {
-  final Range<int> range;
-
-  const _RangeAsk({
-    required this.range,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border(
-          left: BorderSide(
-            color: context.colors.outlineBorder,
-            width: 1,
-          ),
         ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _RangeValue(
-            title: context.l10n.maximumAsk,
-            value: range.max ?? 0,
-          ),
-          const SizedBox(height: 19),
-          _RangeValue(
-            title: context.l10n.minimumAsk,
-            value: range.min ?? 0,
-          ),
-        ],
-      ),
     );
+  }
+
+  void _toggleExpanded() {
+    setState(() {
+      isExpanded = !isExpanded;
+    });
   }
 }
 
-class _RangeValue extends StatelessWidget {
-  final String title;
-  final int value;
-
-  const _RangeValue({
-    required this.title,
-    required this.value,
-  });
-
-  String get _formattedValue => AmountFormatter.decimalFormat(value);
+class _CampaignTimelineState extends State<_CampaignTimeline> {
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Skeleton.keep(
-          child: Text(
-            title,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.sysColorsNeutralN60,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: SizedBox(
+        height: 300,
+        child: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            _scrollController.jumpTo(
+              _scrollController.offset - details.delta.dx,
+            );
+          },
+          //When using ListView, child were expanding
+          // in full height of the parent
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(width: 120),
+                ...widget.timelineItems.map(_CampaignTimelineCard.new),
+                const SizedBox(width: 120),
+              ],
             ),
           ),
         ),
-        Text(
-          '${const Currency.ada().symbol} $_formattedValue',
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: context.colors.sysColorsNeutralN60,
-          ),
-        ),
-        _CampaignTimeline(mockCampaignTimeline),
-      ],
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
 

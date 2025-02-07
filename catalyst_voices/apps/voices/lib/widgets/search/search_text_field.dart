@@ -28,7 +28,7 @@ class SearchTextField extends StatelessWidget {
         ),
         keyboardType: TextInputType.text,
         onFieldSubmitted: (value) => _handleSearchQuery(context, value, true),
-        onChanged: (value) => _handleSearchQuery(context, value, false),
+        onChanged: (value) => _handleSearchQuery(context, value!, false),
       ),
     );
   }
