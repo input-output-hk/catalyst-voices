@@ -42,7 +42,7 @@ class _CampaignDetailsDialogState extends State<CampaignDetailsDialog> {
   }
 
   @override
-  void didUpdateWidget(covariant CampaignDetailsDialog oldWidget) {
+  void didUpdateWidget(CampaignDetailsDialog oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.id != oldWidget.id) {

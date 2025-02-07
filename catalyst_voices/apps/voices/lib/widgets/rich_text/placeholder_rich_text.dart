@@ -37,7 +37,7 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
   }
 
   @override
-  void didUpdateWidget(covariant PlaceholderRichText oldWidget) {
+  void didUpdateWidget(PlaceholderRichText oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.text != oldWidget.text) {

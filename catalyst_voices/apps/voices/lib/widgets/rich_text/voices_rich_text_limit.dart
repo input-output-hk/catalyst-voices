@@ -29,7 +29,7 @@ class _VoicesRichTextLimitState extends State<VoicesRichTextLimit> {
   }
 
   @override
-  void didUpdateWidget(covariant VoicesRichTextLimit oldWidget) {
+  void didUpdateWidget(VoicesRichTextLimit oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.document != oldWidget.document) {
