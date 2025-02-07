@@ -80,7 +80,6 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       currency: widget.currency,
       showHelper: widget.isEditMode,
       enabled: widget.isEditMode,
-      readOnly: !widget.isEditMode,
       ignorePointers: !widget.isEditMode,
     );
   }

@@ -259,9 +259,7 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
     // register for a new one
     newController.addListener(_handleControllerChanged);
 
-    if (oldWidget.decoration?.errorText != widget.decoration?.errorText ||
-        oldWidget.textValidator != widget.textValidator ||
-        oldWidget.controller?.text != newController.text) {
+    if (oldWidget.controller?.text != newController.text) {
       setValue(newController.text);
     }
   }
@@ -294,6 +292,7 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
   void reset() {
     // Set the controller value before calling super.reset() to let
     // _handleControllerChanged suppress the change.
+    _validation = const VoicesTextFieldValidationResult.none();
     _obtainController().text = widget.initialValue ?? '';
     super.reset();
     widget.onChanged?.call(_obtainController().text);
@@ -574,7 +573,7 @@ class _VoicesTextFieldState extends VoicesFormFieldState<String> {
 
   void _handleControllerChanged() {
     final text = _obtainController().text;
-    if (text != value) {
+    if (value != text) {
       setValue(text);
     }
   }

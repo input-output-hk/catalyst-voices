@@ -19,7 +19,7 @@ class VoicesFormField<T> extends FormField<T> {
     required super.builder,
     super.validator,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
-  });
+  }) : super(initialValue: value);
 
   @override
   FormFieldState<T> createState() => VoicesFormFieldState<T>();
@@ -28,16 +28,6 @@ class VoicesFormField<T> extends FormField<T> {
 class VoicesFormFieldState<T> extends FormFieldState<T> {
   @override
   VoicesFormField<T> get widget => super.widget as VoicesFormField<T>;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final value = widget.value;
-    if (value != null) {
-      setValue(value);
-    }
-  }
 
   @override
   void didUpdateWidget(VoicesFormField<T> oldWidget) {

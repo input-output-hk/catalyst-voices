@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';
@@ -119,6 +121,14 @@ class _DocumentBuilderSectionTileState
       _editedSection = widget.section;
       _builder = _editedSection.toBuilder();
       _isEditMode = false;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Need to reset after the frame because first we need
+      // to revert the original values (which is done in setState()),
+      // then the widgets need to rebuild with these values
+      // and only then we can reset the validation error.
+      _formKey.currentState?.reset();
     });
   }
 
