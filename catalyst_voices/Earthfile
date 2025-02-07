@@ -51,6 +51,7 @@ code-generator:
 
     RUN melos l10n
     RUN melos build_runner
+    RUN melos build_runner_repository
 
     IF [ $save_locally = true ]
         RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway.*.swagger.*" \)
