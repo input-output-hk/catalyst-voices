@@ -87,6 +87,9 @@ class VoicesTextField extends VoicesFormField<String> {
   /// [TextField.mouseCursor]
   final MouseCursor? mouseCursor;
 
+  /// [TextField.readOnly].
+  final bool readOnly;
+
   VoicesTextField({
     super.key,
     super.enabled = true,
@@ -118,7 +121,7 @@ class VoicesTextField extends VoicesFormField<String> {
     this.inputFormatters,
     this.maxLengthEnforcement,
     this.mouseCursor,
-    super.readOnly,
+    this.readOnly = false,
   }) : super(
           value: controller?.text ?? initialText,
           validator: (value) {
