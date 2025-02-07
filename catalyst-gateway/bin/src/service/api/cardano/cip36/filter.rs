@@ -432,7 +432,7 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36D
 }
 
 /// Stake addr may have multiple registrations and multiple vote key associations, filter
-/// out latets vote key.
+/// out latest vote key.
 fn latest_vote_key(
     mut registrations: Vec<Cip36Details>,
 ) -> anyhow::Result<Ed25519HexEncodedPublicKey> {
