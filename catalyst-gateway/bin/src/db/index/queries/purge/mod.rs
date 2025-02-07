@@ -1,7 +1,7 @@
 //! Queries for purging volatile data.
 
+pub(crate) mod catalyst_id_for_txn_id;
 pub(crate) mod chain_root_for_stake_address;
-pub(crate) mod chain_root_for_txn_id;
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod cip36_registration_invalid;
@@ -80,7 +80,7 @@ pub(crate) enum PreparedSelectQuery {
     /// RBAC 509 Registration Select query.
     Rbac509,
     /// Chain Root For Transaction ID Select query.
-    ChainRootForTxnId,
+    CatalystIdForTxnId,
     /// Chain Root For Stake Address Select query.
     ChainRootForStakeAddress,
 }
@@ -185,9 +185,11 @@ impl PreparedQueries {
                 &session, cfg,
             )
             .await?,
-            select_chain_root_for_txn_id: chain_root_for_txn_id::PrimaryKeyQuery::prepare(&session)
-                .await?,
-            delete_chain_root_for_txn_id: chain_root_for_txn_id::DeleteQuery::prepare_batch(
+            select_chain_root_for_txn_id: catalyst_id_for_txn_id::PrimaryKeyQuery::prepare(
+                &session,
+            )
+            .await?,
+            delete_chain_root_for_txn_id: catalyst_id_for_txn_id::DeleteQuery::prepare_batch(
                 &session, cfg,
             )
             .await?,
@@ -239,7 +241,7 @@ impl PreparedQueries {
                 &self.select_cip36_registration_for_vote_key
             },
             PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration,
-            PreparedSelectQuery::ChainRootForTxnId => &self.select_chain_root_for_txn_id,
+            PreparedSelectQuery::CatalystIdForTxnId => &self.select_chain_root_for_txn_id,
             PreparedSelectQuery::ChainRootForStakeAddress => {
                 &self.select_chain_root_for_stake_address
             },

@@ -2,15 +2,13 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
-use super::TransactionHash;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionHash, DbTxnIndex},
+        types::{DbCatalystId, DbCip19StakeAddress, DbSlot, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -22,7 +20,7 @@ const INSERT_QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_addres
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// Stake Address Hash. 32 bytes.
-    stake_addr: DbStakeAddress,
+    stake_addr: DbCip19StakeAddress,
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -45,7 +43,8 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_addr: DbStakeAddress, slot_no: DbSlot, txn: DbTxnIndex, catalyst_id: DbCatalystId,
+        stake_addr: DbCip19StakeAddress, slot_no: DbSlot, txn: DbTxnIndex,
+        catalyst_id: DbCatalystId,
     ) -> Self {
         Params {
             stake_addr,

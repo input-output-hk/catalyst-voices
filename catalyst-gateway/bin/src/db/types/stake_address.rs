@@ -1,6 +1,7 @@
-//! A `StakeAddress` hash wrapper that can be stored to and load from a database.
+//! A binary `CIP-19` stack address (29  bytes) that can be stored to and load from a
+//! database.
 
-use cardano_blockchain_types::StakeAddress;
+use pallas::ledger::addresses::StakeAddress;
 use scylla::{
     deserialize::{DeserializationError, DeserializeValue, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,
@@ -11,32 +12,32 @@ use scylla::{
     },
 };
 
-/// A `StakeAddress` wrapper that can be stored to and load from a database.
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DbStakeAddress(StakeAddress);
+/// A binary `CIP-19` stack address (29  bytes) that can be stored to and load from a
+/// database.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct DbCip19StakeAddress(Vec<u8>);
 
-impl From<StakeAddress> for DbStakeAddress {
+impl From<StakeAddress> for DbCip19StakeAddress {
     fn from(value: StakeAddress) -> Self {
-        Self(value)
+        Self(value.to_vec())
     }
 }
 
-impl From<DbStakeAddress> for StakeAddress {
-    fn from(value: DbStakeAddress) -> Self {
+impl From<DbCip19StakeAddress> for Vec<u8> {
+    fn from(value: DbCip19StakeAddress) -> Self {
         value.0
     }
 }
 
-impl SerializeValue for DbStakeAddress {
+impl SerializeValue for DbCip19StakeAddress {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
-        let bytes: Vec<u8> = self.0.into();
-        bytes.serialize(typ, writer)
+        self.0.serialize(typ, writer)
     }
 }
 
-impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbStakeAddress {
+impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbCip19StakeAddress {
     fn type_check(typ: &ColumnType) -> Result<(), TypeCheckError> {
         <Vec<u8>>::type_check(typ)
     }
@@ -44,8 +45,15 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbStakeAddress {
     fn deserialize(
         typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
+        const EXPECTED_LENGTH: usize = 20;
+
         let bytes = <Vec<u8>>::deserialize(typ, v)?;
-        let hash = StakeAddress::try_from(bytes).map_err(DeserializationError::new)?;
-        Ok(Self(hash))
+        if bytes.len() != EXPECTED_LENGTH {
+            return Err(DeserializationError::new(format!(
+                "Unexpected length {}, expected {EXPECTED_LENGTH}",
+                bytes.len()
+            )));
+        }
+        Ok(Self(bytes))
     }
 }

@@ -1,8 +1,5 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
-// TODO: FIXME:
-#![allow(unused_imports)]
-
 pub(crate) mod insert_catalyst_id_for_stake_address;
 pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
@@ -10,34 +7,24 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::sync::{Arc, LazyLock};
 
-use c509_certificate::{
-    c509::C509,
-    extensions::{alt_name::GeneralNamesOrText, extension::ExtensionValue},
-    general_names::general_name::{GeneralNameTypeRegistry, GeneralNameValue},
-};
-use cardano_blockchain_types::{MultiEraBlock, Slot, StakeAddress, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{Cip0134Uri, MultiEraBlock, Slot, TransactionHash, TxnIndex};
 use catalyst_types::id_uri::IdUri;
-use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
+use der_parser::{asn1_rs::oid, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::Address;
-use rbac_registration::cardano::cip509::{
-    C509Cert, Cip509, Cip509RbacMetadata, KeyLocalRef, LocalRefInt, RoleNumber, X509DerCert,
-};
+use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
 use scylla::Session;
 use tracing::error;
-use x509_cert::{
-    certificate::{CertificateInner, Rfc5280},
-    der::{oid::db::rfc5912::ID_CE_SUBJECT_ALT_NAME, Decode},
-};
 
 use crate::{
-    db::index::{
-        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
-        session::CassandraSession,
+    db::{
+        index::{
+            queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
+        types::DbCip19StakeAddress,
     },
-    service::common::auth::rbac::role0_kid::Role0Kid,
     settings::cassandra_db::EnvVars,
-    utils::blake2b_hash::blake2b_128,
 };
 
 /// Context-specific primitive type with tag number 6 (`raw_tag` 134) for
@@ -127,7 +114,7 @@ impl Rbac509InsertQuery {
             );
         }
 
-        let Some(catalyst_id) = catalyst_id(&cip509, txn_hash) else {
+        let Some(catalyst_id) = catalyst_id(session, &cip509, txn_hash, slot, index).await else {
             error!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
             return;
         };
@@ -229,231 +216,59 @@ impl Rbac509InsertQuery {
 }
 
 /// Returns a Catalyst ID of the given registration.
-fn catalyst_id(cip509: &Cip509, txn_hash: TransactionHash) -> Option<IdUri> {
+async fn catalyst_id(
+    session: &Arc<CassandraSession>, cip509: &Cip509, txn_hash: TransactionHash, slot: Slot,
+    index: TxnIndex,
+) -> Option<IdUri> {
+    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::{
+        cache_for_transaction_id, Query,
+    };
+
     let id = match cip509.previous_transaction() {
-        Some(previous) => catalyst_id_from_tx(&previous)?,
+        Some(previous) => {
+            Query::get_latest(session, previous.into())
+                .await
+                .inspect_err(|e| error!("{e:?}"))
+                .ok()
+                .flatten()?
+                .catalyst_id
+                .into()
+        },
         None => cip509.catalyst_id()?.as_short_id(),
     };
 
+    cache_for_transaction_id(
+        txn_hash.into(),
+        id.clone().into(),
+        slot.into(),
+        index.into(),
+    );
     CATALYST_ID_BY_TXN_ID_CACHE.insert(txn_hash, id.clone());
     Some(id)
 }
 
-/// Finds a Catalyst ID of the given transaction in the cache or database.
-fn catalyst_id_from_tx(txn_hash: &TransactionHash) -> Option<IdUri> {
-    if let Some(id) = CATALYST_ID_BY_TXN_ID_CACHE.get(txn_hash) {
-        return Some(id);
-    };
-
-    // TODO: FIXME: Try to get from database.
-
-    todo!()
-}
-
-// TODO: FIXME: Fix stake address type
-fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<StakeAddress> {
+/// Returns stake addresses of the role 0.
+fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<DbCip19StakeAddress> {
     let mut result = Vec::new();
 
     if let Some(uris) = metadata.certificate_uris.x_uris().get(&0) {
-        result.extend(uris.into_iter().filter_map(|uri| {
-            match uri.address() {
-                Address::Stake(a) => Some(a.to_owned()),
-                _ => None,
-            }
-        }));
+        result.extend(convert_stake_addresses(uris));
     }
     if let Some(uris) = metadata.certificate_uris.c_uris().get(&0) {
-        result.extend(uris.into_iter().filter_map(|uri| {
-            match uri.address() {
-                Address::Stake(a) => Some(a.to_owned()),
-                _ => None,
-            }
-        }));
+        result.extend(convert_stake_addresses(uris));
     }
 
     result
 }
 
-// /// Role0 Certificate Data.
-// struct Role0CertificateData {
-//     /// Role0 Key
-//     role0_key: Role0Key,
-//     /// Stake Addresses
-//     stake_addresses: Option<Vec<StakeAddress>>,
-// }
-
-// /// Get Role0 X509 Certificate from `KeyReference`
-// fn get_role0_x509_certs_from_reference(
-//     x509_certs: Option<&Vec<X509DerCert>>, key_offset: Option<usize>,
-// ) -> Option<(Role0Kid, x509_cert::Certificate)> {
-//     x509_certs.and_then(|certs| {
-//         key_offset.and_then(|pk_idx| {
-//             certs.get(pk_idx).and_then(|cert| {
-//                 match cert {
-//                     X509DerCert::X509Cert(der_cert) => {
-//                         match x509_cert::Certificate::from_der(der_cert) {
-//                             Ok(decoded_cert) => {
-//                                 let x = blake2b_128(&der_cert);
-//                             },
-//                             Err(err) => error!(err=%err,"Failed to decode Role0
-// certificate."),                         }
-//                     },
-//                     X509DerCert::Deleted | X509DerCert::Undefined => None,
-//                 }
-//             })
-//         })
-//     })
-// }
-//
-// /// Get Role0 C509 Certificate from `KeyReference`
-// fn get_role0_c509_certs_from_reference(
-//     c509_certs: Option<&Vec<C509Cert>>, key_offset: Option<usize>,
-// ) -> Option<&C509> {
-//     c509_certs.and_then(|certs| {
-//         key_offset.and_then(|pk_idx| {
-//             certs.get(pk_idx).and_then(|cert| {
-//                 match cert {
-//                     C509Cert::C509Certificate(cert) => Some(cert.as_ref()),
-//                     // Currently C509CertInMetadatumReference is unsupported
-//                     C509Cert::C509CertInMetadatumReference(_)
-//                     | C509Cert::Undefined
-//                     | C509Cert::Deleted => None,
-//                 }
-//             })
-//         })
-//     })
-// }
-//
-// /// Extract Role0 Key from `KeyReference`
-// fn extract_role0_data(
-//     key_local_ref: &KeyLocalRef, rbac_metadata: &Cip509RbacMetadata,
-// ) -> Option<Role0CertificateData> {
-//     let key_offset: Option<usize> = key_local_ref.key_offset.try_into().ok();
-//     match key_local_ref.local_ref {
-//         LocalRefInt::X509Certs => {
-//             get_role0_x509_certs_from_reference(rbac_metadata.x509_certs.as_ref(),
-// key_offset)                 .and_then(|der_cert| {
-//                     let cert = der_cert;
-//                     let role0_key = der_cert
-//                         .tbs_certificate
-//                         .subject_public_key_info
-//                         .subject_public_key
-//                         .as_bytes()
-//                         .map(<[u8]>::to_vec);
-//
-//                     role0_key.map(|role0_key| {
-//                         let stake_addresses =
-// extract_stake_addresses_from_x509(&der_cert);
-// Role0CertificateData {                             role0_key,
-//                             stake_addresses,
-//                         }
-//                     })
-//                 })
-//         },
-//         LocalRefInt::C509Certs => {
-//             get_role0_c509_certs_from_reference(rbac_metadata.c509_certs.as_ref(),
-// key_offset).map(                 |cert| {
-//                     let stake_addresses = extract_stake_addresses_from_c509(cert);
-//                     Role0CertificateData {
-//                         role0_key: cert.tbs_cert().subject_public_key().to_vec(),
-//                         stake_addresses,
-//                     }
-//                 },
-//             )
-//         },
-//         LocalRefInt::PubKeys => None, // Invalid for Role0 to have a simple key.
-//     }
-// }
-//
-// /// Extract Stake Address from X509 Certificate
-// fn extract_stake_addresses_from_x509(
-//     der_cert: &CertificateInner<Rfc5280>,
-// ) -> Option<Vec<StakeAddress>> {
-//     let mut stake_addresses = Vec::new();
-//     // Find the Subject Alternative Name extension
-//     let san_ext = der_cert
-//         .tbs_certificate
-//         .extensions
-//         .as_ref()
-//         .and_then(|exts| {
-//             exts.iter()
-//                 .find(|ext| ext.extn_id == ID_CE_SUBJECT_ALT_NAME)
-//         });
-//     // Subject Alternative Name extension if it exists
-//     san_ext
-//         .and_then(|san_ext| parse_der_sequence(san_ext.extn_value.as_bytes()).ok())
-//         .and_then(|(_, parsed_seq)| {
-//             for data in parsed_seq.ref_iter() {
-//                 // Check for context-specific primitive type with tag number
-//                 // 6 (raw_tag 134)
-//                 if data.header.raw_tag() == Some(&[SAN_URI]) {
-//                     if let Ok(content) = data.content.as_slice() {
-//                         // Decode the UTF-8 string
-//                         if let Some(addr) = std::str::from_utf8(content)
-//                             .map(std::string::ToString::to_string)
-//                             .ok()
-//                             .and_then(|addr| extract_cip19_hash(&addr, Some("stake")))
-//                         {
-//                             stake_addresses.push(addr);
-//                         }
-//                     }
-//                 }
-//             }
-//             if stake_addresses.is_empty() {
-//                 None
-//             } else {
-//                 Some(stake_addresses)
-//             }
-//         })
-// }
-//
-// /// Extract Stake Address from C509 Certificate
-// fn extract_stake_addresses_from_c509(c509: &C509) -> Option<Vec<StakeAddress>> {
-//     let mut stake_addresses = Vec::new();
-//     for exts in c509.tbs_cert().extensions().extensions() {
-//         if *exts.registered_oid().c509_oid().oid() == SUBJECT_ALT_NAME_OID {
-//             if let ExtensionValue::AlternativeName(alt_name) = exts.value() {
-//                 if let GeneralNamesOrText::GeneralNames(gn) = alt_name.general_name() {
-//                     for name in gn.general_names() {
-//                         if name.gn_type() ==
-// &GeneralNameTypeRegistry::UniformResourceIdentifier {                             if
-// let GeneralNameValue::Text(s) = name.gn_value() {                                 if
-// let Some(h) = extract_cip19_hash(s, Some("stake")) {
-// stake_addresses.push(h);                                 }
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     if stake_addresses.is_empty() {
-//         None
-//     } else {
-//         Some(stake_addresses)
-//     }
-// }
-
-// /// Return RBAC metadata if its found in the transaction, or None
-// async fn rbac_metadata(
-//     session: &Arc<CassandraSession>, txn_hash: TransactionHash, txn_idx: usize,
-// slot_no: u64,     block: &MultiEraBlock,
-// ) -> Option<(Arc<Cip509>, ChainRoot)> {
-//     if let Some(decoded_metadata) = block.txn_metadata(txn_idx, cip509::LABEL) {
-//         if let Metadata::DecodedMetadataValues::Cip509(rbac) = &decoded_metadata.value
-// {             if let Some(chain_root) =
-//                 ChainRoot::get(session, txn_hash, txn_idx, slot_no, rbac).await
-//             {
-//                 return Some((rbac.clone(), chain_root));
-//             }
-//
-//             // TODO: Maybe Index Invalid RBAC Registrations detected.
-//             error!(
-//                 slot = slot_no,
-//                 txn_idx = txn_idx,
-//                 "Invalid RBAC Registration Metadata in transaction."
-//             );
-//         }
-//     }
-//     None
-// }
+/// Converts a list of `Cip0134Uri` to a list of `DbCip19StakeAddress`.
+fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<DbCip19StakeAddress> {
+    uris.into_iter()
+        .filter_map(|uri| {
+            match uri.address() {
+                Address::Stake(a) => Some(a.clone().into()),
+                _ => None,
+            }
+        })
+        .collect()
+}

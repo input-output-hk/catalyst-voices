@@ -61,7 +61,7 @@ async fn purge_chain_root_for_stake_address(
 async fn purge_chain_root_for_txn_id(
     session: &Arc<CassandraSession>, txn_hashes: &HashSet<TransactionHash>,
 ) -> anyhow::Result<()> {
-    use purge::chain_root_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
+    use purge::catalyst_id_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;

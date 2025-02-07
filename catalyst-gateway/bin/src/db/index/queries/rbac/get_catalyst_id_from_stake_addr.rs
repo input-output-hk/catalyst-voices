@@ -1,4 +1,5 @@
-//! Get chain root by stake address.
+//! Get Catalyst ID by stake address.
+
 use std::sync::{Arc, LazyLock};
 
 use anyhow::bail;
@@ -25,10 +26,6 @@ static CATALYST_ID_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, String>>
         Cache::builder()
             // Set Eviction Policy to `LRU`
             .eviction_policy(EvictionPolicy::lru())
-            // Set the initial capacity
-            .initial_capacity(chain_root::LRU_MAX_CAPACITY)
-            // Set the maximum number of LRU entries
-            .max_capacity(chain_root::LRU_MAX_CAPACITY as u64)
             // Create the cache.
             .build()
     });

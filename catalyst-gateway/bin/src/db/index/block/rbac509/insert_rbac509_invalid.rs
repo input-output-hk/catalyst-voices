@@ -3,7 +3,6 @@
 use std::{fmt::Debug, sync::Arc};
 
 use catalyst_types::problem_report::ProblemReport;
-use rbac_registration::cardano::cip509::Cip509;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 

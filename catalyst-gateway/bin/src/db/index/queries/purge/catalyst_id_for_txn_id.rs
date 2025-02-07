@@ -36,7 +36,7 @@ pub(crate) mod result {
 }
 
 /// Select primary keys for Chain Root For TX ID registration.
-const SELECT_QUERY: &str = include_str!("./cql/get_chain_root_for_txn_id.cql");
+const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_txn_id.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
@@ -84,7 +84,7 @@ impl PrimaryKeyQuery {
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
-            .purge_execute_iter(PreparedSelectQuery::ChainRootForTxnId)
+            .purge_execute_iter(PreparedSelectQuery::CatalystIdForTxnId)
             .await?
             .rows_stream::<result::PrimaryKey>()?;
 
@@ -93,7 +93,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete Chain Root For TX ID registration
-const DELETE_QUERY: &str = include_str!("./cql/delete_chain_root_for_txn_id.cql");
+const DELETE_QUERY: &str = include_str!("cql/delete_catalyst_id_for_txn_id.cql");
 
 /// Delete Chain Root For TX ID registration Query
 pub(crate) struct DeleteQuery;

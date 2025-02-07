@@ -2,7 +2,7 @@
 
 pub use catalyst_id::DbCatalystId;
 pub use slot::DbSlot;
-pub use stake_address::DbStakeAddress;
+pub use stake_address::DbCip19StakeAddress;
 pub use transaction_hash::DbTransactionHash;
 pub use transaction_index::DbTxnIndex;
 pub use uuidv4::DbUuidV4;

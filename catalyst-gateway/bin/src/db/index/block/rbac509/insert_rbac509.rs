@@ -2,7 +2,6 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use rbac_registration::cardano::cip509::Cip509;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
