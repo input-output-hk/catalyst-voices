@@ -35,14 +35,32 @@ what should be committed.
 
 ### Drift
 
+Files have to be generated with build runner command.
+
+```bash
+dart run build_runner build
+```
+
+or melos
+
+```bash
+melos build_runner_repository
+```
+
+Build migration test files with
+
+```bash
+melos db-make-migration
+```
+
 #### Web
 
 Use same port while building for db to be restored. `--web-port=5555`
 
 Additional headers
 
-- `Cross-Origin-Opener-Policy`: Needs to be set to `same-origin`.
-- `Cross-Origin-Embedder-Policy`: Needs to be set to `require-corp` or `credentialless`.
+* `Cross-Origin-Opener-Policy`: Needs to be set to `same-origin`.
+* `Cross-Origin-Embedder-Policy`: Needs to be set to `require-corp`.
 
 Read more [here](https://drift.simonbinder.eu/platforms/web/#additional-headers).
 
