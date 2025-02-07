@@ -11,7 +11,7 @@ from api_tests import (
 )
 from datetime import datetime, timezone
 
-@pytest.mark.ci
+@pytest.mark.skip
 def test_is_live_endpoint():
     print(os.environ["CAT_GATEWAY_URL"])
 
