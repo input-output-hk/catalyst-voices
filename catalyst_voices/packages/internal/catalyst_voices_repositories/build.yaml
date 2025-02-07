@@ -22,10 +22,6 @@ targets:
                 - CommunityChoiceProposal$ProposalCategory
                 - CommunityChoiceProposal$Proposer
       json_serializable:
-        generate_for:
-          include:
-            - lib/generated/api/**
-            - lib/src/dto/**
         options:
           explicit_to_json: true
       drift_dev:
@@ -33,9 +29,6 @@ targets:
         enabled: false
       drift_dev:analyzer:
         enabled: true
-        generate_for:
-          include:
-            - lib/src/database/**
         # Drift build options, as per https://drift.simonbinder.eu/docs/advanced-features/builder_options/
         options: &options
           # Use ISO 8601 string instead of a unix timestamp

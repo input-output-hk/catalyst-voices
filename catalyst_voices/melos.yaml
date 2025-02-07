@@ -254,6 +254,7 @@ scripts:
         '*.openapi.dart' \
         '*.gen.dart' \
         '*.swagger.*.dart' \
+        '*.drift.dart' \
         'lib/generated/**' \;
 
       # merges all coverage reports into a single one and puts it in /coverage/lcov.info
