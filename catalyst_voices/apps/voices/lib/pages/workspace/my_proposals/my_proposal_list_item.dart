@@ -1,4 +1,4 @@
-part of 'my_proposals.dart';
+part of 'workspace_my_proposals_selector.dart';
 
 class ProposalListItem extends StatelessWidget {
   final WorkspaceProposalListItem item;

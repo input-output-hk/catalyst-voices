@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/pages/workspace/header/workspace_header.dart';
-import 'package:catalyst_voices/pages/workspace/my_proposals/my_proposals.dart';
+import 'package:catalyst_voices/pages/workspace/my_proposals/workspace_my_proposals_selector.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_empty.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_error.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
@@ -25,10 +25,10 @@ class _WorkspacePageState extends State<WorkspacePage> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                WorkspaceErrorSelector(),
-                WorkspaceEmptyStateSelector(),
-                WorkspaceProposalsSelector(),
+                WorkspaceMyProposalsSelector(),
                 WorkspaceLoadingSelector(),
+                WorkspaceEmptyStateSelector(),
+                WorkspaceErrorSelector(),
               ],
             ),
           ),
@@ -40,7 +40,6 @@ class _WorkspacePageState extends State<WorkspacePage> {
   @override
   void initState() {
     super.initState();
-
     context.read<WorkspaceBloc>().add(const LoadProposalsEvent());
   }
 }

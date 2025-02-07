@@ -9,12 +9,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'my_proposal_list_item.dart';
 part 'my_proposals_list.dart';
+part 'my_proposals_list_selector.dart';
 part 'my_proposals_tab_selector.dart';
 part 'my_proposals_tabs.dart';
-part 'workspace_proposals_selector.dart';
 
-class MyProposals extends StatelessWidget {
-  const MyProposals({super.key});
+class WorkspaceMyProposalsSelector extends StatelessWidget {
+  const WorkspaceMyProposalsSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +52,10 @@ class MyProposals extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
-          // const WorkspaceProposalsSelector(),
+          //const SizedBox(height: 10),
+          const Expanded(
+            child: MyProposalsListSelector(),
+          ),
         ],
       ),
     );

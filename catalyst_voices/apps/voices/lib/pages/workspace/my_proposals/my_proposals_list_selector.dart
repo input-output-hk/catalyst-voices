@@ -1,7 +1,7 @@
-part of 'my_proposals.dart';
+part of 'workspace_my_proposals_selector.dart';
 
-class WorkspaceProposalsSelector extends StatelessWidget {
-  const WorkspaceProposalsSelector({super.key});
+class MyProposalsListSelector extends StatelessWidget {
+  const MyProposalsListSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
