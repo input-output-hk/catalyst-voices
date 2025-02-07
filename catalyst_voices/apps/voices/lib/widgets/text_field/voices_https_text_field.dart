@@ -6,18 +6,20 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesHttpsTextField extends StatefulWidget {
-  final ValueChanged<String?>? onFieldSubmitted;
   final TextEditingController? controller;
   final FocusNode? focusNode;
+  final ValueChanged<String?>? onChanged;
+  final ValueChanged<String?>? onFieldSubmitted;
   final VoicesTextFieldValidator? validator;
   final bool enabled;
 
   const VoicesHttpsTextField({
     super.key,
-    this.onFieldSubmitted,
+    this.controller,
     this.focusNode,
     this.enabled = false,
-    this.controller,
+    this.onChanged,
+    this.onFieldSubmitted,
     this.validator,
   });
 
@@ -27,6 +29,8 @@ class VoicesHttpsTextField extends StatefulWidget {
 
 class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
     with LaunchUrlMixin {
+  final _textFieldKey = GlobalKey<VoicesTextFieldState>();
+
   TextEditingController? _controller;
   TextEditingController get _effectiveController {
     return widget.controller ?? (_controller ??= TextEditingController());
@@ -45,10 +49,12 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
     return GestureDetector(
       onTap: widget.enabled ? null : _launchUrl,
       child: VoicesTextField(
+        key: _textFieldKey,
         controller: _effectiveController,
         focusNode: widget.focusNode,
+        onChanged: widget.onChanged,
         onFieldSubmitted: widget.onFieldSubmitted,
-        validator: widget.validator,
+        textValidator: widget.validator,
         decoration: VoicesTextFieldDecoration(
           hintText:
               widget.enabled ? context.l10n.noUrlAdded : context.l10n.addUrl,
@@ -110,7 +116,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
   }
 
   void _onClearTap() {
-    _effectiveController.clear();
+    _textFieldKey.currentState?.clear();
   }
 }
 

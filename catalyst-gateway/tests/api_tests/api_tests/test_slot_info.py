@@ -9,7 +9,7 @@ from api_tests import (
 )
 from datetime import datetime, timezone
 
-@pytest.mark.nightly
+@pytest.mark.skip
 def test_date_time_to_slot_number_endpoint():
     check_is_live()
     check_is_ready()

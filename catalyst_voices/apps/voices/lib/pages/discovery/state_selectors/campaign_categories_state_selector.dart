@@ -8,7 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef _ListItems = List<CampaignCategoryCardViewModel>;
+typedef _ListItems = List<CampaignCategoryViewModel>;
 
 class CampaignCategoriesStateSelector extends StatelessWidget {
   const CampaignCategoriesStateSelector({super.key});
@@ -35,6 +35,29 @@ class CampaignCategoriesStateSelector extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _CampaignCategoriesLoading extends StatelessWidget {
+  const _CampaignCategoriesLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
+      selector: (state) {
+        return state.campaignCategories.isLoading;
+      },
+      builder: (context, state) {
+        final dummyCategories = List.filled(
+          6,
+          CampaignCategoryViewModel.dummy(),
+        );
+        return Offstage(
+          offstage: !state,
+          child: CampaignCategories(dummyCategories, isLoading: state),
+        );
+      },
     );
   }
 }
@@ -85,29 +108,6 @@ class _CampaignCategoriesError extends StatelessWidget {
               ),
             ),
           ),
-        );
-      },
-    );
-  }
-}
-
-class _CampaignCategoriesLoading extends StatelessWidget {
-  const _CampaignCategoriesLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
-      selector: (state) {
-        return state.campaignCategories.isLoading;
-      },
-      builder: (context, state) {
-        final dummyCategories = List.filled(
-          6,
-          CampaignCategoryCardViewModel.dummy(),
-        );
-        return Offstage(
-          offstage: !state,
-          child: CampaignCategories(dummyCategories, isLoading: state),
         );
       },
     );

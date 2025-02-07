@@ -55,7 +55,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
   }
 
   @override
-  void didUpdateWidget(covariant ProposalBuilderPage oldWidget) {
+  void didUpdateWidget(ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId ||

@@ -1,11 +1,12 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/amount_formatter.dart';
+import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
+import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -33,7 +34,7 @@ class CurrentCampaign extends StatelessWidget {
             children: [
               Skeletonizer(
                 enabled: isLoading,
-                child: _CurrentCampaignDetails(
+                child: FundsDetailCard(
                   allFunds: currentCampaignInfo.allFunds,
                   totalAsk: currentCampaignInfo.totalAsk,
                   askRange: currentCampaignInfo.askRange,
@@ -237,6 +238,7 @@ class _RangeValue extends StatelessWidget {
             color: context.colors.sysColorsNeutralN60,
           ),
         ),
+        _CampaignTimeline(mockCampaignTimeline),
       ],
     );
   }

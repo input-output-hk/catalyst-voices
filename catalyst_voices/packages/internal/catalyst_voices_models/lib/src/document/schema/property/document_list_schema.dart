@@ -65,7 +65,11 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
 
   /// The title of the child created from [itemsSchema].
   String getChildItemTitle(int index) {
-    return '${itemsSchema.title} #${index + 1}';
+    if (itemsSchema.title.isEmpty) {
+      return '';
+    } else {
+      return '${itemsSchema.title} #${index + 1}';
+    }
   }
 
   @override

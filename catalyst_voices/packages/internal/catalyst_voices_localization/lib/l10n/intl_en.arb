@@ -1424,6 +1424,17 @@
       }
     }
   },
+  "dateAtTime": "{date} at {time}",
+  "@dateAtTime": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "accountMenuPopupTooltip": "Account menu",
   "account": "Account",
   "settings": "Settings",
@@ -1444,6 +1455,32 @@
   "@catalyst": {
     "description": "Catalyst is a project name"
   },
+  "proposalsSubmittedCount": "{count} {count, plural, one{Proposal} other{Proposals}} Submitted",
+  "@proposalsSubmittedCount": {
+    "description": "Used in proposal card in campaign category",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inObject": "In {object}",
+  "@inObject": {
+    "description": "In (Category Name)",
+    "placeholders": {
+      "object": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryRequirements": "Category Requirements:",
+  "proposalsSubmissionClose": "Proposals submission close:",
+  "backToCampaign": "Back to Campaign",
+  "category": "Category",
+  "exploreCategories": "Explore Categories",
+  "categoryBudget": "Category Budget",
+  "fundsAvailableForCategory": "Funds available for this category",
+  "currentAsk": "Current Ask",
   "displayName": "Display Name",
   "emailAddress": "Email address",
   "myAccount": "My account",
