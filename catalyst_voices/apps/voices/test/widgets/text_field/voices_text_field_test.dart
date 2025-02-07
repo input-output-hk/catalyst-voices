@@ -139,8 +139,7 @@ void main() {
       );
 
       // Verify that the TextField is rendered as disabled
-      final textField =
-          tester.widget<TextField>(find.byType(TextField));
+      final textField = tester.widget<TextField>(find.byType(TextField));
       expect(textField.enabled, isFalse);
     });
   });
