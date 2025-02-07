@@ -8,6 +8,10 @@
 
 /catalyst-gateway-crates/ @stevenj @Mr-Leshiy @cong-or @saibatizoku @bkioshn @stanislav-tkach
 
+/catalyst-gateway/tests/ @kukkok3
+
+/catalyst_voices/apps/voices/integration_test/ @kukkok3
+
 /docs/ @stevenj @neil-iohk @nathanbogale @minikin
 
 .md  @stevenj @minikin
