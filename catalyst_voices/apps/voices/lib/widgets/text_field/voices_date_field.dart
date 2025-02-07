@@ -70,7 +70,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   }
 
   @override
-  void didUpdateWidget(covariant VoicesDateField oldWidget) {
+  void didUpdateWidget(VoicesDateField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.controller != oldWidget.controller) {
       (oldWidget.controller ?? _controller)?.removeListener(_handleDateChanged);
@@ -101,7 +101,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
       onChanged: onChanged != null
           ? (value) => onChanged(_convertTextToDate(value))
           : null,
-      validator: _validate,
+      validator: _validator,
       hintText: _pattern.toUpperCase(),
       onFieldSubmitted: onFieldSubmitted != null
           ? (value) => onFieldSubmitted(_convertTextToDate(value))
@@ -164,7 +164,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
     }
   }
 
-  VoicesTextFieldValidationResult _validate(String value) {
+  VoicesTextFieldValidationResult _validator(String value) {
     final today = DateTime.now();
     final maxDate = DateTime(today.year + 1, today.month, today.day);
 

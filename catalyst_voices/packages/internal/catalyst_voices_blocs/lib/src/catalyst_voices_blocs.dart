@@ -5,6 +5,7 @@ export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';
 export 'campaign/details/campaign_details.dart';
 export 'campaign/info/campaign_info.dart';
+export 'category/category_detail.dart';
 export 'discovery/discovery.dart';
 export 'proposal_builder/proposal_builder.dart';
 export 'proposals/proposals.dart';

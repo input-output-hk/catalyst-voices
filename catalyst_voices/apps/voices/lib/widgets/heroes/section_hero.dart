@@ -51,7 +51,7 @@ class _HeroSectionState extends State<HeroSection>
   }
 
   @override
-  void didUpdateWidget(covariant HeroSection oldWidget) {
+  void didUpdateWidget(HeroSection oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.asset != widget.asset ||
