@@ -572,8 +572,9 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     if (widget.decoration?.errorStyle != null) {
       return widget.decoration?.errorStyle;
     }
+
     return widget.enabled
-        ? textTheme.bodySmall
+        ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
         : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
   }
 
