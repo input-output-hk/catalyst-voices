@@ -1,20 +1,49 @@
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
+import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
 import 'package:drift/drift.dart';
 
 /// Exposes only public operation on drafts, and related, tables.
-abstract interface class DraftsDao {}
+abstract interface class DraftsDao {
+  /// Returns all drafts
+  Future<List<Draft>> queryAll();
+
+  /// Counts unique drafts. All versions of same document are counted as 1.
+  Future<int> countAll();
+
+  /// Inserts all drafts. On conflicts updates.
+  Future<void> saveAll(Iterable<Draft> drafts);
+}
 
 @DriftAccessor(
   tables: [
     Drafts,
-    DocumentsMetadata,
   ],
 )
 class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftDraftsDaoMixin
     implements DraftsDao {
   DriftDraftsDao(super.attachedDatabase);
+
+  @override
+  Future<List<Draft>> queryAll() {
+    return select(drafts).get();
+  }
+
+  @override
+  Future<int> countAll() {
+    return drafts.count().getSingle();
+  }
+
+  @override
+  Future<void> saveAll(Iterable<Draft> drafts) async {
+    await batch((batch) {
+      batch.insertAll(
+        this.drafts,
+        drafts,
+        mode: InsertMode.insertOrReplace,
+      );
+    });
+  }
 }

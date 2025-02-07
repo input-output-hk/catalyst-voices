@@ -1,8 +1,14 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-extension type const SignedDocumentContent(Map<String, dynamic> data)
-    implements Object {}
+final class SignedDocumentContent extends Equatable {
+  final Map<String, dynamic> data;
+
+  const SignedDocumentContent(this.data);
+
+  @override
+  List<Object?> get props => [data];
+}
 
 // List of types and metadata fields is here
 // https://input-output-hk.github.io/catalyst-libs/branch/feat_signed_object/architecture/08_concepts/signed_doc/types/
