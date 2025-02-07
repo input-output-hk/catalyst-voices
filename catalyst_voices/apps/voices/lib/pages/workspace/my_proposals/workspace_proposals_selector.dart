@@ -10,7 +10,7 @@ class WorkspaceProposalsSelector extends StatelessWidget {
       builder: (context, state) {
         return Offstage(
           offstage: state.isEmpty,
-          child: const MyProposals(),
+          child: MyProposalsList(items: state),
         );
       },
     );

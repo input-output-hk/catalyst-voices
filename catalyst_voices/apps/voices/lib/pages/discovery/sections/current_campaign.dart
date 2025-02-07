@@ -45,10 +45,12 @@ class CurrentCampaign extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 32),
-        // TODO(minikin): fix padding
-        CampaignTimeline(
-          timelineItems: CampaignTimelineViewModelX.mockData,
-          placement: CampaignTimelinePlacement.discovery,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 120),
+          child: CampaignTimeline(
+            timelineItems: CampaignTimelineViewModelX.mockData,
+            placement: CampaignTimelinePlacement.discovery,
+          ),
         ),
       ],
     );

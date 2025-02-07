@@ -53,6 +53,7 @@ class MyProposals extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
+          // const WorkspaceProposalsSelector(),
         ],
       ),
     );
