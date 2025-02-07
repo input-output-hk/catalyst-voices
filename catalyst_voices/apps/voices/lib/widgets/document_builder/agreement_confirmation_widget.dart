@@ -36,7 +36,7 @@ class _AgreementConfirmationWidgetState
       value: _value,
       onChanged: _onChanged,
       validator: _validator,
-      readOnly: !widget.isEditMode,
+      enabled: widget.isEditMode,
       description: widget.schema.description ?? MarkdownData.empty,
     );
   }
@@ -61,7 +61,7 @@ class _AgreementConfirmationFormField extends VoicesFormField<bool> {
   _AgreementConfirmationFormField({
     required super.value,
     required super.onChanged,
-    super.readOnly,
+    super.enabled,
     super.validator,
     required MarkdownData description,
   }) : super(
@@ -86,18 +86,21 @@ class _AgreementConfirmationFormField extends VoicesFormField<bool> {
                 VoicesCheckbox(
                   value: value,
                   onChanged: onChangedHandler,
-                  isEnabled: !readOnly,
+                  isEnabled: enabled,
                   isError: field.hasError,
                   label: Text(
                     context.l10n.agree,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: readOnly && !value
+                          color: !enabled && !value
                               ? Theme.of(context).colors.textDisabled
                               : null,
                         ),
                   ),
                 ),
-                if (field.hasError) DocumentErrorText(text: field.errorText),
+                if (field.hasError) ...[
+                  const SizedBox(height: 4),
+                  DocumentErrorText(text: field.errorText),
+                ],
               ],
             );
           },

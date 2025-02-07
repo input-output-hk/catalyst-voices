@@ -47,7 +47,7 @@ class _DurationInMonthsWidgetState extends State<DurationInMonthsWidget> {
             onChanged: _onChanged,
             validator: _validator,
             value: _value,
-            readOnly: !widget.isEditMode,
+            enabled: widget.isEditMode,
             hintText: _placeholder,
           ),
         ],

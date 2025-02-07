@@ -67,7 +67,7 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
   }
 
   DocumentPropertySchema?
-      getPropertyWithSchemaType<T extends DocumentPropertySchema>() {
+      getPropertySchemaOfType<T extends DocumentPropertySchema>() {
     return properties.firstWhereOrNull((e) => e is T);
   }
 
@@ -263,21 +263,30 @@ final class DocumentSingleGroupedTagSelectorSchema
             .firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema)
         as DocumentValueProperty<String>?;
 
-    final group = groupProperty?.value;
-    final tag = tagProperty?.value;
+    return validateGroupedTagsSelection(
+      GroupedTagsSelection(
+        group: groupProperty?.value,
+        tag: tagProperty?.value,
+      ),
+    );
+  }
 
-    if (groupProperty == null ||
-        tagProperty == null ||
-        group == null ||
-        tag == null) {
+  DocumentValidationResult validateGroupedTagsSelection(
+    GroupedTagsSelection? selection,
+  ) {
+    final group = selection?.group;
+    final tag = selection?.tag;
+
+    if (group == null || tag == null) {
       return MissingRequiredDocumentValue(invalidNodeId: nodeId);
     }
 
     final groups = groupedTags();
     final matchingGroup = groups.firstWhereOrNull((e) => e.group == group);
     if (matchingGroup == null) {
+      final groupProperty = getPropertySchemaOfType<DocumentTagGroupSchema>();
       return DocumentEnumValueMismatch(
-        invalidNodeId: groupProperty.nodeId,
+        invalidNodeId: groupProperty!.nodeId,
         enumValues: groups.map((e) => e.group).toList(),
       );
     }
@@ -285,8 +294,9 @@ final class DocumentSingleGroupedTagSelectorSchema
     if (matchingGroup.tags.contains(tag)) {
       return const SuccessfulDocumentValidation();
     } else {
+      final tagProperty = getPropertySchemaOfType<DocumentTagSelectionSchema>();
       return DocumentEnumValueMismatch(
-        invalidNodeId: tagProperty.nodeId,
+        invalidNodeId: tagProperty!.nodeId,
         enumValues: matchingGroup.tags,
       );
     }
@@ -320,20 +330,19 @@ final class DocumentSingleGroupedTagSelectorSchema
     );
   }
 
-  List<DocumentChange> buildDocumentChanges(GroupedTagsSelection selection) {
-    final groupProperty = getPropertyWithSchemaType<DocumentTagGroupSchema>()!;
+  List<DocumentChange> buildDocumentChanges(GroupedTagsSelection? selection) {
+    final groupProperty = getPropertySchemaOfType<DocumentTagGroupSchema>()!;
 
-    final tagProperty =
-        getPropertyWithSchemaType<DocumentTagSelectionSchema>()!;
+    final tagProperty = getPropertySchemaOfType<DocumentTagSelectionSchema>()!;
 
     return [
       DocumentValueChange(
         nodeId: groupProperty.nodeId,
-        value: selection.group,
+        value: selection?.group,
       ),
       DocumentValueChange(
         nodeId: tagProperty.nodeId,
-        value: selection.tag,
+        value: selection?.tag,
       ),
     ];
   }
@@ -384,7 +393,6 @@ final class DocumentBorderGroupSchema extends DocumentObjectSchema {
     );
   }
 }
-
 
 final class DocumentGenericObjectSchema extends DocumentObjectSchema {
   const DocumentGenericObjectSchema({

@@ -1,13 +1,15 @@
 import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-// TODO(dtscalac): convert to form field
 class SingleGroupedTagSelectorWidget extends StatefulWidget {
   final DocumentSingleGroupedTagSelectorSchema schema;
   final DocumentObjectProperty property;
@@ -30,72 +32,76 @@ class SingleGroupedTagSelectorWidget extends StatefulWidget {
 
 class _SingleGroupedTagSelectorWidgetState
     extends State<SingleGroupedTagSelectorWidget> {
-  late GroupedTagsSelection _selection;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _selection = _getInitialSelection(widget);
-  }
-
-  @override
-  void didUpdateWidget(SingleGroupedTagSelectorWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final oldSelection = _getInitialSelection(oldWidget);
-    final newSelection = _getInitialSelection(widget);
-
-    if (newSelection != oldSelection) {
-      _selection = newSelection;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (widget.isEditMode) {
-      return _TagSelector(
-        groupedTags: widget.schema.groupedTags(),
-        selection: _selection,
-        onGroupChanged: _handleGroupedTagsSelection,
-        onSelectionChanged: _handleTagSelection,
-        hintText: widget.schema.placeholder,
-        isRequired: widget.schema.isRequired,
-      );
-    } else {
-      return _GroupedTagChip(_selection);
-    }
+    return _TagWidget(
+      value: widget.schema.groupedTagsSelection(widget.property),
+      groupedTags: widget.schema.groupedTags(),
+      hintText: widget.schema.placeholder,
+      isRequired: widget.schema.isRequired,
+      onChanged: _onChanged,
+      validator: _validator,
+      enabled: widget.isEditMode,
+    );
   }
 
-  GroupedTagsSelection _getInitialSelection(
-    SingleGroupedTagSelectorWidget from,
-  ) {
-    return from.schema.groupedTagsSelection(from.property) ??
-        const GroupedTagsSelection();
+  void _onChanged(GroupedTagsSelection? value) {
+    final changes = widget.schema.buildDocumentChanges(value);
+    widget.onChanged(changes);
   }
 
-  void _handleGroupedTagsSelection(GroupedTags? groupedTags) {
-    setState(() {
-      final groupChanged = _selection.group != groupedTags?.group;
+  String? _validator(GroupedTagsSelection? value) {
+    final schema = widget.schema;
+    final result = schema.validateGroupedTagsSelection(value);
 
-      _selection = _selection.copyWith(
-        group: Optional(groupedTags?.group),
-        tag: groupChanged ? const Optional<String>.empty() : null,
-      );
-
-      final changes = widget.schema.buildDocumentChanges(_selection);
-      widget.onChanged(changes);
-    });
+    return LocalizedDocumentValidationResult.from(result).message(context);
   }
+}
 
-  void _handleTagSelection(GroupedTagsSelection value) {
-    setState(() {
-      _selection = value;
+class _TagWidget extends VoicesFormField<GroupedTagsSelection> {
+  _TagWidget({
+    required super.value,
+    super.onChanged,
+    super.enabled,
+    super.validator,
+    required List<GroupedTags> groupedTags,
+    required String? hintText,
+    required bool isRequired,
+  }) : super(
+          builder: (field) {
+            final selection = field.value ?? const GroupedTagsSelection();
 
-      final changes = widget.schema.buildDocumentChanges(value);
-      widget.onChanged(changes);
-    });
-  }
+            void onSelectionChanged(GroupedTagsSelection? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
+            void onGroupChanged(GroupedTags? groupedTags) {
+              final groupChanged = selection.group != groupedTags?.group;
+
+              final newSelection = selection.copyWith(
+                group: Optional(groupedTags?.group),
+                tag: groupChanged ? const Optional<String>.empty() : null,
+              );
+
+              onSelectionChanged(newSelection);
+            }
+
+            if (enabled) {
+              return _TagSelector(
+                groupedTags: groupedTags,
+                selection: selection,
+                onGroupChanged: onGroupChanged,
+                onSelectionChanged: onSelectionChanged,
+                hintText: hintText,
+                errorText: field.errorText,
+                isRequired: isRequired,
+              );
+            } else {
+              return _GroupedTagChip(selection);
+            }
+          },
+        );
 }
 
 class _TagSelector extends StatelessWidget {
@@ -104,6 +110,7 @@ class _TagSelector extends StatelessWidget {
   final ValueChanged<GroupedTags?> onGroupChanged;
   final ValueChanged<GroupedTagsSelection> onSelectionChanged;
   final String? hintText;
+  final String? errorText;
   final bool isRequired;
 
   GroupedTags? get _selectedGroupedTags {
@@ -118,6 +125,7 @@ class _TagSelector extends StatelessWidget {
     required this.onGroupChanged,
     required this.onSelectionChanged,
     required this.hintText,
+    required this.errorText,
     required this.isRequired,
   });
 
@@ -160,6 +168,10 @@ class _TagSelector extends StatelessWidget {
             onSelectionChanged(selection);
           },
         ),
+        if (errorText != null) ...[
+          const SizedBox(height: 12),
+          DocumentErrorText(text: errorText),
+        ],
       ],
     );
   }

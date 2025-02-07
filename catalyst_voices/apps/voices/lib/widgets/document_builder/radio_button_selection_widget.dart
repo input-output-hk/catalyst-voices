@@ -44,7 +44,7 @@ class _RadioButtonSelectionWidgetState extends State<RadioButtonSelectWidget> {
             items: _items,
             value: widget.property.value ?? widget.schema.defaultValue,
             onChanged: _onChanged,
-            readOnly: !widget.isEditMode,
+            enabled: widget.isEditMode,
             validator: _validator,
           ),
         ],

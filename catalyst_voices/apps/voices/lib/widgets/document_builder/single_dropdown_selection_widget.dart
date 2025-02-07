@@ -45,7 +45,7 @@ class _SingleDropdownSelectionWidgetState
           value: widget.property.value ?? widget.schema.defaultValue,
           onChanged: _onChanged,
           validator: _validator,
-          readOnly: !widget.isEditMode,
+          enabled: widget.isEditMode,
         ),
       ],
     );

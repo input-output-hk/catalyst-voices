@@ -82,7 +82,6 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
         VoicesHttpsTextField(
           controller: _textEditingController,
           focusNode: _focusNode,
-          
           onFieldSubmitted: _notifyChangeListener,
           validator: _validator,
           enabled: widget.isEditMode,

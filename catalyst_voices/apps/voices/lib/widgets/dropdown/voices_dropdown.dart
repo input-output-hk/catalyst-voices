@@ -89,7 +89,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
     required this.items,
     required super.value,
     required super.onChanged,
-    super.readOnly,
+    super.enabled,
     super.validator,
     this.hintText,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
@@ -108,7 +108,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                 controller: state._controller,
                 expandedInsets: EdgeInsets.zero,
                 initialSelection: state.value,
-                enabled: !readOnly,
+                enabled: enabled,
                 hintText: hintText,
                 dropdownMenuEntries: items,
                 onSelected: onChangedHandler,
@@ -130,7 +130,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                 // the space for the icon, otherwise when widget changes
                 // to edits mode it expands to make space for the icon
                 trailingIcon: Visibility.maintain(
-                  visible: !readOnly,
+                  visible: enabled,
                   child: VoicesAssets.icons.chevronDown.buildIcon(),
                 ),
                 selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),

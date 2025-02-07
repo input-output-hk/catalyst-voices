@@ -44,7 +44,7 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
           items: _buildMenuEntries(),
           value: _value,
           onChanged: _onChanged,
-          readOnly: !widget.isEditMode,
+          enabled: widget.isEditMode,
         ),
       ],
     );

@@ -89,7 +89,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
           decoration: VoicesTextFieldDecoration(
             hintText: widget.schema.placeholder,
           ),
-          readOnly: !widget.isEditMode,
+          enabled: widget.isEditMode,
           resizableVertically: _resizable,
           resizableHorizontally: false,
           maxLengthEnforcement: MaxLengthEnforcement.none,

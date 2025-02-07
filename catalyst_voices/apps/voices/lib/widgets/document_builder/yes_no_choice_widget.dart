@@ -45,7 +45,7 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
         ],
         _YesNoChoiceSegmentButton(
           value: _value,
-          readOnly: !widget.isEditMode,
+          enabled: widget.isEditMode,
           onChanged: _onChanged,
           validator: _validate,
         ),
@@ -72,7 +72,7 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
     super.key,
     required super.value,
     required super.onChanged,
-    super.readOnly,
+    super.enabled,
     super.validator,
   }) : super(
           builder: (field) {
@@ -90,7 +90,7 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IgnorePointer(
-                  ignoring: readOnly,
+                  ignoring: !enabled,
                   child: VoicesSegmentedButton<bool>(
                     key: key,
                     segments: [
@@ -111,7 +111,10 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
                     style: _getButtonStyle(field),
                   ),
                 ),
-                if (field.hasError) DocumentErrorText(text: field.errorText),
+                if (field.hasError) ...[
+                  const SizedBox(height: 4),
+                  DocumentErrorText(text: field.errorText),
+                ],
               ],
             );
           },

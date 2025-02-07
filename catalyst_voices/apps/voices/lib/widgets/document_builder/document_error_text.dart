@@ -11,14 +11,11 @@ class DocumentErrorText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Text(
-        text ?? context.l10n.snackbarErrorLabelText,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.error,
-            ),
-      ),
+    return Text(
+      text ?? context.l10n.snackbarErrorLabelText,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.error,
+          ),
     );
   }
 }
