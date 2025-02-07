@@ -6,18 +6,20 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesHttpsTextField extends StatefulWidget {
-  final ValueChanged<String?>? onFieldSubmitted;
   final TextEditingController? controller;
   final FocusNode? focusNode;
+  final ValueChanged<String?>? onChanged;
+  final ValueChanged<String?>? onFieldSubmitted;
   final VoicesTextFieldValidator? validator;
   final bool enabled;
 
   const VoicesHttpsTextField({
     super.key,
-    this.onFieldSubmitted,
+    this.controller,
     this.focusNode,
     this.enabled = false,
-    this.controller,
+    this.onChanged,
+    this.onFieldSubmitted,
     this.validator,
   });
 
@@ -47,6 +49,7 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField>
       child: VoicesTextField(
         controller: _effectiveController,
         focusNode: widget.focusNode,
+        onChanged: widget.onChanged,
         onFieldSubmitted: widget.onFieldSubmitted,
         textValidator: widget.validator,
         decoration: VoicesTextFieldDecoration(

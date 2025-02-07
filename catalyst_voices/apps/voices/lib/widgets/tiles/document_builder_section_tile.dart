@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/widgets/document_builder/agreement_confirmation_widget.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/document_builder/document_token_value_widget.dart';

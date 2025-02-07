@@ -40,9 +40,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
 
     final textValue = TextEditingValueExt.collapsedAtEndOf(_value);
 
-    _textEditingController = TextEditingController.fromValue(textValue)
-      ..addListener(_handleControllerChange);
-
+    _textEditingController = TextEditingController.fromValue(textValue);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
@@ -82,7 +80,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
         VoicesHttpsTextField(
           controller: _textEditingController,
           focusNode: _focusNode,
-          onFieldSubmitted: _notifyChangeListener,
+          onChanged: _onChanged,
           validator: _validator,
           enabled: widget.isEditMode,
         ),
@@ -90,15 +88,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     );
   }
 
-  void _handleControllerChange() {
-    final oldValue = widget.property.value;
-    final newValue = _textEditingController.text;
-    if (oldValue != newValue) {
-      _notifyChangeListener(newValue);
-    }
-  }
-
-  void _notifyChangeListener(String? value) {
+  void _onChanged(String? value) {
     final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
