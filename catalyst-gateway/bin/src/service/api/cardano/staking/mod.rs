@@ -26,7 +26,7 @@ impl Api {
     /// This endpoint returns the total Cardano's staked ADA amount to the corresponded
     /// user's stake address.
     #[oai(
-        path = "/v1/cardano/assets/:stake_address",
+        path = "/v2/cardano/assets/:stake_address",
         method = "get",
         operation_id = "stakedAdaAmountGet",
         transform = "schema_version_validation"
