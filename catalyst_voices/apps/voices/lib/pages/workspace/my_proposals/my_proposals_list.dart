@@ -26,7 +26,7 @@ class MyProposalsList extends StatelessWidget {
       },
       separatorBuilder: (context, index) => const SizedBox(height: 8),
       itemCount: items.length,
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(8),
     );
   }
 }

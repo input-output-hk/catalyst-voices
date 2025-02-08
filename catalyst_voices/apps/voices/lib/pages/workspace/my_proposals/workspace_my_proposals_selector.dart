@@ -52,7 +52,6 @@ class WorkspaceMyProposalsSelector extends StatelessWidget {
               ],
             ),
           ),
-          //const SizedBox(height: 10),
           const Expanded(
             child: MyProposalsListSelector(),
           ),
