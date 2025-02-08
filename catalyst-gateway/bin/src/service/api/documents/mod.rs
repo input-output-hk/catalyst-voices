@@ -72,7 +72,7 @@ impl DocumentApi {
     /// This endpoint returns OK if the document is valid, able to be put by the
     /// submitter, and if it already exists, is identical to the existing document.
     #[oai(
-        path = "/v1/document",
+        path = "/draft/document",
         method = "put",
         operation_id = "putDocument",
         transform = "schema_version_validation"
