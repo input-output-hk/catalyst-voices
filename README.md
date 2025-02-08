@@ -47,8 +47,7 @@ Athena is our [brief description of what Athena does].
 
 Catalyst Voices frontend.
 
-* **Directory
-  **: [catalyst_voices](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices)
+* **Directory**: [catalyst_voices](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices)
 * **Setup**: Navigate to ./catalyst_voices.
 * **Documentation**: [Link to detailed documentation or Wiki]
 
@@ -56,8 +55,7 @@ Catalyst Voices frontend.
 
 The backend services for Catalyst Voices.
 
-* **Directory
-  **: [catalyst-voices-backend](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst-gateway)
+* **Directory**: [catalyst-voices-backend](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst-gateway)
 * **Setup**: Navigate to ./catalyst-gateway.
 * **Documentation**: [Link to detailed documentation or Wiki]
 
@@ -65,8 +63,7 @@ The backend services for Catalyst Voices.
 
 Shared Flutter and Dart packages used across the Catalyst.
 
-* **Directory
-  **: [catalyst_voices_libs](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs)
+* **Directory**: [catalyst_voices_libs](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs)
 * **Setup**: Navigate to ./catalyst_voices/packages/libs.
 * **Documentation**: [Link to detailed documentation or Wiki]
 
