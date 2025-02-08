@@ -64,7 +64,7 @@ impl Query {
         session: &CassandraSession, params: QueryParams,
     ) -> Result<TypedRowStream<Query>> {
         session
-            .execute_iter(PreparedSelectQuery::ChainRootByStakeAddress, params)
+            .execute_iter(PreparedSelectQuery::CatalystIdByTransactionId, params)
             .await?
             .rows_stream::<Query>()
             .map_err(Into::into)

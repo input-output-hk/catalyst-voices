@@ -9,7 +9,6 @@ use std::sync::{Arc, LazyLock};
 
 use cardano_blockchain_types::{Cip0134Uri, MultiEraBlock, Slot, TransactionHash, TxnIndex};
 use catalyst_types::id_uri::IdUri;
-use der_parser::{asn1_rs::oid, Oid};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::Address;
 use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
@@ -26,13 +25,6 @@ use crate::{
     },
     settings::cassandra_db::EnvVars,
 };
-
-/// Context-specific primitive type with tag number 6 (`raw_tag` 134) for
-/// uniform resource identifier (URI) in the subject alternative name extension.
-pub const SAN_URI: u8 = 134;
-
-/// Subject Alternative Name OID
-pub(crate) const SUBJECT_ALT_NAME_OID: Oid = oid!(2.5.29 .17);
 
 /// A Catalyst ID by transaction ID cache.
 static CATALYST_ID_BY_TXN_ID_CACHE: LazyLock<Cache<TransactionHash, IdUri>> = LazyLock::new(|| {
@@ -192,7 +184,7 @@ impl Rbac509InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::CatalystIdForTxnIdInsertQuery,
+                        PreparedQuery::RbacCatalystIdForTxnIdInsertQuery,
                         self.catalyst_id_for_txn_id,
                     )
                     .await
@@ -204,7 +196,7 @@ impl Rbac509InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::CatalystIdForStakeAddressInsertQuery,
+                        PreparedQuery::RbacCatalystIdForStakeAddressInsertQuery,
                         self.catalyst_id_for_stake_address,
                     )
                     .await

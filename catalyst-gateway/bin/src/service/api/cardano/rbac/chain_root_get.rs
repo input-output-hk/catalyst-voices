@@ -1,6 +1,7 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
 
 use anyhow::anyhow;
+use catalyst_types::id_uri::IdUri;
 use der_parser::asn1_rs::ToDer;
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse, Object};
@@ -76,8 +77,9 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
                     },
                 };
 
+                let id: IdUri = row.catalyst_id.into();
                 let res = Response {
-                    chain_root: row.chain_root.to_string(),
+                    chain_root: id.to_string(),
                 };
 
                 Responses::Ok(Json(res)).into()

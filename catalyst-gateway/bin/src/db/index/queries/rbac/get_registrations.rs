@@ -51,7 +51,7 @@ impl GetRegistrationsByCatalystIdQuery {
         session: &CassandraSession, params: GetRegistrationsByChainRootQueryParams,
     ) -> anyhow::Result<TypedRowStream<GetRegistrationsByCatalystIdQuery>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::RegistrationsByChainRoot, params)
+            .execute_iter(PreparedSelectQuery::RegistrationsByCatalystId, params)
             .await?
             .rows_stream::<GetRegistrationsByCatalystIdQuery>()?;
 

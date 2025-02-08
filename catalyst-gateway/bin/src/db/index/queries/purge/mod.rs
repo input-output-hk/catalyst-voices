@@ -50,6 +50,8 @@ pub(crate) enum PreparedDeleteQuery {
     Cip36RegistrationForVoteKey,
     /// RBAC 509 Registration Delete query.
     Rbac509,
+    /// Invalid RBAC 509 Registration Delete query.
+    Rbac509Invalid,
     /// Chain Root For Transaction ID Delete query.
     ChainRootForTxnId,
     /// Chain Root For Stake Address Delete query.
@@ -79,6 +81,8 @@ pub(crate) enum PreparedSelectQuery {
     Cip36RegistrationForVoteKey,
     /// RBAC 509 Registration Select query.
     Rbac509,
+    /// Invalid RBAC 509 Registration Select query.
+    Rbac509Invalid,
     /// Chain Root For Transaction ID Select query.
     CatalystIdForTxnId,
     /// Chain Root For Stake Address Select query.
@@ -127,6 +131,10 @@ pub(crate) struct PreparedQueries {
     select_rbac509_registration: PreparedStatement,
     /// RBAC 509 Registrations Delete Query.
     delete_rbac509_registration: SizedBatch,
+    /// RBAC 509 invalid registrations Primary Key Query.
+    select_rbac509_invalid_registration: PreparedStatement,
+    /// RBAC 509 invalid registrations Delete Query.
+    delete_rbac509_invalid_registration: SizedBatch,
     /// Chain Root for TX ID Primary Key Query..
     select_chain_root_for_txn_id: PreparedStatement,
     /// Chain Root for TX ID Delete Query..
@@ -185,6 +193,10 @@ impl PreparedQueries {
                 &session, cfg,
             )
             .await?,
+            select_rbac509_invalid_registration:
+                rbac509_invalid_registration::PrimaryKeyQuery::prepare(&session).await?,
+            delete_rbac509_invalid_registration:
+                rbac509_invalid_registration::DeleteQuery::prepare_batch(&session, cfg).await?,
             select_chain_root_for_txn_id: catalyst_id_for_txn_id::PrimaryKeyQuery::prepare(
                 &session,
             )
@@ -241,6 +253,7 @@ impl PreparedQueries {
                 &self.select_cip36_registration_for_vote_key
             },
             PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration,
+            PreparedSelectQuery::Rbac509Invalid => &self.select_rbac509_invalid_registration,
             PreparedSelectQuery::CatalystIdForTxnId => &self.select_chain_root_for_txn_id,
             PreparedSelectQuery::ChainRootForStakeAddress => {
                 &self.select_chain_root_for_stake_address
@@ -270,6 +283,7 @@ impl PreparedQueries {
                 &self.delete_cip36_registration_for_vote_key
             },
             PreparedDeleteQuery::Rbac509 => &self.delete_rbac509_registration,
+            PreparedDeleteQuery::Rbac509Invalid => &self.delete_rbac509_invalid_registration,
             PreparedDeleteQuery::ChainRootForTxnId => &self.delete_chain_root_for_txn_id,
             PreparedDeleteQuery::ChainRootForStakeAddress => {
                 &self.delete_chain_root_for_stake_address

@@ -2,7 +2,7 @@
 
 use std::sync::{Arc, LazyLock};
 
-use anyhow::bail;
+use anyhow::Context;
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use pallas::ledger::addresses::StakeAddress;
@@ -17,11 +17,11 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbSlot, DbTransactionHash, DbTxnIndex},
+    types::{DbCatalystId, DbSlot, DbTxnIndex},
 };
 
 /// Cached Chain Root By Stake Address.
-static CATALYST_ID_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, String>> =
+static CATALYST_ID_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, Query>> =
     LazyLock::new(|| {
         Cache::builder()
             // Set Eviction Policy to `LRU`
@@ -30,95 +30,69 @@ static CATALYST_ID_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, String>>
             .build()
     });
 
-/// Get get chain root by stake address query string.
-const GET_CHAIN_ROOT: &str = include_str!("../cql/get_rbac_chain_root_for_stake_addr.cql");
+/// Get Catalyst ID by stake address query string.
+const QUERY: &str = include_str!("../cql/get_rbac_chain_root_for_stake_addr.cql");
 
-/// Get chain root by stake address query params.
+/// Get Catalyst ID by stake address query params.
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
-    /// Stake address to get the chain root for.
+    /// Stake address to get the Catalyst ID for.
     pub(crate) stake_address: Vec<u8>,
 }
 
-/// Get chain root by stake address query.
-#[derive(DeserializeRow)]
+/// Get Catalyst ID by stake address query.
+#[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// Slot Number the stake address was registered in.
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Offset the stake address was registered in.
     pub(crate) txn: DbTxnIndex,
-    /// Chain root for the queries stake address.
-    pub(crate) chain_root: DbTransactionHash,
-    /// Chain roots slot number
-    pub(crate) chain_root_slot: DbSlot,
-    /// Chain roots txn index
-    pub(crate) chain_root_txn: DbTxnIndex,
+    /// Catalyst ID for the queries stake address.
+    pub(crate) catalyst_id: DbCatalystId,
 }
 
 impl Query {
-    /// Prepares a get chain root by stake address query.
+    /// Prepares a get Catalyst ID by stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_chain_root_by_stake_address_query = PreparedQueries::prepare(
-            session,
-            GET_CHAIN_ROOT,
-            scylla::statement::Consistency::All,
-            true,
-        )
-        .await;
-
-        if let Err(ref error) = get_chain_root_by_stake_address_query {
-            error!(error=%error, "Failed to prepare get chain root by stake address query");
-        };
-
-        get_chain_root_by_stake_address_query
+        PreparedQueries::prepare(session, QUERY, scylla::statement::Consistency::All, true)
+            .await
+            .inspect_err(
+                |e| error!(error=%e, "Failed to prepare get Catalyst ID by stake address query"),
+            )
     }
 
-    /// Executes a get chain root by stake address query.
+    /// Executes a get Catalyst ID by stake address query.
     /// Don't call directly, use one of the methods instead.
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
-        let iter = session
-            .execute_iter(PreparedSelectQuery::ChainRootByStakeAddress, params)
+        session
+            .execute_iter(PreparedSelectQuery::CatalystIdByStakeAddress, params)
             .await?
-            .rows_stream::<Query>()?;
-
-        Ok(iter)
+            .rows_stream::<Query>()
+            .map_err(Into::into)
     }
 
-    /// Get latest Chain Root for a given stake address, uncached.
+    /// Get latest Catalyst ID for a given stake address, uncached.
     ///
     /// Unless you really know you need an uncached result, use the cached version.
     pub(crate) async fn get_latest_uncached(
         session: &CassandraSession, stake_addr: &StakeAddress,
-    ) -> anyhow::Result<Option<String>> {
-        let mut result = Self::execute(session, QueryParams {
+    ) -> anyhow::Result<Option<Query>> {
+        Self::execute(session, QueryParams {
             stake_address: stake_addr.to_vec(),
         })
-        .await?;
-
-        match result.next().await {
-            Some(Ok(first_row)) => {
-                Ok(Some(ChainRoot::new(
-                    first_row.chain_root.into(),
-                    first_row.chain_root_slot.into(),
-                    first_row.chain_root_txn.into(),
-                )))
-            },
-            Some(Err(err)) => {
-                bail!(
-                    "Failed to get chain root by stake address query row: {}",
-                    err
-                );
-            },
-            None => Ok(None), // Nothing found, but query ran OK.
-        }
+        .await?
+        .next()
+        .await
+        .transpose()
+        .context("Failed to get Catalyst ID by stake address query row")
     }
 
     /// Get latest chain-root registration for a stake address.
     pub(crate) async fn get_latest(
         session: &CassandraSession, stake_addr: &StakeAddress,
-    ) -> anyhow::Result<Option<String>> {
+    ) -> anyhow::Result<Option<Query>> {
         match CATALYST_ID_BY_STAKE_ADDRESS_CACHE.get(stake_addr) {
             Some(chain_root) => Ok(Some(chain_root)),
             None => {
@@ -130,6 +104,13 @@ impl Query {
 }
 
 /// Update the cache when a rbac registration is indexed.
-pub(crate) fn cache_for_stake_addr(stake: &StakeAddress, catalyst_id: &str) {
-    CATALYST_ID_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), catalyst_id.to_owned())
+pub(crate) fn cache_for_stake_addr(
+    stake: &StakeAddress, slot_no: DbSlot, txn: DbTxnIndex, catalyst_id: DbCatalystId,
+) {
+    let value = Query {
+        slot_no,
+        txn,
+        catalyst_id,
+    };
+    CATALYST_ID_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), value)
 }
