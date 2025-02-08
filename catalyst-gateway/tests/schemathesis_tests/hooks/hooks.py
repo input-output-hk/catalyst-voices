@@ -2,6 +2,7 @@ import schemathesis
 import random
 import time
 import os
+import hypothesis
 
 
 @schemathesis.auth()
@@ -13,8 +14,8 @@ class MyAuth:
     def set(self, case, data, context):
         security_definitions = case.operation.definition.raw.get("security", [])
         # randomly choose what kind of authentication would be applied
-        random.seed(time.time())
-        choosen_auth = random.choice(security_definitions)
+        choosen_auth_st = hypothesis.strategies.sampled_from(security_definitions)
+        choosen_auth = hypothesis.find(choosen_auth_st, lambda x: True)
         if "NoAuthorization" in choosen_auth:
             case.headers.pop("Authorization", None)
             case.headers.pop("X-API-Key", None)
