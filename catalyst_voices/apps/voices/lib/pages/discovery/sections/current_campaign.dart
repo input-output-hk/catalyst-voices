@@ -44,9 +44,8 @@ class CurrentCampaign extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 32),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 120),
+          padding: const EdgeInsets.symmetric(horizontal: 120, vertical: 32),
           child: CampaignTimeline(
             timelineItems: CampaignTimelineViewModelX.mockData,
             placement: CampaignTimelinePlacement.discovery,
