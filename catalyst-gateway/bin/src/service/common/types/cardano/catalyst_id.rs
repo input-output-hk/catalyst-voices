@@ -25,7 +25,7 @@ impl Type for CatalystId {
     fn schema_ref() -> MetaSchemaRef {
         let schema = MetaSchema {
             title: Some("Catalyst short ID".into()),
-            description: Some("Catalyst short identifier in string format".into()),
+            description: Some("Catalyst short identifier in string format"),
             example: Some("cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE".into()),
             ..MetaSchema::ANY
         };

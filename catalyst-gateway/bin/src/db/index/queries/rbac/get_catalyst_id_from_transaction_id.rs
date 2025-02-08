@@ -108,5 +108,5 @@ pub(crate) fn cache_for_transaction_id(
         slot_no,
         txn_idx,
     };
-    CACHE.insert(transaction_id, value)
+    CACHE.insert(transaction_id, value);
 }

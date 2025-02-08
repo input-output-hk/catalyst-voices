@@ -112,5 +112,5 @@ pub(crate) fn cache_for_stake_addr(
         txn,
         catalyst_id,
     };
-    CATALYST_ID_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), value)
+    CATALYST_ID_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), value);
 }

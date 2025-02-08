@@ -102,6 +102,9 @@ impl Api {
     /// Get RBAC chain root for a given role0 key.
     ///
     /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
+    // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated or
+    // removed.
+    #[allow(clippy::unused_async)]
     async fn rbac_role0_key_chain_root(
         &self,
         /// Role0 key to get the chain root for.
@@ -110,8 +113,6 @@ impl Api {
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::chain_root_get::AllResponses {
-        // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
-        // or removed.
         rbac::chain_root_get::AllResponses::internal_error(&anyhow::anyhow!("Removed"))
     }
 }

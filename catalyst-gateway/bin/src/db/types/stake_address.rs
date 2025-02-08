@@ -63,6 +63,7 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbCip19StakeAddr
 /// An invalid length error for `DbCip19StakeAddress` deserialization.
 #[derive(Debug)]
 struct InvalidLength {
+    /// An incorrect actual length value.
     length: usize,
 }
 
