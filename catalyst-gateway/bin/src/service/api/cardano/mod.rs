@@ -12,7 +12,7 @@ use crate::service::{
         objects::cardano::network::Network,
         tags::ApiTags,
         types::{
-            cardano::cip19_stake_address::Cip19StakeAddress,
+            cardano::{catalyst_id::CatalystId, cip19_stake_address::Cip19StakeAddress},
             generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
         },
     },
@@ -79,22 +79,19 @@ impl Api {
     }
 
     #[oai(
-        path = "/draft/rbac/registrations/:chain_root",
+        path = "/draft/rbac/registrations/:catalyst_id",
         method = "get",
         operation_id = "rbacRegistrations"
     )]
-    /// Get registrations by RBAC chain root
-    ///
-    /// This endpoint returns the registrations for a given chain root.
+    /// Get registrations by Catalyst short ID.
     async fn rbac_registrations_get(
         &self,
-        /// Chain root to get the registrations for.
-        #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
-        Path(chain_root): Path<String>,
+        /// A Catalyst short ID to get the registrations for.
+        Path(catalyst_id): Path<CatalystId>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::registrations_get::AllResponses {
-        rbac::registrations_get::endpoint(chain_root).await
+        rbac::registrations_get::endpoint(catalyst_id.into()).await
     }
 
     #[oai(

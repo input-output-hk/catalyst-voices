@@ -12,7 +12,7 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
-use rbac::{get_catalyst_id_from_stake_addr, get_registrations::GetRegistrationsByChainRootQuery};
+use rbac::{get_catalyst_id_from_stake_addr, get_registrations::GetRegistrationsByCatalystIdQuery};
 use registrations::{
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
     get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
@@ -89,12 +89,12 @@ pub(crate) enum PreparedSelectQuery {
     StakeAddrFromStakeHash,
     /// Get stake addr from vote key
     StakeAddrFromVoteKey,
-    /// Get chain root by stake address
-    ChainRootByStakeAddress,
+    /// Get Catalyst ID by transaction ID.
+    CatalystIdByTransactionId,
+    /// Get Catalyst ID by stake address.
+    CatalystIdByStakeAddress,
     /// Get registrations by chain root
     RegistrationsByChainRoot,
-    /// Get chain root by transaction id
-    ChainRootByTransactionId,
     /// Get all stake and vote keys for snapshot (`stake_pub_key,vote_key`)
     GetAllStakesAndVoteKeys,
 }
@@ -194,8 +194,7 @@ impl PreparedQueries {
         let chain_root_by_stake_address =
             get_catalyst_id_from_stake_addr::Query::prepare(session.clone()).await;
         let registrations_by_chain_root =
-            GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
-        let chain_root_by_transaction_id = get_chain_root::Query::prepare(session.clone()).await;
+            GetRegistrationsByCatalystIdQuery::prepare(session.clone()).await;
         let get_all_stakes_and_vote_keys_query =
             GetAllStakesAndVoteKeysQuery::prepare(session).await;
 
@@ -242,9 +241,7 @@ impl PreparedQueries {
             stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
             invalid_registrations_from_stake_addr_query: invalid_registrations?,
             sync_status_insert: sync_status_insert?,
-            chain_root_by_stake_address_query: chain_root_by_stake_address?,
             registrations_by_chain_root_query: registrations_by_chain_root?,
-            chain_root_by_transaction_id_query: chain_root_by_transaction_id?,
             get_all_stakes_and_vote_keys_query: get_all_stakes_and_vote_keys_query?,
         })
     }
@@ -331,7 +328,6 @@ impl PreparedQueries {
             PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
                 &self.invalid_registrations_from_stake_addr_query
             },
-            PreparedSelectQuery::ChainRootByStakeAddress => &self.chain_root_by_stake_address_query,
             PreparedSelectQuery::RegistrationsByChainRoot => {
                 &self.registrations_by_chain_root_query
             },
