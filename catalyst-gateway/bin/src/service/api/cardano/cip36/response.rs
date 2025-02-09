@@ -41,7 +41,7 @@ pub(crate) struct Cip36RegistrationList {
     #[oai(skip_serializing_if_is_empty, validator(max_items = "10"))]
     pub invalid: Vec<Cip36Details>,
     /// Current Page
-    #[oai(nullable)]
+    #[oai(skip_serializing_if_is_none)]
     pub page: Option<common::objects::generic::pagination::CurrentPage>,
 }
 
