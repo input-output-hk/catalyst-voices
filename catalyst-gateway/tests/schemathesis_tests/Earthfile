@@ -52,7 +52,7 @@ test-fuzzer-api:
         --service cat-gateway \
         --allow-privileged
         # Need to wait until cat-gateway will successfully connect to the scylladb
-        RUN sleep 30; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
