@@ -141,10 +141,9 @@ enum CampaignTimelinePlacement {
     final colors = Theme.of(context).colors;
 
     return switch ((this, isOngoing)) {
-      (discovery, true) => colorScheme.onPrimary,
-      // TODO(minikin): chat with design about colors inconsistency.
+      (discovery, _) => colorScheme.onPrimary,
+      // TODO(minikin): Discuss color inconsistency with the design team.
       (workspace, true) => colors.onSurfacePrimary016.withAlpha(1),
-      (discovery, false) => colorScheme.onPrimary,
       (workspace, false) => colors.iconsBackgroundVariant,
     };
   }
