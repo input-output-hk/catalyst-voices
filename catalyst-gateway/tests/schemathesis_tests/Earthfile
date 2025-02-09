@@ -48,11 +48,10 @@ test-fuzzer-api:
         --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway-integration) \
-        --service event-db \
         --service cat-gateway \
         --allow-privileged
         # Need to wait until cat-gateway will successfully connect to the scylladb
-        RUN sleep 10; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN sleep 30; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END

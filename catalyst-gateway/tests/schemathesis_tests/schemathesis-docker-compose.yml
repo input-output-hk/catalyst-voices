@@ -27,6 +27,8 @@ services:
 
   cat-gateway:
     image: cat-gateway:latest
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
     ports:
       - 3030:3030
     depends_on:
