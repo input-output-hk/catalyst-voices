@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_https_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -29,32 +29,32 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
   late final TextEditingController _textEditingController;
   late final FocusNode _focusNode;
 
-  String get _title => widget.schema.formattedTitle;
+  String get _value =>
+      widget.property.value ?? widget.schema.defaultValue ?? '';
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   @override
   void initState() {
     super.initState();
 
-    final textValue =
-        TextEditingValueExt.collapsedAtEndOf(widget.property.value ?? '');
+    final textValue = TextEditingValueExt.collapsedAtEndOf(_value);
 
-    _textEditingController = TextEditingController.fromValue(textValue)
-      ..addListener(_handleControllerChange);
-
+    _textEditingController = TextEditingController.fromValue(textValue);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
   @override
-  void didUpdateWidget(covariant SingleLineHttpsUrlWidget oldWidget) {
+  void didUpdateWidget(SingleLineHttpsUrlWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.isEditMode != widget.isEditMode &&
         widget.isEditMode == false) {
-      _textEditingController.textWithSelection = widget.property.value ?? '';
+      _textEditingController.textWithSelection = _value;
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
-      _handleEditModeChanged();
+      _onEditModeChanged();
     }
   }
 
@@ -72,7 +72,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
@@ -80,23 +80,15 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
         VoicesHttpsTextField(
           controller: _textEditingController,
           focusNode: _focusNode,
-          onFieldSubmitted: _notifyChangeListener,
-          validator: _validate,
+          onChanged: _onChanged,
+          validator: _validator,
           enabled: widget.isEditMode,
         ),
       ],
     );
   }
 
-  void _handleControllerChange() {
-    final oldValue = widget.property.value;
-    final newValue = _textEditingController.text;
-    if (oldValue != newValue) {
-      _notifyChangeListener(newValue);
-    }
-  }
-
-  void _notifyChangeListener(String? value) {
+  void _onChanged(String? value) {
     final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
@@ -105,7 +97,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     widget.onChanged([change]);
   }
 
-  VoicesTextFieldValidationResult _validate(String? value) {
+  VoicesTextFieldValidationResult _validator(String? value) {
     final schema = widget.schema;
     final normalizedValue = schema.normalizeValue(value);
     final result = schema.validate(normalizedValue);
@@ -121,7 +113,7 @@ class _SingleLineHttpsUrlWidgetState extends State<SingleLineHttpsUrlWidget> {
     }
   }
 
-  void _handleEditModeChanged() {
+  void _onEditModeChanged() {
     _focusNode.canRequestFocus = widget.isEditMode;
 
     if (widget.isEditMode) {

@@ -11,7 +11,7 @@ COPY_SRC:
     FUNCTION
 
     COPY --keep-ts --dir \
-        .cargo .config Cargo.toml clippy.toml deny.toml rustfmt.toml \
+        .cargo .config Cargo.toml Cargo.lock clippy.toml deny.toml rustfmt.toml \
         bin \
         .
 

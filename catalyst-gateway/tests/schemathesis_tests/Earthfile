@@ -78,7 +78,7 @@ nightly-package-schemathesis:
     COPY ./hooks/hooks.py .
     VOLUME /results
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                st run \
+                && st run \
                     --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
                     --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
                     --checks=all $api_spec \

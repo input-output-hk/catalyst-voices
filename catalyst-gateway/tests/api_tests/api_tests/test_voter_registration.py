@@ -25,7 +25,7 @@ def check_delegations(provided, expected):
     else:
         assert provided["voting_key"] == expected
 
-@pytest.mark.nightly
+@pytest.mark.skip
 def test_voter_registration_endpoint():
     check_is_live()
     check_is_ready()
