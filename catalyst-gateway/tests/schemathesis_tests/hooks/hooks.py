@@ -9,10 +9,10 @@ import cbor2
 @schemathesis.serializer("application/cbor")
 class CborSerializer:
     def as_requests(self, context, value):
-        cbor2.dumps(value)
+        return cbor2.dumps(value)
 
     def as_werkzeug(self, context, value):
-        cbor2.dumps(value)
+        return cbor2.dumps(value)
 
 
 @schemathesis.auth()
