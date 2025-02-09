@@ -89,65 +89,61 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
     required this.items,
     required super.value,
     required super.onChanged,
-    super.validator,
     super.enabled,
+    super.validator,
     this.hintText,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
           builder: (field) {
             final state = field as _DropdownFormFieldState<T>;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ConstrainedBox(
-                  constraints: const BoxConstraints(),
-                  child: DropdownMenu(
-                    controller: state._controller,
-                    expandedInsets: EdgeInsets.zero,
-                    initialSelection: state.value,
-                    enabled: enabled,
-                    hintText: hintText,
-                    dropdownMenuEntries: items,
-                    onSelected: field.didChange,
-                    inputDecorationTheme: InputDecorationTheme(
-                      hintStyle: Theme.of(field.context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(
+            void onChangedHandler(T? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
+            return ConstrainedBox(
+              constraints: const BoxConstraints(),
+              child: DropdownMenu(
+                controller: state._controller,
+                expandedInsets: EdgeInsets.zero,
+                initialSelection: state.value,
+                enabled: enabled,
+                hintText: hintText,
+                dropdownMenuEntries: items,
+                onSelected: onChangedHandler,
+                inputDecorationTheme: InputDecorationTheme(
+                  hintStyle:
+                      Theme.of(field.context).textTheme.bodyLarge?.copyWith(
                             color: Theme.of(field.context).colors.textDisabled,
                           ),
-                      fillColor: Theme.of(field.context)
-                          .colors
-                          .elevationsOnSurfaceNeutralLv1Grey,
-                      filled: true,
-                      enabledBorder: _border(field.context),
-                      disabledBorder: _border(field.context),
-                      focusedBorder: _border(field.context),
-                    ),
-                    // using visibility so that the widget reserves
-                    // the space for the icon, otherwise when widget changes
-                    // to edits mode it expands to make space for the icon
-                    trailingIcon: Visibility.maintain(
-                      visible: enabled,
-                      child: VoicesAssets.icons.chevronDown.buildIcon(),
-                    ),
-                    selectedTrailingIcon:
-                        VoicesAssets.icons.chevronUp.buildIcon(),
-                    menuStyle: MenuStyle(
-                      backgroundColor: WidgetStatePropertyAll(
-                        Theme.of(field.context)
-                            .colors
-                            .elevationsOnSurfaceNeutralLv1Grey,
-                      ),
-                      maximumSize:
-                          const WidgetStatePropertyAll(Size.fromHeight(350)),
-                    ),
-                  ),
+                  fillColor: Theme.of(field.context)
+                      .colors
+                      .elevationsOnSurfaceNeutralLv1Grey,
+                  filled: true,
+                  enabledBorder: _border(field.context),
+                  disabledBorder: _border(field.context),
+                  focusedBorder: _border(field.context),
                 ),
-                if (field.hasError) _ErrorText(text: field.errorText),
-              ],
+                errorText: field.errorText,
+                // using visibility so that the widget reserves
+                // the space for the icon, otherwise when widget changes
+                // to edits mode it expands to make space for the icon
+                trailingIcon: Visibility.maintain(
+                  visible: enabled,
+                  child: VoicesAssets.icons.chevronDown.buildIcon(),
+                ),
+                selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
+                menuStyle: MenuStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(field.context)
+                        .colors
+                        .elevationsOnSurfaceNeutralLv1Grey,
+                  ),
+                  maximumSize:
+                      const WidgetStatePropertyAll(Size.fromHeight(350)),
+                ),
+              ),
             );
           },
         );
@@ -166,6 +162,9 @@ class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {
   final TextEditingController _controller = TextEditingController();
 
   @override
+  SingleSelectDropdown<T> get widget => super.widget as SingleSelectDropdown<T>;
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -174,30 +173,11 @@ class _DropdownFormFieldState<T> extends VoicesFormFieldState<T> {
   @override
   void setValue(T? value) {
     super.setValue(value);
-    final item = _widget.items.firstWhereOrNull((e) => e.value == value);
+    final item = widget.items.firstWhereOrNull((e) => e.value == value);
     if (item != null) {
       _controller.textWithSelection = item.label;
+    } else {
+      _controller.textWithSelection = '';
     }
-  }
-
-  SingleSelectDropdown<T> get _widget => widget as SingleSelectDropdown<T>;
-}
-
-class _ErrorText extends StatelessWidget {
-  final String? text;
-
-  const _ErrorText({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Text(
-        text ?? context.l10n.snackbarErrorLabelText,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.error,
-            ),
-      ),
-    );
   }
 }
