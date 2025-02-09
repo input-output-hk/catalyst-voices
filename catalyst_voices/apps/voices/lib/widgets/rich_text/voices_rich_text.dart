@@ -209,6 +209,7 @@ class _EditorState extends State<_Editor> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
     return QuillEditor(
       controller: widget.controller,
       focusNode: widget.focusNode,
@@ -218,8 +219,7 @@ class _EditorState extends State<_Editor> {
         placeholder: context.l10n.placeholderRichText,
         customStyles: DefaultStyles(
           placeHolder: DefaultTextBlockStyle(
-            theme.textTheme.bodyLarge
-                    ?.copyWith(color: theme.colors.textDisabled) ??
+            textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
                 DefaultTextStyle.of(context).style,
             HorizontalSpacing.zero,
             VerticalSpacing.zero,

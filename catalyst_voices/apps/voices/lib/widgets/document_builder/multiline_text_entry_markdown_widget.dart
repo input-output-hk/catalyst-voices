@@ -105,7 +105,6 @@ class _MultilineTextEntryMarkdownWidgetState
     if (value.isNotEmpty) {
       final input = MarkdownData(value);
       final delta = markdown.encoder.convert(input);
-      // _controller.document = quill.Document.fromDelta(delta);
 
       _controller.replaceText(
         0,
@@ -114,6 +113,7 @@ class _MultilineTextEntryMarkdownWidgetState
         _controller.document.length <= value.length
             ? null
             : TextSelection.collapsed(offset: value.length),
+        shouldNotifyListeners: false,
       );
     } else {
       _controller.clear();
