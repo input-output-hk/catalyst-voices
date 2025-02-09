@@ -72,7 +72,7 @@ impl DocumentApi {
     /// This endpoint returns OK if the document is valid, able to be put by the
     /// submitter, and if it already exists, is identical to the existing document.
     #[oai(
-        path = "/draft/document",
+        path = "/v1/document",
         method = "put",
         operation_id = "putDocument",
         transform = "schema_version_validation"
@@ -106,7 +106,7 @@ impl DocumentApi {
     /// It does not return the actual documents, just an index of the document identifiers
     /// which allows the documents to be retrieved by the `GET document` endpoint.
     #[oai(
-        path = "/v1/document/index",
+        path = "/draft/document/index",
         method = "post",
         operation_id = "postDocument",
         transform = "schema_version_validation"

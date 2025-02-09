@@ -8,6 +8,7 @@ package-schemathesis:
 
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
+    RUN python -n pip install cbor2
     RUN mkdir /results
     COPY ./hooks/hooks.py .
     VOLUME /results

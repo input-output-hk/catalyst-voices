@@ -30,7 +30,6 @@ package-cat-gateway-integration:
     ENV CHAIN_NETWORK="Preprod"
     ENV CAT_ADDRESS=0.0.0.0:3030
     ENV INTERNAL_API_KEY=123
-    ENV EVENT_DB_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
     DO +INSTALL_SCYLLA --VERSION=6.2
 
