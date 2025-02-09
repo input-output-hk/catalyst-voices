@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -27,6 +29,7 @@ class SimpleTextEntryWidget extends StatefulWidget {
 class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
+  Timer? _onChangedTimer;
 
   String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
@@ -64,6 +67,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _onChangedTimer?.cancel();
     super.dispose();
   }
 
@@ -111,6 +115,14 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   }
 
   void _onChanged(String? value) {
+    _onChangedTimer?.cancel();
+    _onChangedTimer = Timer(
+      const Duration(milliseconds: 400),
+      () => _dispatchChange(value),
+    );
+  }
+
+  void _dispatchChange(String? value) {
     final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
