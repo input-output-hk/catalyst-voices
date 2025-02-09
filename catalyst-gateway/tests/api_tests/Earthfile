@@ -20,7 +20,7 @@ test:
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../../+package) \
-        --service cat-gateway \
+        --service cat-gateway-is-running \
         --allow-privileged
         RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
     END
