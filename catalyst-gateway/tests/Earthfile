@@ -30,6 +30,7 @@ package-cat-gateway-integration:
     ENV CHAIN_NETWORK="Preprod"
     ENV CAT_ADDRESS=0.0.0.0:3030
     ENV INTERNAL_API_KEY=123
+    ENV RBAC_OFF=True
 
     DO +INSTALL_SCYLLA --VERSION=6.2
 

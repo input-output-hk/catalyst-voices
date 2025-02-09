@@ -9,10 +9,12 @@ import cbor2
 @schemathesis.serializer("application/cbor")
 class CborSerializer:
     def as_requests(self, context, value):
-        return cbor2.dumps(value)
+        data = cbor2.dumps(value)
+        return {"data": data}
 
     def as_werkzeug(self, context, value):
-        return cbor2.dumps(value)
+        data = cbor2.dumps(value)
+        return {"data": data}
 
 
 @schemathesis.auth()
@@ -31,7 +33,8 @@ class MyAuth:
             case.headers.pop("X-API-Key", None)
         if "CatalystRBACSecurityScheme" in choosen_auth:
             case.headers.pop("X-API-Key", None)
-            # add RBAC token generation
+            rbac_token = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
+            case.headers["Authorization"] = f"Bearer {rbac_token}"
             pass
         if "InternalApiKeyAuthorization" in choosen_auth:
             case.headers.pop("Authorization", None)
