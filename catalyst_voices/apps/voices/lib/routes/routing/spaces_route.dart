@@ -21,6 +21,18 @@ part 'spaces_route.g.dart';
 
 const _prefix = Routes.currentMilestone;
 
+final class CategoryDetailRoute extends GoRouteData
+    with FadePageTransitionMixin {
+  final String categoryId;
+
+  const CategoryDetailRoute(this.categoryId);
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return CategoryPage(categoryId: categoryId);
+  }
+}
+
 final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
   const DiscoveryRoute();
 
@@ -94,7 +106,9 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   });
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ProposalsPage(categoryId: categoryId);
+    return ProposalsPage(
+      categoryId: categoryId,
+    );
   }
 }
 
@@ -201,24 +215,12 @@ final class WorkspaceRoute extends GoRouteData
 
   @override
   List<RouteGuard> get routeGuards => const [
-        // SessionUnlockedGuard(),
-        // UserAccessGuard(),
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const WorkspacePage();
-  }
-}
-
-final class CategoryDetailRoute extends GoRouteData
-    with FadePageTransitionMixin {
-  final String categoryId;
-
-  const CategoryDetailRoute(this.categoryId);
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return CategoryPage(categoryId: categoryId);
   }
 }
