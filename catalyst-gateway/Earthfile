@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.35 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:fix/deny-allow-git AS rust-ci
 IMPORT ../ AS repo-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
