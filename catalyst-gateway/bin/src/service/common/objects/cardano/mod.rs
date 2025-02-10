@@ -4,6 +4,7 @@
 //! common. They should not be simple types. but actual objects.
 //! Simple types belong in `common/types`.
 
+pub(crate) mod chain_root;
 pub(crate) mod hash;
 pub(crate) mod network;
 pub(crate) mod registration_info;

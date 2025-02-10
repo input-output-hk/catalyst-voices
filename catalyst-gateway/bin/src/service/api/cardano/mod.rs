@@ -7,7 +7,10 @@ use poem_openapi::{
 use crate::service::{
     common::{
         auth::none_or_rbac::NoneOrRBAC,
-        objects::{cardano::network::Network, generic::api_date_time::ApiDateTime},
+        objects::{
+            cardano::{chain_root::ChainRoot, network::Network},
+            generic::api_date_time::ApiDateTime,
+        },
         tags::ApiTags,
         types::{
             cardano::cip19_stake_address::Cip19StakeAddress,
@@ -85,12 +88,11 @@ impl Api {
     async fn rbac_registrations_get(
         &self,
         /// Chain root to get the registrations for.
-        #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
-        Path(chain_root): Path<String>,
+        Path(chain_root): Path<ChainRoot>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::registrations_get::AllResponses {
-        rbac::registrations_get::endpoint(chain_root).await
+        rbac::registrations_get::endpoint(chain_root.to_string()).await
     }
 
     #[oai(

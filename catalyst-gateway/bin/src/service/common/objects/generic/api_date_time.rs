@@ -7,7 +7,7 @@ use poem_openapi::{
 };
 
 /// Newtype for `DateTime<Utc>`. Should be used for API interfacing `DateTime<Utc>` only.
-#[derive(Debug, Clone, Eq, PartialEq, From, FromStr, Into)]
+#[derive(Debug, Clone, From, FromStr, Into)]
 pub(crate) struct ApiDateTime(chrono::DateTime<chrono::offset::Utc>);
 
 impl Type for ApiDateTime {
@@ -21,14 +21,14 @@ impl Type for ApiDateTime {
     }
 
     fn schema_ref() -> MetaSchemaRef {
-        let schema_ref =
-            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("string", "date-time")));
-        schema_ref.merge(MetaSchema {
-            title: Some("RFC 3339 Date and Time".into()),
-            description: Some("RFC 3339 Date and Time"),
-            example: Some(Self::example().0.to_rfc3339().into()),
-            ..poem_openapi::registry::MetaSchema::ANY
-        })
+        MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("string", "date-time"))).merge(
+            MetaSchema {
+                title: Some("RFC 3339 Date and Time".into()),
+                description: Some("RFC 3339 date and time."),
+                example: Some(Self::example().0.to_rfc3339().into()),
+                ..poem_openapi::registry::MetaSchema::ANY
+            },
+        )
     }
 
     fn as_raw_value(&self) -> Option<&Self::RawValueType> {
