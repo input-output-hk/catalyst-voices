@@ -11,7 +11,7 @@ URL = "api/draft/document"
 # cspell: disable-next-line
 TOKEN = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
 
-@pytest.mark.nightly
+@pytest.mark.ci
 def test_signed_doc():
     check_is_live()
     check_is_ready()
