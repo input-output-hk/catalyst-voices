@@ -64,7 +64,7 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
               driftWorker: config.web.driftWorker,
             ),
 
-            /// Native not yet(!) supported.
+            // TODO(damian-molinski): Native not supported yet
             native: null,
           ),
         );

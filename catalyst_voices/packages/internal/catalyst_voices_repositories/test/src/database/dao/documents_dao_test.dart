@@ -20,7 +20,7 @@ void main() {
     await database.close();
   });
 
-  group(DocumentsDao, skip: true, () {
+  group(DocumentsDao, () {
     group('save all', () {
       test('documents can be queried back correctly', () async {
         // Given
