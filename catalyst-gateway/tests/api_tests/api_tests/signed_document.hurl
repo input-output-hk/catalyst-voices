@@ -57,7 +57,9 @@ status <= 204
 
 # Test page out of range
 POST http://localhost:3030/api/draft/document/index?page=92233720368547759
+# cspell: disable
 Authorization: Bearer catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ
+# cspell: enable
 {
     "id": { "eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e" }
 }
