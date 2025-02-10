@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:patrol_finders/patrol_finders.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-import 'onboarding_page_interface.dart';
+import '../../utils/translations_utils.dart';
+import '../common_page.dart';
+import 'onboarding_base_page.dart';
 import 'step_10_input_seedphrase.dart';
 
-class SeedphraseSuccessPanel implements OnboardingPage {
-  PatrolTester $;
-  SeedphraseSuccessPanel(this.$);
+class SeedphraseSuccessPanel extends OnboardingPageBase {
+  SeedphraseSuccessPanel(super.$);
 
-  static const nextButton = Key('NextButton');
+  final nextStepBody = const Key('NextStepBody');
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -22,8 +23,26 @@ class SeedphraseSuccessPanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
-    // TODO: implement verifyPageElements
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
-  
+
+  Future<void> verifyDetailsPanel() async {}
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    //temporary: check for specific picture (green checked icon)
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect(
+      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      T.get('Learn More'),
+    );
+    expect(
+      $(nextStepBody).text,
+      T.get('Now let’s set your Unlock password for this device!'),
+    );
+    expect(await closeButton(), findsOneWidget);
+  }
 }

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:patrol_finders/patrol_finders.dart';
 
 import '../../utils/translations_utils.dart';
-import 'onboarding_page_interface.dart';
+import '../common_page.dart';
+import 'onboarding_base_page.dart';
 import 'step_14_keychain_final.dart';
 
-class LinkWalletInfoPanel implements OnboardingPage {
-  PatrolTester $;
-  LinkWalletInfoPanel(this.$);
+class LinkWalletInfoPanel extends OnboardingPageBase {
+  LinkWalletInfoPanel(super.$);
 
   static const chooseCardanoWalletButton = Key('ChooseCardanoWalletButton');
 
@@ -23,10 +22,28 @@ class LinkWalletInfoPanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
+  }
+
+  Future<void> verifyDetailsPanel() async {}
+
+  Future<void> verifyInfoPanel() async {
     expect(
-          $(chooseCardanoWalletButton).$(Text).text,
-          T.get('Choose Cardano Wallet'),
-        );
+      await infoPartHeaderTitleText(),
+      T.get('Link keys to your Catalyst Keychain'),
+    );
+    expect(
+      await infoPartHeaderSubtitleText(),
+      T.get('Link your Cardano wallet'),
+    );
+    //temporary: check for specific picture (blue key icon)
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect(
+      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      T.get('Learn More'),
+    );
   }
 }

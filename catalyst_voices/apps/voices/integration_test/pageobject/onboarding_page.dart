@@ -209,7 +209,7 @@ class OnboardingPage {
         expect(
           await infoPartHeaderBodyText($),
           T.get(
-            'Make sure you write down your 12-words in  a safe place as well.',
+            'Make sure you write down your 12-words in a safe place as well.',
           ),
         );
         expect(infoPartTaskPicture($), findsOneWidget);
@@ -220,7 +220,10 @@ class OnboardingPage {
         );
         break;
       case RegistrationState.keychainCreateMnemonicInputInfo:
-        expect(await infoPartHeaderTitleText($), T.get('Catalyst Keychain'));
+        expect(
+          $(registrationInfoPanel).$(headerTitle).text,
+          T.get('Catalyst Keychain'),
+        );
         expect(infoPartTaskPicture($), findsOneWidget);
         expect($(progressBar), findsOneWidget);
         expect(
@@ -237,7 +240,7 @@ class OnboardingPage {
         expect(
           await infoPartHeaderBodyText($),
           T.get(
-            'Select your 12 written down words in  the correct order.',
+            'Select your 12 written down words in the correct order.',
           ),
         );
         expect(infoPartTaskPicture($), findsOneWidget);
@@ -382,7 +385,7 @@ class OnboardingPage {
       case RegistrationState.keychainCreated:
         expect(
           $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
-          T.get('Great! Your Catalyst Keychain  has been created.'),
+          T.get('Great! Your Catalyst Keychain has been created.'),
         );
         expect(
           $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
@@ -454,7 +457,7 @@ class OnboardingPage {
       case RegistrationState.passwordInfo:
         expect(
           $(registrationDetailsPanel).$(registrationDetailsTitle).$(Text).text,
-          T.get('Set your Catalyst unlock password  for this device'),
+          T.get('Set your Catalyst unlock password for this device'),
         );
         expect(
           $(registrationDetailsPanel).$(registrationDetailsBody).$(Text).text,
@@ -481,7 +484,7 @@ class OnboardingPage {
       case RegistrationState.keychainCreateSuccess:
         expect(
           $(finishAccountCreationPanel).$(Text).text,
-          T.get('Congratulations your Catalyst  Keychain is created!'),
+          T.get('Congratulations your Catalyst Keychain is created!'),
         );
         expect(
           $(finishAccountKeychainCreated).$(Text).text,
@@ -501,7 +504,7 @@ class OnboardingPage {
         );
         expect(
           $(nextStepBody).text,
-          T.get('In the next step you write your Catalyst roles and  account '
+          T.get('In the next step you write your Catalyst roles and account '
               'to the Cardano Mainnet.'),
         );
         expect(
@@ -516,7 +519,7 @@ class OnboardingPage {
         );
         expect(
           $(onDeviceKeychainsWidget).$(keychainNotFoundIndicator).$(Text).text,
-          T.get('No Catalyst Keychain found on this device.'),
+          T.get('No Catalyst Keychain found on this device.'),
         );
         expect(
           $(recoverKeychainMethodsSubtitle).text,

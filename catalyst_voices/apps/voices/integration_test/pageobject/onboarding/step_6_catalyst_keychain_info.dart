@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:patrol_finders/patrol_finders.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-import 'onboarding_page_interface.dart';
+import '../../utils/translations_utils.dart';
+import '../common_page.dart';
+import 'onboarding_base_page.dart';
 import 'step_5_base_profile_final.dart';
 
-class CatalystKeychainInfoPanel implements OnboardingPage {
-  PatrolTester $;
-  CatalystKeychainInfoPanel(this.$);
+class CatalystKeychainInfoPanel extends OnboardingPageBase {
+  CatalystKeychainInfoPanel(super.$);
 
   static const createKeychainButton = Key('CreateKeychainButton');
 
@@ -21,7 +22,17 @@ class CatalystKeychainInfoPanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
-    // TODO: implement verifyPageElements
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect(
+      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      T.get('Learn More'),
+    );
   }
 }

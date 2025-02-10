@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:patrol_finders/patrol_finders.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-import 'onboarding_page_interface.dart';
+import '../../utils/translations_utils.dart';
+import '../common_page.dart';
+import 'onboarding_base_page.dart';
 import 'step_8_writedown_seedphrase.dart';
 
-class WritedownSeedphraseInfoPanel implements OnboardingPage {
-  PatrolTester $;
-  WritedownSeedphraseInfoPanel(this.$);
-
-  static const nextButton = Key('NextButton');
+class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
+  WritedownSeedphraseInfoPanel(super.$);
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -23,7 +22,20 @@ class WritedownSeedphraseInfoPanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
-    // TODO: implement verifyPageElements
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
   }
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect(
+      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      T.get('Learn More'),
+    );
+    expect(await closeButton(), findsOneWidget);
+  }
+
+  Future<void> verifyDetailsPanel() async {}
 }

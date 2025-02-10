@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:patrol_finders/patrol_finders.dart';
 
 import '../../utils/test_context.dart';
-import 'onboarding_page_interface.dart';
+import '../../utils/translations_utils.dart';
+import '../common_page.dart';
+import 'onboarding_base_page.dart';
 import 'step_9_writedown_seedphrase_info.dart';
 
-class InputSeedphrasePanel implements OnboardingPage {
-  PatrolTester $;
-  InputSeedphrasePanel(this.$);
+class InputSeedphrasePanel extends OnboardingPageBase {
+  InputSeedphrasePanel(super.$);
 
-  static const nextButton = Key('NextButton');
   static const seedPhrasesPicker = Key('SeedPhrasesPicker');
   static const resetButton = Key('ResetButton');
 
@@ -34,7 +33,23 @@ class InputSeedphrasePanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
-    // TODO: implement verifyPageElements
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+  }
+
+  Future<void> verifyDetailsPanel() async {}
+
+  Future<void> verifyInfoPanel() async {
+    expect(
+      $(registrationInfoPanel).$(headerTitle).text,
+      T.get('Catalyst Keychain'),
+    );
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect(
+      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      T.get('Learn More'),
+    );
+    expect(await closeButton(), findsOneWidget);
   }
 }

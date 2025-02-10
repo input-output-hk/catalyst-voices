@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:patrol_finders/patrol_finders.dart';
 
-import 'onboarding_page_interface.dart';
+import 'onboarding_base_page.dart';
 import 'step_4_acknowledgments.dart';
 
-class BaseProfileFinalPanel implements OnboardingPage {
-  PatrolTester $;
-  BaseProfileFinalPanel(this.$);
+class BaseProfileFinalPanel extends OnboardingPageBase {
+  BaseProfileFinalPanel(super.$);
 
   static const createKeychainButton = Key('CreateKeychainButton');
 
@@ -21,7 +19,7 @@ class BaseProfileFinalPanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
-    // TODO: implement verifyPageElements
+  Future<void> verifyPageElements() async {
+    // TODO(emiride): implement verifyPageElements
   }
 }

@@ -1,14 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:patrol_finders/patrol_finders.dart';
-
-import 'onboarding_page_interface.dart';
+import 'onboarding_base_page.dart';
 import 'step_3_setup_base_profile.dart';
 
-class AcknowledgmentsPanel implements OnboardingPage {
-  PatrolTester $;
-  AcknowledgmentsPanel(this.$);
-
-  static const nextButton = Key('NextButton');
+class AcknowledgmentsPanel extends OnboardingPageBase {
+  AcknowledgmentsPanel(super.$);
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -21,7 +15,7 @@ class AcknowledgmentsPanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
-    // TODO: implement verifyPageElements
+  Future<void> verifyPageElements() async {
+    // TODO(emiride): implement verifyPageElements
   }
 }

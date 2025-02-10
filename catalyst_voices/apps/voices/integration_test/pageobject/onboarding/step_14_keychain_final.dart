@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:patrol_finders/patrol_finders.dart';
 
 import '../../utils/translations_utils.dart';
-import 'onboarding_page_interface.dart';
+import '../common_page.dart';
+import 'onboarding_base_page.dart';
 import 'step_13_password_input.dart';
 
-class KeychainFinalPanel implements OnboardingPage {
-  PatrolTester $;
-  KeychainFinalPanel(this.$);
+class KeychainFinalPanel extends OnboardingPageBase {
+  KeychainFinalPanel(super.$);
 
   static const linkWalletAndRolesButton = Key('LinkWalletAndRolesButton');
 
@@ -24,10 +23,21 @@ class KeychainFinalPanel implements OnboardingPage {
   }
 
   @override
-  void verifyPageElements() {
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
+  }
+
+  Future<void> verifyDetailsPanel() async {}
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), T.get('Catalyst Keychain'));
+    //temporary: check for specific picture (green key locked icon)
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
     expect(
-      $(linkWalletAndRolesButton).$(Text).text,
-      T.get('Link your Cardano Wallet & Roles'),
+      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      T.get('Learn More'),
     );
   }
 }
