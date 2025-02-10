@@ -304,7 +304,6 @@ class _AllProposalsState extends State<_AllProposals> {
   late final ProposalsCubit _proposalBloc;
   late StreamSubscription<ProposalsState> _blocSub;
   late PagingController<ProposalViewModel> _pagingController;
-  int currentPage = 0;
 
   @override
   void initState() {

@@ -10,7 +10,8 @@ typedef PagingStateListener<ItemType> = void Function(
   PagingState<ItemType> status,
 );
 
-/// A controller that manages pagination state and notifies listeners of changes.
+/// A controller that manages pagination state
+/// and notifies listeners of changes.
 ///
 /// The [PagingController] handles pagination logic including:
 /// * Maintaining the current page number
@@ -111,6 +112,7 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     value = value.copyWith(
       currentPage: nextPage,
       itemList: itemList,
+      error: null,
     );
   }
 
