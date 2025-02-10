@@ -37,8 +37,8 @@ targets:
           data_class_to_companions: false
           # Can not turn this on because of cat-gateway endpoints generation
           fatal_warnings: false
-          # Potentially turn this off if not useful
-          generate_manager: true
+          # We're not using it right now
+          generate_manager: false
           sql:
             dialect: sqlite
             options:
