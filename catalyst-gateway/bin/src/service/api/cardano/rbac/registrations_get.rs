@@ -12,7 +12,7 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
-        objects::cardano::hash::Hash, responses::WithErrorResponses,
+        objects::cardano::hash::Hash256, responses::WithErrorResponses,
         types::headers::retry_after::RetryAfterOption,
     },
 };
@@ -21,7 +21,7 @@ use crate::{
 #[derive(Object)]
 pub(crate) struct RbacRegistration {
     /// Registration transaction hash.
-    tx_hash: Hash,
+    tx_hash: Hash256,
 }
 
 /// GET RBAC registrations by chain root response.

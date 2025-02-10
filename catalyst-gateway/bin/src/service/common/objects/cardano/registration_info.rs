@@ -4,7 +4,7 @@ use poem_openapi::{types::Example, Object, Union};
 
 use crate::service::{
     api::cardano::types::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
-    common::objects::cardano::hash::Hash,
+    common::objects::cardano::hash::Hash256,
     utilities::as_hex_string,
 };
 
@@ -55,7 +55,7 @@ pub(crate) struct RegistrationInfo {
     rewards_address: String,
 
     /// Transaction hash in which the [CIP-36](https://cips.cardano.org/cip/CIP-36/) registration is made.
-    tx_hash: Hash,
+    tx_hash: Hash256,
 
     /// Registration nonce.
     // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
