@@ -1,27 +1,45 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// The state of available proposals.
-sealed class ProposalsState extends Equatable {
-  const ProposalsState();
-}
-
-/// The proposals are loading.
-final class LoadingProposalsState extends ProposalsState {
-  const LoadingProposalsState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-/// The loaded proposals.
-final class LoadedProposalsState extends ProposalsState {
+class ProposalsState extends Equatable {
   final List<ProposalViewModel> proposals;
+  final List<CampaignCategoryViewModel> categories;
+  final CampaignCategoryViewModel? selectedCategory;
+  final bool isLoading;
+  final LocalizedException? error;
 
-  const LoadedProposalsState({
+  const ProposalsState({
     this.proposals = const [],
+    this.categories = const [],
+    this.selectedCategory,
+    this.isLoading = false,
+    this.error,
   });
 
+  ProposalsState copyWith({
+    List<ProposalViewModel>? proposals,
+    List<CampaignCategoryViewModel>? categories,
+    CampaignCategoryViewModel? selectedCategory,
+    bool? isLoading,
+    Optional<LocalizedException>? error,
+  }) {
+    return ProposalsState(
+      proposals: proposals ?? this.proposals,
+      categories: categories ?? this.categories,
+      selectedCategory: selectedCategory ?? this.selectedCategory,
+      isLoading: isLoading ?? this.isLoading,
+      error: error.dataOr(this.error),
+    );
+  }
+
   @override
-  List<Object?> get props => [proposals];
+  List<Object?> get props => [
+        proposals,
+        categories,
+        selectedCategory,
+        isLoading,
+        error,
+      ];
 }

@@ -69,7 +69,7 @@ void main() {
     });
 
     blocTest<ProposalsCubit, ProposalsState>(
-      'initial state is $LoadingProposalsState',
+      'initial state is loading',
       build: () {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
@@ -78,12 +78,12 @@ void main() {
         );
       },
       verify: (cubit) {
-        expect(cubit.state, equals(const LoadingProposalsState()));
+        expect(cubit.state.isLoading, isTrue);
       },
     );
 
     blocTest<ProposalsCubit, ProposalsState>(
-      'load emits $LoadedProposalsState with proposals',
+      'load emits with proposals',
       build: () {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
@@ -93,9 +93,10 @@ void main() {
       },
       act: (cubit) async => cubit.load(),
       expect: () => [
-        const LoadingProposalsState(),
-        LoadedProposalsState(
+        const ProposalsState(isLoading: true),
+        ProposalsState(
           proposals: [pendingProposal],
+          isLoading: false,
         ),
       ],
     );
@@ -119,8 +120,9 @@ void main() {
         return Future<void>.delayed(const Duration(microseconds: 50));
       },
       expect: () => [
-        const LoadingProposalsState(),
-        const LoadedProposalsState(
+        const ProposalsState(isLoading: true),
+        const ProposalsState(
+          isLoading: false,
           proposals: [],
         ),
       ],
@@ -145,9 +147,10 @@ void main() {
         return Future<void>.delayed(const Duration(microseconds: 50));
       },
       expect: () => [
-        const LoadingProposalsState(),
-        LoadedProposalsState(
+        const ProposalsState(isLoading: true),
+        ProposalsState(
           proposals: [pendingProposal],
+          isLoading: false,
         ),
       ],
     );
@@ -167,15 +170,18 @@ void main() {
         await cubit.onChangeFavoriteProposal(proposal.id, isFavorite: false);
       },
       expect: () => [
-        const LoadingProposalsState(),
-        LoadedProposalsState(
+        const ProposalsState(isLoading: true),
+        ProposalsState(
           proposals: [pendingProposal],
+          isLoading: false,
         ),
-        LoadedProposalsState(
+        ProposalsState(
           proposals: [pendingProposal.copyWith(isFavorite: true)],
+          isLoading: false,
         ),
-        LoadedProposalsState(
+        ProposalsState(
           proposals: [pendingProposal],
+          isLoading: false,
         ),
       ],
     );

@@ -5,6 +5,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the proposals.
@@ -21,24 +22,51 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     this._proposalService,
     this._adminTools,
   )   : _adminToolsState = _adminTools.state,
-        super(const LoadingProposalsState()) {
+        super(const ProposalsState(isLoading: true)) {
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
+  }
+
+  Future<void> init(String? categoryId) async {
+    // TODO(LynxLynxx): get categories from repository.
+    final categories = List.generate(
+      6,
+      (index) => CampaignCategoryViewModel.dummy(id: '$index'),
+    );
+    emit(
+      state.copyWith(
+        categories: categories,
+        selectedCategory:
+            categories.firstWhereOrNull((e) => e.id == categoryId),
+        isLoading: false,
+      ),
+    );
+  }
+
+  void changeSelectedCategory(String? categoryId) {
+    if (categoryId == null) {
+      return emit(state.copyWith(selectedCategory: null));
+    }
+    final selectedCategory =
+        state.categories.firstWhereOrNull((e) => e.id == categoryId);
+
+    emit(state.copyWith(selectedCategory: selectedCategory));
   }
 
   /// Loads the proposals.
   Future<void> load() async {
-    emit(const LoadingProposalsState());
+    emit(state.copyWith(isLoading: true));
 
     final campaign = await _campaignService.getActiveCampaign();
     if (campaign == null) {
-      emit(const LoadedProposalsState());
+      emit(state.copyWith(isLoading: false));
       return;
     }
 
     final proposals = await _loadProposals(campaign);
     emit(
-      LoadedProposalsState(
+      state.copyWith(
         proposals: proposals,
+        isLoading: false,
       ),
     );
   }
@@ -48,16 +76,18 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     String proposalId, {
     required bool isFavorite,
   }) async {
-    final loadedState = state;
-    if (loadedState is! LoadedProposalsState) return;
-
-    final proposals = List<ProposalViewModel>.of(loadedState.proposals);
+    final proposals = List<ProposalViewModel>.of(state.proposals);
     final favoriteProposal = proposals.indexWhere((e) => e.id == proposalId);
     if (favoriteProposal == -1) return;
     proposals[favoriteProposal] =
         proposals[favoriteProposal].copyWith(isFavorite: isFavorite);
 
-    emit(LoadedProposalsState(proposals: proposals));
+    emit(
+      state.copyWith(
+        proposals: proposals,
+        isLoading: false,
+      ),
+    );
   }
 
   @override

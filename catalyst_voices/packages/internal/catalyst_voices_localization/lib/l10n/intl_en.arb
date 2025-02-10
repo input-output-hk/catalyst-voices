@@ -1482,5 +1482,6 @@
   "startProposal": "Start Proposal",
   "editRolesDialogTitle": "Editing Roles",
   "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
-  "continueText": "Continue"
+  "continueText": "Continue",
+  "showAll": "Show All"
 }
