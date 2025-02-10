@@ -11,6 +11,7 @@ import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dar
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:synchronized/synchronized.dart';
 
 /// Database interface which expose only publicly accessible functions and
 /// classes.
@@ -51,6 +52,8 @@ abstract interface class CatalystDatabase {
 )
 class DriftCatalystDatabase extends $DriftCatalystDatabase
     implements CatalystDatabase {
+  final _clearLock = Lock();
+
   @visibleForTesting
   DriftCatalystDatabase(super.connection);
 
@@ -87,16 +90,18 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
   }
 
   @override
-  Future<void> clear() async {
-    try {
-      await customStatement('PRAGMA foreign_keys = OFF');
-      await transaction(() async {
-        for (final table in allTables) {
-          await delete(table).go();
-        }
-      });
-    } finally {
-      await customStatement('PRAGMA foreign_keys = ON');
-    }
+  Future<void> clear() {
+    return _clearLock.synchronized(() async {
+      try {
+        await customStatement('PRAGMA foreign_keys = OFF');
+        await transaction(() async {
+          for (final table in allTables) {
+            await delete(table).go();
+          }
+        });
+      } finally {
+        await customStatement('PRAGMA foreign_keys = ON');
+      }
+    });
   }
 }
