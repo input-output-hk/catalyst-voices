@@ -172,9 +172,20 @@ scripts:
       --depends-on="build_runner" \
       --scope="catalyst_voices_repositories" -- \
           dart run build_runner build --delete-conflicting-outputs \
-              --build-filter="lib/src/dto/**"
+              --build-filter="lib/src/dto/**" \
+              --build-filter="lib/src/database/**"
     description: |
       Run `build_runner` in catalyst_voices_repositories package only in selected folders
+
+  db-make-migration:
+    run: |
+      melos exec -c 1 \
+      --depends-on="build_runner" \
+      --scope="catalyst_voices_repositories" -- \
+          dart run drift_dev make-migrations
+    description: |
+      Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
+      classes
 
   metrics:
     run: |
@@ -246,6 +257,7 @@ scripts:
         '*.openapi.dart' \
         '*.gen.dart' \
         '*.swagger.*.dart' \
+        '*.drift.dart' \
         'lib/generated/**' \;
       
       # merges all coverage reports into a single one and puts it in /coverage/lcov.info
