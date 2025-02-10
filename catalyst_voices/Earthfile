@@ -77,11 +77,6 @@ code-generator:
     # restore current working directory to the root of the project
     WORKDIR /frontend
 
-# Runs static analysis on the code.
-check-static-analysis:
-    FROM +code-generator
-    DO flutter-ci+ANALYZE
-
 # Runs code formatting checks.
 check-code-formatting:
     FROM +builder
@@ -101,6 +96,11 @@ check-license:
 test-unit:
     FROM +code-generator
     DO flutter-ci+UNIT_TESTS
+
+# Runs static analysis on the code.
+build-static-analysis:
+    FROM +code-generator
+    DO flutter-ci+ANALYZE
 
 # Build web version of Catalyst Voices
 build-web:

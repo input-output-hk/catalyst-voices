@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/toggles/voices_radio.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +15,14 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
     required super.onChanged,
     super.enabled,
     super.validator,
-    super.autovalidateMode = AutovalidateMode.always,
+    super.autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
           builder: (field) {
+            void onChangedHandler(String? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
             return Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,13 +30,13 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
                 _RadioButtonList(
                   enabled: enabled,
                   items: items,
-                  onChanged: field.didChange,
+                  onChanged: onChangedHandler,
                   value: field.value,
                 ),
-                if (field.hasError)
-                  _ErrorText(
-                    errorText: field.errorText,
-                  ),
+                if (field.hasError) ...[
+                  const SizedBox(height: 4),
+                  DocumentErrorText(text: field.errorText),
+                ],
               ],
             );
           },
@@ -84,27 +89,6 @@ class _RadioButtonList extends StatelessWidget {
     }
     return textStyle?.copyWith(
       color: context.colors.textDisabled,
-    );
-  }
-}
-
-class _ErrorText extends StatelessWidget {
-  final String? errorText;
-
-  const _ErrorText({
-    this.errorText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Text(
-        errorText ?? context.l10n.snackbarErrorLabelText,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.error,
-            ),
-      ),
     );
   }
 }

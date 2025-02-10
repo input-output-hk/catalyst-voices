@@ -20,7 +20,7 @@ bootstrap: generate-code
 
 # Runs all static code checks
 check-code:
-    earthly +check-static-analysis
+    earthly +build-static-analysis
     earthly +check-code-formatting
     earthly +check-license
 

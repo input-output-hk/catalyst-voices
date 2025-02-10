@@ -217,7 +217,7 @@ class _SearchTextField extends StatelessWidget {
           context.read<WorkspaceBloc>().add(event);
         },
         onChanged: (value) {
-          final event = SearchQueryChangedEvent(value);
+          final event = SearchQueryChangedEvent(value ?? '');
           context.read<WorkspaceBloc>().add(event);
         },
       ),

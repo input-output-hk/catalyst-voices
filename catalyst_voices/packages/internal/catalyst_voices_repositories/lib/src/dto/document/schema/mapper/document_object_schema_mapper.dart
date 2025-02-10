@@ -7,6 +7,7 @@ enum _DocumentObjectDefinition {
   section('section'),
   nestedQuestions('nestedQuestions'),
   singleGroupedTagSelector('singleGroupedTagSelector'),
+  borderGroup('borderGroup'),
   unknown('unknown');
 
   final String def;
@@ -114,6 +115,20 @@ final class DocumentObjectSchemaMapper {
         );
       case _DocumentObjectDefinition.singleGroupedTagSelector:
         return DocumentSingleGroupedTagSelectorSchema(
+          nodeId: nodeId,
+          format: format,
+          title: title,
+          description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidance,
+          isSubsection: isSubsection,
+          isRequired: isRequired,
+          properties: mappedProperties,
+          oneOf: mappedOneOf,
+          order: mappedOrder,
+        );
+      case _DocumentObjectDefinition.borderGroup:
+        return DocumentBorderGroupSchema(
           nodeId: nodeId,
           format: format,
           title: title,
