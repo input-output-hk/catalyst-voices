@@ -36,7 +36,7 @@ package-schemathesis:
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
                     --cassette-path=/results/cassette.yaml \
-                    $seed
+                    --hypothesis-seed=$seed
 
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
@@ -57,7 +57,7 @@ test-fuzzer-api:
         --service cat-gateway \
         --allow-privileged
         # Need to wait until cat-gateway will successfully connect to the scylladb
-        RUN sleep 60; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
@@ -98,7 +98,7 @@ nightly-package-schemathesis:
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
                     --cassette-path=/results/cassette.yaml \
-                    $seed
+                    --hypothesis-seed=$seed
 
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
@@ -120,7 +120,7 @@ nightly-test-fuzzer-api:
         --service cat-gateway \
         --allow-privileged
         # Need to wait until cat-gateway will successfully connect to the scylladb
-        RUN --no-cache sleep 5; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN --no-cache sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
             docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log
