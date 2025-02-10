@@ -8,7 +8,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 class CurrentCampaignSelector extends StatelessWidget {
   const CurrentCampaignSelector({super.key});
 
