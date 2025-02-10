@@ -67,7 +67,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       version: signedDocumentData.metadata.version,
     );
 
-    final data = DocumentDataDto.fromJson(signedDocumentData.payload.data);
+    final data = DocumentDataDto.fromJson(signedDocumentData.content.data);
     final schema = template.schema;
     final document = DocumentDto.fromJsonSchema(data, schema).toModel();
 
@@ -96,7 +96,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       version: signedDocumentData.metadata.version,
     );
 
-    final json = signedDocumentData.payload.data;
+    final json = signedDocumentData.content.data;
     final schema = DocumentSchemaDto.fromJson(json).toModel();
 
     return ProposalTemplate(
@@ -130,11 +130,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       template: template,
     );
 
-    final payload = SignedDocumentDataPayload(signedDocument);
+    final content = SignedDocumentContent(signedDocument);
 
     return SignedDocumentData(
       metadata: metadata,
-      payload: payload,
+      content: content,
     );
   }
 }

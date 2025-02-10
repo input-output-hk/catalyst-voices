@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/src/hi_lo/hi_lo.dart';
-import 'package:convert/convert.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid/parsing.dart';
 import 'package:uuid/validation.dart';
 
@@ -23,8 +23,8 @@ final class UuidHiLo extends HiLo<BigInt> {
     }
 
     final bytes = UuidParsing.parseHexToBytes(sanitized);
-    final high = BigInt.parse(hex.encode(bytes.sublist(0, 8)), radix: 16);
-    final low = BigInt.parse(hex.encode(bytes.sublist(8, 16)), radix: 16);
+    final high = BigInt.from(ByteData.sublistView(bytes, 0, 8).getInt64(0));
+    final low = BigInt.from(ByteData.sublistView(bytes, 8, 16).getInt64(0));
 
     return UuidHiLo(
       high: high,
@@ -32,21 +32,22 @@ final class UuidHiLo extends HiLo<BigInt> {
     );
   }
 
-  String get _fullHex => _highHex + _lowHex;
-
-  String get _highHex => high.toRadixString(16).padLeft(16, '0');
-
-  String get _lowHex => low.toRadixString(16).padLeft(16, '0');
-
   /// Version is always 13th digit of uuid.
   int get _version {
-    final source = String.fromCharCode(_highHex.codeUnitAt(12));
+    final source = String.fromCharCode(uuid.codeUnitAt(14));
     return int.parse(source);
   }
 
   String get uuid {
-    final fullHex = _fullHex;
-    final bytes = UuidParsing.parseHexToBytes(fullHex);
+    // Convert BigInt back to bytes
+    final highBytes = ByteData(8)..setInt64(0, high.toInt());
+    final lowBytes = ByteData(8)..setInt64(0, low.toInt());
+
+    // Merge them into a single byte array
+    final bytes = Uint8List.fromList([
+      ...highBytes.buffer.asUint8List(),
+      ...lowBytes.buffer.asUint8List(),
+    ]);
 
     return UuidParsing.unparse(bytes);
   }
@@ -57,8 +58,10 @@ final class UuidHiLo extends HiLo<BigInt> {
       throw StateError('uuid version is not v7');
     }
 
-    final msTimestamp = (high >> 16).toInt();
+    // Get the first 48 bits (high >> 16)
+    final timestampMillis = (high.toInt() >> 16) & 0xFFFFFFFFFFFF;
 
-    return DateTime.fromMillisecondsSinceEpoch(msTimestamp);
+    // Convert milliseconds since Unix epoch (1970-01-01)
+    return DateTime.fromMillisecondsSinceEpoch(timestampMillis);
   }
 }
