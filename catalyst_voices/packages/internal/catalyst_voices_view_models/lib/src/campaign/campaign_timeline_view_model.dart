@@ -61,7 +61,7 @@ extension CampaignTimelineViewModelX on CampaignTimelineViewModel {
           '''Votes are tallied and the results revealed. Voters and community reviewers receive their rewards.''',
       timeline: DateRange(
         from: DateTime(2025, 2, 2),
-        to: DateTime(2025, 2, 8),
+        to: DateTime(2025, 2, 18),
       ),
     ),
     CampaignTimelineViewModel(

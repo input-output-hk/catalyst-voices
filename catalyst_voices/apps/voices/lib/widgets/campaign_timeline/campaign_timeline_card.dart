@@ -143,7 +143,9 @@ enum CampaignTimelinePlacement {
     return switch ((this, isOngoing)) {
       (discovery, _) => colorScheme.onPrimary,
       // TODO(minikin): Discuss color inconsistency with the design team.
-      (workspace, true) => colors.onSurfacePrimary016.withAlpha(1),
+      // The color on Figma files is #E3E8FA (measured),
+      //but the color on the design system is #123CD3 with alpha 0.12.
+      (workspace, true) => VoicesColors.lightIconsPrimary.withAlpha(31),
       (workspace, false) => colors.iconsBackgroundVariant,
     };
   }
