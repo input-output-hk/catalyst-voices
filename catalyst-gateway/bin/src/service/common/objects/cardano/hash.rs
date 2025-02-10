@@ -1,5 +1,8 @@
 //! Defines API schema of Cardano hash type.
 
+use core::fmt;
+
+use derive_more::From;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef, Registry},
     types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -8,14 +11,8 @@ use poem_openapi::{
 use crate::service::utilities::as_hex_string;
 
 /// Cardano Blake2b256 hash encoded in hex.
-#[derive(Debug)]
+#[derive(Debug, From)]
 pub(crate) struct Hash(Vec<u8>);
-
-impl From<Vec<u8>> for Hash {
-    fn from(hash: Vec<u8>) -> Self {
-        Self(hash)
-    }
-}
 
 impl Hash {
     /// Creates a `CardanoStakeAddress` schema definition.
@@ -28,8 +25,9 @@ impl Hash {
             "0x0000000000000000000000000000000000000000000000000000000000000000".to_string(),
             // cspell: enable
         ));
+        schema.min_length = Some(66);
         schema.max_length = Some(66);
-        schema.pattern = Some("0x[0-9a-f]{64}".to_string());
+        schema.pattern = Some("^0x[0-9a-f]{64}$".to_string());
         schema
     }
 }
@@ -92,5 +90,12 @@ impl ParseFromJSON for Hash {
 impl ToJSON for Hash {
     fn to_json(&self) -> Option<serde_json::Value> {
         Some(serde_json::Value::String(as_hex_string(&self.0)))
+    }
+}
+
+impl fmt::Display for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(as_hex_string(&self.0).as_str())?;
+        Ok(())
     }
 }

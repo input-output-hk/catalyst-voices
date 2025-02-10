@@ -8,7 +8,7 @@ use crate::service::{
     common::{
         auth::none_or_rbac::NoneOrRBAC,
         objects::{
-            cardano::{chain_root::ChainRoot, network::Network},
+            cardano::{hash::Hash, network::Network},
             generic::api_date_time::ApiDateTime,
         },
         tags::ApiTags,
@@ -88,7 +88,7 @@ impl Api {
     async fn rbac_registrations_get(
         &self,
         /// Chain root to get the registrations for.
-        Path(chain_root): Path<ChainRoot>,
+        Path(chain_root): Path<Hash>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::registrations_get::AllResponses {
