@@ -1,5 +1,6 @@
 import requests
 import pytest
+from loguru import logger
 
 from api_tests import (
     cat_gateway_endpoint_url,
@@ -43,6 +44,7 @@ def test_signed_doc():
     resp = put_signed_doc(data=signed_doc)
     assert 201 <= resp.status_code <= 204, f"Failed to publish document: {resp.status_code} - {resp.text}"
 
+    logger.info("Signed document test successful.")
 
 # Signed document GET
 def get_signed_doc(document_id: str):
