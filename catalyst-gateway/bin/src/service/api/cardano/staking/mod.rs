@@ -28,7 +28,7 @@ impl Api {
     #[oai(
         path = "/draft/cardano/assets/:stake_address",
         method = "get",
-        operation_id = "stakedAdaAmountGet",
+        operation_id = "stakedAssetsGet",
         transform = "schema_version_validation"
     )]
     async fn staked_ada_get(
