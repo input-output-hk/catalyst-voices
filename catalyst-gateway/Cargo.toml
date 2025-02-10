@@ -50,3 +50,6 @@ unchecked_duration_subtraction = "deny"
 unreachable = "deny"
 missing_docs_in_private_items = "deny"
 arithmetic_side_effects = "deny"
+
+[patch.crates-io]
+orx-pseudo-default = { git = "https://github.com/orxfun/orx-pseudo-default?rev=1.4.0", tag = "1.4.0" }
