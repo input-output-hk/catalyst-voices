@@ -6,7 +6,6 @@ use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use super::SlotNumber;
 use crate::{
     db::index::{
         queries::staked_ada::{
@@ -21,13 +20,16 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::{
-        objects::cardano::{
-            network::Network,
-            stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
+    service::{
+        api::cardano::types::SlotNumber,
+        common::{
+            objects::cardano::{
+                network::Network,
+                stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
+            },
+            responses::WithErrorResponses,
+            types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
         },
-        responses::WithErrorResponses,
-        types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
     },
 };
 

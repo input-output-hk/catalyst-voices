@@ -5,10 +5,11 @@ use poem_openapi::{
     OpenApi,
 };
 
-use super::types::SlotNumber;
 use crate::service::{
     common::{
-        auth::none_or_rbac::NoneOrRBAC, objects::cardano::network::Network, tags::ApiTags,
+        auth::none_or_rbac::NoneOrRBAC,
+        objects::cardano::{network::Network, slot_number::SlotNumber},
+        tags::ApiTags,
         types::cardano::cip19_stake_address::Cip19StakeAddress,
     },
     utilities::middleware::schema_validation::schema_version_validation,
@@ -46,12 +47,10 @@ impl Api {
         network: Query<Option<Network>>,
         /// Slot number at which the staked ADA amount should be calculated.
         /// If omitted latest slot number is used.
-        // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-        #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
         slot_number: Query<Option<SlotNumber>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> assets_get::AllResponses {
-        assets_get::endpoint(stake_address.0, network.0, slot_number.0).await
+        assets_get::endpoint(stake_address.0, network.0, slot_number.0.map(Into::into)).await
     }
 }
