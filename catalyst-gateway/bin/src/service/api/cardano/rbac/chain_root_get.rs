@@ -1,17 +1,10 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
 
-use anyhow::anyhow;
-use catalyst_types::id_uri::IdUri;
-use futures::StreamExt;
-use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::rbac::get_catalyst_id_from_stake_addr::{self},
-        session::CassandraSession,
-    },
+    db::index::session::CassandraSession,
     service::common::{
         responses::WithErrorResponses,
         types::{
@@ -46,8 +39,8 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// Get chain root endpoint.
-pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
-    let Some(session) = CassandraSession::get(true) else {
+pub(crate) async fn endpoint(_stake_address: Cip19StakeAddress) -> AllResponses {
+    let Some(_session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
         let err = anyhow::anyhow!("Failed to acquire db session");
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);

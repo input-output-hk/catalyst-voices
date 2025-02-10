@@ -9,7 +9,7 @@ pub(crate) mod insert_unstaked_txo_asset;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex, TxnOutputOffset};
 use scylla::Session;
 use tracing::{error, warn};
 
@@ -18,7 +18,6 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    service::utilities::convert::from_saturating,
     settings::cassandra_db,
 };
 
@@ -150,7 +149,7 @@ impl TxoInsertQuery {
             };
 
             let staked = stake_address != NO_STAKE_ADDRESS;
-            let txo_index = from_saturating(txo_index);
+            let txo_index = TxnOutputOffset::from(txo_index);
 
             if staked {
                 let params = insert_txo::Params::new(

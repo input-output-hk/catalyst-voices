@@ -2,7 +2,7 @@
 //! This is mainly to test whether the defined purge queries work with the database or
 //! not.
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex, TxnOutputOffset};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
 
@@ -612,7 +612,7 @@ async fn test_txo_ada() {
             &[0],
             Slot::from(0).into(),
             TxnIndex::from(0).into(),
-            0,
+            TxnOutputOffset::from(0),
             "addr0",
             0,
             TransactionHash::new(&[0]).into(),
@@ -621,7 +621,7 @@ async fn test_txo_ada() {
             &[1],
             Slot::from(1).into(),
             TxnIndex::from(1).into(),
-            1,
+            TxnOutputOffset::from(1),
             "addr1",
             1,
             TransactionHash::new(&[1]).into(),
@@ -679,7 +679,7 @@ async fn test_txo_assets() {
             &[0],
             Slot::from(0).into(),
             TxnIndex::from(0).into(),
-            0,
+            TxnOutputOffset::from(0),
             &[0],
             &[0],
             0,
@@ -688,7 +688,7 @@ async fn test_txo_assets() {
             &[1],
             Slot::from(1).into(),
             TxnIndex::from(1).into(),
-            1,
+            TxnOutputOffset::from(1),
             &[1],
             &[1],
             1,
@@ -751,7 +751,7 @@ async fn test_unstaked_txo_ada() {
     let data = vec![
         txo::insert_unstaked_txo::Params::new(
             TransactionHash::new(&[0]).into(),
-            0,
+            TxnOutputOffset::from(0),
             Slot::from(0).into(),
             TxnIndex::from(0).into(),
             "addr0",
@@ -759,7 +759,7 @@ async fn test_unstaked_txo_ada() {
         ),
         txo::insert_unstaked_txo::Params::new(
             TransactionHash::new(&[1]).into(),
-            1,
+            TxnOutputOffset::from(1),
             Slot::from(1).into(),
             TxnIndex::from(1).into(),
             "addr1",
@@ -823,7 +823,7 @@ async fn test_unstaked_txo_assets() {
     let data = vec![
         txo::insert_unstaked_txo_asset::Params::new(
             TransactionHash::new(&[0]).into(),
-            0,
+            TxnOutputOffset::from(0),
             &[0],
             &[0],
             Slot::from(0).into(),
@@ -832,7 +832,7 @@ async fn test_unstaked_txo_assets() {
         ),
         txo::insert_unstaked_txo_asset::Params::new(
             TransactionHash::new(&[1]).into(),
-            1,
+            TxnOutputOffset::from(1),
             &[1],
             &[1],
             Slot::from(1).into(),

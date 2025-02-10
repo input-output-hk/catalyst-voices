@@ -12,7 +12,6 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
-use rbac::{get_catalyst_id_from_stake_addr, get_rbac_registrations::Query};
 use registrations::{
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
     get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
@@ -35,7 +34,11 @@ use super::block::{
     txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
 use crate::{
-    db::index::queries::rbac::get_catalyst_id_from_transaction_id, settings::cassandra_db,
+    db::index::queries::rbac::{
+        get_catalyst_id_from_stake_addr, get_catalyst_id_from_transaction_id,
+        get_rbac_invalid_registrations, get_rbac_registrations,
+    },
+    settings::cassandra_db,
 };
 
 /// Batches of different sizes, prepared and ready for use.
@@ -202,9 +205,10 @@ impl PreparedQueries {
             get_catalyst_id_from_stake_addr::Query::prepare(session.clone()).await?;
         let catalyst_id_by_transaction_id_query =
             get_catalyst_id_from_transaction_id::Query::prepare(session.clone()).await?;
-        let rbac_registrations_by_catalyst_id_query = Query::prepare(session.clone()).await?;
+        let rbac_registrations_by_catalyst_id_query =
+            get_rbac_registrations::Query::prepare(session.clone()).await?;
         let rbac_invalid_registrations_by_catalyst_id_query =
-            GetRbacInvalidRegistrationsByCatalystIdQuery::prepare(session.clone()).await?;
+            get_rbac_invalid_registrations::Query::prepare(session.clone()).await?;
         let get_all_stakes_and_vote_keys_query =
             GetAllStakesAndVoteKeysQuery::prepare(session).await?;
 
