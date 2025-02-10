@@ -7,13 +7,13 @@ import 'package:drift/drift.dart';
 /// Exposes only public operation on drafts, and related, tables.
 abstract interface class DraftsDao {
   /// Returns all drafts
-  Future<List<Draft>> queryAll();
+  Future<List<DraftEntity>> queryAll();
 
   /// Counts unique drafts. All versions of same document are counted as 1.
   Future<int> countAll();
 
   /// Inserts all drafts. On conflicts updates.
-  Future<void> saveAll(Iterable<Draft> drafts);
+  Future<void> saveAll(Iterable<DraftEntity> drafts);
 }
 
 @DriftAccessor(
@@ -27,7 +27,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDraftsDao(super.attachedDatabase);
 
   @override
-  Future<List<Draft>> queryAll() {
+  Future<List<DraftEntity>> queryAll() {
     return select(drafts).get();
   }
 
@@ -37,7 +37,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> saveAll(Iterable<Draft> drafts) async {
+  Future<void> saveAll(Iterable<DraftEntity> drafts) async {
     await batch((batch) {
       batch.insertAll(
         this.drafts,

@@ -10,6 +10,7 @@ import 'package:drift/drift.dart';
 /// Its representation of [SignedDocumentData] class.
 @TableIndex(name: 'idx_doc_type', columns: {#type})
 @TableIndex(name: 'idx_unique_ver', columns: {#verHi, #verLo}, unique: true)
+@DataClassName('DocumentEntity')
 class Documents extends Table
     with IdHiLoTableMixin, VerHiLoTableMixin, DocumentTableMixin {
   DateTimeColumn get createdAt => dateTime()();

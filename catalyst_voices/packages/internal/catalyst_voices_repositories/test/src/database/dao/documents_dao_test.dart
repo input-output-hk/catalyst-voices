@@ -24,7 +24,7 @@ void main() {
     group('save all', () {
       test('documents can be queried back correctly', () async {
         // Given
-        final documentsWithMetadata = List<DocumentWithMetadata>.generate(
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           10,
           (index) => DocumentWithMetadataFactory.build(),
         );
@@ -41,7 +41,7 @@ void main() {
 
       test('conflicting documents are ignored', () async {
         // Given
-        final documentsWithMetadata = List<DocumentWithMetadata>.generate(
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           20,
           (index) => DocumentWithMetadataFactory.build(),
         );
@@ -65,7 +65,7 @@ void main() {
     group('watch all', () {
       test('emits data when new entities are saved', () async {
         // Given
-        final documentsWithMetadata = List<DocumentWithMetadata>.generate(
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           1,
           (index) => DocumentWithMetadataFactory.build(),
         );
@@ -92,7 +92,7 @@ void main() {
     group('count', () {
       test('document returns expected number', () async {
         // Given
-        final documentsWithMetadata = List<DocumentWithMetadata>.generate(
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           20,
           (index) => DocumentWithMetadataFactory.build(),
         );
@@ -109,7 +109,7 @@ void main() {
       test('two versions of same document will be counted as one', () async {
         // Given
         final id = const Uuid().v7();
-        final documentsWithMetadata = List<DocumentWithMetadata>.generate(
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           2,
           (index) {
             final metadata = SignedDocumentMetadata(
@@ -134,7 +134,7 @@ void main() {
     group('delete all', () {
       test('removes all documents', () async {
         // Given
-        final documentsWithMetadata = List<DocumentWithMetadata>.generate(
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           5,
           (index) => DocumentWithMetadataFactory.build(),
         );
@@ -154,7 +154,7 @@ void main() {
 
       test('cascades metadata', () async {
         // Given
-        final documentsWithMetadata = List<DocumentWithMetadata>.generate(
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           5,
           (index) => DocumentWithMetadataFactory.build(),
         );

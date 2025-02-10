@@ -14,6 +14,7 @@ import 'package:drift/drift.dart';
 /// purposes. If there will be too many requirements we may introduce
 /// DraftsMetadata table, similar to [DocumentsMetadata].
 @TableIndex(name: 'idx_draft_type', columns: {#type})
+@DataClassName('DraftEntity')
 class Drafts extends Table
     with IdHiLoTableMixin, VerHiLoTableMixin, DocumentTableMixin {
   /// not encrypted title for search

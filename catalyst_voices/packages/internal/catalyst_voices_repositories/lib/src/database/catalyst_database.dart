@@ -24,11 +24,11 @@ abstract interface class CatalystDatabase {
     required CatalystDriftDatabaseConfig config,
   }) = DriftCatalystDatabase.withConfig;
 
-  /// Contains all operations related to [Document] which is db specific.
+  /// Contains all operations related to [DocumentEntity] which is db specific.
   /// Do not confuse it with other documents.
   DocumentsDao get documentsDao;
 
-  /// Contains all operations related to [Draft] which is db specific.
+  /// Contains all operations related to [DraftEntity] which is db specific.
   /// Do not confuse it with other documents / drafts.
   DraftsDao get draftsDao;
 

@@ -10,11 +10,11 @@ import 'package:flutter/foundation.dart';
 /// Exposes only public operation on documents, and related, tables.
 abstract interface class DocumentsDao {
   /// Similar to [queryAll] but emits when new records are inserted or deleted.
-  Stream<List<Document>> watchAll();
+  Stream<List<DocumentEntity>> watchAll();
 
   /// Returns all entities. If same document have different versions
   /// all will be returned.
-  Future<List<Document>> queryAll();
+  Future<List<DocumentEntity>> queryAll();
 
   /// Counts all documents.
   Future<int> countAll();
@@ -26,7 +26,9 @@ abstract interface class DocumentsDao {
   Future<int> countDocumentsMetadata();
 
   /// Inserts all documents and metadata. On conflicts ignores duplicates.
-  Future<void> saveAll(Iterable<DocumentWithMetadata> documentsWithMetadata);
+  Future<void> saveAll(
+    Iterable<DocumentEntityWithMetadata> documentsWithMetadata,
+  );
 
   /// Deletes all documents. Cascades to metadata.
   Future<void> deleteAll();
@@ -44,12 +46,12 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDocumentsDao(super.attachedDatabase);
 
   @override
-  Stream<List<Document>> watchAll() {
+  Stream<List<DocumentEntity>> watchAll() {
     return select(documents).watch();
   }
 
   @override
-  Future<List<Document>> queryAll() {
+  Future<List<DocumentEntity>> queryAll() {
     return select(documents).get();
   }
 
@@ -94,7 +96,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<void> saveAll(
-    Iterable<DocumentWithMetadata> documentsWithMetadata,
+    Iterable<DocumentEntityWithMetadata> documentsWithMetadata,
   ) async {
     final documents = documentsWithMetadata.map((e) => e.document);
     final metadata = documentsWithMetadata.expand((e) => e.metadata);

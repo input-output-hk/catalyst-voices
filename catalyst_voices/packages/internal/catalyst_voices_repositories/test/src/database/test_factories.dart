@@ -5,7 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_metada
 import 'package:uuid/uuid.dart';
 
 abstract final class DocumentWithMetadataFactory {
-  static DocumentWithMetadata build({
+  static DocumentEntityWithMetadata build({
     SignedDocumentContent? content,
     SignedDocumentMetadata? metadata,
     DateTime? createdAt,
@@ -32,7 +32,7 @@ abstract final class DocumentWithMetadataFactory {
 }
 
 abstract final class DocumentFactory {
-  static Document build({
+  static DocumentEntity build({
     SignedDocumentContent? content,
     SignedDocumentMetadata? metadata,
     DateTime? createdAt,
@@ -48,7 +48,7 @@ abstract final class DocumentFactory {
     final id = UuidHiLo.from(metadata.id);
     final ver = UuidHiLo.from(metadata.version);
 
-    return Document(
+    return DocumentEntity(
       idHi: id.high,
       idLo: id.low,
       verHi: ver.high,
@@ -62,7 +62,7 @@ abstract final class DocumentFactory {
 }
 
 abstract final class DocumentMetadataFactory {
-  static DocumentMetadata build({
+  static DocumentMetadataEntity build({
     String? ver,
     required DocumentMetadataFieldKey fieldKey,
     required String fieldValue,
@@ -71,7 +71,7 @@ abstract final class DocumentMetadataFactory {
 
     final verHiLo = UuidHiLo.from(ver);
 
-    return DocumentMetadata(
+    return DocumentMetadataEntity(
       verHi: verHiLo.high,
       verLo: verHiLo.low,
       fieldKey: fieldKey,
@@ -81,7 +81,7 @@ abstract final class DocumentMetadataFactory {
 }
 
 abstract final class DraftFactory {
-  static Draft build({
+  static DraftEntity build({
     SignedDocumentContent? content,
     SignedDocumentMetadata? metadata,
     String? title,
@@ -99,7 +99,7 @@ abstract final class DraftFactory {
     final id = UuidHiLo.from(metadata.id);
     final ver = UuidHiLo.from(metadata.version);
 
-    return Draft(
+    return DraftEntity(
       idHi: id.high,
       idLo: id.low,
       verHi: ver.high,

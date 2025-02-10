@@ -12,11 +12,11 @@ enum DocumentMetadataFieldKey {
 
 /// This table breaks out metadata into a key-value structure for each
 /// document version, enabling more granular or indexed queries
-@DataClassName('DocumentMetadata')
 @TableIndex(
   name: 'idx_doc_metadata_key_value',
   columns: {#fieldKey, #fieldValue},
 )
+@DataClassName('DocumentMetadataEntity')
 class DocumentsMetadata extends Table with VerHiLoTableMixin {
   /// e.g. 'category', 'title', 'description'
   TextColumn get fieldKey => textEnum<DocumentMetadataFieldKey>()();
