@@ -1,15 +1,14 @@
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:uuid/uuid.dart';
 
 abstract interface class DocumentRepository {
   factory DocumentRepository(
-    SignedDocumentManager signedDocumentManager,
+    SignedDocumentLocalSource localSource,
+    SignedDocumentRemoteSource remoteSource,
   ) = DocumentRepositoryImpl;
 
   Future<void> publishDocument(SignedDocumentData document);
@@ -24,13 +23,14 @@ abstract interface class DocumentRepository {
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
-  // ignore: unused_field
-  final SignedDocumentManager _signedDocumentManager;
+  final SignedDocumentLocalSource _localSource;
+  final SignedDocumentRemoteSource _remoteSource;
 
-  final _proposalTemplateLock = Lock();
+  final _templateLock = Lock();
 
   DocumentRepositoryImpl(
-    this._signedDocumentManager,
+    this._localSource,
+    this._remoteSource,
   );
 
   @override
@@ -58,7 +58,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final templateRef = signedDocumentData.metadata.template!;
 
-    final template = await _proposalTemplateLock.synchronized(() {
+    final template = await _templateLock.synchronized(() {
       return getProposalTemplate(ref: templateRef);
     });
 
@@ -84,19 +84,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     // TODO(damian-molinski): remove this override once we have API
     ref = const SignedDocumentRef(id: 'schema');
 
-    final signedDocumentData = await _getSignedDocumentData(ref: ref);
+    final signedDocument = await _getSignedDocumentData(ref: ref);
 
     assert(
-      signedDocumentData.metadata.type == SignedDocumentType.proposalTemplate,
+      signedDocument.metadata.type == SignedDocumentType.proposalTemplate,
       'Invalid SignedDocument type',
     );
 
     final metadata = ProposalTemplateMetadata(
-      id: signedDocumentData.metadata.id,
-      version: signedDocumentData.metadata.version,
+      id: signedDocument.metadata.id,
+      version: signedDocument.metadata.version,
     );
 
-    final json = signedDocumentData.content.data;
+    final json = signedDocument.content.data;
     final schema = DocumentSchemaDto.fromJson(json).toModel();
 
     return ProposalTemplate(
@@ -105,36 +105,26 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
-  // TODO(damian-molinski): should return SignedDocument.
-  // TODO(damian-molinski): make API call.
-  // TODO(damian-molinski): implement caching.
   Future<SignedDocumentData> _getSignedDocumentData({
     required SignedDocumentRef ref,
   }) async {
-    final isSchema = ref.id == 'schema';
+    // if version is not specified we're asking remote for latest version
+    // if remote does not know about this id its probably draft so
+    // local will return latest version
+    if (!ref.isExact) {
+      final latestVersion = await _remoteSource.getLatestVersion(ref.id);
+      ref = ref.copyWith(version: Optional(latestVersion));
+    }
 
-    final signedDocument = await (isSchema
-        ? VoicesDocumentsTemplates.proposalF14Schema
-        : VoicesDocumentsTemplates.proposalF14Document);
+    final isCached = await _localSource.exists(ref: ref);
+    if (isCached) {
+      return _localSource.get(ref: ref);
+    }
 
-    final type = isSchema
-        ? SignedDocumentType.proposalTemplate
-        : SignedDocumentType.proposalDocument;
-    final ver = ref.version ?? const Uuid().v7();
-    final template = !isSchema ? const SignedDocumentRef(id: 'schema') : null;
+    final remoteData = await _remoteSource.get(ref: ref);
 
-    final metadata = SignedDocumentMetadata(
-      type: type,
-      id: ref.id,
-      version: ver,
-      template: template,
-    );
+    await _localSource.save(data: remoteData);
 
-    final content = SignedDocumentContent(signedDocument);
-
-    return SignedDocumentData(
-      metadata: metadata,
-      content: content,
-    );
+    return remoteData;
   }
 }
