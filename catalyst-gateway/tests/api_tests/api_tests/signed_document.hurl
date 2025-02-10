@@ -41,7 +41,7 @@ Authorization: Bearer catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mq
 # cspell: enable
 Content-Type: application/cbor
 hex, 84585fa6012703183270436f6e74656e742d456e636f64696e676262726474797065d82550913c9265f9f944fcb3cf9d9516ae9baf626964d8255001946ea1818a7e0eb6b16169f02ffd4e63766572d8255001946ea1818a7e0eb6b16169f02ffd4ea0581c8b0b807b22616765223a33302c226e616d65223a22416c6578227d0380;
-HTTP 400
+HTTP 422
 
 # publish document with the same id, but with different version
 PUT http://localhost:3030/api/draft/document
