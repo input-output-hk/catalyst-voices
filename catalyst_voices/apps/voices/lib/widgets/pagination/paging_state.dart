@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/pagination/paging_status.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -50,7 +51,7 @@ class PagingState<ItemType> extends Equatable {
     int? maxResults,
     int? itemsPerPage,
     List<ItemType>? itemList,
-    LocalizedException? error,
+    Optional<LocalizedException>? error,
     bool isLoading = false,
   }) {
     return PagingState<ItemType>(
@@ -58,7 +59,7 @@ class PagingState<ItemType> extends Equatable {
       maxResults: maxResults ?? this.maxResults,
       itemsPerPage: itemsPerPage ?? this.itemsPerPage,
       itemList: itemList ?? this.itemList,
-      error: error ?? this.error,
+      error: error.dataOr(this.error),
       isLoading: isLoading,
     );
   }
@@ -77,18 +78,6 @@ class PagingState<ItemType> extends Equatable {
     }
     return PagingStatus.ongoing;
   }
-
-  int get _itemCount => itemList.length;
-
-  bool get _hasItems => itemList.isNotEmpty;
-
-  bool get _isListingUnfinished => _hasItems && _itemCount < maxResults;
-
-  bool get _isOngoing => _isListingUnfinished && !_hasError;
-
-  bool get _isLoadingFirstPage => _itemCount == 0 && !_hasError;
-
-  bool get _hasError => error != null;
 
   bool get isCompleted => _hasItems && !_isListingUnfinished;
 
@@ -109,6 +98,18 @@ class PagingState<ItemType> extends Equatable {
   }
 
   int get toValue => currentTo + 1;
+
+  int get _itemCount => itemList.length;
+
+  bool get _hasItems => itemList.isNotEmpty;
+
+  bool get _isListingUnfinished => _hasItems && _itemCount < maxResults;
+
+  bool get _isOngoing => _isListingUnfinished && !_hasError;
+
+  bool get _isLoadingFirstPage => _itemCount == 0 && !_hasError;
+
+  bool get _hasError => error != null;
 
   @override
   List<Object?> get props => [

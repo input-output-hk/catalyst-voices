@@ -42,7 +42,7 @@ void main() {
     test('page request listeners are notified', () {
       var capturedPageKey = 0;
       controller
-        ..addPageRequestListener((pageKey) {
+        ..addPageRequestListener((pageKey, _, __) {
           capturedPageKey = pageKey;
         })
         ..notifyPageRequestListeners(1);
@@ -73,7 +73,7 @@ void main() {
 
     test('removes listeners correctly', () {
       var callCount = 0;
-      void listener(int pageKey) => callCount++;
+      void listener(int pageKey, _, __) => callCount++;
 
       controller
         ..addPageRequestListener(listener)

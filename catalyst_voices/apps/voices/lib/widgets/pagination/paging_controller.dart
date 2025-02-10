@@ -1,9 +1,12 @@
 import 'package:catalyst_voices/widgets/pagination/paging_state.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
-typedef PageRequestListener<PageKeyType> = void Function(
+typedef PageRequestListener<PageKeyType, ItemType> = void Function(
   PageKeyType pageKey,
+  int pageSize,
+  ItemType? lastProposalId,
 );
 
 typedef PagingStateListener<ItemType> = void Function(
@@ -56,8 +59,8 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
           ),
         );
 
-  ObserverList<PageRequestListener<int>>? _pageRequestListeners =
-      ObserverList<PageRequestListener<int>>();
+  ObserverList<PageRequestListener<int, ItemType>>? _pageRequestListeners =
+      ObserverList<PageRequestListener<int, ItemType>>();
 
   ObserverList<PagingStateListener<ItemType>>? _statusListeners =
       ObserverList<PagingStateListener<ItemType>>();
@@ -71,7 +74,7 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
   LocalizedException? get error => value.error;
 
   set error(LocalizedException? newError) {
-    value = value.copyWith(error: newError);
+    value = value.copyWith(error: Optional(newError));
   }
 
   int get currentPage => value.currentPage;
@@ -116,16 +119,18 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     );
   }
 
-  void addPageRequestListener(PageRequestListener<int> listener) {
+  void addPageRequestListener(PageRequestListener<int, ItemType> listener) {
+    _debugAssertNotDisposed();
     _pageRequestListeners?.add(listener);
   }
 
-  void removePageRequestListener(PageRequestListener<int> listener) {
+  void removePageRequestListener(PageRequestListener<int, ItemType> listener) {
+    _debugAssertNotDisposed();
     _pageRequestListeners?.remove(listener);
   }
 
   void notifyPageRequestListeners(int pageKey) {
-    // assert(_debugAssertNotDisposed());
+    _debugAssertNotDisposed();
 
     value = value.copyWith(isLoading: true);
     if (_pageRequestListeners?.isEmpty ?? true) {
@@ -133,24 +138,31 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     }
 
     final localListeners =
-        List<PageRequestListener<int>>.from(_pageRequestListeners!);
+        List<PageRequestListener<int, ItemType>>.from(_pageRequestListeners!);
 
     for (final listener in localListeners) {
       if (_pageRequestListeners!.contains(listener)) {
-        listener(pageKey);
+        listener(
+          pageKey,
+          value.currentPage,
+          itemList.last,
+        );
       }
     }
   }
 
   void addStatusListener(PagingStateListener<ItemType> listener) {
+    _debugAssertNotDisposed();
     _statusListeners?.add(listener);
   }
 
   void removeStatusListener(PagingStateListener<ItemType> listener) {
+    _debugAssertNotDisposed();
     _statusListeners?.remove(listener);
   }
 
   void notifyStateListeners(PagingState<ItemType> state) {
+    _debugAssertNotDisposed();
     if (_statusListeners?.isEmpty ?? true) {
       return;
     }
@@ -162,6 +174,25 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
         listener(state);
       }
     }
+  }
+
+  bool _debugAssertNotDisposed() {
+    assert(
+      () {
+        if (_pageRequestListeners == null || _statusListeners == null) {
+          throw Exception(
+            'A PagingController was used after being disposed.\nOnce you have '
+            'called dispose() on a PagingController, it can no longer be '
+            'used.\nIf you’re using a Future, it probably completed after '
+            'the disposal of the owning widget.\nMake sure dispose() has not '
+            'been called yet before using the PagingController.',
+          );
+        }
+        return true;
+      }(),
+      'A PagingController was used after being disposed.',
+    );
+    return true;
   }
 
   @override

@@ -26,7 +26,13 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   }
 
   /// Loads the proposals.
-  Future<void> load({int pageKey = 0}) async {
+  Future<void> load({
+    int pageKey = 0,
+    int pageSize = 24,
+    String? lastProposalId,
+    String? categoryId,
+    String? searchValue,
+  }) async {
     emit(LoadingProposalsState(proposals: state.proposals));
     await Future.delayed(const Duration(seconds: 1), () {});
     final campaign = await _campaignService.getActiveCampaign();

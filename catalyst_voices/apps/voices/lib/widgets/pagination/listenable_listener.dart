@@ -30,8 +30,10 @@ class _ListenableListenerState extends State<ListenableListener> {
   @override
   void initState() {
     super.initState();
-    _listenable.addListener(_handleChange);
-    _handleChange();
+    if (widget.listener != null) {
+      _listenable.addListener(_handleChange);
+      _handleChange();
+    }
   }
 
   @override
@@ -39,7 +41,9 @@ class _ListenableListenerState extends State<ListenableListener> {
     super.didUpdateWidget(oldWidget);
     if (_listenable != oldWidget.listenable) {
       oldWidget.listenable.removeListener(_handleChange);
-      _listenable.addListener(_handleChange);
+      if (widget.listener != null) {
+        _listenable.addListener(_handleChange);
+      }
     }
   }
 

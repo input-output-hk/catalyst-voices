@@ -8,35 +8,28 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class GridWrapLayout<ItemType> extends StatefulWidget {
+class PaginatedGridView<ItemType> extends StatelessWidget {
   final PagingController<ItemType> pagingController;
   final PagedWrapChildBuilder<ItemType> builderDelegate;
 
-  const GridWrapLayout({
+  const PaginatedGridView({
     super.key,
     required this.pagingController,
     required this.builderDelegate,
   });
 
-  @override
-  State<GridWrapLayout<ItemType>> createState() =>
-      _GridWrapLayoutState<ItemType>();
-}
+  PagingController<ItemType> get _pagingController => pagingController;
 
-class _GridWrapLayoutState<ItemType> extends State<GridWrapLayout<ItemType>> {
-  PagingController<ItemType> get _pagingController => widget.pagingController;
+  ItemWidgetBuilder<ItemType> get _itemBuilder => builderDelegate.builder;
 
-  ItemWidgetBuilder<ItemType> get _itemBuilder =>
-      widget.builderDelegate.builder;
-
-  WidgetBuilder get _errorIndicatorBuilder =>
-      widget.builderDelegate.errorIndicatorBuilder ??
+  WidgetBuilder _errorIndicatorBuilder(BuildContext context) =>
+      builderDelegate.errorIndicatorBuilder ??
       (_) => VoicesErrorIndicator(
             message: context.l10n.somethingWentWrong,
           );
 
   WidgetBuilder get _loadingIndicatorBuilder =>
-      widget.builderDelegate.loadingIndicatorBuilder ??
+      builderDelegate.loadingIndicatorBuilder ??
       (_) => const Padding(
             padding: EdgeInsets.all(16),
             child: Center(child: VoicesCircularProgressIndicator()),
@@ -83,12 +76,12 @@ class _GridWrapLayoutState<ItemType> extends State<GridWrapLayout<ItemType>> {
               break;
 
             case PagingStatus.error:
-              child = _errorIndicatorBuilder(context);
+              child = _errorIndicatorBuilder(context)(context);
           }
 
-          if (widget.builderDelegate.animateTransition) {
+          if (builderDelegate.animateTransition) {
             child = AnimatedSwitcher(
-              duration: widget.builderDelegate.transitionDuration,
+              duration: builderDelegate.transitionDuration,
               child: child,
             );
           }

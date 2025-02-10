@@ -7,7 +7,7 @@ import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
-import 'package:catalyst_voices/widgets/pagination/layouts/grid_wrap_layout.dart';
+import 'package:catalyst_voices/widgets/pagination/layouts/paginated_grid_view.dart.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -311,12 +311,20 @@ class _AllProposalsState extends State<_AllProposals> {
     _proposalBloc = context.read<ProposalsCubit>();
     _pagingController = PagingController(
       initialPage: _proposalBloc.state.pageKey,
-      initialMaxResults: 0,
+      initialMaxResults: _proposalBloc.state.resultsNumber,
       itemsPerPage: 8,
     );
 
-    _pagingController.addPageRequestListener((newPageKey) async {
-      await _proposalBloc.load(pageKey: newPageKey);
+    _pagingController.addPageRequestListener((
+      newPageKey,
+      pageSize,
+      lastItem,
+    ) async {
+      await _proposalBloc.load(
+        pageKey: newPageKey,
+        pageSize: pageSize,
+        lastProposalId: lastItem?.id,
+      );
     });
 
     _blocSub = _proposalBloc.stream.listen((state) {
@@ -341,7 +349,7 @@ class _AllProposalsState extends State<_AllProposals> {
 
   @override
   Widget build(BuildContext context) {
-    return GridWrapLayout<ProposalViewModel>(
+    return PaginatedGridView<ProposalViewModel>(
       pagingController: _pagingController,
       builderDelegate: PagedWrapChildBuilder<ProposalViewModel>(
         builder: (context, item) => ProposalCard(
