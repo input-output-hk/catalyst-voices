@@ -36,7 +36,7 @@ package-schemathesis:
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
                     --cassette-path=/results/cassette.yaml \
-                    --hypothesis-seed=$seed
+                    $seed
 
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
@@ -98,7 +98,7 @@ nightly-package-schemathesis:
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
                     --cassette-path=/results/cassette.yaml \
-                    --hypothesis-seed=$seed
+                    $seed
 
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
