@@ -3,12 +3,11 @@ use poem_openapi::{
     param::{Path, Query},
     OpenApi,
 };
-use types::DateTime;
 
 use crate::service::{
     common::{
         auth::none_or_rbac::NoneOrRBAC,
-        objects::cardano::network::Network,
+        objects::{cardano::network::Network, generic::api_date_time::ApiDateTime},
         tags::ApiTags,
         types::{
             cardano::cip19_stake_address::Cip19StakeAddress,
@@ -44,7 +43,7 @@ impl Api {
         &self,
         /// The date-time for which the slot number should be calculated.
         /// If omitted current date time is used.
-        date_time: Query<Option<DateTime>>,
+        date_time: Query<Option<ApiDateTime>>,
         /// Cardano network type.
         /// If omitted `mainnet` network type is defined.
         /// As `preprod` and `preview` network types in the stake address encoded as a
@@ -54,7 +53,7 @@ impl Api {
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> date_time_to_slot_number_get::AllResponses {
-        date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
+        date_time_to_slot_number_get::endpoint(date_time.0.map(Into::into), network.0).await
     }
 
     #[oai(
