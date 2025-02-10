@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::DbTxnOutputOffset,
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,16 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXO Assets by TXN Hash purge queries.
 
+    use crate::db::types::DbTxnOutputOffset;
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, i16, Vec<u8>, Vec<u8>, num_bigint::BigInt);
+    pub(crate) type PrimaryKey = (
+        Vec<u8>,
+        DbTxnOutputOffset,
+        Vec<u8>,
+        Vec<u8>,
+        num_bigint::BigInt,
+    );
 }
 
 /// Select primary keys for TXO Assets by TXN Hash.
@@ -34,7 +45,7 @@ pub(crate) struct Params {
     /// 32 byte hash of this transaction.
     pub(crate) txn_hash: Vec<u8>,
     /// Offset in the txo list of the transaction the txo is in.
-    pub(crate) txo: i16,
+    pub(crate) txo: DbTxnOutputOffset,
     /// Asset Policy Hash - Binary 28 bytes.
     pub(crate) policy_id: Vec<u8>,
     /// Name of the asset, within the Policy.

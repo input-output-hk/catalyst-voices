@@ -17,7 +17,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::DbTransactionHash,
+        types::{DbTransactionHash, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -25,10 +25,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for Unstaked TXO ADA purge queries.
 
-    use crate::db::types::DbTransactionHash;
+    use crate::db::types::{DbTransactionHash, DbTxnOutputOffset};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbTransactionHash, i16, num_bigint::BigInt);
+    pub(crate) type PrimaryKey = (DbTransactionHash, DbTxnOutputOffset, num_bigint::BigInt);
 }
 
 /// Select primary keys for Unstaked TXO ADA.
@@ -40,7 +40,7 @@ pub(crate) struct Params {
     /// 32 byte hash of this transaction.
     pub(crate) txn_hash: DbTransactionHash,
     /// Transaction Output Offset inside the transaction.
-    pub(crate) txo: i16,
+    pub(crate) txo: DbTxnOutputOffset,
 }
 
 impl Debug for Params {

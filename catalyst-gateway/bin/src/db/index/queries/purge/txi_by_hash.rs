@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::DbTransactionHash,
+        types::{DbTransactionHash, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -24,10 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXI by hash purge queries.
 
-    use crate::db::types::{DbSlot, DbTransactionHash};
+    use crate::db::types::{DbSlot, DbTransactionHash, DbTxnOutputOffset};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbTransactionHash, i16, DbSlot);
+    pub(crate) type PrimaryKey = (DbTransactionHash, DbTxnOutputOffset, DbSlot);
 }
 
 /// Select primary keys for TXI by hash.
@@ -39,7 +39,7 @@ pub(crate) struct Params {
     /// 32 byte hash of this transaction.
     pub(crate) txn_hash: DbTransactionHash,
     /// Transaction Output Offset inside the transaction.
-    pub(crate) txo: i16,
+    pub(crate) txo: DbTxnOutputOffset,
 }
 
 impl Debug for Params {

@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Cip36, VotingPubKey};
+use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -36,7 +36,7 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: &VotingPubKey, slot_no: DbSlot, txn: DbTxnIndex, cip36: &Cip36, valid: bool,
+        vote_key: &VotingPubKey, slot_no: Slot, txn: TxnIndex, cip36: &Cip36, valid: bool,
     ) -> Self {
         Params {
             vote_key: vote_key
@@ -47,8 +47,8 @@ impl Params {
                 .stake_pk()
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
-            slot_no,
-            txn,
+            slot_no: slot_no.into(),
+            txn: txn.into(),
             valid,
         }
     }

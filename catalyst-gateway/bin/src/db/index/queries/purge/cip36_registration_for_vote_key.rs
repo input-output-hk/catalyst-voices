@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::{DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for CIP-36 registration by Vote key purge queries.
 
+    use crate::db::types::{DbSlot, DbTxnIndex};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, Vec<u8>, num_bigint::BigInt, i16, bool);
+    pub(crate) type PrimaryKey = (Vec<u8>, Vec<u8>, DbSlot, DbTxnIndex, bool);
 }
 
 /// Select primary keys for CIP-36 registration by Vote key.
@@ -36,9 +41,9 @@ pub(crate) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     pub(crate) stake_address: Vec<u8>,
     /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
+    pub(crate) txn: DbTxnIndex,
     /// True if registration is valid.
     pub(crate) valid: bool,
 }

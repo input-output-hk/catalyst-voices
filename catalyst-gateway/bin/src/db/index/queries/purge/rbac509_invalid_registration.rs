@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4},
+        types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -24,34 +24,26 @@ use crate::{
 pub(crate) mod result {
     //! Return values for RBAC 509 invalid registration purge queries.
 
-    use crate::db::types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4};
+    use crate::db::types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (
-        DbCatalystId,
-        DbSlot,
-        DbTxnIndex,
-        DbTransactionHash,
-        DbUuidV4,
-    );
+    pub(crate) type PrimaryKey = (DbCatalystId, DbSlot, DbTxnIndex, DbTransactionHash);
 }
 
 /// Select primary keys for RBAC 509 invalid registration.
-const SELECT_QUERY: &str = include_str!("./cql/get_rbac509_invalid_registration.cql");
+const SELECT_QUERY: &str = include_str!("cql/get_rbac_invalid_registration.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A short Catalyst ID.
     pub(crate) catalyst_id: DbCatalystId,
-    /// Block Slot Number
-    pub(crate) slot_no: DbSlot,
-    /// Transaction Offset inside the block.
-    pub(crate) txn: DbTxnIndex,
-    /// Transaction Hash ID - Binary 32 bytes.
+    /// A transaction ID.
     transaction_id: DbTransactionHash,
-    /// `UUIDv4` Purpose - Binary 16 bytes.
-    purpose: DbUuidV4,
+    /// A block slot number.
+    pub(crate) slot_no: DbSlot,
+    /// A transaction offset inside the block.
+    pub(crate) txn: DbTxnIndex,
 }
 
 impl Debug for Params {
@@ -61,7 +53,6 @@ impl Debug for Params {
             .field("slot_no", &self.slot_no)
             .field("txn", &self.txn)
             .field("transaction_id", &self.transaction_id)
-            .field("purpose", &self.purpose)
             .finish()
     }
 }
@@ -73,7 +64,6 @@ impl From<result::PrimaryKey> for Params {
             slot_no: value.1,
             txn: value.2,
             transaction_id: value.3,
-            purpose: value.4,
         }
     }
 }
@@ -110,7 +100,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete RBAC 509 invalid registration
-const DELETE_QUERY: &str = include_str!("./cql/delete_rbac509_invalid_registration.cql");
+const DELETE_QUERY: &str = include_str!("cql/delete_rbac_invalid_registration.cql");
 
 /// Delete RBAC 509 invalid registration Query
 pub(crate) struct DeleteQuery;

@@ -1,5 +1,5 @@
--- Index of Chain Root For Stake Address. RBAC 509 registrations.
-INSERT INTO rbac_catalyst_id_for_stake_addr (
+-- Index of Catalyst ID For Stake Address. RBAC 509 registrations.
+INSERT INTO catalyst_id_for_stake_addr (
     stake_addr,
     slot_no,
     txn,

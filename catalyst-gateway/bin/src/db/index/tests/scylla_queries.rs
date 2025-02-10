@@ -1,13 +1,14 @@
 //! Integration tests of the `IndexDB` queries testing on its session.
 //! This is mainly to test whether the defined queries work with the database or not.
 
+use cardano_blockchain_types::TransactionHash;
 use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 
 use super::*;
 use crate::{
     db::index::queries::{
-        rbac::get_registrations::*,
+        rbac,
         registrations::{
             get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*, get_invalid::*,
         },
@@ -41,6 +42,45 @@ async fn test_get_assets_by_stake_addr() {
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
+async fn get_catalyst_id_by_stake_address() {
+    use rbac::get_catalyst_id_from_stake_addr::{Query, QueryParams};
+
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // TODO: FIXME: Construct the test address.
+    let stake_address = todo!();
+    let mut row_stream = Query::execute(&session, QueryParams { stake_address })
+        .await
+        .unwrap();
+
+    while let Some(row_res) = row_stream.next().await {
+        drop(row_res.unwrap());
+    }
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn get_catalyst_id_by_transaction_id() {
+    use rbac::get_catalyst_id_from_transaction_id::{Query, QueryParams};
+
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    let transaction_id = TransactionHash::new(&[1, 2, 3]).into();
+    let mut row_stream = Query::execute(&session, QueryParams { transaction_id })
+        .await
+        .unwrap();
+
+    while let Some(row_res) = row_stream.next().await {
+        drop(row_res.unwrap());
+    }
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
 async fn test_get_invalid_registration_w_stake_addr() {
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
@@ -60,7 +100,9 @@ async fn test_get_invalid_registration_w_stake_addr() {
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_registrations_by_catalyst_id() {
+async fn get_rbac_registrations_by_catalyst_id() {
+    use rbac::get_rbac_registrations::{Query, QueryParams};
+
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
@@ -68,12 +110,32 @@ async fn test_get_registrations_by_catalyst_id() {
     let id: IdUri = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
         .parse()
         .unwrap();
-    let mut row_stream = GetRegistrationsByCatalystIdQuery::execute(
-        &session,
-        GetRegistrationsByChainRootQueryParams {
-            catalyst_id: id.into(),
-        },
-    )
+    let mut row_stream = Query::execute(&session, QueryParams {
+        catalyst_id: id.into(),
+    })
+    .await
+    .unwrap();
+
+    while let Some(row_res) = row_stream.next().await {
+        drop(row_res.unwrap());
+    }
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn get_rbac_invalid_registrations_by_catalyst_id() {
+    use rbac::get_rbac_invalid_registrations::{Query, QueryParams};
+
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    let id: IdUri = "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+        .parse()
+        .unwrap();
+    let mut row_stream = Query::execute(&session, QueryParams {
+        catalyst_id: id.into(),
+    })
     .await
     .unwrap();
 

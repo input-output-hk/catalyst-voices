@@ -5,6 +5,7 @@ pub use slot::DbSlot;
 pub use stake_address::DbCip19StakeAddress;
 pub use transaction_hash::DbTransactionHash;
 pub use transaction_index::DbTxnIndex;
+pub use txn_output_offset::DbTxnOutputOffset;
 pub use uuidv4::DbUuidV4;
 pub use verifying_key::DbVerifyingKey;
 
@@ -13,5 +14,6 @@ mod slot;
 mod stake_address;
 mod transaction_hash;
 mod transaction_index;
+mod txn_output_offset;
 mod uuidv4;
 mod verifying_key;

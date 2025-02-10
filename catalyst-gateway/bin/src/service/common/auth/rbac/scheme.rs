@@ -58,9 +58,7 @@ impl ResponseError for AuthTokenError {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where
-        Self: Error + Send + Sync + 'static,
-    {
+    where Self: Error + Send + Sync + 'static {
         ErrorResponses::unauthorized().into_response()
     }
 }
@@ -79,9 +77,7 @@ impl ResponseError for AuthTokenAccessViolation {
 
     /// Convert this error to a HTTP response.
     fn as_response(&self) -> poem::Response
-    where
-        Self: Error + Send + Sync + 'static,
-    {
+    where Self: Error + Send + Sync + 'static {
         // TODO: Actually check permissions needed for an endpoint.
         ErrorResponses::forbidden(Some(self.0.clone())).into_response()
     }
@@ -136,13 +132,14 @@ async fn checker_api_catalyst_auth(
     // Ok, so its validly decoded, but we haven't seen it before.
     // Check that the token is able to be authorized.
 
+    // TODO: FIXME: Check/ask
     // Get pub key from CERTS state given decoded KID from decoded bearer token
     // TODO: Look up certs from the Kid based on RBAC Registrations.
-    //let pub_key_bytes = if let Some(cert) = CERTS.get(&token.kid) {
+    // let pub_key_bytes = if let Some(cert) = CERTS.get(&token.kid) {
     //    *cert
     //} else {
-    //error!(kid = %token.kid, "Invalid KID");
-    //Err(AuthTokenAccessViolation(vec!["UNREGISTERED".to_string()]))?;
+    // error!(kid = %token.kid, "Invalid KID");
+    // Err(AuthTokenAccessViolation(vec!["UNREGISTERED".to_string()]))?;
     //};
 
     // Verify the token signature using the public key.

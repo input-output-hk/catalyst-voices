@@ -1,5 +1,5 @@
--- Index RBAC 509 Registrations (Valid)
-INSERT INTO rbac_registration_invalid (
+-- Index RBAC 509 Registrations (invalid)
+INSERT INTO rbac_invalid_registration (
     catalyst_id,
     transaction_id,
     slot_no,
@@ -12,7 +12,7 @@ INSERT INTO rbac_registration_invalid (
     :transaction_id,
     :slot_no,
     :txn,
-    :prv_txn_id
+    :prv_txn_id,
     :purpose,
     :problem_report
 );

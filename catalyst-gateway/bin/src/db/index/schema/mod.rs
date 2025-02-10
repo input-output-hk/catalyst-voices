@@ -71,19 +71,19 @@ const SCHEMAS: &[(&str, &str)] = &[
         "Create Table RBAC Registration",
     ),
     (
-        // Invalid RBAC Registration Table Schema
+        // RBAC Invalid Registration Table Schema
         include_str!("cql/rbac_invalid_registration.cql"),
         "Create Table Invalid RBAC Registration",
     ),
     (
-        // RBAC Catalyst ID For TX ID Registration Table Schema
-        include_str!("./cql/rbac_catalyst_id_for_txn_id.cql"),
-        "Create Table RBAC Catalyst ID For TX ID",
+        // Catalyst ID For TX ID Registration Table Schema
+        include_str!("cql/catalyst_id_for_txn_id.cql"),
+        "Create Table Catalyst ID For TX ID",
     ),
     (
-        // RBAC Catalyst ID For Stake Address Registration Table Schema
-        include_str!("./cql/rbac_catalyst_id_for_stake_addr.cql"),
-        "Create Table RBAC Catalyst ID For Stake Address",
+        // Catalyst ID For Stake Address Registration Table Schema
+        include_str!("cql/catalyst_id_for_stake_addr.cql"),
+        "Create Table Catalyst ID For Stake Address",
     ),
 ];
 

@@ -1,7 +1,7 @@
 -- Get all primary keys from RBAC 509 invalid registration.
 SELECT
-    chain_root,
+    catalyst_id,
+    transaction_id,
     slot_no,
-    txn,
-    transaction_id
-FROM rbac509_invalid_registration
+    txn
+FROM rbac_invalid_registration

@@ -33,26 +33,26 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     let mut txi_index = TxiInsertQuery::new();
     let mut txo_index = TxoInsertQuery::new();
 
-    let slot = block.point().slot_or_default();
+    let slot_no = block.point().slot_or_default();
 
     // We add all transactions in the block to their respective index data sets.
     for (index, txn) in block.enumerate_txs() {
         let txn_hash = Blake2b256Hash::from(txn.hash()).into();
 
         // Index the TXIs.
-        txi_index.index(&txn, slot);
+        txi_index.index(&txn, slot_no);
 
         // TODO: Index minting.
         // let mint = txs.mints().iter() {};
 
         // TODO: Index Metadata.
-        cip36_index.index(index, slot, block);
+        cip36_index.index(index, slot_no, block);
 
         // Index Certificates inside the transaction.
-        cert_index.index(&txn, slot, index, block);
+        cert_index.index(&txn, slot_no, index, block);
 
         // Index the TXOs.
-        txo_index.index(&txn, slot, txn_hash, index);
+        txo_index.index(&txn, slot_no, txn_hash, index);
 
         // Index RBAC 509 inside the transaction.
         rbac509_index.index(&session, txn_hash, index, block).await;

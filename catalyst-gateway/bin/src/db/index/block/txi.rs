@@ -7,9 +7,12 @@ use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
-        session::CassandraSession,
+    db::{
+        index::{
+            queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
+        types::DbSlot,
     },
     settings::cassandra_db,
 };
@@ -22,7 +25,7 @@ pub(crate) struct TxiInsertParams {
     /// TXO Index spent.
     txo: i16,
     /// Block Slot Number when spend occurred.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
 }
 
 impl TxiInsertParams {

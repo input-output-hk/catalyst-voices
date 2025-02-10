@@ -17,27 +17,25 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbSlot, DbTxnIndex},
+    types::{DbCatalystId, DbCip19StakeAddress, DbSlot, DbTxnIndex},
 };
 
-/// Cached Chain Root By Stake Address.
+/// Cached data.
 static CATALYST_ID_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, Query>> =
     LazyLock::new(|| {
         Cache::builder()
-            // Set Eviction Policy to `LRU`
             .eviction_policy(EvictionPolicy::lru())
-            // Create the cache.
             .build()
     });
 
 /// Get Catalyst ID by stake address query string.
-const QUERY: &str = include_str!("../cql/get_rbac_chain_root_for_stake_addr.cql");
+const QUERY: &str = include_str!("../cql/get_catalyst_id_for_stake_addr.cql");
 
 /// Get Catalyst ID by stake address query params.
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
     /// Stake address to get the Catalyst ID for.
-    pub(crate) stake_address: Vec<u8>,
+    pub(crate) stake_address: DbCip19StakeAddress,
 }
 
 /// Get Catalyst ID by stake address query.
@@ -80,7 +78,7 @@ impl Query {
         session: &CassandraSession, stake_addr: &StakeAddress,
     ) -> anyhow::Result<Option<Query>> {
         Self::execute(session, QueryParams {
-            stake_address: stake_addr.to_vec(),
+            stake_address: stake_addr.clone().into(),
         })
         .await?
         .next()
@@ -89,12 +87,12 @@ impl Query {
         .context("Failed to get Catalyst ID by stake address query row")
     }
 
-    /// Get latest chain-root registration for a stake address.
+    /// Get latest registration for a stake address.
     pub(crate) async fn get_latest(
         session: &CassandraSession, stake_addr: &StakeAddress,
     ) -> anyhow::Result<Option<Query>> {
         match CATALYST_ID_BY_STAKE_ADDRESS_CACHE.get(stake_addr) {
-            Some(chain_root) => Ok(Some(chain_root)),
+            Some(v) => Ok(Some(v)),
             None => {
                 // Look in DB for the stake registration
                 Self::get_latest_uncached(session, stake_addr).await

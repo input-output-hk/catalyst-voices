@@ -2,8 +2,8 @@
 
 use anyhow::anyhow;
 use catalyst_types::id_uri::IdUri;
-use der_parser::asn1_rs::ToDer;
 use futures::StreamExt;
+use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
 
@@ -53,44 +53,7 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
-    let Ok(stake_address) = stake_address.to_der_vec() else {
-        error!("Failed to create stake address vec");
-        let err = anyhow!("Failed to create stake address vec");
-        return AllResponses::internal_error(&err);
-    };
-
-    let query_res = get_catalyst_id_from_stake_addr::Query::execute(
-        &session,
-        get_catalyst_id_from_stake_addr::QueryParams { stake_address },
-    )
-    .await;
-
-    match query_res {
-        Ok(mut row_iter) => {
-            if let Some(row_res) = row_iter.next().await {
-                let row = match row_res {
-                    Ok(row) => row,
-                    Err(err) => {
-                        error!(error = ?err, "Failed to parse get chain root by stake address query row");
-                        let err = anyhow!(err);
-                        return AllResponses::internal_error(&err);
-                    },
-                };
-
-                let id: IdUri = row.catalyst_id.into();
-                let res = Response {
-                    chain_root: id.to_string(),
-                };
-
-                Responses::Ok(Json(res)).into()
-            } else {
-                Responses::NotFound.into()
-            }
-        },
-        Err(err) => {
-            error!(error = ?err, "Failed to execute get chain root by stake address query");
-            let err = anyhow!(err);
-            AllResponses::internal_error(&err)
-        },
-    }
+    // TODO: This endpoint needs to be removed or updated because "chain root" was replaced by
+    // Catalyst ID.
+    AllResponses::forbidden(None)
 }

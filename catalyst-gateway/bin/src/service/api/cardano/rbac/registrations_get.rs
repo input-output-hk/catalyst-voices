@@ -7,9 +7,7 @@ use tracing::error;
 
 use crate::{
     db::index::{
-        queries::rbac::get_registrations::{
-            GetRegistrationsByCatalystIdQuery, GetRegistrationsByChainRootQueryParams,
-        },
+        queries::rbac::get_rbac_registrations::{Query, QueryParams},
         session::CassandraSession,
     },
     service::common::{
@@ -58,12 +56,9 @@ pub(crate) async fn endpoint(catalyst_id: IdUri) -> AllResponses {
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
-    let query_res = GetRegistrationsByCatalystIdQuery::execute(
-        &session,
-        GetRegistrationsByChainRootQueryParams {
-            catalyst_id: catalyst_id.into(),
-        },
-    )
+    let query_res = Query::execute(&session, QueryParams {
+        catalyst_id: catalyst_id.into(),
+    })
     .await;
 
     let mut row_iter = match query_res {

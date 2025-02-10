@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbSlot, DbTxnIndex},
+        types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -24,10 +24,17 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXO Assets by Stake Address purge queries.
 
-    use crate::db::types::{DbSlot, DbTxnIndex};
+    use crate::db::types::{DbSlot, DbTxnIndex, DbTxnOutputOffset};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, DbSlot, DbTxnIndex, i16, Vec<u8>, Vec<u8>);
+    pub(crate) type PrimaryKey = (
+        Vec<u8>,
+        DbSlot,
+        DbTxnIndex,
+        DbTxnOutputOffset,
+        Vec<u8>,
+        Vec<u8>,
+    );
 }
 
 /// Select primary keys for TXO Assets by Stake Address.
@@ -43,7 +50,7 @@ pub(crate) struct Params {
     /// Transaction Offset inside the block.
     pub(crate) txn: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
-    pub(crate) txo: i16,
+    pub(crate) txo: DbTxnOutputOffset,
     /// Asset Policy Hash - Binary 28 bytes.
     policy_id: Vec<u8>,
     /// Name of the asset, within the Policy.

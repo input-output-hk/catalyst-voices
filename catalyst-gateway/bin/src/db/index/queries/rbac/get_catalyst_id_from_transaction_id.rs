@@ -19,7 +19,7 @@ use crate::db::{
     types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex},
 };
 
-/// Cached Catalyst ID values.
+/// Cached data.
 static CACHE: LazyLock<Cache<DbTransactionHash, Query>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
@@ -27,7 +27,7 @@ static CACHE: LazyLock<Cache<DbTransactionHash, Query>> = LazyLock::new(|| {
 });
 
 /// A query string.
-const QUERY: &str = include_str!("../cql/get_rbac_catalyst_id_for_transaction_id.cql");
+const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql");
 
 /// Get Catalyst ID by transaction ID query parameters.
 #[derive(SerializeRow)]
@@ -36,7 +36,7 @@ pub(crate) struct QueryParams {
     pub(crate) transaction_id: DbTransactionHash,
 }
 
-/// Get chain root by stake address query.
+/// Get Catalyst ID by stake address query.
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// A Catalyst ID.

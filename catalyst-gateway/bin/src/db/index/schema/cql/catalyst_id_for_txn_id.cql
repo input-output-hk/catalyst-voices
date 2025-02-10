@@ -1,5 +1,5 @@
 -- Index of Chain Root For TX ID. RBAC 509 registrations. 
-CREATE TABLE IF NOT EXISTS rbac_catalyst_id_for_txn_id (
+CREATE TABLE IF NOT EXISTS catalyst_id_for_txn_id (
     -- Primary Key Data
     transaction_id      blob,       -- 32 Bytes of Transaction Hash. (TransactionHash)
 

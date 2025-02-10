@@ -1,4 +1,4 @@
-//! Chain Root For Stake Address (RBAC 509 registrations) Queries used in purging data.
+//! Catalyst ID For Stake Address (RBAC 509 registrations) Queries used in purging data.
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
@@ -16,28 +16,28 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbSlot, DbTxnIndex},
+        types::{DbCip19StakeAddress, DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
 };
 
 pub(crate) mod result {
-    //! Return values for Chain Root For Stake Address registration purge queries.
+    //! Return values for Catalyst ID For Stake Address registration purge queries.
 
-    use crate::db::types::{DbSlot, DbTxnIndex};
+    use crate::db::types::{DbCip19StakeAddress, DbSlot, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (DbCip19StakeAddress, DbSlot, DbTxnIndex);
 }
 
-/// Select primary keys for Chain Root For Stake Address registration.
-const SELECT_QUERY: &str = include_str!("./cql/get_chain_root_for_stake_addr.cql");
+/// Select primary keys for Catalyst ID For Stake Address registration.
+const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_stake_addr.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 32 bytes.
-    pub(crate) stake_addr: Vec<u8>,
+    /// A stake address.
+    pub(crate) stake_addr: DbCip19StakeAddress,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -63,11 +63,11 @@ impl From<result::PrimaryKey> for Params {
         }
     }
 }
-/// Get primary key for Chain Root For Stake Address registration query.
+/// Get primary key for Catalyst ID For Stake Address registration query.
 pub(crate) struct PrimaryKeyQuery;
 
 impl PrimaryKeyQuery {
-    /// Prepares a query to get all Chain Root For Stake Address registration primary
+    /// Prepares a query to get all Catalyst ID For Stake Address registration primary
     /// keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
@@ -78,18 +78,18 @@ impl PrimaryKeyQuery {
         )
         .await
         .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get Chain Root For Stake Address registration primary key query."),
+            |error| error!(error=%error, "Failed to prepare get Catalyst ID For Stake Address registration primary key query."),
         )
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
-    /// Executes a query to get all Chain Root For Stake Address registration primary
+    /// Executes a query to get all Catalyst ID For Stake Address registration primary
     /// keys.
     pub(crate) async fn execute(
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
-            .purge_execute_iter(PreparedSelectQuery::ChainRootForStakeAddress)
+            .purge_execute_iter(PreparedSelectQuery::CatalystIdForStakeAddress)
             .await?
             .rows_stream::<result::PrimaryKey>()?;
 
@@ -97,10 +97,10 @@ impl PrimaryKeyQuery {
     }
 }
 
-/// Delete Chain Root For Stake Address registration
-const DELETE_QUERY: &str = include_str!("./cql/delete_chain_root_for_stake_addr.cql");
+/// Delete Catalyst ID For Stake Address registration
+const DELETE_QUERY: &str = include_str!("cql/delete_catalyst_id_for_stake_addr.cql");
 
-/// Delete Chain Root For Stake Address registration Query
+/// Delete Catalyst ID For Stake Address registration Query
 pub(crate) struct DeleteQuery;
 
 impl DeleteQuery {
@@ -118,7 +118,7 @@ impl DeleteQuery {
         )
         .await
         .inspect_err(
-            |error| error!(error=%error, "Failed to prepare delete Chain Root For Stake Address registration primary key query."),
+            |error| error!(error=%error, "Failed to prepare delete Catalyst ID For Stake Address registration primary key query."),
         )
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
@@ -128,7 +128,7 @@ impl DeleteQuery {
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::ChainRootForStakeAddress, params)
+            .purge_execute_batch(PreparedDeleteQuery::CatalystIdForStakeAddress, params)
             .await?;
 
         Ok(results)

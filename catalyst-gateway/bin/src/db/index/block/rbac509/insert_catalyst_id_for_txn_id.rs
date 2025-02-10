@@ -1,6 +1,9 @@
-//! Index RBAC Chain Root For Transaction ID Insert Query.
+//! Index RBAC Catalyst ID For Transaction ID Insert Query.
+
 use std::{fmt::Debug, sync::Arc};
 
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use catalyst_types::id_uri::IdUri;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -12,19 +15,19 @@ use crate::{
     settings::cassandra_db::EnvVars,
 };
 
-/// Index RBAC Chain Root by TX ID.
-const INSERT_QUERY: &str = include_str!("cql/insert_catalyst_id_for_txn_id.cql");
+/// Index RBAC Catalyst ID by TX ID.
+const QUERY: &str = include_str!("cql/insert_catalyst_id_for_txn_id.cql");
 
-/// Insert Chain Root For Transaction ID Query Parameters
+/// Insert Catalyst ID For Transaction ID Query Parameters
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Transaction ID Hash. 32 bytes.
+    /// A transaction hash.
     transaction_id: DbTransactionHash,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
-    /// Slot Number the chain root is in.
+    /// A slot number.
     slot_no: DbSlot,
-    /// Transaction Offset inside the block.
+    /// A transaction offset inside the block.
     txn_idx: DbTxnIndex,
 }
 
@@ -40,26 +43,25 @@ impl Debug for Params {
 }
 
 impl Params {
-    /// Create a new record for this transaction.
+    /// Creates a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: DbCatalystId, transaction_id: DbTransactionHash, slot_no: DbSlot,
-        txn_idx: DbTxnIndex,
+        catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn_idx: TxnIndex,
     ) -> Self {
         Params {
-            transaction_id,
+            transaction_id: transaction_id.into(),
             catalyst_id: catalyst_id.into(),
-            slot_no,
-            txn_idx,
+            slot_no: slot_no.into(),
+            txn_idx: txn_idx.into(),
         }
     }
 
-    /// Prepare Batch of RBAC Registration Index Data Queries
+    /// Prepares a Batch of RBAC Registration Index Data Queries.
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
-            INSERT_QUERY,
+            QUERY,
             cfg,
             scylla::statement::Consistency::Any,
             true,
@@ -67,8 +69,8 @@ impl Params {
         )
         .await
         .inspect_err(
-            |error| error!(error=%error,"Failed to prepare Insert Chain Root For TXN ID Query."),
+            |error| error!(error=%error,"Failed to prepare Insert Catalyst ID For TXN ID Query."),
         )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_QUERY}"))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{QUERY}"))
     }
 }

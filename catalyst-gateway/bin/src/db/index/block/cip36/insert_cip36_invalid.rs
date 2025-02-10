@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Cip36, VotingPubKey};
+use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
 use pallas::ledger::addresses::ShelleyAddress;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
@@ -71,7 +71,7 @@ impl Debug for Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: Option<&VotingPubKey>, slot_no: DbSlot, txn: DbTxnIndex, cip36: &Cip36,
+        vote_key: Option<&VotingPubKey>, slot_no: Slot, txn: TxnIndex, cip36: &Cip36,
     ) -> Self {
         let stake_address = cip36
             .stake_pk()
@@ -95,8 +95,8 @@ impl Params {
 
         Params {
             stake_address,
-            slot_no,
-            txn,
+            slot_no: slot_no.into(),
+            txn: txn.into(),
             vote_key,
             payment_address,
             is_payable: cip36.is_payable().unwrap_or_default(),

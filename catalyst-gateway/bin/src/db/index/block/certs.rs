@@ -79,7 +79,7 @@ impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        stake_hash: Vec<u8>, slot_no: DbSlot, txn: DbTxnIndex, stake_address: Option<VerifyingKey>,
+        stake_hash: Vec<u8>, slot_no: Slot, txn: TxnIndex, stake_address: Option<VerifyingKey>,
         script: bool, register: bool, deregister: bool, pool_delegation: Option<Vec<u8>>,
     ) -> Self {
         let stake_address = stake_address
@@ -88,7 +88,7 @@ impl StakeRegistrationInsertQuery {
         StakeRegistrationInsertQuery {
             stake_hash,
             slot_no: slot_no.into(),
-            txn,
+            txn: txn.into(),
             stake_address,
             script,
             register: if register {

@@ -5,50 +5,37 @@ pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
 
-use std::sync::{Arc, LazyLock};
+use std::sync::Arc;
 
 use cardano_blockchain_types::{Cip0134Uri, MultiEraBlock, Slot, TransactionHash, TxnIndex};
 use catalyst_types::id_uri::IdUri;
-use moka::{policy::EvictionPolicy, sync::Cache};
-use pallas::ledger::addresses::Address;
+use pallas::ledger::addresses::{Address, StakeAddress};
 use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
 use scylla::Session;
 use tracing::error;
 
 use crate::{
-    db::{
-        index::{
-            queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
-            session::CassandraSession,
-        },
-        types::DbCip19StakeAddress,
+    db::index::{
+        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
+        session::CassandraSession,
     },
     settings::cassandra_db::EnvVars,
 };
-
-/// A Catalyst ID by transaction ID cache.
-static CATALYST_ID_BY_TXN_ID_CACHE: LazyLock<Cache<TransactionHash, IdUri>> = LazyLock::new(|| {
-    Cache::builder()
-        // Set Eviction Policy to `LRU`
-        .eviction_policy(EvictionPolicy::lru())
-        // Create the cache.
-        .build()
-});
 
 /// Index RBAC 509 Registration Query Parameters
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
     registrations: Vec<insert_rbac509::Params>,
-    /// Invalid RBAC Registration Data.
+    /// An invalid RBAC registration data.
     invalid: Vec<insert_rbac509_invalid::Params>,
-    /// Chain Root For Transaction ID Data captured during indexing.
+    /// A Catalyst ID for transaction ID Data captured during indexing.
     catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
-    /// Chain Root For Stake Address Data captured during indexing.
+    /// A Catalyst ID for stake address data captured during indexing.
     catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
-    /// Create new data set for RBAC 509 Registrations Insert Query Batch.
+    /// Creates new data set for RBAC 509 Registrations Insert Query Batch.
     pub(crate) fn new() -> Self {
         Rbac509InsertQuery {
             registrations: Vec::new(),
@@ -83,6 +70,9 @@ impl Rbac509InsertQuery {
                 return;
             },
             Err(e) => {
+                // This registration is either completely corrupted or someone else is using "our"
+                // label (`MetadatumLabel::CIP509_RBAC`). We don't want to index it even as
+                // incorrect.
                 error!(
                     slot = ?slot,
                     index = ?index,
@@ -184,7 +174,7 @@ impl Rbac509InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::RbacCatalystIdForTxnIdInsertQuery,
+                        PreparedQuery::CatalystIdForTxnIdInsertQuery,
                         self.catalyst_id_for_txn_id,
                     )
                     .await
@@ -196,7 +186,7 @@ impl Rbac509InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
-                        PreparedQuery::RbacCatalystIdForStakeAddressInsertQuery,
+                        PreparedQuery::CatalystIdForStakeAddressInsertQuery,
                         self.catalyst_id_for_stake_address,
                     )
                     .await
@@ -235,12 +225,12 @@ async fn catalyst_id(
         slot.into(),
         index.into(),
     );
-    CATALYST_ID_BY_TXN_ID_CACHE.insert(txn_hash, id.clone());
+
     Some(id)
 }
 
 /// Returns stake addresses of the role 0.
-fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<DbCip19StakeAddress> {
+fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<StakeAddress> {
     let mut result = Vec::new();
 
     if let Some(uris) = metadata.certificate_uris.x_uris().get(&0) {
@@ -253,12 +243,12 @@ fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<DbCip19StakeAddress> {
     result
 }
 
-/// Converts a list of `Cip0134Uri` to a list of `DbCip19StakeAddress`.
-fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<DbCip19StakeAddress> {
+/// Converts a list of `Cip0134Uri` to a list of stake addresses.
+fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<StakeAddress> {
     uris.into_iter()
         .filter_map(|uri| {
             match uri.address() {
-                Address::Stake(a) => Some(a.clone().into()),
+                Address::Stake(a) => Some(a.clone()),
                 _ => None,
             }
         })

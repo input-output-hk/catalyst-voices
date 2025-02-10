@@ -1,5 +1,5 @@
 -- Index of Catalyst ID For Stake Address. RBAC 509 registrations.
-CREATE TABLE IF NOT EXISTS rbac_catalyst_id_for_stake_addr (
+CREATE TABLE IF NOT EXISTS catalyst_id_for_stake_addr (
     -- Primary Key Data
     stake_addr          blob,       -- 29 Byte Stake Address (CIP19)
     slot_no             varint,     -- slot number when the key_was_registered. (u64)

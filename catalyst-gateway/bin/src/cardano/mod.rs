@@ -367,7 +367,7 @@ impl SyncTask {
     async fn run(&mut self) {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
-        let tips = cardano_chain_follower::ChainFollower::get_tips(self.cfg.chain).await;
+        let tips = ChainFollower::get_tips(self.cfg.chain).await;
         self.immutable_tip_slot = tips.0.slot_or_default().into();
         self.live_tip_slot = tips.1.slot_or_default().into();
         info!(chain=%self.cfg.chain, immutable_tip=self.immutable_tip_slot, live_tip=self.live_tip_slot, "Blockchain ready to sync from.");

@@ -2,13 +2,14 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::{Slot, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbTxnIndex},
+        types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -27,7 +28,7 @@ pub(crate) struct Params {
     /// Transaction Offset inside the block.
     txn: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
-    txo: i16,
+    txo: DbTxnOutputOffset,
     /// Policy hash of the asset
     policy_id: Vec<u8>,
     /// Name of the asset, within the Policy.
@@ -43,14 +44,14 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
-        stake_address: &[u8], slot_no: DbSlot, txn: DbTxnIndex, txo: i16, policy_id: &[u8],
+        stake_address: &[u8], slot_no: Slot, txn: TxnIndex, txo: TxnOutputOffset, policy_id: &[u8],
         asset_name: &[u8], value: i128,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
             slot_no: slot_no.into(),
-            txn,
-            txo,
+            txn: txn.into(),
+            txo: txo.into(),
             policy_id: policy_id.to_vec(),
             asset_name: asset_name.to_vec(),
             value: value.into(),

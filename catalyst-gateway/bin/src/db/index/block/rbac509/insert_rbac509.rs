@@ -2,6 +2,8 @@
 
 use std::{fmt::Debug, sync::Arc};
 
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use catalyst_types::{id_uri::IdUri, uuid::UuidV4};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
@@ -14,18 +16,18 @@ use crate::{
 };
 
 /// RBAC Registration Indexing query
-const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
+const QUERY: &str = include_str!("cql/insert_rbac509.cql");
 
 /// Insert RBAC Registration Query Parameters
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
-    /// Transaction ID Hash. 32 bytes.
+    /// A transaction hash
     transaction_id: DbTransactionHash,
-    /// Block Slot Number
+    /// A block slot number.
     slot_no: DbSlot,
-    /// Transaction Offset inside the block.
+    /// A transaction offset inside the block.
     txn: DbTxnIndex,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<DbTransactionHash>,
@@ -53,17 +55,19 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: DbCatalystId, transaction_id: DbTransactionHash, slot_no: DbSlot,
-        txn: DbTxnIndex, purpose: DbUuidV4, prv_txn_id: Option<DbTransactionHash>,
+        catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn: TxnIndex,
+        purpose: UuidV4, prv_txn_id: Option<TransactionHash>,
     ) -> Self {
-        let prv_txn_id = prv_txn_id.map(MaybeUnset::Set).unwrap_or(MaybeUnset::Unset);
+        let prv_txn_id = prv_txn_id
+            .map(|v| MaybeUnset::Set(v.into()))
+            .unwrap_or(MaybeUnset::Unset);
 
         Self {
-            catalyst_id,
-            transaction_id,
-            purpose,
-            slot_no,
-            txn,
+            catalyst_id: catalyst_id.into(),
+            transaction_id: transaction_id.into(),
+            purpose: purpose.into(),
+            slot_no: slot_no.into(),
+            txn: txn.into(),
             prv_txn_id,
         }
     }
@@ -74,7 +78,7 @@ impl Params {
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
-            INSERT_RBAC509_QUERY,
+            QUERY,
             cfg,
             scylla::statement::Consistency::Any,
             true,
@@ -84,6 +88,6 @@ impl Params {
         .inspect_err(
             |error| error!(error=%error,"Failed to prepare Insert RBAC 509 Registration Query."),
         )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_RBAC509_QUERY}"))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{QUERY}"))
     }
 }

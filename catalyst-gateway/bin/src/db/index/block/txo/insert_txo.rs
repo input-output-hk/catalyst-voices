@@ -4,13 +4,14 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::{Slot, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbTransactionHash, DbTxnIndex},
+        types::{DbSlot, DbTransactionHash, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -29,7 +30,7 @@ pub(crate) struct Params {
     /// Transaction Offset inside the block.
     txn: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
-    txo: i16,
+    txo: DbTxnOutputOffset,
     /// Actual full TXO Address
     address: String,
     /// Actual TXO Value in lovelace
@@ -41,14 +42,14 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_address: &[u8], slot_no: DbSlot, txn: DbTxnIndex, txo: i16, address: &str,
+        stake_address: &[u8], slot_no: Slot, txn: TxnIndex, txo: TxnOutputOffset, address: &str,
         value: u64, txn_hash: DbTransactionHash,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
-            slot_no,
-            txn,
-            txo,
+            slot_no: slot_no.into(),
+            txn: txn.into(),
+            txo: txo.into(),
             address: address.to_string(),
             value: value.into(),
             txn_hash,

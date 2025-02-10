@@ -34,6 +34,12 @@ impl From<DbCip19StakeAddress> for Vec<u8> {
     }
 }
 
+impl AsRef<[u8]> for DbCip19StakeAddress {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_ref()
+    }
+}
+
 impl SerializeValue for DbCip19StakeAddress {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,

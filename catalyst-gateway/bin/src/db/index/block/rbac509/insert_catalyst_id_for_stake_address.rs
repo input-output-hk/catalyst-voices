@@ -1,7 +1,10 @@
-//! Index RBAC Chain Root For Stake Address Insert Query.
+//! Index RBAC Catalyst ID for Stake Address Insert Query.
 
 use std::{fmt::Debug, sync::Arc};
 
+use cardano_blockchain_types::{Slot, TxnIndex};
+use catalyst_types::id_uri::IdUri;
+use pallas::ledger::addresses::StakeAddress;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -13,17 +16,17 @@ use crate::{
     settings::cassandra_db::EnvVars,
 };
 
-/// Index RBAC Chain Root by Stake Address
-const INSERT_QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_address.cql");
+/// Index RBAC Catalyst ID by Stake Address.
+const QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_address.cql");
 
-/// Insert Chain Root For Stake Address Query Parameters
+/// Insert Catalyst ID For Stake Address Query Parameters
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address Hash. 32 bytes.
+    /// A stake address.
     stake_addr: DbCip19StakeAddress,
-    /// Block Slot Number
+    /// A block slot number.
     slot_no: DbSlot,
-    /// Transaction Offset inside the block.
+    /// A transaction offset inside the block.
     txn: DbTxnIndex,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
@@ -43,14 +46,13 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_addr: DbCip19StakeAddress, slot_no: DbSlot, txn: DbTxnIndex,
-        catalyst_id: DbCatalystId,
+        stake_addr: StakeAddress, slot_no: Slot, txn: TxnIndex, catalyst_id: IdUri,
     ) -> Self {
         Params {
-            stake_addr,
-            slot_no,
-            txn,
-            catalyst_id,
+            stake_addr: stake_addr.into(),
+            slot_no: slot_no.into(),
+            txn: txn.into(),
+            catalyst_id: catalyst_id.into(),
         }
     }
 
@@ -60,14 +62,14 @@ impl Params {
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
-            INSERT_QUERY,
+            QUERY,
             cfg,
             scylla::statement::Consistency::Any,
             true,
             false,
         )
         .await
-        .inspect_err(|error| error!(error=%error,"Failed to prepare Insert Chain Root For Stake Address Query."))
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_QUERY}"))
+        .inspect_err(|error| error!(error=%error, "Failed to prepare Insert Catalyst ID For Stake Address Query."))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{QUERY}"))
     }
 }

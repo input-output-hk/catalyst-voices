@@ -21,12 +21,13 @@ pub(crate) async fn purge_live_index(purge_slot: Slot) -> anyhow::Result<()> {
     let purge_to_slot = purge_slot - Settings::purge_slot_buffer();
 
     let txn_hashes = purge_txi_by_hash(&session, purge_to_slot).await?;
-    purge_chain_root_for_stake_address(&session, purge_to_slot).await?;
-    purge_chain_root_for_txn_id(&session, &txn_hashes).await?;
+    purge_catalyst_id_for_stake_address(&session, purge_to_slot).await?;
+    purge_catalyst_id_for_txn_id(&session, &txn_hashes).await?;
     purge_cip36_registration(&session, purge_to_slot).await?;
     purge_cip36_registration_for_vote_key(&session, purge_to_slot).await?;
     purge_cip36_registration_invalid(&session, purge_to_slot).await?;
     purge_rbac509_registration(&session, purge_to_slot).await?;
+    purge_invalid_rbac509_registration(&session, purge_to_slot).await?;
     purge_stake_registration(&session, purge_to_slot).await?;
     purge_txo_ada(&session, purge_to_slot).await?;
     purge_txo_assets(&session, purge_to_slot).await?;
@@ -36,11 +37,11 @@ pub(crate) async fn purge_live_index(purge_slot: Slot) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Purge data from `chain_root_for_stake_address`.
-async fn purge_chain_root_for_stake_address(
+/// Purges the data from `catalyst_id_for_stake_addr`.
+async fn purge_catalyst_id_for_stake_address(
     session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
-    use purge::chain_root_for_stake_address::{DeleteQuery, Params, PrimaryKeyQuery};
+    use purge::catalyst_id_for_stake_address::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
@@ -57,8 +58,8 @@ async fn purge_chain_root_for_stake_address(
     Ok(())
 }
 
-/// Purge data from `chain_root_for_txn_id`.
-async fn purge_chain_root_for_txn_id(
+/// Purges the data from `catalyst_id_for_txn_id`.
+async fn purge_catalyst_id_for_txn_id(
     session: &Arc<CassandraSession>, txn_hashes: &HashSet<TransactionHash>,
 ) -> anyhow::Result<()> {
     use purge::catalyst_id_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
@@ -158,6 +159,25 @@ async fn purge_rbac509_registration(
         }
     }
     // Delete filtered keys
+    DeleteQuery::execute(session, delete_params).await?;
+    Ok(())
+}
+
+/// Purges the data from `rbac509_invalid_registration`.
+async fn purge_invalid_rbac509_registration(
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
+) -> anyhow::Result<()> {
+    use purge::rbac509_invalid_registration::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+    let mut delete_params: Vec<Params> = Vec::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        let params: Params = primary_key.into();
+        if params.slot_no <= purge_to_slot.into() {
+            delete_params.push(params);
+        }
+    }
+
     DeleteQuery::execute(session, delete_params).await?;
     Ok(())
 }

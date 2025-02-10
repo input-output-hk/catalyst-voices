@@ -1,4 +1,5 @@
-//! Chain Root For TX ID (RBAC 509 registrations) Queries used in purging data.
+//! Catalyst ID For TX ID (RBAC 509 registrations) Queries used in purging data.
+
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
@@ -22,7 +23,7 @@ use crate::{
 };
 
 pub(crate) mod result {
-    //! Return values for Chain Root For TX ID registration purge queries.
+    //! Return values for Catalyst ID For TX ID registration purge queries.
     use scylla::DeserializeRow;
 
     use crate::db::types::DbTransactionHash;
@@ -30,18 +31,18 @@ pub(crate) mod result {
     /// Primary Key Row
     #[derive(DeserializeRow)]
     pub(crate) struct PrimaryKey {
-        /// TXN ID HASH - Binary 32 bytes.
+        /// A transaction hash.
         pub(crate) transaction_id: DbTransactionHash,
     }
 }
 
-/// Select primary keys for Chain Root For TX ID registration.
+/// Select primary keys for Catalyst ID For TX ID registration.
 const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_txn_id.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// TXN ID HASH - Binary 32 bytes.
+    /// A transaction hash.
     pub(crate) transaction_id: DbTransactionHash,
 }
 
@@ -60,11 +61,12 @@ impl From<result::PrimaryKey> for Params {
         }
     }
 }
-/// Get primary key for Chain Root For TX ID registration query.
+
+/// Get primary key for Catalyst ID For TX ID registration query.
 pub(crate) struct PrimaryKeyQuery;
 
 impl PrimaryKeyQuery {
-    /// Prepares a query to get all Chain Root For TX ID registration primary keys.
+    /// Prepares a query to get all Catalyst ID For TX ID registration primary keys.
     pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session.clone(),
@@ -74,12 +76,12 @@ impl PrimaryKeyQuery {
         )
         .await
         .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get Chain Root For TX ID registration primary key query."),
+            |error| error!(error=%error, "Failed to prepare get Catalyst ID For TX ID registration primary key query."),
         )
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
-    /// Executes a query to get all Chain Root For TX ID registration primary keys.
+    /// Executes a query to get all Catalyst ID For TX ID registration primary keys.
     pub(crate) async fn execute(
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
@@ -92,10 +94,10 @@ impl PrimaryKeyQuery {
     }
 }
 
-/// Delete Chain Root For TX ID registration
+/// Delete Catalyst ID For TX ID registration
 const DELETE_QUERY: &str = include_str!("cql/delete_catalyst_id_for_txn_id.cql");
 
-/// Delete Chain Root For TX ID registration Query
+/// Delete Catalyst ID For TX ID registration Query
 pub(crate) struct DeleteQuery;
 
 impl DeleteQuery {
@@ -113,7 +115,7 @@ impl DeleteQuery {
         )
         .await
         .inspect_err(
-            |error| error!(error=%error, "Failed to prepare delete Chain Root For TX ID registration primary key query."),
+            |error| error!(error=%error, "Failed to prepare delete Catalyst ID For TX ID registration primary key query."),
         )
         .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
@@ -123,7 +125,7 @@ impl DeleteQuery {
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::ChainRootForTxnId, params)
+            .purge_execute_batch(PreparedDeleteQuery::CatalystIdForTxnId, params)
             .await?;
 
         Ok(results)
