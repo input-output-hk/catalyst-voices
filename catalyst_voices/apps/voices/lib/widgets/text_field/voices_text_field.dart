@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -11,7 +12,7 @@ import 'package:flutter/services.dart';
 /// that is pre-configured to use Project Catalyst theming.
 ///
 /// Uses [OutlineInputBorder] instead of the default [UnderlineInputBorder] one.
-class VoicesTextField extends StatefulWidget {
+class VoicesTextField extends VoicesFormField<String> {
   final String? initialText;
 
   /// [TextField.controller]
@@ -53,9 +54,6 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.maxLength].
   final int? maxLength;
 
-  /// [TextField.enabled].
-  final bool enabled;
-
   /// [TextField.readOnly].
   final bool readOnly;
 
@@ -74,11 +72,8 @@ class VoicesTextField extends StatefulWidget {
   /// Defaults to false on all platforms.
   final bool resizableHorizontally;
 
-  /// [TextFormField.validator]
-  final VoicesTextFieldValidator? validator;
-
-  /// [TextField.onChanged]
-  final ValueChanged<String>? onChanged;
+  /// A replacement for [TextFormField.validator]
+  final VoicesTextFieldValidator? textValidator;
 
   /// [TextField.onSubmitted]
   final ValueChanged<String>? onFieldSubmitted;
@@ -86,14 +81,8 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.onEditingComplete]
   final VoidCallback? onEditingComplete;
 
-  /// [FormField.onSaved]
-  final FormFieldSetter<String>? onSaved;
-
   /// [TextField.inputFormatters]
   final List<TextInputFormatter>? inputFormatters;
-
-  /// [TextFormField.autovalidateMode]
-  final AutovalidateMode? autovalidateMode;
 
   /// [TextField.maxLengthEnforcement]
   final MaxLengthEnforcement? maxLengthEnforcement;
@@ -101,10 +90,11 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.mouseCursor]
   final MouseCursor? mouseCursor;
 
-  final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
-
-  const VoicesTextField({
+  VoicesTextField({
     super.key,
+    super.enabled = true,
+    super.autovalidateMode = AutovalidateMode.onUserInteraction,
+    super.onChanged,
     this.initialText,
     this.controller,
     this.statesController,
@@ -119,11 +109,9 @@ class VoicesTextField extends StatefulWidget {
     this.maxLength,
     this.maxLines = 1,
     this.minLines,
-    this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
-    this.validator,
-    this.onChanged,
+    this.textValidator,
     this.resizableVertically,
     this.resizableHorizontally = false,
     // Making it required but nullable because default behaviour is
@@ -131,19 +119,91 @@ class VoicesTextField extends StatefulWidget {
     // else.
     required this.onFieldSubmitted,
     this.onEditingComplete,
-    this.onSaved,
     this.inputFormatters,
-    this.autovalidateMode,
     this.maxLengthEnforcement,
     this.mouseCursor,
-    this.onStatusChanged,
-  });
+  }) : super(
+          value: controller?.text ?? initialText,
+          validator: (value) {
+            final errorText = decoration?.errorText;
+            if (errorText != null) {
+              return errorText;
+            } else {
+              final result = textValidator?.call(value ?? '');
+              return result?.errorMessage;
+            }
+          },
+          builder: (field) {
+            final context = field.context;
+            final state = field as VoicesTextFieldState;
+            final theme = Theme.of(context);
+            final textTheme = theme.textTheme;
+
+            final labelText = decoration?.labelText ?? '';
+            final resizableVertically = state._isResizableVertically;
+            final resizableHorizontally = state._isResizableHorizontally;
+
+            void onChangedHandler(String? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (labelText.isNotEmpty) ...[
+                  Text(
+                    labelText,
+                    style: enabled
+                        ? textTheme.titleSmall
+                        : textTheme.titleSmall!
+                            .copyWith(color: theme.colors.textDisabled),
+                  ),
+                  const SizedBox(height: 4),
+                ],
+                ResizableBoxParent(
+                  resizableHorizontally: resizableHorizontally,
+                  resizableVertically: resizableVertically,
+                  minHeight: maxLines == null ? 65 : 48,
+                  iconBottomSpacing: maxLines == null ? 18 : 0,
+                  child: TextField(
+                    key: const Key('VoicesTextField'),
+                    textAlignVertical: TextAlignVertical.top,
+                    autofocus: autofocus,
+                    expands: resizableVertically,
+                    controller: state._obtainController(),
+                    statesController: statesController,
+                    focusNode: focusNode,
+                    onSubmitted: onFieldSubmitted,
+                    onEditingComplete: onEditingComplete,
+                    inputFormatters: inputFormatters,
+                    decoration: state._buildDecoration(),
+                    keyboardType: keyboardType,
+                    textInputAction: textInputAction,
+                    textCapitalization: textCapitalization,
+                    style: style,
+                    obscureText: obscureText,
+                    maxLines: maxLines,
+                    minLines: minLines,
+                    maxLength: maxLength,
+                    maxLengthEnforcement: maxLengthEnforcement,
+                    enabled: enabled,
+                    readOnly: readOnly,
+                    ignorePointers: ignorePointers,
+                    onChanged: onChangedHandler,
+                    mouseCursor: mouseCursor,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
 
   @override
-  State<VoicesTextField> createState() => _VoicesTextFieldState();
+  VoicesFormFieldState<String> createState() => VoicesTextFieldState();
 }
 
-class _VoicesTextFieldState extends State<VoicesTextField> {
+class VoicesTextFieldState extends VoicesFormFieldState<String> {
   TextEditingController? _customController;
 
   VoicesTextFieldValidationResult _validation =
@@ -169,16 +229,18 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _obtainController().addListener(_onChanged);
-  }
+  VoicesTextField get widget => super.widget as VoicesTextField;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
 
-    _validate(_obtainController().text);
+    final text = widget.initialText ?? widget.controller?.text ?? '';
+    setValue(text);
+
+    _obtainController()
+      ..textWithSelection = text
+      ..addListener(_handleControllerChanged);
   }
 
   @override
@@ -188,8 +250,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final newController = _obtainController();
 
     // unregister listener from potentially old controllers
-    _customController?.removeListener(_onChanged);
-    oldWidget.controller?.removeListener(_onChanged);
+    _customController?.removeListener(_handleControllerChanged);
+    oldWidget.controller?.removeListener(_handleControllerChanged);
 
     // the widget got controller from the parent, lets dispose our own
     if (widget.controller != null) {
@@ -198,12 +260,10 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     }
 
     // register for a new one
-    newController.addListener(_onChanged);
+    newController.addListener(_handleControllerChanged);
 
-    if (oldWidget.decoration?.errorText != widget.decoration?.errorText ||
-        oldWidget.validator != widget.validator ||
-        oldWidget.controller?.text != newController.text) {
-      _validate(newController.text);
+    if (oldWidget.controller?.text != newController.text) {
+      setValue(newController.text);
     }
   }
 
@@ -211,72 +271,55 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   void dispose() {
     _customController?.dispose();
     _customController = null;
-    widget.controller?.removeListener(_onChanged);
+    widget.controller?.removeListener(_handleControllerChanged);
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    final labelText = widget.decoration?.labelText ?? '';
-    final resizableVertically = _isResizableVertically;
-    final resizableHorizontally = _isResizableHorizontally;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (labelText.isNotEmpty) ...[
-          Text(
-            labelText,
-            style: widget.enabled
-                ? textTheme.titleSmall
-                : textTheme.titleSmall!
-                    .copyWith(color: theme.colors.textDisabled),
-          ),
-          const SizedBox(height: 4),
-        ],
-        ResizableBoxParent(
-          resizableHorizontally: resizableHorizontally,
-          resizableVertically: resizableVertically,
-          minHeight: widget.maxLines == null ? 65 : 48,
-          iconBottomSpacing: widget.maxLines == null ? 18 : 0,
-          child: TextFormField(
-            mouseCursor: widget.mouseCursor,
-            key: const Key('VoicesTextField'),
-            textAlignVertical: TextAlignVertical.top,
-            autofocus: widget.autofocus,
-            expands: resizableVertically,
-            controller: _obtainController(),
-            statesController: widget.statesController,
-            focusNode: widget.focusNode,
-            onFieldSubmitted: widget.onFieldSubmitted,
-            onEditingComplete: widget.onEditingComplete,
-            onSaved: widget.onSaved,
-            inputFormatters: widget.inputFormatters,
-            autovalidateMode: widget.autovalidateMode,
-            decoration: _buildDecoration(context),
-            keyboardType: widget.keyboardType,
-            textInputAction: widget.textInputAction,
-            textCapitalization: widget.textCapitalization,
-            style: widget.style,
-            obscureText: widget.obscureText,
-            maxLines: widget.maxLines,
-            minLines: widget.minLines,
-            maxLength: widget.maxLength,
-            maxLengthEnforcement: widget.maxLengthEnforcement,
-            readOnly: widget.readOnly,
-            ignorePointers: widget.ignorePointers,
-            enabled: widget.enabled,
-            onChanged: widget.onChanged,
-          ),
-        ),
-      ],
-    );
+  bool validate() {
+    _validate(_obtainController().text);
+    return super.validate();
   }
 
-  InputDecoration _buildDecoration(BuildContext context) {
+  @override
+  void didChange(String? value) {
+    super.didChange(value);
+
+    final controller = _obtainController();
+    if (controller.text != value) {
+      controller.textWithSelection = value ?? '';
+    }
+  }
+
+  @override
+  void reset() {
+    // Set the controller value before calling super.reset() to let
+    // _handleControllerChanged suppress the change.
+    _validation = const VoicesTextFieldValidationResult.none();
+    _obtainController().text = widget.initialValue ?? '';
+    super.reset();
+    widget.onChanged?.call(_obtainController().text);
+  }
+
+  /// Clears the text field.
+  void clear() {
+    didChange(null);
+    widget.onChanged?.call(null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Validating in build(), similar workaround is done in the
+    // original FormField build method to make sure validation
+    // errors are shown when needed.
+    if (widget.enabled) {
+      _validateIfValidationModeAllows(_obtainController().text);
+    }
+
+    return super.build(context);
+  }
+
+  InputDecoration _buildDecoration() {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colors = theme.colors;
@@ -467,7 +510,9 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
 
   Widget? _wrapSuffixIfExists(Widget? child, EdgeInsetsDirectional padding) {
     final statusSuffixWidget = _getStatusSuffixWidget();
-    if (child == null) return statusSuffixWidget;
+    if (child == null) {
+      return statusSuffixWidget;
+    }
 
     return Padding(
       padding: padding,
@@ -530,37 +575,36 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     if (widget.decoration?.errorStyle != null) {
       return widget.decoration?.errorStyle;
     }
+
     return widget.enabled
-        ? textTheme.bodySmall
+        ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
         : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
   }
 
-  void _onChanged() {
-    _validate(_obtainController().text);
+  void _handleControllerChanged() {
+    final text = _obtainController().text;
+    if (value != text) {
+      setValue(text);
+    }
   }
 
-  void _validate(String value) {
-    final errorText = widget.decoration?.errorText;
-    if (errorText != null) {
-      _onValidationResultChanged(
-        VoicesTextFieldValidationResult.error(errorText),
-      );
-      return;
+  void _validateIfValidationModeAllows(String? value) {
+    switch (widget.autovalidateMode) {
+      case AutovalidateMode.disabled:
+      case AutovalidateMode.onUnfocus:
+        _validation = const VoicesTextFieldValidationResult.none();
+      case AutovalidateMode.always:
+        _validate(value);
+      case AutovalidateMode.onUserInteraction:
+        if (hasInteractedByUser) {
+          _validate(value);
+        }
     }
-
-    final result = widget.validator?.call(value);
-    _onValidationResultChanged(
-      result ?? const VoicesTextFieldValidationResult.none(),
-    );
   }
 
-  void _onValidationResultChanged(VoicesTextFieldValidationResult validation) {
-    if (_validation != validation) {
-      setState(() {
-        _validation = validation;
-        widget.onStatusChanged?.call(validation.status);
-      });
-    }
+  void _validate(String? value) {
+    final result = widget.textValidator?.call(value ?? '');
+    _validation = result ?? const VoicesTextFieldValidationResult.none();
   }
 }
 
@@ -574,7 +618,7 @@ typedef VoicesTextFieldValidator = VoicesTextFieldValidationResult Function(
   String value,
 );
 
-/// The return value of the [VoicesTextField.validator].
+/// The return value of the [VoicesTextField.textValidator].
 class VoicesTextFieldValidationResult with EquatableMixin {
   /// The status of the validation.
   ///
@@ -603,7 +647,7 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// Returns a successful validation result.
   ///
   /// The method was designed to be used as
-  /// [VoicesTextField.validator] param:
+  /// [VoicesTextField.textValidator] param:
   ///
   /// ```
   ///   validator: (value) {
@@ -621,7 +665,7 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// Returns a warning validation result.
   ///
   /// The method was designed to be used as
-  /// [VoicesTextField.validator] param:
+  /// [VoicesTextField.textValidator] param:
   ///
   /// ```
   ///   validator: (value) {
@@ -640,7 +684,7 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// Returns an error validation result.
   ///
   /// The method was designed to be used as
-  /// [VoicesTextField.validator] param:
+  /// [VoicesTextField.textValidator] param:
   ///
   /// ```
   ///   validator: (value) {

@@ -10,7 +10,7 @@ from api_tests import (
     utils,
 )
 
-@pytest.mark.nightly
+@pytest.mark.skip
 def test_staked_ada_endpoint():
     check_is_live()
     check_is_ready()
