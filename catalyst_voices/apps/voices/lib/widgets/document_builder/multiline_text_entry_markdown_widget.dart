@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -29,11 +28,10 @@ class MultilineTextEntryMarkdownWidget extends StatefulWidget {
 
 class _MultilineTextEntryMarkdownWidgetState
     extends State<MultilineTextEntryMarkdownWidget> {
-  late VoicesRichTextController _controller;
+  late final VoicesRichTextController _controller;
   late final VoicesRichTextFocusNode _focus;
   late final ScrollController _scrollController;
-
-  Timer? _onChangedTimer;
+  late final Debouncer _onChangedDebouncer;
 
   String get _title => widget.schema.formattedTitle;
   int? get _maxLength => widget.schema.strLengthRange?.max;
@@ -45,6 +43,7 @@ class _MultilineTextEntryMarkdownWidgetState
     _controller = _buildController(widget.property.value ?? '');
     _focus = VoicesRichTextFocusNode();
     _scrollController = ScrollController();
+    _onChangedDebouncer = Debouncer();
   }
 
   @override
@@ -67,7 +66,7 @@ class _MultilineTextEntryMarkdownWidgetState
     _controller.dispose();
     _focus.dispose();
     _scrollController.dispose();
-    _onChangedTimer?.cancel();
+    _onChangedDebouncer.dispose();
     super.dispose();
   }
 
@@ -125,11 +124,7 @@ class _MultilineTextEntryMarkdownWidgetState
   }
 
   void _onChanged(quill.Document? document) {
-    _onChangedTimer?.cancel();
-    _onChangedTimer = Timer(
-      const Duration(milliseconds: 400),
-      () => _dispatchChange(document),
-    );
+    _onChangedDebouncer.run(() => _dispatchChange(document));
   }
 
   void _dispatchChange(quill.Document? document) {
