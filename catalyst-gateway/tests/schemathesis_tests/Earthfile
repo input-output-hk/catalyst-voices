@@ -18,8 +18,8 @@ package-schemathesis:
                     # remove these includes when endpoints will be not "draft"
                     --include-operation-id 'putDocument' \
                     --include-operation-id 'getDocument' \
-                    --include-operation-id 'cardanoRegistrationCip36'
-                    --include-operation-id 'stakedAdaAmountGet'
+                    --include-operation-id 'cardanoRegistrationCip36' \
+                    --include-operation-id 'stakedAdaAmountGet' \
                     --exclude-path-regex '\"*/draft/*\"' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
