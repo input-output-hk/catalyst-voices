@@ -43,7 +43,7 @@ impl CurrentPage {
     ///  - Invalid `limit` value, must be in range
     ///  - Invalid `remaining` value, must be in range
     #[allow(dead_code)]
-    fn new(page: u64, limit: u64, remaining: u64) -> anyhow::Result<Self> {
+    fn new(page: u32, limit: u32, remaining: u32) -> anyhow::Result<Self> {
         Ok(Self {
             page: page.try_into()?,
             limit: limit.try_into()?,
