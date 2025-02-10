@@ -17,7 +17,7 @@ impl Type for ApiDateTime {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "date_time".into()
+        "ApiDateTime".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {

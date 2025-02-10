@@ -8,7 +8,10 @@ use crate::service::{
     common::{
         auth::none_or_rbac::NoneOrRBAC,
         objects::{
-            cardano::{hash::{Hash128, Hash256}, network::Network},
+            cardano::{
+                hash::{Hash128, Hash256},
+                network::Network,
+            },
             generic::api_date_time::ApiDateTime,
         },
         tags::ApiTags,
@@ -103,8 +106,7 @@ impl Api {
     ///
     /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
     async fn rbac_role0_key_chain_root(
-        &self,
-        /// Role0 key to get the chain root for.
+        &self, /// Role0 key to get the chain root for.
         Path(role0_key): Path<Hash128>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,

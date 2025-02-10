@@ -18,16 +18,16 @@ impl Hash256 {
     /// The hex-encoded hash length of this hash type.
     const HASH_LEN: usize = 64;
 
-    /// Creates a `CardanoStakeAddress` schema definition.
+    /// Creates a `Hash256` schema definition.
     fn schema() -> MetaSchema {
         let mut schema = MetaSchema::new("string");
-        schema.title = Some(Self::name().to_string());
+        schema.title = Some(format!("Cardano {}-bit Hash", Self::HASH_LEN * 4));
         schema.description = Some("Cardano Blake2b256 hash encoded in hex.");
-        schema.example = Some(serde_json::Value::String(
+        schema.example = Some(
             // cspell: disable
-            "0x0000000000000000000000000000000000000000000000000000000000000000".to_string(),
+            "0x0000000000000000000000000000000000000000000000000000000000000000".into(),
             // cspell: enable
-        ));
+        );
         schema.min_length = Some(Self::HASH_LEN + 2);
         schema.max_length = Some(Self::HASH_LEN + 2);
         schema.pattern = Some("^0x[0-9a-f]{64}$".to_string());
@@ -101,7 +101,7 @@ impl ParseFromJSON for Hash256 {
 
 impl ToJSON for Hash256 {
     fn to_json(&self) -> Option<serde_json::Value> {
-        Some(serde_json::Value::String(as_hex_string(&self.0)))
+        Some(self.to_string().into())
     }
 }
 
@@ -120,16 +120,16 @@ impl Hash128 {
     /// The hex-encoded hash length of this hash type.
     const HASH_LEN: usize = 32;
 
-    /// Creates a `CardanoStakeAddress` schema definition.
+    /// Creates a `Hash128` schema definition.
     fn schema() -> MetaSchema {
         let mut schema = MetaSchema::new("string");
-        schema.title = Some(Self::name().to_string());
+        schema.title = Some(format!("Cardano {}-bit Hash", Self::HASH_LEN * 4));
         schema.description = Some("Cardano Blake2b128 hash encoded in hex.");
-        schema.example = Some(serde_json::Value::String(
+        schema.example = Some(
             // cspell: disable
-            "0x00000000000000000000000000000000".to_string(),
+            "0x00000000000000000000000000000000".into(),
             // cspell: enable
-        ));
+        );
         schema.min_length = Some(Self::HASH_LEN + 2);
         schema.max_length = Some(Self::HASH_LEN + 2);
         schema.pattern = Some("^0x[0-9a-f]{32}$".to_string());
@@ -203,7 +203,7 @@ impl ParseFromJSON for Hash128 {
 
 impl ToJSON for Hash128 {
     fn to_json(&self) -> Option<serde_json::Value> {
-        Some(serde_json::Value::String(as_hex_string(&self.0)))
+        Some(self.to_string().into())
     }
 }
 
