@@ -86,7 +86,7 @@ class _DisplayNameTextField extends StatelessWidget {
       onChanged: (value) {
         RegistrationCubit.of(context)
             .baseProfile
-            .updateDisplayName(DisplayName.dirty(value));
+            .updateDisplayName(DisplayName.dirty(value ?? ''));
       },
       onFieldSubmitted: null,
       decoration: VoicesTextFieldDecoration(
@@ -128,7 +128,7 @@ class _EmailTextField extends StatelessWidget {
       onChanged: (value) {
         RegistrationCubit.of(context)
             .baseProfile
-            .updateEmail(Email.dirty(value));
+            .updateEmail(Email.dirty(value ?? ''));
       },
       onFieldSubmitted: (value) {
         final email = Email.dirty(value);

@@ -1,4 +1,5 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/widgets/document_builder/document_error_text.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 
 class YesNoChoiceWidget extends StatefulWidget {
   final DocumentValueProperty<bool> property;
-  final DocumentYesNoChoiceSchema schema;
+  final DocumentBooleanSchema schema;
   final ValueChanged<List<DocumentChange>> onChanged;
   final bool isEditMode;
 
@@ -25,30 +26,9 @@ class YesNoChoiceWidget extends StatefulWidget {
 }
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
-  late bool? _selectedValue;
-
-  String get _title => widget.schema.formattedTitle;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _handleInitialValue();
-  }
-
-  @override
-  void didUpdateWidget(covariant YesNoChoiceWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.property.value != widget.property.value) {
-      _handleInitialValue();
-    }
-
-    if (oldWidget.isEditMode != widget.isEditMode &&
-        widget.isEditMode == false) {
-      _handleInitialValue();
-    }
-  }
+  bool? get _value => widget.property.value ?? widget.schema.defaultValue;
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   @override
   Widget build(BuildContext context) {
@@ -58,46 +38,32 @@ class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
         ],
         _YesNoChoiceSegmentButton(
-          value: _selectedValue,
+          value: _value,
           enabled: widget.isEditMode,
-          onChanged: _handleValueChanged,
-          validator: (value) {
-            final result = widget.schema.validate(value);
-
-            return LocalizedDocumentValidationResult.from(result)
-                .message(context);
-          },
+          onChanged: _onChanged,
+          validator: _validate,
         ),
       ],
     );
   }
 
-  void _handleInitialValue() {
-    _selectedValue = widget.property.value;
-  }
-
-  void _handleValueChanged(bool? value) {
-    setState(() {
-      _selectedValue = value;
-    });
-
-    if (widget.property.value != value) {
-      _notifyChangeListener(value);
-    }
-  }
-
-  void _notifyChangeListener(bool? value) {
+  void _onChanged(bool? value) {
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
       value: value,
     );
     widget.onChanged([change]);
+  }
+
+  String? _validate(bool? value) {
+    final result = widget.schema.validate(value);
+    return LocalizedDocumentValidationResult.from(result).message(context);
   }
 }
 
@@ -106,8 +72,8 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
     super.key,
     required super.value,
     required super.onChanged,
-    super.validator,
     super.enabled,
+    super.validator,
   }) : super(
           builder: (field) {
             final state = field as VoicesFormFieldState<bool?>;
@@ -116,6 +82,7 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
             void onChangedHandler(Set<bool> selected) {
               final newValue = selected.isEmpty ? null : selected.first;
               field.didChange(newValue);
+              onChanged?.call(newValue);
             }
 
             return Column(
@@ -144,20 +111,10 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
                     style: _getButtonStyle(field),
                   ),
                 ),
-                if (field.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      field.errorText ??
-                          field.context.l10n.snackbarErrorLabelText,
-                      style: Theme.of(field.context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(
-                            color: Theme.of(field.context).colorScheme.error,
-                          ),
-                    ),
-                  ),
+                if (field.hasError) ...[
+                  const SizedBox(height: 4),
+                  DocumentErrorText(text: field.errorText),
+                ],
               ],
             );
           },

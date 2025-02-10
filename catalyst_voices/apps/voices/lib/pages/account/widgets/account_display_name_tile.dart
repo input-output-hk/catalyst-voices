@@ -58,8 +58,8 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
   Widget build(BuildContext context) {
     return EditableTile(
       title: context.l10n.displayName,
-      onChanged: _handleEditModeChange,
-      initialEditMode: _isEditMode,
+      onChanged: _onEditModeChange,
+      isEditMode: _isEditMode,
       isSaveEnabled: _displayName.isValid,
       child: VoicesDisplayNameTextField(
         controller: _controller,
@@ -75,7 +75,7 @@ class _AccountDisplayNameTileState extends State<AccountDisplayNameTile> {
     );
   }
 
-  void _handleEditModeChange(EditableTileChange value) {
+  void _onEditModeChange(EditableTileChange value) {
     setState(() {
       _isEditMode = value.isEditMode;
 
