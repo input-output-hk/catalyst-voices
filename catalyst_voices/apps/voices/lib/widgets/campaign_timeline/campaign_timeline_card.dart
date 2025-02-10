@@ -73,33 +73,44 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                   style: context.textTheme.titleSmall?.copyWith(
                     color: context.colors.textOnPrimaryLevel1,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      DateFormatter.formatDateRange(
-                        MaterialLocalizations.of(context),
-                        context.l10n,
-                        widget.timelineItem.timeline,
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          DateFormatter.formatDateRange(
+                            MaterialLocalizations.of(context),
+                            context.l10n,
+                            widget.timelineItem.timeline,
+                          ),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.colors.sysColorsNeutralN60,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.colors.sysColorsNeutralN60,
-                      ),
-                    ),
-                    Offstage(
-                      offstage: !isOngoing,
-                      child: VoicesChip.round(
-                        content: Text(
-                          context.l10n.ongoing,
-                          style: context.textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
+                      if (isOngoing) ...[
+                        const SizedBox(width: 8),
+                        Offstage(
+                          offstage: !isOngoing,
+                          child: VoicesChip.round(
+                            backgroundColor: colors.primary,
+                            content: Text(
+                              context.l10n.ongoing,
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                        backgroundColor: colors.primary,
-                      ),
-                    ),
-                  ],
+                      ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 AnimatedSwitcher(

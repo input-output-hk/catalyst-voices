@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
+import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
 import 'package:catalyst_voices_brands/src/themes/catalyst.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -139,25 +140,27 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Find the row that contains the chip
-        final row = find
-            .descendant(
-              of: find.byType(CampaignTimelineCard),
-              matching: find.byType(Row),
+        final voicesChips =
+            tester.widgetList<VoicesChip>(find.byType(VoicesChip));
+        expect(voicesChips, hasLength(1));
+
+        final ongoingTextWidget = find.text('Ongoing');
+        expect(ongoingTextWidget, findsOneWidget);
+
+        final ongoingText = tester.widget<Text>(ongoingTextWidget);
+        expect(ongoingText.style?.color, Colors.white);
+
+        final offstage = find
+            .ancestor(
+              of: ongoingTextWidget,
+              matching: find.byType(Offstage),
+              matchRoot: true,
             )
             .evaluate()
-            .elementAt(1); // The second Row contains our chip
+            .first
+            .widget as Offstage;
 
-        final offstage = find.descendant(
-          of: find.byWidget(row.widget),
-          matching: find.byType(Offstage),
-        );
-
-        expect(offstage, findsOneWidget);
-        expect(
-          tester.widget<Offstage>(offstage).offstage,
-          isFalse,
-        );
+        expect(offstage.offstage, isFalse);
       },
     );
 
