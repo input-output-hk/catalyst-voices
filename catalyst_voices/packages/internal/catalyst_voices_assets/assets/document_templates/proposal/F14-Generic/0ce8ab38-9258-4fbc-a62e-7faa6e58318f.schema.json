@@ -212,6 +212,11 @@
             ],
             "default": "en",
             "x-note": "Select the ISO 639-1 two-letter code for the language. For example: 'en' for English, 'es' for Spanish, 'fr' for French, etc."
+        },
+        "borderGroup": {
+            "$comment": "UI - Border Group for better UI rendering",
+            "type": "object",
+            "x-border-color": "#ff0000"
         }
     },
     "type": "object",
@@ -506,6 +511,7 @@
         },
         "campaign_category": {
             "title": "Campaign Category",
+            "x-icon": "top-bar",
             "$ref": "#/definitions/segment",
             "description": "Determine the eligibility of the proposal for this category",
             "properties": {
@@ -515,7 +521,7 @@
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "properties": {
                         "informational_content": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -526,7 +532,7 @@
                             }
                         },
                         "foundational_rd": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -537,7 +543,7 @@
                             }
                         },
                         "financial_products": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -548,7 +554,7 @@
                             }
                         },
                         "early_stage_product": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -559,7 +565,7 @@
                             }
                         },
                         "developer_tools": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -570,7 +576,7 @@
                             }
                         },
                         "enterprise_partnership": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -591,7 +597,7 @@
                             }
                         },
                         "working_product": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -612,7 +618,7 @@
                             }
                         },
                         "timeline": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -623,7 +629,7 @@
                             }
                         },
                         "matching_funds": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -644,7 +650,7 @@
                             }
                         },
                         "adoption_potential": {
-                            "type": "object",
+                            "$ref": "#/definitions/borderGroup",
                             "properties": {
                                 "answer": {
                                     "$ref": "#/definitions/yesNoChoice",
@@ -1162,6 +1168,7 @@
         "agreements": {
             "$ref": "#/definitions/segment",
             "title": "Acknowledgements",
+            "x-icon": "double_check",
             "properties": {
                 "mandatory": {
                     "$ref": "#/definitions/section",

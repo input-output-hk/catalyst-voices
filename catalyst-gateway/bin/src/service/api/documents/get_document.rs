@@ -30,7 +30,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
     // Find the doc in the static templates first
-    if let Some(doc) = get_doc_static_template(document_id, version) {
+    if let Some(doc) = get_doc_static_template(document_id) {
         return Responses::Ok(Cbor(doc)).into();
     }
 

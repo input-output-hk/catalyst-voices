@@ -89,7 +89,7 @@ class TimezoneDateTimeText extends StatelessWidget {
     );
 
     final style = this.style ?? const TextStyle();
-    final effectiveStyle = style.merge(baseStyle);
+    final effectiveStyle = baseStyle.merge(style);
 
     return AffixDecorator(
       gap: showTimezone ? 6 : 0,

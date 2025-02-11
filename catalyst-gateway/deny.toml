@@ -58,6 +58,7 @@ allow-git = [
     "https://github.com/txpipe/kes",
     "https://github.com/txpipe/curve25519-dalek",
     "https://github.com/input-output-hk/mithril",
+    "https://github.com/orxfun/orx-pseudo-default",
 ]
 
 [licenses]

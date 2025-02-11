@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -25,50 +25,25 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
 
 class _SingleDropdownSelectionWidgetState
     extends State<SingleDropdownSelectionWidget> {
-  late List<DropdownMenuEntry<String>> _dropdownMenuEntries;
-  late String? _selectedValue;
-
-  String get _title => widget.schema.formattedTitle;
-
-  List<DropdownMenuEntry<String>> get _mapItems {
-    final items = widget.schema.enumValues ?? [];
-    return items.map((e) => DropdownMenuEntry(value: e, label: e)).toList();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _handleInitialValue();
-  }
-
-  @override
-  void didUpdateWidget(covariant SingleDropdownSelectionWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.isEditMode != widget.isEditMode &&
-        widget.isEditMode == false) {
-      _handleInitialValue();
-    }
-
-    if (oldWidget.property.value != widget.property.value) {
-      _handleInitialValue();
-    }
-  }
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          _title,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 8),
+        if (_title.isNotEmpty) ...[
+          Text(
+            _title.starred(isEnabled: _isRequired),
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+        ],
         SingleSelectDropdown(
-          items: _dropdownMenuEntries,
-          value: _selectedValue,
-          onChanged: _handleValueChanged,
+          items: _buildMenuEntries(),
+          value: widget.property.value ?? widget.schema.defaultValue,
+          onChanged: _onChanged,
           validator: _validator,
           enabled: widget.isEditMode,
         ),
@@ -76,22 +51,12 @@ class _SingleDropdownSelectionWidgetState
     );
   }
 
-  void _handleInitialValue() {
-    _selectedValue = widget.property.value;
-    _dropdownMenuEntries = _mapItems;
+  List<DropdownMenuEntry<String>> _buildMenuEntries() {
+    final items = widget.schema.enumValues ?? [];
+    return items.map((e) => DropdownMenuEntry(value: e, label: e)).toList();
   }
 
-  void _handleValueChanged(String? value) {
-    setState(() {
-      _selectedValue = value;
-    });
-
-    if (widget.property.value != value) {
-      _notifyChangeListener(value);
-    }
-  }
-
-  void _notifyChangeListener(String? value) {
+  void _onChanged(String? value) {
     final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,

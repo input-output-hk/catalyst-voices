@@ -35,12 +35,16 @@ pub(crate) struct RbacRegistrationsResponse {
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
+    /// ## Ok
+    ///
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
     Ok(Json<RbacRegistrationsResponse>),
-    /// Response for bad requests.
-    #[oai(status = 400)]
-    BadRequest,
+    /// ## Unprocessable Content
+    ///
+    /// Response for unprocessable content.
+    #[oai(status = 422)]
+    UnprocessableContent,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
@@ -54,7 +58,7 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
     };
 
     let Ok(decoded_chain_root) = hex::decode(chain_root) else {
-        return Responses::BadRequest.into();
+        return Responses::UnprocessableContent.into();
     };
 
     let query_res = GetRegistrationsByChainRootQuery::execute(
