@@ -4,32 +4,38 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_data_dto.g.dart';
 
-/// Utility structure for traversing a json map using [DocumentNodeId]'s.
-final class DocumentDataDto {
-  final Map<String, dynamic> json;
+/// Dto of [DocumentDataContent].
+///
+/// Contains utility structure for traversing a json map using [DocumentNodeId].
+final class DocumentDataContentDto {
+  final Map<String, dynamic> data;
 
-  String get schemaUrl => json[r'$schema'] as String;
+  String get schemaUrl => data[r'$schema'] as String;
 
-  const DocumentDataDto.fromJson(this.json);
+  const DocumentDataContentDto.fromJson(this.data);
 
-  factory DocumentDataDto.fromDocument({
+  DocumentDataContentDto.fromModel(DocumentDataContent data) : data = data.data;
+
+  factory DocumentDataContentDto.fromDocument({
     required String schemaUrl,
     required Iterable<Map<String, dynamic>> properties,
   }) {
-    return DocumentDataDto.fromJson({
+    return DocumentDataContentDto.fromJson({
       r'$schema': schemaUrl,
       for (final property in properties) ...property,
     });
   }
 
+  DocumentDataContent toModel() => DocumentDataContent(data);
+
   /// Retrieves the value of a property located at the specified [nodeId].
   ///
-  /// This method traverses the nested structure of the [json] using
+  /// This method traverses the nested structure of the [data] using
   /// the paths defined in the [nodeId]. If the specified path exists, the
   /// corresponding property value is returned. If the path is invalid or does
   /// not exist, the method returns `null`.
   Object? getProperty(DocumentNodeId nodeId) {
-    Object? object = json;
+    Object? object = data;
     for (final path in nodeId.paths) {
       if (object is Map<String, dynamic>) {
         object = object[path];

@@ -60,9 +60,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       version: signedDocumentData.metadata.version,
     );
 
-    final data = DocumentDataDto.fromJson(signedDocumentData.content.data);
+    final content = DocumentDataContentDto.fromModel(
+      signedDocumentData.content,
+    );
     final schema = template.schema;
-    final document = DocumentDto.fromJsonSchema(data, schema).toModel();
+    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
 
     return ProposalDocument(
       metadata: metadata,
