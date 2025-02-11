@@ -27,7 +27,7 @@ abstract interface class DraftsDao {
   /// Inserts all drafts. On conflicts updates.
   Future<void> saveAll(Iterable<DraftEntity> drafts);
 
-  /// Singular version of [saveAll].
+  /// Singular version of [saveAll]. Does not run in transaction.
   Future<void> save(DraftEntity draft);
 
   /// Updates matching [ref] records with [content].
