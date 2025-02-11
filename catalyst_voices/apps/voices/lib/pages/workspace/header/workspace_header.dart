@@ -52,11 +52,11 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                 ),
               ),
               const Spacer(),
-              const CreateProposalButton(),
+              const _CreateProposalButton(),
               const SizedBox(width: 8),
-              const ImportProposalButton(),
+              const _ImportProposalButton(),
               const SizedBox(width: 8),
-              TimelineToggleButton(
+              _TimelineToggleButton(
                 onPressed: _toggleTimelineVisibility,
               ),
             ],

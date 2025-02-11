@@ -1,11 +1,10 @@
 part of 'workspace_my_proposals_selector.dart';
 
-class MyProposalsTabs extends StatelessWidget {
+class _MyProposalsTabs extends StatelessWidget {
   final int draftProposalCount;
   final int finalProposalCount;
 
-  const MyProposalsTabs({
-    super.key,
+  const _MyProposalsTabs({
     required this.draftProposalCount,
     required this.finalProposalCount,
   });

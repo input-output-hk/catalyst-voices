@@ -41,7 +41,7 @@ class WorkspaceMyProposalsSelector extends StatelessWidget {
               children: [
                 const SizedBox(
                   width: double.infinity,
-                  child: MyProposalsTabSelector(),
+                  child: _MyProposalsTabSelector(),
                 ),
                 Positioned(
                   right: 4,
@@ -63,7 +63,7 @@ class WorkspaceMyProposalsSelector extends StatelessWidget {
             ),
           ),
           const Expanded(
-            child: MyProposalsListSelector(),
+            child: _MyProposalsListSelector(),
           ),
         ],
       ),

@@ -1,7 +1,7 @@
 part of 'workspace_header.dart';
 
-class CreateProposalButton extends StatelessWidget {
-  const CreateProposalButton({super.key});
+class _CreateProposalButton extends StatelessWidget {
+  const _CreateProposalButton();
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,10 @@
 part of 'workspace_my_proposals_selector.dart';
 
-class ProposalListItem extends StatelessWidget {
+class _ProposalListItem extends StatelessWidget {
   final WorkspaceProposalListItem item;
   final VoidCallback? onTap;
 
-  const ProposalListItem({
+  const _ProposalListItem({
     super.key,
     required this.item,
     this.onTap,

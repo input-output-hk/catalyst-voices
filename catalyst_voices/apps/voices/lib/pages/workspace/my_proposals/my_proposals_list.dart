@@ -2,11 +2,10 @@ part of 'workspace_my_proposals_selector.dart';
 
 typedef MyProposalsListItems = List<WorkspaceProposalListItem>;
 
-class MyProposalsList extends StatelessWidget {
+class _MyProposalsList extends StatelessWidget {
   final List<WorkspaceProposalListItem> items;
 
-  const MyProposalsList({
-    super.key,
+  const _MyProposalsList({
     required this.items,
   });
 
@@ -16,7 +15,7 @@ class MyProposalsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = items[index];
 
-        return ProposalListItem(
+        return _ProposalListItem(
           key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
           item: item,
           onTap: () {

@@ -1,7 +1,7 @@
 part of 'workspace_my_proposals_selector.dart';
 
-class MyProposalsListSelector extends StatelessWidget {
-  const MyProposalsListSelector({super.key});
+class _MyProposalsListSelector extends StatelessWidget {
+  const _MyProposalsListSelector();
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +10,7 @@ class MyProposalsListSelector extends StatelessWidget {
       builder: (context, state) {
         return Offstage(
           offstage: state.isEmpty,
-          child: MyProposalsList(items: state),
+          child: _MyProposalsList(items: state),
         );
       },
     );

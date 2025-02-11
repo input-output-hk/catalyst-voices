@@ -1,18 +1,17 @@
 part of 'workspace_header.dart';
 
-class TimelineToggleButton extends StatefulWidget {
+class _TimelineToggleButton extends StatefulWidget {
   final VoidCallback? onPressed;
 
-  const TimelineToggleButton({
-    super.key,
-    this.onPressed,
+  const _TimelineToggleButton({
+    required this.onPressed,
   });
 
   @override
-  State<TimelineToggleButton> createState() => TimelineToggleButtonState();
+  State<_TimelineToggleButton> createState() => _TimelineToggleButtonState();
 }
 
-class TimelineToggleButtonState extends State<TimelineToggleButton> {
+class _TimelineToggleButtonState extends State<_TimelineToggleButton> {
   bool isTimelineVisible = false;
 
   @override
