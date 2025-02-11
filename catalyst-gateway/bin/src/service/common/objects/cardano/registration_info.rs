@@ -58,7 +58,6 @@ pub(crate) struct RegistrationInfo {
     tx_hash: Hash256,
 
     /// Registration nonce.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     nonce: Nonce,
 

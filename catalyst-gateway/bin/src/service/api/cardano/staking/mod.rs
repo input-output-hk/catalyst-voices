@@ -8,9 +8,9 @@ use poem_openapi::{
 use crate::service::{
     common::{
         auth::none_or_rbac::NoneOrRBAC,
-        objects::cardano::{network::Network, slot_number::SlotNumber},
+        objects::cardano::network::Network,
         tags::ApiTags,
-        types::cardano::cip19_stake_address::Cip19StakeAddress,
+        types::cardano::{cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo},
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };
@@ -47,7 +47,7 @@ impl Api {
         network: Query<Option<Network>>,
         /// Slot number at which the staked ADA amount should be calculated.
         /// If omitted latest slot number is used.
-        slot_number: Query<Option<SlotNumber>>,
+        slot_number: Query<Option<SlotNo>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> assets_get::AllResponses {

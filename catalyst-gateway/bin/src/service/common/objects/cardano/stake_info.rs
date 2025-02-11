@@ -25,12 +25,10 @@ pub(crate) struct StakedNativeTokenInfo {
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Total stake amount.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) ada_amount: StakeAmount,
 
     /// Block's slot number which contains the latest unspent UTXO.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) slot_number: SlotNumber,
 

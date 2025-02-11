@@ -13,7 +13,6 @@ use crate::service::{
 #[allow(clippy::struct_field_names)]
 pub(crate) struct Slot {
     /// Slot number.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) slot_number: SlotNumber,
 

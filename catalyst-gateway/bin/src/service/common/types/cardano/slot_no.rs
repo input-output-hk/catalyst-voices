@@ -3,6 +3,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use derive_more::{From, Into};
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -35,7 +36,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Slot number
-#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord, From, Into)]
 
 pub(crate) struct SlotNo(u64);
 
@@ -119,9 +120,9 @@ impl TryFrom<i64> for SlotNo {
     }
 }
 
-impl From<u64> for SlotNo {
-    fn from(value: u64) -> Self {
-        Self(value)
+impl Into<i64> for SlotNo {
+    fn into(self) -> i64 {
+        i64::try_from(self.0).unwrap_or_default()
     }
 }
 
