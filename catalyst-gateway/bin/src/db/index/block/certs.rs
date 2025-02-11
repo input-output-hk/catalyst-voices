@@ -82,9 +82,7 @@ impl StakeRegistrationInsertQuery {
         stake_hash: Vec<u8>, slot_no: Slot, txn: TxnIndex, stake_address: Option<VerifyingKey>,
         script: bool, register: bool, deregister: bool, pool_delegation: Option<Vec<u8>>,
     ) -> Self {
-        let stake_address = stake_address
-            .map(|a| MaybeUnset::Set(a.into()))
-            .unwrap_or(MaybeUnset::Unset);
+        let stake_address = stake_address.map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.into()));
         StakeRegistrationInsertQuery {
             stake_hash,
             slot_no: slot_no.into(),
@@ -163,7 +161,7 @@ impl CertInsertQuery {
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
-                (cred.to_vec(), addr.clone(), false)
+                (cred.to_vec(), addr, false)
             },
             conway::StakeCredential::Scripthash(script) => (script.to_vec(), None, true),
         };
@@ -184,14 +182,7 @@ impl CertInsertQuery {
 
         // This may not be witnessed, its normal but disappointing.
         self.stake_reg_data.push(StakeRegistrationInsertQuery::new(
-            key_hash,
-            slot_no.into(),
-            txn.into(),
-            pubkey,
-            script,
-            register,
-            deregister,
-            delegation,
+            key_hash, slot_no, txn, pubkey, script, register, deregister, delegation,
         ));
     }
 

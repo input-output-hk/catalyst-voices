@@ -41,17 +41,13 @@ impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn: TxnIndex,
-        purpose: Option<UuidV4>, prv_txn_id: Option<TransactionHash>, report: ProblemReport,
+        purpose: Option<UuidV4>, prv_txn_id: Option<TransactionHash>, report: &ProblemReport,
     ) -> Self {
-        let purpose = purpose
-            .map(|v| MaybeUnset::Set(v.into()))
-            .unwrap_or(MaybeUnset::Unset);
-        let prv_txn_id = prv_txn_id
-            .map(|v| MaybeUnset::Set(v.into()))
-            .unwrap_or(MaybeUnset::Unset);
+        let purpose = purpose.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
+        let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
         let problem_report = serde_json::to_string(&report).unwrap_or_else(|e| {
             error!("Failed to serialize problem report: {e:?}. Report = {report:?}");
-            "".into()
+            String::new()
         });
 
         Self {
@@ -102,6 +98,7 @@ impl Debug for Params {
             .field("txn", &self.txn)
             .field("prv_txn_id", &prv_txn_id)
             .field("purpose", &purpose)
+            .field("problem_report", &self.problem_report)
             .finish()
     }
 }

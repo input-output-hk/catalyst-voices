@@ -46,6 +46,8 @@ impl Query {
     }
 
     /// Executes a get registrations by Catalyst ID query.
+    // TODO: Remove the `dead_code` annotation when the query is used.
+    #[allow(dead_code)]
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {

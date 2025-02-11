@@ -49,7 +49,7 @@ impl CatalystRBACTokenV1 {
     /// kid, ulid, signature ]. ED25519 Signature over the preceding two fields -
     /// sig(cbor(kid), cbor(ulid))
     #[allow(dead_code, clippy::expect_used)]
-    pub(crate) fn new(sk: &SigningKey, der_cert: &Vec<u8>) -> Self {
+    pub(crate) fn new(sk: &SigningKey, der_cert: &[u8]) -> Self {
         // Generate the Kid from the der_certificate
         let kid = Role0Kid::new(der_cert);
 

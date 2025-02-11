@@ -7,6 +7,7 @@ use scylla::_macro_internal::{
 };
 
 /// A `IdUri` wrapper that can be stored to and load from a database.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Hash)]
 pub struct DbCatalystId(IdUri);
 

@@ -83,15 +83,16 @@ impl Params {
         let payment_address = cip36
             .payment_address()
             .map_or(Vec::new(), ShelleyAddress::to_vec);
-        let error_report = serde_json::to_string(cip36.err_report())
-            .map(|v| vec![v])
-            .unwrap_or_else(|e| {
+        let error_report = serde_json::to_string(cip36.err_report()).map_or_else(
+            |e| {
                 error!(
                     "Failed to serialize problem report: {e:?}. Report = {:?}",
                     cip36.err_report()
                 );
                 Vec::new()
-            });
+            },
+            |v| vec![v],
+        );
 
         Params {
             stake_address,

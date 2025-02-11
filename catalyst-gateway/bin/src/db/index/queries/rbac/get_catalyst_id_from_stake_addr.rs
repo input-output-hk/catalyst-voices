@@ -50,7 +50,8 @@ impl Query {
     }
 
     /// Executes a get Catalyst ID by stake address query.
-    /// Don't call directly, use one of the methods instead.
+    // TODO: Remove the `dead_code` annotation when the query is used.
+    #[allow(dead_code)]
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {

@@ -154,8 +154,8 @@ impl TxoInsertQuery {
             if staked {
                 let params = insert_txo::Params::new(
                     &stake_address,
-                    slot_no.into(),
-                    index.into(),
+                    slot_no,
+                    index,
                     txo_index,
                     &address,
                     txo.lovelace_amount(),
@@ -165,10 +165,10 @@ impl TxoInsertQuery {
                 self.staked_txo.push(params);
             } else {
                 let params = insert_unstaked_txo::Params::new(
-                    txn_hash.into(),
+                    txn_hash,
                     txo_index,
-                    slot_no.into(),
-                    index.into(),
+                    slot_no,
+                    index,
                     &address,
                     txo.lovelace_amount(),
                 );
@@ -186,8 +186,8 @@ impl TxoInsertQuery {
                         if staked {
                             let params = insert_txo_asset::Params::new(
                                 &stake_address,
-                                slot_no.into(),
-                                index.into(),
+                                slot_no,
+                                index,
                                 txo_index,
                                 &policy_id,
                                 asset_name,
@@ -196,13 +196,7 @@ impl TxoInsertQuery {
                             self.staked_txo_asset.push(params);
                         } else {
                             let params = insert_unstaked_txo_asset::Params::new(
-                                txn_hash.into(),
-                                txo_index,
-                                &policy_id,
-                                asset_name,
-                                slot_no.into(),
-                                index.into(),
-                                value,
+                                txn_hash, txo_index, &policy_id, asset_name, slot_no, index, value,
                             );
                             self.unstaked_txo_asset.push(params);
                         }

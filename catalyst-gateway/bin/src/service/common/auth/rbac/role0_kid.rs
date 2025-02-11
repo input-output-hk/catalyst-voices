@@ -9,7 +9,7 @@ use to_vec::ToVec;
 
 use crate::utils::blake2b_hash::blake2b_128;
 
-// Length of the role0 hash
+/// Length of the role0 hash
 const ROLE0_KID_LENGTH: usize = 16;
 
 /// Role 0 Key ID - Blake2b-128 hash of the Role 0 Certificate defining the Session public
@@ -21,7 +21,7 @@ impl Role0Kid {
     /// Create a new Role0 Kid from a Certificate.
     ///
     /// `cert` should be a valid X509 or C509 certificate, this is not checked.
-    pub fn new(cert: &Vec<u8>) -> Self {
+    pub fn new(cert: &[u8]) -> Self {
         let kid = blake2b_128(cert);
         Self(kid.into())
     }
@@ -55,8 +55,7 @@ impl Decode<'_, ()> for Role0Kid {
         let kid = d.bytes()?;
         if kid.len() != ROLE0_KID_LENGTH {
             return Err(minicbor::decode::Error::message(format!(
-                "Kid length must be {}",
-                ROLE0_KID_LENGTH
+                "Kid length must be {ROLE0_KID_LENGTH}"
             )));
         }
 

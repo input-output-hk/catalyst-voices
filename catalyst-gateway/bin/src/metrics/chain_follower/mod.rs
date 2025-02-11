@@ -188,7 +188,7 @@ fn report_live(
         .set(i64::try_from(stats.blocks).unwrap_or(-1));
     reporter::LIVE_HEAD_SLOT[net_idx]
         .with_label_values(&[api_host_names, service_id, &network])
-        .set(i64::try_from(u64::from(u64::from(stats.head_slot))).unwrap_or(-1));
+        .set(i64::try_from(u64::from(stats.head_slot)).unwrap_or(-1));
     reporter::LIVE_TIP[net_idx]
         .with_label_values(&[api_host_names, service_id, &network])
         .set(i64::try_from(u64::from(stats.tip)).unwrap_or(-1));

@@ -40,6 +40,7 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// Get chain root endpoint.
+#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(_stake_address: Cip19StakeAddress) -> AllResponses {
     let Some(_session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");

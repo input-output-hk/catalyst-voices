@@ -6,7 +6,8 @@ use scylla::_macro_internal::{
     SerializeValue, TypeCheckError, WrittenCellProof,
 };
 
-/// A `Slot` wrapper that can be stored to and load from a database.
+/// A `Slot` wrapper that can be stored to and load from a database.\
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct DbSlot(u64);
 

@@ -487,7 +487,7 @@ impl SyncTask {
                 );
 
                 if let Some((first_point, last_point)) =
-                    self.get_syncable_range(self.start_slot.into(), end_slot)
+                    self.get_syncable_range(self.start_slot, end_slot)
                 {
                     self.sync_tasks.push(sync_subchain(SyncParams::new(
                         self.cfg.chain,

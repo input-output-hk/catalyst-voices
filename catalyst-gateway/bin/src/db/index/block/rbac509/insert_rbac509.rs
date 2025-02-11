@@ -58,9 +58,7 @@ impl Params {
         catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn: TxnIndex,
         purpose: UuidV4, prv_txn_id: Option<TransactionHash>,
     ) -> Self {
-        let prv_txn_id = prv_txn_id
-            .map(|v| MaybeUnset::Set(v.into()))
-            .unwrap_or(MaybeUnset::Unset);
+        let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
 
         Self {
             catalyst_id: catalyst_id.into(),

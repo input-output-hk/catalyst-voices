@@ -106,40 +106,40 @@ impl Rbac509InsertQuery {
         match cip509.consume() {
             Ok((purpose, metadata, _)) => {
                 self.registrations.push(insert_rbac509::Params::new(
-                    catalyst_id.clone().into(),
-                    txn_hash.into(),
-                    slot.into(),
-                    index.into(),
-                    purpose.into(),
-                    previous_transaction.map(Into::into),
+                    catalyst_id.clone(),
+                    txn_hash,
+                    slot,
+                    index,
+                    purpose,
+                    previous_transaction,
                 ));
                 self.catalyst_id_for_txn_id
                     .push(insert_catalyst_id_for_txn_id::Params::new(
-                        catalyst_id.clone().into(),
-                        txn_hash.into(),
-                        slot.into(),
-                        index.into(),
+                        catalyst_id.clone(),
+                        txn_hash,
+                        slot,
+                        index,
                     ));
                 for address in stake_addresses(&metadata) {
                     self.catalyst_id_for_stake_address.push(
                         insert_catalyst_id_for_stake_address::Params::new(
                             address,
-                            slot.into(),
-                            index.into(),
-                            catalyst_id.clone().into(),
+                            slot,
+                            index,
+                            catalyst_id.clone(),
                         ),
                     );
                 }
             },
             Err(report) => {
                 self.invalid.push(insert_rbac509_invalid::Params::new(
-                    catalyst_id.into(),
-                    txn_hash.into(),
-                    slot.into(),
-                    index.into(),
-                    purpose.map(Into::into),
-                    previous_transaction.map(Into::into),
-                    report,
+                    catalyst_id,
+                    txn_hash,
+                    slot,
+                    index,
+                    purpose,
+                    previous_transaction,
+                    &report,
                 ));
             },
         }
@@ -219,12 +219,7 @@ async fn catalyst_id(
         None => cip509.catalyst_id()?.as_short_id(),
     };
 
-    cache_for_transaction_id(
-        txn_hash.into(),
-        id.clone().into(),
-        slot.into(),
-        index.into(),
-    );
+    cache_for_transaction_id(txn_hash, id.clone(), slot, index);
 
     Some(id)
 }
@@ -245,7 +240,7 @@ fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<StakeAddress> {
 
 /// Converts a list of `Cip0134Uri` to a list of stake addresses.
 fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<StakeAddress> {
-    uris.into_iter()
+    uris.iter()
         .filter_map(|uri| {
             match uri.address() {
                 Address::Stake(a) => Some(a.clone()),

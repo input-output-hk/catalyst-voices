@@ -18,6 +18,8 @@ pub(crate) async fn purge_live_index(purge_slot: Slot) -> anyhow::Result<()> {
     };
 
     // Purge data up to this slot
+    // Slots arithmetic has saturating semantic, so this is ok.
+    #[allow(clippy::arithmetic_side_effects)]
     let purge_to_slot = purge_slot - Settings::purge_slot_buffer();
 
     let txn_hashes = purge_txi_by_hash(&session, purge_to_slot).await?;
@@ -217,7 +219,7 @@ async fn purge_txi_by_hash(
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         if primary_key.2 <= purge_to_slot.into() {
             let params: Params = primary_key.into();
-            txn_hashes.insert(params.txn_hash.clone().into());
+            txn_hashes.insert(params.txn_hash.into());
             delete_params.push(params);
         }
     }

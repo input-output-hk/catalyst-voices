@@ -64,19 +64,12 @@ impl Cip36InsertQuery {
                 // This should always pass, because we already checked if the array has only one
                 if let Some(voting_key) = cip36.voting_pks().first() {
                     self.registrations.push(insert_cip36::Params::new(
-                        voting_key,
-                        slot_no.into(),
-                        index.into(),
-                        &cip36,
+                        voting_key, slot_no, index, &cip36,
                     ));
 
                     self.for_vote_key
                         .push(insert_cip36_for_vote_key::Params::new(
-                            voting_key,
-                            slot_no.into(),
-                            index.into(),
-                            &cip36,
-                            true,
+                            voting_key, slot_no, index, &cip36, true,
                         ));
                 }
             },
@@ -86,26 +79,19 @@ impl Cip36InsertQuery {
                 if cip36.stake_pk().is_some() {
                     if cip36.voting_pks().is_empty() {
                         self.invalid.push(insert_cip36_invalid::Params::new(
-                            None,
-                            slot_no.into(),
-                            index.into(),
-                            &cip36,
+                            None, slot_no, index, &cip36,
                         ));
                     } else {
                         for voting_key in cip36.voting_pks() {
                             self.invalid.push(insert_cip36_invalid::Params::new(
                                 Some(voting_key),
-                                slot_no.into(),
-                                index.into(),
+                                slot_no,
+                                index,
                                 &cip36,
                             ));
                             self.for_vote_key
                                 .push(insert_cip36_for_vote_key::Params::new(
-                                    voting_key,
-                                    slot_no.into(),
-                                    index.into(),
-                                    &cip36,
-                                    false,
+                                    voting_key, slot_no, index, &cip36, false,
                                 ));
                         }
                     }

@@ -14,10 +14,12 @@ use scylla::{
     },
 };
 
+/// A length in bytes of the address.
 const ADDRESS_LENGTH: usize = 29;
 
 /// A binary `CIP-19` stack address (29  bytes) that can be stored to and load from a
 /// database.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct DbCip19StakeAddress(Vec<u8>);
 

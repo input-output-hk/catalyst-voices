@@ -3,6 +3,8 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
@@ -102,13 +104,12 @@ impl Query {
 
 /// Update the cache when a rbac registration is indexed.
 pub(crate) fn cache_for_transaction_id(
-    transaction_id: DbTransactionHash, catalyst_id: DbCatalystId, slot_no: DbSlot,
-    txn_idx: DbTxnIndex,
+    transaction_id: TransactionHash, catalyst_id: IdUri, slot_no: Slot, txn_idx: TxnIndex,
 ) {
     let value = Query {
-        catalyst_id,
-        slot_no,
-        txn_idx,
+        catalyst_id: catalyst_id.into(),
+        slot_no: slot_no.into(),
+        txn_idx: txn_idx.into(),
     };
-    CACHE.insert(transaction_id, value);
+    CACHE.insert(transaction_id.into(), value);
 }

@@ -1,14 +1,15 @@
 //! A `VerifyingKey` wrapper that can be stored to and load from a database.
 
-use ed25519_dalek::{VerifyingKey, PUBLIC_KEY_LENGTH};
+use ed25519_dalek::VerifyingKey;
 use scylla::_macro_internal::{
     CellWriter, ColumnType, DeserializationError, DeserializeValue, FrameSlice, SerializationError,
     SerializeValue, TypeCheckError, WrittenCellProof,
 };
 
 /// A `VerifyingKey` wrapper that can be stored to and load from a database.
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DbVerifyingKey([u8; PUBLIC_KEY_LENGTH]);
+#[allow(clippy::module_name_repetitions)]
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct DbVerifyingKey(VerifyingKey);
 
 impl AsRef<[u8]> for DbVerifyingKey {
     fn as_ref(&self) -> &[u8] {
@@ -18,15 +19,13 @@ impl AsRef<[u8]> for DbVerifyingKey {
 
 impl From<VerifyingKey> for DbVerifyingKey {
     fn from(value: VerifyingKey) -> Self {
-        Self(value.to_bytes())
+        Self(value)
     }
 }
 
 impl From<DbVerifyingKey> for VerifyingKey {
     fn from(value: DbVerifyingKey) -> Self {
-        // This should never fail because the wrapper can only be constructed from the original
-        // type and `DeserializeValue` performs validation.
-        VerifyingKey::from_bytes(&value.0).expect("Invalid VerifyingKey")
+        value.0
     }
 }
 
@@ -34,7 +33,7 @@ impl SerializeValue for DbVerifyingKey {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
-        self.0.serialize(typ, writer)
+        self.0.as_ref().serialize(typ, writer)
     }
 }
 
