@@ -213,8 +213,8 @@ async fn get_all_registrations_from_stake_pub_key(
             nonce: Some(Nonce::from(nonce)),
             txn: Some(TxnIndex::try_from(row.txn)?),
             payment_address: Some(Cip19ShelleyAddress::new(hex::encode(row.payment_address))),
-            is_payable: row.is_payable,
-            cip15: !row.cip36,
+            is_payable: row.is_payable.into(),
+            cip15: (!row.cip36).into(),
             errors: vec![],
         };
 
@@ -271,8 +271,8 @@ async fn get_invalid_registrations(
             nonce: None,
             txn: None,
             payment_address: Some(Cip19ShelleyAddress::new(hex::encode(row.payment_address))),
-            is_payable: row.is_payable,
-            cip15: !row.cip36,
+            is_payable: row.is_payable.into(),
+            cip15: (!row.cip36).into(),
             errors: row
                 .error_report
                 .iter()

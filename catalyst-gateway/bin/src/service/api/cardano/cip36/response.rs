@@ -100,11 +100,11 @@ pub(crate) struct Cip36Details {
     #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
     /// If the payment address is a script, then it can not be payed rewards.
-    #[oai(default = "is_payable_default")]
-    pub is_payable: bool,
+    #[oai(default = "common::types::cardano::boolean::IsPayable::default")]
+    pub is_payable: common::types::cardano::boolean::IsPayable,
     /// If this field is set, then the registration was in CIP15 format.
-    #[oai(default = "cip15_default")]
-    pub cip15: bool,
+    #[oai(default = "common::types::cardano::boolean::IsCip15::default")]
+    pub cip15: common::types::cardano::boolean::IsCip15,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
     #[oai(
@@ -113,16 +113,6 @@ pub(crate) struct Cip36Details {
         validator(max_items = "10")
     )]
     pub errors: Vec<common::types::generic::error_msg::ErrorMessage>,
-}
-
-/// Is the payment address payable by catalyst.
-fn is_payable_default() -> bool {
-    true
-}
-
-/// Is the registration using CIP15 format.
-fn cip15_default() -> bool {
-    false
 }
 
 impl Example for Cip36Details {
@@ -141,8 +131,8 @@ impl Example for Cip36Details {
             payment_address: Some(
                 common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
             ),
-            is_payable: true,
-            cip15: false,
+            is_payable: common::types::cardano::boolean::IsPayable::example(),
+            cip15: common::types::cardano::boolean::IsCip15::example(),
             errors: Vec::<common::types::generic::error_msg::ErrorMessage>::new(),
         }
     }
@@ -160,8 +150,8 @@ impl Cip36Details {
             nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
             txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: None,
-            is_payable: false,
-            cip15: true,
+            is_payable: common::types::cardano::boolean::IsPayable::example(),
+            cip15: common::types::cardano::boolean::IsCip15::example(),
             errors: vec!["Stake Public Key is required".into()],
         }
     }
