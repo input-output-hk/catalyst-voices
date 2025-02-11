@@ -124,7 +124,7 @@ impl CatalystRBACTokenV1 {
     pub(crate) fn verify(&self, public_key: &VerifyingKey) -> anyhow::Result<()> {
         // TODO: KID is the hash of the cert, not the key.
         // Verify the Kid of the Token matches the PublicKey.
-        //if self.kid != *public_key {
+        // if self.kid != *public_key {
         //    error!(token=%self, public_key=?public_key,
         //        "Tokens Kid did not match verifying Public Key",
         //    );
@@ -206,74 +206,73 @@ mod tests {
         let _pub_key = x509_cert::spki::SubjectPublicKeyInfoOwned::from_key(verifying_key)
             .expect("get ed25519 pub key");
 
-        /* The following is broken, needs fixing by encoding an X509 certificate from the generated keys, and using that.
-
-        let mut builder = x509_cert::builder::CertificateBuilder::new(
-            profile,
-            serial_number,
-            validity,
-            subject,
-            pub_key,
-            &signing_key,
-        )
-        .expect("Create certificate");
-
-        //let signing_key2: SigningKey = SigningKey::generate(&mut random_seed);
-        //let verifying_key2 = signing_key2.verifying_key();
-
+        // The following is broken, needs fixing by encoding an X509 certificate from the
+        // generated keys, and using that.
+        //
+        // let mut builder = x509_cert::builder::CertificateBuilder::new(
+        // profile,
+        // serial_number,
+        // validity,
+        // subject,
+        // pub_key,
+        // &signing_key,
+        // )
+        // .expect("Create certificate");
+        //
+        // let signing_key2: SigningKey = SigningKey::generate(&mut random_seed);
+        // let verifying_key2 = signing_key2.verifying_key();
+        //
         // Generate a Kid and then check it verifies properly against itself.
         // And doesn't against a different verifying key.
-        //let kid = Kid::from(&verifying_key);
-        //assert!(kid == verifying_key);
-        //assert!(kid != verifying_key2);
-
+        // let kid = Kid::from(&verifying_key);
+        // assert!(kid == verifying_key);
+        // assert!(kid != verifying_key2);
+        //
         // Create a new Catalyst V1 Token
-        //let token = CatalystRBACTokenV1::new(&signing_key);
+        // let token = CatalystRBACTokenV1::new(&signing_key);
         // Check its signed properly against its own key, and not another.
-        //assert!(token.verify(&verifying_key).is_ok());
-        //assert!(token.verify(&verifying_key2).is_err());
-
-        //let decoded_token = format!("{token}");
-
-        //let re_encoded_token = CatalystRBACTokenV1::decode(&decoded_token)
+        // assert!(token.verify(&verifying_key).is_ok());
+        // assert!(token.verify(&verifying_key2).is_err());
+        //
+        // let decoded_token = format!("{token}");
+        //
+        // let re_encoded_token = CatalystRBACTokenV1::decode(&decoded_token)
         //    .expect("Failed to decode a token we encoded.");
-
+        //
         // Check its still signed properly against its own key, and not another.
-        //assert!(re_encoded_token.verify(&verifying_key).is_ok());
-        //assert!(re_encoded_token.verify(&verifying_key2).is_err());
-        */
+        // assert!(re_encoded_token.verify(&verifying_key).is_ok());
+        // assert!(re_encoded_token.verify(&verifying_key2).is_err());
     }
 
-    /* Test also broken because its using a public key as the src for the kid, not the cert.
-    #[test]
-    fn is_young() {
-        let mut random_seed = OsRng;
-        let key = SigningKey::generate(&mut random_seed);
-        let mut token = CatalystRBACTokenV1::new(&key);
-
-        // Update the token timestamp to be two seconds in the past.
-        let now = SystemTime::now();
-        token.ulid = Ulid::from_datetime(now - Duration::from_secs(2));
-
-        // Check that the token ISN'T young if max_age is one second.
-        let max_age = Duration::from_secs(1);
-        let max_skew = Duration::from_secs(1);
-        assert!(!token.is_young(max_age, max_skew));
-
-        // Check that the token IS young if max_age is three seconds.
-        let max_age = Duration::from_secs(3);
-        assert!(token.is_young(max_age, max_skew));
-
-        // Update the token timestamp to be two seconds in the future.
-        token.ulid = Ulid::from_datetime(now + Duration::from_secs(2));
-
-        // Check that the token IS too new if max_skew is one seconds.
-        let max_skew = Duration::from_secs(1);
-        assert!(!token.is_young(max_age, max_skew));
-
-        // Check that the token ISN'T too new if max_skew is three seconds.
-        let max_skew = Duration::from_secs(3);
-        assert!(token.is_young(max_age, max_skew));
-    }
-     */
+    // Test also broken because its using a public key as the src for the kid, not the
+    // cert. #[test]
+    // fn is_young() {
+    // let mut random_seed = OsRng;
+    // let key = SigningKey::generate(&mut random_seed);
+    // let mut token = CatalystRBACTokenV1::new(&key);
+    //
+    // Update the token timestamp to be two seconds in the past.
+    // let now = SystemTime::now();
+    // token.ulid = Ulid::from_datetime(now - Duration::from_secs(2));
+    //
+    // Check that the token ISN'T young if max_age is one second.
+    // let max_age = Duration::from_secs(1);
+    // let max_skew = Duration::from_secs(1);
+    // assert!(!token.is_young(max_age, max_skew));
+    //
+    // Check that the token IS young if max_age is three seconds.
+    // let max_age = Duration::from_secs(3);
+    // assert!(token.is_young(max_age, max_skew));
+    //
+    // Update the token timestamp to be two seconds in the future.
+    // token.ulid = Ulid::from_datetime(now + Duration::from_secs(2));
+    //
+    // Check that the token IS too new if max_skew is one seconds.
+    // let max_skew = Duration::from_secs(1);
+    // assert!(!token.is_young(max_age, max_skew));
+    //
+    // Check that the token ISN'T too new if max_skew is three seconds.
+    // let max_skew = Duration::from_secs(3);
+    // assert!(token.is_young(max_age, max_skew));
+    // }
 }

@@ -4,6 +4,9 @@
 use cardano_blockchain_types::TransactionHash;
 use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
+use pallas::ledger::addresses::{
+    Network, ShelleyAddress, ShelleyDelegationPart, ShelleyPaymentPart, StakeAddress,
+};
 
 use super::*;
 use crate::{
@@ -49,11 +52,26 @@ async fn get_catalyst_id_by_stake_address() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    // TODO: FIXME: Construct the test address.
-    let stake_address = todo!();
-    let mut row_stream = Query::execute(&session, QueryParams { stake_address })
-        .await
+    let payment = ShelleyPaymentPart::Key(
+        [
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        ]
+        .into(),
+    );
+    let delegation = ShelleyDelegationPart::Key(
+        [
+            2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+        ]
+        .into(),
+    );
+    let address: StakeAddress = ShelleyAddress::new(Network::Mainnet, payment, delegation)
+        .try_into()
         .unwrap();
+    let mut row_stream = Query::execute(&session, QueryParams {
+        stake_address: address.into(),
+    })
+    .await
+    .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());
