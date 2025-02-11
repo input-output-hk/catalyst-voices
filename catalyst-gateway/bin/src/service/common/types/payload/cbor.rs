@@ -104,6 +104,7 @@ impl<T: Send> Payload for Cbor<T> {
     fn schema_ref() -> MetaSchemaRef {
         MetaSchemaRef::Inline(Box::new(MetaSchema {
             format: Some("binary"),
+            example: Some("(binary data)".into()),
             ..MetaSchema::new("string")
         }))
     }
