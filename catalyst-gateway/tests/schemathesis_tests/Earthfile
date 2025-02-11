@@ -45,15 +45,17 @@ package-schemathesis:
 test-fuzzer-api:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl # workaround for https://github.com/earthly/earthly/issues/3784
-    COPY schemathesis-docker-compose.yml .
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG seed
 
+    COPY ./../+docker-compose/docker-compose.yml .
+
     WITH DOCKER \
-        --compose schemathesis-docker-compose.yml \
+        --compose docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../+package-cat-gateway-integration) \
+        --load cat-gateway:latest=(./../../+docker) \
+        --load scylla-node:latest=(./../+package-scylla-node) \
         --service cat-gateway \
         --allow-privileged
         # Need to wait until cat-gateway will successfully connect to the scylladb

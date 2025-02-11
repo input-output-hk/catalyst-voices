@@ -17,9 +17,9 @@ test:
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load ./../../event-db+build \
-        --load ./../../+docker \
-        --load ./../+package-scylla-node \
+        --load event-db:latest=(./../../event-db+build) \
+        --load cat-gateway:latest=(./../../+docker) \
+        --load scylla-node:latest=(./../+package-scylla-node) \
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
