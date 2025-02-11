@@ -159,7 +159,7 @@ impl TxoInsertQuery {
                     txo_index,
                     &address,
                     txo.lovelace_amount(),
-                    txn_hash.into(),
+                    txn_hash,
                 );
 
                 self.staked_txo.push(params);

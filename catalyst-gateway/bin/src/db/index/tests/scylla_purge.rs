@@ -2,7 +2,7 @@
 //! This is mainly to test whether the defined purge queries work with the database or
 //! not.
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::TransactionHash;
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -16,36 +16,21 @@ use crate::db::index::{
     queries::{purge::*, PreparedQuery},
 };
 
-// TODO: FIXME:
-// - rbac invalid registrations
+mod helper {
+    use cardano_blockchain_types::{Cip36, VotingPubKey};
+    use ed25519_dalek::VerifyingKey;
 
-// TODO: FIXME:
-// mod helper {
-//     use cardano_blockchain_types::{Cip36, VotingPubKey};
-//     use ed25519_dalek::VerifyingKey;
-//
-//     pub(super) fn create_dummy_cip36(number: u32) -> (Cip36, VotingPubKey) {
-//         let empty_cip36 = Cip36 {
-//             cip36: None,
-//             voting_keys: vec![],
-//             stake_pk: Some(VerifyingKey::from_bytes(&[u8::try_from(number).unwrap();
-// 32]).unwrap()),             payment_addr: vec![],
-//             payable: false,
-//             raw_nonce: 0,
-//             nonce: 0,
-//             purpose: 0,
-//             signed: false,
-//             strict_catalyst: true,
-//         };
-//
-//         let pub_key = VotingPubKey::new(
-//             Some(VerifyingKey::from_bytes(&[u8::try_from(number).unwrap();
-// 32]).unwrap()),             0,
-//         );
-//
-//         (empty_cip36, pub_key)
-//     }
-// }
+    pub(super) fn create_dummy_cip36(number: u32) -> (Cip36, VotingPubKey) {
+        let empty_cip36 = todo!();
+
+        let pub_key = VotingPubKey::new(
+            Some(VerifyingKey::from_bytes(&[u8::try_from(number).unwrap(); 32]).unwrap()),
+            0,
+        );
+
+        (empty_cip36, pub_key)
+    }
+}
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
@@ -346,229 +331,204 @@ async fn rbac509_invalid_registration() {
     assert!(read_rows.is_empty());
 }
 
-// TODO: FIXME:
-// #[ignore = "An integration test which requires a running Scylla node instance, disabled
-// from `testunit` CI run"] #[tokio::test]
-// async fn test_cip36_registration_for_vote_key() {
-//     let Ok((session, _)) = get_shared_session().await else {
-//         panic!("{SESSION_ERR_MSG}");
-//     };
-//
-//     // data
-//     let dummy0 = helper::create_dummy_cip36(0);
-//     let dummy1 = helper::create_dummy_cip36(1);
-//
-//     let data = vec![
-//         cip36::insert_cip36_for_vote_key::Params::new(
-//             &dummy0.1,
-//             Slot::from(0).into(),
-//             TxnIndex::from(0).into(),
-//             &dummy0.0,
-//             false,
-//         ),
-//         cip36::insert_cip36_for_vote_key::Params::new(
-//             &dummy1.1,
-//             Slot::from(1).into(),
-//             TxnIndex::from(1).into(),
-//             &dummy1.0,
-//             true,
-//         ),
-//     ];
-//     let data_len = data.len();
-//
-//     // insert
-//     session
-//         .execute_batch(
-//             PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
-//             data,
-//         )
-//         .await
-//         .unwrap();
-//
-//     // read
-//     let mut row_stream =
-// cip36_registration_for_vote_key::PrimaryKeyQuery::execute(&session)         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert_eq!(read_rows.len(), data_len);
-//
-//     // delete
-//     let delete_params = read_rows
-//         .into_iter()
-//         .map(cip36_registration_for_vote_key::Params::from)
-//         .collect();
-//     let row_results =
-//         cip36_registration_for_vote_key::DeleteQuery::execute(&session, delete_params)
-//             .await
-//             .unwrap()
-//             .into_iter()
-//             .all(|r| r.result_not_rows().is_ok());
-//
-//     assert!(row_results);
-//
-//     // re-read
-//     let mut row_stream =
-// cip36_registration_for_vote_key::PrimaryKeyQuery::execute(&session)         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert!(read_rows.is_empty());
-// }
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn test_cip36_registration_for_vote_key() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
 
-// TODO: FIXME:
-// #[ignore = "An integration test which requires a running Scylla node instance, disabled
-// from `testunit` CI run"] #[tokio::test]
-// async fn test_cip36_registration_invalid() {
-//     let Ok((session, _)) = get_shared_session().await else {
-//         panic!("{SESSION_ERR_MSG}");
-//     };
-//
-//     // data
-//     let dummy0 = helper::create_dummy_cip36(0);
-//     let dummy1 = helper::create_dummy_cip36(1);
-//
-//     let data = vec![
-//         cip36::insert_cip36_invalid::Params::new(
-//             Some(&dummy0.1),
-//             Slot::from(1).into(),
-//             TxnIndex::from(0).into(),
-//             &dummy0.0,
-//             vec![],
-//         ),
-//         cip36::insert_cip36_invalid::Params::new(
-//             Some(&dummy1.1),
-//             Slot::from(1).into(),
-//             TxnIndex::from(1).into(),
-//             &dummy1.0,
-//             vec![],
-//         ),
-//     ];
-//     let data_len = data.len();
-//
-//     // insert
-//     session
-//         .execute_batch(PreparedQuery::Cip36RegistrationInsertErrorQuery, data)
-//         .await
-//         .unwrap();
-//
-//     // read
-//     let mut row_stream = cip36_registration_invalid::PrimaryKeyQuery::execute(&session)
-//         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert_eq!(read_rows.len(), data_len);
-//
-//     // delete
-//     let delete_params = read_rows
-//         .into_iter()
-//         .map(cip36_registration_invalid::Params::from)
-//         .collect();
-//     let row_results = cip36_registration_invalid::DeleteQuery::execute(&session,
-// delete_params)         .await
-//         .unwrap()
-//         .into_iter()
-//         .all(|r| r.result_not_rows().is_ok());
-//
-//     assert!(row_results);
-//
-//     // re-read
-//     let mut row_stream = cip36_registration_invalid::PrimaryKeyQuery::execute(&session)
-//         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert!(read_rows.is_empty());
-// }
+    // data
+    let dummy0 = helper::create_dummy_cip36(0);
+    let dummy1 = helper::create_dummy_cip36(1);
 
-// TODO: FIXME:
-// #[ignore = "An integration test which requires a running Scylla node instance, disabled
-// from `testunit` CI run"] #[tokio::test]
-// async fn test_cip36_registration() {
-//     let Ok((session, _)) = get_shared_session().await else {
-//         panic!("{SESSION_ERR_MSG}");
-//     };
-//
-//     // data
-//     let dummy0 = helper::create_dummy_cip36(0);
-//     let dummy1 = helper::create_dummy_cip36(1);
-//
-//     let data = vec![
-//         cip36::insert_cip36::Params::new(
-//             &dummy0.1,
-//             Slot::from(0).into(),
-//             TxnIndex::from(0).into(),
-//             &dummy0.0,
-//         ),
-//         cip36::insert_cip36::Params::new(
-//             &dummy1.1,
-//             Slot::from(1).into(),
-//             TxnIndex::from(1).into(),
-//             &dummy1.0,
-//         ),
-//     ];
-//     let data_len = data.len();
-//
-//     // insert
-//     session
-//         .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, data)
-//         .await
-//         .unwrap();
-//
-//     // read
-//     let mut row_stream = cip36_registration::PrimaryKeyQuery::execute(&session)
-//         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert_eq!(read_rows.len(), data_len);
-//
-//     // delete
-//     let delete_params = read_rows
-//         .into_iter()
-//         .map(cip36_registration::Params::from)
-//         .collect();
-//     let row_results = cip36_registration::DeleteQuery::execute(&session, delete_params)
-//         .await
-//         .unwrap()
-//         .into_iter()
-//         .all(|r| r.result_not_rows().is_ok());
-//
-//     assert!(row_results);
-//
-//     // re-read
-//     let mut row_stream = cip36_registration::PrimaryKeyQuery::execute(&session)
-//         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert!(read_rows.is_empty());
-// }
+    let data = vec![
+        cip36::insert_cip36_for_vote_key::Params::new(
+            &dummy0.1,
+            0.into(),
+            0.into(),
+            &dummy0.0,
+            false,
+        ),
+        cip36::insert_cip36_for_vote_key::Params::new(
+            &dummy1.1,
+            1.into(),
+            1.into(),
+            &dummy1.0,
+            true,
+        ),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(
+            PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
+            data,
+        )
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = cip36_registration_for_vote_key::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(cip36_registration_for_vote_key::Params::from)
+        .collect();
+    let row_results =
+        cip36_registration_for_vote_key::DeleteQuery::execute(&session, delete_params)
+            .await
+            .unwrap()
+            .into_iter()
+            .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = cip36_registration_for_vote_key::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn test_cip36_registration_invalid() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // data
+    let dummy0 = helper::create_dummy_cip36(0);
+    let dummy1 = helper::create_dummy_cip36(1);
+
+    let data = vec![
+        cip36::insert_cip36_invalid::Params::new(Some(&dummy0.1), 1.into(), 0.into(), &dummy0.0),
+        cip36::insert_cip36_invalid::Params::new(Some(&dummy1.1), 1.into(), 1.into(), &dummy1.0),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::Cip36RegistrationInsertErrorQuery, data)
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = cip36_registration_invalid::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(cip36_registration_invalid::Params::from)
+        .collect();
+    let row_results = cip36_registration_invalid::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = cip36_registration_invalid::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn test_cip36_registration() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // data
+    let dummy0 = helper::create_dummy_cip36(0);
+    let dummy1 = helper::create_dummy_cip36(1);
+
+    let data = vec![
+        cip36::insert_cip36::Params::new(&dummy0.1, 0.into(), 0.into(), &dummy0.0),
+        cip36::insert_cip36::Params::new(&dummy1.1, 1.into(), 1.into(), &dummy1.0),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = cip36_registration::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(cip36_registration::Params::from)
+        .collect();
+    let row_results = cip36_registration::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = cip36_registration::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
@@ -591,8 +551,8 @@ async fn test_stake_registration() {
     let data = vec![
         certs::StakeRegistrationInsertQuery::new(
             vec![0],
-            Slot::from(0).into(),
-            TxnIndex::from(0).into(),
+            0.into(),
+            0.into(),
             Some(stake_address_1),
             false,
             false,
@@ -601,8 +561,8 @@ async fn test_stake_registration() {
         ),
         certs::StakeRegistrationInsertQuery::new(
             vec![1],
-            Slot::from(1).into(),
-            TxnIndex::from(1).into(),
+            1.into(),
+            1.into(),
             Some(stake_address_2),
             true,
             true,
@@ -725,21 +685,21 @@ async fn test_txo_ada() {
     let data = vec![
         txo::insert_txo::Params::new(
             &[0],
-            Slot::from(0).into(),
-            TxnIndex::from(0).into(),
-            TxnOutputOffset::from(0),
+            0.into(),
+            0.into(),
+            0.into(),
             "addr0",
             0,
-            TransactionHash::new(&[0]).into(),
+            TransactionHash::new(&[0]),
         ),
         txo::insert_txo::Params::new(
             &[1],
-            Slot::from(1).into(),
-            TxnIndex::from(1).into(),
-            TxnOutputOffset::from(1),
+            1.into(),
+            1.into(),
+            1.into(),
             "addr1",
             1,
-            TransactionHash::new(&[1]).into(),
+            TransactionHash::new(&[1]),
         ),
     ];
     let data_len = data.len();
@@ -790,24 +750,8 @@ async fn test_txo_assets() {
 
     // data
     let data = vec![
-        txo::insert_txo_asset::Params::new(
-            &[0],
-            Slot::from(0).into(),
-            TxnIndex::from(0).into(),
-            TxnOutputOffset::from(0),
-            &[0],
-            &[0],
-            0,
-        ),
-        txo::insert_txo_asset::Params::new(
-            &[1],
-            Slot::from(1).into(),
-            TxnIndex::from(1).into(),
-            TxnOutputOffset::from(1),
-            &[1],
-            &[1],
-            1,
-        ),
+        txo::insert_txo_asset::Params::new(&[0], 0.into(), 0.into(), 0.into(), &[0], &[0], 0),
+        txo::insert_txo_asset::Params::new(&[1], 1.into(), 1.into(), 1.into(), &[1], &[1], 1),
     ];
     let data_len = data.len();
 
@@ -865,18 +809,18 @@ async fn test_unstaked_txo_ada() {
     // data
     let data = vec![
         txo::insert_unstaked_txo::Params::new(
-            TransactionHash::new(&[0]).into(),
-            TxnOutputOffset::from(0),
-            Slot::from(0).into(),
-            TxnIndex::from(0).into(),
+            TransactionHash::new(&[0]),
+            0.into(),
+            0.into(),
+            0.into(),
             "addr0",
             0,
         ),
         txo::insert_unstaked_txo::Params::new(
-            TransactionHash::new(&[1]).into(),
-            TxnOutputOffset::from(1),
-            Slot::from(1).into(),
-            TxnIndex::from(1).into(),
+            TransactionHash::new(&[1]),
+            1.into(),
+            1.into(),
+            1.into(),
             "addr1",
             1,
         ),
@@ -937,21 +881,21 @@ async fn test_unstaked_txo_assets() {
     // data
     let data = vec![
         txo::insert_unstaked_txo_asset::Params::new(
-            TransactionHash::new(&[0]).into(),
-            TxnOutputOffset::from(0),
+            TransactionHash::new(&[0]),
+            0.into(),
             &[0],
             &[0],
-            Slot::from(0).into(),
-            TxnIndex::from(0).into(),
+            0.into(),
+            0.into(),
             0,
         ),
         txo::insert_unstaked_txo_asset::Params::new(
-            TransactionHash::new(&[1]).into(),
-            TxnOutputOffset::from(1),
+            TransactionHash::new(&[1]),
+            1.into(),
             &[1],
             &[1],
-            Slot::from(1).into(),
-            TxnIndex::from(1).into(),
+            1.into(),
+            1.into(),
             1,
         ),
     ];
