@@ -12,14 +12,14 @@ class _TimelineToggleButton extends StatefulWidget {
 }
 
 class _TimelineToggleButtonState extends State<_TimelineToggleButton> {
-  bool isTimelineVisible = false;
+  bool _isTimelineVisible = false;
 
   @override
   Widget build(BuildContext context) {
     final iconColor = Theme.of(context).colorScheme.primary;
 
     return VoicesIconButton.outlined(
-      onTap: toggleTimelineVisibility,
+      onTap: _toggleTimelineVisibility,
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
@@ -27,7 +27,7 @@ class _TimelineToggleButtonState extends State<_TimelineToggleButton> {
           ),
         ),
       ),
-      child: isTimelineVisible
+      child: _isTimelineVisible
           ? VoicesAssets.icons.topBarFilled.buildIcon(
               color: iconColor,
             )
@@ -37,8 +37,8 @@ class _TimelineToggleButtonState extends State<_TimelineToggleButton> {
     );
   }
 
-  void toggleTimelineVisibility() {
-    setState(() => isTimelineVisible = !isTimelineVisible);
+  void _toggleTimelineVisibility() {
+    setState(() => _isTimelineVisible = !_isTimelineVisible);
     widget.onPressed?.call();
   }
 }

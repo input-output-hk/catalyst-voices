@@ -24,12 +24,12 @@ class CampaignTimelineCard extends StatefulWidget {
 }
 
 class CampaignTimelineCardState extends State<CampaignTimelineCard> {
-  bool isExpanded = false;
+  bool _isExpanded = false;
 
-  bool get isOngoing => widget.timelineItem.timeline.isTodayInRange();
-  SvgGenImage get _expandedIcon => isExpanded
+  SvgGenImage get _expandedIcon => _isExpanded
       ? VoicesAssets.icons.chevronDown
       : VoicesAssets.icons.chevronRight;
+  bool get _isOngoing => widget.timelineItem.timeline.isTodayInRange();
 
   @override
   Widget build(BuildContext context) {
@@ -39,14 +39,14 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
       onTap: _toggleExpanded,
       child: SizedBox(
         width: 288,
-        height: isExpanded ? 300 : 150,
+        height: _isExpanded ? 300 : 150,
         child: Card(
           color:
-              widget.placement.backgroundColor(context, isOngoing: isOngoing),
+              widget.placement.backgroundColor(context, isOngoing: _isOngoing),
           shape: OutlineInputBorder(
             borderSide: BorderSide(
-              color: isOngoing ? colors.primary : Colors.white,
-              width: isOngoing ? 2 : 1,
+              color: _isOngoing ? colors.primary : Colors.white,
+              width: _isOngoing ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -94,10 +94,10 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (isOngoing) ...[
+                      if (_isOngoing) ...[
                         const SizedBox(width: 8),
                         Offstage(
-                          offstage: !isOngoing,
+                          offstage: !_isOngoing,
                           child: VoicesChip.round(
                             backgroundColor: colors.primary,
                             content: Text(
@@ -115,7 +115,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
                 const SizedBox(height: 16),
                 AnimatedSwitcher(
                   duration: Durations.medium4,
-                  child: isExpanded
+                  child: _isExpanded
                       ? Text(
                           widget.timelineItem.description,
                           style: context.textTheme.bodyMedium?.copyWith(
@@ -134,8 +134,8 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
 
   void _toggleExpanded() {
     setState(() {
-      isExpanded = !isExpanded;
-      widget.onExpandedChanged?.call(isExpanded);
+      _isExpanded = !_isExpanded;
+      widget.onExpandedChanged?.call(_isExpanded);
     });
   }
 }

@@ -65,7 +65,7 @@ void main() {
     );
 
     testWidgets(
-      '''calls onSearch with isSubmitted=true when search is submitted with done action''',
+      'calls onSearch with isSubmitted=true when done is pressed',
       (tester) async {
         String? lastSearchValue;
         bool? lastIsSubmitted;

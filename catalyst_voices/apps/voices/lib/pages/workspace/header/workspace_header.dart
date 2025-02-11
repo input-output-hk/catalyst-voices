@@ -20,8 +20,8 @@ class WorkspaceHeader extends StatefulWidget {
 }
 
 class _WorkspaceHeaderState extends State<WorkspaceHeader> {
-  bool isTimelineExpanded = false;
-  bool isTimelineVisible = true;
+  bool _isTimelineExpanded = false;
+  bool _isTimelineVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +62,12 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
             ],
           ),
           const SizedBox(height: 24),
-          if (isTimelineVisible)
+          if (_isTimelineVisible)
             Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: isTimelineExpanded ? 340 : 190,
+                    height: _isTimelineExpanded ? 340 : 190,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -81,7 +81,7 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                       placement: CampaignTimelinePlacement.workspace,
                       onExpandedChanged: (isExpanded) {
                         setState(() {
-                          isTimelineExpanded = isExpanded;
+                          _isTimelineExpanded = isExpanded;
                         });
                       },
                     ),
@@ -97,9 +97,9 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
 
   void _toggleTimelineVisibility() {
     setState(() {
-      isTimelineVisible = !isTimelineVisible;
-      if (!isTimelineVisible) {
-        isTimelineExpanded = false;
+      _isTimelineVisible = !_isTimelineVisible;
+      if (!_isTimelineVisible) {
+        _isTimelineExpanded = false;
       }
     });
   }

@@ -46,7 +46,7 @@ class WorkspaceMyProposalsSelector extends StatelessWidget {
                 Positioned(
                   right: 4,
                   child: SearchTextField(
-                    hintText: '${l10n.searchProposals}...',
+                    hintText: '${l10n.searchProposals}…',
                     onSearch: ({
                       required searchValue,
                       required isSubmitted,
