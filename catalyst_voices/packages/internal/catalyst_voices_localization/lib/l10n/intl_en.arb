@@ -1059,7 +1059,7 @@
   "@selectASection": {
     "description": "Message when there is no section selected"
   },
-  "noGuidanceForThisSection": "There is no guidance for this section",
+  "noGuidanceForThisSection": "There is no guidance for this section.",
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
   },
