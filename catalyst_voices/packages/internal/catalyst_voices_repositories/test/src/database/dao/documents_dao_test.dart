@@ -1,9 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:uuid/data.dart';
 import 'package:uuid/uuid.dart';
 
 import '../test_factories.dart';
@@ -62,8 +63,8 @@ void main() {
       });
     });
 
-    group('watch all', () {
-      test('emits data when new entities are saved', () async {
+    group('query', () {
+      test('stream emits data when new entities are saved', () async {
         // Given
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           1,
@@ -86,6 +87,101 @@ void main() {
             equals(expectedDocuments),
           ]),
         );
+      });
+
+      test('returns specific version matching exact ref', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) => DocumentWithMetadataFactory.build(),
+        );
+        final document = documentsWithMetadata.first.document;
+        final ref = DocumentRef(
+          id: document.metadata.id,
+          version: document.metadata.version,
+        );
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final entity = await database.documentsDao.query(ref: ref);
+
+        expect(entity, isNotNull);
+
+        final id = UuidHiLo(high: entity!.idHi, low: entity.idLo);
+        final ver = UuidHiLo(high: entity.verHi, low: entity.verLo);
+
+        expect(id.uuid, ref.id);
+        expect(ver.uuid, ref.version);
+      });
+
+      test('returns newest version when ver is not specified', () async {
+        // Given
+        final id = const Uuid().v7();
+        final firstVersionId = const Uuid().v7(
+          config: V7Options(
+            DateTime(2025, 2, 10).millisecondsSinceEpoch,
+            null,
+          ),
+        );
+        final secondVersionId = const Uuid().v7(
+          config: V7Options(
+            DateTime(2025, 2, 11).millisecondsSinceEpoch,
+            null,
+          ),
+        );
+
+        const secondContent = DocumentDataContent({'title': 'Dev'});
+        final documentsWithMetadata = <DocumentEntityWithMetadata>[
+          DocumentWithMetadataFactory.build(
+            content: const DocumentDataContent({'title': 'D'}),
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: firstVersionId,
+            ),
+          ),
+          DocumentWithMetadataFactory.build(
+            content: secondContent,
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: secondVersionId,
+            ),
+          ),
+        ];
+        final document = documentsWithMetadata.first.document;
+        final ref = DocumentRef(id: document.metadata.id);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final entity = await database.documentsDao.query(ref: ref);
+
+        expect(entity, isNotNull);
+
+        expect(entity!.metadata.id, id);
+        expect(entity.metadata.version, secondVersionId);
+        expect(entity.content, secondContent);
+      });
+
+      test('returns null when id does not match any id', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) => DocumentWithMetadataFactory.build(),
+        );
+        final ref = DocumentRef(id: const Uuid().v7());
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final entity = await database.documentsDao.query(ref: ref);
+
+        expect(entity, isNull);
       });
     });
 
