@@ -219,8 +219,12 @@ rules:
     given: "$..schema"
     severity: error
     then:
-      field: "example"
-      function: truthy
+      function: schema
+      functionOptions:
+        schema:
+          anyOf:
+            - required: ["example"]
+            - required: ["enum"]
   api-example-properties:
     message: "Property should contain example"
     given: "$..*[?(@.properties && !@.example)].properties.*"

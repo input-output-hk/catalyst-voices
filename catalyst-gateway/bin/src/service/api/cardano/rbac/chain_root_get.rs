@@ -11,6 +11,7 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
+        objects::cardano::hash::Hash256,
         responses::WithErrorResponses,
         types::{
             cardano::cip19_stake_address::Cip19StakeAddress, headers::retry_after::RetryAfterOption,
@@ -22,8 +23,7 @@ use crate::{
 #[derive(Object)]
 pub(crate) struct Response {
     /// RBAC certificate chain root.
-    #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
-    chain_root: String,
+    chain_root: Hash256,
 }
 
 /// Endpoint responses.
@@ -73,7 +73,7 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
                 };
 
                 let res = Response {
-                    chain_root: format!("0x{}", hex::encode(row.chain_root)),
+                    chain_root: Hash256::from(row.chain_root),
                 };
 
                 Responses::Ok(Json(res)).into()
