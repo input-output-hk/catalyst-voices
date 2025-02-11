@@ -4,9 +4,11 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
-import 'package:catalyst_voices/widgets/containers/grid_pagination_page_container.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
+import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
+import 'package:catalyst_voices/widgets/pagination/layouts/paginated_grid_view.dart.dart';
+import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -31,7 +33,6 @@ class _ProposalsPageState extends State<ProposalsPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<ProposalsCubit>().load());
     unawaited(context.read<CampaignInfoCubit>().load());
   }
 
@@ -219,10 +220,9 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState,
-        List<ProposalViewModel>>(
-      selector: (state) => state.proposals,
-      builder: (context, proposals) {
+    return BlocSelector<ProposalsCubit, ProposalsState, int>(
+      selector: (state) => state.resultsNumber,
+      builder: (context, state) {
         return ConstrainedBox(
           constraints: const BoxConstraints(),
           child: TabBar(
@@ -231,16 +231,16 @@ class _TabBar extends StatelessWidget {
             dividerHeight: 0,
             tabs: [
               Tab(
-                text: context.l10n.noOfAll(proposals.length),
+                text: context.l10n.noOfAll(state),
               ),
               Tab(
-                text: context.l10n.noOfDraft(proposals.draftProposals.length),
+                text: context.l10n.noOfDraft(state),
               ),
               Tab(
-                text: context.l10n.noOfFinal(proposals.finalProposals.length),
+                text: context.l10n.noOfFinal(state),
               ),
               Tab(
-                text: context.l10n.noOfFavorites(proposals.favorites.length),
+                text: context.l10n.noOfFavorites(state),
               ),
               Tab(
                 text: context.l10n.noOfMyProposals(100),
@@ -301,29 +301,74 @@ class _AllProposals extends StatefulWidget {
 }
 
 class _AllProposalsState extends State<_AllProposals> {
-  int currentPage = 0;
+  late final ProposalsCubit _proposalBloc;
+  late StreamSubscription<ProposalsState> _blocSub;
+  late PagingController<ProposalViewModel> _pagingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _proposalBloc = context.read<ProposalsCubit>();
+    _pagingController = PagingController(
+      initialPage: _proposalBloc.state.pageKey,
+      initialMaxResults: _proposalBloc.state.resultsNumber,
+      itemsPerPage: 8,
+    );
+
+    _pagingController.addPageRequestListener((
+      newPageKey,
+      pageSize,
+      lastItem,
+    ) async {
+      await _proposalBloc.load(
+        pageKey: newPageKey,
+        pageSize: pageSize,
+        lastProposalId: lastItem?.id,
+      );
+    });
+
+    _blocSub = _proposalBloc.stream.listen((state) {
+      if (state is LoadedProposalsState) {
+        if (state.resultsNumber != _pagingController.maxResults) {
+          _pagingController.maxResults = state.resultsNumber;
+        } else {
+          _pagingController.appendPage(state.proposals, state.pageKey);
+        }
+      } else if (state is ErrorProposalsState) {
+        _pagingController.error = state.error;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    unawaited(_blocSub.cancel());
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProposalsCubit, ProposalsState>(
-      builder: (context, state) {
-        return switch (state) {
-          LoadedProposalsState(:final proposals, :final resultsNumber) =>
-            proposals.isEmpty
-                ? const _EmptyProposals()
-                : GirdPaginationPageContainer(
-                    currentPage: currentPage,
-                    items: proposals,
-                    maxResults: resultsNumber,
-                    resultsPerPage: 8,
-                    onNextPage: (value) async {
-                      currentPage = value;
-                      await context.read<ProposalsCubit>().load();
-                    },
-                  ),
-          _ => const _LoadingProposals(),
-        };
-      },
+    return PaginatedGridView<ProposalViewModel>(
+      pagingController: _pagingController,
+      builderDelegate: PagedWrapChildBuilder<ProposalViewModel>(
+        builder: (context, item) => ProposalCard(
+          key: UniqueKey(),
+          proposal: item,
+          showStatus: false,
+          showLastUpdate: false,
+          showComments: false,
+          showSegments: false,
+          isFavorite: item.isFavorite,
+          onFavoriteChanged: (isFavorite) async {
+            await context.read<ProposalsCubit>().onChangeFavoriteProposal(
+                  item.id,
+                  isFavorite: isFavorite,
+                );
+          },
+        ),
+        animateTransition: false,
+      ),
     );
   }
 }
@@ -345,16 +390,7 @@ class _DraftProposalsState extends State<_DraftProposals> {
           LoadedProposalsState(:final proposals) =>
             proposals.draftProposals.isEmpty
                 ? const _EmptyProposals()
-                : GirdPaginationPageContainer(
-                    currentPage: currentPage,
-                    items: proposals.draftProposals,
-                    maxResults: proposals.draftProposals.length,
-                    resultsPerPage: 8,
-                    onNextPage: (value) async {
-                      currentPage = value;
-                      await context.read<ProposalsCubit>().load();
-                    },
-                  ),
+                : const Placeholder(),
           _ => const _LoadingProposals(),
         };
       },
@@ -379,16 +415,7 @@ class _FinalProposalsState extends State<_FinalProposals> {
           LoadedProposalsState(:final proposals) =>
             proposals.finalProposals.isEmpty
                 ? const _EmptyProposals()
-                : GirdPaginationPageContainer(
-                    currentPage: currentPage,
-                    items: proposals.finalProposals,
-                    maxResults: proposals.finalProposals.length,
-                    resultsPerPage: 8,
-                    onNextPage: (value) async {
-                      currentPage = value;
-                      await context.read<ProposalsCubit>().load();
-                    },
-                  ),
+                : const Placeholder(),
           _ => const _LoadingProposals(),
         };
       },
