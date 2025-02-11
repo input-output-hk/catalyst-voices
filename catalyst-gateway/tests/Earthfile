@@ -86,6 +86,7 @@ test-scylla:
     COPY +docker-compose/docker-compose.yml .
 
     ENV CASSANDRA_PERSISTENT_URL "localhost:9042"
+    ENV CASSANDRA_VOLATILE_URL "localhost:9042"
     ENV CHAIN_NETWORK "Preprod"
 
     # limit the nextest duration to prevent freezing in case of failure.

@@ -12,7 +12,6 @@ builder:
 
 test:
     FROM +builder
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     COPY ./../+docker-compose/docker-compose.yml .
 
