@@ -6,8 +6,8 @@ import 'package:uuid/uuid.dart';
 
 abstract final class DocumentWithMetadataFactory {
   static DocumentEntityWithMetadata build({
-    SignedDocumentContent? content,
-    SignedDocumentMetadata? metadata,
+    DocumentDataContent? content,
+    DocumentDataMetadata? metadata,
     DateTime? createdAt,
   }) {
     final document = DocumentFactory.build(
@@ -33,14 +33,14 @@ abstract final class DocumentWithMetadataFactory {
 
 abstract final class DocumentFactory {
   static DocumentEntity build({
-    SignedDocumentContent? content,
-    SignedDocumentMetadata? metadata,
+    DocumentDataContent? content,
+    DocumentDataMetadata? metadata,
     DateTime? createdAt,
   }) {
-    content ??= const SignedDocumentContent({});
+    content ??= const DocumentDataContent({});
 
-    metadata ??= SignedDocumentMetadata(
-      type: SignedDocumentType.proposalDocument,
+    metadata ??= DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
       id: const Uuid().v7(),
       version: const Uuid().v7(),
     );
@@ -82,14 +82,14 @@ abstract final class DocumentMetadataFactory {
 
 abstract final class DraftFactory {
   static DraftEntity build({
-    SignedDocumentContent? content,
-    SignedDocumentMetadata? metadata,
+    DocumentDataContent? content,
+    DocumentDataMetadata? metadata,
     String? title,
   }) {
-    content ??= const SignedDocumentContent({});
+    content ??= const DocumentDataContent({});
 
-    metadata ??= SignedDocumentMetadata(
-      type: SignedDocumentType.proposalDocument,
+    metadata ??= DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
       id: const Uuid().v7(),
       version: const Uuid().v7(),
     );

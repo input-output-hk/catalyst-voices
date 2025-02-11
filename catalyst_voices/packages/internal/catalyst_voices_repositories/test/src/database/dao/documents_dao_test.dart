@@ -112,8 +112,8 @@ void main() {
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           2,
           (index) {
-            final metadata = SignedDocumentMetadata(
-              type: SignedDocumentType.proposalDocument,
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
               id: id,
               version: const Uuid().v7(),
             );

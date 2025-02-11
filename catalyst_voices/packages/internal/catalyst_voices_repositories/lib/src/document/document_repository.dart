@@ -7,48 +7,41 @@ import 'package:synchronized/synchronized.dart';
 
 abstract interface class DocumentRepository {
   factory DocumentRepository(
-    SignedDocumentLocalSource localSource,
-    SignedDocumentRemoteSource remoteSource,
+    DocumentDataLocalSource local,
+    DocumentDataRemoteSource remote,
   ) = DocumentRepositoryImpl;
 
-  Future<void> publishDocument(SignedDocumentData document);
-
   Future<ProposalDocument> getProposalDocument({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   });
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
-  final SignedDocumentLocalSource _localSource;
-  final SignedDocumentRemoteSource _remoteSource;
+  final DocumentDataLocalSource _local;
+  final DocumentDataRemoteSource _remote;
 
   final _templateLock = Lock();
 
   DocumentRepositoryImpl(
-    this._localSource,
-    this._remoteSource,
+    this._local,
+    this._remote,
   );
 
   @override
-  Future<void> publishDocument(SignedDocumentData document) {
-    throw UnimplementedError();
-  }
-
-  @override
   Future<ProposalDocument> getProposalDocument({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   }) async {
     // TODO(damian-molinski): remove this override once we have API
-    ref = const SignedDocumentRef(id: 'proposal');
+    ref = const DocumentRef(id: 'proposal');
 
-    final signedDocumentData = await _getSignedDocumentData(ref: ref);
+    final signedDocumentData = await _getDocumentData(ref: ref);
 
     assert(
-      signedDocumentData.metadata.type == SignedDocumentType.proposalDocument,
+      signedDocumentData.metadata.type == DocumentType.proposalDocument,
       'Invalid Proposal SignedDocument type',
     );
     assert(
@@ -79,15 +72,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   }) async {
     // TODO(damian-molinski): remove this override once we have API
-    ref = const SignedDocumentRef(id: 'schema');
+    ref = const DocumentRef(id: 'schema');
 
-    final signedDocument = await _getSignedDocumentData(ref: ref);
+    final signedDocument = await _getDocumentData(ref: ref);
 
     assert(
-      signedDocument.metadata.type == SignedDocumentType.proposalTemplate,
+      signedDocument.metadata.type == DocumentType.proposalTemplate,
       'Invalid SignedDocument type',
     );
 
@@ -105,25 +98,25 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
-  Future<SignedDocumentData> _getSignedDocumentData({
-    required SignedDocumentRef ref,
+  Future<DocumentData> _getDocumentData({
+    required DocumentRef ref,
   }) async {
     // if version is not specified we're asking remote for latest version
     // if remote does not know about this id its probably draft so
     // local will return latest version
     if (!ref.isExact) {
-      final latestVersion = await _remoteSource.getLatestVersion(ref.id);
+      final latestVersion = await _remote.getLatestVersion(ref.id);
       ref = ref.copyWith(version: Optional(latestVersion));
     }
 
-    final isCached = await _localSource.exists(ref: ref);
+    final isCached = await _local.exists(ref: ref);
     if (isCached) {
-      return _localSource.get(ref: ref);
+      return _local.get(ref: ref);
     }
 
-    final remoteData = await _remoteSource.get(ref: ref);
+    final remoteData = await _remote.get(ref: ref);
 
-    await _localSource.save(data: remoteData);
+    await _local.save(data: remoteData);
 
     return remoteData;
   }
