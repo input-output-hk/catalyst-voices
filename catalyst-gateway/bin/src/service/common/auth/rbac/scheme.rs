@@ -132,7 +132,6 @@ async fn checker_api_catalyst_auth(
     // Ok, so its validly decoded, but we haven't seen it before.
     // Check that the token is able to be authorized.
 
-    // TODO: FIXME: Check/ask
     // Get pub key from CERTS state given decoded KID from decoded bearer token
     // TODO: Look up certs from the Kid based on RBAC Registrations.
     // let pub_key_bytes = if let Some(cert) = CERTS.get(&token.kid) {

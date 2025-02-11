@@ -3,7 +3,7 @@
 //! not.
 
 use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex, TxnOutputOffset};
-use catalyst_types::uuid::UuidV4;
+use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
 use pallas::ledger::addresses::{
@@ -17,7 +17,6 @@ use crate::db::index::{
 };
 
 // TODO: FIXME:
-// - rbac registrations
 // - rbac invalid registrations
 
 // TODO: FIXME:
@@ -257,6 +256,85 @@ async fn rbac509_registration() {
 
     // re-read
     let mut row_stream = rbac509_registration::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
+
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn rbac509_invalid_registration() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // data
+    let report = ProblemReport::new("test context");
+    let data = vec![
+        rbac509::insert_rbac509_invalid::Params::new(
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+            TransactionHash::new(&[0]),
+            0.into(),
+            0.into(),
+            Some(UuidV4::new()),
+            None,
+            &report,
+        ),
+        rbac509::insert_rbac509_invalid::Params::new(
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+            TransactionHash::new(&[1]),
+            1.into(),
+            1.into(),
+            Some(UuidV4::new()),
+            None,
+            &report,
+        ),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::Rbac509InvalidInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = rbac509_invalid_registration::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(rbac509_registration::Params::from)
+        .collect();
+    let row_results = rbac509_registration::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = rbac509_invalid_registration::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 

@@ -26,7 +26,7 @@ pub struct SignatureEd25519(pub [u8; 64]);
 #[derive(Debug, Clone)]
 pub(crate) struct CatalystRBACTokenV1 {
     /// Token Key Identifier
-    // TODO: FIXME: Investigate and remove the annotation?
+    // TODO: This needs to be updated/removed.
     #[allow(dead_code)]
     pub(crate) kid: Role0Kid,
     /// Tokens ULID (Time and Random Nonce)
