@@ -24,3 +24,41 @@ targets:
       json_serializable:
         options:
           explicit_to_json: true
+      drift_dev:
+        # disable drift's default builder, we're using the modular setup instead.
+        enabled: false
+      drift_dev:analyzer:
+        enabled: true
+        # Drift build options, as per https://drift.simonbinder.eu/docs/advanced-features/builder_options/
+        options: &options
+          # Use ISO 8601 string instead of a unix timestamp
+          store_date_time_values_as_text: true
+          # Potentially turn this on if gradual updates will be needed.
+          data_class_to_companions: false
+          # Can not turn this on because of cat-gateway endpoints generation
+          fatal_warnings: false
+          # We're not using it right now
+          generate_manager: false
+          sql:
+            dialect: sqlite
+            options:
+              # Note that these options are used for static analysis only and don't have an
+              # impact on the actual sqlite version at runtime.
+              # https://drift.simonbinder.eu/generation_options/?h=dialect#assumed-sql-environment
+              version: "3.45"
+              # See modules here https://drift.simonbinder.eu/generation_options/?h=dialect#multi-dialect-code-generation
+              modules:
+                - json1
+
+          # To use the make-migrations command
+          databases:
+            catalyst_database: lib/src/database/catalyst_database.dart
+
+          # The directory where the test files are stored:
+          test_dir: test/src/database/migration/
+          # The directory where the schema files are stored:
+          schema_dir: drift_schemas/
+      drift_dev:modular:
+        enabled: true
+        # We use yaml anchors to give the two builders the same options
+        options: *options
