@@ -9,6 +9,9 @@ final class DocumentDataContent extends Equatable {
 
   const DocumentDataContent(this.data);
 
+  // TODO(damian-molinski): should somehow query data
+  String? get title => null;
+
   @override
   List<Object?> get props => [data];
 }

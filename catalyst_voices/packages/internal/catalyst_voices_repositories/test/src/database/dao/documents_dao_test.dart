@@ -129,6 +129,88 @@ void main() {
 
         expect(count, 1);
       });
+
+      test('where without ver counts all versions', () async {
+        // Given
+        final id = const Uuid().v7();
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) {
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: const Uuid().v7(),
+            );
+            return DocumentWithMetadataFactory.build(metadata: metadata);
+          },
+        );
+
+        final expectedCount = documentsWithMetadata.length;
+        final ref = DocumentRef(id: id);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final count = await database.documentsDao.count(ref: ref);
+
+        expect(count, expectedCount);
+      });
+
+      test('where with ver counts only matching results', () async {
+        // Given
+        final id = const Uuid().v7();
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) {
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: const Uuid().v7(),
+            );
+            return DocumentWithMetadataFactory.build(metadata: metadata);
+          },
+        );
+        final version = documentsWithMetadata.first.document.metadata.version;
+        final ref = DocumentRef(id: id, version: version);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final count = await database.documentsDao.count(ref: ref);
+
+        expect(count, 1);
+      });
+
+      test(
+          'where returns correct value when '
+          'many different documents are found', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          10,
+          (index) {
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: const Uuid().v7(),
+              version: const Uuid().v7(),
+            );
+            return DocumentWithMetadataFactory.build(metadata: metadata);
+          },
+        );
+        final document = documentsWithMetadata.last.document;
+        final id = document.metadata.id;
+        final version = document.metadata.version;
+        final ref = DocumentRef(id: id, version: version);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final count = await database.documentsDao.count(ref: ref);
+
+        expect(count, 1);
+      });
     });
 
     group('delete all', () {

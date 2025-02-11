@@ -7,8 +7,9 @@ import 'package:synchronized/synchronized.dart';
 
 abstract interface class DocumentRepository {
   factory DocumentRepository(
-    DocumentDataLocalSource local,
-    DocumentDataRemoteSource remote,
+    DraftDataSource drafts,
+    DocumentDataLocalSource localDocuments,
+    DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
   Future<ProposalDocument> getProposalDocument({
@@ -21,14 +22,17 @@ abstract interface class DocumentRepository {
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
-  final DocumentDataLocalSource _local;
-  final DocumentDataRemoteSource _remote;
+  // ignore: unused_field
+  final DraftDataSource _drafts;
+  final DocumentDataLocalSource _localDocuments;
+  final DocumentDataRemoteSource _remoteDocuments;
 
   final _templateLock = Lock();
 
   DocumentRepositoryImpl(
-    this._local,
-    this._remote,
+    this._drafts,
+    this._localDocuments,
+    this._remoteDocuments,
   );
 
   @override
@@ -107,18 +111,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     // if remote does not know about this id its probably draft so
     // local will return latest version
     if (!ref.isExact) {
-      final latestVersion = await _remote.getLatestVersion(ref.id);
+      final latestVersion = await _remoteDocuments.getLatestVersion(ref.id);
       ref = ref.copyWith(version: Optional(latestVersion));
     }
 
-    final isCached = await _local.exists(ref: ref);
+    final isCached = await _localDocuments.exists(ref: ref);
     if (isCached) {
-      return _local.get(ref: ref);
+      return _localDocuments.get(ref: ref);
     }
 
-    final remoteData = await _remote.get(ref: ref);
+    final remoteData = await _remoteDocuments.get(ref: ref);
 
-    await _local.save(data: remoteData);
+    await _localDocuments.save(data: remoteData);
 
     return remoteData;
   }

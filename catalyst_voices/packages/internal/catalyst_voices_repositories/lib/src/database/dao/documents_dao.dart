@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
@@ -16,8 +17,18 @@ abstract interface class DocumentsDao {
   /// all will be returned.
   Future<List<DocumentEntity>> queryAll();
 
+  /// If version is specified in [ref] returns this version or null.
+  /// Returns newest version with matching id or null of none found.
+  Future<DocumentEntity?> query({required DocumentRef ref});
+
   /// Counts all documents.
   Future<int> countAll();
+
+  /// Counts documents matching required [ref] id and optional [ref] ver.
+  ///
+  /// If [ref] ver is not specified it will return count of all version
+  /// matching [ref] id.
+  Future<int> count({required DocumentRef ref});
 
   /// Counts unique documents. All versions of same document are counted as 1.
   Future<int> countDocuments();
@@ -56,8 +67,25 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<DocumentEntity?> query({required DocumentRef ref}) {
+    final query = select(documents)
+      ..where((tbl) => _filterRef(tbl, ref))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ])
+      ..limit(1);
+
+    return query.get().then((value) => value.firstOrNull);
+  }
+
+  @override
   Future<int> countAll() {
     return documents.count().getSingle();
+  }
+
+  @override
+  Future<int> count({required DocumentRef ref}) {
+    return documents.count(where: (row) => _filterRef(row, ref)).getSingle();
   }
 
   @override
@@ -118,10 +146,24 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<void> deleteAll() async {
-    final count = await delete(documents).go();
+    final deletedRows = await delete(documents).go();
 
     if (kDebugMode) {
-      debugPrint('DocumentsDao: Deleted $count rows');
+      debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
     }
+  }
+
+  Expression<bool> _filterRef($DocumentsTable row, DocumentRef ref) {
+    final id = UuidHiLo.from(ref.id);
+    final ver = UuidHiLo.fromNullable(ref.version);
+
+    return Expression.and([
+      row.idHi.equals(id.high),
+      row.idLo.equals(id.low),
+      if (ver != null) ...[
+        row.verHi.equals(ver.high),
+        row.verLo.equals(ver.low),
+      ],
+    ]);
   }
 }
