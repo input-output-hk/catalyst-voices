@@ -47,6 +47,16 @@ class WorkspaceMyProposalsSelector extends StatelessWidget {
                   right: 4,
                   child: SearchTextField(
                     hintText: '${l10n.searchProposals}...',
+                    onSearch: ({
+                      required searchValue,
+                      required isSubmitted,
+                    }) {
+                      final event = SearchQueryChangedEvent(
+                        searchValue,
+                        isSubmitted: isSubmitted,
+                      );
+                      context.read<WorkspaceBloc>().add(event);
+                    },
                   ),
                 ),
               ],

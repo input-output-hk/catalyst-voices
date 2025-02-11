@@ -1,22 +1,31 @@
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
+typedef SearchCallback = void Function({
+  required String searchValue,
+  required bool isSubmitted,
+});
 
 class SearchTextField extends StatelessWidget {
   final String hintText;
+  final SearchCallback onSearch;
+  final double width;
+  final double height;
 
   const SearchTextField({
     super.key,
     required this.hintText,
+    required this.onSearch,
+    this.width = 250,
+    this.height = 56,
   });
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 250, maxHeight: 56),
+      constraints: BoxConstraints(maxWidth: width, maxHeight: height),
       child: VoicesTextField(
         decoration: VoicesTextFieldDecoration(
           hintText: hintText,
@@ -28,26 +37,27 @@ class SearchTextField extends StatelessWidget {
           fillColor: Theme.of(context).colorScheme.surface,
         ),
         keyboardType: TextInputType.text,
-        onFieldSubmitted: (value) => _handleSearchQuery(context, value, true),
-        onChanged: (value) => _handleSearchQuery(context, value, false),
+        onFieldSubmitted: (value) => _handleSearchQuery(
+          searchValue: value,
+          isSubmitted: true,
+        ),
+        onChanged: (value) => _handleSearchQuery(
+          searchValue: value,
+          isSubmitted: false,
+        ),
       ),
     );
   }
 
-  void _handleSearchQuery(
-    BuildContext context,
-    String? value,
-    bool isSubmitted,
-  ) {
-    if (value == null) return;
+  void _handleSearchQuery({
+    required String? searchValue,
+    required bool isSubmitted,
+  }) {
+    if (searchValue == null) return;
 
-    final trimmedValue = value.trim();
+    final trimmedValue = searchValue.trim();
     if (trimmedValue.isEmpty) return;
 
-    final event = SearchQueryChangedEvent(
-      trimmedValue,
-      isSubmitted: isSubmitted,
-    );
-    context.read<WorkspaceBloc>().add(event);
+    onSearch(searchValue: trimmedValue, isSubmitted: isSubmitted);
   }
 }
