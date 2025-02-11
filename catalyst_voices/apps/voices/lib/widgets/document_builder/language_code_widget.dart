@@ -1,7 +1,6 @@
-import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
@@ -9,7 +8,6 @@ class LanguageCodeWidget extends StatefulWidget {
   final DocumentValueProperty<String> property;
   final DocumentLanguageCodeSchema schema;
   final bool isEditMode;
-
   final ValueChanged<List<DocumentChange>> onChanged;
 
   const LanguageCodeWidget({
@@ -25,48 +23,9 @@ class LanguageCodeWidget extends StatefulWidget {
 }
 
 class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
-  late List<DropdownMenuEntry<String>> _dropdownMenuEntries;
-  late String? _selectedValue;
-
-  String get _title => widget.schema.formattedTitle;
-
-  List<DropdownMenuEntry<String>> get _mapItems {
-    return (widget.schema.enumValues ?? [])
-        .map((e) {
-          final label = _getLocalizedLanguageName(e);
-          return label != null
-              ? DropdownMenuEntry(value: e, label: label)
-              : null;
-        })
-        .whereNotNull()
-        .toList();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _handleInitialValue();
-  }
-
-  @override
-  void didUpdateWidget(LanguageCodeWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.isEditMode != widget.isEditMode &&
-        widget.isEditMode == false) {
-      _handleInitialValue();
-    }
-
-    if (oldWidget.property.value != widget.property.value) {
-      _handleInitialValue();
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _dropdownMenuEntries = _mapItems;
-  }
+  String? get _value => widget.property.value ?? widget.schema.defaultValue;
+  String get _title => widget.schema.title;
+  bool get _isRequired => widget.schema.isRequired;
 
   @override
   Widget build(BuildContext context) {
@@ -76,37 +35,34 @@ class _LanguageCodeWidgetState extends State<LanguageCodeWidget> {
       children: [
         if (_title.isNotEmpty) ...[
           Text(
-            _title,
+            _title.starred(isEnabled: _isRequired),
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
         ],
         SingleSelectDropdown(
-          items: _dropdownMenuEntries,
-          value: _selectedValue,
-          onChanged: _handleValueChanged,
+          items: _buildMenuEntries(),
+          value: _value,
+          onChanged: _onChanged,
           enabled: widget.isEditMode,
         ),
       ],
     );
   }
 
-  void _handleInitialValue() {
-    _selectedValue =
-        widget.property.value ?? widget.property.schema.defaultValue;
+  List<DropdownMenuEntry<String>> _buildMenuEntries() {
+    return (widget.schema.enumValues ?? [])
+        .map((e) {
+          final label = _getLocalizedLanguageName(e);
+          return label != null
+              ? DropdownMenuEntry(value: e, label: label)
+              : null;
+        })
+        .nonNulls
+        .toList();
   }
 
-  void _handleValueChanged(String? value) {
-    setState(() {
-      _selectedValue = value;
-    });
-
-    if (widget.property.value != value) {
-      _notifyChangeListener(value);
-    }
-  }
-
-  void _notifyChangeListener(String? value) {
+  void _onChanged(String? value) {
     final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,

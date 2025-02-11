@@ -1,7 +1,8 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.33 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.38 AS flutter-ci
+
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -52,9 +53,9 @@ code-generator:
     RUN melos build_runner
 
     IF [ $save_locally = true ]
-        RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway.*.swagger.*" \)
+        RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway.*.swagger.*" -o -name "*.drift.dart" \)
 
-        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway_api.*.swagger.*" \))
+        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway_api.*.swagger.*" -o -name "*.drift.dart" \))
             SAVE ARTIFACT $generated_file AS LOCAL $generated_file
         END
     ELSE
@@ -76,12 +77,6 @@ code-generator:
     # restore current working directory to the root of the project
     WORKDIR /frontend
 
-
-# Runs static analysis on the code.
-check-static-analysis:
-    FROM +code-generator
-    DO flutter-ci+ANALYZE
-
 # Runs code formatting checks.
 check-code-formatting:
     FROM +builder
@@ -101,6 +96,11 @@ check-license:
 test-unit:
     FROM +code-generator
     DO flutter-ci+UNIT_TESTS
+
+# Runs static analysis on the code.
+build-static-analysis:
+    FROM +code-generator
+    DO flutter-ci+ANALYZE
 
 # Build web version of Catalyst Voices
 build-web:

@@ -1,3 +1,7 @@
+## 1.0.0
+
+ - Upgrade flutter version to 3.27.3
+
 ## 0.4.1
 
  - Update a dependency to the latest release.

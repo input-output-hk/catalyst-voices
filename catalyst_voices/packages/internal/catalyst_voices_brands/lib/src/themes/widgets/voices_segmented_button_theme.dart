@@ -18,6 +18,7 @@ class VoicesSegmentedButtonTheme extends SegmentedButtonThemeData {
             textStyle: textTheme.labelLarge,
           ).copyWith(
             side: _Side(colors: voicesColors),
+            iconColor: _IconColor(colors: voicesColors),
           ),
         );
 }
@@ -36,5 +37,23 @@ class _Side extends WidgetStateBorderSide {
     }
 
     return BorderSide(color: colors.outlineBorder);
+  }
+}
+
+class _IconColor extends WidgetStateColor {
+  final VoicesColorScheme colors;
+
+  _IconColor({
+    required this.colors,
+  }) : super(
+          colors.iconsForeground.toARGB32(),
+        );
+
+  @override
+  Color resolve(Set<WidgetState> states) {
+    if (!states.contains(WidgetState.selected)) {
+      return colors.iconsForeground;
+    }
+    return colors.iconsBackground;
   }
 }

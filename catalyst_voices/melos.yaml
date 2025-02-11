@@ -86,18 +86,19 @@ command:
     runPubGetInParallel: true
     environment:
       sdk: ">=3.5.0 <4.0.0"
-      flutter: ">=3.24.1"
+      flutter: ">=3.27.3"
     dependencies:
       asn1lib: ^1.5.3
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
       chopper: ^8.0.3
-      collection: ^1.18.0
+      collection: ^1.19.0
       cryptography: ^2.7.0
       dotted_border: ^2.1.0
       ed25519_hd_key: ^2.3.0
       email_validator: ^3.0.0
       equatable: ^2.0.7
+      fake_async: ^1.3.1
       ffi: ^2.1.0
       ffigen: ^11.0.0
       file_picker: ^8.0.7
@@ -171,9 +172,20 @@ scripts:
       --depends-on="build_runner" \
       --scope="catalyst_voices_repositories" -- \
           dart run build_runner build --delete-conflicting-outputs \
-              --build-filter="lib/src/dto/**"
+              --build-filter="lib/src/dto/**" \
+              --build-filter="lib/src/database/**"
     description: |
       Run `build_runner` in catalyst_voices_repositories package only in selected folders
+
+  db-make-migration:
+    run: |
+      melos exec -c 1 \
+      --depends-on="build_runner" \
+      --scope="catalyst_voices_repositories" -- \
+          dart run drift_dev make-migrations
+    description: |
+      Run `make-migrations` in catalyst_voices_repositories package and generates schema migration
+      classes
 
   metrics:
     run: |
@@ -221,18 +233,20 @@ scripts:
       # cleanup old coverage files and create empty folder where coverage files will be stored
       find . -type d -name coverage -prune -exec rm -rf {} \;
       mkdir $MELOS_ROOT_PATH/coverage
-
+            
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
-          'OUTPUT=$(flutter test --reporter expanded --coverage --machine) ; \
-          EXIT_CODE=$? ; \
-          printf "%s" "$OUTPUT" | tojunit --output $MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml ; \
-          exit $EXIT_CODE'
-
+      ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
+        JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
+        flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
+        EXIT_CODE=$? ; \
+        cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
+        exit $EXIT_CODE'
+      
       # store the exit code after running the tests,
       # this is the exit code for the whole script
       EXIT_CODE=$?
-
+      
       # removes code coverage for generated code
       find . -name "*.lcov.info" -exec \
         lcov --remove {} -o {} --ignore-errors unused,unused \
@@ -243,10 +257,12 @@ scripts:
         '*.openapi.dart' \
         '*.gen.dart' \
         '*.swagger.*.dart' \
+        '*.drift.dart' \
         'lib/generated/**' \;
-
+      
       # merges all coverage reports into a single one and puts it in /coverage/lcov.info
       dart pub global run combine_coverage --repo-path=.
+      
       exit $EXIT_CODE
 
     description: |

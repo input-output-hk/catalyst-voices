@@ -74,8 +74,8 @@ class TimezoneDateTimeText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final timezone = context.select<SessionCubit, TimezonePreferences>(
-      (value) => value.state.settings.timezone,
+    final timezone = context.select<SessionCubit?, TimezonePreferences>(
+      (value) => value?.state.settings.timezone ?? TimezonePreferences.local,
     );
 
     final effectiveData = switch (timezone) {
@@ -89,7 +89,7 @@ class TimezoneDateTimeText extends StatelessWidget {
     );
 
     final style = this.style ?? const TextStyle();
-    final effectiveStyle = style.merge(baseStyle);
+    final effectiveStyle = baseStyle.merge(style);
 
     return AffixDecorator(
       gap: showTimezone ? 6 : 0,

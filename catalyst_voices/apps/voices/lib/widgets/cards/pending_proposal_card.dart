@@ -51,7 +51,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   }
 
   @override
-  void didUpdateWidget(covariant PendingProposalCard oldWidget) {
+  void didUpdateWidget(PendingProposalCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
       _border = _ProposalBorderColor(
@@ -142,7 +142,7 @@ final class _ProposalBorderColor extends WidgetStateColor {
     required this.publishStage,
     required this.colors,
     required this.colorScheme,
-  }) : super(colors.outlineBorder.value);
+  }) : super(colors.outlineBorder.toARGB32());
 
   @override
   Color resolve(Set<WidgetState> states) {
@@ -291,7 +291,7 @@ class _FundsAndDuration extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: SizedBox(

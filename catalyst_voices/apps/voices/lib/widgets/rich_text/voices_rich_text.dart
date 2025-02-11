@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -14,7 +17,7 @@ final class VoicesRichTextController extends QuillController {
   });
 }
 
-class VoicesRichText extends FormField<Document> {
+class VoicesRichText extends VoicesFormField<Document> {
   final VoicesRichTextController controller;
   final String title;
   final FocusNode focusNode;
@@ -23,16 +26,23 @@ class VoicesRichText extends FormField<Document> {
 
   VoicesRichText({
     super.key,
+    required super.onChanged,
+    super.autovalidateMode = AutovalidateMode.onUserInteraction,
     super.enabled,
-    super.autovalidateMode = AutovalidateMode.always,
+    super.validator,
     required this.controller,
     required this.title,
     required this.focusNode,
     required this.scrollController,
     this.charsLimit,
-    super.validator,
   }) : super(
+          value: controller.document,
           builder: (field) {
+            void onChangedHandler(Document? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -52,6 +62,7 @@ class VoicesRichText extends FormField<Document> {
                     controller: controller,
                     focusNode: focusNode,
                     scrollController: scrollController,
+                    onChanged: onChangedHandler,
                   ),
                 ),
                 Offstage(
@@ -104,11 +115,11 @@ class _EditorDecoration extends StatelessWidget {
   Widget build(BuildContext context) {
     return
         // TODO(jakub): enable after implementing https://github.com/input-output-hk/catalyst-voices/issues/846
-        //   ResizableBoxParent(
+        // ResizableBoxParent(
         //   minHeight: 470,
         //   resizableVertically: true,
         //   resizableHorizontally: false,
-        // child:
+        //   child:
         DecoratedBox(
       decoration: BoxDecoration(
         color: isEditMode
@@ -122,7 +133,6 @@ class _EditorDecoration extends StatelessWidget {
       ),
       child: child,
     );
-    // ),
   }
 
   Color _getBorderColor(BuildContext context) {
@@ -140,25 +150,70 @@ class _EditorDecoration extends StatelessWidget {
   }
 }
 
-class _Editor extends StatelessWidget {
+class _Editor extends StatefulWidget {
   final VoicesRichTextController controller;
   final FocusNode focusNode;
   final ScrollController scrollController;
+  final ValueChanged<Document?>? onChanged;
 
   const _Editor({
     required this.controller,
     required this.focusNode,
     required this.scrollController,
+    required this.onChanged,
   });
+
+  @override
+  State<_Editor> createState() => _EditorState();
+}
+
+class _EditorState extends State<_Editor> {
+  Document? _observedDocument;
+  StreamSubscription<DocChange>? _documentChangeSub;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller.addListener(_onControllerChanged);
+    _updateObservedDocument();
+  }
+
+  @override
+  void didUpdateWidget(_Editor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!identical(oldWidget.controller, widget.controller)) {
+      oldWidget.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+      _updateObservedDocument();
+    }
+  }
+
+  void _onControllerChanged() {
+    if (_observedDocument != widget.controller.document) {
+      _updateObservedDocument();
+    }
+  }
+
+  void _updateObservedDocument() {
+    unawaited(_documentChangeSub?.cancel());
+
+    _observedDocument = widget.controller.document;
+    _documentChangeSub = _observedDocument?.changes.listen((delta) {
+      final document = widget.controller.document;
+      widget.onChanged?.call(document);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     return QuillEditor(
-      controller: controller,
-      focusNode: focusNode,
-      scrollController: scrollController,
+      controller: widget.controller,
+      focusNode: widget.focusNode,
+      scrollController: widget.scrollController,
       configurations: QuillEditorConfigurations(
         padding: const EdgeInsets.all(16),
         placeholder: context.l10n.placeholderRichText,

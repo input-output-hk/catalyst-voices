@@ -9,9 +9,9 @@ typedef EditableTileChange = ({
   EditableTileChangeSource source,
 });
 
-class EditableTile extends StatefulWidget {
+class EditableTile extends StatelessWidget {
   final String title;
-  final bool initialEditMode;
+  final bool isEditMode;
   final bool isSaveEnabled;
   final ValueChanged<EditableTileChange>? onChanged;
   final Widget child;
@@ -19,70 +19,46 @@ class EditableTile extends StatefulWidget {
   const EditableTile({
     super.key,
     required this.title,
-    this.initialEditMode = false,
+    this.isEditMode = false,
     this.isSaveEnabled = false,
     this.onChanged,
     required this.child,
   });
 
   @override
-  State<EditableTile> createState() => _EditableTileState();
-}
-
-class _EditableTileState extends State<EditableTile> {
-  late bool _isEditMode;
-
-  @override
-  void initState() {
-    super.initState();
-    _isEditMode = widget.initialEditMode;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PropertyTile(
-      title: widget.title,
+      title: title,
       action: VoicesEditSaveButton(
         onTap: _toggleEditMode,
-        isEditing: _isEditMode,
+        isEditing: isEditMode,
       ),
-      footer: _isEditMode
+      footer: isEditMode
           ? _Footer(
-              isSaveEnabled: widget.isSaveEnabled,
+              isSaveEnabled: isSaveEnabled,
               onSave: _save,
             )
           : null,
-      child: widget.child,
+      child: child,
     );
   }
 
   void _toggleEditMode() {
-    setState(() {
-      _isEditMode = !_isEditMode;
+    final change = (
+      isEditMode: !isEditMode,
+      source: EditableTileChangeSource.cancel,
+    );
 
-      final onChanged = widget.onChanged;
-      if (onChanged != null) {
-        final change = (
-          isEditMode: _isEditMode,
-          source: EditableTileChangeSource.cancel,
-        );
-        onChanged(change);
-      }
-    });
+    onChanged?.call(change);
   }
 
   void _save() {
-    setState(() {
-      _isEditMode = false;
-      final onChanged = widget.onChanged;
-      if (onChanged != null) {
-        final change = (
-          isEditMode: _isEditMode,
-          source: EditableTileChangeSource.save,
-        );
-        onChanged(change);
-      }
-    });
+    const change = (
+      isEditMode: false,
+      source: EditableTileChangeSource.save,
+    );
+
+    onChanged?.call(change);
   }
 }
 

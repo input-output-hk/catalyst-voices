@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCategoryCard extends StatelessWidget {
-  final CampaignCategoryCardViewModel category;
+  final CampaignCategoryViewModel category;
 
   const CampaignCategoryCard({
     super.key,
@@ -21,7 +21,7 @@ class CampaignCategoryCard extends StatelessWidget {
         color: context.colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.colors.outlineBorderVariant.withOpacity(.38),
+          color: context.colors.outlineBorderVariant.withValues(alpha: .38),
         ),
       ),
       clipBehavior: Clip.antiAlias,
@@ -81,7 +81,7 @@ class _Buttons extends StatelessWidget {
       children: [
         VoicesFilledButton(
           onTap: () {
-            // TODO(LynxxLynx): implement redirect to category details
+            CategoryDetailRoute(categoryId).go(context);
           },
           child: Text(context.l10n.categoryDetails),
         ),

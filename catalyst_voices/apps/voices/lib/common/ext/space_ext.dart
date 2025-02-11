@@ -41,11 +41,11 @@ extension SpaceExt on Space {
 
   Color backgroundColor(BuildContext context) => switch (this) {
         Space.discovery =>
-          Theme.of(context).colors.iconsSecondary.withOpacity(0.16),
+          Theme.of(context).colors.iconsSecondary.withValues(alpha: 0.16),
         Space.workspace => Theme.of(context).colorScheme.primaryContainer,
         Space.voting => Theme.of(context).colors.warningContainer,
         Space.fundedProjects =>
-          Theme.of(context).colors.iconsSecondary.withOpacity(0.16),
+          Theme.of(context).colors.iconsSecondary.withValues(alpha: 0.16),
         Space.treasury => Theme.of(context).colors.successContainer,
       };
 
