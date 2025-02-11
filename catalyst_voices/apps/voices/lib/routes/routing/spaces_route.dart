@@ -215,8 +215,8 @@ final class WorkspaceRoute extends GoRouteData
 
   @override
   List<RouteGuard> get routeGuards => const [
-        // SessionUnlockedGuard(),
-        // UserAccessGuard(),
+        SessionUnlockedGuard(),
+        UserAccessGuard(),
       ];
 
   @override
