@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
