@@ -223,7 +223,7 @@ rules:
       function: truthy
   api-example-properties:
     message: "Property should contain example"
-    given: "$..properties.*"
+    given: "$..*[?(@.properties && !@.example)].properties.*"
     severity: error
     then:
       field: "example"

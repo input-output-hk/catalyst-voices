@@ -13,7 +13,7 @@ pub(crate) struct SlotNumber(i64);
 impl SlotNumber {
     /// Creates a `SlotNumber` schema definition.
     fn schema() -> MetaSchema {
-        MetaSchema::new("string").merge(MetaSchema {
+        MetaSchema::new_with_format("integer", "int64").merge(MetaSchema {
             title: Some("Slot Number".into()),
             description: Some("Cardano slot number."),
             example: Some(Self::example().0.into()),
