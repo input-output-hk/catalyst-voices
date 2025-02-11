@@ -43,6 +43,7 @@ class _VoicesRichTextExampleState extends State<VoicesRichTextExample> {
           enabled: true,
           focusNode: FocusNode(),
           scrollController: ScrollController(),
+          onChanged: (_) {},
         ),
       ),
     );

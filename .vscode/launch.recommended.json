@@ -24,6 +24,7 @@
         "--dart-define",
         "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
         // flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
+        // drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
         "--web-header",
         "Cross-Origin-Opener-Policy=same-origin",
         "--web-header",
