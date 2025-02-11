@@ -100,22 +100,36 @@ class _MultilineTextEntryMarkdownWidgetState
     );
   }
 
-  void _updateContents(String value) {
-    if (value.isNotEmpty) {
-      final input = MarkdownData(value);
-      final delta = markdown.encoder.convert(input);
-
-      _controller.replaceText(
-        0,
-        _controller.document.length,
-        delta,
-        _controller.document.length <= value.length
-            ? null
-            : TextSelection.collapsed(offset: value.length),
-        shouldNotifyListeners: false,
-      );
-    } else {
+  void _updateContents(String newMarkdown) {
+    if (newMarkdown.isEmpty) {
       _controller.clear();
+    } else {
+      // Don't update the document if the markdown representation didn't change.
+      // When updating the document Quill removes blank lines which conflict
+      // with a user trying to insert a blank line.
+      final oldMarkdown = _formatDocumentAsMarkdown(_controller.document);
+      if (oldMarkdown != newMarkdown) {
+        final input = MarkdownData(newMarkdown);
+        final delta = markdown.encoder.convert(input);
+        final newDocument = quill.Document.fromDelta(delta);
+
+        // Replace entire document with new text
+        _controller.document = newDocument;
+
+        // Save current cursor position
+        final selection = _controller.selection;
+
+        // Restore cursor position if possible
+        final newOffset = selection.baseOffset.clamp(
+          0,
+          newDocument.toPlainText().length,
+        );
+
+        _controller.updateSelection(
+          TextSelection.collapsed(offset: newOffset),
+          quill.ChangeSource.silent,
+        );
+      }
     }
   }
 
@@ -128,10 +142,8 @@ class _MultilineTextEntryMarkdownWidgetState
   }
 
   void _dispatchChange(quill.Document? document) {
-    final delta = document?.toDelta();
-    final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
-    final value = markdownData?.data;
-    final normalizedValue = widget.schema.normalizeValue(value);
+    final markdown = _formatDocumentAsMarkdown(document);
+    final normalizedValue = widget.schema.normalizeValue(markdown);
 
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
@@ -139,6 +151,16 @@ class _MultilineTextEntryMarkdownWidgetState
     );
 
     widget.onChanged([change]);
+  }
+
+  String? _formatDocumentAsMarkdown(quill.Document? document) {
+    if (document == null || document.isEmpty()) {
+      return null;
+    }
+
+    final delta = document.toDelta();
+    final markdownData = markdown.decoder.convert(delta);
+    return markdownData.data;
   }
 
   String? _validator(quill.Document? document) {
