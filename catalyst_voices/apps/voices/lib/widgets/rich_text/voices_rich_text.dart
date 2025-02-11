@@ -209,7 +209,9 @@ class _EditorState extends State<_Editor> {
         padding: const EdgeInsets.all(16),
         placeholder: context.l10n.placeholderRichText,
         characterShortcutEvents: standardCharactersShortcutEvents,
+        /* cSpell:disable */
         spaceShortcutEvents: standardSpaceShorcutEvents,
+        /* cSpell:enable */
         customStyles: DefaultStyles(
           placeHolder: DefaultTextBlockStyle(
             textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
