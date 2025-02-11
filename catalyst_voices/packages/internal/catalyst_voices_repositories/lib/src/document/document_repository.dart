@@ -13,6 +13,10 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
+  Stream<ProposalDocument?> watchProposalDocument({
+    required DocumentRef ref,
+  });
+
   Future<ProposalDocument> getProposalDocument({
     required DocumentRef ref,
   });
@@ -37,44 +41,33 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   );
 
   @override
+  Stream<ProposalDocument?> watchProposalDocument({
+    required DocumentRef ref,
+  }) {
+    // TODO(damian-molinski): remove this override once we have API
+    ref = const DocumentRef(id: mockedDocumentUuid);
+
+    return _watchDocumentData(ref: ref).asyncMap(
+      (documentData) async {
+        if (documentData == null) {
+          return null;
+        }
+
+        return _buildProposalDocument(from: documentData);
+      },
+    );
+  }
+
+  @override
   Future<ProposalDocument> getProposalDocument({
     required DocumentRef ref,
   }) async {
     // TODO(damian-molinski): remove this override once we have API
     ref = const DocumentRef(id: mockedDocumentUuid);
 
-    final signedDocumentData = await getDocumentData(ref: ref);
+    final documentData = await getDocumentData(ref: ref);
 
-    assert(
-      signedDocumentData.metadata.type == DocumentType.proposalDocument,
-      'Invalid Proposal SignedDocument type',
-    );
-    assert(
-      signedDocumentData.metadata.template != null,
-      'Proposal metadata has no template',
-    );
-
-    final templateRef = signedDocumentData.metadata.template!;
-
-    final template = await _templateLock.synchronized(() {
-      return getProposalTemplate(ref: templateRef);
-    });
-
-    final metadata = ProposalMetadata(
-      id: signedDocumentData.metadata.id,
-      version: signedDocumentData.metadata.version,
-    );
-
-    final content = DocumentDataContentDto.fromModel(
-      signedDocumentData.content,
-    );
-    final schema = template.schema;
-    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
-
-    return ProposalDocument(
-      metadata: metadata,
-      document: document,
-    );
+    return _buildProposalDocument(from: documentData);
   }
 
   @override
@@ -103,6 +96,51 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       metadata: metadata,
       schema: schema,
     );
+  }
+
+  Future<ProposalDocument> _buildProposalDocument({
+    required DocumentData from,
+  }) async {
+    assert(
+      from.metadata.type == DocumentType.proposalDocument,
+      'Invalid Proposal SignedDocument type',
+    );
+    assert(
+      from.metadata.template != null,
+      'Proposal metadata has no template',
+    );
+
+    final templateRef = from.metadata.template!;
+
+    final template = await _templateLock.synchronized(() {
+      return getProposalTemplate(ref: templateRef);
+    });
+
+    final metadata = ProposalMetadata(
+      id: from.metadata.id,
+      version: from.metadata.version,
+    );
+
+    final content = DocumentDataContentDto.fromModel(
+      from.content,
+    );
+    final schema = template.schema;
+    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
+
+    return ProposalDocument(
+      metadata: metadata,
+      document: document,
+    );
+  }
+
+  Stream<DocumentData?> _watchDocumentData({
+    required DocumentRef ref,
+  }) {
+    /// Make sure we're update to date with document ref.
+    // ignore: discarded_futures
+    getDocumentData(ref: ref).ignore();
+
+    return _localDocuments.watch(ref: ref);
   }
 
   @visibleForTesting

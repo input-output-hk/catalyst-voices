@@ -28,6 +28,12 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Stream<DocumentData?> watch({required DocumentRef ref}) {
+    // TODO: implement watch
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> save({required DocumentData data}) async {
     final idHiLo = UuidHiLo.from(data.metadata.id);
     final verHiLo = UuidHiLo.from(data.metadata.version);

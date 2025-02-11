@@ -1,8 +1,9 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -96,7 +97,95 @@ void main() {
         verify(() => remoteDocuments.get(ref: exactRef)).called(1);
       });
     });
+
+    group('watchProposalDocument', () {
+      test('description', () async {
+        // Given
+        // TODO(damian-molinski): remove mocked ids when api integrated.
+        final templateRef = DocumentRef(
+          id: mockedTemplateUuid,
+          version: const Uuid().v7(),
+        );
+        final proposalRef = DocumentRef(
+          id: mockedTemplateUuid,
+          version: const Uuid().v7(),
+        );
+
+        when(() => remoteDocuments.get(ref: templateRef)).thenAnswer((_) {
+          return _buildProposalTemplate(
+            id: templateRef.id,
+            version: templateRef.version,
+          );
+        });
+        when(() => remoteDocuments.get(ref: proposalRef)).thenAnswer((_) {
+          return _buildProposal(
+            id: proposalRef.id,
+            version: proposalRef.version,
+            template: templateRef,
+          );
+        });
+
+        // When
+        final proposalStream = repository.watchProposalDocument(
+          ref: proposalRef,
+        );
+
+        // Then
+        expect(
+          proposalStream,
+          emitsThrough([
+            isNotNull,
+          ]),
+        );
+      });
+    });
   });
+}
+
+Future<DocumentData> _buildProposalTemplate({
+  String? id,
+  String? version,
+}) async {
+  final rawContent = await VoicesDocumentsTemplates.proposalF14Schema;
+
+  final metadata = DocumentDataMetadata(
+    type: DocumentType.proposalTemplate,
+    id: id ?? const Uuid().v7(),
+    version: version ?? const Uuid().v7(),
+  );
+
+  final content = DocumentDataContent(rawContent);
+
+  return DocumentData(
+    metadata: metadata,
+    content: content,
+  );
+}
+
+Future<DocumentData> _buildProposal({
+  String? id,
+  String? version,
+  DocumentRef? template,
+}) async {
+  final rawContent = await VoicesDocumentsTemplates.proposalF14Document;
+
+  final metadata = DocumentDataMetadata(
+    type: DocumentType.proposalDocument,
+    id: id ?? const Uuid().v7(),
+    version: version ?? const Uuid().v7(),
+    template: template ??
+        DocumentRef(
+          id: const Uuid().v7(),
+          version: const Uuid().v7(),
+        ),
+  );
+
+  final content = DocumentDataContent(rawContent);
+
+  return DocumentData(
+    metadata: metadata,
+    content: content,
+  );
 }
 
 class _MockDocumentDataRemoteSource extends Mock
