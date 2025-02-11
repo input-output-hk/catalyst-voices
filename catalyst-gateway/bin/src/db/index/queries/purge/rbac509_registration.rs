@@ -37,13 +37,13 @@ const SELECT_QUERY: &str = include_str!("cql/get_rbac_registration.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A short Catalyst ID.
-    pub(crate) catalyst_id: DbCatalystId,
+    pub catalyst_id: DbCatalystId,
     /// A transaction ID.
-    transaction_id: DbTransactionHash,
+    pub transaction_id: DbTransactionHash,
     /// Block Slot Number
-    pub(crate) slot_no: DbSlot,
+    pub slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: DbTxnIndex,
+    pub txn: DbTxnIndex,
 }
 
 impl Debug for Params {

@@ -6,8 +6,8 @@ use anyhow::{Context, Result};
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
+    prepared_statement::PreparedStatement, statement::Consistency,
+    transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session,
 };
 use tracing::error;
 
@@ -40,17 +40,19 @@ pub(crate) struct QueryParams {
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// A Catalyst ID.
-    pub(crate) catalyst_id: DbCatalystId,
+    pub catalyst_id: DbCatalystId,
     /// A slot number.
-    pub(crate) slot_no: DbSlot,
+    #[allow(dead_code)]
+    pub slot_no: DbSlot,
     /// A transaction index.
-    pub(crate) txn_idx: DbTxnIndex,
+    #[allow(dead_code)]
+    pub txn_idx: DbTxnIndex,
 }
 
 impl Query {
     /// Prepares a get catalyst ID by transaction ID query.
     pub(crate) async fn prepare(session: Arc<Session>) -> Result<PreparedStatement> {
-        PreparedQueries::prepare(session, QUERY, scylla::statement::Consistency::All, true)
+        PreparedQueries::prepare(session, QUERY, Consistency::All, true)
             .await
             .inspect_err(
                 |e| error!(error=%e, "Failed to prepare get Catalyst ID by transaction ID query"),

@@ -1,14 +1,10 @@
 //! Get Catalyst ID by stake address.
 
-use std::sync::{Arc, LazyLock};
+use std::sync::Arc;
 
-use anyhow::Context;
-use futures::StreamExt;
-use moka::{policy::EvictionPolicy, sync::Cache};
-use pallas::ledger::addresses::StakeAddress;
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
+    prepared_statement::PreparedStatement, statement::Consistency,
+    transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session,
 };
 use tracing::error;
 
@@ -19,14 +15,6 @@ use crate::db::{
     },
     types::{DbCatalystId, DbCip19StakeAddress, DbSlot, DbTxnIndex},
 };
-
-/// Cached data.
-static CATALYST_ID_BY_STAKE_ADDRESS_CACHE: LazyLock<Cache<StakeAddress, Query>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            .eviction_policy(EvictionPolicy::lru())
-            .build()
-    });
 
 /// Get Catalyst ID by stake address query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_stake_addr.cql");
@@ -39,20 +27,22 @@ pub(crate) struct QueryParams {
 }
 
 /// Get Catalyst ID by stake address query.
+// TODO: Remove the `dead_code` annotation when the query is used.
+#[allow(dead_code)]
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// Slot Number the stake address was registered in.
-    pub(crate) slot_no: DbSlot,
+    pub slot_no: DbSlot,
     /// Transaction Offset the stake address was registered in.
-    pub(crate) txn: DbTxnIndex,
+    pub txn: DbTxnIndex,
     /// Catalyst ID for the queries stake address.
-    pub(crate) catalyst_id: DbCatalystId,
+    pub catalyst_id: DbCatalystId,
 }
 
 impl Query {
     /// Prepares a get Catalyst ID by stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        PreparedQueries::prepare(session, QUERY, scylla::statement::Consistency::All, true)
+        PreparedQueries::prepare(session, QUERY, Consistency::All, true)
             .await
             .inspect_err(
                 |e| error!(error=%e, "Failed to prepare get Catalyst ID by stake address query"),
@@ -70,45 +60,4 @@ impl Query {
             .rows_stream::<Query>()
             .map_err(Into::into)
     }
-
-    /// Get latest Catalyst ID for a given stake address, uncached.
-    ///
-    /// Unless you really know you need an uncached result, use the cached version.
-    pub(crate) async fn get_latest_uncached(
-        session: &CassandraSession, stake_addr: &StakeAddress,
-    ) -> anyhow::Result<Option<Query>> {
-        Self::execute(session, QueryParams {
-            stake_address: stake_addr.clone().into(),
-        })
-        .await?
-        .next()
-        .await
-        .transpose()
-        .context("Failed to get Catalyst ID by stake address query row")
-    }
-
-    /// Get latest registration for a stake address.
-    pub(crate) async fn get_latest(
-        session: &CassandraSession, stake_addr: &StakeAddress,
-    ) -> anyhow::Result<Option<Query>> {
-        match CATALYST_ID_BY_STAKE_ADDRESS_CACHE.get(stake_addr) {
-            Some(v) => Ok(Some(v)),
-            None => {
-                // Look in DB for the stake registration
-                Self::get_latest_uncached(session, stake_addr).await
-            },
-        }
-    }
-}
-
-/// Update the cache when a rbac registration is indexed.
-pub(crate) fn cache_for_stake_addr(
-    stake: &StakeAddress, slot_no: DbSlot, txn: DbTxnIndex, catalyst_id: DbCatalystId,
-) {
-    let value = Query {
-        slot_no,
-        txn,
-        catalyst_id,
-    };
-    CATALYST_ID_BY_STAKE_ADDRESS_CACHE.insert(stake.clone(), value);
 }

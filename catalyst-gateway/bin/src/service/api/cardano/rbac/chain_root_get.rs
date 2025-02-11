@@ -22,6 +22,7 @@ pub(crate) struct Response {
 }
 
 /// Endpoint responses.
+#[allow(dead_code)]
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
     /// ## Ok

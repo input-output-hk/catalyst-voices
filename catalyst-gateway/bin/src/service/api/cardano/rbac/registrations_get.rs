@@ -39,11 +39,6 @@ pub(crate) enum Responses {
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
     Ok(Json<RbacRegistrationsResponse>),
-    /// ## Unprocessable Content
-    ///
-    /// Response for unprocessable content.
-    #[oai(status = 422)]
-    UnprocessableContent,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;

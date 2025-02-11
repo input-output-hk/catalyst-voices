@@ -12,7 +12,8 @@ use crate::utils::blake2b_hash::blake2b_128;
 // Length of the role0 hash
 const ROLE0_KID_LENGTH: usize = 16;
 
-/// Role 0 Key ID - Blake2b-128 hash of the Role 0 Certificate defining the Session public key.
+/// Role 0 Key ID - Blake2b-128 hash of the Role 0 Certificate defining the Session public
+/// key.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct Role0Kid(Hash<ROLE0_KID_LENGTH>);
 
@@ -88,8 +89,8 @@ mod test_big_uint {
     #[test]
     fn test_encode_decode() {
         let dummy_cert: Vec<u8> = vec![
-            0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd,
-            0xee, 0xff,
+            0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD,
+            0xEE, 0xFF,
         ];
 
         let kid = Role0Kid::new(&dummy_cert);

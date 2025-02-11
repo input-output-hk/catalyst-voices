@@ -37,13 +37,13 @@ const SELECT_QUERY: &str = include_str!("cql/get_rbac_invalid_registration.cql")
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A short Catalyst ID.
-    pub(crate) catalyst_id: DbCatalystId,
+    pub catalyst_id: DbCatalystId,
     /// A transaction ID.
     transaction_id: DbTransactionHash,
     /// A block slot number.
-    pub(crate) slot_no: DbSlot,
+    pub slot_no: DbSlot,
     /// A transaction offset inside the block.
-    pub(crate) txn: DbTxnIndex,
+    pub txn: DbTxnIndex,
 }
 
 impl Debug for Params {
@@ -91,7 +91,7 @@ impl PrimaryKeyQuery {
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
-            .purge_execute_iter(PreparedSelectQuery::Rbac509)
+            .purge_execute_iter(PreparedSelectQuery::Rbac509Invalid)
             .await?
             .rows_stream::<result::PrimaryKey>()?;
 
@@ -118,11 +118,11 @@ impl DeleteQuery {
             true,
             false,
         )
-            .await
-            .inspect_err(
-                |error| error!(error=%error, "Failed to prepare delete RBAC 509 invalid registration primary key query."),
-            )
-            .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
+        .await
+        .inspect_err(
+            |error| error!(error=%error, "Failed to prepare delete RBAC 509 invalid registration primary key query."),
+        )
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query
@@ -130,9 +130,8 @@ impl DeleteQuery {
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::Rbac509, params)
+            .purge_execute_batch(PreparedDeleteQuery::Rbac509Invalid, params)
             .await?;
-
         Ok(results)
     }
 }
