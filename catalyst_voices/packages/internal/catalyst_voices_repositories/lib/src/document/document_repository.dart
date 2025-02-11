@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:synchronized/synchronized.dart';
 
 abstract interface class DocumentRepository {
@@ -40,9 +41,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
   }) async {
     // TODO(damian-molinski): remove this override once we have API
-    ref = const DocumentRef(id: 'proposal');
+    ref = const DocumentRef(id: mockedDocumentUuid);
 
-    final signedDocumentData = await _getDocumentData(ref: ref);
+    final signedDocumentData = await getDocumentData(ref: ref);
 
     assert(
       signedDocumentData.metadata.type == DocumentType.proposalDocument,
@@ -81,9 +82,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
   }) async {
     // TODO(damian-molinski): remove this override once we have API
-    ref = const DocumentRef(id: 'schema');
+    ref = const DocumentRef(id: mockedTemplateUuid);
 
-    final signedDocument = await _getDocumentData(ref: ref);
+    final signedDocument = await getDocumentData(ref: ref);
 
     assert(
       signedDocument.metadata.type == DocumentType.proposalTemplate,
@@ -104,7 +105,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
-  Future<DocumentData> _getDocumentData({
+  @visibleForTesting
+  Future<DocumentData> getDocumentData({
     required DocumentRef ref,
   }) async {
     // if version is not specified we're asking remote for latest version

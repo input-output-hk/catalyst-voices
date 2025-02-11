@@ -4,6 +4,9 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:uuid/uuid.dart';
 
+const mockedDocumentUuid = '0194f567-65f5-7ec6-b4f2-f744c0f74844';
+const mockedTemplateUuid = '0194f567-65f5-7d96-ad12-77762fdef00b';
+
 abstract interface class DocumentDataRemoteSource
     implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
@@ -24,7 +27,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   // TODO(damian-molinski): make API call and use _signedDocumentManager.
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
-    final isSchema = ref.id == 'schema';
+    final isSchema = ref.id == mockedTemplateUuid;
 
     final signedDocument = await (isSchema
         ? VoicesDocumentsTemplates.proposalF14Schema
@@ -33,8 +36,9 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     final type = isSchema
         ? DocumentType.proposalTemplate
         : DocumentType.proposalDocument;
-    final ver = ref.version ?? const Uuid().v7();
-    final template = !isSchema ? const DocumentRef(id: 'schema') : null;
+    final ver = ref.version ?? ref.id;
+    final template =
+        !isSchema ? const DocumentRef(id: mockedTemplateUuid) : null;
 
     final metadata = DocumentDataMetadata(
       type: type,
