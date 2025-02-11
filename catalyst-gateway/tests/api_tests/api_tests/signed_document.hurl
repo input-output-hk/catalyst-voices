@@ -63,4 +63,4 @@ Authorization: Bearer catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mq
 {
     "id": { "eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e" }
 }
-HTTP 400
+HTTP 412
