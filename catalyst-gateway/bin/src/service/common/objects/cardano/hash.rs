@@ -5,7 +5,7 @@ use core::fmt;
 use derive_more::From;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef, Registry},
-    types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 
 use crate::service::utilities::as_hex_string;
@@ -23,11 +23,7 @@ impl Hash256 {
         let mut schema = MetaSchema::new("string");
         schema.title = Some(format!("Cardano {}-bit Hash", Self::HASH_LEN * 4));
         schema.description = Some("Cardano Blake2b256 hash encoded in hex.");
-        schema.example = Some(
-            // cspell: disable
-            "0x0000000000000000000000000000000000000000000000000000000000000000".into(),
-            // cspell: enable
-        );
+        schema.example = Some(Self::example().to_string().into());
         schema.min_length = Some(Self::HASH_LEN + 2);
         schema.max_length = Some(Self::HASH_LEN + 2);
         schema.pattern = Some("^0x[0-9a-f]{64}$".to_string());
@@ -61,6 +57,16 @@ impl Type for Hash256 {
         &'a self,
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
+    }
+}
+
+impl Example for Hash256 {
+    fn example() -> Self {
+        // 0xff561c1ce6becf136a5d3063f50d78b8db50b8a1d4c03b18d41a8e98a6a18aed
+        Self::from(vec![
+            255, 86, 28, 28, 230, 190, 207, 19, 106, 93, 48, 99, 245, 13, 120, 184, 219, 80, 184,
+            161, 212, 192, 59, 24, 212, 26, 142, 152, 166, 161, 138, 237,
+        ])
     }
 }
 
@@ -125,11 +131,7 @@ impl Hash128 {
         let mut schema = MetaSchema::new("string");
         schema.title = Some(format!("Cardano {}-bit Hash", Self::HASH_LEN * 4));
         schema.description = Some("Cardano Blake2b128 hash encoded in hex.");
-        schema.example = Some(
-            // cspell: disable
-            "0x00000000000000000000000000000000".into(),
-            // cspell: enable
-        );
+        schema.example = Some(Self::example().to_string().into());
         schema.min_length = Some(Self::HASH_LEN + 2);
         schema.max_length = Some(Self::HASH_LEN + 2);
         schema.pattern = Some("^0x[0-9a-f]{32}$".to_string());
@@ -163,6 +165,15 @@ impl Type for Hash128 {
         &'a self,
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
+    }
+}
+
+impl Example for Hash128 {
+    fn example() -> Self {
+        // 0xdb50b8a1d4c03b18d41a8e98a6a18aed
+        Self::from(vec![
+            219, 80, 184, 161, 212, 192, 59, 24, 212, 26, 142, 152, 166, 161, 138, 237,
+        ])
     }
 }
 
