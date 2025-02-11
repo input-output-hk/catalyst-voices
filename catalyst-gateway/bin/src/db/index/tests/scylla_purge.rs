@@ -16,7 +16,6 @@ use crate::db::index::{
 };
 
 // TODO: FIXME:
-// - catalyst_id_for_stake_address
 // - catalyst_id_for_transaction_id
 // - rbac registrations
 // - rbac invalid registrations
@@ -49,8 +48,7 @@ use crate::db::index::{
 //     }
 // }
 
-#[ignore = "An integration test which requires a running Scylla node instance, disabled
-from `testunit` CI run"]
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn catalyst_id_for_stake_address() {
     let Ok((session, _)) = get_shared_session().await else {
@@ -122,64 +120,77 @@ async fn catalyst_id_for_stake_address() {
     assert!(read_rows.is_empty());
 }
 
-// TODO: FIXME:
-// #[ignore = "An integration test which requires a running Scylla node instance, disabled
-// from `testunit` CI run"] #[tokio::test]
-// async fn test_chain_root_for_txn_id() {
-//     let Ok((session, _)) = get_shared_session().await else {
-//         panic!("{SESSION_ERR_MSG}");
-//     };
-//
-//     // data
-//     let data = vec![
-//         rbac509::insert_chain_root_for_txn_id::Params::new(&[0], &[0]),
-//         rbac509::insert_chain_root_for_txn_id::Params::new(&[1], &[1]),
-//     ];
-//     let data_len = data.len();
-//
-//     // insert
-//     session
-//         .execute_batch(PreparedQuery::ChainRootForTxnIdInsertQuery, data)
-//         .await
-//         .unwrap();
-//
-//     // read
-//     let mut row_stream = chain_root_for_txn_id::PrimaryKeyQuery::execute(&session)
-//         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert_eq!(read_rows.len(), data_len);
-//
-//     // delete
-//     let delete_params = read_rows
-//         .into_iter()
-//         .map(chain_root_for_txn_id::Params::from)
-//         .collect();
-//     let row_results = chain_root_for_txn_id::DeleteQuery::execute(&session,
-// delete_params)         .await
-//         .unwrap()
-//         .into_iter()
-//         .all(|r| r.result_not_rows().is_ok());
-//
-//     assert!(row_results);
-//
-//     // re-read
-//     let mut row_stream = chain_root_for_txn_id::PrimaryKeyQuery::execute(&session)
-//         .await
-//         .unwrap();
-//
-//     let mut read_rows = vec![];
-//     while let Some(row_res) = row_stream.next().await {
-//         read_rows.push(row_res.unwrap());
-//     }
-//
-//     assert!(read_rows.is_empty());
-// }
+#[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+#[tokio::test]
+async fn catalyst_id_for_txn_id() {
+    let Ok((session, _)) = get_shared_session().await else {
+        panic!("{SESSION_ERR_MSG}");
+    };
+
+    // data
+    let data = vec![
+        rbac509::insert_catalyst_id_for_txn_id::Params::new(
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+            TransactionHash::new(&[0]),
+            0.into(),
+            0.into(),
+        ),
+        rbac509::insert_catalyst_id_for_txn_id::Params::new(
+            "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
+                .parse()
+                .unwrap(),
+            TransactionHash::new(&[1]),
+            1.into(),
+            1.into(),
+        ),
+    ];
+    let data_len = data.len();
+
+    // insert
+    session
+        .execute_batch(PreparedQuery::CatalystIdForTxnIdInsertQuery, data)
+        .await
+        .unwrap();
+
+    // read
+    let mut row_stream = catalyst_id_for_txn_id::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert_eq!(read_rows.len(), data_len);
+
+    // delete
+    let delete_params = read_rows
+        .into_iter()
+        .map(catalyst_id_for_txn_id::Params::from)
+        .collect();
+    let row_results = catalyst_id_for_txn_id::DeleteQuery::execute(&session, delete_params)
+        .await
+        .unwrap()
+        .into_iter()
+        .all(|r| r.result_not_rows().is_ok());
+
+    assert!(row_results);
+
+    // re-read
+    let mut row_stream = catalyst_id_for_txn_id::PrimaryKeyQuery::execute(&session)
+        .await
+        .unwrap();
+
+    let mut read_rows = vec![];
+    while let Some(row_res) = row_stream.next().await {
+        read_rows.push(row_res.unwrap());
+    }
+
+    assert!(read_rows.is_empty());
+}
 
 // TODO: FIXME:
 // #[ignore = "An integration test which requires a running Scylla node instance, disabled
