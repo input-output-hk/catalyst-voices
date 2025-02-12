@@ -35,10 +35,12 @@ final class ProposalBuilderSegment extends BaseSegment<ProposalBuilderSection> {
 
 final class ProposalBuilderSection extends BaseSection {
   final DocumentProperty property;
+  final DocumentPropertySchema schema;
 
   const ProposalBuilderSection({
     required super.id,
     required this.property,
+    required this.schema,
     super.isEnabled,
     super.isEditable,
   });

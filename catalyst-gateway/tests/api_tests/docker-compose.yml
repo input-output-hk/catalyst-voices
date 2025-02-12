@@ -28,14 +28,21 @@ services:
   cat-gateway:
     image: cat-gateway:latest
     environment:
-      - DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CAT_ADDRESS=0.0.0.0:3030
       - LOG_LEVEL=error
       - DATA_REFRESH_TICK=5
       - CHECK_CONFIG_TICK=5
       - MACHINE_ID="UID"
+      - RBAC_OFF=true
+
     ports:
       - 3030:3030
+
+  cat-gateway-is-running:
+    image: alpine:3.20.3
     depends_on:
       event-db:
         condition: service_healthy
+      cat-gateway:
+        condition: service_started

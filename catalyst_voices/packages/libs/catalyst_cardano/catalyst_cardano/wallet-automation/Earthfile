@@ -1,6 +1,6 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.35 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.35 AS playwright-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.38 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.38 AS playwright-ci
 
 deps:
     DO playwright-ci+SETUP --workdir=/wallet-automation

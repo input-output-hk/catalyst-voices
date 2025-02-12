@@ -21,10 +21,11 @@ export default defineConfig({
   timeout: 60 * 1000,
   projects: [
     {
-      name: "chromium",
+      name: "chrome",
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
+          channel: "chrome",
           args: [
             "--unsafely-treat-insecure-origin-as-secure=http://test-app:80",
           ],
