@@ -48,7 +48,9 @@ pub(crate) struct Cip36RegistrationList {
 impl Example for Cip36RegistrationList {
     fn example() -> Self {
         Self {
-            slot: (common::types::cardano::slot_no::EXAMPLE + 635).into(),
+            slot: (common::types::cardano::slot_no::EXAMPLE + 635)
+                .try_into()
+                .unwrap_or_default(),
             voting_key: vec![Cip36RegistrationsForVotingPublicKey::example()],
             invalid: vec![Cip36Details::invalid_example()],
             page: Some(common::objects::generic::pagination::CurrentPage::example()),
@@ -143,7 +145,9 @@ impl Cip36Details {
     /// Example of an invalid registration
     fn invalid_example() -> Self {
         Self {
-            slot_no: (common::types::cardano::slot_no::EXAMPLE + 135).into(),
+            slot_no: (common::types::cardano::slot_no::EXAMPLE + 135)
+                .try_into()
+                .unwrap_or_default(),
             stake_pub_key: None,
             vote_pub_key: Some(
                 common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),

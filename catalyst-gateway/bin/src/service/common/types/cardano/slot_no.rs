@@ -3,7 +3,6 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
-use derive_more::{From, Into};
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -20,7 +19,7 @@ pub(crate) const EXAMPLE: u64 = 1_234_567;
 /// Minimum.
 const MINIMUM: u64 = 0;
 /// Maximum.
-const MAXIMUM: u64 = u64::MAX;
+const MAXIMUM: u64 = u64::MAX / 2;
 
 /// Schema.
 #[allow(clippy::cast_precision_loss)]
@@ -36,13 +35,22 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Slot number
-#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord, From, Into)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
 
 pub(crate) struct SlotNo(u64);
 
-/// Is the Slot Number valid?
-fn is_valid(_value: u64) -> bool {
-    true
+impl SlotNo {
+    /// Is the Slot Number valid?
+    fn is_valid(value: u64) -> bool {
+        value >= MINIMUM && value <= MAXIMUM
+    }
+}
+
+impl Default for SlotNo {
+    /// Explicit default implementation of `SlotNo` which is `0`.
+    fn default() -> Self {
+        Self(0)
+    }
 }
 
 impl Type for SlotNo {
@@ -86,7 +94,7 @@ impl ParseFromJSON for SlotNo {
             let value = value
                 .as_u64()
                 .ok_or(ParseError::from("invalid slot number"))?;
-            if !is_valid(value) {
+            if !Self::is_valid(value) {
                 return Err("invalid AssetValue".into());
             }
             Ok(Self(value))
@@ -108,20 +116,39 @@ impl ToJSON for SlotNo {
     }
 }
 
-impl TryFrom<i64> for SlotNo {
+impl TryFrom<u64> for SlotNo {
     type Error = anyhow::Error;
 
-    fn try_from(value: i64) -> Result<Self, Self::Error> {
-        let value: u64 = value.try_into()?;
-        if !is_valid(value) {
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        if !Self::is_valid(value) {
             bail!("Invalid Slot Number");
         }
         Ok(Self(value))
     }
 }
 
+impl TryFrom<i64> for SlotNo {
+    type Error = anyhow::Error;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        let value: u64 = value.try_into()?;
+        if !Self::is_valid(value) {
+            bail!("Invalid Slot Number");
+        }
+        Ok(Self(value))
+    }
+}
+
+impl Into<u64> for SlotNo {
+    fn into(self) -> u64 {
+        // assume that the value is always valid
+        self.0
+    }
+}
+
 impl Into<i64> for SlotNo {
     fn into(self) -> i64 {
+        // assume that the value is always valid
         i64::try_from(self.0).unwrap_or_default()
     }
 }

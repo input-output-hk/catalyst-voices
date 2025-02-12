@@ -207,7 +207,7 @@ async fn get_all_registrations_from_stake_pub_key(
         };
 
         let cip36 = Cip36Details {
-            slot_no: SlotNo::from(slot_no),
+            slot_no: SlotNo::try_from(slot_no)?,
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
@@ -252,7 +252,7 @@ async fn get_invalid_registrations(
     let slot_no = if let Some(slot_no) = slot_no {
         slot_no
     } else {
-        SlotNo::from(0)
+        SlotNo::default()
     };
 
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
@@ -420,7 +420,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
 
     AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
-            slot: slot_no.unwrap_or(SlotNo::from(0)),
+            slot: slot_no.unwrap_or_default(),
             voting_key: all_registrations_after_filtering,
             invalid: all_invalids_after_filtering.into_iter().flatten().collect(),
             page: None,
