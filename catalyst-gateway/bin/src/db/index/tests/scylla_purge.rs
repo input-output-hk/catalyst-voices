@@ -4,9 +4,7 @@
 
 // cSpell:ignoreRegExp cardano/Fftx
 
-use cardano_blockchain_types::{
-    Cip36, MultiEraBlock, Network, Point, TransactionHash, VotingPubKey,
-};
+use cardano_blockchain_types::{TransactionHash, VotingPubKey};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -18,6 +16,7 @@ use super::*;
 use crate::db::index::{
     block::*,
     queries::{purge::*, PreparedQuery},
+    tests::test_utils,
 };
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -332,14 +331,14 @@ async fn test_cip36_registration_for_vote_key() {
             &voting_pub_key(0),
             0.into(),
             0.into(),
-            &cip_36_1(),
+            &test_utils::cip_36_1(),
             false,
         ),
         cip36::insert_cip36_for_vote_key::Params::new(
             &voting_pub_key(1),
             1.into(),
             1.into(),
-            &cip_36_2(),
+            &test_utils::cip_36_2(),
             true,
         ),
     ];
@@ -406,13 +405,13 @@ async fn test_cip36_registration_invalid() {
             Some(&voting_pub_key(0)),
             0.into(),
             0.into(),
-            &cip_36_1(),
+            &test_utils::cip_36_1(),
         ),
         cip36::insert_cip36_invalid::Params::new(
             Some(&voting_pub_key(1)),
             1.into(),
             1.into(),
-            &cip_36_2(),
+            &test_utils::cip_36_2(),
         ),
     ];
     let data_len = data.len();
@@ -470,8 +469,18 @@ async fn test_cip36_registration() {
 
     // data
     let data = vec![
-        cip36::insert_cip36::Params::new(&voting_pub_key(0), 0.into(), 0.into(), &cip_36_1()),
-        cip36::insert_cip36::Params::new(&voting_pub_key(1), 1.into(), 1.into(), &cip_36_2()),
+        cip36::insert_cip36::Params::new(
+            &voting_pub_key(0),
+            0.into(),
+            0.into(),
+            &test_utils::cip_36_1(),
+        ),
+        cip36::insert_cip36::Params::new(
+            &voting_pub_key(1),
+            1.into(),
+            1.into(),
+            &test_utils::cip_36_2(),
+        ),
     ];
     let data_len = data.len();
 
@@ -974,27 +983,6 @@ fn stake_address_2() -> StakeAddress {
     )
     .try_into()
     .unwrap()
-}
-
-/// Returns `Cip36` from the second (index 1) transaction from the block located in the
-/// `block_with_cip19_1.block` file.
-fn cip_36_1() -> Cip36 {
-    let block = block(include_str!("./test_data/block_with_cip19_1.block"));
-    Cip36::new(&block, 1.into(), true).unwrap().unwrap()
-}
-
-/// Returns `Cip36` from the first (index 0) transaction from the block located in the
-/// `block_with_cip19_2.block` file.
-fn cip_36_2() -> Cip36 {
-    let block = block(include_str!("./test_data/block_with_cip19_2.block"));
-    Cip36::new(&block, 1.into(), true).unwrap().unwrap()
-}
-
-/// Decodes a block from the given string.
-fn block(data: &str) -> MultiEraBlock {
-    let data = hex::decode(data).unwrap();
-    let previous = Point::fuzzy(0.into());
-    MultiEraBlock::new(Network::Preprod, data, &previous, 0.into()).unwrap()
 }
 
 /// Creates `VotingPubKey` from the given number.

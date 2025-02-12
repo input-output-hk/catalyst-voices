@@ -146,3 +146,19 @@ impl Cip36InsertQuery {
         query_handles
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::index::tests::test_utils;
+
+    #[test]
+    fn index() {
+        let block = test_utils::block_2();
+        let mut query = Cip36InsertQuery::new();
+        query.index(0.into(), 0.into(), &block);
+        assert_eq!(1, query.registrations.len());
+        assert!(query.invalid.is_empty());
+        assert_eq!(1, query.for_vote_key.len());
+    }
+}

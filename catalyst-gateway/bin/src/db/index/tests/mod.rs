@@ -1,6 +1,8 @@
 //! Integration tests of the `IndexDB` queries
 //! This module contains utility functions used with different testing modules.
 
+pub mod test_utils;
+
 use std::sync::Arc;
 
 use tokio::sync::OnceCell;
