@@ -215,7 +215,7 @@ rules:
         # Match content type application/json should be object
         match: "object"
   api-example-schema:
-    message: "Schema should contain example"
+    message: "Schema must contain example"
     given: "$..schema"
     severity: error
     then:
@@ -226,7 +226,7 @@ rules:
             - required: ["example"]
             - required: ["enum"]
   api-example-properties:
-    message: "Property should contain example"
+    message: "Property must contain example"
     given: "$..properties.*"
     severity: error
     then:
