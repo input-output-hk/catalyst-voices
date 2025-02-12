@@ -40,6 +40,7 @@ final class DocumentObjectSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;
     final isSubsection = schema.subsection ?? false;
     final properties = schema.properties ?? const {};
     final required = schema.required ?? const [];
@@ -76,7 +77,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -92,7 +93,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -106,7 +107,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -120,7 +121,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -134,7 +135,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -148,7 +149,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
