@@ -10,13 +10,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct PubKey(Vec<u8>);
 
-impl PubKey {
-    /// Get bytes
-    pub(crate) fn bytes(&self) -> &[u8] {
-        &self.0
-    }
-}
-
 /// The source of voting power for a given registration
 ///
 /// The voting power can either come from:
@@ -40,13 +33,3 @@ pub(crate) enum VotingInfo {
 
 /// Block time
 pub(crate) type DateTime = chrono::DateTime<chrono::offset::Utc>;
-/// Transaction id
-pub(crate) type TxId = Vec<u8>;
-/// Public voting key
-pub(crate) type PublicVotingInfo = VotingInfo;
-/// Payment address
-pub(crate) type PaymentAddress = Vec<u8>;
-/// Nonce
-pub(crate) type Nonce = i64;
-/// Stake amount.
-pub(crate) type StakeAmount = i64;

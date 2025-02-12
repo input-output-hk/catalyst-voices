@@ -2,11 +2,9 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::service::{
-    api::cardano::types::StakeAmount,
-    common::types::cardano::{
-        asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28, slot_no::SlotNo,
-    },
+use crate::service::common::types::cardano::{
+    asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28, slot_no::SlotNo,
+    stake_amount::StakeAmount,
 };
 
 /// User's staked native token info.
@@ -25,7 +23,6 @@ pub(crate) struct StakedNativeTokenInfo {
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Total stake amount.
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) ada_amount: StakeAmount,
 
     /// Block's slot number which contains the latest unspent UTXO.
@@ -40,7 +37,7 @@ impl Example for StakeInfo {
     fn example() -> Self {
         Self {
             slot_number: 5u64.try_into().unwrap_or_default(),
-            ada_amount: 1,
+            ada_amount: 1u64.try_into().unwrap_or_default(),
             native_tokens: Vec::new(),
         }
     }

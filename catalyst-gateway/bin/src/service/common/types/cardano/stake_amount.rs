@@ -44,6 +44,16 @@ impl StakeAmount {
     fn is_valid(value: u64) -> bool {
         (MINIMUM..=MAXIMUM).contains(&value)
     }
+
+    pub(crate) fn checked_add(self, rhs: u64) -> Result<Self, anyhow::Error> {
+        self.0
+            .checked_add(rhs)
+            .ok_or(anyhow::anyhow!(
+                "Total stake amount overflow: {} + {rhs}",
+                self.0
+            ))
+            .map(Self)
+    }
 }
 
 impl Default for StakeAmount {
