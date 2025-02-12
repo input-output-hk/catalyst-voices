@@ -1,53 +1,21 @@
-import 'dart:async';
-
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 
-class VoicesRichTextLimit extends StatefulWidget {
-  final Document document;
+class VoicesRichTextLimit extends StatelessWidget {
+  final VoicesRichTextController controller;
   final int? charsLimit;
   final String? errorMessage;
 
   const VoicesRichTextLimit({
     super.key,
-    required this.document,
+    required this.controller,
     this.charsLimit,
     this.errorMessage,
   });
 
   @override
-  State<VoicesRichTextLimit> createState() => _VoicesRichTextLimitState();
-}
-
-class _VoicesRichTextLimitState extends State<VoicesRichTextLimit> {
-  StreamSubscription<DocChange>? _docChangesSub;
-
-  @override
-  void initState() {
-    super.initState();
-    _docChangesSub = widget.document.changes.listen(_updateDocLength);
-  }
-
-  @override
-  void didUpdateWidget(VoicesRichTextLimit oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.document != oldWidget.document) {
-      unawaited(_docChangesSub?.cancel());
-      _docChangesSub = widget.document.changes.listen(_updateDocLength);
-    }
-  }
-
-  @override
-  void dispose() {
-    unawaited(_docChangesSub?.cancel());
-    _docChangesSub = null;
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final error = widget.errorMessage ?? '';
+    final error = errorMessage ?? '';
 
     return Padding(
       padding: EdgeInsets.only(
@@ -63,26 +31,30 @@ class _VoicesRichTextLimitState extends State<VoicesRichTextLimit> {
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
-          Text(
-            _formatText(),
-            style: Theme.of(context).textTheme.bodySmall,
+          StreamBuilder(
+            initialData: controller.markdownData.data.length,
+            stream: controller.changes
+                .map((e) => controller.markdownData.data.length)
+                .distinct(),
+            builder: (context, snapshot) {
+              final data = snapshot.data;
+              return Text(
+                _formatText(data ?? 0),
+                style: Theme.of(context).textTheme.bodySmall,
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  String _formatText() {
-    final charsLimit = widget.charsLimit;
-    final documentLength = widget.document.length;
+  String _formatText(int length) {
+    final charsLimit = this.charsLimit;
     if (charsLimit == null) {
-      return '$documentLength';
+      return '';
     }
 
-    return '$documentLength/$charsLimit';
-  }
-
-  void _updateDocLength(DocChange change) {
-    setState(() {});
+    return '$length/$charsLimit';
   }
 }
