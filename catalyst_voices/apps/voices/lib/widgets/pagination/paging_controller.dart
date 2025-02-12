@@ -110,8 +110,6 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
   }
 
   void appendPage(List<ItemType> newItems, int nextPage) {
-    print('befor: ${value.itemList.length}');
-    print('append ${newItems.length}');
     value = value.copyWith(
       currentPage: nextPage,
       itemList: newItems,

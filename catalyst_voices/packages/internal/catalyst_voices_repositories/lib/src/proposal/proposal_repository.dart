@@ -13,9 +13,14 @@ abstract interface class ProposalRepository {
   });
 
   /// Fetches all proposals.
-  Future<List<ProposalBase>> getProposals({
+  Future<ProposalsSearchResult> getProposals({
+    required ProposalPaginationRequest request,
     required String campaignId,
   });
+
+  Future<List<String>> getFavoritesProposalsIds();
+
+  Future<List<String>> getUserProposalsIds(String userId);
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
@@ -29,13 +34,65 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<List<ProposalBase>> getProposals({
+  Future<ProposalsSearchResult> getProposals({
+    required ProposalPaginationRequest request,
     required String campaignId,
   }) async {
     // optionally filter by status.
+    final proposals = <ProposalBase>[];
 
-    return _proposals;
+    for (var i = 0; i < request.pageSize; i++) {
+      // ignore: lines_longer_than_80_chars
+      final stage = Random().nextBool()
+          ? ProposalPublish.published
+          : ProposalPublish.draft;
+      proposals.add(
+        ProposalBase(
+          id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
+          category: 'Cardano Use Cases / MVP',
+          title: 'Proposal Title that rocks the world',
+          updateDate: DateTime.now().minusDays(2),
+          fundsRequested: Coin.fromAda(100000),
+          status: ProposalStatus.draft,
+          publish: request.stage ?? stage,
+          access: ProposalAccess.private,
+          commentsCount: 0,
+          description: _proposalDescription,
+          duration: 6,
+          author: 'Alex Wells',
+          version: 1,
+        ),
+      );
+    }
+
+    return ProposalsSearchResult(
+      maxResults: _maxResults(request.stage),
+      proposals: proposals,
+    );
   }
+
+  @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    // TODO(LynxLynxx): read db to get favorites proposals ids
+    return <String>[];
+  }
+
+  @override
+  Future<List<String>> getUserProposalsIds(String userId) async {
+    // TODO(LynxLynxx): read db to get user's proposals
+    return <String>[];
+  }
+}
+
+// TODO(LynxLynxx): remove after implementing reading db
+int _maxResults(ProposalPublish? stage) {
+  if (stage == null) {
+    return 64;
+  }
+  if (stage == ProposalPublish.published) {
+    return 48;
+  }
+  return 32;
 }
 
 final _proposalDescription = """

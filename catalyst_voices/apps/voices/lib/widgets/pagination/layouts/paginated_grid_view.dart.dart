@@ -45,12 +45,11 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
           case PagingStatus.loading:
             child = _loadingIndicatorBuilder(context);
             break;
+          case PagingStatus.empty:
+            child = builderDelegate.emptyIndicatorBuilder(context);
+            break;
           case PagingStatus.ongoing:
           case PagingStatus.completed:
-            if (itemList.isEmpty) {
-              child = builderDelegate.emptyIndicatorBuilder(context);
-              break;
-            }
             child = Wrap(
               spacing: 16,
               runSpacing: 16,

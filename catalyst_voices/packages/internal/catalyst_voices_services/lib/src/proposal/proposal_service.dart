@@ -22,9 +22,17 @@ abstract interface class ProposalService {
   });
 
   /// Fetches proposals for the [campaignId].
-  Future<ProposalSearchResult> getProposals({
+  Future<ProposalPaginationItems<Proposal>> getProposals({
+    required ProposalPaginationRequest request,
     required String campaignId,
   });
+
+  /// Fetches favorites proposals ids of the user
+  Future<List<String>> getFavoritesProposalsIds();
+
+  /// Fetches user's proposals ids  depending on his id that is saved
+  /// in metadata of proposal document
+  Future<List<String>> getUserProposalsIds(String userId);
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -58,25 +66,38 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<ProposalSearchResult> getProposals({
+  Future<ProposalPaginationItems<Proposal>> getProposals({
+    required ProposalPaginationRequest request,
     required String campaignId,
   }) async {
     final proposalBases = await _proposalRepository.getProposals(
+      request: request,
       campaignId: campaignId,
     );
 
-    final futures = proposalBases.map(_buildProposal);
+    final futures = proposalBases.proposals.map(_buildProposal);
 
     final proposals = await Future.wait(futures);
 
-    // TODO(LynxLynxx): implement real search result from DB
-    return ProposalSearchResult(
-      proposals: proposals,
-      finalProposalCount: 5 * 4,
-      draftProposalCount: 3 * 4,
-      myProposalCount: 0,
-      favoriteProposalCount: 0,
+    return ProposalPaginationItems(
+      items: proposals,
+      pageKey: request.pageKey,
+      maxResults: proposalBases.maxResults,
     );
+  }
+
+  @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    final List<String> proposalsIds =
+        await _proposalRepository.getFavoritesProposalsIds();
+    return proposalsIds;
+  }
+
+  @override
+  Future<List<String>> getUserProposalsIds(String userId) async {
+    final List<String> proposalsIds =
+        await _proposalRepository.getUserProposalsIds(userId);
+    return proposalsIds;
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {

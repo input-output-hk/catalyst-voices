@@ -4,35 +4,52 @@ import 'package:equatable/equatable.dart';
 
 /// The state of available proposals.
 class ProposalsState extends Equatable {
-  final int pageKey;
-  final ProposalSearchViewModel proposals;
-  final bool isLoading;
-  final LocalizedException? error;
+  final ProposalPaginationItems<ProposalViewModel> draftProposals;
+  final ProposalPaginationItems<ProposalViewModel> finalProposals;
+  final ProposalPaginationItems<ProposalViewModel> favoriteProposals;
+  final ProposalPaginationItems<ProposalViewModel> myProposals;
+  final ProposalPaginationItems<ProposalViewModel> allProposals;
+  final List<String> favoritesIds;
+  final List<String> myProposalsIds;
 
   const ProposalsState({
-    this.pageKey = 0,
-    this.proposals = const ProposalSearchViewModel(),
-    this.isLoading = false,
-    this.error,
+    this.draftProposals = const ProposalPaginationItems(),
+    this.finalProposals = const ProposalPaginationItems(),
+    this.favoriteProposals = const ProposalPaginationItems(),
+    this.myProposals = const ProposalPaginationItems(),
+    this.allProposals = const ProposalPaginationItems(),
+    this.favoritesIds = const [],
+    this.myProposalsIds = const [],
   });
 
   ProposalsState copyWith({
-    int? pageKey,
-    ProposalSearchViewModel? proposals,
-    bool? isLoading,
-    Optional<LocalizedException>? error,
+    ProposalPaginationItems<ProposalViewModel>? draftProposals,
+    ProposalPaginationItems<ProposalViewModel>? finalProposals,
+    ProposalPaginationItems<ProposalViewModel>? favoriteProposals,
+    ProposalPaginationItems<ProposalViewModel>? myProposals,
+    ProposalPaginationItems<ProposalViewModel>? allProposals,
+    List<String>? favoritesIds,
+    List<String>? myProposalsIds,
   }) {
     return ProposalsState(
-      pageKey: pageKey ?? this.pageKey,
-      proposals: proposals ?? this.proposals,
-      isLoading: isLoading ?? this.isLoading,
-      error: error.dataOr(this.error),
+      draftProposals: draftProposals ?? this.draftProposals,
+      finalProposals: finalProposals ?? this.finalProposals,
+      favoriteProposals: favoriteProposals ?? this.favoriteProposals,
+      myProposals: myProposals ?? this.myProposals,
+      allProposals: allProposals ?? this.allProposals,
+      favoritesIds: favoritesIds ?? this.favoritesIds,
+      myProposalsIds: myProposalsIds ?? this.myProposalsIds,
     );
   }
 
   @override
   List<Object?> get props => [
-        proposals,
-        pageKey,
+        draftProposals,
+        finalProposals,
+        favoriteProposals,
+        myProposals,
+        allProposals,
+        favoritesIds,
+        myProposalsIds,
       ];
 }

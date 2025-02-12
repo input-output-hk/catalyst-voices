@@ -67,7 +67,9 @@ class PagingState<ItemType> extends Equatable {
   }
 
   PagingStatus get status {
-    if (isLoading) {
+    if (itemList.isEmpty && !isLoading && error == null) {
+      return PagingStatus.empty;
+    } else if (isLoading) {
       return PagingStatus.loading;
     } else if (_isOngoing) {
       return PagingStatus.ongoing;

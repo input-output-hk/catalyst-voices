@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the proposals.
@@ -14,76 +16,127 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   ProposalsCubit(
     this._campaignService,
     this._proposalService,
-  ) : super(const ProposalsState(isLoading: true));
-
-  /// Loads the proposals.
-  Future<void> load({
-    int pageKey = 0,
-    int pageSize = 24,
-    String? lastProposalId,
-    String? categoryId,
-    String? searchValue,
-  }) async {
-    await Future.delayed(const Duration(seconds: 1), () {});
-    final campaign = await _campaignService.getActiveCampaign();
-    if (campaign == null) {
-      return;
-    }
-
-    final proposals = await _loadRegularProposals(
-      campaignId: campaign.id,
-      campaignName: campaign.name,
-      campaignStage: CampaignStage.fromCampaign(campaign, DateTimeExt.now()),
-    );
-    proposals.proposals.shuffle();
-    emit(
-      state.copyWith(
-        proposals: proposals.copyWith(
-          proposals: state.proposals.proposals + proposals.proposals,
-        ),
-        isLoading: false,
-        pageKey: pageKey,
-      ),
-    );
-  }
+  ) : super(const ProposalsState());
 
   /// Changes the favorite status of the proposal with [proposalId].
   Future<void> onChangeFavoriteProposal(
     String proposalId, {
     required bool isFavorite,
   }) async {
-    final proposals = List<ProposalViewModel>.of(state.proposals.proposals);
-    final favoriteProposal = proposals.indexWhere((e) => e.id == proposalId);
-    if (favoriteProposal == -1) return;
-    proposals[favoriteProposal] =
-        proposals[favoriteProposal].copyWith(isFavorite: isFavorite);
-
-    // emit(
-    //   LoadedProposalsState(
-    //     proposals: proposals,
-    //     resultsNumber: state.resultsNumber,
-    //   ),
-    // );
+    // TODO(LynxLynxx): implement favorites
   }
 
-  Future<ProposalSearchViewModel> _loadRegularProposals({
-    required String campaignId,
-    required String campaignName,
-    required CampaignStage campaignStage,
-  }) async {
+  Future<void> getProposals(
+    ProposalPaginationRequest request,
+  ) async {
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return;
+    }
+
     final proposals = await _proposalService.getProposals(
-      campaignId: campaignId,
+      request: request,
+      campaignId: campaign.id,
     );
+    await Future.delayed(const Duration(seconds: 1), () {});
 
-    return ProposalSearchViewModel.fromModel(
-      proposals,
-      campaignName,
-      campaignStage,
-    );
+    final proposalViewModelList = proposals.items
+        .map(
+          (e) => ProposalViewModel.fromProposalAtStage(
+            proposal: e,
+            campaignName: campaign.name,
+            campaignStage:
+                CampaignStage.fromCampaign(campaign, DateTimeExt.now()),
+          ),
+        )
+        .toList();
+    if (request.stage == ProposalPublish.published) {
+      return emit(
+        state.copyWith(
+          finalProposals: state.finalProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.finalProposals.items,
+              ...proposalViewModelList,
+            ],
+          ),
+        ),
+      );
+    } else if (request.stage == ProposalPublish.draft) {
+      return emit(
+        state.copyWith(
+          draftProposals: state.draftProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.draftProposals.items,
+              ...proposalViewModelList,
+            ],
+          ),
+        ),
+      );
+    } else {
+      final allProposals = [
+        ...state.allProposals.items,
+        ...proposalViewModelList,
+      ]..shuffled();
+      return emit(
+        state.copyWith(
+          allProposals: state.allProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: allProposals,
+          ),
+        ),
+      );
+    }
   }
 
-  void resetCurrentPage() {
-    emit(state.copyWith(pageKey: 0));
-    print('change page to 0');
+  Future<void> getProposalsById(
+    ProposalPaginationRequest request, {
+    bool getFavorites = true,
+  }) async {
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return;
+    }
+
+    final proposals = await _proposalService.getProposals(
+      request: request,
+      campaignId: campaign.id,
+    );
+    await Future.delayed(const Duration(seconds: 1), () {});
+
+    if (getFavorites) {
+      emit(
+        state.copyWith(
+          favoriteProposals: state.favoriteProposals.copyWith(
+            isEmpty: true,
+          ),
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          myProposals: state.favoriteProposals.copyWith(
+            isEmpty: true,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> getFavoritesList() async {
+    final favoritesList = await _proposalService.getFavoritesProposalsIds();
+
+    emit(state.copyWith(favoritesIds: favoritesList));
+  }
+
+  Future<void> getUserProposals() async {
+    // TODO(LynxLynxx): pass user id? or we read it inside of the service?
+    final favoritesList = await _proposalService.getUserProposalsIds('');
+
+    emit(state.copyWith(favoritesIds: favoritesList));
   }
 }

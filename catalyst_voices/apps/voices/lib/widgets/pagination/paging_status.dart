@@ -3,4 +3,5 @@ enum PagingStatus {
   error,
   completed,
   ongoing,
+  empty,
 }
