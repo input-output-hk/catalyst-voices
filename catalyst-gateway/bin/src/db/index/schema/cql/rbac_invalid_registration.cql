@@ -13,4 +13,4 @@ CREATE TABLE IF NOT EXISTS rbac_invalid_registration (
 
     PRIMARY KEY (catalyst_id, transaction_id, slot_no, txn)
 )
-WITH CLUSTERING ORDER BY (slot_no DESC, txn DESC);
+WITH CLUSTERING ORDER BY (transaction_id DESC, slot_no DESC, txn DESC);
