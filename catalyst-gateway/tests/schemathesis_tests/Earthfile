@@ -44,7 +44,7 @@ package-schemathesis:
 
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
 test-fuzzer-api:
-    FROM debian:bookworm-slim
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG seed
 
@@ -72,7 +72,7 @@ test-fuzzer-api:
     END
 
 nightly-package-schemathesis:
-    FROM python:3.12-alpine3.20
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     ARG api_spec
     # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG seed
