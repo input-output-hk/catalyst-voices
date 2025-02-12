@@ -22,14 +22,14 @@ pub(crate) struct DocumentIndexList {
     #[oai(validator(max_items = "100"))]
     pub docs: Vec<IndexedDocumentDocumented>,
     /// Current Page
-    pub page: Option<common::objects::generic::pagination::CurrentPage>,
+    pub page: common::objects::generic::pagination::CurrentPage,
 }
 
 impl Example for DocumentIndexList {
     fn example() -> Self {
         Self {
             docs: vec![IndexedDocumentDocumented::example()],
-            page: Some(common::objects::generic::pagination::CurrentPage::example()),
+            page: common::objects::generic::pagination::CurrentPage::example(),
         }
     }
 }
