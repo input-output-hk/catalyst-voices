@@ -21,7 +21,7 @@ enum VoicesStatusIndicatorType { success, error }
 ///         child: Text('QR VERIFIED'),
 ///       ),
 ///       title: Text('Your QR code verified successfully'),
-///       body: Text('You can now use your QR-code  to login into Catalyst.'),
+///       body: Text('You can now use your QR-code to login into Catalyst.'),
 ///       type: VoicesStatusIndicatorType.success,
 ///     ),
 /// ```

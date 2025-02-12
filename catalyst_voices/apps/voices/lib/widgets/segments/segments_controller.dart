@@ -42,15 +42,15 @@ final class SegmentsControllerState extends Equatable {
   /// All [segments] are opened and first section is selected.
   factory SegmentsControllerState.initial({
     required List<Segment> segments,
+    NodeId? activeSectionId,
   }) {
     final allSegmentsIds = segments.map((e) => e.id).toSet();
-
-    final section = segments.firstWhereOrNull((e) => e.sections.isNotEmpty);
+    final segment = segments.firstWhereOrNull((e) => e.sections.isNotEmpty);
 
     return SegmentsControllerState(
       segments: segments,
       openedSegments: allSegmentsIds,
-      activeSectionId: section?.sections.first.id,
+      activeSectionId: activeSectionId ?? segment?.sections.first.id,
     );
   }
 

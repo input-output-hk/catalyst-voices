@@ -39,7 +39,10 @@ class SpaceSidePanel extends StatefulWidget {
     this.onCollapseTap,
     this.tabController,
     required this.tabs,
-    this.margin = const EdgeInsets.only(top: 10),
+    this.margin = const EdgeInsets.only(
+      top: 12,
+      bottom: 12,
+    ),
   });
 
   @override
@@ -104,37 +107,39 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
             ),
           SlideTransition(
             position: _offsetAnimation,
-            child: SingleChildScrollView(
-              child: _Container(
-                margin: widget.margin,
-                borderRadius: widget.isLeft
-                    ? const BorderRadius.horizontal(right: Radius.circular(16))
-                    : const BorderRadius.horizontal(left: Radius.circular(16)),
-                child: DefaultTabController(
-                  length: widget.tabs.length,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _Header(
-                        name: widget.name,
-                        onCollapseTap: () {
-                          _controller.forward();
-                          widget.onCollapseTap?.call();
-                        },
-                        isLeft: widget.isLeft,
+            child: _Container(
+              margin: widget.margin,
+              borderRadius: widget.isLeft
+                  ? const BorderRadius.horizontal(right: Radius.circular(16))
+                  : const BorderRadius.horizontal(left: Radius.circular(16)),
+              child: DefaultTabController(
+                length: widget.tabs.length,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    _Header(
+                      name: widget.name,
+                      onCollapseTap: () {
+                        _controller.forward();
+                        widget.onCollapseTap?.call();
+                      },
+                      isLeft: widget.isLeft,
+                    ),
+                    _Tabs(
+                      widget.tabs,
+                      controller: widget.tabController,
+                    ),
+                    const SizedBox(height: 12),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: TabBarStackView(
+                          controller: widget.tabController,
+                          children: widget.tabs.map((e) => e.body).toList(),
+                        ),
                       ),
-                      _Tabs(
-                        widget.tabs,
-                        controller: widget.tabController,
-                      ),
-                      const SizedBox(height: 12),
-                      TabBarStackView(
-                        controller: widget.tabController,
-                        children: widget.tabs.map((e) => e.body).toList(),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
