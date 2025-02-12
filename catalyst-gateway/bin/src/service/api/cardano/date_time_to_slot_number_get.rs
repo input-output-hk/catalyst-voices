@@ -8,7 +8,7 @@ use crate::service::common::{
         slot_info::{Slot, SlotInfo},
     },
     responses::WithErrorResponses,
-    types::generic::api_date_time::ApiDateTime,
+    types::generic::date_time::DateTime,
 };
 
 /// Endpoint responses.
@@ -27,9 +27,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/date_time_to_slot_number`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    date_time: Option<ApiDateTime>, network: Option<Network>,
+    date_time: Option<DateTime>, network: Option<Network>,
 ) -> AllResponses {
-    let _date_time = date_time.unwrap_or_else(ApiDateTime::now);
+    let _date_time = date_time.unwrap_or_else(DateTime::now);
     let _network = network.unwrap_or(Network::Mainnet);
 
     let previous = Some(Slot::example());

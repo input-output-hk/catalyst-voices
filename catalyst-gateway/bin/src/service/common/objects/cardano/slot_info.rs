@@ -4,7 +4,7 @@ use poem_openapi::{types::Example, Object};
 
 use crate::service::common::{
     objects::cardano::hash::Hash256,
-    types::{cardano::slot_no::SlotNo, generic::api_date_time::ApiDateTime},
+    types::{cardano::slot_no::SlotNo, generic::date_time::DateTime},
 };
 
 /// Cardano block's slot data.
@@ -19,7 +19,7 @@ pub(crate) struct Slot {
     pub(crate) block_hash: Hash256,
 
     /// Block time.
-    pub(crate) block_time: ApiDateTime,
+    pub(crate) block_time: DateTime,
 }
 
 impl Example for Slot {
@@ -27,7 +27,7 @@ impl Example for Slot {
         Self {
             slot_number: SlotNo::example(),
             block_hash: Hash256::example(),
-            block_time: ApiDateTime::example(),
+            block_time: DateTime::example(),
         }
     }
 }

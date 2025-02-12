@@ -14,7 +14,7 @@ use crate::service::{
         tags::ApiTags,
         types::{
             cardano::cip19_stake_address::Cip19StakeAddress,
-            generic::{api_date_time::ApiDateTime, ed25519_public_key::Ed25519HexEncodedPublicKey},
+            generic::{date_time::DateTime, ed25519_public_key::Ed25519HexEncodedPublicKey},
         },
     },
     utilities::middleware::schema_validation::schema_version_validation,
@@ -45,7 +45,7 @@ impl Api {
         &self,
         /// The date-time for which the slot number should be calculated.
         /// If omitted current date time is used.
-        date_time: Query<Option<ApiDateTime>>,
+        date_time: Query<Option<DateTime>>,
         /// Cardano network type.
         /// If omitted `mainnet` network type is defined.
         /// As `preprod` and `preview` network types in the stake address encoded as a
