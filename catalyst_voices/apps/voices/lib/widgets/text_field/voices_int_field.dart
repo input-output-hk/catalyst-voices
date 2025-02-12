@@ -15,7 +15,6 @@ class VoicesIntField extends VoicesNumField<int> {
     super.decoration,
     super.onChanged,
     super.validator,
-    super.onStatusChanged,
     required super.onFieldSubmitted,
     List<TextInputFormatter>? inputFormatters,
     super.enabled,

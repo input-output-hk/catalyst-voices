@@ -11,7 +11,6 @@ enum _DocumentStringDefinition {
   dropDownSingleSelect('dropDownSingleSelect'),
   tagGroup('tagGroup'),
   tagSelection('tagSelection'),
-  spdxLicenseOrUrl('spdxLicenseOrURL'),
   languageCode('languageCode'),
   radioButtonSelect('radioButtonSelect'),
   unknown('unknown');
@@ -47,6 +46,7 @@ final class DocumentStringSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;
     final isSubsection = schema.subsection ?? false;
     final defaultValue = schema.defaultValue as String?;
     final constValue = schema.constValue as String?;
@@ -66,7 +66,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -83,7 +83,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -100,7 +100,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -117,7 +117,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -134,7 +134,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -151,7 +151,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -168,7 +168,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -177,23 +177,7 @@ final class DocumentStringSchemaMapper {
           strLengthRange: strLengthRange,
           pattern: patternRegExp,
         );
-      case _DocumentStringDefinition.spdxLicenseOrUrl:
-        return DocumentSpdxLicenseOrUrlSchema(
-          nodeId: nodeId,
-          format: format,
-          contentMediaType: contentMediaType,
-          title: title,
-          description: descriptionMarkdown,
-          placeholder: placeholder,
-          guidance: guidance,
-          isSubsection: isSubsection,
-          isRequired: isRequired,
-          defaultValue: defaultValue,
-          constValue: constValue,
-          enumValues: enumValues,
-          strLengthRange: strLengthRange,
-          pattern: patternRegExp,
-        );
+
       case _DocumentStringDefinition.languageCode:
         return DocumentLanguageCodeSchema(
           nodeId: nodeId,
@@ -202,7 +186,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -220,7 +204,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -237,7 +221,7 @@ final class DocumentStringSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,

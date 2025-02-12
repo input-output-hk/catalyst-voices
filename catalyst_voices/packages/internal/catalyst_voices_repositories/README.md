@@ -30,3 +30,52 @@ If you are running the command on a **Linux** platform, you can omit this flag.
 In this way it's possible to locally generate the code using the same version of
 OpenAPI specs defined in the backend code and developers have full control of
 what should be committed.
+
+## Database
+
+### Drift
+
+Files have to be generated with build runner command.
+
+```bash
+dart run build_runner build
+```
+
+or melos
+
+```bash
+melos build_runner_repository
+```
+
+Build migration test files with
+
+```bash
+melos db-make-migration
+```
+
+#### Web
+
+Use same port while building for db to be restored. `--web-port=5555`
+
+Additional headers
+
+* `Cross-Origin-Opener-Policy`: Needs to be set to `same-origin`.
+* `Cross-Origin-Embedder-Policy`: Needs to be set to `require-corp`.
+
+Read more [here](https://drift.simonbinder.eu/platforms/web/#additional-headers).
+
+Drift requires **driftWorker** and **driftWorker**
+
+Those files can be compiles by hand or downloaded from
+
+* [sqlite3Wasm](https://github.com/simolus3/sqlite3.dart/releases)
+* [driftWorker](https://github.com/simolus3/drift/releases).
+
+`sqlite3.wasm` file needs to be served with a `Content-Type` of `application/wasm` since browsers
+will reject the module otherwise.
+
+Read more [here](https://drift.simonbinder.eu/platforms/web/#prerequisites).
+
+#### Native
+
+TODO

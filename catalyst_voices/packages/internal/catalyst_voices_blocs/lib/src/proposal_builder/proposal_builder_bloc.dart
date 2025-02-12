@@ -1,9 +1,11 @@
+import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,9 +18,6 @@ final class ProposalBuilderBloc
 
   DocumentBuilder? _documentBuilder;
 
-  // ignore: unused_field
-  NodeId? _activeNodeId;
-
   ProposalBuilderBloc(
     this._campaignService,
     this._proposalService,
@@ -28,7 +27,7 @@ final class ProposalBuilderBloc
     on<LoadProposalEvent>(_loadProposal);
     on<ActiveNodeChangedEvent>(
       _handleActiveNodeChangedEvent,
-      transformer: (events, mapper) => events.distinct(),
+      transformer: uniqueEvents(),
     );
     on<SectionChangedEvent>(_handleSectionChangedEvent);
   }
@@ -37,10 +36,15 @@ final class ProposalBuilderBloc
     ActiveNodeChangedEvent event,
     Emitter<ProposalBuilderState> emit,
   ) {
-    _logger.info('Active node changed to [${event.id}]');
+    final nodeId = event.id;
+    _logger.info('Active node changed to [$nodeId]');
 
-    // TODO(damian-molinski): Show guidance for this node and its parents.
-    _activeNodeId = event.id;
+    emit(
+      state.copyWith(
+        activeNodeId: Optional(nodeId),
+        guidance: _getGuidanceForNodeId(nodeId),
+      ),
+    );
   }
 
   void _handleSectionChangedEvent(
@@ -54,7 +58,6 @@ final class ProposalBuilderBloc
     final document = documentBuilder.build();
     final segments = _mapDocumentToSegments(document);
 
-    // TODO(damian-molinski): Get guidance + convert to MarkdownData
     emit(state.copyWith(segments: segments));
   }
 
@@ -138,8 +141,17 @@ final class ProposalBuilderBloc
       final document = documentBuilder.build();
       final segments = _mapDocumentToSegments(document);
 
-      // TODO(damian-molinski): Get guidance + convert to MarkdownData
-      emit(ProposalBuilderState(segments: segments));
+      final firstSegment = segments.firstOrNull;
+      final firstSection = firstSegment?.sections.firstOrNull;
+      final guidance = _getGuidanceForSection(firstSegment, firstSection);
+
+      emit(
+        ProposalBuilderState(
+          segments: segments,
+          guidance: guidance,
+          activeNodeId: firstSection?.id,
+        ),
+      );
     } on LocalizedException catch (error) {
       emit(ProposalBuilderState(error: error));
     } catch (error) {
@@ -149,7 +161,7 @@ final class ProposalBuilderBloc
     }
   }
 
-  List<Segment> _mapDocumentToSegments(Document document) {
+  List<ProposalBuilderSegment> _mapDocumentToSegments(Document document) {
     return document.segments.map((segment) {
       final sections = segment.sections
           .expand(_findSectionsAndSubsections)
@@ -157,6 +169,7 @@ final class ProposalBuilderBloc
             (section) => ProposalBuilderSection(
               id: section.schema.nodeId,
               property: section,
+              schema: section.schema,
               isEnabled: true,
               isEditable: true,
             ),
@@ -190,6 +203,60 @@ final class ProposalBuilderBloc
         }
       case DocumentValueProperty():
       // value property doesn't have children
+    }
+  }
+
+  ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
+    if (nodeId == null) {
+      return const ProposalGuidance(isNoneSelected: true);
+    } else {
+      final segment =
+          state.segments.firstWhereOrNull((e) => nodeId.isChildOf(e.id));
+      final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
+
+      return _getGuidanceForSection(segment, section);
+    }
+  }
+
+  ProposalGuidance _getGuidanceForSection(
+    ProposalBuilderSegment? segment,
+    ProposalBuilderSection? section,
+  ) {
+    if (segment == null || section == null) {
+      return const ProposalGuidance();
+    } else {
+      return ProposalGuidance(
+        guidanceList:
+            _findGuidanceItems(segment, section, section.property).toList(),
+      );
+    }
+  }
+
+  Iterable<ProposalGuidanceItem> _findGuidanceItems(
+    ProposalBuilderSegment segment,
+    ProposalBuilderSection section,
+    DocumentProperty property,
+  ) sync* {
+    final guidance = property.schema.guidance;
+    if (guidance != null) {
+      yield ProposalGuidanceItem(
+        segmentTitle: segment.schema.title,
+        sectionTitle: section.schema.title,
+        description: guidance,
+      );
+    }
+
+    switch (property) {
+      case DocumentListProperty():
+        for (final childProperty in property.properties) {
+          yield* _findGuidanceItems(segment, section, childProperty);
+        }
+      case DocumentObjectProperty():
+        for (final childProperty in property.properties) {
+          yield* _findGuidanceItems(segment, section, childProperty);
+        }
+      case DocumentValueProperty():
+      // do nothing, values don't have children
     }
   }
 }

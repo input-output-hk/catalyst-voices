@@ -7,6 +7,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
-  StreamSubscription<List<Segment>>? _segmentsSub;
+  StreamSubscription<dynamic>? _segmentsSub;
 
   @override
   void initState() {
@@ -47,15 +48,17 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
       ..attachItemsScrollController(_segmentsScrollController);
 
     _segmentsSub = bloc.stream
-        .map((event) => event.segments)
-        .distinct(listEquals)
-        .listen(_updateSegments);
+        .map((event) => (segments: event.segments, nodeId: event.activeNodeId))
+        .distinct(
+          (a, b) => listEquals(a.segments, b.segments) && a.nodeId == b.nodeId,
+        )
+        .listen((record) => _updateSegments(record.segments, record.nodeId));
 
     _updateSource(bloc: bloc);
   }
 
   @override
-  void didUpdateWidget(covariant ProposalBuilderPage oldWidget) {
+  void didUpdateWidget(ProposalBuilderPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId ||
@@ -88,12 +91,18 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage> {
     );
   }
 
-  void _updateSegments(List<Segment> data) {
+  void _updateSegments(List<Segment> data, NodeId? activeSectionId) {
     final state = _segmentsController.value;
 
     final newState = state.segments.isEmpty
-        ? SegmentsControllerState.initial(segments: data)
-        : state.copyWith(segments: data);
+        ? SegmentsControllerState.initial(
+            segments: data,
+            activeSectionId: activeSectionId,
+          )
+        : state.copyWith(
+            segments: data,
+            activeSectionId: Optional(activeSectionId),
+          );
 
     _segmentsController.value = newState;
   }

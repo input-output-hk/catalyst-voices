@@ -7,6 +7,7 @@ enum _DocumentObjectDefinition {
   section('section'),
   nestedQuestions('nestedQuestions'),
   singleGroupedTagSelector('singleGroupedTagSelector'),
+  borderGroup('borderGroup'),
   unknown('unknown');
 
   final String def;
@@ -39,6 +40,7 @@ final class DocumentObjectSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;
     final isSubsection = schema.subsection ?? false;
     final properties = schema.properties ?? const {};
     final required = schema.required ?? const [];
@@ -75,7 +77,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -91,7 +93,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -105,7 +107,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -119,7 +121,21 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
+          isSubsection: isSubsection,
+          isRequired: isRequired,
+          properties: mappedProperties,
+          oneOf: mappedOneOf,
+          order: mappedOrder,
+        );
+      case _DocumentObjectDefinition.borderGroup:
+        return DocumentBorderGroupSchema(
+          nodeId: nodeId,
+          format: format,
+          title: title,
+          description: descriptionMarkdown,
+          placeholder: placeholder,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,
@@ -133,7 +149,7 @@ final class DocumentObjectSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           properties: mappedProperties,

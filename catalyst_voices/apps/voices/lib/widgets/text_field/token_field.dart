@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 
 class TokenField extends StatelessWidget {
   final VoicesIntFieldController? controller;
+  final ValueChanged<int?>? onChanged;
   final ValueChanged<int?>? onFieldSubmitted;
-  final ValueChanged<VoicesTextFieldStatus>? onStatusChanged;
   final VoicesNumFieldValidator<int>? validator;
   final String? labelText;
   final String? errorText;
@@ -16,14 +16,15 @@ class TokenField extends StatelessWidget {
   final Range<int>? range;
   final Currency currency;
   final bool showHelper;
+  final bool enabled;
   final bool readOnly;
   final bool? ignorePointers;
 
   const TokenField({
     super.key,
     this.controller,
+    this.onChanged,
     required this.onFieldSubmitted,
-    this.onStatusChanged,
     this.validator,
     this.labelText,
     this.errorText,
@@ -31,6 +32,7 @@ class TokenField extends StatelessWidget {
     this.range,
     this.currency = const Currency.ada(),
     this.showHelper = true,
+    this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
   }) : assert(
@@ -59,8 +61,9 @@ class TokenField extends StatelessWidget {
             : null,
       ),
       validator: (int? value, text) => _validate(context, value, text),
-      onStatusChanged: onStatusChanged,
+      onChanged: onChanged,
       onFieldSubmitted: onFieldSubmitted,
+      enabled: enabled,
       readOnly: readOnly,
       ignorePointers: ignorePointers,
     );

@@ -2,6 +2,19 @@ import schemathesis
 import random
 import time
 import os
+import hypothesis
+import cbor2
+
+
+@schemathesis.serializer("application/cbor")
+class CborSerializer:
+    def as_requests(self, context, value):
+        data = cbor2.dumps(value)
+        return {"data": data}
+
+    def as_werkzeug(self, context, value):
+        data = cbor2.dumps(value)
+        return {"data": data}
 
 
 @schemathesis.auth()
@@ -13,14 +26,17 @@ class MyAuth:
     def set(self, case, data, context):
         security_definitions = case.operation.definition.raw.get("security", [])
         # randomly choose what kind of authentication would be applied
-        random.seed(time.time())
-        choosen_auth = random.choice(security_definitions)
+        choosen_auth_st = hypothesis.strategies.sampled_from(security_definitions)
+        choosen_auth = hypothesis.find(choosen_auth_st, lambda x: True)
         if "NoAuthorization" in choosen_auth:
             case.headers.pop("Authorization", None)
             case.headers.pop("X-API-Key", None)
         if "CatalystRBACSecurityScheme" in choosen_auth:
             case.headers.pop("X-API-Key", None)
-            # add RBAC token generation
+            # cspell: disable
+            rbac_token = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
+            # cspell: enable
+            case.headers["Authorization"] = f"Bearer {rbac_token}"
             pass
         if "InternalApiKeyAuthorization" in choosen_auth:
             case.headers.pop("Authorization", None)
@@ -42,6 +58,14 @@ def ignored_auth_custom(ctx, response, case):
 
 @schemathesis.check
 def negative_data_rejection_custom(ctx, response, case):
+    responses = case.operation.definition.raw.get("responses", {})
+    status_codes = responses.keys()
+
+    # correctly setup allowed status codes for negative_data_rejection check
+    ctx.config.negative_data_rejection.allowed_statuses = list(
+        [code for code in status_codes if code.startswith("4")]
+    )
+
     if case.data_generation_method and case.data_generation_method.is_negative:
         # if only headers are included
         if (

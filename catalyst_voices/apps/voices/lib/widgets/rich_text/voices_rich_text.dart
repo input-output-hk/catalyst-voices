@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -14,7 +17,7 @@ final class VoicesRichTextController extends QuillController {
   });
 }
 
-class VoicesRichText extends FormField<Document> {
+class VoicesRichText extends VoicesFormField<Document> {
   final VoicesRichTextController controller;
   final String title;
   final FocusNode focusNode;
@@ -23,16 +26,23 @@ class VoicesRichText extends FormField<Document> {
 
   VoicesRichText({
     super.key,
+    required super.onChanged,
+    super.autovalidateMode = AutovalidateMode.onUserInteraction,
     super.enabled,
-    super.autovalidateMode = AutovalidateMode.always,
+    super.validator,
     required this.controller,
     required this.title,
     required this.focusNode,
     required this.scrollController,
     this.charsLimit,
-    super.validator,
   }) : super(
+          value: controller.document,
           builder: (field) {
+            void onChangedHandler(Document? value) {
+              field.didChange(value);
+              onChanged?.call(value);
+            }
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -52,6 +62,7 @@ class VoicesRichText extends FormField<Document> {
                     controller: controller,
                     focusNode: focusNode,
                     scrollController: scrollController,
+                    onChanged: onChangedHandler,
                   ),
                 ),
                 Offstage(
@@ -102,14 +113,7 @@ class _EditorDecoration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-        // TODO(jakub): enable after implementing https://github.com/input-output-hk/catalyst-voices/issues/846
-        //   ResizableBoxParent(
-        //   minHeight: 470,
-        //   resizableVertically: true,
-        //   resizableHorizontally: false,
-        // child:
-        DecoratedBox(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: isEditMode
             ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
@@ -122,46 +126,92 @@ class _EditorDecoration extends StatelessWidget {
       ),
       child: child,
     );
-    // ),
   }
 
   Color _getBorderColor(BuildContext context) {
     if (!isEditMode) {
       return Theme.of(context).colorScheme.outlineVariant;
+    } else if (isInvalid) {
+      return Theme.of(context).colorScheme.error;
+    } else if (focusNode.hasFocus) {
+      return Theme.of(context).colorScheme.primary;
     } else {
-      if (isInvalid) {
-        return Theme.of(context).colorScheme.error;
-      }
-      if (focusNode.hasFocus) {
-        return Theme.of(context).colorScheme.primary;
-      }
       return Theme.of(context).colorScheme.outlineVariant;
     }
   }
 }
 
-class _Editor extends StatelessWidget {
+class _Editor extends StatefulWidget {
   final VoicesRichTextController controller;
   final FocusNode focusNode;
   final ScrollController scrollController;
+  final ValueChanged<Document?>? onChanged;
 
   const _Editor({
     required this.controller,
     required this.focusNode,
     required this.scrollController,
+    required this.onChanged,
   });
+
+  @override
+  State<_Editor> createState() => _EditorState();
+}
+
+class _EditorState extends State<_Editor> {
+  Document? _observedDocument;
+  StreamSubscription<DocChange>? _documentChangeSub;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller.addListener(_onControllerChanged);
+    _updateObservedDocument();
+  }
+
+  @override
+  void didUpdateWidget(_Editor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!identical(oldWidget.controller, widget.controller)) {
+      oldWidget.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+      _updateObservedDocument();
+    }
+  }
+
+  void _onControllerChanged() {
+    if (_observedDocument != widget.controller.document) {
+      _updateObservedDocument();
+    }
+  }
+
+  void _updateObservedDocument() {
+    unawaited(_documentChangeSub?.cancel());
+
+    _observedDocument = widget.controller.document;
+    _documentChangeSub = _observedDocument?.changes.listen((change) {
+      final document = widget.controller.document;
+      widget.onChanged?.call(document);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     return QuillEditor(
-      controller: controller,
-      focusNode: focusNode,
-      scrollController: scrollController,
+      controller: widget.controller,
+      focusNode: widget.focusNode,
+      scrollController: widget.scrollController,
       configurations: QuillEditorConfigurations(
         padding: const EdgeInsets.all(16),
         placeholder: context.l10n.placeholderRichText,
+        characterShortcutEvents: standardCharactersShortcutEvents,
+        /* cSpell:disable */
+        spaceShortcutEvents: standardSpaceShorcutEvents,
+        /* cSpell:enable */
         customStyles: DefaultStyles(
           placeHolder: DefaultTextBlockStyle(
             textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
@@ -196,86 +246,32 @@ class _Toolbar extends StatelessWidget {
         configurations: const QuillToolbarConfigurations(),
         child: Row(
           children: [
-            QuillToolbarIconButton(
-              tooltip: context.l10n.headerTooltipText,
-              onPressed: () {
-                if (controller.isHeaderSelected) {
-                  controller.formatSelection(Attribute.header);
-                } else {
-                  controller.formatSelection(Attribute.h1);
-                }
-              },
-              icon: VoicesAssets.icons.rtHeading.buildIcon(),
-              isSelected: controller.isHeaderSelected,
-              iconTheme: null,
-            ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtBold,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtHeading,
+              attribute: Attribute.h1,
+            ),
+            _ToolbarAttributeIconButton(
+              controller: controller,
+              icon: VoicesAssets.icons.rtBold,
               attribute: Attribute.bold,
             ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtItalic,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtItalic,
               attribute: Attribute.italic,
             ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtOrderedList,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtOrderedList,
               attribute: Attribute.ol,
             ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtUnorderedList,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtUnorderedList,
               attribute: Attribute.ul,
             ),
-            QuillToolbarIndentButton(
-              options: QuillToolbarIndentButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtIncreaseIndent,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
-              controller: controller,
-              isIncrease: true,
-            ),
-            QuillToolbarIndentButton(
-              options: QuillToolbarIndentButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtDecreaseIndent,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
-              controller: controller,
-              isIncrease: false,
-            ),
-            QuillToolbarImageButton(
-              options: QuillToolbarImageButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.photograph,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarImageOptionButton(
               controller: controller,
             ),
           ],
@@ -285,12 +281,43 @@ class _Toolbar extends StatelessWidget {
   }
 }
 
+class _ToolbarAttributeIconButton extends StatelessWidget {
+  final QuillController controller;
+  final Attribute<dynamic> attribute;
+  final SvgGenImage icon;
+
+  const _ToolbarAttributeIconButton({
+    required this.controller,
+    required this.attribute,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return QuillToolbarToggleStyleButton(
+      controller: controller,
+      attribute: attribute,
+      options: QuillToolbarToggleStyleButtonOptions(
+        childBuilder: (options, extraOptions) {
+          return _ToolbarIconButton(
+            icon: icon,
+            isToggled: extraOptions.isToggled,
+            onPressed: extraOptions.onPressed,
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _ToolbarIconButton extends StatelessWidget {
   final SvgGenImage icon;
+  final bool isToggled;
   final VoidCallback? onPressed;
 
   const _ToolbarIconButton({
     required this.icon,
+    required this.isToggled,
     required this.onPressed,
   });
 
@@ -299,12 +326,29 @@ class _ToolbarIconButton extends StatelessWidget {
     return IconButton(
       onPressed: onPressed,
       icon: icon.buildIcon(),
+      color: isToggled ? Theme.of(context).colorScheme.primary : null,
     );
   }
 }
 
-extension on QuillController {
-  bool get isHeaderSelected {
-    return getSelectionStyle().attributes.containsKey('header');
+class _ToolbarImageOptionButton extends StatelessWidget {
+  final QuillController controller;
+
+  const _ToolbarImageOptionButton({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return QuillToolbarImageButton(
+      controller: controller,
+      options: QuillToolbarImageButtonOptions(
+        childBuilder: (options, extraOptions) {
+          return _ToolbarIconButton(
+            icon: VoicesAssets.icons.photograph,
+            isToggled: false,
+            onPressed: extraOptions.onPressed,
+          );
+        },
+      ),
+    );
   }
 }

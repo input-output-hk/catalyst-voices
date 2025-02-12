@@ -85,7 +85,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: (value) {
+                textValidator: (value) {
                   return const VoicesTextFieldValidationResult.success();
                 },
                 onFieldSubmitted: (value) {},
@@ -101,7 +101,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: (value) {
+                textValidator: (value) {
                   return const VoicesTextFieldValidationResult.warning(
                     'Warning message',
                   );
@@ -119,7 +119,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: (value) {
+                textValidator: (value) {
                   return const VoicesTextFieldValidationResult.error(
                     'Error message',
                   );
@@ -137,7 +137,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: (value) {
+                textValidator: (value) {
                   return const VoicesTextFieldValidationResult.success();
                 },
                 enabled: false,
@@ -154,7 +154,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: (value) {
+                textValidator: (value) {
                   return const VoicesTextFieldValidationResult.warning(
                     'Warning message',
                   );
@@ -173,7 +173,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   hintText: 'Hint text',
                 ),
                 maxLength: 200,
-                validator: (value) {
+                textValidator: (value) {
                   return const VoicesTextFieldValidationResult.error(
                     'Error message',
                   );
@@ -191,7 +191,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
                 ),
-                validator: (value) {
+                textValidator: (value) {
                   if (value == 'success') {
                     return const VoicesTextFieldValidationResult(
                       status: VoicesTextFieldStatus.success,

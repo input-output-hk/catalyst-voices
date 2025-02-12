@@ -27,7 +27,8 @@ class VoicesCheckbox extends StatelessWidget {
   /// An optional widget to display the note text.
   final Widget? note;
 
-  final bool isDisabled;
+  /// Whether the widget can accept the user input.
+  final bool isEnabled;
 
   const VoicesCheckbox({
     super.key,
@@ -36,7 +37,7 @@ class VoicesCheckbox extends StatelessWidget {
     this.isError = false,
     this.label,
     this.note,
-    this.isDisabled = false,
+    this.isEnabled = true,
   });
 
   @override
@@ -44,7 +45,7 @@ class VoicesCheckbox extends StatelessWidget {
     final onChanged = this.onChanged;
 
     return AbsorbPointer(
-      absorbing: isDisabled,
+      absorbing: !isEnabled,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
@@ -60,12 +61,12 @@ class VoicesCheckbox extends StatelessWidget {
               onChanged:
                   onChanged != null ? (value) => onChanged(value!) : null,
               isError: isError,
-              side: isDisabled
-                  ? BorderSide(
+              side: isEnabled
+                  ? null
+                  : BorderSide(
                       width: 2,
                       color: Theme.of(context).colors.onSurfaceNeutral012,
-                    )
-                  : null,
+                    ),
             ),
           ),
         ),

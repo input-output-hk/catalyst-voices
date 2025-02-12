@@ -67,7 +67,7 @@ class _VoicesDateTimeFieldState extends State<VoicesDateTimeField> {
   }
 
   @override
-  void didUpdateWidget(covariant VoicesDateTimeField oldWidget) {
+  void didUpdateWidget(VoicesDateTimeField oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller != oldWidget.controller) {

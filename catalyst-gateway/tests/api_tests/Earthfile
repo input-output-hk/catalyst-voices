@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.35 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.38 AS python-ci
 
 builder:
     FROM python-ci+python-base
@@ -10,19 +10,20 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-disabled-test:
+test:
     FROM +builder
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
-    COPY ./docker-compose.yml .
+    COPY ./../+docker-compose/docker-compose.yml .
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway) \
+        --load event-db:latest=(./../../event-db+build) \
+        --load cat-gateway:latest=(./../../+docker) \
+        --load scylla-node:latest=(./../+package-scylla-node) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest -s -m ci --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
+        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL api-tests.junit-report.xml

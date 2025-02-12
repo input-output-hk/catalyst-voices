@@ -18,6 +18,7 @@ void main() {
         enabled: true,
         focusNode: FocusNode(),
         scrollController: ScrollController(),
+        onChanged: (_) {},
       );
 
       // When

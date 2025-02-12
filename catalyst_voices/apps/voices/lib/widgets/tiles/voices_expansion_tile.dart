@@ -6,12 +6,14 @@ class VoicesExpansionTile extends StatefulWidget {
   final Widget title;
   final List<Widget> children;
   final bool initiallyExpanded;
+  final Color? backgroundColor;
 
   const VoicesExpansionTile({
     super.key,
     required this.title,
     this.children = const [],
     this.initiallyExpanded = false,
+    this.backgroundColor,
   });
 
   @override
@@ -50,6 +52,8 @@ class _VoicesExpansionTileState extends State<VoicesExpansionTile> {
             controller: _controller,
             initiallyExpanded: _isExpanded,
             onExpansionChanged: _updateExpended,
+            backgroundColor: widget.backgroundColor,
+            collapsedBackgroundColor: widget.backgroundColor,
             children: widget.children,
           );
         },
