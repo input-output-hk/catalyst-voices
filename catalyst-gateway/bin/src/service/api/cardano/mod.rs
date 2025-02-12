@@ -31,7 +31,7 @@ pub(crate) struct Api;
 
 #[OpenApi(tag = "ApiTags::Cardano")]
 impl Api {
-    /// Get Cardano slot info to the provided date-time.
+    /// Get Cardano slot to the provided date-time.
     ///
     /// This endpoint returns the closest cardano slot info to the provided
     /// date-time.

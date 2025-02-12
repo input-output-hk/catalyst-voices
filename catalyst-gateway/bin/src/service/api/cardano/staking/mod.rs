@@ -21,14 +21,14 @@ pub(crate) struct Api;
 
 #[OpenApi(tag = "ApiTags::Cardano")]
 impl Api {
-    /// Get staked ADA amount.
+    /// Get staked assets.
     ///
-    /// This endpoint returns the total Cardano's staked ADA amount to the corresponded
+    /// This endpoint returns the total Cardano's staked assets to the corresponded
     /// user's stake address.
     #[oai(
         path = "/draft/cardano/assets/:stake_address",
         method = "get",
-        operation_id = "stakedAdaAmountGet",
+        operation_id = "stakedAssetsGet",
         transform = "schema_version_validation"
     )]
     async fn staked_ada_get(
