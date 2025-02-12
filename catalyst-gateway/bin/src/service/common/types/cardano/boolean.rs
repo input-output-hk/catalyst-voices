@@ -1,4 +1,4 @@
-//! Implement newtypes for boolean types
+//! Implement type wrappers for boolean types
 
 use derive_more::{From, Into};
 use poem_openapi::{types::Example, NewType};

@@ -34,7 +34,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Slot number
+/// Slot Number
 #[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
 
 pub(crate) struct SlotNo(u64);
@@ -43,6 +43,11 @@ impl SlotNo {
     /// Is the Slot Number valid?
     fn is_valid(value: u64) -> bool {
         value >= MINIMUM && value <= MAXIMUM
+    }
+
+    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
+    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
+        value.map(std::convert::Into::into)
     }
 }
 
@@ -60,7 +65,7 @@ impl Type for SlotNo {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "integer(u64)".into()
+        "SlotNo".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
@@ -150,13 +155,6 @@ impl Into<i64> for SlotNo {
     fn into(self) -> i64 {
         // assume that the value is always valid
         i64::try_from(self.0).unwrap_or_default()
-    }
-}
-
-impl SlotNo {
-    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
-    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
-        value.map(std::convert::Into::into)
     }
 }
 

@@ -1,9 +1,11 @@
 //! Implement API endpoint interfacing `DateTime`.
 
+use core::fmt;
+
 use derive_more::{From, FromStr, Into};
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
-    types::{Example, ParseFromParameter, ParseResult, Type},
+    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 
 /// Newtype for `DateTime<Utc>`. Should be used for API interfacing `DateTime<Utc>` only.
@@ -48,8 +50,33 @@ impl ParseFromParameter for ApiDateTime {
     }
 }
 
+impl ParseFromJSON for ApiDateTime {
+    fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
+        let value = value.ok_or(ParseError::custom(
+            "Invalid RFC 3339 date and time. Null or missing value.",
+        ))?;
+        let value = value.as_str().ok_or(ParseError::custom(
+            "Invalid RFC 3339 date and time. Must be string.",
+        ))?;
+        Ok(Self(value.parse()?))
+    }
+}
+
+impl ToJSON for ApiDateTime {
+    fn to_json(&self) -> Option<serde_json::Value> {
+        Some(self.to_string().into())
+    }
+}
+
+impl fmt::Display for ApiDateTime {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0.to_rfc3339())?;
+        Ok(())
+    }
+}
+
 impl Example for ApiDateTime {
     fn example() -> Self {
-        Self(chrono::Utc::now())
+        Self(chrono::DateTime::from_timestamp(1_712_676_501, 0).unwrap_or_default())
     }
 }
