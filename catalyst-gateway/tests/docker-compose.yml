@@ -28,7 +28,7 @@ services:
     image: scylla-node:latest
     container_name: scylla-node
     restart: unless-stopped
-    command: --developer-mode 1 --smp 2 --memory 1G --overprovisioned 1
+    command: --developer-mode 1 --smp 2 --memory 250M --overprovisioned 1
     ports:  
       - "9042:9042"
     healthcheck:
