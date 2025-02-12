@@ -189,7 +189,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final updateStream = Stream.fromFuture(documentDataFuture);
     final localStream = _localDocuments.watch(ref: ref);
 
-    return StreamGroup.merge([updateStream, localStream]);
+    return StreamGroup.merge([updateStream, localStream]).distinct();
   }
 
   @visibleForTesting
