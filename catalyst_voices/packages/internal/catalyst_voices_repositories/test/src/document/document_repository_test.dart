@@ -9,7 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:uuid/uuid.dart';
 
+import '../utils/test_factories.dart';
+
 void main() {
+  // this is required only by VoicesDocumentsTemplates
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late DocumentRepositoryImpl repository;
 
   late DriftCatalystDatabase database;
@@ -38,22 +43,82 @@ void main() {
   });
 
   group(DocumentRepository, () {
+    test('getProposalDocument returns correct model', () async {
+      // Given
+      final templateData = await VoicesDocumentsTemplates.proposalF14Schema;
+      final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
+
+      final template = DocumentDataFactory.build(
+        id: mockedTemplateUuid,
+        type: DocumentType.proposalTemplate,
+        content: DocumentDataContent(templateData),
+      );
+      final proposal = DocumentDataFactory.build(
+        id: mockedDocumentUuid,
+        type: DocumentType.proposalDocument,
+        template: template.ref,
+        content: DocumentDataContent(proposalData),
+      );
+
+      when(() => remoteDocuments.get(ref: template.ref))
+          .thenAnswer((_) => Future.value(template));
+      when(() => remoteDocuments.get(ref: proposal.ref))
+          .thenAnswer((_) => Future.value(proposal));
+
+      // When
+      final ref = proposal.ref;
+      final proposalDocument = await repository.getProposalDocument(
+        ref: ref,
+      );
+
+      // Then
+      expect(proposalDocument.metadata.id, proposal.metadata.id);
+      expect(proposalDocument.metadata.version, proposal.metadata.version);
+    });
+
+    test('getProposalDocument correctly propagates errors', () async {
+      // Given
+      final templateRef = DocumentRef(
+        id: mockedTemplateUuid,
+        version: const Uuid().v7(),
+      );
+      final proposal = DocumentDataFactory.build(
+        id: mockedDocumentUuid,
+        type: DocumentType.proposalDocument,
+        template: templateRef,
+        content: const DocumentDataContent({}),
+      );
+
+      when(() => remoteDocuments.get(ref: templateRef))
+          .thenAnswer((_) => Future.error(DocumentNotFound(ref: templateRef)));
+      when(() => remoteDocuments.get(ref: proposal.ref))
+          .thenAnswer((_) => Future.value(proposal));
+
+      // When
+      final ref = proposal.ref;
+      final proposalDocumentFuture = repository.getProposalDocument(
+        ref: ref,
+      );
+
+      // Then
+      expect(
+        () async => proposalDocumentFuture,
+        throwsA(isA<DocumentNotFound>()),
+      );
+    });
+
     group('getDocumentData', () {
-      test('remote source is called only once for same document', () async {
+      test('remote source is called only once for same proposal', () async {
         // Given
         final id = const Uuid().v7();
         final version = id;
 
-        final documentData = DocumentData(
-          metadata: DocumentDataMetadata(
-            type: DocumentType.proposalDocument,
-            id: id,
-            version: version,
-          ),
-          content: const DocumentDataContent({}),
+        final documentData = DocumentDataFactory.build(
+          id: id,
+          version: version,
         );
 
-        final ref = DocumentRef(id: id, version: version);
+        final ref = documentData.ref;
 
         when(() => remoteDocuments.get(ref: ref))
             .thenAnswer((_) => Future.value(documentData));
@@ -71,13 +136,9 @@ void main() {
         final id = const Uuid().v7();
         final version = id;
 
-        final documentData = DocumentData(
-          metadata: DocumentDataMetadata(
-            type: DocumentType.proposalDocument,
-            id: id,
-            version: version,
-          ),
-          content: const DocumentDataContent({}),
+        final documentData = DocumentDataFactory.build(
+          id: id,
+          version: version,
         );
 
         final ref = DocumentRef(id: id);
@@ -98,94 +159,83 @@ void main() {
       });
     });
 
-    group('watchProposalDocument', () {
-      test('description', () async {
+    group('watchDocumentWithRef', () {
+      test('template reference is watched and combined correctly', () async {
         // Given
-        // TODO(damian-molinski): remove mocked ids when api integrated.
-        final templateRef = DocumentRef(
-          id: mockedTemplateUuid,
-          version: const Uuid().v7(),
+        final template = DocumentDataFactory.build(
+          type: DocumentType.proposalTemplate,
         );
-        final proposalRef = DocumentRef(
-          id: mockedTemplateUuid,
-          version: const Uuid().v7(),
-        );
+        final proposal = DocumentDataFactory.build(template: template.ref);
 
-        when(() => remoteDocuments.get(ref: templateRef)).thenAnswer((_) {
-          return _buildProposalTemplate(
-            id: templateRef.id,
-            version: templateRef.version,
-          );
-        });
-        when(() => remoteDocuments.get(ref: proposalRef)).thenAnswer((_) {
-          return _buildProposal(
-            id: proposalRef.id,
-            version: proposalRef.version,
-            template: templateRef,
-          );
-        });
+        when(() => remoteDocuments.get(ref: template.ref))
+            .thenAnswer((_) => Future.value(template));
+        when(() => remoteDocuments.get(ref: proposal.ref))
+            .thenAnswer((_) => Future.value(proposal));
 
         // When
-        final proposalStream = repository.watchProposalDocument(
-          ref: proposalRef,
+        final proposalStream = repository.watchDocumentWithRef(
+          ref: proposal.ref,
+          refGetter: (data) => data.metadata.template!,
         );
 
         // Then
         expect(
           proposalStream,
-          emitsThrough([
-            isNotNull,
+          emitsInOrder([
+            // db initially is empty so emits null first,
+            isNull,
+            // second is emitted because template initially is not there
+            isNull,
+            // should have all data ready.
+            predicate<DocumentsDataWithRefData?>(
+              (data) =>
+                  data?.data.ref == proposal.ref &&
+                  data?.refData.ref == template.ref,
+              'data or dataRef ref do not match',
+            ),
           ]),
         );
       });
+
+      test('loads template once when two documents refers to it', () async {
+        // Given
+        final template = DocumentDataFactory.build(
+          type: DocumentType.proposalTemplate,
+        );
+        final proposal1 = DocumentDataFactory.build(template: template.ref);
+        final proposal2 = DocumentDataFactory.build(template: template.ref);
+
+        when(() => remoteDocuments.get(ref: template.ref))
+            .thenAnswer((_) => Future.value(template));
+        when(() => remoteDocuments.get(ref: proposal1.ref))
+            .thenAnswer((_) => Future.value(proposal1));
+        when(() => remoteDocuments.get(ref: proposal2.ref))
+            .thenAnswer((_) => Future.value(proposal2));
+
+        // When
+        final proposal1Future = repository
+            .watchDocumentWithRef(
+              ref: proposal1.ref,
+              refGetter: (data) => data.metadata.template!,
+            )
+            .firstWhere((element) => element != null);
+        final proposal2Future = repository
+            .watchDocumentWithRef(
+              ref: proposal2.ref,
+              refGetter: (data) => data.metadata.template!,
+            )
+            .firstWhere((element) => element != null);
+
+        final proposals = await Future.wait([proposal1Future, proposal2Future]);
+
+        // Then
+        expect(proposals[0]!.data.ref, proposal1.ref);
+        expect(proposals[1]!.data.ref, proposal2.ref);
+
+        verify(() => remoteDocuments.get(ref: template.ref)).called(1);
+      });
     });
   });
-}
-
-Future<DocumentData> _buildProposalTemplate({
-  String? id,
-  String? version,
-}) async {
-  final rawContent = await VoicesDocumentsTemplates.proposalF14Schema;
-
-  final metadata = DocumentDataMetadata(
-    type: DocumentType.proposalTemplate,
-    id: id ?? const Uuid().v7(),
-    version: version ?? const Uuid().v7(),
-  );
-
-  final content = DocumentDataContent(rawContent);
-
-  return DocumentData(
-    metadata: metadata,
-    content: content,
-  );
-}
-
-Future<DocumentData> _buildProposal({
-  String? id,
-  String? version,
-  DocumentRef? template,
-}) async {
-  final rawContent = await VoicesDocumentsTemplates.proposalF14Document;
-
-  final metadata = DocumentDataMetadata(
-    type: DocumentType.proposalDocument,
-    id: id ?? const Uuid().v7(),
-    version: version ?? const Uuid().v7(),
-    template: template ??
-        DocumentRef(
-          id: const Uuid().v7(),
-          version: const Uuid().v7(),
-        ),
-  );
-
-  final content = DocumentDataContent(rawContent);
-
-  return DocumentData(
-    metadata: metadata,
-    content: content,
-  );
 }
 
 class _MockDocumentDataRemoteSource extends Mock

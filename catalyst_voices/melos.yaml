@@ -88,6 +88,7 @@ command:
       sdk: ">=3.5.0 <4.0.0"
       flutter: ">=3.27.3"
     dependencies:
+      async: ^2.11.0
       asn1lib: ^1.5.3
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2

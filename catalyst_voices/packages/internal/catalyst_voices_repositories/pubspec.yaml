@@ -8,6 +8,7 @@ environment:
   flutter: ">=3.27.3"
 
 dependencies:
+  async: ^2.11.0
   catalyst_cardano_serialization: ^1.0.0
   # using for document json assets
   catalyst_voices_assets:

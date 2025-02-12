@@ -21,16 +21,14 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
       throw DraftNotFound(ref: ref);
     }
 
-    return DocumentData(
-      metadata: entity.metadata,
-      content: entity.content,
-    );
+    return entity.toModel();
   }
 
   @override
   Stream<DocumentData?> watch({required DocumentRef ref}) {
-    // TODO: implement watch
-    throw UnimplementedError();
+    return _database.draftsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
   }
 
   @override
@@ -58,5 +56,14 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     required DocumentDataContent content,
   }) async {
     await _database.draftsDao.updateContent(ref: ref, content: content);
+  }
+}
+
+extension _DraftEntityMapper on DraftEntity {
+  DocumentData toModel() {
+    return DocumentData(
+      metadata: metadata,
+      content: content,
+    );
   }
 }

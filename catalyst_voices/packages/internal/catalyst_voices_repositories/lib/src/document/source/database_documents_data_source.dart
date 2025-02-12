@@ -20,16 +20,14 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
       throw DocumentNotFound(ref: ref);
     }
 
-    return DocumentData(
-      metadata: entity.metadata,
-      content: entity.content,
-    );
+    return entity.toModel();
   }
 
   @override
   Stream<DocumentData?> watch({required DocumentRef ref}) {
-    // TODO: implement watch
-    throw UnimplementedError();
+    return _database.documentsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
   }
 
   @override
@@ -56,5 +54,14 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
     final documentWithMetadata = (document: document, metadata: metadata);
 
     await _database.documentsDao.saveAll([documentWithMetadata]);
+  }
+}
+
+extension _DocumentEntityMapper on DocumentEntity {
+  DocumentData toModel() {
+    return DocumentData(
+      metadata: metadata,
+      content: content,
+    );
   }
 }

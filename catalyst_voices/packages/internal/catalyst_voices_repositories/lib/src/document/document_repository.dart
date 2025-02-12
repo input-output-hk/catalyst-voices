@@ -1,10 +1,18 @@
+import 'dart:async';
+
+import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/transformers.dart';
 import 'package:synchronized/synchronized.dart';
+
+@visibleForTesting
+typedef DocumentsDataWithRefData = ({DocumentData data, DocumentData refData});
 
 abstract interface class DocumentRepository {
   factory DocumentRepository(
@@ -32,7 +40,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   final DocumentDataLocalSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
 
-  final _templateLock = Lock();
+  final _documentDataLock = Lock();
 
   DocumentRepositoryImpl(
     this._drafts,
@@ -45,15 +53,23 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
   }) {
     // TODO(damian-molinski): remove this override once we have API
-    ref = const DocumentRef(id: mockedDocumentUuid);
+    ref = ref.copyWith(id: mockedDocumentUuid);
 
-    return _watchDocumentData(ref: ref).asyncMap(
-      (documentData) async {
-        if (documentData == null) {
+    return watchDocumentWithRef(
+      ref: ref,
+      refGetter: (data) => data.metadata.template!,
+    ).map(
+      (event) {
+        if (event == null) {
           return null;
         }
+        final documentData = event.data;
+        final templateData = event.refData;
 
-        return _buildProposalDocument(from: documentData);
+        return _buildProposalDocument(
+          documentData: documentData,
+          templateData: templateData,
+        );
       },
     );
   }
@@ -61,13 +77,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<ProposalDocument> getProposalDocument({
     required DocumentRef ref,
-  }) async {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = const DocumentRef(id: mockedDocumentUuid);
-
-    final documentData = await getDocumentData(ref: ref);
-
-    return _buildProposalDocument(from: documentData);
+  }) {
+    return watchProposalDocument(ref: ref)
+        .firstWhere((proposal) => proposal != null)
+        .then((proposal) => proposal!);
   }
 
   @override
@@ -75,54 +88,31 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
   }) async {
     // TODO(damian-molinski): remove this override once we have API
-    ref = const DocumentRef(id: mockedTemplateUuid);
+    ref = ref.copyWith(id: mockedTemplateUuid);
 
-    final signedDocument = await getDocumentData(ref: ref);
+    final documentData = await getDocumentData(ref: ref);
 
-    assert(
-      signedDocument.metadata.type == DocumentType.proposalTemplate,
-      'Invalid SignedDocument type',
-    );
-
-    final metadata = ProposalTemplateMetadata(
-      id: signedDocument.metadata.id,
-      version: signedDocument.metadata.version,
-    );
-
-    final json = signedDocument.content.data;
-    final schema = DocumentSchemaDto.fromJson(json).toModel();
-
-    return ProposalTemplate(
-      metadata: metadata,
-      schema: schema,
-    );
+    return _buildProposalTemplate(documentData: documentData);
   }
 
-  Future<ProposalDocument> _buildProposalDocument({
-    required DocumentData from,
-  }) async {
+  ProposalDocument _buildProposalDocument({
+    required DocumentData documentData,
+    required DocumentData templateData,
+  }) {
     assert(
-      from.metadata.type == DocumentType.proposalDocument,
-      'Invalid Proposal SignedDocument type',
-    );
-    assert(
-      from.metadata.template != null,
-      'Proposal metadata has no template',
+      documentData.metadata.type == DocumentType.proposalDocument,
+      'Not a proposalDocument document data type',
     );
 
-    final templateRef = from.metadata.template!;
-
-    final template = await _templateLock.synchronized(() {
-      return getProposalTemplate(ref: templateRef);
-    });
+    final template = _buildProposalTemplate(documentData: templateData);
 
     final metadata = ProposalMetadata(
-      id: from.metadata.id,
-      version: from.metadata.version,
+      id: documentData.metadata.id,
+      version: documentData.metadata.version,
     );
 
     final content = DocumentDataContentDto.fromModel(
-      from.content,
+      documentData.content,
     );
     final schema = template.schema;
     final document = DocumentDto.fromJsonSchema(content, schema).toModel();
@@ -133,14 +123,73 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
+  ProposalTemplate _buildProposalTemplate({
+    required DocumentData documentData,
+  }) {
+    assert(
+      documentData.metadata.type == DocumentType.proposalTemplate,
+      'Not a proposalTemplate document data type',
+    );
+
+    final metadata = ProposalTemplateMetadata(
+      id: documentData.metadata.id,
+      version: documentData.metadata.version,
+    );
+
+    final contentData = documentData.content.data;
+    final schema = DocumentSchemaDto.fromJson(contentData).toModel();
+
+    return ProposalTemplate(
+      metadata: metadata,
+      schema: schema,
+    );
+  }
+
+  @visibleForTesting
+  Stream<DocumentsDataWithRefData?> watchDocumentWithRef({
+    required DocumentRef ref,
+    required ValueResolver<DocumentData, DocumentRef> refGetter,
+  }) {
+    return _watchDocumentData(ref: ref)
+        .switchMap<DocumentsDataWithRefData?>((document) {
+      if (document == null) {
+        return Stream.value(null);
+      }
+
+      final ref = refGetter(document);
+      final refDocumentStream = _watchDocumentData(
+        ref: ref,
+        // Synchronized because we may have many document which are referring
+        // to same template. When loading multiple documents at same
+        // time we want to fetch only once template.
+        synchronizedUpdate: true,
+      );
+
+      return refDocumentStream.map<DocumentsDataWithRefData?>(
+        (refDocumentData) {
+          return refDocumentData != null
+              ? (data: document, refData: refDocumentData)
+              : null;
+        },
+      );
+    });
+  }
+
   Stream<DocumentData?> _watchDocumentData({
     required DocumentRef ref,
+    bool synchronizedUpdate = false,
   }) {
     /// Make sure we're update to date with document ref.
-    // ignore: discarded_futures
-    getDocumentData(ref: ref).ignore();
+    final documentDataFuture = synchronizedUpdate
+        // ignore: discarded_futures
+        ? _documentDataLock.synchronized(() => getDocumentData(ref: ref))
+        // ignore: discarded_futures
+        : getDocumentData(ref: ref);
 
-    return _localDocuments.watch(ref: ref);
+    final updateStream = Stream.fromFuture(documentDataFuture);
+    final localStream = _localDocuments.watch(ref: ref);
+
+    return StreamGroup.merge([updateStream, localStream]);
   }
 
   @visibleForTesting
@@ -159,7 +208,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     if (isCached) {
       return _localDocuments.get(ref: ref);
     }
-
     final remoteData = await _remoteDocuments.get(ref: ref);
 
     await _localDocuments.save(data: remoteData);

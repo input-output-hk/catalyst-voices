@@ -111,3 +111,23 @@ abstract final class DraftFactory {
     );
   }
 }
+
+abstract final class DocumentDataFactory {
+  static DocumentData build({
+    DocumentType type = DocumentType.proposalDocument,
+    String? id,
+    String? version,
+    DocumentRef? template,
+    DocumentDataContent content = const DocumentDataContent({}),
+  }) {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: type,
+        id: id ?? const Uuid().v7(),
+        version: version ?? const Uuid().v7(),
+        template: template,
+      ),
+      content: content,
+    );
+  }
+}

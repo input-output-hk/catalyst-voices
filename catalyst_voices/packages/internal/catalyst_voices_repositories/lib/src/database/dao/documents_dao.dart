@@ -21,6 +21,9 @@ abstract interface class DocumentsDao {
   /// Returns newest version with matching id or null of none found.
   Future<DocumentEntity?> query({required DocumentRef ref});
 
+  /// Same as [query] but emits updates.
+  Stream<DocumentEntity?> watch({required DocumentRef ref});
+
   /// Counts all documents.
   Future<int> countAll();
 
@@ -68,14 +71,15 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<DocumentEntity?> query({required DocumentRef ref}) {
-    final query = select(documents)
-      ..where((tbl) => _filterRef(tbl, ref))
-      ..orderBy([
-        (u) => OrderingTerm.desc(u.verHi),
-      ])
-      ..limit(1);
+    return _selectRef(ref).get().then((value) => value.firstOrNull);
+  }
 
-    return query.get().then((value) => value.firstOrNull);
+  @override
+  Stream<DocumentEntity?> watch({required DocumentRef ref}) {
+    return _selectRef(ref)
+        .watch()
+        .map((event) => event.firstOrNull)
+        .distinct(_entitiesEquals);
   }
 
   @override
@@ -153,6 +157,17 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
   }
 
+  SimpleSelectStatement<$DocumentsTable, DocumentEntity> _selectRef(
+    DocumentRef ref,
+  ) {
+    return select(documents)
+      ..where((tbl) => _filterRef(tbl, ref))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ])
+      ..limit(1);
+  }
+
   Expression<bool> _filterRef($DocumentsTable row, DocumentRef ref) {
     final id = UuidHiLo.from(ref.id);
     final ver = UuidHiLo.fromNullable(ref.version);
@@ -165,5 +180,15 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         row.verLo.equals(ver.low),
       ],
     ]);
+  }
+
+  bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {
+    final previousId = (previous?.idHi, previous?.idLo);
+    final nextId = (next?.idHi, next?.idLo);
+
+    final previousVer = (previous?.verHi, previous?.verLo);
+    final nextVer = (next?.verHi, next?.verLo);
+
+    return previousId == nextId && previousVer == nextVer;
   }
 }

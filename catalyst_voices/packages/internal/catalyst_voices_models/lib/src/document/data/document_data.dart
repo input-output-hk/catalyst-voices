@@ -21,6 +21,13 @@ final class DocumentData extends Equatable {
     required this.content,
   });
 
+  DocumentRef get ref {
+    return DocumentRef(
+      id: metadata.id,
+      version: metadata.version,
+    );
+  }
+
   @override
   List<Object?> get props => [
         metadata,

@@ -15,6 +15,9 @@ abstract interface class DraftsDao {
   /// Returns newest version with matching id or null of none found.
   Future<DraftEntity?> query({required DocumentRef ref});
 
+  /// Same as [query] but emits updates.
+  Stream<DraftEntity?> watch({required DocumentRef ref});
+
   /// Counts unique drafts. All versions of same document are counted as 1.
   Future<int> countAll();
 
@@ -57,14 +60,12 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<DraftEntity?> query({required DocumentRef ref}) {
-    final query = select(drafts)
-      ..where((tbl) => _filterRef(tbl, ref))
-      ..orderBy([
-        (u) => OrderingTerm.desc(u.verHi),
-      ])
-      ..limit(1);
+    return _selectRef(ref).get().then((value) => value.firstOrNull);
+  }
 
-    return query.get().then((value) => value.firstOrNull);
+  @override
+  Stream<DraftEntity?> watch({required DocumentRef ref}) {
+    return _selectRef(ref).watch().map((event) => event.firstOrNull);
   }
 
   @override
@@ -106,6 +107,17 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     if (kDebugMode) {
       debugPrint('DraftsDao: Updated[$updatedRows] $ref rows');
     }
+  }
+
+  SimpleSelectStatement<$DraftsTable, DraftEntity> _selectRef(
+    DocumentRef ref,
+  ) {
+    return select(drafts)
+      ..where((tbl) => _filterRef(tbl, ref))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ])
+      ..limit(1);
   }
 
   Expression<bool> _filterRef($DraftsTable row, DocumentRef ref) {
