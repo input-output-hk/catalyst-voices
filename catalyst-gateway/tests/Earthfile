@@ -37,7 +37,8 @@ test-postgres:
         --pull alpine:3.20.3 \
         --service event-db-is-running
         RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-            cargo nextest run --release --run-ignored=only signed_docs
+            cargo nextest run --release --run-ignored=only signed_docs && \
+            docker-compose logs -n all scylla-node
     END
 
 # test-scylla - Runs the integration test for scylla.

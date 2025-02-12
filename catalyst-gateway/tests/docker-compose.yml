@@ -56,6 +56,11 @@ services:
     hostname: 127.0.0.1
     ports:
       - 3030:3030
+    depends_on:
+      event-db:
+        condition: service_started
+      scylla-node:
+        condition: service_started
 
 # it is a helper service to wait until the event-db will be ready
 # mainly its a trick for Earthly how to wait until service will be fully functional
@@ -63,7 +68,7 @@ services:
     image: alpine:3.20.3
     depends_on:
       event-db:
-        condition: service_healthy
+        condition: service_started
 
 # it is a helper service to wait until the scylla-node will be ready
 # mainly its a trick for Earthly how to wait until service will be fully functional
@@ -71,5 +76,5 @@ services:
     image: alpine:3.20.3
     depends_on:
       scylla-node:
-        condition: service_healthy
+        condition: service_started
 
