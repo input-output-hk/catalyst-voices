@@ -44,8 +44,7 @@ package-schemathesis:
 
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
 test-fuzzer-api:
-    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
+    FROM debian:bookworm-slim
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG seed
 

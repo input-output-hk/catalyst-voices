@@ -33,7 +33,7 @@ services:
       test: ["CMD-SHELL", "cqlsh -e 'SELECT now() FROM system.local;'"]
       interval: 10s
       timeout: 5s
-      retries: 30
+      retries: 10
 
   cat-gateway:
     image: cat-gateway:latest
@@ -54,6 +54,8 @@ services:
     ports:
       - 3030:3030
     depends_on:
+      event-db:
+        condition: service_healthy
       scylla-node:
         condition: service_healthy
 
