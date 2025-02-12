@@ -101,6 +101,12 @@ impl From<SlotNo> for BigInt {
     }
 }
 
+impl From<SlotNo> for u64 {
+    fn from(value: SlotNo) -> Self {
+        value.0
+    }
+}
+
 impl ToJSON for SlotNo {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())

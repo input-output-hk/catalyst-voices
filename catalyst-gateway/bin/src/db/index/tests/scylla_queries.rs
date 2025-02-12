@@ -55,7 +55,7 @@ async fn get_catalyst_id_by_stake_address() {
     };
 
     let payment = ShelleyPaymentPart::Key(
-        "0d8d00cdd4657ac84d82f0a56067634a7adfdf43da41cb534bcaa45060973d21"
+        "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
             .parse()
             .unwrap(),
     );

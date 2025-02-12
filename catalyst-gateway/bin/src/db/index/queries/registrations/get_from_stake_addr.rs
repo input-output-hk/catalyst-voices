@@ -8,9 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get registrations from stake addr query.
@@ -40,9 +43,9 @@ pub(crate) struct GetRegistrationQuery {
     /// Nonce value after normalization.
     pub nonce: num_bigint::BigInt,
     /// Slot Number the cert is in.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
     /// Transaction Index.
-    pub txn: i16,
+    pub txn: DbTxnIndex,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

@@ -22,6 +22,12 @@ impl From<DbTxnIndex> for TxnIndex {
     }
 }
 
+impl From<DbTxnIndex> for i16 {
+    fn from(value: DbTxnIndex) -> Self {
+        value.0
+    }
+}
+
 impl SerializeValue for DbTxnIndex {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,

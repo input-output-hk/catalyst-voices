@@ -17,6 +17,18 @@ impl From<Slot> for DbSlot {
     }
 }
 
+impl From<u64> for DbSlot {
+    fn from(value: u64) -> Self {
+        Self(value)
+    }
+}
+
+impl From<DbSlot> for u64 {
+    fn from(value: DbSlot) -> Self {
+        value.0
+    }
+}
+
 impl From<DbSlot> for Slot {
     fn from(value: DbSlot) -> Self {
         value.0.into()

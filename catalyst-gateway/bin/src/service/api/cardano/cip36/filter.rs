@@ -200,18 +200,15 @@ async fn get_all_registrations_from_stake_pub_key(
             continue;
         };
 
-        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
-            *slot_no
-        } else {
-            continue;
-        };
+        let slot_no: u64 = row.slot_no.into();
+        let txn: i16 = row.txn.into();
 
         let cip36 = Cip36Details {
-            slot_no: SlotNo::from(slot_no),
+            slot_no: slot_no.into(),
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
-            txn: Some(TxnIndex::try_from(row.txn)?),
+            txn: Some(TxnIndex::try_from(txn)?),
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
