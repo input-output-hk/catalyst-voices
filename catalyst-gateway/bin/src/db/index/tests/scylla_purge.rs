@@ -2,6 +2,8 @@
 //! This is mainly to test whether the defined purge queries work with the database or
 //! not.
 
+// cSpell:ignoreRegExp cardano/Fftx
+
 use cardano_blockchain_types::{
     Cip36, MultiEraBlock, Network, Point, TransactionHash, VotingPubKey,
 };
