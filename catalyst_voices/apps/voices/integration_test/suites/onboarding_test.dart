@@ -8,12 +8,24 @@ import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/app_bar_page.dart';
+import '../pageobject/onboarding/onboarding_base_page.dart';
+import '../pageobject/onboarding/step_10_input_seedphrase.dart';
+import '../pageobject/onboarding/step_11_seedphrase_success.dart';
+import '../pageobject/onboarding/step_12_password_info.dart';
+import '../pageobject/onboarding/step_13_password_input.dart';
+import '../pageobject/onboarding/step_14_keychain_final.dart';
+import '../pageobject/onboarding/step_15_link_wallet_info.dart';
+import '../pageobject/onboarding/step_16_wallet_list.dart';
+import '../pageobject/onboarding/step_1_get_started.dart';
+import '../pageobject/onboarding/step_6_catalyst_keychain_info.dart';
+import '../pageobject/onboarding/step_7_catalyst_keychain_success.dart';
+import '../pageobject/onboarding/step_8_writedown_seedphrase.dart';
+import '../pageobject/onboarding/step_9_writedown_seedphrase_info.dart';
 import '../pageobject/onboarding_page.dart';
 import '../types/password_validation_states.dart';
 import '../types/registration_state.dart';
 import '../utils/constants.dart';
 import '../utils/test_context.dart';
-import '../utils/translations_utils.dart';
 
 void main() async {
   late final GoRouter router;
@@ -39,26 +51,28 @@ void main() async {
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
       await $(AppBarPage.getStartedBtn).tap();
-      expect($(OnboardingPage.registrationInfoPanel), findsOneWidget);
-      expect($(OnboardingPage.registrationDetailsPanel), findsOneWidget);
+      expect($(OnboardingPageBase($).registrationInfoPanel), findsOneWidget);
+      expect(
+        $(
+          OnboardingPageBase($).registrationDetailsPanel,
+        ),
+        findsOneWidget,
+      );
     });
 
     patrolWidgetTest('visitor - get started screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.getStarted,
-      );
+      await GetStartedPanel($).goto();
+      await GetStartedPanel($).verifyPageElements();
     });
 
     patrolWidgetTest('visitor - get started screen close button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.long.duration);
-      await OnboardingPage.closeBtn($).tap();
-      expect($(OnboardingPage.registrationDialog), findsNothing);
+      await GetStartedPanel($).goto();
+      await OnboardingPageBase($).closeButton().tap();
+      expect($(OnboardingPageBase($).registrationDialog), findsNothing);
     });
 
     // TODO(oldgreg): add Introduction screen tests and base profile screens
@@ -66,713 +80,233 @@ void main() async {
     patrolWidgetTest('visitor - create - keychain info screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.createKeychainInfo,
-      );
+      await CatalystKeychainInfoPanel($).goto();
+      await CatalystKeychainInfoPanel($).verifyPageElements();
     });
 
     patrolWidgetTest('visitor - create - keychain created screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreated,
-      );
+      await CatalystKeychainSuccessPanel($).goto();
+      await CatalystKeychainSuccessPanel($).verifyPageElements();
     });
 
     patrolWidgetTest(
         'visitor - create - keychain created screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.createKeychainInfo,
-      );
+      await CatalystKeychainSuccessPanel($).goto();
+      await CatalystKeychainSuccessPanel($).clickBack();
+      await CatalystKeychainInfoPanel($).verifyPageElements();
     });
 
     patrolWidgetTest('visitor - create - mnemonic writedown screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicWritedown,
-      );
+      await WriteDownSeedphrasePanel($).goto();
+      await WriteDownSeedphrasePanel($).verifyPageElements();
     });
 
     patrolWidgetTest(
         'visitor - create - mnemonic writedown screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.keychainCreated,
-      );
+      await WriteDownSeedphrasePanel($).goto();
+      await WriteDownSeedphrasePanel($).clickBack();
+      await CatalystKeychainSuccessPanel($).verifyPageElements();
     });
 
     patrolWidgetTest(
         'visitor - create - mnemonic writedown screen next button is disabled',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicWritedown,
-      );
-      OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
+      await WriteDownSeedphrasePanel($).goto();
+      await WriteDownSeedphrasePanel($).verifyPageElements();
+      await WriteDownSeedphrasePanel($).verifyNextButtonIsDisabled();
     });
 
     patrolWidgetTest('visitor - create - mnemonic input info screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicInputInfo,
-      );
+      await WritedownSeedphraseInfoPanel($).goto();
+      await WritedownSeedphraseInfoPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest(
         'visitor - create - mnemonic input info screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicWritedown,
-      );
+      await WritedownSeedphraseInfoPanel($).goto();
+      await WritedownSeedphraseInfoPanel($).clickBack();
+      await WriteDownSeedphrasePanel($).verifyPageElements();
     });
 
     patrolWidgetTest('visitor - create - mnemonic input screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicInput,
-      );
+      await InputSeedphrasePanel($).goto();
+      await InputSeedphrasePanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest(
         'visitor - create - mnemonic input screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicInputInfo,
-      );
+      await InputSeedphrasePanel($).goto();
+      await InputSeedphrasePanel($).clickBack();
+      await WritedownSeedphraseInfoPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest(
         'visitor - create - mnemonic input - correct words unlock next button',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
+      await InputSeedphrasePanel($).goto();
+      await InputSeedphrasePanel($).inputSeedPhraseWords();
+      await InputSeedphrasePanel($).verifyNextButtonIsEnabled();
     });
 
     patrolWidgetTest(
         'visitor - create - mnemonic input verified screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicVerified,
-      );
+      await SeedphraseSuccessPanel($).goto();
+      await SeedphraseSuccessPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest(
         'visitor - create - mnemonic input verified screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationInfoPanelLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateMnemonicInputInfo,
-      );
+      await SeedphraseSuccessPanel($).goto();
+      await SeedphraseSuccessPanel($).clickBack();
+      await InputSeedphrasePanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest('visitor - create - password info screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.passwordInfo,
-      );
+      await PasswordInfoPanel($).goto();
+      await PasswordInfoPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest(
         'visitor - create - password info screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      expect(
-        $(OnboardingPage.nextStepBody).text,
-        T.get('Now let’s set your Unlock password '
-            'for this device!'),
-      );
+      await PasswordInfoPanel($).goto();
+      await PasswordInfoPanel($).clickBack();
+      await PasswordInfoPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest('visitor - create - password input screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.passwordInput,
-      );
+      await PasswordInputPanel($).goto();
+      await PasswordInputPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest(
         'visitor - create - password input screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.registrationDetailsPanelLooksAsExpected(
-        $,
-        RegistrationState.passwordInfo,
-      );
+      await PasswordInputPanel($).goto();
+      await PasswordInputPanel($).clickBack();
+      await PasswordInfoPanel($).verifyPageElements();
     });
 
     patrolWidgetTest(
         'visitor - create - password input - valid minimum length password',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234');
-      await OnboardingPage.enterPasswordConfirm($, 'Test1234');
-      OnboardingPage.passwordConfirmErrorIconIsShown(
-        $,
-        reverse: true,
-      );
-      OnboardingPage.checkValidationIndicator(
-        $,
+      await PasswordInputPanel($).goto();
+      await PasswordInputPanel($).enterPassword('Test1234', 'Test1234');
+      PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
+      PasswordInputPanel($).verifyValidationIndicator(
         PasswordValidationStatus.normal,
       );
-      OnboardingPage.passwordConfirmErrorIconIsShown(
-        $,
-        reverse: true,
-      );
-      OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
+      await PasswordInputPanel($).verifyNextButtonIsEnabled();
     });
 
     patrolWidgetTest('visitor - create - password input - valid long password',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234Test1234');
-      await OnboardingPage.enterPasswordConfirm($, 'Test1234Test1234');
-      OnboardingPage.checkValidationIndicator(
-        $,
+      await PasswordInputPanel($).goto();
+      await PasswordInputPanel($).enterPassword(
+        'Test1234Test1234',
+        'Test1234Test1234',
+      );
+      PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
+      PasswordInputPanel($).verifyValidationIndicator(
         PasswordValidationStatus.good,
       );
-      OnboardingPage.passwordConfirmErrorIconIsShown(
-        $,
-        reverse: true,
-      );
-      OnboardingPage.voicesButtonIsEnabled($, OnboardingPage.nextButton);
+      await PasswordInputPanel($).verifyNextButtonIsEnabled();
     });
 
     patrolWidgetTest('visitor - create - password input - too short password',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test123');
-      OnboardingPage.checkValidationIndicator(
-        $,
-        PasswordValidationStatus.weak,
-      );
-      OnboardingPage.passwordConfirmErrorIconIsShown(
-        $,
-        reverse: true,
-      );
-      OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
+      await PasswordInputPanel($).goto();
+      await PasswordInputPanel($).enterPassword('Test123', '');
+      PasswordInputPanel($)
+          .verifyValidationIndicator(PasswordValidationStatus.weak);
+      PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
+      await PasswordInputPanel($).verifyNextButtonIsDisabled();
     });
 
     patrolWidgetTest(
         'visitor - create - password input - valid password, no confirmation',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234');
-      OnboardingPage.checkValidationIndicator(
-        $,
-        PasswordValidationStatus.normal,
-      );
-      OnboardingPage.passwordConfirmErrorIconIsShown(
-        $,
-        reverse: true,
-      );
-      OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
+      await PasswordInputPanel($).goto();
+      await PasswordInputPanel($).enterPassword('Test1234', '');
+      PasswordInputPanel($)
+          .verifyValidationIndicator(PasswordValidationStatus.normal);
+      PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: false);
+      await PasswordInputPanel($).verifyNextButtonIsDisabled();
     });
 
     patrolWidgetTest(
         'visitor - create - password input - not matching confirmation',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234');
-      await OnboardingPage.enterPasswordConfirm($, 'Test123');
-      OnboardingPage.checkValidationIndicator(
-        $,
-        PasswordValidationStatus.normal,
-      );
-      OnboardingPage.passwordConfirmErrorIconIsShown($);
-      OnboardingPage.voicesButtonIsDisabled($, OnboardingPage.nextButton);
+      await PasswordInputPanel($).goto();
+      await PasswordInputPanel($).enterPassword('Test1234', 'Test123');
+      PasswordInputPanel($)
+          .verifyValidationIndicator(PasswordValidationStatus.normal);
+      PasswordInputPanel($).verifyPasswordConfirmErrorIcon(isShown: true);
+      await PasswordInputPanel($).verifyNextButtonIsDisabled();
     });
 
     patrolWidgetTest(
         'visitor - create - keychain created success screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234');
-      await OnboardingPage.enterPasswordConfirm($, 'Test1234');
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.keychainCreateSuccess,
-      );
+      await KeychainFinalPanel($).goto();
+      await KeychainFinalPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest('visitor - create - link wallet info screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234');
-      await OnboardingPage.enterPasswordConfirm($, 'Test1234');
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.linkWalletAndRolesButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.linkWalletInfo,
-      );
+      await LinkWalletInfoPanel($).goto();
+      await LinkWalletInfoPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest('visitor - create - link wallet select screen looks OK',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234');
-      await OnboardingPage.enterPasswordConfirm($, 'Test1234');
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.linkWalletAndRolesButton).tap();
-      await $(OnboardingPage.chooseCardanoWalletButton).tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.linkWalletSelect,
-      );
+      await WalletListPanel($).goto();
+      await WalletListPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest(
         'visitor - create - link wallet select screen back button works',
         (PatrolTester $) async {
       await $.pumpWidgetAndSettle(App(routerConfig: router));
-      await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-      await OnboardingPage.detailsPartGetStartedCreateNewBtn($).tap();
-      await $(OnboardingPage.createBaseProfileNext).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await OnboardingPage.detailsPartCreateKeychainBtn($).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.storeSeedPhrases($);
-      await $(OnboardingPage.seedPhraseStoredCheckbox).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      // TODO(oldgreg): remove reset when seeds are no longer prefilled
-      //issues_1531
-      await $(OnboardingPage.resetButton).tap();
-      await OnboardingPage.enterStoredSeedPhrases($);
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.nextButton).tap();
-      await OnboardingPage.enterPassword($, 'Test1234');
-      await OnboardingPage.enterPasswordConfirm($, 'Test1234');
-      await $(OnboardingPage.nextButton).tap();
-      await $(OnboardingPage.linkWalletAndRolesButton).tap();
-      await $(OnboardingPage.chooseCardanoWalletButton).tap();
-      await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
-      await OnboardingPage.onboardingScreenLooksAsExpected(
-        $,
-        RegistrationState.linkWalletInfo,
-      );
+      await WalletListPanel($).goto();
+      await WalletListPanel($).clickBack();
+      await LinkWalletInfoPanel($).verifyInfoPanel();
     });
 
     patrolWidgetTest('visitor - restore - keychain choice screen looks OK',
