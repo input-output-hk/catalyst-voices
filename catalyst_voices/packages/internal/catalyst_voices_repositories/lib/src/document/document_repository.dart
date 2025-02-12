@@ -146,6 +146,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required ValueResolver<DocumentData, DocumentRef> refGetter,
   }) {
     return _watchDocumentData(ref: ref)
+        .distinct()
         .switchMap<DocumentsDataWithRefData?>((document) {
       if (document == null) {
         return Stream.value(null);
@@ -184,7 +185,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final updateStream = Stream.fromFuture(documentDataFuture);
     final localStream = _localDocuments.watch(ref: ref);
 
-    return StreamGroup.merge([updateStream, localStream]).distinct();
+    return StreamGroup.merge([updateStream, localStream]);
+  }
+
+  Stream<DocumentData?> _watchDraftData({
+    required DocumentRef ref,
+  }) {
+    return _drafts.watch(ref: ref);
   }
 
   @visibleForTesting
