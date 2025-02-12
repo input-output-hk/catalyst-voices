@@ -10,14 +10,22 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
+import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
     as quill_ext;
 
+part 'voices_rich_text_rules.dart';
+
 final class VoicesRichTextController extends quill.QuillController {
+  final _customRules = const <quill_int.Rule>[_AutoExitBlockRule()];
+
   VoicesRichTextController({
     required super.document,
     required super.selection,
-  });
+  }) {
+    document.setCustomRules(_customRules);
+  }
 
   factory VoicesRichTextController.fromMarkdown({
     required MarkdownData markdownData,
@@ -25,6 +33,7 @@ final class VoicesRichTextController extends quill.QuillController {
   }) {
     final delta = markdown.encoder.convert(markdownData);
     final newDocument = quill.Document.fromDelta(delta);
+
     return VoicesRichTextController(
       document: newDocument,
       selection: selection,
