@@ -1,5 +1,4 @@
 enum PagingStatus {
-  loadingFirstPage,
   loading,
   error,
   completed,

@@ -75,8 +75,6 @@ class PagingState<ItemType> extends Equatable {
       return PagingStatus.completed;
     } else if (_hasError) {
       return PagingStatus.error;
-    } else if (_isLoadingFirstPage) {
-      return PagingStatus.loadingFirstPage;
     }
     return PagingStatus.ongoing;
   }
@@ -114,8 +112,6 @@ class PagingState<ItemType> extends Equatable {
   bool get _isListingUnfinished => _hasItems && _itemCount < maxResults;
 
   bool get _isOngoing => _isListingUnfinished && !_hasError;
-
-  bool get _isLoadingFirstPage => _itemCount == 0 && !_hasError;
 
   bool get _hasError => error != null;
 

@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
-import 'package:catalyst_voices/widgets/pagination/listenable_listener.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_state.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_status.dart';
@@ -37,64 +36,55 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableListener(
-      listenable: _pagingController,
-      listener: () {
-        final status = _pagingController.value.status;
-        if (status == PagingStatus.loadingFirstPage) {
-          _pagingController.notifyPageRequestListeners(
-            0,
+    return ValueListenableBuilder<PagingState<ItemType>>(
+      valueListenable: _pagingController,
+      builder: (context, pagingState, _) {
+        Widget child;
+        final itemList = _pagingController.itemList;
+        switch (pagingState.status) {
+          case PagingStatus.loading:
+            child = _loadingIndicatorBuilder(context);
+            break;
+          case PagingStatus.ongoing:
+          case PagingStatus.completed:
+            if (itemList.isEmpty) {
+              child = builderDelegate.emptyIndicatorBuilder(context);
+              break;
+            }
+            child = Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                for (var i = pagingState.currentFrom;
+                    i <= pagingState.currentTo;
+                    i++)
+                  _itemBuilder(
+                    context,
+                    itemList[i],
+                  ),
+              ],
+            );
+            break;
+
+          case PagingStatus.error:
+            child = _errorIndicatorBuilder(context);
+            break;
+        }
+
+        if (builderDelegate.animateTransition) {
+          child = AnimatedSwitcher(
+            duration: builderDelegate.transitionDuration,
+            child: child,
           );
         }
-      },
-      child: ValueListenableBuilder<PagingState<ItemType>>(
-        valueListenable: _pagingController,
-        builder: (context, pagingState, _) {
-          Widget child;
-          final itemList = _pagingController.itemList;
 
-          switch (pagingState.status) {
-            case PagingStatus.loading:
-            case PagingStatus.loadingFirstPage:
-              child = _loadingIndicatorBuilder(context);
-              break;
-            case PagingStatus.ongoing:
-            case PagingStatus.completed:
-              if (itemList.isEmpty) {
-                child = builderDelegate.emptyIndicatorBuilder(context);
-                break;
-              }
-              child = Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  for (var i = pagingState.currentFrom;
-                      i <= pagingState.currentTo;
-                      i++)
-                    _itemBuilder(
-                      context,
-                      itemList[i],
-                    ),
-                ],
-              );
-              break;
-
-            case PagingStatus.error:
-              child = _errorIndicatorBuilder(context);
-              break;
-          }
-
-          if (builderDelegate.animateTransition) {
-            child = AnimatedSwitcher(
-              duration: builderDelegate.transitionDuration,
-              child: child,
-            );
-          }
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              child,
-              _Controls(
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            child,
+            Offstage(
+              offstage: pagingState.itemList.isEmpty,
+              child: _Controls(
                 fromNumber: pagingState.fromValue,
                 toNumber: pagingState.toValue,
                 maxResults: pagingState.maxResults,
@@ -103,10 +93,10 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                     : () => _onNextPageTap(pagingState),
                 onPrevPageTap: pagingState.isFirstPage ? null : _onPrevPageTap,
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -116,8 +106,7 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
 
   void _onNextPageTap(PagingState<ItemType> pagingState) {
     if (pagingState.isLoading) return;
-    final currentPage = pagingState.currentPage ?? 0;
-    if (currentPage < pagingState.currentLastPage) {
+    if (pagingState.currentPage < pagingState.currentLastPage) {
       _pagingController.nextPage();
     } else {
       _pagingController

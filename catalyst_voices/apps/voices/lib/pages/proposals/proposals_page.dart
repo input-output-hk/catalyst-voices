@@ -34,6 +34,7 @@ class _ProposalsPageState extends State<ProposalsPage> {
   void initState() {
     super.initState();
     unawaited(context.read<CampaignInfoCubit>().load());
+    unawaited(context.read<ProposalsCubit>().load());
   }
 
   @override
@@ -167,26 +168,52 @@ class _CampaignStage extends StatelessWidget {
   }
 }
 
-class _Tabs extends StatelessWidget {
+class _Tabs extends StatefulWidget {
   const _Tabs();
+
+  @override
+  State<_Tabs> createState() => _TabsState();
+}
+
+class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
+  late final TabController _tabController;
+  final tabsLength = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: tabsLength, vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        context.read<ProposalsCubit>().resetCurrentPage();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: tabsLength,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
+          SizedBox(
             width: double.infinity,
             child: Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.end,
               runSpacing: 10,
               children: [
-                _TabBar(),
-                _Controls(),
+                _TabBar(_tabController),
+                const _Controls(),
               ],
             ),
           ),
@@ -199,13 +226,67 @@ class _Tabs extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const TabBarStackView(
+          TabBarStackView(
+            controller: _tabController,
             children: [
-              _AllProposals(),
-              _DraftProposals(),
-              _FinalProposals(),
-              _FavoriteProposals(),
-              _FavoriteProposals(),
+              BlocBuilder<ProposalsCubit, ProposalsState>(
+                buildWhen: (previous, current) {
+                  if (previous.proposals.proposals !=
+                      current.proposals.proposals) {
+                    return true;
+                  } else if (previous.pageKey != current.pageKey) {
+                    return true;
+                  }
+                  return false;
+                },
+                builder: (context, state) {
+                  return _AllProposals(
+                    state.proposals.proposals,
+                    state.pageKey,
+                    state.proposals.totalProposalCount,
+                  );
+                },
+              ),
+              BlocBuilder<ProposalsCubit, ProposalsState>(
+                buildWhen: (previous, current) {
+                  if (previous.proposals.proposals.draftProposals !=
+                      current.proposals.proposals.draftProposals) {
+                    return true;
+                  } else if (previous.pageKey != current.pageKey) {
+                    return true;
+                  }
+                  return false;
+                },
+                builder: (context, state) {
+                  return _AllProposals(
+                    state.proposals.proposals.draftProposals,
+                    state.pageKey,
+                    state.proposals.draftProposalCount,
+                  );
+                },
+              ),
+              BlocBuilder<ProposalsCubit, ProposalsState>(
+                buildWhen: (previous, current) {
+                  if (previous.proposals.proposals.finalProposals !=
+                      current.proposals.proposals.finalProposals) {
+                    return true;
+                  } else if (previous.pageKey != current.pageKey) {
+                    return true;
+                  }
+                  return false;
+                },
+                builder: (context, state) {
+                  return _AllProposals(
+                    state.proposals.proposals.finalProposals,
+                    state.pageKey,
+                    state.proposals.finalProposalCount,
+                  );
+                },
+              ),
+              // const _DraftProposals(),
+              const _FinalProposals(),
+              const _FavoriteProposals(),
+              // const _FavoriteProposals(),
             ],
           ),
           const SizedBox(height: 12),
@@ -216,31 +297,34 @@ class _Tabs extends StatelessWidget {
 }
 
 class _TabBar extends StatelessWidget {
-  const _TabBar();
+  final TabController tabController;
+  const _TabBar(this.tabController);
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, int>(
-      selector: (state) => state.resultsNumber,
+    return BlocSelector<ProposalsCubit, ProposalsState,
+        ProposalSearchViewModel>(
+      selector: (state) => state.proposals,
       builder: (context, state) {
         return ConstrainedBox(
           constraints: const BoxConstraints(),
           child: TabBar(
+            controller: tabController,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             dividerHeight: 0,
             tabs: [
               Tab(
-                text: context.l10n.noOfAll(state),
+                text: context.l10n.noOfAll(state.totalProposalCount),
               ),
               Tab(
-                text: context.l10n.noOfDraft(state),
+                text: context.l10n.noOfDraft(state.draftProposalCount),
               ),
               Tab(
-                text: context.l10n.noOfFinal(state),
+                text: context.l10n.noOfFinal(state.finalProposalCount),
               ),
               Tab(
-                text: context.l10n.noOfFavorites(state),
+                text: context.l10n.noOfFavorites(state.favoriteProposalCount),
               ),
               Tab(
                 text: context.l10n.noOfMyProposals(100),
@@ -294,7 +378,14 @@ class _Controls extends StatelessWidget {
 }
 
 class _AllProposals extends StatefulWidget {
-  const _AllProposals();
+  final List<ProposalViewModel> proposals;
+  final int pageKey;
+  final int maxResults;
+  const _AllProposals(
+    this.proposals,
+    this.pageKey,
+    this.maxResults,
+  );
 
   @override
   State<_AllProposals> createState() => _AllProposalsState();
@@ -302,7 +393,6 @@ class _AllProposals extends StatefulWidget {
 
 class _AllProposalsState extends State<_AllProposals> {
   late final ProposalsCubit _proposalBloc;
-  late StreamSubscription<ProposalsState> _blocSub;
   late PagingController<ProposalViewModel> _pagingController;
 
   @override
@@ -310,8 +400,8 @@ class _AllProposalsState extends State<_AllProposals> {
     super.initState();
     _proposalBloc = context.read<ProposalsCubit>();
     _pagingController = PagingController(
-      initialPage: _proposalBloc.state.pageKey,
-      initialMaxResults: _proposalBloc.state.resultsNumber,
+      initialPage: widget.pageKey,
+      initialMaxResults: widget.maxResults,
       itemsPerPage: 8,
     );
 
@@ -326,24 +416,34 @@ class _AllProposalsState extends State<_AllProposals> {
         lastProposalId: lastItem?.id,
       );
     });
+    _handleItemListChange();
+  }
 
-    _blocSub = _proposalBloc.stream.listen((state) {
-      if (state is LoadedProposalsState) {
-        if (state.resultsNumber != _pagingController.maxResults) {
-          _pagingController.maxResults = state.resultsNumber;
-        } else {
-          _pagingController.appendPage(state.proposals, state.pageKey);
-        }
-      } else if (state is ErrorProposalsState) {
-        _pagingController.error = state.error;
-      }
-    });
+  @override
+  void didUpdateWidget(covariant _AllProposals oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pageKey != widget.pageKey) {
+      _pagingController.currentPage = widget.pageKey;
+    }
+    if (oldWidget.maxResults != widget.maxResults) {
+      _pagingController.maxResults = widget.maxResults;
+    }
+    if (oldWidget.proposals != widget.proposals) {
+      _handleItemListChange();
+    }
+  }
+
+  void _handleItemListChange() {
+    _pagingController.appendPage(
+      widget.proposals,
+      widget.pageKey,
+    );
   }
 
   @override
   void dispose() {
     _pagingController.dispose();
-    unawaited(_blocSub.cancel());
+    // unawaited(_blocSub.cancel());
     super.dispose();
   }
 
@@ -367,6 +467,7 @@ class _AllProposalsState extends State<_AllProposals> {
                 );
           },
         ),
+        emptyIndicatorBuilder: (context) => const _EmptyProposals(),
         animateTransition: false,
       ),
     );
@@ -386,13 +487,7 @@ class _DraftProposalsState extends State<_DraftProposals> {
   Widget build(BuildContext context) {
     return BlocBuilder<ProposalsCubit, ProposalsState>(
       builder: (context, state) {
-        return switch (state) {
-          LoadedProposalsState(:final proposals) =>
-            proposals.draftProposals.isEmpty
-                ? const _EmptyProposals()
-                : const Placeholder(),
-          _ => const _LoadingProposals(),
-        };
+        return const Placeholder();
       },
     );
   }
@@ -411,13 +506,7 @@ class _FinalProposalsState extends State<_FinalProposals> {
   Widget build(BuildContext context) {
     return BlocBuilder<ProposalsCubit, ProposalsState>(
       builder: (context, state) {
-        return switch (state) {
-          LoadedProposalsState(:final proposals) =>
-            proposals.finalProposals.isEmpty
-                ? const _EmptyProposals()
-                : const Placeholder(),
-          _ => const _LoadingProposals(),
-        };
+        return const Placeholder();
       },
     );
   }
@@ -430,14 +519,7 @@ class _FavoriteProposals extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProposalsCubit, ProposalsState>(
       builder: (context, state) {
-        return switch (state) {
-          LoadedProposalsState(:final proposals) => proposals.favorites.isEmpty
-              ? const _EmptyProposals()
-              : _ProposalsList(
-                  proposals: proposals.favorites,
-                ),
-          _ => const _LoadingProposals(),
-        };
+        return const Placeholder();
       },
     );
   }

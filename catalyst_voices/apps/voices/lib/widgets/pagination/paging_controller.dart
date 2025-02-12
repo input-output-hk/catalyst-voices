@@ -56,6 +56,7 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
             currentPage: initialPage,
             maxResults: initialMaxResults,
             itemsPerPage: itemsPerPage,
+            isLoading: true,
           ),
         );
 
@@ -109,9 +110,8 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
   }
 
   void appendPage(List<ItemType> newItems, int nextPage) {
-    final previousItems = value.itemList;
-    final itemList = previousItems + newItems;
-
+    print('befor: ${value.itemList.length}');
+    print('append ${newItems.length}');
     value = value.copyWith(
       currentPage: nextPage,
       itemList: newItems,

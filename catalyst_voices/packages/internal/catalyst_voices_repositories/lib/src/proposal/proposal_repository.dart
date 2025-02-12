@@ -33,6 +33,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required String campaignId,
   }) async {
     // optionally filter by status.
+
     return _proposals;
   }
 }
