@@ -35,7 +35,7 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   final String title;
   final MarkdownData? description;
   final String? placeholder;
-  final String? guidance;
+  final MarkdownData? guidance;
 
   /// True if the property should be treated as a standalone
   /// section rather than a nested property.
