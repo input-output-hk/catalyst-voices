@@ -4,7 +4,8 @@ class ProposalPaginationRequest extends PaginationPage<String?> {
   final String? categoryId;
   final String? searchValue;
   final ProposalPublish? stage;
-  final bool getFavorites;
+  final bool usersProposals;
+  final bool usersFavorite;
 
   const ProposalPaginationRequest({
     required super.pageKey,
@@ -13,7 +14,8 @@ class ProposalPaginationRequest extends PaginationPage<String?> {
     this.categoryId,
     this.searchValue,
     this.stage,
-    this.getFavorites = false,
+    this.usersProposals = false,
+    this.usersFavorite = false,
   });
 
   @override
@@ -25,6 +27,8 @@ class ProposalPaginationRequest extends PaginationPage<String?> {
     int? pageSize,
     String? lastId,
     bool? getFavorites,
+    bool? usersProposals,
+    bool? usersFavorite,
   }) {
     return ProposalPaginationRequest(
       categoryId: categoryId ?? this.categoryId,
@@ -33,7 +37,8 @@ class ProposalPaginationRequest extends PaginationPage<String?> {
       pageKey: pageKey ?? this.pageKey,
       pageSize: pageSize ?? this.pageSize,
       lastId: lastId ?? this.lastId,
-      getFavorites: getFavorites ?? this.getFavorites,
+      usersProposals: usersProposals ?? this.usersProposals,
+      usersFavorite: usersFavorite ?? this.usersFavorite,
     );
   }
 
@@ -42,7 +47,8 @@ class ProposalPaginationRequest extends PaginationPage<String?> {
         categoryId,
         searchValue,
         stage,
-        getFavorites,
+        usersProposals,
+        usersFavorite,
         ...super.props,
       ];
 }

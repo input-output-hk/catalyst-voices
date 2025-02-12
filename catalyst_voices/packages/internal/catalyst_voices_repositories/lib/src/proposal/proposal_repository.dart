@@ -41,6 +41,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     // optionally filter by status.
     final proposals = <ProposalBase>[];
 
+    // Return users proposals match his account id with proposals metadata from
+    // author field.
+    if (request.usersProposals) {
+      return const ProposalsSearchResult(maxResults: 0, proposals: []);
+    } else if (request.usersFavorite) {
+      return const ProposalsSearchResult(maxResults: 0, proposals: []);
+    }
+
     for (var i = 0; i < request.pageSize; i++) {
       // ignore: lines_longer_than_80_chars
       final stage = Random().nextBool()

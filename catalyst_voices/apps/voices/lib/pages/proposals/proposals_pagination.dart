@@ -16,15 +16,18 @@ class ProposalsPagination extends StatefulWidget {
   final int maxResults;
   final ProposalPublish? stage;
   final bool isEmpty;
-  final ValueChanged<ProposalPaginationRequest>? onLoadMore;
+  final bool userProposals;
+  final bool usersFavorite;
+
   const ProposalsPagination(
     this.proposals,
     this.pageKey,
     this.maxResults, {
     super.key,
     this.stage,
-    this.onLoadMore,
     this.isEmpty = false,
+    this.userProposals = false,
+    this.usersFavorite = false,
   });
 
   @override
@@ -42,7 +45,6 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
     _pagingController = PagingController(
       initialPage: widget.pageKey,
       initialMaxResults: widget.maxResults,
-      itemsPerPage: 8,
     );
 
     _pagingController.addPageRequestListener((
@@ -55,12 +57,10 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
         pageSize: pageSize,
         lastId: lastItem?.id,
         stage: widget.stage,
+        usersProposals: widget.userProposals,
+        usersFavorite: widget.usersFavorite,
       );
-      if (widget.onLoadMore == null) {
-        await _proposalBloc.getProposals(request);
-      } else {
-        widget.onLoadMore?.call(request);
-      }
+      await _proposalBloc.getProposals(request);
     });
     _handleItemListChange();
     _pagingController.notifyPageRequestListeners(0);

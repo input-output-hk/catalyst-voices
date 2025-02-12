@@ -7,7 +7,7 @@ class ProposalsState extends Equatable {
   final ProposalPaginationItems<ProposalViewModel> draftProposals;
   final ProposalPaginationItems<ProposalViewModel> finalProposals;
   final ProposalPaginationItems<ProposalViewModel> favoriteProposals;
-  final ProposalPaginationItems<ProposalViewModel> myProposals;
+  final ProposalPaginationItems<ProposalViewModel> userProposals;
   final ProposalPaginationItems<ProposalViewModel> allProposals;
   final List<String> favoritesIds;
   final List<String> myProposalsIds;
@@ -16,7 +16,7 @@ class ProposalsState extends Equatable {
     this.draftProposals = const ProposalPaginationItems(),
     this.finalProposals = const ProposalPaginationItems(),
     this.favoriteProposals = const ProposalPaginationItems(),
-    this.myProposals = const ProposalPaginationItems(),
+    this.userProposals = const ProposalPaginationItems(),
     this.allProposals = const ProposalPaginationItems(),
     this.favoritesIds = const [],
     this.myProposalsIds = const [],
@@ -26,7 +26,7 @@ class ProposalsState extends Equatable {
     ProposalPaginationItems<ProposalViewModel>? draftProposals,
     ProposalPaginationItems<ProposalViewModel>? finalProposals,
     ProposalPaginationItems<ProposalViewModel>? favoriteProposals,
-    ProposalPaginationItems<ProposalViewModel>? myProposals,
+    ProposalPaginationItems<ProposalViewModel>? userProposals,
     ProposalPaginationItems<ProposalViewModel>? allProposals,
     List<String>? favoritesIds,
     List<String>? myProposalsIds,
@@ -35,7 +35,7 @@ class ProposalsState extends Equatable {
       draftProposals: draftProposals ?? this.draftProposals,
       finalProposals: finalProposals ?? this.finalProposals,
       favoriteProposals: favoriteProposals ?? this.favoriteProposals,
-      myProposals: myProposals ?? this.myProposals,
+      userProposals: userProposals ?? this.userProposals,
       allProposals: allProposals ?? this.allProposals,
       favoritesIds: favoritesIds ?? this.favoritesIds,
       myProposalsIds: myProposalsIds ?? this.myProposalsIds,
@@ -47,7 +47,7 @@ class ProposalsState extends Equatable {
         draftProposals,
         finalProposals,
         favoriteProposals,
-        myProposals,
+        userProposals,
         allProposals,
         favoritesIds,
         myProposalsIds,

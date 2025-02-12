@@ -88,15 +88,13 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<List<String>> getFavoritesProposalsIds() async {
-    final List<String> proposalsIds =
-        await _proposalRepository.getFavoritesProposalsIds();
+    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
     return proposalsIds;
   }
 
   @override
   Future<List<String>> getUserProposalsIds(String userId) async {
-    final List<String> proposalsIds =
-        await _proposalRepository.getUserProposalsIds(userId);
+    final proposalsIds = await _proposalRepository.getUserProposalsIds(userId);
     return proposalsIds;
   }
 

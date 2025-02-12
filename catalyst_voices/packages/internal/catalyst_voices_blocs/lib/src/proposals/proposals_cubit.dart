@@ -50,7 +50,36 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
           ),
         )
         .toList();
-    if (request.stage == ProposalPublish.published) {
+
+    if (request.usersProposals) {
+      return emit(
+        state.copyWith(
+          userProposals: state.userProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.userProposals.items,
+              ...proposalViewModelList,
+            ],
+            isEmpty: proposalViewModelList.isEmpty,
+          ),
+        ),
+      );
+    } else if (request.usersFavorite) {
+      return emit(
+        state.copyWith(
+          favoriteProposals: state.favoriteProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.favoriteProposals.items,
+              ...proposalViewModelList,
+            ],
+            isEmpty: proposalViewModelList.isEmpty,
+          ),
+        ),
+      );
+    } else if (request.stage == ProposalPublish.published) {
       return emit(
         state.copyWith(
           finalProposals: state.finalProposals.copyWith(
@@ -60,6 +89,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
               ...state.finalProposals.items,
               ...proposalViewModelList,
             ],
+            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -73,6 +103,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
               ...state.draftProposals.items,
               ...proposalViewModelList,
             ],
+            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -87,40 +118,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
             pageKey: proposals.pageKey,
             maxResults: proposals.maxResults,
             items: allProposals,
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> getProposalsById(
-    ProposalPaginationRequest request, {
-    bool getFavorites = true,
-  }) async {
-    final campaign = await _campaignService.getActiveCampaign();
-    if (campaign == null) {
-      return;
-    }
-
-    final proposals = await _proposalService.getProposals(
-      request: request,
-      campaignId: campaign.id,
-    );
-    await Future.delayed(const Duration(seconds: 1), () {});
-
-    if (getFavorites) {
-      emit(
-        state.copyWith(
-          favoriteProposals: state.favoriteProposals.copyWith(
-            isEmpty: true,
-          ),
-        ),
-      );
-    } else {
-      emit(
-        state.copyWith(
-          myProposals: state.favoriteProposals.copyWith(
-            isEmpty: true,
+            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -133,7 +131,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     emit(state.copyWith(favoritesIds: favoritesList));
   }
 
-  Future<void> getUserProposals() async {
+  Future<void> getUserProposalsList() async {
     // TODO(LynxLynxx): pass user id? or we read it inside of the service?
     final favoritesList = await _proposalService.getUserProposalsIds('');
 

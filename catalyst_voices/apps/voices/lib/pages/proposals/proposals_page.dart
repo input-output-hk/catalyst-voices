@@ -31,6 +31,12 @@ class _ProposalsPageState extends State<ProposalsPage> {
   void initState() {
     super.initState();
     unawaited(context.read<CampaignInfoCubit>().load());
+    unawaited(
+      context.read<ProposalsCubit>().getFavoritesList(),
+    );
+    unawaited(
+      context.read<ProposalsCubit>().getUserProposalsList(),
+    );
   }
 
   @override
@@ -253,18 +259,14 @@ class _Tabs extends StatelessWidget {
                     state.pageKey,
                     state.maxResults,
                     isEmpty: state.isEmpty,
-                    onLoadMore: (val) async {
-                      await context
-                          .read<ProposalsCubit>()
-                          .getProposalsById(val);
-                    },
+                    usersFavorite: true,
                   );
                 },
               ),
               BlocSelector<ProposalsCubit, ProposalsState,
                   ProposalPaginationItems<ProposalViewModel>>(
                 selector: (state) {
-                  return state.myProposals;
+                  return state.userProposals;
                 },
                 builder: (context, state) {
                   return ProposalsPagination(
@@ -272,11 +274,7 @@ class _Tabs extends StatelessWidget {
                     state.pageKey,
                     state.maxResults,
                     isEmpty: state.isEmpty,
-                    onLoadMore: (val) async {
-                      await context
-                          .read<ProposalsCubit>()
-                          .getProposalsById(val, getFavorites: false);
-                    },
+                    userProposals: true,
                   );
                 },
               ),
