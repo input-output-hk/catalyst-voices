@@ -12,6 +12,13 @@ use poem_openapi::{
 #[derive(Debug, Clone, From, FromStr, Into)]
 pub(crate) struct ApiDateTime(chrono::DateTime<chrono::offset::Utc>);
 
+impl ApiDateTime {
+    /// Returns a `DateTime<Utc>` which corresponds to the current date and time in UTC.
+    pub(crate) fn now() -> Self {
+        Self(chrono::Utc::now())
+    }
+}
+
 impl Type for ApiDateTime {
     type RawElementValueType = Self;
     type RawValueType = Self;

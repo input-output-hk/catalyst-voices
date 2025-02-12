@@ -25,7 +25,6 @@ mod date_time_to_slot_number_get;
 mod rbac;
 // mod registration_get;
 pub(crate) mod staking;
-pub(crate) mod types;
 
 /// Cardano Follower API Endpoints
 pub(crate) struct Api;

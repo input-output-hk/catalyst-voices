@@ -2,13 +2,13 @@
 
 use poem_openapi::{payload::Json, types::Example, ApiResponse};
 
-use super::types::DateTime;
 use crate::service::common::{
     objects::cardano::{
         network::Network,
         slot_info::{Slot, SlotInfo},
     },
     responses::WithErrorResponses,
+    types::generic::api_date_time::ApiDateTime,
 };
 
 /// Endpoint responses.
@@ -27,9 +27,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/date_time_to_slot_number`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    date_time: Option<DateTime>, network: Option<Network>,
+    date_time: Option<ApiDateTime>, network: Option<Network>,
 ) -> AllResponses {
-    let _date_time = date_time.unwrap_or_else(chrono::Utc::now);
+    let _date_time = date_time.unwrap_or_else(ApiDateTime::now);
     let _network = network.unwrap_or(Network::Mainnet);
 
     let previous = Some(Slot::example());
