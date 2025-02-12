@@ -35,6 +35,7 @@ final class DocumentNumberSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;
     final isSubsection = schema.subsection ?? false;
     final defaultValue = schema.defaultValue as double?;
     final constValue = schema.constValue as double?;
@@ -53,7 +54,7 @@ final class DocumentNumberSchemaMapper {
           format: format,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
