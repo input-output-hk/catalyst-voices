@@ -9,6 +9,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
 import 'package:flutter_quill/quill_delta.dart';
@@ -58,14 +59,26 @@ final class VoicesRichTextController extends quill.QuillController {
       // When updating the document Quill removes blank lines which conflict
       // with a user trying to insert a blank line.
       return;
-    }
-
-    if (newMarkdownData.data.isEmpty) {
+    } else if (newMarkdownData.data.isEmpty) {
       clear();
     } else {
       final delta = markdown.encoder.convert(newMarkdownData);
       document = quill.Document.fromDelta(delta);
     }
+  }
+
+  void clearFormattingFromSelection() {
+    toggledStyle = const quill.Style();
+    formatSelection(
+      quill.Attribute.clone(quill.Attribute.ul, null),
+      shouldNotifyListeners: false,
+    );
+    formatSelection(
+      quill.Attribute.clone(quill.Attribute.ol, null),
+      shouldNotifyListeners: false,
+    );
+
+    notifyListeners();
   }
 }
 
@@ -217,6 +230,7 @@ class _Editor extends StatefulWidget {
 }
 
 class _EditorState extends State<_Editor> {
+  late final FocusNode _keyboardListenerFocus;
   quill.Document? _observedDocument;
   StreamSubscription<quill.DocChange>? _documentChangeSub;
 
@@ -224,6 +238,7 @@ class _EditorState extends State<_Editor> {
   void initState() {
     super.initState();
 
+    _keyboardListenerFocus = FocusNode();
     widget.controller.addListener(_onControllerChanged);
     _updateObservedDocument();
   }
@@ -237,6 +252,12 @@ class _EditorState extends State<_Editor> {
       widget.controller.addListener(_onControllerChanged);
       _updateObservedDocument();
     }
+  }
+
+  @override
+  void dispose() {
+    _keyboardListenerFocus.dispose();
+    super.dispose();
   }
 
   void _onControllerChanged() {
@@ -259,32 +280,48 @@ class _EditorState extends State<_Editor> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    return quill.QuillEditor(
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-      scrollController: widget.scrollController,
-      configurations: quill.QuillEditorConfigurations(
-        padding: const EdgeInsets.all(16),
-        placeholder: context.l10n.placeholderRichText,
-        characterShortcutEvents: quill.standardCharactersShortcutEvents,
-        /* cSpell:disable */
-        spaceShortcutEvents: quill.standardSpaceShorcutEvents,
-        /* cSpell:enable */
-        customStyles: quill.DefaultStyles(
-          placeHolder: quill.DefaultTextBlockStyle(
-            textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
-                DefaultTextStyle.of(context).style,
-            quill.HorizontalSpacing.zero,
-            quill.VerticalSpacing.zero,
-            quill.VerticalSpacing.zero,
-            null,
+    return KeyboardListener(
+      focusNode: _keyboardListenerFocus,
+      onKeyEvent: _onKeyEvent,
+      child: quill.QuillEditor(
+        controller: widget.controller,
+        focusNode: widget.focusNode,
+        scrollController: widget.scrollController,
+        configurations: quill.QuillEditorConfigurations(
+          padding: const EdgeInsets.all(16),
+          placeholder: context.l10n.placeholderRichText,
+          characterShortcutEvents: quill.standardCharactersShortcutEvents,
+          /* cSpell:disable */
+          spaceShortcutEvents: quill.standardSpaceShorcutEvents,
+          /* cSpell:enable */
+          customStyles: quill.DefaultStyles(
+            placeHolder: quill.DefaultTextBlockStyle(
+              textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
+                  DefaultTextStyle.of(context).style,
+              quill.HorizontalSpacing.zero,
+              quill.VerticalSpacing.zero,
+              quill.VerticalSpacing.zero,
+              null,
+            ),
           ),
+          embedBuilders: CatalystPlatform.isWeb
+              ? quill_ext.FlutterQuillEmbeds.editorWebBuilders()
+              : quill_ext.FlutterQuillEmbeds.editorBuilders(),
         ),
-        embedBuilders: CatalystPlatform.isWeb
-            ? quill_ext.FlutterQuillEmbeds.editorWebBuilders()
-            : quill_ext.FlutterQuillEmbeds.editorBuilders(),
       ),
     );
+  }
+
+  void _onKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.backspace &&
+        widget.controller.selection.end == 0) {
+      // Cleanup the formatting from the selection.
+      // By default quill will not remove the last bullet point (ordered/unordered),
+      // here we are removing it manually after the user has removed everything
+      // else and only this is remaining.
+      widget.controller.clearFormattingFromSelection();
+    }
   }
 }
 
@@ -359,6 +396,7 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
         childBuilder: (options, extraOptions) {
           return _ToolbarIconButton(
             icon: icon,
+            tooltip: options.tooltip,
             isToggled: extraOptions.isToggled,
             onPressed: extraOptions.onPressed,
           );
@@ -370,11 +408,13 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
 
 class _ToolbarIconButton extends StatelessWidget {
   final SvgGenImage icon;
+  final String? tooltip;
   final bool isToggled;
   final VoidCallback? onPressed;
 
   const _ToolbarIconButton({
     required this.icon,
+    required this.tooltip,
     required this.isToggled,
     required this.onPressed,
   });
@@ -383,6 +423,7 @@ class _ToolbarIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressed,
+      tooltip: tooltip,
       icon: icon.buildIcon(),
       color: isToggled ? Theme.of(context).colorScheme.primary : null,
     );
@@ -402,6 +443,7 @@ class _ToolbarImageOptionButton extends StatelessWidget {
         childBuilder: (options, extraOptions) {
           return _ToolbarIconButton(
             icon: VoicesAssets.icons.photograph,
+            tooltip: options.tooltip,
             isToggled: false,
             onPressed: extraOptions.onPressed,
           );
