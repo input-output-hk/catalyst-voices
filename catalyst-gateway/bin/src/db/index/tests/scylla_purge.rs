@@ -2,12 +2,14 @@
 //! This is mainly to test whether the defined purge queries work with the database or
 //! not.
 
-use cardano_blockchain_types::TransactionHash;
+use cardano_blockchain_types::{
+    Cip36, MultiEraBlock, Network, Point, TransactionHash, VotingPubKey,
+};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
 use pallas::ledger::addresses::{
-    Network, ShelleyAddress, ShelleyDelegationPart, ShelleyPaymentPart, StakeAddress,
+    ShelleyAddress, ShelleyDelegationPart, ShelleyPaymentPart, StakeAddress,
 };
 
 use super::*;
@@ -15,22 +17,6 @@ use crate::db::index::{
     block::*,
     queries::{purge::*, PreparedQuery},
 };
-
-mod helper {
-    use cardano_blockchain_types::{Cip36, VotingPubKey};
-    use ed25519_dalek::VerifyingKey;
-
-    pub(super) fn create_dummy_cip36(number: u32) -> (Cip36, VotingPubKey) {
-        let empty_cip36 = todo!();
-
-        let pub_key = VotingPubKey::new(
-            Some(VerifyingKey::from_bytes(&[u8::try_from(number).unwrap(); 32]).unwrap()),
-            0,
-        );
-
-        (empty_cip36, pub_key)
-    }
-}
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
@@ -339,22 +325,19 @@ async fn test_cip36_registration_for_vote_key() {
     };
 
     // data
-    let dummy0 = helper::create_dummy_cip36(0);
-    let dummy1 = helper::create_dummy_cip36(1);
-
     let data = vec![
         cip36::insert_cip36_for_vote_key::Params::new(
-            &dummy0.1,
+            &voting_pub_key(0),
             0.into(),
             0.into(),
-            &dummy0.0,
+            &cip_36_1(),
             false,
         ),
         cip36::insert_cip36_for_vote_key::Params::new(
-            &dummy1.1,
+            &voting_pub_key(1),
             1.into(),
             1.into(),
-            &dummy1.0,
+            &cip_36_2(),
             true,
         ),
     ];
@@ -416,12 +399,19 @@ async fn test_cip36_registration_invalid() {
     };
 
     // data
-    let dummy0 = helper::create_dummy_cip36(0);
-    let dummy1 = helper::create_dummy_cip36(1);
-
     let data = vec![
-        cip36::insert_cip36_invalid::Params::new(Some(&dummy0.1), 1.into(), 0.into(), &dummy0.0),
-        cip36::insert_cip36_invalid::Params::new(Some(&dummy1.1), 1.into(), 1.into(), &dummy1.0),
+        cip36::insert_cip36_invalid::Params::new(
+            Some(&voting_pub_key(0)),
+            0.into(),
+            0.into(),
+            &cip_36_1(),
+        ),
+        cip36::insert_cip36_invalid::Params::new(
+            Some(&voting_pub_key(1)),
+            1.into(),
+            1.into(),
+            &cip_36_2(),
+        ),
     ];
     let data_len = data.len();
 
@@ -477,12 +467,9 @@ async fn test_cip36_registration() {
     };
 
     // data
-    let dummy0 = helper::create_dummy_cip36(0);
-    let dummy1 = helper::create_dummy_cip36(1);
-
     let data = vec![
-        cip36::insert_cip36::Params::new(&dummy0.1, 0.into(), 0.into(), &dummy0.0),
-        cip36::insert_cip36::Params::new(&dummy1.1, 1.into(), 1.into(), &dummy1.0),
+        cip36::insert_cip36::Params::new(&voting_pub_key(0), 0.into(), 0.into(), &cip_36_1()),
+        cip36::insert_cip36::Params::new(&voting_pub_key(1), 1.into(), 1.into(), &cip_36_2()),
     ];
     let data_len = data.len();
 
@@ -945,6 +932,7 @@ async fn test_unstaked_txo_assets() {
     assert!(read_rows.is_empty());
 }
 
+/// Returns a stake address.
 fn stake_address_1() -> StakeAddress {
     let payment = ShelleyPaymentPart::Key(
         "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
@@ -956,11 +944,16 @@ fn stake_address_1() -> StakeAddress {
             .parse()
             .unwrap(),
     );
-    ShelleyAddress::new(Network::Mainnet, payment, delegation)
-        .try_into()
-        .unwrap()
+    ShelleyAddress::new(
+        pallas::ledger::addresses::Network::Mainnet,
+        payment,
+        delegation,
+    )
+    .try_into()
+    .unwrap()
 }
 
+/// Returns a different stake address.
 fn stake_address_2() -> StakeAddress {
     let payment = ShelleyPaymentPart::Key(
         "0d8d00cdd4657ac84d82f0a56067634a7adfdf43da41cb534bcaa45060973d21"
@@ -972,7 +965,40 @@ fn stake_address_2() -> StakeAddress {
             .parse()
             .unwrap(),
     );
-    ShelleyAddress::new(Network::Mainnet, payment, delegation)
-        .try_into()
-        .unwrap()
+    ShelleyAddress::new(
+        pallas::ledger::addresses::Network::Mainnet,
+        payment,
+        delegation,
+    )
+    .try_into()
+    .unwrap()
+}
+
+/// Returns `Cip36` from the second (index 1) transaction from the block located in the
+/// `block_with_cip19_1.block` file.
+fn cip_36_1() -> Cip36 {
+    let block = block(include_str!("./test_data/block_with_cip19_1.block"));
+    Cip36::new(&block, 1.into(), true).unwrap().unwrap()
+}
+
+/// Returns `Cip36` from the first (index 0) transaction from the block located in the
+/// `block_with_cip19_2.block` file.
+fn cip_36_2() -> Cip36 {
+    let block = block(include_str!("./test_data/block_with_cip19_2.block"));
+    Cip36::new(&block, 1.into(), true).unwrap().unwrap()
+}
+
+/// Decodes a block from the given string.
+fn block(data: &str) -> MultiEraBlock {
+    let data = hex::decode(data).unwrap();
+    let previous = Point::fuzzy(0.into());
+    MultiEraBlock::new(Network::Preprod, data, &previous, 0.into()).unwrap()
+}
+
+/// Creates `VotingPubKey` from the giuven number.
+fn voting_pub_key(number: u32) -> VotingPubKey {
+    VotingPubKey::new(
+        Some(VerifyingKey::from_bytes(&[u8::try_from(number).unwrap(); 32]).unwrap()),
+        0,
+    )
 }
