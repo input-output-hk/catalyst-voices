@@ -1,6 +1,8 @@
 //! Integration tests of the `IndexDB` queries testing on its session.
 //! This is mainly to test whether the defined queries work with the database or not.
 
+// cspell: words cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE
+
 use cardano_blockchain_types::TransactionHash;
 use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
