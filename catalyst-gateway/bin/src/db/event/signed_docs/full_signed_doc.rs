@@ -2,7 +2,7 @@
 
 use super::SignedDocBody;
 use crate::{
-    db::event::EventDB,
+    db::event::{EventDB, NotFoundError},
     jinja::{get_template, JinjaTemplateSource},
 };
 
@@ -84,22 +84,16 @@ impl FullSignedDoc {
     ///  - `ver` is a UUID v7
     ///  - `doc_type` is a UUID v4
     pub(crate) async fn store(&self) -> anyhow::Result<bool> {
-        // Perform insert before checking if the document already exists.
-        // This should prevent race condition.
-        match EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await {
-            // Able to insert, no conflict
-            Ok(()) => Ok(true),
-            Err(_) => {
-                // Attempt to retrieve the document now that we failed to insert
-                match Self::retrieve(self.id(), Some(self.ver())).await {
-                    Ok(res_doc) => {
-                        anyhow::ensure!(&res_doc == self, StoreError);
-                        // Document already exists and matches, return false
-                        Ok(false)
-                    },
-                    Err(e) => Err(e),
-                }
+        match Self::retrieve(self.id(), Some(self.ver())).await {
+            Ok(res_doc) => {
+                anyhow::ensure!(&res_doc == self, StoreError);
+                Ok(false)
             },
+            Err(err) if err.is::<NotFoundError>() => {
+                EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await?;
+                Ok(true)
+            },
+            Err(err) => Err(err),
         }
     }
 
