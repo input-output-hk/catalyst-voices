@@ -27,7 +27,6 @@ pub(crate) struct QueryParams {
 }
 
 /// Get Catalyst ID by stake address query.
-// TODO: Remove the `dead_code` annotation when the query is used.
 #[allow(dead_code)]
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {

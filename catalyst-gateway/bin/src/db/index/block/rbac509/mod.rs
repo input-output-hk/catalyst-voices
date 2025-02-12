@@ -270,6 +270,7 @@ mod tests {
             .unwrap();
         query.index(&session, txn_hash, 0.into(), &block).await;
         println!("{query:#?}");
+        // TODO: FIXME:
         assert_eq!(true, false);
     }
 }

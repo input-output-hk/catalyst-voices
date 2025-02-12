@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::DbCatalystId,
+    types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4},
 };
 
 /// Get registrations by Catalyst ID query.
@@ -27,10 +27,19 @@ pub(crate) struct QueryParams {
 }
 
 /// Get registrations by Catalyst ID query.
+#[allow(dead_code)]
 #[derive(DeserializeRow)]
 pub(crate) struct Query {
     /// Registration transaction id.
-    pub transaction_id: Vec<u8>,
+    pub transaction_id: DbTransactionHash,
+    /// A block slot number.
+    pub slot_no: DbSlot,
+    /// A transaction index.
+    pub txn: DbTxnIndex,
+    /// A previous  transaction id.
+    pub prv_txn_id: Option<DbTransactionHash>,
+    /// A registration purpose.
+    pub purpose: DbUuidV4,
 }
 
 impl Query {
