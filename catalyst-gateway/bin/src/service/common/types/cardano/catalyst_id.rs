@@ -1,5 +1,7 @@
 //! A Catalyst short identifier.
 
+// cSpell:ignoreRegExp cardano/Fftx
+
 use std::borrow::Cow;
 
 use catalyst_types::id_uri::IdUri;

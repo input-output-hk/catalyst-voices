@@ -997,7 +997,7 @@ fn block(data: &str) -> MultiEraBlock {
     MultiEraBlock::new(Network::Preprod, data, &previous, 0.into()).unwrap()
 }
 
-/// Creates `VotingPubKey` from the giuven number.
+/// Creates `VotingPubKey` from the given number.
 fn voting_pub_key(number: u32) -> VotingPubKey {
     VotingPubKey::new(
         Some(VerifyingKey::from_bytes(&[u8::try_from(number).unwrap(); 32]).unwrap()),
