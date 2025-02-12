@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS cip36_registration_for_vote_key (
     -- Primary Key Data
     vote_key            blob,       -- 32 Bytes of Vote Key.
     stake_address       blob,       -- 32 Bytes of Stake Address.
-    slot_no             varint,     -- slot number when the key_was_registered/re-registered.
+    slot_no             bigint,     -- slot number when the key_was_registered/re-registered.
     txn                 smallint,   -- Index of the TX which holds the registration data.
     valid               boolean,    -- True if the registration is valid.
 

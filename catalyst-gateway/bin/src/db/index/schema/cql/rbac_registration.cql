@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS rbac_registration (
     -- Primary Key Data
     catalyst_id         text,           -- Short Catalyst id
     transaction_id      blob,           -- 32 Bytes of Transaction Hash. (TransactionHash)
-    slot_no             varint,         -- slot number of the transaction_id. (u64)
+    slot_no             bigint,         -- slot number of the transaction_id. (u64)
     txn                 smallint,       -- Index of the TX which holds the registration data. (i16)
 
     -- Non-Key Data

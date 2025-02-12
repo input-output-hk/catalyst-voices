@@ -259,7 +259,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "ab38b241-a181-8043-88a3-8dd37d9a84f5";
+    const SCHEMA_VERSION: &str = "245b2806-4f9a-83f6-b887-e25afb5df5e4";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.
