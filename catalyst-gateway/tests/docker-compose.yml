@@ -3,6 +3,7 @@
 services:
   event-db:
     image: event-db:latest
+    container_name: event-db
     environment:
       - DB_HOST=localhost
       - DB_PORT=5432
@@ -25,6 +26,7 @@ services:
 
   scylla-node:
     image: scylla-node:latest
+    container_name: scylla-node
     restart: unless-stopped
     command: --developer-mode 1 --smp 2 --memory 1G --overprovisioned 1
     ports:  
@@ -37,6 +39,7 @@ services:
 
   cat-gateway:
     image: cat-gateway:latest
+    container_name: cat-gateway
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
@@ -53,11 +56,6 @@ services:
     hostname: 127.0.0.1
     ports:
       - 3030:3030
-    depends_on:
-      event-db:
-        condition: service_healthy
-      scylla-node:
-        condition: service_healthy
 
 # it is a helper service to wait until the event-db will be ready
 # mainly its a trick for Earthly how to wait until service will be fully functional
