@@ -18,7 +18,7 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
 part 'voices_rich_text_rules.dart';
 
 final class VoicesRichTextController extends quill.QuillController {
-  final _customRules = const <quill_int.Rule>[_AutoExitBlockRule()];
+  final _customRules = const <quill_int.Rule>[_AutoAlwaysExitBlockRule()];
 
   VoicesRichTextController({
     required super.document,

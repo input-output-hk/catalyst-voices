@@ -3,12 +3,12 @@ part of 'voices_rich_text.dart';
 /// Heuristic rule to exit current block when user inserts two consecutive
 /// newlines.
 ///
-/// This rule is similar to Quill's AutoExitBlockRule but
+/// This rule is a modified version of Quill's AutoExitBlockRule but
 /// it always exits the block no matter if it was the last line
 /// of the block or middle one.
 @immutable
-class _AutoExitBlockRule extends quill_int.InsertRule {
-  const _AutoExitBlockRule();
+class _AutoAlwaysExitBlockRule extends quill_int.InsertRule {
+  const _AutoAlwaysExitBlockRule();
 
   @override
   Delta? applyRule(
