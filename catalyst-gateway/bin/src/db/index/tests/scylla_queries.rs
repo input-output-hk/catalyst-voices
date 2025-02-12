@@ -135,7 +135,7 @@ async fn get_rbac_registrations_by_catalyst_id() {
     .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        row_res.unwrap();
     }
 }
 
