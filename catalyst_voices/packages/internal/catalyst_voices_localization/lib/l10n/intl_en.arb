@@ -1043,21 +1043,13 @@
   "errorWalletLinkInternalError": "Wallet authorisation internal error",
   "errorWalletLinkRefused": "Wallet authorisation failed",
   "errorWalletLinkAccountChange": "Wallet account change",
-  "mandatoryGuidanceType": "Mandatory",
-  "@mandatoryGuidanceType": {
-    "description": "Guidance type label for mandatory guidance"
-  },
-  "educationGuidanceType": "Education",
-  "@educationGuidanceType": {
-    "description": "Guidance type label for education guidance"
-  },
-  "tipsGuidanceType": "Tips",
-  "@tipsGuidanceType": {
-    "description": "Guidance type label for tips guidance"
-  },
   "all": "All",
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
+  },
+  "guidance": "Guidance",
+  "@guidance": {
+    "description": "A tab name of the guidance for the proposal editor."
   },
   "noGuidanceOfThisType": "There is no guidance of this type",
   "@noGuidanceOfThisType": {
@@ -1067,7 +1059,7 @@
   "@selectASection": {
     "description": "Message when there is no section selected"
   },
-  "noGuidanceForThisSection": "There is no guidance for this section",
+  "noGuidanceForThisSection": "There is no guidance for this section.",
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
   },
