@@ -7,14 +7,6 @@ docker-compose:
     COPY ./docker-compose.yml .
     SAVE ARTIFACT ./docker-compose.yml
 
-package-scylla-node:
-    FROM scylladb/scylla:6.2
-
-    COPY scylla.yml /etc/scylla/scylla.yaml
-
-    ENTRYPOINT scylla --options-file /etc/scylla/scylla.yaml --smp 2 --memory 1G --overprovisioned 1 --default-log-level error
-    SAVE IMAGE scylla-node:latest
-
 # Installs scylla for bookworm-slim/debian
 INSTALL_SCYLLA:
     FUNCTION
