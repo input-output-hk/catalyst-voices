@@ -42,7 +42,7 @@ pub(crate) struct StakeAmount(u64);
 impl StakeAmount {
     /// Is the Stake Amount valid?
     fn is_valid(value: u64) -> bool {
-        value >= MINIMUM && value <= MAXIMUM
+        (MINIMUM..=MAXIMUM).contains(&value)
     }
 }
 
@@ -136,20 +136,6 @@ impl TryFrom<i64> for StakeAmount {
             bail!("Invalid Stake Amount");
         }
         Ok(Self(value))
-    }
-}
-
-impl Into<u64> for StakeAmount {
-    fn into(self) -> u64 {
-        // assume that the value is always valid
-        self.0
-    }
-}
-
-impl Into<i64> for StakeAmount {
-    fn into(self) -> i64 {
-        // assume that the value is always valid
-        i64::try_from(self.0).unwrap_or_default()
     }
 }
 

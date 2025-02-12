@@ -9,6 +9,7 @@ use poem_openapi::{types::Example, NewType};
 pub(crate) struct IsPayable(bool);
 
 impl Default for IsPayable {
+    /// Explicit default implementation of `IsPayable`.
     fn default() -> Self {
         Self(true)
     }
@@ -26,6 +27,7 @@ impl Example for IsPayable {
 pub(crate) struct IsCip15(bool);
 
 impl Default for IsCip15 {
+    /// Explicit default implementation of `IsCip15`.
     fn default() -> Self {
         Self(false)
     }

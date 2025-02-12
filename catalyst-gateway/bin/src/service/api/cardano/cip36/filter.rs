@@ -249,11 +249,7 @@ async fn get_invalid_registrations(
 ) -> anyhow::Result<Vec<Cip36Details>> {
     // include any erroneous registrations which occur AFTER the slot# of the last valid
     // registration or return all invalids if NO slot# declared.
-    let slot_no = if let Some(slot_no) = slot_no {
-        slot_no
-    } else {
-        SlotNo::default()
-    };
+    let slot_no = slot_no.unwrap_or_default();
 
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
         &session,

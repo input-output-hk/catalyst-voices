@@ -42,7 +42,7 @@ pub(crate) struct SlotNo(u64);
 impl SlotNo {
     /// Is the Slot Number valid?
     fn is_valid(value: u64) -> bool {
-        value >= MINIMUM && value <= MAXIMUM
+        (MINIMUM..=MAXIMUM).contains(&value)
     }
 
     /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
