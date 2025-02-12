@@ -23,7 +23,7 @@ test:
         --load scylla-node:latest=(./../+package-scylla-node) \
         --service cat-gateway \
         --allow-privileged
-        RUN docker container logs -n all scylla-node || poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
+        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov; docker container logs -n all scylla-node
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL api-tests.junit-report.xml

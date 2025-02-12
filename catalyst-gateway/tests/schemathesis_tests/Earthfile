@@ -123,7 +123,8 @@ nightly-test-fuzzer-api:
         RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
-            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log
+            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log; \
+            docker container logs -n all scylla-node
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly.junit-report.xml
