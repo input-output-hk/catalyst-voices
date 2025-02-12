@@ -23,6 +23,7 @@ use crate::{
 };
 
 /// Index RBAC 509 Registration Query Parameters
+#[derive(Debug)]
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
     registrations: Vec<insert_rbac509::Params>,
@@ -249,3 +250,75 @@ fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<StakeAddress> {
         })
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::index::tests::{get_shared_session, test_utils, SESSION_ERR_MSG};
+
+    #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+    #[tokio::test]
+    async fn index() {
+        let Ok((session, _)) = get_shared_session().await else {
+            panic!("{SESSION_ERR_MSG}");
+        };
+
+        let block = test_utils::block_3();
+        let mut query = Rbac509InsertQuery::new();
+        let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
+            .parse()
+            .unwrap();
+        query.index(&session, txn_hash, 0.into(), &block).await;
+        println!("{query:#?}");
+
+        todo!();
+    }
+}
+
+// RBAC 509 indexing tests.
+//
+// use cardano_blockchain_types::TransactionHash;
+//
+// use crate::db::index::{
+// block::rbac509::Rbac509InsertQuery,
+// tests::{get_shared_session, test_utils, SESSION_ERR_MSG},
+// };
+//
+//#[ignore = "An integration test which requires a running Scylla node instance, disabled
+//#[ignore from `testunit` CI run"]
+// #[tokio::test]
+// async fn index() {
+// let Ok((session, _)) = get_shared_session().await else {
+// panic!("{SESSION_ERR_MSG}");
+// };
+//
+// let block = test_utils::block_3();
+// let mut query = Rbac509InsertQuery::new();
+// let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
+// .parse()
+// .unwrap();
+// query.index(&session, txn_hash, 0.into(), &block);
+// }
+//
+// pub fn block_1() -> BlockTestData {
+// let data = hex::decode(include_str!("../test_data/cardano/conway_1.block")).unwrap();
+// BlockTestData {
+// block: block(data),
+// slot: 82_004_293.into(),
+// role: 0.into(),
+// txn_index: 0.into(),
+// txn_hash: "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
+// .parse()
+// .unwrap(),
+// prv_hash: None,
+// purpose: "ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c"
+// .parse::<Uuid>()
+// .unwrap()
+// .try_into()
+// .unwrap(),
+// stake_addr: Some(
+// "stake_test1urs8t0ssa3w9wh90ld5tprp3gurxd487rth2qlqk6ernjqcef4ugr".to_string(),
+// ),
+// }
+// }
+//
