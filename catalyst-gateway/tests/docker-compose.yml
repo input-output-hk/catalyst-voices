@@ -24,26 +24,13 @@ services:
       timeout: 5s
       retries: 10
 
-  scylla-node:
-    image: scylla-node:latest
-    container_name: scylla-node
-    restart: unless-stopped
-    command: --developer-mode 1 --smp 2 --memory 250M --overprovisioned 1
-    ports:  
-      - "9042:9042"
-    healthcheck:
-      test: ["CMD-SHELL", "cqlsh -e 'SELECT now() FROM system.local;'"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  cat-gateway:
-    image: cat-gateway:latest
-    container_name: cat-gateway
+  cat-gateway-with-scylla:
+    image: cat-gateway-with-scylla:latest
+    container_name: cat-gateway-with-scylla
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
-      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+      - CASSANDRA_PERSISTENT_URL=localhost:9042
+      - CASSANDRA_VOLATILE_URL=localhost:9042
       - CAT_ADDRESS=0.0.0.0:3030
       - CHAIN_NETWORK="Preprod"
       - LOG_LEVEL=error
@@ -58,9 +45,7 @@ services:
       - 3030:3030
     depends_on:
       event-db:
-        condition: service_started
-      scylla-node:
-        condition: service_started
+        condition: service_healthy
 
 # it is a helper service to wait until the event-db will be ready
 # mainly its a trick for Earthly how to wait until service will be fully functional
@@ -68,13 +53,4 @@ services:
     image: alpine:3.20.3
     depends_on:
       event-db:
-        condition: service_started
-
-# it is a helper service to wait until the scylla-node will be ready
-# mainly its a trick for Earthly how to wait until service will be fully functional
-  scylla-node-is-running:
-    image: alpine:3.20.3
-    depends_on:
-      scylla-node:
-        condition: service_started
-
+        condition: service_healthy
