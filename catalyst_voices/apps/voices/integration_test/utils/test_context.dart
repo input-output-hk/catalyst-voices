@@ -27,7 +27,7 @@ class TestContext {
     TestContext.instance.context[key] = value;
   }
 
-  static String get({required String key}) {
+  static String get(String key) {
     if (has(key: key)) {
       return TestContext.instance.context[key]!;
     }
