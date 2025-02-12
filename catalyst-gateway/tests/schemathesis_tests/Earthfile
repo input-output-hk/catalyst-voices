@@ -19,7 +19,7 @@ package-schemathesis:
     VOLUME /results
 
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                && st run \
+                && st run --checks=all $api_spec \
                     # remove these includes when endpoints will be not "draft"
                     --include-operation-id 'putDocument' \
                     --include-operation-id 'getDocument' \
