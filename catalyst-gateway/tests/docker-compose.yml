@@ -54,8 +54,6 @@ services:
     ports:
       - 3030:3030
     depends_on:
-      event-db:
-        condition: service_healthy
       scylla-node:
         condition: service_healthy
 
