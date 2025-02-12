@@ -21,7 +21,7 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
-  Stream<ProposalDocument?> watchProposalDocument({
+  Stream<ProposalDocument> watchProposalDocument({
     required DocumentRef ref,
   });
 
@@ -49,7 +49,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   );
 
   @override
-  Stream<ProposalDocument?> watchProposalDocument({
+  Stream<ProposalDocument> watchProposalDocument({
     required DocumentRef ref,
   }) {
     // TODO(damian-molinski): remove this override once we have API
@@ -58,11 +58,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return watchDocumentWithRef(
       ref: ref,
       refGetter: (data) => data.metadata.template!,
-    ).map(
+    ).whereNotNull().map(
       (event) {
-        if (event == null) {
-          return null;
-        }
         final documentData = event.data;
         final templateData = event.refData;
 
@@ -78,9 +75,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<ProposalDocument> getProposalDocument({
     required DocumentRef ref,
   }) {
-    return watchProposalDocument(ref: ref)
-        .firstWhere((proposal) => proposal != null)
-        .then((proposal) => proposal!);
+    return watchProposalDocument(ref: ref).first;
   }
 
   @override
