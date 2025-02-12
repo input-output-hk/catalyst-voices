@@ -118,8 +118,6 @@ impl DocumentApi {
         /// Authorization required.
         _auth: CatalystRBACSecurityScheme,
     ) -> post_document_index_query::AllResponses {
-        #[allow(clippy::no_effect_underscore_binding)]
-        let _max = u32::MAX;
         post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
     }
 }

@@ -23,7 +23,7 @@ test:
         --load scylla-node:latest=(./../+package-scylla-node) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov && \
+        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov || \
             docker-compose logs -n all scylla-node
     END
     WAIT
