@@ -12,7 +12,7 @@ use crate::service::common;
 /// resource.
 pub(crate) struct Unauthorized {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
-    id: Uuid,
+    id: common::types::generic::error_uuid::ErrorUuid,
     /// Error message.
     // Will not contain sensitive information, internal details or backtraces.
     //#[oai(validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"))]
@@ -28,7 +28,7 @@ impl Unauthorized {
         let id = Uuid::new_v4();
 
         Self {
-            id,
+            id: id.into(),
             msg: msg.into(),
         }
     }

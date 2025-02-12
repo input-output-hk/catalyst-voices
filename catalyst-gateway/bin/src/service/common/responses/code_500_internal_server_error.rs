@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 /// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will
 /// probably want to place this in your crate root
-use crate::settings::Settings;
+use crate::{service::common, settings::Settings};
 
 #[derive(Object)]
 #[oai(example, skip_serializing_if_is_none)]
@@ -15,7 +15,7 @@ use crate::settings::Settings;
 /// *The contents of this response should be reported to the projects issue tracker.*
 pub(crate) struct InternalServerError {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
-    id: Uuid,
+    id: common::types::generic::error_uuid::ErrorUuid,
     /// Error message.
     // Will not contain sensitive information, internal details or backtraces.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
@@ -35,12 +35,16 @@ impl InternalServerError {
         let issue_title = format!("Internal Server Error - {id}");
         let issue = Settings::generate_github_issue_url(&issue_title);
 
-        Self { id, msg, issue }
+        Self {
+            id: id.into(),
+            msg,
+            issue,
+        }
     }
 
     /// Get the id of this Server Error.
     pub(crate) fn id(&self) -> Uuid {
-        self.id
+        self.id.clone().into()
     }
 }
 
