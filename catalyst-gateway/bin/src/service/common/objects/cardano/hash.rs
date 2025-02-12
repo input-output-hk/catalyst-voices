@@ -4,7 +4,7 @@ use core::fmt;
 
 use derive_more::From;
 use poem_openapi::{
-    registry::{MetaSchema, MetaSchemaRef, Registry},
+    registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 
@@ -42,11 +42,7 @@ impl Type for Hash256 {
     }
 
     fn schema_ref() -> MetaSchemaRef {
-        MetaSchemaRef::Reference(Self::name().to_string())
-    }
-
-    fn register(registry: &mut Registry) {
-        registry.create_schema::<Self, _>(Self::name().to_string(), |_| Self::schema());
+        MetaSchemaRef::Inline(Box::new(Self::schema()))
     }
 
     fn as_raw_value(&self) -> Option<&Self::RawValueType> {
@@ -150,11 +146,7 @@ impl Type for Hash128 {
     }
 
     fn schema_ref() -> MetaSchemaRef {
-        MetaSchemaRef::Reference(Self::name().to_string())
-    }
-
-    fn register(registry: &mut Registry) {
-        registry.create_schema::<Self, _>(Self::name().to_string(), |_| Self::schema());
+        MetaSchemaRef::Inline(Box::new(Self::schema()))
     }
 
     fn as_raw_value(&self) -> Option<&Self::RawValueType> {
