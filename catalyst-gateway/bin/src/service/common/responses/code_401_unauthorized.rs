@@ -15,7 +15,6 @@ pub(crate) struct Unauthorized {
     id: common::types::generic::error_uuid::ErrorUuid,
     /// Error message.
     // Will not contain sensitive information, internal details or backtraces.
-    //#[oai(validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"))]
     msg: common::types::generic::error_msg::ErrorMessage,
 }
 

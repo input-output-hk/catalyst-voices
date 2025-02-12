@@ -18,8 +18,7 @@ pub(crate) struct InternalServerError {
     id: common::types::generic::error_uuid::ErrorUuid,
     /// Error message.
     // Will not contain sensitive information, internal details or backtraces.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    msg: String,
+    msg: common::types::generic::error_msg::ErrorMessage,
     /// A URL to report an issue.
     #[oai(validator(max_length = "1000"))]
     issue: Option<Url>,
@@ -37,7 +36,7 @@ impl InternalServerError {
 
         Self {
             id: id.into(),
-            msg,
+            msg: msg.into(),
             issue,
         }
     }

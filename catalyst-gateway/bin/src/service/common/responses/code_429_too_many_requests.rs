@@ -13,8 +13,7 @@ pub(crate) struct TooManyRequests {
     id: common::types::generic::error_uuid::ErrorUuid,
     /// Error message.
     // Will not contain sensitive information, internal details or backtraces.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    msg: String,
+    msg: common::types::generic::error_msg::ErrorMessage,
 }
 
 impl TooManyRequests {
@@ -25,7 +24,10 @@ impl TooManyRequests {
         );
         let id = Uuid::new_v4();
 
-        Self { id: id.into(), msg }
+        Self {
+            id: id.into(),
+            msg: msg.into(),
+        }
     }
 }
 
