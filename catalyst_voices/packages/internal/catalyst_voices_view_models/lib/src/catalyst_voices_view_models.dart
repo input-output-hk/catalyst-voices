@@ -17,6 +17,7 @@ export 'exception/localized_unknown_exception.dart';
 export 'menu/menu_item.dart';
 export 'menu/popup_menu_item.dart';
 export 'proposal/comment.dart';
+export 'proposal/proposal_search_view_model.dart';
 export 'proposal/proposal_view_model.dart';
 export 'proposal_builder/proposal_builder_segments.dart';
 export 'registration/exception/localized_registration_exception.dart';

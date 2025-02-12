@@ -22,7 +22,7 @@ abstract interface class ProposalService {
   });
 
   /// Fetches proposals for the [campaignId].
-  Future<List<Proposal>> getProposals({
+  Future<ProposalSearchResult> getProposals({
     required String campaignId,
   });
 }
@@ -58,7 +58,7 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<Proposal>> getProposals({
+  Future<ProposalSearchResult> getProposals({
     required String campaignId,
   }) async {
     final proposalBases = await _proposalRepository.getProposals(
@@ -69,7 +69,14 @@ final class ProposalServiceImpl implements ProposalService {
 
     final proposals = await Future.wait(futures);
 
-    return proposals;
+    // TODO(LynxLynxx): implement real search result from DB
+    return ProposalSearchResult(
+      proposals: proposals,
+      finalProposalCount: 5 * 4,
+      draftProposalCount: 3 * 4,
+      myProposalCount: 0,
+      favoriteProposalCount: 0,
+    );
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {

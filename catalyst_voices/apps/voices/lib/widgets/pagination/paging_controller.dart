@@ -114,7 +114,15 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
 
     value = value.copyWith(
       currentPage: nextPage,
-      itemList: itemList,
+      itemList: newItems,
+      error: null,
+    );
+  }
+
+  void empty() {
+    value = value.copyWith(
+      itemList: [],
+      isLoading: false,
       error: null,
     );
   }
@@ -137,15 +145,17 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
       return;
     }
 
-    final localListeners =
-        List<PageRequestListener<int, ItemType>>.from(_pageRequestListeners!);
+    final localListeners = List<PageRequestListener<int, ItemType>>.from(
+      _pageRequestListeners ?? [],
+    );
+    final lastItem = itemList.isEmpty ? null : itemList.last;
 
     for (final listener in localListeners) {
       if (_pageRequestListeners!.contains(listener)) {
         listener(
           pageKey,
-          value.currentPage,
-          itemList.last,
+          value.itemsPerPage,
+          lastItem,
         );
       }
     }

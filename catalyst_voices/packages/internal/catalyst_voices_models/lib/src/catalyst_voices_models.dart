@@ -31,6 +31,7 @@ export 'node_id.dart';
 export 'optional.dart';
 export 'proposal/proposal.dart';
 export 'proposal/proposal_base.dart';
+export 'proposal/proposal_search_result.dart';
 export 'registration/registration.dart';
 export 'seed_phrase.dart';
 export 'space.dart';

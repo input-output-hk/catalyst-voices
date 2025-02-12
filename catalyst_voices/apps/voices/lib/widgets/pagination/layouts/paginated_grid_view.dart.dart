@@ -22,9 +22,9 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
 
   ItemWidgetBuilder<ItemType> get _itemBuilder => builderDelegate.builder;
 
-  WidgetBuilder _errorIndicatorBuilder(BuildContext context) =>
+  WidgetBuilder get _errorIndicatorBuilder =>
       builderDelegate.errorIndicatorBuilder ??
-      (_) => VoicesErrorIndicator(
+      (context) => VoicesErrorIndicator(
             message: context.l10n.somethingWentWrong,
           );
 
@@ -60,6 +60,10 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
               break;
             case PagingStatus.ongoing:
             case PagingStatus.completed:
+              if (itemList.isEmpty) {
+                child = builderDelegate.emptyIndicatorBuilder(context);
+                break;
+              }
               child = Wrap(
                 spacing: 16,
                 runSpacing: 16,
@@ -76,7 +80,8 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
               break;
 
             case PagingStatus.error:
-              child = _errorIndicatorBuilder(context)(context);
+              child = _errorIndicatorBuilder(context);
+              break;
           }
 
           if (builderDelegate.animateTransition) {
@@ -111,7 +116,8 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
 
   void _onNextPageTap(PagingState<ItemType> pagingState) {
     if (pagingState.isLoading) return;
-    if (pagingState.currentPage < pagingState.currentLastPage) {
+    final currentPage = pagingState.currentPage ?? 0;
+    if (currentPage < pagingState.currentLastPage) {
       _pagingController.nextPage();
     } else {
       _pagingController

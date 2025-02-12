@@ -47,7 +47,7 @@ and PRISM, but its potential is only barely exploited.
 
 final _proposals = [
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}1',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -62,7 +62,7 @@ final _proposals = [
     version: 1,
   ),
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}2',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -77,7 +77,7 @@ final _proposals = [
     version: 2,
   ),
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}3',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -92,7 +92,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}4',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -107,7 +107,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}5',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -122,7 +122,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}6',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -137,7 +137,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}7',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -152,7 +152,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(100)}',
+    id: '${Random().nextInt(1000)}8',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
