@@ -84,7 +84,7 @@ mod test_big_uint {
 
     use super::*;
 
-    /// Check if we can round trip Encode/Decode a Role0Kid
+    /// Check if we can round trip Encode/Decode a `Role0Kid`
     #[test]
     fn test_encode_decode() {
         let dummy_cert: Vec<u8> = vec![

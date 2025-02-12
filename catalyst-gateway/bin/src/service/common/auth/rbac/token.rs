@@ -201,7 +201,7 @@ mod tests {
 
         let _serial_number = x509_cert::serial_number::SerialNumber::from(42u32);
         let _validity = x509_cert::time::Validity::from_now(Duration::new(5, 0)).unwrap();
-        let _profile = x509_cert::builder::Profile::Root;
+        // let _profile = x509_cert::builder::Profile::Root;
         let _subject =
             x509_cert::name::Name::from_str("CN=Project Catalyst,O=Project Catalyst,C=SG").unwrap();
 
