@@ -2,8 +2,11 @@
 
 use poem_openapi::{types::Example, Object};
 
+use super::environment::ConfigEnvironment;
+use crate::service::common;
+
 /// Frontend JSON schema.
-#[derive(Object, Default, serde::Deserialize)]
+#[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct FrontendConfig {
     /// Sentry properties.
@@ -19,26 +22,24 @@ impl Example for FrontendConfig {
 }
 
 /// Frontend configuration for Sentry.
-#[derive(Object, Default, serde::Deserialize)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Sentry {
     /// The Data Source Name (DSN) for Sentry.
-    #[oai(validator(max_length = "100", pattern = "^https?://"))]
-    dsn: String,
+    dsn: common::types::generic::url::Url,
     /// A version of the code deployed to an environment.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
     release: Option<String>,
     /// The environment in which the application is running, e.g., 'dev', 'qa'.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    environment: Option<String>,
+    environment: Option<ConfigEnvironment>,
 }
 
 impl Example for Sentry {
     fn example() -> Self {
         Sentry {
-            dsn: "https://example.com".to_string(),
+            dsn: common::types::generic::url::Url::example(),
             release: Some("1.0.0".to_string()),
-            environment: Some("dev".to_string()),
+            environment: Some(ConfigEnvironment::example()),
         }
     }
 }

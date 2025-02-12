@@ -1,7 +1,6 @@
 //! Define `ServerError` type.
 
 use poem_openapi::{types::Example, Object};
-use url::Url;
 use uuid::Uuid;
 
 /// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will
@@ -20,8 +19,7 @@ pub(crate) struct InternalServerError {
     // Will not contain sensitive information, internal details or backtraces.
     msg: common::types::generic::error_msg::ErrorMessage,
     /// A URL to report an issue.
-    #[oai(validator(max_length = "1000"))]
-    issue: Option<Url>,
+    issue: Option<common::types::generic::url::Url>,
 }
 
 impl InternalServerError {
@@ -37,7 +35,7 @@ impl InternalServerError {
         Self {
             id: id.into(),
             msg: msg.into(),
-            issue,
+            issue: issue.map(Into::into),
         }
     }
 

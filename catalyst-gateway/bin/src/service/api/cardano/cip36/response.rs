@@ -163,25 +163,24 @@ impl Cip36Details {
 }
 
 /// Cip36 Registration Validation Error.
-#[derive(Object, Default)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationUnprocessableContent {
     /// Error messages.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    error: String,
+    error: common::types::generic::error_msg::ErrorMessage,
 }
 
 impl Cip36RegistrationUnprocessableContent {
     /// Create a new instance of `Cip36RegistrationUnprocessableContent`.
     pub(crate) fn new(error: &(impl ToString + ?Sized)) -> Self {
         Self {
-            error: error.to_string(),
+            error: error.to_string().into(),
         }
     }
 }
 
 impl Example for Cip36RegistrationUnprocessableContent {
     fn example() -> Self {
-        Cip36RegistrationUnprocessableContent::new("Cip36 Registration in request body")
+        Self::new("Cip36 Registration in request body")
     }
 }

@@ -5,7 +5,7 @@ use poem::web::RealIp;
 use poem_openapi::{
     param::Query,
     payload::Json,
-    types::{Example, ToJSON},
+    types::{Example, ParseFromJSON, ToJSON},
     ApiResponse, NewType, OpenApi,
 };
 use serde_json::Value;
@@ -114,7 +114,7 @@ impl ConfigApi {
 
                 // Convert the merged Value to FrontendConfig
                 let frontend_config: FrontendConfig =
-                    serde_json::from_value(response_config).unwrap_or_default(); // Handle error as needed
+                    FrontendConfig::parse_from_json(Some(response_config)).unwrap_or_default(); // Handle error as needed
 
                 GetConfigResponses::Ok(Json(frontend_config)).into()
             },
@@ -142,8 +142,8 @@ impl ConfigApi {
     async fn get_frontend_schema(&self, _auth: NoneOrRBAC) -> GetConfigSchemaAllResponses {
         // Schema for both IP specific and general are identical
         let schema_value = ConfigKey::Frontend.schema().clone();
-        let frontend_config: FrontendConfig =
-            serde_json::from_value(schema_value).unwrap_or_default();
+        let frontend_config =
+            FrontendConfig::parse_from_json(Some(schema_value)).unwrap_or_default();
         GetConfigSchemaResponses::Ok(Json(frontend_config)).into()
     }
 
