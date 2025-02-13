@@ -6,7 +6,9 @@ builder:
     FROM python-ci+python-base
 
     # prepare tests
-    COPY --dir ./api_tests .
+    COPY --dir ./api .
+    COPY --dir ./integration .
+    COPY --dir ./utils .
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
