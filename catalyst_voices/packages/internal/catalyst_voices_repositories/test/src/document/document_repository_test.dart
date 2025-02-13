@@ -49,12 +49,12 @@ void main() {
       final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
       final template = DocumentDataFactory.build(
-        id: mockedTemplateUuid,
+        selfRef: DocumentRefFactory.buildSigned(id: mockedTemplateUuid),
         type: DocumentType.proposalTemplate,
         content: DocumentDataContent(templateData),
       );
       final proposal = DocumentDataFactory.build(
-        id: mockedDocumentUuid,
+        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
         type: DocumentType.proposalDocument,
         template: template.ref,
         content: DocumentDataContent(proposalData),
@@ -78,12 +78,12 @@ void main() {
 
     test('getProposalDocument correctly propagates errors', () async {
       // Given
-      final templateRef = DocumentRef(
+      final templateRef = SignedDocumentRef(
         id: mockedTemplateUuid,
         version: const Uuid().v7(),
       );
       final proposal = DocumentDataFactory.build(
-        id: mockedDocumentUuid,
+        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
         type: DocumentType.proposalDocument,
         template: templateRef,
         content: const DocumentDataContent({}),
@@ -114,8 +114,7 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          id: id,
-          version: version,
+          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
         );
 
         final ref = documentData.ref;
@@ -137,11 +136,10 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          id: id,
-          version: version,
+          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
         );
 
-        final ref = DocumentRef(id: id);
+        final ref = SignedDocumentRef(id: id);
         final exactRef = ref.copyWith(version: Optional(version));
 
         when(() => remoteDocuments.getLatestVersion(id))

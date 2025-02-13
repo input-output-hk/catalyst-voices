@@ -62,8 +62,7 @@ final class DocumentDataMetadataDto {
     fromJson: DocumentType.fromJson,
   )
   final DocumentType type;
-  final String id;
-  final String version;
+  final DocumentRefDto selfRef;
   final DocumentRefDto? ref;
   final SecuredDocumentRefDto? refHash;
   final DocumentRefDto? template;
@@ -74,8 +73,7 @@ final class DocumentDataMetadataDto {
 
   DocumentDataMetadataDto({
     required this.type,
-    required this.id,
-    required this.version,
+    required this.selfRef,
     this.ref,
     this.refHash,
     this.template,
@@ -88,8 +86,7 @@ final class DocumentDataMetadataDto {
   DocumentDataMetadataDto.fromModel(DocumentDataMetadata data)
       : this(
           type: data.type,
-          id: data.id,
-          version: data.version,
+          selfRef: data.selfRef.toDto(),
           ref: data.ref?.toDto(),
           refHash: data.refHash?.toDto(),
           template: data.template?.toDto(),
@@ -100,7 +97,9 @@ final class DocumentDataMetadataDto {
         );
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
-    return _$DocumentDataMetadataDtoFromJson(json);
+    final migrated = _migrateJson1(json);
+
+    return _$DocumentDataMetadataDtoFromJson(migrated);
   }
 
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoToJson(this);
@@ -108,8 +107,7 @@ final class DocumentDataMetadataDto {
   DocumentDataMetadata toModel() {
     return DocumentDataMetadata(
       type: type,
-      id: id,
-      version: version,
+      selfRef: selfRef.toModel(),
       ref: ref?.toModel(),
       refHash: refHash?.toModel(),
       template: template?.toModel(),
@@ -119,6 +117,23 @@ final class DocumentDataMetadataDto {
       categoryId: categoryId,
     );
   }
+}
+
+Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
+  final modified = Map<String, dynamic>.from(json);
+
+  if (modified.containsKey('id') && modified.containsKey('version')) {
+    final id = modified.remove('id') as String;
+    final version = modified.remove('version') as String;
+
+    modified['selfRef'] = {
+      'id': id,
+      'version': version,
+      'type': DocumentRefDtoType.signed.name,
+    };
+  }
+
+  return modified;
 }
 
 extension _SignedDocumentRefExt on DocumentRef {
