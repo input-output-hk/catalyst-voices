@@ -52,6 +52,10 @@ integration-test-web:
             --web-browser-flag=--disable-gpu \
             --web-browser-flag=--headless=old \
             --web-browser-flag=--disable-search-engine-choice-screen \
+            # flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
+            # drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
+            --web-header Cross-Origin-Opener-Policy=same-origin \
+            --web-header Cross-Origin-Embedder-Policy=require-corp \
             --profile || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
