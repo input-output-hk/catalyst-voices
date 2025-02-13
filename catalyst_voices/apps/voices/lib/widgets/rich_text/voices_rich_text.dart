@@ -1,23 +1,86 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_rules.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
+    as quill_ext;
 
-final class VoicesRichTextController extends QuillController {
+final class VoicesRichTextController extends quill.QuillController {
+  final _customRules = const <quill_int.Rule>[AutoAlwaysExitBlockRule()];
+
   VoicesRichTextController({
     required super.document,
     required super.selection,
-  });
+  }) {
+    document.setCustomRules(_customRules);
+  }
+
+  factory VoicesRichTextController.fromMarkdown({
+    required MarkdownData markdownData,
+    required TextSelection selection,
+  }) {
+    final delta = markdown.encoder.convert(markdownData);
+    final newDocument = quill.Document.fromDelta(delta);
+
+    return VoicesRichTextController(
+      document: newDocument,
+      selection: selection,
+    );
+  }
+
+  MarkdownData get markdownData {
+    final document = this.document;
+    if (document.isEmpty()) {
+      return MarkdownData.empty;
+    }
+
+    final delta = document.toDelta();
+    final markdownData = markdown.decoder.convert(delta);
+    return markdownData;
+  }
+
+  set markdownData(MarkdownData newMarkdownData) {
+    final oldMarkdown = markdownData;
+    if (oldMarkdown == newMarkdownData) {
+      // Don't update the document if the markdown representation didn't change.
+      // When updating the document Quill removes blank lines which conflict
+      // with a user trying to insert a blank line.
+      return;
+    } else if (newMarkdownData.data.isEmpty) {
+      clear();
+    } else {
+      final delta = markdown.encoder.convert(newMarkdownData);
+      document = quill.Document.fromDelta(delta);
+    }
+  }
+
+  void clearFormattingFromSelection() {
+    toggledStyle = const quill.Style();
+    formatSelection(
+      quill.Attribute.clone(quill.Attribute.ul, null),
+      shouldNotifyListeners: false,
+    );
+    formatSelection(
+      quill.Attribute.clone(quill.Attribute.ol, null),
+      shouldNotifyListeners: false,
+    );
+
+    notifyListeners();
+  }
 }
 
-class VoicesRichText extends VoicesFormField<Document> {
+class VoicesRichText extends VoicesFormField<MarkdownData> {
   final VoicesRichTextController controller;
   final String title;
   final FocusNode focusNode;
@@ -36,9 +99,9 @@ class VoicesRichText extends VoicesFormField<Document> {
     required this.scrollController,
     this.charsLimit,
   }) : super(
-          value: controller.document,
+          value: controller.markdownData,
           builder: (field) {
-            void onChangedHandler(Document? value) {
+            void onChangedHandler(MarkdownData? value) {
               field.didChange(value);
               onChanged?.call(value);
             }
@@ -66,9 +129,9 @@ class VoicesRichText extends VoicesFormField<Document> {
                   ),
                 ),
                 Offstage(
-                  offstage: charsLimit == null,
+                  offstage: charsLimit == null && field.errorText == null,
                   child: VoicesRichTextLimit(
-                    document: controller.document,
+                    controller: controller,
                     charsLimit: charsLimit,
                     errorMessage: field.errorText,
                   ),
@@ -113,27 +176,33 @@ class _EditorDecoration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: isEditMode
-            ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
-            : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-        border: Border.all(
-          color: _getBorderColor(context),
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
+    return ListenableBuilder(
+      listenable: focusNode,
       child: child,
+      builder: (context, child) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: isEditMode
+                ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
+                : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+            border: Border.all(
+              color: _getBorderColor(context, focusNode.hasFocus),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: child,
+        );
+      },
     );
   }
 
-  Color _getBorderColor(BuildContext context) {
+  Color _getBorderColor(BuildContext context, bool hasFocus) {
     if (!isEditMode) {
       return Theme.of(context).colorScheme.outlineVariant;
     } else if (isInvalid) {
       return Theme.of(context).colorScheme.error;
-    } else if (focusNode.hasFocus) {
+    } else if (hasFocus) {
       return Theme.of(context).colorScheme.primary;
     } else {
       return Theme.of(context).colorScheme.outlineVariant;
@@ -145,7 +214,7 @@ class _Editor extends StatefulWidget {
   final VoicesRichTextController controller;
   final FocusNode focusNode;
   final ScrollController scrollController;
-  final ValueChanged<Document?>? onChanged;
+  final ValueChanged<MarkdownData?>? onChanged;
 
   const _Editor({
     required this.controller,
@@ -159,13 +228,15 @@ class _Editor extends StatefulWidget {
 }
 
 class _EditorState extends State<_Editor> {
-  Document? _observedDocument;
-  StreamSubscription<DocChange>? _documentChangeSub;
+  late final FocusNode _keyboardListenerFocus;
+  quill.Document? _observedDocument;
+  StreamSubscription<quill.DocChange>? _documentChangeSub;
 
   @override
   void initState() {
     super.initState();
 
+    _keyboardListenerFocus = FocusNode();
     widget.controller.addListener(_onControllerChanged);
     _updateObservedDocument();
   }
@@ -181,6 +252,12 @@ class _EditorState extends State<_Editor> {
     }
   }
 
+  @override
+  void dispose() {
+    _keyboardListenerFocus.dispose();
+    super.dispose();
+  }
+
   void _onControllerChanged() {
     if (_observedDocument != widget.controller.document) {
       _updateObservedDocument();
@@ -192,8 +269,8 @@ class _EditorState extends State<_Editor> {
 
     _observedDocument = widget.controller.document;
     _documentChangeSub = _observedDocument?.changes.listen((change) {
-      final document = widget.controller.document;
-      widget.onChanged?.call(document);
+      final markdownData = widget.controller.markdownData;
+      widget.onChanged?.call(markdownData);
     });
   }
 
@@ -201,37 +278,53 @@ class _EditorState extends State<_Editor> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    return QuillEditor(
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-      scrollController: widget.scrollController,
-      configurations: QuillEditorConfigurations(
-        padding: const EdgeInsets.all(16),
-        placeholder: context.l10n.placeholderRichText,
-        characterShortcutEvents: standardCharactersShortcutEvents,
-        /* cSpell:disable */
-        spaceShortcutEvents: standardSpaceShorcutEvents,
-        /* cSpell:enable */
-        customStyles: DefaultStyles(
-          placeHolder: DefaultTextBlockStyle(
-            textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
-                DefaultTextStyle.of(context).style,
-            HorizontalSpacing.zero,
-            VerticalSpacing.zero,
-            VerticalSpacing.zero,
-            null,
+    return KeyboardListener(
+      focusNode: _keyboardListenerFocus,
+      onKeyEvent: _onKeyEvent,
+      child: quill.QuillEditor(
+        controller: widget.controller,
+        focusNode: widget.focusNode,
+        scrollController: widget.scrollController,
+        configurations: quill.QuillEditorConfigurations(
+          padding: const EdgeInsets.all(16),
+          placeholder: context.l10n.placeholderRichText,
+          characterShortcutEvents: quill.standardCharactersShortcutEvents,
+          /* cSpell:disable */
+          spaceShortcutEvents: quill.standardSpaceShorcutEvents,
+          /* cSpell:enable */
+          customStyles: quill.DefaultStyles(
+            placeHolder: quill.DefaultTextBlockStyle(
+              textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
+                  DefaultTextStyle.of(context).style,
+              quill.HorizontalSpacing.zero,
+              quill.VerticalSpacing.zero,
+              quill.VerticalSpacing.zero,
+              null,
+            ),
           ),
+          embedBuilders: CatalystPlatform.isWeb
+              ? quill_ext.FlutterQuillEmbeds.editorWebBuilders()
+              : quill_ext.FlutterQuillEmbeds.editorBuilders(),
         ),
-        embedBuilders: CatalystPlatform.isWeb
-            ? FlutterQuillEmbeds.editorWebBuilders()
-            : FlutterQuillEmbeds.editorBuilders(),
       ),
     );
+  }
+
+  void _onKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.backspace &&
+        widget.controller.selection.end == 0) {
+      // Cleanup the formatting from the selection.
+      // By default quill will not remove the last bullet point (ordered/unordered),
+      // here we are removing it manually after the user has removed everything
+      // else and only this is remaining.
+      widget.controller.clearFormattingFromSelection();
+    }
   }
 }
 
 class _Toolbar extends StatelessWidget {
-  final QuillController controller;
+  final quill.QuillController controller;
 
   const _Toolbar({
     required this.controller,
@@ -242,34 +335,34 @@ class _Toolbar extends StatelessWidget {
     return Container(
       color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
       padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: QuillToolbar(
-        configurations: const QuillToolbarConfigurations(),
+      child: quill.QuillToolbar(
+        configurations: const quill.QuillToolbarConfigurations(),
         child: Row(
           children: [
             _ToolbarAttributeIconButton(
               controller: controller,
               icon: VoicesAssets.icons.rtHeading,
-              attribute: Attribute.h1,
+              attribute: quill.Attribute.h1,
             ),
             _ToolbarAttributeIconButton(
               controller: controller,
               icon: VoicesAssets.icons.rtBold,
-              attribute: Attribute.bold,
+              attribute: quill.Attribute.bold,
             ),
             _ToolbarAttributeIconButton(
               controller: controller,
               icon: VoicesAssets.icons.rtItalic,
-              attribute: Attribute.italic,
+              attribute: quill.Attribute.italic,
             ),
             _ToolbarAttributeIconButton(
               controller: controller,
               icon: VoicesAssets.icons.rtOrderedList,
-              attribute: Attribute.ol,
+              attribute: quill.Attribute.ol,
             ),
             _ToolbarAttributeIconButton(
               controller: controller,
               icon: VoicesAssets.icons.rtUnorderedList,
-              attribute: Attribute.ul,
+              attribute: quill.Attribute.ul,
             ),
             _ToolbarImageOptionButton(
               controller: controller,
@@ -282,8 +375,8 @@ class _Toolbar extends StatelessWidget {
 }
 
 class _ToolbarAttributeIconButton extends StatelessWidget {
-  final QuillController controller;
-  final Attribute<dynamic> attribute;
+  final quill.QuillController controller;
+  final quill.Attribute<dynamic> attribute;
   final SvgGenImage icon;
 
   const _ToolbarAttributeIconButton({
@@ -294,13 +387,14 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return QuillToolbarToggleStyleButton(
+    return quill.QuillToolbarToggleStyleButton(
       controller: controller,
       attribute: attribute,
-      options: QuillToolbarToggleStyleButtonOptions(
+      options: quill.QuillToolbarToggleStyleButtonOptions(
         childBuilder: (options, extraOptions) {
           return _ToolbarIconButton(
             icon: icon,
+            tooltip: options.tooltip,
             isToggled: extraOptions.isToggled,
             onPressed: extraOptions.onPressed,
           );
@@ -312,11 +406,13 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
 
 class _ToolbarIconButton extends StatelessWidget {
   final SvgGenImage icon;
+  final String? tooltip;
   final bool isToggled;
   final VoidCallback? onPressed;
 
   const _ToolbarIconButton({
     required this.icon,
+    required this.tooltip,
     required this.isToggled,
     required this.onPressed,
   });
@@ -325,6 +421,7 @@ class _ToolbarIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onPressed,
+      tooltip: tooltip,
       icon: icon.buildIcon(),
       color: isToggled ? Theme.of(context).colorScheme.primary : null,
     );
@@ -332,18 +429,19 @@ class _ToolbarIconButton extends StatelessWidget {
 }
 
 class _ToolbarImageOptionButton extends StatelessWidget {
-  final QuillController controller;
+  final quill.QuillController controller;
 
   const _ToolbarImageOptionButton({required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return QuillToolbarImageButton(
+    return quill_ext.QuillToolbarImageButton(
       controller: controller,
-      options: QuillToolbarImageButtonOptions(
+      options: quill_ext.QuillToolbarImageButtonOptions(
         childBuilder: (options, extraOptions) {
           return _ToolbarIconButton(
             icon: VoicesAssets.icons.photograph,
+            tooltip: options.tooltip,
             isToggled: false,
             onPressed: extraOptions.onPressed,
           );
