@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:chore/upgrade-flutter-3-29-0 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.39 AS rust-ci
 IMPORT ../ AS flutter-rust-bridge
 
 # builder : Setup the builder
