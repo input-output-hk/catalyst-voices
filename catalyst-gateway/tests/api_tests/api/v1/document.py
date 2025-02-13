@@ -1,6 +1,5 @@
 import requests
-from api import cat_gateway_endpoint_url
-from utils.auth import BEARER_TOKEN
+from api import cat_gateway_endpoint_url, BEARER_TOKEN
 
 URL = cat_gateway_endpoint_url("api/draft/document")
 
