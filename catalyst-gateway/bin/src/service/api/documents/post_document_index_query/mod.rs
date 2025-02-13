@@ -64,7 +64,7 @@ pub(crate) async fn endpoint(
     let page = page.unwrap_or_default();
     let limit = limit.unwrap_or_default();
 
-    let total: u64 = match counts {
+    let total: u32 = match counts {
         Ok(total) => {
             match total.try_into() {
                 Ok(t) => t,
@@ -78,7 +78,7 @@ pub(crate) async fn endpoint(
 
     match docs {
         Ok(docs) => {
-            let doc_count: u64 = match docs.len().try_into() {
+            let doc_count: u32 = match docs.len().try_into() {
                 Ok(d) => d,
                 Err(e) => return AllResponses::handle_error(&e.into()),
             };
@@ -87,11 +87,11 @@ pub(crate) async fn endpoint(
 
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
                 docs,
-                page: Some(CurrentPage {
+                page: CurrentPage {
                     page,
                     limit,
                     remaining,
-                }),
+                },
             })))
             .into()
         },

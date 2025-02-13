@@ -84,17 +84,17 @@ schema_commitlog_segment_size_in_mb: 128
 # seed_provider class_name is saved for future use.
 # A seed address is mandatory.
 seed_provider:
-    # The addresses of hosts that will serve as contact points for the joining node.
-    # It allows the node to discover the cluster ring topology on startup (when
-    # joining the cluster).
-    # Once the node has joined the cluster, the seed list has no function.
-    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
-      parameters:
-          # In a new cluster, provide the address of the first node.
-          # In an existing cluster, specify the address of at least one existing node.
-          # If you specify addresses of more than one node, use a comma to separate them.
-          # For example: "<IP1>,<IP2>,<IP3>"
-          - seeds: "127.0.0.1"
+  # The addresses of hosts that will serve as contact points for the joining node.
+  # It allows the node to discover the cluster ring topology on startup (when
+  # joining the cluster).
+  # Once the node has joined the cluster, the seed list has no function.
+  - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+    parameters:
+      # In a new cluster, provide the address of the first node.
+      # In an existing cluster, specify the address of at least one existing node.
+      # If you specify addresses of more than one node, use a comma to separate them.
+      # For example: "<IP1>,<IP2>,<IP3>"
+      - seeds: "127.0.0.1"
 
 # Address to bind to and tell other Scylla nodes to connect to.
 # You _must_ change this if you want multiple nodes to be able to communicate!
@@ -107,7 +107,6 @@ listen_address: localhost
 # Address to broadcast to other Scylla nodes
 # Leaving this blank will set it to the same value as listen_address
 # broadcast_address: 1.2.3.4
-
 
 # When using multiple physical network interfaces, set this to true to listen on broadcast_address
 # in addition to the listen_address, allowing nodes to communicate in both interfaces.
@@ -300,7 +299,6 @@ batch_size_fail_threshold_in_kb: 1024
 # generated.  After it has been dead this long, new hints for it will not be
 # created until it has been seen alive and gone down again.
 # max_hint_window_in_ms: 10800000 # 3 hours
-
 
 # Validity period for permissions cache (fetching permissions can be an
 # expensive operation depending on the authorizer, CassandraAuthorizer is
@@ -505,8 +503,7 @@ commitlog_total_space_in_mb: -1
 # false: strict environment checks are in place; do not start if they are not met.
 # true: relaxed environment checks; performance and reliability may degraade.
 #
-# developer_mode: false
-
+developer_mode: true
 
 # Idle-time background processing
 #

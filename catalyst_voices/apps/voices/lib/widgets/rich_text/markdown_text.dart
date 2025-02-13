@@ -7,6 +7,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 class MarkdownText extends StatelessWidget with LaunchUrlMixin {
   final MarkdownData markdownData;
   final bool selectable;
+
   const MarkdownText(
     this.markdownData, {
     super.key,

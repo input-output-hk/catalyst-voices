@@ -37,6 +37,7 @@ final class DocumentIntegerSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;
     final isSubsection = schema.subsection ?? false;
     final defaultValue = schema.defaultValue as int?;
     final constValue = schema.constValue as int?;
@@ -53,7 +54,7 @@ final class DocumentIntegerSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -68,7 +69,7 @@ final class DocumentIntegerSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,
@@ -83,7 +84,7 @@ final class DocumentIntegerSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           defaultValue: defaultValue,

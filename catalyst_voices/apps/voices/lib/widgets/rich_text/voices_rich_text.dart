@@ -113,14 +113,7 @@ class _EditorDecoration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-        // TODO(jakub): enable after implementing https://github.com/input-output-hk/catalyst-voices/issues/846
-        // ResizableBoxParent(
-        //   minHeight: 470,
-        //   resizableVertically: true,
-        //   resizableHorizontally: false,
-        //   child:
-        DecoratedBox(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: isEditMode
             ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
@@ -138,13 +131,11 @@ class _EditorDecoration extends StatelessWidget {
   Color _getBorderColor(BuildContext context) {
     if (!isEditMode) {
       return Theme.of(context).colorScheme.outlineVariant;
+    } else if (isInvalid) {
+      return Theme.of(context).colorScheme.error;
+    } else if (focusNode.hasFocus) {
+      return Theme.of(context).colorScheme.primary;
     } else {
-      if (isInvalid) {
-        return Theme.of(context).colorScheme.error;
-      }
-      if (focusNode.hasFocus) {
-        return Theme.of(context).colorScheme.primary;
-      }
       return Theme.of(context).colorScheme.outlineVariant;
     }
   }
@@ -200,7 +191,7 @@ class _EditorState extends State<_Editor> {
     unawaited(_documentChangeSub?.cancel());
 
     _observedDocument = widget.controller.document;
-    _documentChangeSub = _observedDocument?.changes.listen((delta) {
+    _documentChangeSub = _observedDocument?.changes.listen((change) {
       final document = widget.controller.document;
       widget.onChanged?.call(document);
     });
@@ -217,6 +208,10 @@ class _EditorState extends State<_Editor> {
       configurations: QuillEditorConfigurations(
         padding: const EdgeInsets.all(16),
         placeholder: context.l10n.placeholderRichText,
+        characterShortcutEvents: standardCharactersShortcutEvents,
+        /* cSpell:disable */
+        spaceShortcutEvents: standardSpaceShorcutEvents,
+        /* cSpell:enable */
         customStyles: DefaultStyles(
           placeHolder: DefaultTextBlockStyle(
             textTheme.bodyLarge?.copyWith(color: theme.colors.textDisabled) ??
@@ -251,86 +246,32 @@ class _Toolbar extends StatelessWidget {
         configurations: const QuillToolbarConfigurations(),
         child: Row(
           children: [
-            QuillToolbarIconButton(
-              tooltip: context.l10n.headerTooltipText,
-              onPressed: () {
-                if (controller.isHeaderSelected) {
-                  controller.formatSelection(Attribute.header);
-                } else {
-                  controller.formatSelection(Attribute.h1);
-                }
-              },
-              icon: VoicesAssets.icons.rtHeading.buildIcon(),
-              isSelected: controller.isHeaderSelected,
-              iconTheme: null,
-            ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtBold,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtHeading,
+              attribute: Attribute.h1,
+            ),
+            _ToolbarAttributeIconButton(
+              controller: controller,
+              icon: VoicesAssets.icons.rtBold,
               attribute: Attribute.bold,
             ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtItalic,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtItalic,
               attribute: Attribute.italic,
             ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtOrderedList,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtOrderedList,
               attribute: Attribute.ol,
             ),
-            QuillToolbarToggleStyleButton(
-              options: QuillToolbarToggleStyleButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtUnorderedList,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarAttributeIconButton(
               controller: controller,
+              icon: VoicesAssets.icons.rtUnorderedList,
               attribute: Attribute.ul,
             ),
-            QuillToolbarIndentButton(
-              options: QuillToolbarIndentButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtIncreaseIndent,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
-              controller: controller,
-              isIncrease: true,
-            ),
-            QuillToolbarIndentButton(
-              options: QuillToolbarIndentButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.rtDecreaseIndent,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
-              controller: controller,
-              isIncrease: false,
-            ),
-            QuillToolbarImageButton(
-              options: QuillToolbarImageButtonOptions(
-                childBuilder: (options, extraOptions) => _ToolbarIconButton(
-                  icon: VoicesAssets.icons.photograph,
-                  onPressed: extraOptions.onPressed,
-                ),
-              ),
+            _ToolbarImageOptionButton(
               controller: controller,
             ),
           ],
@@ -340,12 +281,43 @@ class _Toolbar extends StatelessWidget {
   }
 }
 
+class _ToolbarAttributeIconButton extends StatelessWidget {
+  final QuillController controller;
+  final Attribute<dynamic> attribute;
+  final SvgGenImage icon;
+
+  const _ToolbarAttributeIconButton({
+    required this.controller,
+    required this.attribute,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return QuillToolbarToggleStyleButton(
+      controller: controller,
+      attribute: attribute,
+      options: QuillToolbarToggleStyleButtonOptions(
+        childBuilder: (options, extraOptions) {
+          return _ToolbarIconButton(
+            icon: icon,
+            isToggled: extraOptions.isToggled,
+            onPressed: extraOptions.onPressed,
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _ToolbarIconButton extends StatelessWidget {
   final SvgGenImage icon;
+  final bool isToggled;
   final VoidCallback? onPressed;
 
   const _ToolbarIconButton({
     required this.icon,
+    required this.isToggled,
     required this.onPressed,
   });
 
@@ -354,12 +326,29 @@ class _ToolbarIconButton extends StatelessWidget {
     return IconButton(
       onPressed: onPressed,
       icon: icon.buildIcon(),
+      color: isToggled ? Theme.of(context).colorScheme.primary : null,
     );
   }
 }
 
-extension on QuillController {
-  bool get isHeaderSelected {
-    return getSelectionStyle().attributes.containsKey('header');
+class _ToolbarImageOptionButton extends StatelessWidget {
+  final QuillController controller;
+
+  const _ToolbarImageOptionButton({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return QuillToolbarImageButton(
+      controller: controller,
+      options: QuillToolbarImageButtonOptions(
+        childBuilder: (options, extraOptions) {
+          return _ToolbarIconButton(
+            icon: VoicesAssets.icons.photograph,
+            isToggled: false,
+            onPressed: extraOptions.onPressed,
+          );
+        },
+      ),
+    );
   }
 }

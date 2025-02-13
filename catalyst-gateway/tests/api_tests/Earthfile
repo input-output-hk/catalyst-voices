@@ -12,15 +12,17 @@ builder:
 
 test:
     FROM +builder
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
-    COPY ./docker-compose.yml .
+    COPY ./../+docker-compose/docker-compose.yml .
+
+    ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+    ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package) \
-        --service cat-gateway-is-running \
+        --load event-db:latest=(./../../event-db+build) \
+        --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
+        --service cat-gateway-with-scylla \
         --allow-privileged
         RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
     END
@@ -31,7 +33,6 @@ test:
 
 disabled-nightly-test:
     FROM +builder
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     COPY ./docker-compose.yml .
 
