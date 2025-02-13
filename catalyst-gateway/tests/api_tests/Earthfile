@@ -28,7 +28,7 @@ test:
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
         --service cat-gateway-with-scylla \
         --allow-privileged
-        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
+        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=integration --cov-report lcov
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL api-tests.junit-report.xml
