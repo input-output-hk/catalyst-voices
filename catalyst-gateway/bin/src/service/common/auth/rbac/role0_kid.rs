@@ -2,7 +2,6 @@
 
 use std::fmt;
 
-use as_slice::AsSlice;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use pallas::crypto::hash::Hash;
 
@@ -33,14 +32,6 @@ impl PartialEq<Vec<u8>> for Role0Kid {
     }
 }
 
-impl AsSlice for Role0Kid {
-    type Element = u8;
-
-    fn as_slice(&self) -> &[u8] {
-        self.0.as_slice()
-    }
-}
-
 impl Decode<'_, ()> for Role0Kid {
     fn decode(
         d: &mut Decoder<'_>, (): &mut (),
@@ -62,7 +53,7 @@ impl Encode<()> for Role0Kid {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, (): &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        e.bytes(self.as_slice())?.ok()
+        e.bytes(self.0.as_slice())?.ok()
     }
 }
 
