@@ -37,7 +37,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_txi_by_txn_hashes.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// 32 byte hash of this transaction.
-    pub(crate) txn_hash: DbTransactionHash,
+    pub(crate) txn_id: DbTransactionHash,
     /// Transaction Output Offset inside the transaction.
     pub(crate) txo: DbTxnOutputOffset,
 }
@@ -45,7 +45,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("txn_hash", &self.txn_hash.to_string())
+            .field("txn_id", &self.txn_id.to_string())
             .field("txo", &self.txo)
             .finish()
     }
@@ -54,7 +54,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            txn_hash: value.0,
+            txn_id: value.0,
             txo: value.1,
         }
     }

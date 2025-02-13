@@ -22,7 +22,7 @@ const INSERT_UNSTAKED_TXO_ASSET_QUERY: &str = include_str!("./cql/insert_unstake
 #[derive(SerializeRow, Debug)]
 pub(crate) struct Params {
     /// Transactions hash.
-    txn_hash: DbTransactionHash,
+    txn_id: DbTransactionHash,
     /// Transaction Output Offset inside the transaction.
     txo: DbTxnOutputOffset,
     /// Policy hash of the asset
@@ -32,7 +32,7 @@ pub(crate) struct Params {
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Value of the asset
     value: num_bigint::BigInt,
 }
@@ -44,16 +44,16 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
-        txn_hash: TransactionHash, txo: TxnOutputOffset, policy_id: &[u8], asset_name: &[u8],
-        slot_no: Slot, txn: TxnIndex, value: i128,
+        txn_id: TransactionHash, txo: TxnOutputOffset, policy_id: &[u8], asset_name: &[u8],
+        slot_no: Slot, txn_index: TxnIndex, value: i128,
     ) -> Self {
         Self {
-            txn_hash: txn_hash.into(),
+            txn_id: txn_id.into(),
             txo: txo.into(),
             policy_id: policy_id.to_vec(),
             asset_name: asset_name.to_vec(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             value: value.into(),
         }
     }

@@ -14,7 +14,7 @@ use crate::db::index::{
 };
 
 /// Get TXI query string.
-const GET_TXI_BY_TXN_HASHES_QUERY: &str = include_str!("../cql/get_txi_by_txn_hashes.cql");
+const GET_TXI_BY_TXN_HASHES_QUERY: &str = include_str!("../cql/get_txi_by_txn_ids.cql");
 
 /// Get TXI query parameters.
 #[derive(SerializeRow)]

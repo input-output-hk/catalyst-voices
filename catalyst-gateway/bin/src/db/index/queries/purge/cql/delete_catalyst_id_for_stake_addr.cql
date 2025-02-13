@@ -2,4 +2,4 @@
 DELETE FROM catalyst_id_for_stake_addr
 WHERE stake_addr = :stake_addr
     AND slot_no = :slot_no
-    AND txn = :txn
+    AND txn_index = :txn_index

@@ -37,7 +37,7 @@ const SCHEMAS: &[(&str, &str)] = &[
     ),
     (
         // TXO Unstaked Assets Table Schema
-        include_str!("./cql/unstaked_txo_assets_by_txn_hash.cql"),
+        include_str!("cql/unstaked_txo_assets_by_txn_id.cql"),
         "Create Table Unstaked TXO Assets By Txn Hash",
     ),
     (
@@ -259,7 +259,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "be286803-f255-8ea6-bbb2-6881083d1fdd";
+    const SCHEMA_VERSION: &str = "ab4f2376-4c9e-8df7-bf7d-bd5707d03061";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.

@@ -27,7 +27,7 @@ pub(crate) struct Params {
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
 }
@@ -37,7 +37,7 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("stake_addr", &self.stake_addr)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("catalyst_id", &self.catalyst_id)
             .finish()
     }
@@ -46,12 +46,12 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_addr: StakeAddress, slot_no: Slot, txn: TxnIndex, catalyst_id: IdUri,
+        stake_addr: StakeAddress, slot_no: Slot, txn_index: TxnIndex, catalyst_id: IdUri,
     ) -> Self {
         Params {
             stake_addr: stake_addr.into(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             catalyst_id: catalyst_id.into(),
         }
     }

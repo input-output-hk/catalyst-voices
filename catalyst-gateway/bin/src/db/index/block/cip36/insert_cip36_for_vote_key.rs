@@ -28,7 +28,7 @@ pub(crate) struct Params {
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Is the registration Valid or not.
     valid: bool,
 }
@@ -36,7 +36,7 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: &VotingPubKey, slot_no: Slot, txn: TxnIndex, cip36: &Cip36, valid: bool,
+        vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36, valid: bool,
     ) -> Self {
         Params {
             vote_key: vote_key
@@ -48,7 +48,7 @@ impl Params {
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             valid,
         }
     }

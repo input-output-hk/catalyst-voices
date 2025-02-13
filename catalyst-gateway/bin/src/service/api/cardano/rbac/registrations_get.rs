@@ -79,7 +79,7 @@ pub(crate) async fn endpoint(catalyst_id: IdUri) -> AllResponses {
             },
         };
 
-        let tx_hash: Vec<_> = TransactionHash::from(row.transaction_id).into();
+        let tx_hash: Vec<_> = TransactionHash::from(row.txn_id).into();
         let item = RbacRegistration {
             tx_hash: tx_hash.into(),
         };

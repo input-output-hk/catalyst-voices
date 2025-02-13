@@ -28,7 +28,7 @@ pub(crate) struct Params {
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
     txo: DbTxnOutputOffset,
     /// Actual full TXO Address
@@ -42,13 +42,13 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_address: &[u8], slot_no: Slot, txn: TxnIndex, txo: TxnOutputOffset, address: &str,
-        value: u64, txn_hash: TransactionHash,
+        stake_address: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
+        address: &str, value: u64, txn_hash: TransactionHash,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             txo: txo.into(),
             address: address.to_string(),
             value: value.into(),

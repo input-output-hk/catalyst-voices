@@ -32,7 +32,7 @@ pub(crate) mod result {
     #[derive(DeserializeRow)]
     pub(crate) struct PrimaryKey {
         /// A transaction hash.
-        pub(crate) transaction_id: DbTransactionHash,
+        pub(crate) txn_id: DbTransactionHash,
     }
 }
 
@@ -43,13 +43,13 @@ const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_txn_id.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A transaction hash.
-    pub(crate) transaction_id: DbTransactionHash,
+    pub(crate) txn_id: DbTransactionHash,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("transaction_id", &self.transaction_id.to_string())
+            .field("txn_id", &self.txn_id.to_string())
             .finish()
     }
 }
@@ -57,7 +57,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            transaction_id: value.transaction_id,
+            txn_id: value.txn_id,
         }
     }
 }

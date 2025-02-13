@@ -27,7 +27,7 @@ pub(crate) struct Params {
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
@@ -43,7 +43,7 @@ pub(crate) struct Params {
     /// Signature validates.
     signed: bool,
     /// List of serialization errors.
-    error_report: Vec<String>,
+    problem_report: String,
 }
 
 impl Debug for Params {
@@ -55,7 +55,7 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("stake_address", &self.stake_address)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("vote_key", &self.vote_key)
             .field("payment_address", &self.payment_address)
             .field("is_payable", &self.is_payable)
@@ -63,7 +63,7 @@ impl Debug for Params {
             .field("nonce", &self.nonce)
             .field("cip36", &cip36)
             .field("signed", &self.signed)
-            .field("error_report", &self.error_report)
+            .field("problem_report", &self.problem_report)
             .finish()
     }
 }
@@ -71,7 +71,7 @@ impl Debug for Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: Option<&VotingPubKey>, slot_no: Slot, txn: TxnIndex, cip36: &Cip36,
+        vote_key: Option<&VotingPubKey>, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36,
     ) -> Self {
         let stake_address = cip36
             .stake_pk()
@@ -83,21 +83,18 @@ impl Params {
         let payment_address = cip36
             .payment_address()
             .map_or(Vec::new(), ShelleyAddress::to_vec);
-        let error_report = serde_json::to_string(cip36.err_report()).map_or_else(
-            |e| {
-                error!(
-                    "Failed to serialize problem report: {e:?}. Report = {:?}",
-                    cip36.err_report()
-                );
-                Vec::new()
-            },
-            |v| vec![v],
-        );
+        let problem_report = serde_json::to_string(cip36.err_report()).unwrap_or_else(|e| {
+            error!(
+                "Failed to serialize problem report: {e:?}. Report = {:?}",
+                cip36.err_report()
+            );
+            String::new()
+        });
 
         Params {
             stake_address,
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             vote_key,
             payment_address,
             is_payable: cip36.is_payable().unwrap_or_default(),
@@ -105,7 +102,7 @@ impl Params {
             nonce: cip36.nonce().unwrap_or_default().into(),
             cip36: is_cip36,
             signed: cip36.is_valid_signature(),
-            error_report,
+            problem_report,
         }
     }
 

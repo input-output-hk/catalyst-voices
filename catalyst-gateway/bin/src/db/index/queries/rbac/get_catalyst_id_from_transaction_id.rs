@@ -48,7 +48,7 @@ pub(crate) struct Query {
     pub slot_no: DbSlot,
     /// A transaction index.
     #[allow(dead_code)]
-    pub txn_idx: DbTxnIndex,
+    pub txn_index: DbTxnIndex,
 }
 
 impl Query {
@@ -109,7 +109,7 @@ pub(crate) fn cache_for_transaction_id(
     let value = Query {
         catalyst_id: catalyst_id.into(),
         slot_no: slot_no.into(),
-        txn_idx: txn_idx.into(),
+        txn_index: txn_idx.into(),
     };
     CACHE.insert(transaction_id.into(), value);
 }

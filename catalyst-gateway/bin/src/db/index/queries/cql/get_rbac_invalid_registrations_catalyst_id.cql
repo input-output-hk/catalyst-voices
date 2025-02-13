@@ -1,6 +1,6 @@
-SELECT transaction_id,
+SELECT txn_id,
        slot_no,
-       txn,
+       txn_index,
        prv_txn_id,
        purpose,
        problem_report

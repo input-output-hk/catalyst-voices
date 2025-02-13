@@ -1,3 +1,4 @@
 SELECT 
-    stake_address,vote_key
+    stake_address,
+    vote_key
 FROM cip36_registration;

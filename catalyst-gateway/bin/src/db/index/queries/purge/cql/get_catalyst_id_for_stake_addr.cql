@@ -2,5 +2,5 @@
 SELECT
     stake_addr,
     slot_no,
-    txn
+    txn_index
 FROM catalyst_id_for_stake_addr

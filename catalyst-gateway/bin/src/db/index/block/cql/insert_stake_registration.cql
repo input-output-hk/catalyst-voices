@@ -2,7 +2,7 @@
 INSERT INTO stake_registration (
     stake_hash,
     slot_no,
-    txn,
+    txn_index,
     stake_address,
     script,
     register,
@@ -11,7 +11,7 @@ INSERT INTO stake_registration (
 ) VALUES (
     :stake_hash,
     :slot_no,
-    :txn,
+    :txn_index,
     :stake_address,
     :script,
     :register,

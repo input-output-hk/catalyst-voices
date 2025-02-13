@@ -28,7 +28,7 @@ pub(crate) struct Params {
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<DbTransactionHash>,
     /// Purpose.`UUIDv4`. 16 bytes.
@@ -45,7 +45,7 @@ impl Debug for Params {
             .field("catalyst_id", &self.catalyst_id)
             .field("transaction_id", &self.transaction_id)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("prv_txn_id", &prv_txn_id)
             .field("purpose", &self.purpose)
             .finish()
@@ -55,7 +55,7 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn: TxnIndex,
+        catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn_index: TxnIndex,
         purpose: UuidV4, prv_txn_id: Option<TransactionHash>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
@@ -65,7 +65,7 @@ impl Params {
             transaction_id: transaction_id.into(),
             purpose: purpose.into(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             prv_txn_id,
         }
     }

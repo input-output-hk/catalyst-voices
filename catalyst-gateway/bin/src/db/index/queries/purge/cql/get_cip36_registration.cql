@@ -3,5 +3,5 @@ SELECT
     stake_address,
     nonce,
     slot_no,
-    txn
+    txn_index
 FROM cip36_registration

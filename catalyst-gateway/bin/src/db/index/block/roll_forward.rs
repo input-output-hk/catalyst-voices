@@ -72,7 +72,7 @@ async fn purge_catalyst_id_for_txn_id(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if txn_hashes.contains(&params.transaction_id.into()) {
+        if txn_hashes.contains(&params.txn_id.into()) {
             delete_params.push(params);
         }
     }
@@ -219,7 +219,7 @@ async fn purge_txi_by_hash(
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         if primary_key.2 <= purge_to_slot.into() {
             let params: Params = primary_key.into();
-            txn_hashes.insert(params.txn_hash.into());
+            txn_hashes.insert(params.txn_id.into());
             delete_params.push(params);
         }
     }

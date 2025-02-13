@@ -2,7 +2,7 @@
 INSERT INTO cip36_registration_invalid (
     stake_address,
     slot_no,
-    txn,
+    txn_index,
     vote_key,
     payment_address,
     is_payable,
@@ -14,7 +14,7 @@ INSERT INTO cip36_registration_invalid (
 ) VALUES (
     :stake_address,
     :slot_no,
-    :txn,
+    :txn_index,
     :vote_key,
     :payment_address,
     :is_payable,

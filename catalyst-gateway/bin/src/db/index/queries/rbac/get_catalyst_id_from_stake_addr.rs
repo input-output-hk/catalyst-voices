@@ -33,7 +33,7 @@ pub(crate) struct Query {
     /// Slot Number the stake address was registered in.
     pub slot_no: DbSlot,
     /// Transaction Offset the stake address was registered in.
-    pub txn: DbTxnIndex,
+    pub txn_index: DbTxnIndex,
     /// Catalyst ID for the queries stake address.
     pub catalyst_id: DbCatalystId,
 }

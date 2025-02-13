@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::DbTxnOutputOffset,
+        types::{DbTransactionHash, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -24,11 +24,11 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXO Assets by TXN Hash purge queries.
 
-    use crate::db::types::DbTxnOutputOffset;
+    use crate::db::types::{DbTransactionHash, DbTxnOutputOffset};
 
     /// Primary Key Row
     pub(crate) type PrimaryKey = (
-        Vec<u8>,
+        DbTransactionHash,
         DbTxnOutputOffset,
         Vec<u8>,
         Vec<u8>,
@@ -43,7 +43,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_unstaked_txo_assets_by_txn_ha
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// 32 byte hash of this transaction.
-    pub(crate) txn_hash: Vec<u8>,
+    pub(crate) txn_id: DbTransactionHash,
     /// Offset in the txo list of the transaction the txo is in.
     pub(crate) txo: DbTxnOutputOffset,
     /// Asset Policy Hash - Binary 28 bytes.
@@ -55,7 +55,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("txn_hash", &self.txn_hash)
+            .field("txn_id", &self.txn_id)
             .field("txo", &self.txo)
             .field("policy_id", &self.policy_id)
             .field("asset_name", &self.asset_name)
@@ -66,7 +66,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            txn_hash: value.0,
+            txn_id: value.0,
             txo: value.1,
             policy_id: value.2,
             asset_name: value.3,

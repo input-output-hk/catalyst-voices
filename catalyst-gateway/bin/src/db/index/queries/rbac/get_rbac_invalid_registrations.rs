@@ -31,11 +31,11 @@ pub(crate) struct QueryParams {
 #[derive(DeserializeRow)]
 pub(crate) struct Query {
     /// Registration transaction id.
-    pub transaction_id: Vec<u8>,
+    pub txn_id: Vec<u8>,
     /// A block slot number.
     pub slot_no: DbSlot,
     /// A transaction index.
-    pub txn: DbTxnIndex,
+    pub txn_index: DbTxnIndex,
     /// A previous  transaction id.
     pub prv_txn_id: Option<DbTransactionHash>,
     /// A registration purpose.

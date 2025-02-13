@@ -43,7 +43,7 @@ pub(crate) struct Params {
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: DbTxnIndex,
+    pub(crate) txn_index: DbTxnIndex,
     /// True if registration is valid.
     pub(crate) valid: bool,
 }
@@ -54,7 +54,7 @@ impl Debug for Params {
             .field("vote_key", &self.vote_key)
             .field("stake_address", &self.stake_address)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("valid", &self.valid)
             .finish()
     }
@@ -66,7 +66,7 @@ impl From<result::PrimaryKey> for Params {
             vote_key: value.0,
             stake_address: value.1,
             slot_no: value.2,
-            txn: value.3,
+            txn_index: value.3,
             valid: value.4,
         }
     }

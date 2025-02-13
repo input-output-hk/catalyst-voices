@@ -21,13 +21,13 @@ const INSERT_UNSTAKED_TXO_QUERY: &str = include_str!("./cql/insert_unstaked_txo.
 #[derive(SerializeRow, Debug)]
 pub(crate) struct Params {
     /// Transactions hash.
-    txn_hash: DbTransactionHash,
+    txn_id: DbTransactionHash,
     /// Transaction Output Offset inside the transaction.
     txo: DbTxnOutputOffset,
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Actual full TXO Address
     address: String,
     /// Actual TXO Value in lovelace
@@ -37,14 +37,14 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        txn_hash: TransactionHash, txo: TxnOutputOffset, slot_no: Slot, txn: TxnIndex,
+        txn_id: TransactionHash, txo: TxnOutputOffset, slot_no: Slot, txn_index: TxnIndex,
         address: &str, value: u64,
     ) -> Self {
         Self {
-            txn_hash: txn_hash.into(),
+            txn_id: txn_id.into(),
             txo: txo.into(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             address: address.to_string(),
             value: value.into(),
         }

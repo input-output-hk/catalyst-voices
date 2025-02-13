@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS stake_registration (
     -- Primary Key Data
     stake_hash      blob,     -- 28 Bytes Stake Key Hash.
     slot_no         bigint,   -- slot number when the key_was_registered/re-registered.
-    txn             smallint, -- Index of the TX which holds the registration data.
+    txn_index       smallint, -- Index of the TX which holds the registration data.
 
     -- Non-Key Data
     stake_address   blob,     -- 32 Bytes Stake address - not present for scripts and may not be present for `register`.
@@ -16,5 +16,5 @@ CREATE TABLE IF NOT EXISTS stake_registration (
     pool_delegation blob,     -- Stake was delegated to this Pool address. 
                               -- Not present if delegation did not change.
 
-    PRIMARY KEY (stake_hash, script, slot_no, txn)
+    PRIMARY KEY (stake_hash, script, slot_no, txn_index)
 );

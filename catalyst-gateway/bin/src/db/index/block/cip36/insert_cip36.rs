@@ -27,7 +27,7 @@ pub(crate) struct Params {
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
@@ -50,7 +50,7 @@ impl Debug for Params {
             .field("stake_address", &self.stake_address)
             .field("nonce", &self.nonce)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("vote_key", &self.vote_key)
             .field("payment_address", &payment_address)
             .field("is_payable", &self.is_payable)
@@ -62,7 +62,7 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new Insert Query.
-    pub fn new(vote_key: &VotingPubKey, slot_no: Slot, txn: TxnIndex, cip36: &Cip36) -> Self {
+    pub fn new(vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36) -> Self {
         let stake_address = cip36
             .stake_pk()
             .map_or_else(Vec::new, |s| s.to_bytes().to_vec());
@@ -78,7 +78,7 @@ impl Params {
             stake_address,
             nonce: cip36.nonce().unwrap_or_default().into(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             vote_key,
             payment_address,
             is_payable: cip36.is_payable().unwrap_or_default(),

@@ -21,7 +21,7 @@ use crate::{
 #[derive(SerializeRow, Debug)]
 pub(crate) struct TxiInsertParams {
     /// Spent Transactions Hash
-    txn_hash: Vec<u8>,
+    txn_id: Vec<u8>,
     /// TXO Index spent.
     txo: i16,
     /// Block Slot Number when spend occurred.
@@ -32,7 +32,7 @@ impl TxiInsertParams {
     /// Create a new record for this transaction.
     pub fn new(txn_hash: &[u8], txo: i16, slot: Slot) -> Self {
         Self {
-            txn_hash: txn_hash.to_vec(),
+            txn_id: txn_hash.to_vec(),
             txo,
             slot_no: slot.into(),
         }

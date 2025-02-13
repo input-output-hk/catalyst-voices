@@ -3,11 +3,11 @@ CREATE TABLE IF NOT EXISTS catalyst_id_for_stake_addr (
     -- Primary Key Data
     stake_addr          blob,       -- 29 Byte Stake Address (CIP19)
     slot_no             bigint,     -- Slot number when the key_was_registered. (u64)
-    txn                 smallint,   -- Index of the TX which holds the registration data. (i16)
+    txn_index           smallint,   -- Index of the TX which holds the registration data. (i16)
 
     -- Non-Key Data
     catalyst_id         text,       -- Catalyst Short ID
 
-    PRIMARY KEY (stake_addr, slot_no, txn)
+    PRIMARY KEY (stake_addr, slot_no, txn_index)
 )
-WITH CLUSTERING ORDER BY (slot_no DESC, txn DESC);
+WITH CLUSTERING ORDER BY (slot_no DESC, txn_index DESC);

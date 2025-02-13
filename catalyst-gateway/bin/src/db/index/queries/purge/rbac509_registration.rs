@@ -39,11 +39,11 @@ pub(crate) struct Params {
     /// A short Catalyst ID.
     pub catalyst_id: DbCatalystId,
     /// A transaction ID.
-    pub transaction_id: DbTransactionHash,
+    pub txn_id: DbTransactionHash,
     /// Block Slot Number
     pub slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub txn: DbTxnIndex,
+    pub txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
@@ -51,8 +51,8 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("catalyst_id", &self.catalyst_id)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
-            .field("transaction_id", &self.transaction_id)
+            .field("txn_index", &self.txn_index)
+            .field("transaction_id", &self.txn_id)
             .finish()
     }
 }
@@ -62,8 +62,8 @@ impl From<result::PrimaryKey> for Params {
         Self {
             catalyst_id: value.0,
             slot_no: value.1,
-            txn: value.2,
-            transaction_id: value.3,
+            txn_index: value.2,
+            txn_id: value.3,
         }
     }
 }

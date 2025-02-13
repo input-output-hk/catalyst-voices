@@ -26,7 +26,7 @@ pub(crate) struct Params {
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
     txo: DbTxnOutputOffset,
     /// Policy hash of the asset
@@ -44,13 +44,13 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
-        stake_address: &[u8], slot_no: Slot, txn: TxnIndex, txo: TxnOutputOffset, policy_id: &[u8],
-        asset_name: &[u8], value: i128,
+        stake_address: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
+        policy_id: &[u8], asset_name: &[u8], value: i128,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
             slot_no: slot_no.into(),
-            txn: txn.into(),
+            txn_index: txn_index.into(),
             txo: txo.into(),
             policy_id: policy_id.to_vec(),
             asset_name: asset_name.to_vec(),

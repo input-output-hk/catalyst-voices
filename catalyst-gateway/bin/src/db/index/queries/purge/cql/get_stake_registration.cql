@@ -3,5 +3,5 @@ SELECT
     stake_hash,
     script,
     slot_no,
-    txn
+    txn_index
 FROM stake_registration

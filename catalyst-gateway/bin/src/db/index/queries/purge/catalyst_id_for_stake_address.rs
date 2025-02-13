@@ -41,7 +41,7 @@ pub(crate) struct Params {
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: DbTxnIndex,
+    pub(crate) txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
@@ -49,7 +49,7 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("stake_addr", &hex::encode(&self.stake_addr))
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .finish()
     }
 }
@@ -59,7 +59,7 @@ impl From<result::PrimaryKey> for Params {
         Self {
             stake_addr: value.0,
             slot_no: value.1,
-            txn: value.2,
+            txn_index: value.2,
         }
     }
 }
