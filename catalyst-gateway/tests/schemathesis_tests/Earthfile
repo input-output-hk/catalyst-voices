@@ -1,10 +1,15 @@
 VERSION 0.8
 
+# schemathesis image that targets only versioned endpoints
 package-schemathesis:
     FROM python:3.12-alpine3.20
     ARG api_spec
+    ARG wait_for_schema
+    ARG max_response_time
+    ARG hypothesis_max_examples
     ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
     ARG version=3.39.8
+    ARG tag="latest"
 
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
@@ -14,7 +19,7 @@ package-schemathesis:
     VOLUME /results
 
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                && st run \
+                && st run --checks=all $api_spec \
                     # remove these includes when endpoints will be not "draft"
                     --include-operation-id 'putDocument' \
                     --include-operation-id 'getDocument' \
@@ -25,11 +30,10 @@ package-schemathesis:
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
                     --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
-                    --checks=all $api_spec \
                     --workers=2 \
-                    --wait-for-schema=500 \
-                    --max-response-time=5000 \
-                    --hypothesis-max-examples=1000 \
+                    --wait-for-schema=$wait_for_schema \
+                    --max-response-time=$max_response_time \
+                    --hypothesis-max-examples=$hypothesis_max_examples \
                     --data-generation-method=all \
                     --exclude-deprecated \
                     --force-schema-version=30 \
@@ -39,20 +43,60 @@ package-schemathesis:
                     --cassette-path=/results/cassette.yaml \
                     $seed
 
-    ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
-# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
-test-fuzzer-api:
+# schemathesis image that targets all the endpoints in the schema
+nightly-package-draft-schemathesis:
+    FROM python:3.12-alpine3.20
+    ARG api_spec
+    ARG wait_for_schema
+    ARG max_response_time
+    ARG hypothesis_max_examples
+    ARG seed # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
+    ARG version=3.39.8
+    ARG tag="draft-latest"
+
+    RUN apk add --no-cache gcc musl-dev
+    RUN python -m pip install schemathesis==$version
+    RUN mkdir /results
+    COPY ./hooks/hooks.py .
+    VOLUME /results
+
+    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
+                && st run --checks=all $api_spec \
+                    --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
+                    --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
+                    --workers=2 \
+                    --wait-for-schema=$wait_for_schema \
+                    --max-response-time=$max_response_time \
+                    --hypothesis-max-examples=$hypothesis_max_examples \
+                    --data-generation-method=all \
+                    --exclude-deprecated \
+                    --force-schema-version=30 \
+                    --show-trace \
+                    --force-color  \
+                    --junit-xml=/results/junit-report.xml \
+                    --cassette-path=/results/cassette.yaml \
+                    $seed
+
+    SAVE IMAGE schemathesis:$tag
+
+# test-ci-schemathesis - Runs schemathesis in CI only on versioned endpoints
+test-ci-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG wait_for_schema=500
+    ARG max_response_time=5000
+    ARG hypothesis_max_examples=1000
     ARG seed
 
     COPY ./../+docker-compose/docker-compose.yml .
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
+        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed \
+                                    --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
+                                    --hypothesis_max_examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
         --service cat-gateway-with-scylla \
@@ -70,54 +114,29 @@ test-fuzzer-api:
             exit 1
     END
 
-nightly-package-schemathesis:
+
+# nightly-test-draft-schemathesis - Runs schemathesis on nightly testing all the endpoints in the api doc
+nightly-test-draft-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
-    ARG api_spec
-    # optional argument that can be used to pass a --hypothesis-seed to replicate specific test failures
-    ARG seed
-    ARG version=3.39.8
-
-    RUN apk add --no-cache gcc musl-dev
-    RUN python -m pip install schemathesis==$version
-    RUN mkdir /results
-    COPY ./hooks/hooks.py .
-    VOLUME /results
-    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
-                && st run \
-                    --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
-                    --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
-                    --checks=all $api_spec \
-                    --workers=2 \
-                    --wait-for-schema=120 \
-                    --max-response-time=300 \
-                    --hypothesis-max-examples=1000 \
-                    --data-generation-method=all \
-                    --exclude-deprecated \
-                    --force-schema-version=30 \
-                    --show-trace \
-                    --force-color  \
-                    --junit-xml=/results/junit-report.xml \
-                    --cassette-path=/results/cassette.yaml \
-                    $seed
-
-    ARG tag="latest"
-    SAVE IMAGE schemathesis:$tag
-
-# nightly-test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
-nightly-test-fuzzer-api:
-    FROM debian:bookworm-slim
+    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
+    ARG wait_for_schema=120
+    ARG max_response_time=300
+    ARG hypothesis_max_examples=1000
     ARG seed
 
     COPY ./../+docker-compose/docker-compose.yml .
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
+        --load schemathesis:latest=(+nightly-package-draft-schemathesis --api_spec=$api_spec --seed=$seed \
+                                    --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
+                                    --hypothesis_max_examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
         --service cat-gateway-with-scylla \
         --allow-privileged
+        # --no-cache is only for running in nightly - DO NOT use this in CI
         RUN --no-cache sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
@@ -131,5 +150,35 @@ nightly-test-fuzzer-api:
     END
     IF [ -f fail ]
         RUN --no-cache echo "Nightly schemathesis test failed. Check the logs for more details" && \
+            exit 1
+    END
+
+# nightly-test-dev-schemathesis - Runs schemathesis on nightly testing the versioned endpoints on dev envrionment
+nightly-test-dev-schemathesis:
+    FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
+    RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
+    COPY schemathesis-docker-compose.yml .
+    LET api_spec="https://gateway.dev.projectcatalyst.io/docs/cat-gateway.json"
+    ARG wait_for_schema=15
+    ARG max_response_time=300
+    ARG hypothesis_max_examples=1000
+    ARG seed
+
+    WITH DOCKER \
+        --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed \
+                                    --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
+                                    --hypothesis_max_examples=$hypothesis_max_examples) \
+                                    --allow-privileged
+        # --no-cache is only for running in nightly - DO NOT use this in CI
+        RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+            docker cp st:/results/junit-report.xml junit-report.xml && \
+            docker cp st:/results/cassette.yaml cassette.yaml
+    END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly-dev.junit-report.xml
+        SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
+    END
+    IF [ -f fail ]
+        RUN --no-cache echo "Nightly dev schemathesis test failed. Check the logs for more details" && \
             exit 1
     END
