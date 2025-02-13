@@ -2,7 +2,8 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::Slot;
+use cardano_blockchain_types::{Slot, TransactionHash};
+use catalyst_types::hashes::Blake2b256Hash;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -12,7 +13,7 @@ use crate::{
             queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
-        types::DbSlot,
+        types::{DbSlot, DbTransactionHash},
     },
     settings::cassandra_db,
 };
@@ -21,7 +22,7 @@ use crate::{
 #[derive(SerializeRow, Debug)]
 pub(crate) struct TxiInsertParams {
     /// Spent Transactions Hash
-    txn_id: Vec<u8>,
+    txn_id: DbTransactionHash,
     /// TXO Index spent.
     txo: i16,
     /// Block Slot Number when spend occurred.
@@ -30,9 +31,9 @@ pub(crate) struct TxiInsertParams {
 
 impl TxiInsertParams {
     /// Create a new record for this transaction.
-    pub fn new(txn_hash: &[u8], txo: i16, slot: Slot) -> Self {
+    pub fn new(txn_id: TransactionHash, txo: i16, slot: Slot) -> Self {
         Self {
-            txn_id: txn_hash.to_vec(),
+            txn_id: txn_id.into(),
             txo,
             slot_no: slot.into(),
         }
@@ -77,11 +78,11 @@ impl TxiInsertQuery {
     pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: Slot) {
         // Index the TXI's.
         for txi in txs.inputs() {
-            let txn_hash = txi.hash().to_vec();
+            let txn_id = Blake2b256Hash::from(txi.hash().clone()).into();
             let txo: i16 = txi.index().try_into().unwrap_or(i16::MAX);
 
             self.txi_data
-                .push(TxiInsertParams::new(&txn_hash, txo, slot_no));
+                .push(TxiInsertParams::new(txn_id, txo, slot_no));
         }
     }
 
