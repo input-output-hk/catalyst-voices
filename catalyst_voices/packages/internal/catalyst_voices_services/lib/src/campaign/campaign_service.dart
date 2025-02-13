@@ -12,6 +12,9 @@ abstract interface class CampaignService {
   Future<Campaign> getCampaign({
     required String id,
   });
+
+  // TODO(LynxLynxx): return correct modely type
+  Future<List<dynamic>> getCampaignCategories();
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -39,5 +42,10 @@ final class CampaignServiceImpl implements CampaignService {
     final campaign = campaignBase.toCampaign();
 
     return campaign;
+  }
+
+  @override
+  Future<List<dynamic>> getCampaignCategories() async {
+    return <dynamic>[];
   }
 }

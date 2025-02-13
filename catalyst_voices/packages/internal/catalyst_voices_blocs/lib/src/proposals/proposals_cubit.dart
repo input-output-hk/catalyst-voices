@@ -137,4 +137,23 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
     emit(state.copyWith(favoritesIds: favoritesList));
   }
+
+  Future<void> getCampaignCategories() async {
+    await _campaignService.getCampaignCategories();
+    final categories = List.generate(
+      6,
+      (index) => CampaignCategoryViewModel.dummy(id: '$index'),
+    );
+
+    emit(state.copyWith(categories: categories));
+  }
+
+  void changeSelectedCategory(String? categoryId) {
+    emit(
+      state.copyWith(
+        clearSelectedCategory: categoryId == null,
+        selectedCategoryId: categoryId,
+      ),
+    );
+  }
 }
