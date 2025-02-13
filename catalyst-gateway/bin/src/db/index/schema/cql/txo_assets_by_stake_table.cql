@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
     -- Primary Key Fields
     stake_address   blob,     -- stake address hash (28 bytes stake address hash, zero length if not staked.)
-    slot_no         bigint,   -- slot number the txo was created in.
+    slot_no         varint,   -- slot number the txo was created in.
     txn_index       smallint, -- Which Transaction in the Slot is the TXO.
     txo             smallint, -- offset in the txo list of the transaction the txo is in.
     policy_id       blob,     -- asset policy hash (id) (28 byte binary hash)

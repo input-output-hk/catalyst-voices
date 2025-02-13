@@ -23,6 +23,12 @@ impl From<DbTxnOutputOffset> for TxnOutputOffset {
     }
 }
 
+impl From<DbTxnOutputOffset> for i16 {
+    fn from(value: DbTxnOutputOffset) -> Self {
+        value.0
+    }
+}
+
 impl SerializeValue for DbTxnOutputOffset {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,

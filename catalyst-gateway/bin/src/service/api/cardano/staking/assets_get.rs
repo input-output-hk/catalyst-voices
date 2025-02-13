@@ -163,7 +163,7 @@ async fn get_txo_by_txn(
             value: row.value,
             txn_hash: row.txn_hash,
             txn: row.txn_index.into(),
-            txo: row.txo,
+            txo: row.txo.into(),
             slot_no: row.slot_no.into(),
             spent_slot_no: None,
             assets: HashMap::new(),

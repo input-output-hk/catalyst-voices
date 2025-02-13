@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS stake_registration (
     -- Primary Key Data
     stake_hash      blob,     -- 28 Bytes Stake Key Hash.
-    slot_no         bigint,   -- slot number when the key_was_registered/re-registered.
+    slot_no         varint,   -- slot number when the key_was_registered/re-registered.
     txn_index       smallint, -- Index of the TX which holds the registration data.
 
     -- Non-Key Data

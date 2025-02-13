@@ -12,7 +12,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbSlot, DbTxnIndex},
+    types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
 };
 
 /// Get assets by stake address query string.
@@ -44,7 +44,7 @@ pub(crate) struct GetAssetsByStakeAddressQuery {
     /// TXO transaction index within the slot.
     pub txn: DbTxnIndex,
     /// TXO index.
-    pub txo: i16,
+    pub txo: DbTxnOutputOffset,
     /// TXO transaction slot number.
     pub slot_no: DbSlot,
     /// Asset hash.

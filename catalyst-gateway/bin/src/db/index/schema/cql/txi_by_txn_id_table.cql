@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS txi_by_txn_id (
     txo             smallint, -- Index of the TXO which was spent
 
     -- Non key data, we can only spend a transaction hash/txo once, so this should be unique in any event.
-    slot_no         bigint,   -- slot number when the spend occurred.
+    slot_no         varint,   -- slot number when the spend occurred.
 
     PRIMARY KEY (txn_id, txo)
 );

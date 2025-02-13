@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS unstaked_txo_assets_by_txn_id (
     asset_name      blob,     -- name of the policy (UTF8) (32 bytes)
 
     -- Secondary Location information for the transaction.
-    slot_no         bigint,     -- slot number the txo was created in.
+    slot_no         varint,     -- slot number the txo was created in.
     txn_index       smallint,   -- Which Transaction in the Slot is the TXO.
 
     -- Value of the asset.
