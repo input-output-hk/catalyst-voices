@@ -23,7 +23,7 @@ def test_signed_doc():
     assert resp.status_code == 200, f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document.post(url=f"{URL}/index", filter={"id": {"eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e"}})
+    resp = document.post(url="/index", filter={"id": {"eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e"}})
     assert resp.status_code == 200, f"Failed to post document: {resp.status_code} - {resp.text}"
 
     # Put a signed document with same ID different content

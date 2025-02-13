@@ -1,10 +1,8 @@
 from loguru import logger
 import pytest
 
-from api_tests import (
-    sync_to,
-    get_date_time_to_slot_number,
-)
+
+from utils import sync
 from utils import health
 from datetime import datetime, timezone
 
@@ -18,7 +16,7 @@ def test_date_time_to_slot_number_endpoint():
 
     # block hash `65b13e1227c36a3327fb1333ae801d15c50c7f5af66919d467befce8d67a4284`
     # 60 second timeout (3 block times iof syncing from tip)
-    sync_to(network=network, slot_num=slot_num, timeout=60)
+    sync.sync_to(network=network, slot_num=slot_num, timeout=60)
 
     date_time = datetime(
         year=2022, month=12, day=22, hour=7, minute=13, second=26, tzinfo=timezone.utc
