@@ -16,6 +16,9 @@ test:
 
     COPY ./../+docker-compose/docker-compose.yml .
 
+    ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+    ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
+
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(./../../event-db+build) \
