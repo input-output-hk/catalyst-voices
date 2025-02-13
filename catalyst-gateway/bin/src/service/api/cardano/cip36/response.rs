@@ -65,22 +65,20 @@ pub(crate) struct Cip36RegistrationsForVotingPublicKey {
     /// Voting Public Key
     pub vote_pub_key: common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
     /// List of Registrations associated with this Voting Key
-    #[oai(validator(max_items = "100"))]
-    pub registrations: Vec<Cip36Details>,
+    pub registrations: common::types::cardano::registration_list::RegistrationCip36List,
 }
 
 impl Example for Cip36RegistrationsForVotingPublicKey {
     fn example() -> Self {
-        Cip36RegistrationsForVotingPublicKey {
-            vote_pub_key:
-                common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
-            registrations: vec![Cip36Details::example()],
+        Self {
+            vote_pub_key: Example::example(),
+            registrations: Example::example(),
         }
     }
 }
 
 /// CIP36 Registration Data as found on-chain.
-#[derive(Object, Clone)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct Cip36Details {
     /// Blocks Slot Number that the registration certificate is in.
@@ -130,8 +128,8 @@ impl Example for Cip36Details {
             payment_address: Some(
                 common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
             ),
-            is_payable: common::types::cardano::boolean::IsPayable::example(),
-            cip15: common::types::cardano::boolean::IsCip15::example(),
+            is_payable: Example::example(),
+            cip15: Example::example(),
             errors: common::types::generic::error_list::ErrorList::default(),
         }
     }
@@ -151,9 +149,9 @@ impl Cip36Details {
             nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
             txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: None,
-            is_payable: common::types::cardano::boolean::IsPayable::example(),
-            cip15: common::types::cardano::boolean::IsCip15::example(),
-            errors: common::types::generic::error_list::ErrorList::example(),
+            is_payable: Example::example(),
+            cip15: Example::example(),
+            errors: Example::example(),
         }
     }
 }

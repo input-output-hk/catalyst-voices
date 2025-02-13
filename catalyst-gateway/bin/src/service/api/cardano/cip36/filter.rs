@@ -153,7 +153,7 @@ pub async fn get_registration_from_stake_addr(
             slot: slot_no,
             voting_key: vec![Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key,
-                registrations: vec![registration.clone()],
+                registrations: vec![registration.clone()].into(),
             }],
             invalid: invalids_report,
             page: None,
@@ -386,13 +386,13 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
 
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key: vote_pub_key.clone(),
-                registrations: filtered_registrations,
+                registrations: filtered_registrations.into(),
             });
         } else {
             // No slot filtering, return ALL registrations without constraints.
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key: vote_pub_key.clone(),
-                registrations: registrations_for_given_stake_pub_key,
+                registrations: registrations_for_given_stake_pub_key.into(),
             });
         }
 

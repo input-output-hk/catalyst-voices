@@ -1,8 +1,8 @@
 //! Implement newtype of `ErrorList`
 
 use poem_openapi::{
-    registry::{MetaSchema, MetaSchemaRef},
-    types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
+    registry::MetaSchema,
+    types::{Example, ToJSON},
 };
 
 use super::error_msg::ErrorMessage;

@@ -6,27 +6,27 @@
 ///
 /// * `$ty` - The Type name to create. Example `MyNewType`.
 /// * `$type_name` - The `OpenAPI` name for the type. Almost always going to be `string`.
-/// * `$item_type` - The Type name of the item inside this Type.
+/// * `$item_ty` - The Type name of the item inside this Type.
 /// * `$schema` - A Poem `MetaSchema` which defines all the schema parameters for the
 ///   type.
 /// * `$validation` - *OPTIONAL* Validation function to apply to the string value.
 macro_rules! impl_array_types {
-    ($(#[$docs:meta])* $ty:ident, $item_type:ident, $schema:expr) => {
-        impl_array_types!($(#[$docs])* $ty, $item_type, $schema, |_| true);
+    ($(#[$docs:meta])* $ty:ident, $item_ty:ident, $schema:expr) => {
+        impl_array_types!($(#[$docs])* $ty, $item_ty, $schema, |_| true);
     };
 
-    ($(#[$docs:meta])* $ty:ident, $item_type:ident, $schema:expr, $validator:expr) => {
+    ($(#[$docs:meta])* $ty:ident, $item_ty:ident, $schema:expr, $validator:expr) => {
         $(#[$docs])*
         #[derive(Debug, Default, Clone)]
-        pub(crate) struct $ty(Vec<$item_type>);
+        pub(crate) struct $ty(Vec<$item_ty>);
 
-        impl From<Vec<$item_type>> for $ty {
-            fn from(value: Vec<ErrorMessage>) -> Self {
+        impl From<Vec<$item_ty>> for $ty {
+            fn from(value: Vec<$item_ty>) -> Self {
                 Self(value)
             }
         }
 
-        impl Type for $ty {
+        impl poem_openapi::types::Type for $ty {
             const IS_REQUIRED: bool = true;
 
             type RawValueType = Self;
@@ -37,8 +37,8 @@ macro_rules! impl_array_types {
                 format!("{}", stringify!($ty)).into()
             }
 
-            fn schema_ref() -> MetaSchemaRef {
-                let schema_ref = MetaSchemaRef::Inline(Box::new(MetaSchema::new("array")));
+            fn schema_ref() -> poem_openapi::registry::MetaSchemaRef {
+                let schema_ref = poem_openapi::registry::MetaSchemaRef::Inline(Box::new(poem_openapi::registry::MetaSchema::new("array")));
                 if let Some(schema) = $schema {
                     schema_ref.merge(schema)
                 } else {
@@ -62,20 +62,20 @@ macro_rules! impl_array_types {
             }
         }
 
-        impl ParseFromJSON for $ty {
-            fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
+        impl poem_openapi::types::ParseFromJSON for $ty {
+            fn parse_from_json(value: Option<serde_json::Value>) -> poem_openapi::types::ParseResult<Self> {
                 Ok(Self(
-                    Vec::parse_from_json(value).map_err(|e| ParseError::custom(e.into_message()))?,
+                    Vec::parse_from_json(value).map_err(|e| poem_openapi::types::ParseError::custom(e.into_message()))?,
                 ))
             }
         }
 
-        impl ToJSON for $ty {
+        impl poem_openapi::types::ToJSON for $ty {
             fn to_json(&self) -> Option<serde_json::Value> {
                 Some(serde_json::Value::Array(
                     self.0
                         .iter()
-                        .map(ToJSON::to_json)
+                        .map(poem_openapi::types::ToJSON::to_json)
                         .filter_map(|v| v)
                         .collect(),
                 ))

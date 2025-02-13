@@ -4,7 +4,7 @@ use derive_more::{From, Into};
 use poem_openapi::{types::Example, NewType};
 
 /// Payable indicator
-#[derive(NewType, Clone, From, Into)]
+#[derive(NewType, Debug, Clone, From, Into)]
 #[oai(example = true)]
 pub(crate) struct IsPayable(bool);
 
@@ -22,7 +22,7 @@ impl Example for IsPayable {
 }
 
 /// CIP-15 Indicator
-#[derive(NewType, Clone, From, Into)]
+#[derive(NewType, Debug, Clone, From, Into)]
 #[oai(example = true)]
 pub(crate) struct IsCip15(bool);
 

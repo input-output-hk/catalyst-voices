@@ -12,7 +12,7 @@ use poem_openapi::{
 use crate::service::utilities::as_hex_string;
 
 /// Cardano Blake2b256 hash encoded in hex.
-#[derive(Debug, From)]
+#[derive(Debug, Clone, From)]
 pub(crate) struct Hash256(Vec<u8>);
 
 impl Hash256 {
@@ -117,7 +117,7 @@ impl fmt::Display for Hash256 {
 }
 
 /// Cardano Blake2b128 hash encoded in hex.
-#[derive(Debug, From)]
+#[derive(Debug, Clone, From)]
 pub(crate) struct Hash128(Vec<u8>);
 
 impl Hash128 {

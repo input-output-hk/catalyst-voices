@@ -1,7 +1,11 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 use anyhow::anyhow;
 use futures::StreamExt;
-use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
+use poem_openapi::{
+    payload::Json,
+    types::{Example, ToJSON, Type},
+    ApiResponse, Object,
+};
 use tracing::error;
 
 use crate::{
@@ -12,26 +16,71 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
-        objects::cardano::hash::Hash256, responses::WithErrorResponses,
-        types::headers::retry_after::RetryAfterOption,
+        objects::cardano::hash::Hash256,
+        responses::WithErrorResponses,
+        types::{array_types::impl_array_types, headers::retry_after::RetryAfterOption},
     },
 };
 
 /// GET RBAC registrations by chain root response list item.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct RbacRegistration {
     /// Registration transaction hash.
     tx_hash: Hash256,
 }
 
+impl RbacRegistration {
+    fn schema() -> poem_openapi::registry::MetaSchema {
+        let mut schema = poem_openapi::registry::MetaSchema::new("object");
+        schema.required = vec!["tx_hash"];
+        schema.properties = vec![("tx_hash", Hash256::schema_ref())];
+        schema
+    }
+}
+
+impl Example for RbacRegistration {
+    fn example() -> Self {
+        Self {
+            tx_hash: Example::example(),
+        }
+    }
+}
+
+// List of RBAC Registrations
+impl_array_types!(
+    RegistrationRbacList,
+    RbacRegistration,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100000),
+        items: Some(Box::new(poem_openapi::registry::MetaSchemaRef::Inline(
+            Box::new(RbacRegistration::schema())
+        ))),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for RegistrationRbacList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
+    }
+}
+
 /// GET RBAC registrations by chain root response.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct RbacRegistrationsResponse {
     /// Registrations by RBAC chain root.
-    #[oai(validator(max_items = "100000"))]
-    registrations: Vec<RbacRegistration>,
+    registrations: RegistrationRbacList,
+}
+
+impl Example for RbacRegistrationsResponse {
+    fn example() -> Self {
+        Self {
+            registrations: Example::example(),
+        }
+    }
 }
 
 /// Endpoint responses.
@@ -99,21 +148,8 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
         registrations.push(item);
     }
 
-    Responses::Ok(Json(RbacRegistrationsResponse { registrations })).into()
-}
-
-impl Example for RbacRegistration {
-    fn example() -> Self {
-        Self {
-            tx_hash: Hash256::example(),
-        }
-    }
-}
-
-impl Example for RbacRegistrationsResponse {
-    fn example() -> Self {
-        Self {
-            registrations: vec![RbacRegistration::example()],
-        }
-    }
+    Responses::Ok(Json(RbacRegistrationsResponse {
+        registrations: registrations.into(),
+    }))
+    .into()
 }
