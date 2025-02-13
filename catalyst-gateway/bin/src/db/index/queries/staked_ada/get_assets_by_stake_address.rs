@@ -42,7 +42,7 @@ impl GetAssetsByStakeAddressParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetAssetsByStakeAddressQuery {
     /// TXO transaction index within the slot.
-    pub txn: DbTxnIndex,
+    pub txn_index: DbTxnIndex,
     /// TXO index.
     pub txo: DbTxnOutputOffset,
     /// TXO transaction slot number.

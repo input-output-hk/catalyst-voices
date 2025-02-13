@@ -1,4 +1,4 @@
-SELECT stake_address,
+SELECT stake_public_key,
        nonce,
        slot_no,
        txn_index,
@@ -7,4 +7,4 @@ SELECT stake_address,
        is_payable,
        cip36
 FROM   cip36_registration
-WHERE  stake_address = :stake_address
+WHERE  stake_public_key = :stake_public_key

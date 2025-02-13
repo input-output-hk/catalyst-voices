@@ -37,7 +37,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_txo_by_stake_address.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_address: Vec<u8>,
+    pub(crate) stake_key_hash: Vec<u8>,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -49,7 +49,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_key_hash", &self.stake_key_hash)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("txo", &self.txo)
@@ -60,7 +60,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_address: value.0,
+            stake_key_hash: value.0,
             slot_no: value.1,
             txn_index: value.2,
             txo: value.3,

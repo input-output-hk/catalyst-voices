@@ -39,7 +39,7 @@ pub(crate) struct Params {
     /// Vote key - Binary 28 bytes.
     pub(crate) vote_key: Vec<u8>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub(crate) stake_address: Vec<u8>,
+    pub(crate) stake_public_key: Vec<u8>,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -52,7 +52,7 @@ impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("vote_key", &self.vote_key)
-            .field("stake_address", &self.stake_address)
+            .field("stake_public_key", &self.stake_public_key)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("valid", &self.valid)
@@ -64,7 +64,7 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             vote_key: value.0,
-            stake_address: value.1,
+            stake_public_key: value.1,
             slot_no: value.2,
             txn_index: value.3,
             valid: value.4,

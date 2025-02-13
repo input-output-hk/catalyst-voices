@@ -27,16 +27,16 @@ const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetInvalidRegistrationParams {
     /// Stake address.
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
     /// Block Slot Number when spend occurred.
     slot_no: DbSlot,
 }
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(stake_address: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
+    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
         Self {
-            stake_address,
+            stake_public_key,
             slot_no: u64::from(slot_no).into(),
         }
     }

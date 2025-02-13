@@ -184,7 +184,7 @@ async fn get_txo_by_txn(
     while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
 
-        let txo_info_key = (row.slot_no.clone(), row.txn, row.txo);
+        let txo_info_key = (row.slot_no.clone(), row.txn_index, row.txo);
         let Some(txo_info) = txo_map.get_mut(&txo_info_key) else {
             continue;
         };
@@ -259,7 +259,7 @@ async fn update_spent(
 
             if let Some(spent_slot) = &txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
-                    stake_address: stake_address.clone(),
+                    stake_key_hash: stake_address.clone(),
                     txn_index: txo_info.txn_index.into(),
                     txo: txo_info.txo.into(),
                     slot_no: txo_info.slot_no.clone(),

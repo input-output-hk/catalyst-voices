@@ -37,7 +37,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_cip36_registration.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub(crate) stake_address: Vec<u8>,
+    pub(crate) stake_public_key: Vec<u8>,
     /// Nonce that has been slot corrected.
     pub(crate) nonce: num_bigint::BigInt,
     /// Block Slot Number
@@ -49,7 +49,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_public_key", &self.stake_public_key)
             .field("nonce", &self.nonce)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
@@ -60,7 +60,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_address: value.0,
+            stake_public_key: value.0,
             nonce: value.1,
             slot_no: value.2,
             txn_index: value.3,

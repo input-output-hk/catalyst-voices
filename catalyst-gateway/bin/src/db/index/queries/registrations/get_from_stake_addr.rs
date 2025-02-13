@@ -24,13 +24,13 @@ const GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetRegistrationParams {
     /// Stake address.
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
 }
 
 impl From<Vec<u8>> for GetRegistrationParams {
     fn from(value: Vec<u8>) -> Self {
         GetRegistrationParams {
-            stake_address: value,
+            stake_public_key: value,
         }
     }
 }
@@ -39,7 +39,7 @@ impl From<Vec<u8>> for GetRegistrationParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetRegistrationQuery {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
     /// Nonce value after normalization.
     pub nonce: num_bigint::BigInt,
     /// Slot Number the cert is in.
