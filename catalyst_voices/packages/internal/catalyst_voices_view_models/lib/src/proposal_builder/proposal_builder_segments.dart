@@ -51,5 +51,5 @@ final class ProposalBuilderSection extends BaseSection {
   }
 
   @override
-  List<Object?> get props => super.props + [property];
+  List<Object?> get props => super.props + [property, schema];
 }
