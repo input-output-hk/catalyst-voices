@@ -76,7 +76,6 @@ final class Dependencies extends DependencyProvider {
         () => ProposalsCubit(
           get<CampaignService>(),
           get<ProposalService>(),
-          get<AdminTools>(),
         ),
       )
       ..registerFactory<CampaignDetailsBloc>(() {
