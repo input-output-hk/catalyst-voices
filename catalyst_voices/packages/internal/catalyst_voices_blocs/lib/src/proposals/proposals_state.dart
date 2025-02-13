@@ -53,6 +53,20 @@ class ProposalsState extends Equatable {
     );
   }
 
+  ProposalsState resetProposals({
+    String? selectedCategoryId,
+    bool clearSelectedCategory = false,
+  }) {
+    return ProposalsState(
+      favoritesIds: favoritesIds,
+      myProposalsIds: myProposalsIds,
+      categories: categories,
+      selectedCategoryId: clearSelectedCategory
+          ? null
+          : (selectedCategoryId ?? this.selectedCategoryId),
+    );
+  }
+
   @override
   List<Object?> get props => [
         draftProposals,

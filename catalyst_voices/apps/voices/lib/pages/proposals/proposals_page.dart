@@ -10,6 +10,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -381,9 +382,12 @@ class _ChangeCategoryButtonSelector extends StatelessWidget {
           ),
           ...dropdownItems,
         ];
+        final selectedName =
+            dropdownCategories.firstWhereOrNull((e) => e.isSelected)?.name ??
+                context.l10n.showAll;
         return (
           categories: dropdownCategories,
-          selectedName: dropdownCategories.firstWhere((e) => e.isSelected).name,
+          selectedName: selectedName,
         );
       },
       builder: (context, state) {
