@@ -24,14 +24,14 @@ const GET_TXI_BY_TXN_HASHES_QUERY: &str = include_str!("../cql/get_txi_by_txn_id
 #[derive(SerializeRow)]
 pub(crate) struct GetTxiByTxnHashesQueryParams {
     /// Transaction hashes.
-    txn_hashes: Vec<DbTransactionHash>,
+    txn_ids: Vec<DbTransactionHash>,
 }
 
 impl GetTxiByTxnHashesQueryParams {
     /// Create a new instance of [`GetTxiByTxnHashesQueryParams`]
-    pub(crate) fn new(txn_hashes: Vec<TransactionHash>) -> Self {
-        let txn_hashes = txn_hashes.into_iter().map(Into::into).collect();
-        Self { txn_hashes }
+    pub(crate) fn new(txn_ids: Vec<TransactionHash>) -> Self {
+        let txn_ids = txn_ids.into_iter().map(Into::into).collect();
+        Self { txn_ids }
     }
 }
 

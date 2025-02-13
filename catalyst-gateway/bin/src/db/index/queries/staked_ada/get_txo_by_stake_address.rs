@@ -42,7 +42,7 @@ impl GetTxoByStakeAddressQueryParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetTxoByStakeAddressQuery {
     /// TXO transaction hash.
-    pub txn_hash: DbTransactionHash,
+    pub txn_id: DbTransactionHash,
     /// TXO transaction index within the slot.
     pub txn_index: DbTxnIndex,
     /// TXO index.

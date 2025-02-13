@@ -45,7 +45,7 @@ pub(crate) struct GetRegistrationQuery {
     /// Slot Number the cert is in.
     pub slot_no: DbSlot,
     /// Transaction Index.
-    pub txn: DbTxnIndex,
+    pub txn_index: DbTxnIndex,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

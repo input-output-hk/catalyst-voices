@@ -165,7 +165,7 @@ async fn get_txo_by_txn(
         let key = (row.slot_no.clone(), row.txn_index, row.txo);
         txo_map.insert(key, TxoInfo {
             value: row.value,
-            txn_hash: row.txn_hash.into(),
+            txn_hash: row.txn_id.into(),
             txn_index: row.txn_index.into(),
             txo: row.txo.into(),
             slot_no: row.slot_no.into(),
