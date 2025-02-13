@@ -21,7 +21,7 @@ def test_signed_doc():
     assert resp.status_code == 200, f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document.post(url="/index", filter={"id": {"eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e"}})
+    resp = document.post("/index", filter={"id": {"eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e"}})
     assert resp.status_code == 200, f"Failed to post document: {resp.status_code} - {resp.text}"
 
     # Put a signed document with same ID different content
@@ -35,7 +35,7 @@ def test_signed_doc():
     assert 201 <= resp.status_code <= 204, f"Failed to publish document: {resp.status_code} - {resp.text}"
 
     # Pagination out of range
-    resp = document.post(url="/index?page=92233720368547759",filter={"id": {"eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e"}})
+    resp = document.post("/index?page=92233720368547759",filter={"id": {"eq": "01946ea1-818a-7e0e-b6b1-6169f02ffd4e"}})
     assert resp.status_code == 412, f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
 
     logger.info("Signed document test successful.")
