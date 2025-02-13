@@ -188,7 +188,7 @@ class _EditorDecoration extends StatelessWidget {
                 ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
                 : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
             border: Border.all(
-              color: _getBorderColor(context),
+              color: _getBorderColor(context, focusNode.hasFocus),
               width: 2,
             ),
             borderRadius: BorderRadius.circular(8),
@@ -199,12 +199,12 @@ class _EditorDecoration extends StatelessWidget {
     );
   }
 
-  Color _getBorderColor(BuildContext context) {
+  Color _getBorderColor(BuildContext context, bool hasFocus) {
     if (!isEditMode) {
       return Theme.of(context).colorScheme.outlineVariant;
     } else if (isInvalid) {
       return Theme.of(context).colorScheme.error;
-    } else if (focusNode.hasFocus) {
+    } else if (hasFocus) {
       return Theme.of(context).colorScheme.primary;
     } else {
       return Theme.of(context).colorScheme.outlineVariant;
