@@ -74,8 +74,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<ProposalDocument> getProposalDocument({
     required DocumentRef ref,
-  }) {
-    return watchProposalDocument(ref: ref).first;
+  }) async {
+    // TODO(damian-molinski): remove this override once we have API
+    ref = ref.copyWith(id: mockedDocumentUuid);
+
+    final documentData = await getDocumentData(ref: ref);
+    final templateRef = documentData.metadata.template!;
+    final templateData = await getDocumentData(ref: templateRef);
+
+    return _buildProposalDocument(
+      documentData: documentData,
+      templateData: templateData,
+    );
   }
 
   @override
@@ -85,7 +95,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     // TODO(damian-molinski): remove this override once we have API
     ref = ref.copyWith(id: mockedTemplateUuid);
 
-    final documentData = await getDocumentData(ref: ref);
+    final documentData = await _documentDataLock.synchronized(
+      () => getDocumentData(ref: ref),
+    );
 
     return _buildProposalTemplate(documentData: documentData);
   }
@@ -186,12 +198,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final localStream = _localDocuments.watch(ref: ref);
 
     return StreamGroup.merge([updateStream, localStream]);
-  }
-
-  Stream<DocumentData?> _watchDraftData({
-    required DocumentRef ref,
-  }) {
-    return _drafts.watch(ref: ref);
   }
 
   @visibleForTesting
