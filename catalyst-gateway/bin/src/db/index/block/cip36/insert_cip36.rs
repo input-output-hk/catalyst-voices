@@ -69,10 +69,9 @@ impl Params {
         let vote_key = vote_key
             .voting_pk()
             .map_or_else(Vec::new, |v| v.to_bytes().to_vec());
-        let payment_address = match cip36.payment_address() {
-            Some(a) => MaybeUnset::Set(a.to_vec()),
-            None => MaybeUnset::Unset,
-        };
+        let payment_address = cip36
+            .payment_address()
+            .map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.to_vec()));
         let is_cip36 = cip36.is_cip36().unwrap_or_default();
         Params {
             stake_address,
