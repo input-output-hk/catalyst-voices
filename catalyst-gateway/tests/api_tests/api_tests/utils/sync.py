@@ -1,9 +1,8 @@
-
-
 import requests
 import time
 from loguru import logger
 import math
+from api_tests import cat_gateway_endpoint_url
 
 def get_sync_state(network: str):
     resp = requests.get(

@@ -4,7 +4,6 @@ from loguru import logger
 import asyncio
 import asyncpg
 import pytest
-
 from api_tests import EVENT_DB_TEST_URL
 from utils import health
 
@@ -37,7 +36,7 @@ def change_version(from_value: int, change_to: int):
 
     return asyncio.run(change_schema_version())
 
-@pytest.mark.skip
+@pytest.mark.skip('To be refactored when the api is ready')
 def test_schema_version_mismatch_changes_cat_gateway_behavior():
     # Check that the `live` endpoint is OK
     health.is_live()

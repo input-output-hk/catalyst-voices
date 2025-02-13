@@ -1,8 +1,6 @@
 import pytest
 from loguru import logger
-
 from utils import health
-
 from endpoints.draft import document
 
 def test_signed_doc():

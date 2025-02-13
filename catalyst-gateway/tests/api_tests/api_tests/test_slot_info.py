@@ -1,12 +1,12 @@
 from loguru import logger
 import pytest
-
-
 from utils import sync
 from utils import health
 from datetime import datetime, timezone
+import requests
+from api_tests import cat_gateway_endpoint_url
 
-@pytest.mark.skip
+@pytest.mark.skip('To be refactored when the api is ready')
 def test_date_time_to_slot_number_endpoint():
     health.is_live()
     health.is_ready()
@@ -44,3 +44,14 @@ def test_date_time_to_slot_number_endpoint():
         and res["next"]["block_hash"]
         == "0x9768fb8df7c3e336da30c82dd93dc664135f866080c773402b528288c970c5b0"
     )
+
+def get_date_time_to_slot_number(network: str, date_time: datetime):
+    # replace special characters
+    date_time = date_time.isoformat().replace(":", "%3A").replace("+", "%2B")
+    resp = requests.get(
+        cat_gateway_endpoint_url(
+            f"api/cardano/date_time_to_slot_number?network={network}&date_time={date_time}"
+        )
+    )
+    assert resp.status_code == 200
+    return resp.json()

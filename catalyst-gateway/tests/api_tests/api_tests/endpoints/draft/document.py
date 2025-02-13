@@ -29,4 +29,4 @@ def post(document_url: str, filter: dict):
         "Authorization": f"Bearer {BEARER_TOKEN}",
         "Content-Type": "application/json"
     }
-    return requests.post(URL+document_url, headers=headers, json=filter)
+    return requests.post(f"{URL}{document_url}", headers=headers, json=filter)
