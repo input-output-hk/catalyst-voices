@@ -1,7 +1,7 @@
 import requests
 from api import cat_gateway_endpoint_url, BEARER_TOKEN
 
-URL = cat_gateway_endpoint_url("api/draft/document")
+URL = cat_gateway_endpoint_url("api/v1/document")
 
 # Signed document GET
 def get(document_id: str):
