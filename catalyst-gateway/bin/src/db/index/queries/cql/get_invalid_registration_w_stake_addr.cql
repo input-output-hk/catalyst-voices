@@ -1,4 +1,4 @@
-SELECT error_report,
+SELECT problem_report,
        stake_address,
        vote_key,
        payment_address,
@@ -6,4 +6,4 @@ SELECT error_report,
        cip36
 FROM   cip36_registration_invalid
 WHERE  stake_address = :stake_address
-       AND slot_no >= :slot_no  
+       AND slot_no >= :slot_no

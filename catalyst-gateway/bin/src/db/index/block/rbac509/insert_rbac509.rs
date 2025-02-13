@@ -24,7 +24,7 @@ pub(crate) struct Params {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
     /// A transaction hash
-    transaction_id: DbTransactionHash,
+    txn_id: DbTransactionHash,
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
@@ -43,7 +43,7 @@ impl Debug for Params {
         };
         f.debug_struct("Params")
             .field("catalyst_id", &self.catalyst_id)
-            .field("transaction_id", &self.transaction_id)
+            .field("txn_id", &self.txn_id)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("prv_txn_id", &prv_txn_id)
@@ -55,14 +55,14 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn_index: TxnIndex,
+        catalyst_id: IdUri, txn_id: TransactionHash, slot_no: Slot, txn_index: TxnIndex,
         purpose: UuidV4, prv_txn_id: Option<TransactionHash>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
 
         Self {
             catalyst_id: catalyst_id.into(),
-            transaction_id: transaction_id.into(),
+            txn_id: txn_id.into(),
             purpose: purpose.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),

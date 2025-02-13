@@ -1,16 +1,16 @@
 -- Create the TXO Record for when its not staked. 
-INSERT INTO unstaked_txo_by_txn_hash (
-    txn_hash,
+INSERT INTO unstaked_txo_by_txn_id (
+    txn_id,
     txo,
     slot_no,
-    txn,
+    txn_index,
     address,
     value
 ) VALUES (
     :txn_hash,
     :txo,
     :slot_no,
-    :txn,
+    :txn_index,
     :address,
     :value
 );

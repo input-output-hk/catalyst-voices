@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS txo_by_stake (
     -- Data needed to correlate a spent TXO.
     txn_id          blob,       -- 32 byte hash of this transaction.
 
-    spent_slot      varint,     -- Slot this TXO was spent in.
+    spent_slot      bigint,     -- Slot this TXO was spent in.
                                 -- This is ONLY calculated/stored 
                                 -- when first detected in a query lookup.
                                 -- It serves as an optimization on subsequent queries. 

@@ -22,7 +22,7 @@ const QUERY: &str = include_str!("cql/insert_catalyst_id_for_txn_id.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A transaction hash.
-    transaction_id: DbTransactionHash,
+    txn_id: DbTransactionHash,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
     /// A slot number.
@@ -34,7 +34,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("transaction_id", &self.transaction_id)
+            .field("txn_id", &self.txn_id)
             .field("catalyst_id", &self.catalyst_id)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
@@ -45,10 +45,10 @@ impl Debug for Params {
 impl Params {
     /// Creates a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: IdUri, transaction_id: TransactionHash, slot_no: Slot, txn_index: TxnIndex,
+        catalyst_id: IdUri, txn_id: TransactionHash, slot_no: Slot, txn_index: TxnIndex,
     ) -> Self {
         Params {
-            transaction_id: transaction_id.into(),
+            txn_id: txn_id.into(),
             catalyst_id: catalyst_id.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),

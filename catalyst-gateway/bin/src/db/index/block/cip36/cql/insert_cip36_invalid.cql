@@ -10,7 +10,7 @@ INSERT INTO cip36_registration_invalid (
     nonce,
     cip36,
     signed,
-    error_report
+    problem_report
 ) VALUES (
     :stake_address,
     :slot_no,
@@ -22,5 +22,5 @@ INSERT INTO cip36_registration_invalid (
     :nonce,
     :cip36,
     :signed,
-    :error_report
+    :problem_report
 );

@@ -140,12 +140,12 @@ async fn calculate_stake_info(
 async fn get_txo_by_txn(
     session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNumber>,
 ) -> anyhow::Result<HashMap<Vec<u8>, HashMap<i16, TxoInfo>>> {
-    let adjusted_slot_num = num_bigint::BigInt::from(slot_num.unwrap_or(i64::MAX));
+    let adjusted_slot_num: u64 = slot_num.unwrap_or(i64::MAX).try_into().unwrap_or(u64::MAX);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), adjusted_slot_num.clone()),
+        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), adjusted_slot_num.into()),
     )
     .await?;
 
@@ -158,13 +158,13 @@ async fn get_txo_by_txn(
             continue;
         }
 
-        let key = (row.slot_no.clone(), row.txn, row.txo);
+        let key = (row.slot_no.clone(), row.txn_index, row.txo);
         txo_map.insert(key, TxoInfo {
             value: row.value,
             txn_hash: row.txn_hash,
-            txn: row.txn,
+            txn: row.txn_index.into(),
             txo: row.txo,
-            slot_no: row.slot_no,
+            slot_no: row.slot_no.into(),
             spent_slot_no: None,
             assets: HashMap::new(),
         });
@@ -173,7 +173,7 @@ async fn get_txo_by_txn(
     // Augment TXO info with asset info.
     let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address, adjusted_slot_num),
+        GetAssetsByStakeAddressParams::new(stake_address, adjusted_slot_num.into()),
     )
     .await?;
 

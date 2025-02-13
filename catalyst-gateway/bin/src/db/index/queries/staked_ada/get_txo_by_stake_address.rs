@@ -1,15 +1,19 @@
 //! Get the TXO by Stake Address
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get txo by stake address query string.
@@ -21,15 +25,15 @@ pub(crate) struct GetTxoByStakeAddressQueryParams {
     /// Stake address.
     stake_address: Vec<u8>,
     /// Max slot num.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
 }
 
 impl GetTxoByStakeAddressQueryParams {
     /// Creates a new [`GetTxoByStakeAddressQueryParams`].
-    pub(crate) fn new(stake_address: Vec<u8>, slot_no: num_bigint::BigInt) -> Self {
+    pub(crate) fn new(stake_address: Vec<u8>, slot_no: Slot) -> Self {
         Self {
             stake_address,
-            slot_no,
+            slot_no: slot_no.into(),
         }
     }
 }
@@ -40,15 +44,15 @@ pub(crate) struct GetTxoByStakeAddressQuery {
     /// TXO transaction hash.
     pub txn_hash: Vec<u8>,
     /// TXO transaction index within the slot.
-    pub txn: i16,
+    pub txn_index: DbTxnIndex,
     /// TXO index.
     pub txo: i16,
     /// TXO transaction slot number.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
     /// TXO value.
     pub value: num_bigint::BigInt,
     /// TXO spent slot.
-    pub spent_slot: Option<num_bigint::BigInt>,
+    pub spent_slot: Option<DbSlot>,
 }
 
 impl GetTxoByStakeAddressQuery {

@@ -1,6 +1,7 @@
 //! A `Slot` wrapper that can be stored to and load from a database.
 
 use cardano_blockchain_types::Slot;
+use num_bigint::BigInt;
 use scylla::_macro_internal::{
     CellWriter, ColumnType, DeserializationError, DeserializeValue, FrameSlice, SerializationError,
     SerializeValue, TypeCheckError, WrittenCellProof,
@@ -35,24 +36,29 @@ impl From<DbSlot> for Slot {
     }
 }
 
+impl From<DbSlot> for BigInt {
+    fn from(value: DbSlot) -> Self {
+        value.0.into()
+    }
+}
+
 impl SerializeValue for DbSlot {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
-        let value = i64::try_from(self.0).map_err(SerializationError::new)?;
-        value.serialize(typ, writer)
+        BigInt::from(self.0).serialize(typ, writer)
     }
 }
 
 impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbSlot {
     fn type_check(typ: &ColumnType) -> Result<(), TypeCheckError> {
-        <i64>::type_check(typ)
+        <BigInt>::type_check(typ)
     }
 
     fn deserialize(
         typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
-        let value = <i64>::deserialize(typ, v)?;
+        let value = <BigInt>::deserialize(typ, v)?;
         let value = u64::try_from(value).map_err(DeserializationError::new)?;
         Ok(Self(value))
     }

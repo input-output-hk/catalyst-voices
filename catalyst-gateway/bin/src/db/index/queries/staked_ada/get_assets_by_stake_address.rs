@@ -7,9 +7,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get assets by stake address query string.
@@ -39,11 +42,11 @@ impl GetAssetsByStakeAddressParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetAssetsByStakeAddressQuery {
     /// TXO transaction index within the slot.
-    pub txn: i16,
+    pub txn: DbTxnIndex,
     /// TXO index.
     pub txo: i16,
     /// TXO transaction slot number.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
     /// Asset hash.
     pub policy_id: Vec<u8>,
     /// Asset name.
