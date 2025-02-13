@@ -1,6 +1,7 @@
 //! Defines API schema of Cardano hash type.
 
 use core::fmt;
+use std::str::FromStr;
 
 use derive_more::From;
 use poem_openapi::{
@@ -66,22 +67,30 @@ impl Example for Hash256 {
     }
 }
 
-impl ParseFromParameter for Hash256 {
-    fn parse_from_parameter(param: &str) -> ParseResult<Self> {
-        let hash = param.strip_prefix("0x").ok_or(ParseError::custom(
+impl FromStr for Hash256 {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let hash = s.strip_prefix("0x").ok_or(anyhow::anyhow!(
             "Invalid Cardano hash. Hex string must start with `0x`.",
         ))?;
 
         if hash.len() != Self::HASH_LEN {
-            return ParseResult::Err(ParseError::custom(format!(
+            return Err(anyhow::anyhow!(
                 "Invalid {}-bit Cardano hash length",
                 Self::HASH_LEN * 4
-            )));
+            ));
         }
 
         hex::decode(hash)
-            .map_err(|_| ParseError::custom("Invalid Cardano hash. Must be hex string."))
+            .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))
             .map(Self)
+    }
+}
+
+impl ParseFromParameter for Hash256 {
+    fn parse_from_parameter(param: &str) -> ParseResult<Self> {
+        Self::from_str(param).map_err(ParseError::custom)
     }
 }
 
@@ -90,7 +99,7 @@ impl ParseFromJSON for Hash256 {
         let value =
             String::parse_from_json(value).map_err(|e| ParseError::custom(e.into_message()))?;
 
-        Self::parse_from_parameter(&value)
+        Self::from_str(&value).map_err(ParseError::custom)
     }
 }
 
@@ -162,22 +171,30 @@ impl Example for Hash128 {
     }
 }
 
-impl ParseFromParameter for Hash128 {
-    fn parse_from_parameter(param: &str) -> ParseResult<Self> {
-        let hash = param.strip_prefix("0x").ok_or(ParseError::custom(
+impl FromStr for Hash128 {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let hash = s.strip_prefix("0x").ok_or(anyhow::anyhow!(
             "Invalid Cardano hash. Hex string must start with `0x`.",
         ))?;
 
         if hash.len() != Self::HASH_LEN {
-            return ParseResult::Err(ParseError::custom(format!(
+            return Err(anyhow::anyhow!(
                 "Invalid {}-bit Cardano hash length",
                 Self::HASH_LEN * 4
-            )));
+            ));
         }
 
         hex::decode(hash)
-            .map_err(|_| ParseError::custom("Invalid Cardano hash. Must be hex string."))
+            .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))
             .map(Self)
+    }
+}
+
+impl ParseFromParameter for Hash128 {
+    fn parse_from_parameter(param: &str) -> ParseResult<Self> {
+        Self::from_str(param).map_err(ParseError::custom)
     }
 }
 
@@ -186,7 +203,7 @@ impl ParseFromJSON for Hash128 {
         let value =
             String::parse_from_json(value).map_err(|e| ParseError::custom(e.into_message()))?;
 
-        Self::parse_from_parameter(&value)
+        Self::from_str(&value).map_err(ParseError::custom)
     }
 }
 
