@@ -12,144 +12,129 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class ProposalsCubit extends Cubit<ProposalsState> {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  final AdminTools _adminTools;
-
-  AdminToolsState _adminToolsState;
-  StreamSubscription<AdminToolsState>? _adminToolsSub;
 
   ProposalsCubit(
     this._campaignService,
     this._proposalService,
-    this._adminTools,
-  )   : _adminToolsState = _adminTools.state,
-        super(const ProposalsState(isLoading: true)) {
-    _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
-  }
-
-  Future<void> init(String? categoryId) async {
-    // TODO(LynxLynxx): get categories from repository.
-    final categories = List.generate(
-      6,
-      (index) => CampaignCategoryViewModel.dummy(id: '$index'),
-    );
-    emit(
-      state.copyWith(
-        categories: categories,
-        selectedCategory:
-            categories.firstWhereOrNull((e) => e.id == categoryId),
-        isLoading: false,
-      ),
-    );
-  }
-
-  void changeSelectedCategory(String? categoryId) {
-    if (categoryId == null) {
-      return emit(state.copyWith(selectedCategory: null));
-    }
-    final selectedCategory =
-        state.categories.firstWhereOrNull((e) => e.id == categoryId);
-
-    emit(state.copyWith(selectedCategory: selectedCategory));
-  }
-
-  /// Loads the proposals.
-  Future<void> load() async {
-    emit(state.copyWith(isLoading: true));
-
-    final campaign = await _campaignService.getActiveCampaign();
-    if (campaign == null) {
-      emit(state.copyWith(isLoading: false));
-      return;
-    }
-
-    final proposals = await _loadProposals(campaign);
-    emit(
-      state.copyWith(
-        proposals: proposals,
-        isLoading: false,
-      ),
-    );
-  }
+  ) : super(const ProposalsState());
 
   /// Changes the favorite status of the proposal with [proposalId].
   Future<void> onChangeFavoriteProposal(
     String proposalId, {
     required bool isFavorite,
   }) async {
-    final proposals = List<ProposalViewModel>.of(state.proposals);
-    final favoriteProposal = proposals.indexWhere((e) => e.id == proposalId);
-    if (favoriteProposal == -1) return;
-    proposals[favoriteProposal] =
-        proposals[favoriteProposal].copyWith(isFavorite: isFavorite);
+    // TODO(LynxLynxx): implement favorites
+  }
 
-    emit(
-      state.copyWith(
-        proposals: proposals,
-        isLoading: false,
-      ),
+  Future<void> getProposals(
+    ProposalPaginationRequest request,
+  ) async {
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return;
+    }
+
+    final proposals = await _proposalService.getProposals(
+      request: request,
+      campaignId: campaign.id,
     );
-  }
+    await Future.delayed(const Duration(seconds: 1), () {});
 
-  @override
-  Future<void> close() async {
-    await _adminToolsSub?.cancel();
-    _adminToolsSub = null;
+    final proposalViewModelList = proposals.items
+        .map(
+          (e) => ProposalViewModel.fromProposalAtStage(
+            proposal: e,
+            campaignName: campaign.name,
+            campaignStage:
+                CampaignStage.fromCampaign(campaign, DateTimeExt.now()),
+          ),
+        )
+        .toList();
 
-    return super.close();
-  }
-
-  Future<void> _onAdminToolsChanged(AdminToolsState adminTools) async {
-    _adminToolsState = adminTools;
-    await load();
-  }
-
-  Future<List<ProposalViewModel>> _loadProposals(Campaign campaign) {
-    if (_adminToolsState.enabled) {
-      return _loadMockedProposals(campaign);
+    if (request.usersProposals) {
+      return emit(
+        state.copyWith(
+          userProposals: state.userProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.userProposals.items,
+              ...proposalViewModelList,
+            ],
+            isEmpty: proposalViewModelList.isEmpty,
+          ),
+        ),
+      );
+    } else if (request.usersFavorite) {
+      return emit(
+        state.copyWith(
+          favoriteProposals: state.favoriteProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.favoriteProposals.items,
+              ...proposalViewModelList,
+            ],
+            isEmpty: proposalViewModelList.isEmpty,
+          ),
+        ),
+      );
+    } else if (request.stage == ProposalPublish.published) {
+      return emit(
+        state.copyWith(
+          finalProposals: state.finalProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.finalProposals.items,
+              ...proposalViewModelList,
+            ],
+            isEmpty: proposalViewModelList.isEmpty,
+          ),
+        ),
+      );
+    } else if (request.stage == ProposalPublish.draft) {
+      return emit(
+        state.copyWith(
+          draftProposals: state.draftProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: [
+              ...state.draftProposals.items,
+              ...proposalViewModelList,
+            ],
+            isEmpty: proposalViewModelList.isEmpty,
+          ),
+        ),
+      );
     } else {
-      return _loadRegularProposals(
-        campaignId: campaign.id,
-        campaignName: campaign.name,
-        campaignStage: CampaignStage.fromCampaign(campaign, DateTimeExt.now()),
+      final allProposals = [
+        ...state.allProposals.items,
+        ...proposalViewModelList,
+      ]..shuffled();
+      return emit(
+        state.copyWith(
+          allProposals: state.allProposals.copyWith(
+            pageKey: proposals.pageKey,
+            maxResults: proposals.maxResults,
+            items: allProposals,
+            isEmpty: proposalViewModelList.isEmpty,
+          ),
+        ),
       );
     }
   }
 
-  Future<List<ProposalViewModel>> _loadMockedProposals(
-    Campaign campaign,
-  ) async {
-    switch (_adminToolsState.campaignStage) {
-      case CampaignStage.draft:
-      case CampaignStage.scheduled:
-        // no proposals yet at this stage
-        return [];
-      case CampaignStage.live:
-      case CampaignStage.completed:
-        return _loadRegularProposals(
-          campaignId: campaign.id,
-          campaignName: campaign.name,
-          campaignStage: _adminToolsState.campaignStage,
-        );
-    }
+  Future<void> getFavoritesList() async {
+    final favoritesList = await _proposalService.getFavoritesProposalsIds();
+
+    emit(state.copyWith(favoritesIds: favoritesList));
   }
 
-  Future<List<ProposalViewModel>> _loadRegularProposals({
-    required String campaignId,
-    required String campaignName,
-    required CampaignStage campaignStage,
-  }) async {
-    final proposals = await _proposalService.getProposals(
-      campaignId: campaignId,
-    );
+  Future<void> getUserProposalsList() async {
+    // TODO(LynxLynxx): pass user id? or we read it inside of the service?
+    final favoritesList = await _proposalService.getUserProposalsIds('');
 
-    return proposals
-        .map(
-          (proposal) => ProposalViewModel.fromProposalAtStage(
-            proposal: proposal,
-            campaignName: campaignName,
-            campaignStage: campaignStage,
-          ),
-        )
-        .toList();
+    emit(state.copyWith(favoritesIds: favoritesList));
   }
 }

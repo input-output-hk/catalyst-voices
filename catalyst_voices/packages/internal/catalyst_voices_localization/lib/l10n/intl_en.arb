@@ -243,9 +243,45 @@
   "@activeVotingRound": {
     "description": "Title of the voting space."
   },
-  "noOfAllProposals": "All proposals ({count})",
-  "@noOfAllProposals": {
+  "noOfAll": "All ({count})",
+  "@noOfAll": {
     "description": "Tab label for all proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfDraft": "Draft proposals ({count})",
+  "@noOfDraft": {
+    "description": "Tab label for draft proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfFinal": "Final proposals ({count})",
+  "@noOfFinal": {
+    "description": "Tab label for final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfMyProposals": "My proposals ({count})",
+  "@noOfMyProposals": {
+    "description": "Tab label for my proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfFavorites": "Favorites ({count})",
+  "@noOfFavorites": {
+    "description": "Tab label for draft proposals in voting space",
     "placeholders": {
       "count": {
         "type": "int"
@@ -888,7 +924,7 @@
   "registrationCompletedDiscoveryButton": "Open Discovery Dashboard",
   "registrationCompletedAccountButton": "Review my account",
   "createKeychainSeedPhraseSubtitle": "Write down your Catalyst seed phrase",
-  "createKeychainSeedPhraseBody": "Make sure you write down your 12-words in \u2028a safe place as well.",
+  "createKeychainSeedPhraseBody": "Make sure you write down your 12-words in a safe place as well.",
   "createKeychainSeedPhraseExport": "Export Security Words",
   "createKeychainSeedPhraseExportConfirmDialogSubtitle": "Are you sure you want to export your key?",
   "createKeychainSeedPhraseExportConfirmDialogContent": "Before using this feature, please read this {link}",
@@ -908,7 +944,7 @@
   "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
   "yourNextStep": "Your next step",
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let’s set your Unlock password for this device!",
-  "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password \u2028for this device",
+  "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
   "createBaseProfileCreatedTitle": "Congratulations your Base profile is setup!",
   "createKeychainCreatedTitle": "Congratulations your Catalyst \u2028Keychain is created!",
@@ -956,7 +992,7 @@
   "recoveryAccountTitle": "Catalyst account recovery",
   "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
   "recoveryAccountDetailsAction": "Set unlock password for this device",
-  "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password \u2028for this device",
+  "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
   "recoveryUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
   "recoverDifferentKeychain": "Restore a different keychain",
   "unlockDialogHeader": "Unlock Catalyst",
@@ -1043,21 +1079,13 @@
   "errorWalletLinkInternalError": "Wallet authorisation internal error",
   "errorWalletLinkRefused": "Wallet authorisation failed",
   "errorWalletLinkAccountChange": "Wallet account change",
-  "mandatoryGuidanceType": "Mandatory",
-  "@mandatoryGuidanceType": {
-    "description": "Guidance type label for mandatory guidance"
-  },
-  "educationGuidanceType": "Education",
-  "@educationGuidanceType": {
-    "description": "Guidance type label for education guidance"
-  },
-  "tipsGuidanceType": "Tips",
-  "@tipsGuidanceType": {
-    "description": "Guidance type label for tips guidance"
-  },
   "all": "All",
   "@all": {
     "description": "Primary used to select all object. To display object without any filter"
+  },
+  "guidance": "Guidance",
+  "@guidance": {
+    "description": "A tab name of the guidance for the proposal editor."
   },
   "noGuidanceOfThisType": "There is no guidance of this type",
   "@noGuidanceOfThisType": {
@@ -1067,7 +1095,7 @@
   "@selectASection": {
     "description": "Message when there is no section selected"
   },
-  "noGuidanceForThisSection": "There is no guidance for this section",
+  "noGuidanceForThisSection": "There is no guidance for this section.",
   "@noGuidanceForThisSection": {
     "description": "Message when there is no guidance for this section"
   },

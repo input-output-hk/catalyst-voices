@@ -57,132 +57,213 @@ void main() {
       author: 'Alex Wells',
     );
 
-    final pendingProposal = PendingProposal.fromProposal(
-      proposal,
+    final proposalViewModel = ProposalViewModel.fromProposalAtStage(
+      proposal: proposal,
       campaignName: campaign.name,
+      campaignStage: CampaignStage.fromCampaign(campaign, DateTime.now()),
     );
 
-    late AdminToolsCubit adminToolsCubit;
+    late ProposalsCubit proposalsCubit;
 
     setUp(() {
-      adminToolsCubit = AdminToolsCubit();
+      proposalsCubit = ProposalsCubit(
+        _FakeCampaignService(campaign),
+        _FakeProposalService([proposal]),
+      );
     });
 
     blocTest<ProposalsCubit, ProposalsState>(
-      'initial state is loading',
+      'getProposals loads user proposals correctly',
+      build: () => proposalsCubit,
+      act: (cubit) async {
+        await cubit.getProposals(
+          const ProposalPaginationRequest(
+            usersProposals: true,
+            pageKey: 1,
+            pageSize: 10,
+            lastId: null,
+          ),
+        );
+      },
+      expect: () => [
+        ProposalsState(
+          userProposals: ProposalPaginationItems(
+            pageKey: 1,
+            maxResults: 10,
+            items: [proposalViewModel],
+            isEmpty: false,
+          ),
+        ),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'getProposals loads favorite proposals correctly',
+      build: () => proposalsCubit,
+      act: (cubit) async {
+        await cubit.getProposals(
+          const ProposalPaginationRequest(
+            pageKey: 1,
+            pageSize: 10,
+            lastId: null,
+            usersFavorite: true,
+          ),
+        );
+      },
+      expect: () => [
+        ProposalsState(
+          favoriteProposals: ProposalPaginationItems(
+            pageKey: 1,
+            maxResults: 10,
+            items: [proposalViewModel],
+            isEmpty: false,
+          ),
+        ),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'getFavoritesList loads favorites ids correctly',
+      build: () => proposalsCubit,
+      act: (cubit) async {
+        await cubit.getFavoritesList();
+      },
+      expect: () => [
+        const ProposalsState(favoritesIds: ['1', '2']),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'getProposals loads draft proposals correctly',
+      build: () => proposalsCubit,
+      act: (cubit) async {
+        await cubit.getProposals(
+          const ProposalPaginationRequest(
+            pageKey: 1,
+            pageSize: 10,
+            lastId: null,
+            stage: ProposalPublish.draft,
+          ),
+        );
+      },
+      expect: () => [
+        ProposalsState(
+          draftProposals: ProposalPaginationItems(
+            pageKey: 1,
+            maxResults: 10,
+            items: [proposalViewModel],
+            isEmpty: false,
+          ),
+        ),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'getProposals loads published proposals correctly',
+      build: () => proposalsCubit,
+      act: (cubit) async {
+        await cubit.getProposals(
+          const ProposalPaginationRequest(
+            pageKey: 1,
+            pageSize: 10,
+            lastId: null,
+            stage: ProposalPublish.published,
+          ),
+        );
+      },
+      expect: () => [
+        ProposalsState(
+          finalProposals: ProposalPaginationItems(
+            pageKey: 1,
+            maxResults: 10,
+            items: [proposalViewModel],
+            isEmpty: false,
+          ),
+        ),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'getProposals loads all proposals correctly',
+      build: () => proposalsCubit,
+      act: (cubit) async {
+        await cubit.getProposals(
+          const ProposalPaginationRequest(
+            pageKey: 1,
+            pageSize: 10,
+            lastId: null,
+          ),
+        );
+      },
+      expect: () => [
+        ProposalsState(
+          allProposals: ProposalPaginationItems(
+            pageKey: 1,
+            maxResults: 10,
+            items: [proposalViewModel],
+            isEmpty: false,
+          ),
+        ),
+      ],
+    );
+
+    blocTest<ProposalsCubit, ProposalsState>(
+      'getProposals handles empty results correctly',
       build: () {
         return ProposalsCubit(
           _FakeCampaignService(campaign),
           _FakeProposalService([]),
-          adminToolsCubit,
-        );
-      },
-      verify: (cubit) {
-        expect(cubit.state.isLoading, isTrue);
-      },
-    );
-
-    blocTest<ProposalsCubit, ProposalsState>(
-      'load emits with proposals',
-      build: () {
-        return ProposalsCubit(
-          _FakeCampaignService(campaign),
-          _FakeProposalService([proposal]),
-          adminToolsCubit,
-        );
-      },
-      act: (cubit) async => cubit.load(),
-      expect: () => [
-        const ProposalsState(isLoading: true),
-        ProposalsState(
-          proposals: [pendingProposal],
-          isLoading: false,
-        ),
-      ],
-    );
-
-    blocTest<ProposalsCubit, ProposalsState>(
-      'admin tools override proposals in draft campaign state',
-      build: () {
-        return ProposalsCubit(
-          _FakeCampaignService(campaign),
-          _FakeProposalService([proposal]),
-          adminToolsCubit,
         );
       },
       act: (cubit) async {
-        adminToolsCubit.emit(
-          const AdminToolsState(
-            enabled: true,
-            campaignStage: CampaignStage.draft,
+        await cubit.getProposals(
+          const ProposalPaginationRequest(
+            pageKey: 1,
+            pageSize: 10,
+            lastId: null,
           ),
         );
-        return Future<void>.delayed(const Duration(microseconds: 50));
       },
       expect: () => [
-        const ProposalsState(isLoading: true),
         const ProposalsState(
-          isLoading: false,
-          proposals: [],
+          allProposals: ProposalPaginationItems(
+            pageKey: 1,
+            maxResults: 10,
+            items: [],
+            isEmpty: true,
+          ),
         ),
       ],
     );
 
     blocTest<ProposalsCubit, ProposalsState>(
-      'admin tools override proposals in live campaign state',
+      'getProposals handles null campaign correctly',
       build: () {
         return ProposalsCubit(
-          _FakeCampaignService(campaign),
+          _FakeCampaignService(null),
           _FakeProposalService([proposal]),
-          adminToolsCubit,
         );
       },
       act: (cubit) async {
-        adminToolsCubit.emit(
-          const AdminToolsState(
-            enabled: true,
-            campaignStage: CampaignStage.live,
+        await cubit.getProposals(
+          const ProposalPaginationRequest(
+            pageKey: 1,
+            pageSize: 10,
+            lastId: null,
           ),
         );
-        return Future<void>.delayed(const Duration(microseconds: 50));
       },
-      expect: () => [
-        const ProposalsState(isLoading: true),
-        ProposalsState(
-          proposals: [pendingProposal],
-          isLoading: false,
-        ),
-      ],
+      expect: () => <ProposalsState>[],
     );
 
     blocTest<ProposalsCubit, ProposalsState>(
-      'onFavoriteProposal / onUnfavoriteProposal adds/removes proposal from favorites',
-      build: () {
-        return ProposalsCubit(
-          _FakeCampaignService(campaign),
-          _FakeProposalService([proposal]),
-          adminToolsCubit,
-        );
-      },
+      'getUserProposalsList updates user proposals ids',
+      build: () => proposalsCubit,
       act: (cubit) async {
-        await cubit.load();
-        await cubit.onChangeFavoriteProposal(proposal.id, isFavorite: true);
-        await cubit.onChangeFavoriteProposal(proposal.id, isFavorite: false);
+        await cubit.getUserProposalsList();
       },
       expect: () => [
-        const ProposalsState(isLoading: true),
-        ProposalsState(
-          proposals: [pendingProposal],
-          isLoading: false,
-        ),
-        ProposalsState(
-          proposals: [pendingProposal.copyWith(isFavorite: true)],
-          isLoading: false,
-        ),
-        ProposalsState(
-          proposals: [pendingProposal],
-          isLoading: false,
-        ),
+        const ProposalsState(favoritesIds: ['1', '2']),
       ],
     );
   });
@@ -205,9 +286,25 @@ class _FakeProposalService extends Fake implements ProposalService {
   _FakeProposalService(this._proposals);
 
   @override
-  Future<List<Proposal>> getProposals({
+  Future<ProposalPaginationItems<Proposal>> getProposals({
+    required ProposalPaginationRequest request,
     required String campaignId,
   }) async {
-    return _proposals;
+    return ProposalPaginationItems(
+      pageKey: request.pageKey,
+      maxResults: 10,
+      items: _proposals,
+      isEmpty: false,
+    );
+  }
+
+  @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    return ['1', '2'];
+  }
+
+  @override
+  Future<List<String>> getUserProposalsIds(String userId) async {
+    return ['1', '2'];
   }
 }

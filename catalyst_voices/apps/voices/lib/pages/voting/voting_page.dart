@@ -160,7 +160,7 @@ class _Tabs extends StatelessWidget {
             tabAlignment: TabAlignment.start,
             tabs: [
               Tab(
-                text: context.l10n.noOfAllProposals(_proposals.length),
+                text: context.l10n.noOfAll(_proposals.length),
               ),
               Tab(
                 child: Row(

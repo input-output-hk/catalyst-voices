@@ -105,10 +105,15 @@ impl_string_types!(
     is_valid
 );
 
-impl Cip19ShelleyAddress {
-    /// Create a new `PaymentAddress`.
-    pub fn new(address: String) -> Self {
-        Cip19ShelleyAddress(address)
+impl TryFrom<Vec<u8>> for Cip19ShelleyAddress {
+    type Error = anyhow::Error;
+
+    fn try_from(bytes: Vec<u8>) -> Result<Self, Self::Error> {
+        let addr = Address::from_bytes(&bytes)?;
+        let Address::Shelley(addr) = addr else {
+            return Err(anyhow::anyhow!("Not a Shelley address: {addr}"));
+        };
+        addr.try_into()
     }
 }
 

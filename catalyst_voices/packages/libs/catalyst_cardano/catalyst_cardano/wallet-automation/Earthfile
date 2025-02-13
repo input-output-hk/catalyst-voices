@@ -20,7 +20,7 @@ src:
     COPY test-fixtures.ts .
     COPY setup.ts .
 
-package-test:
+nightly-package-test:
     FROM +src
     ENV APP_URL http://test-app:80
     RUN mkdir /results
@@ -34,16 +34,16 @@ builder:
     COPY ../../../../../+repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
-build-web:
+nightly-build-web:
     FROM +builder
     ARG WORKDIR=/frontend/packages/libs/catalyst_cardano/catalyst_cardano/example
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
-package-app:
+nightly-package-app:
     FROM nginx:alpine3.20-slim
     ARG tag='latest'
-    COPY +build-web/web /app
+    COPY +nightly-build-web/web /app
     COPY ./nginx.conf /etc/nginx/nginx.conf
     EXPOSE 80
     SAVE IMAGE test-app:$tag
@@ -53,8 +53,8 @@ nightly-test:
     COPY compose.yml .
     WITH DOCKER \
         --compose compose.yml \
-        --load test-app:latest=(+package-app) \
-        --load test:latest=(+package-test)
+        --load test-app:latest=(+nightly-package-app) \
+        --load test:latest=(+nightly-package-test)
 
         RUN docker run --network=default_default --name=test test:latest ; \
             docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml ;

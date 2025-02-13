@@ -5,7 +5,7 @@ import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
 
 /// A proposal view model spanning proposals in different stages.
-abstract base class ProposalViewModel extends Equatable {
+sealed class ProposalViewModel extends Equatable {
   final String id;
   final bool isFavorite;
 
@@ -251,4 +251,15 @@ extension ListProposalViewModelExt on List<ProposalViewModel> {
   List<ProposalViewModel> get favorites {
     return where((proposal) => proposal.isFavorite).toList();
   }
+
+  List<PendingProposal> get _pendingProposals =>
+      whereType<PendingProposal>().toList();
+
+  List<PendingProposal> get draftProposals => _pendingProposals
+      .where((e) => e.publishStage == ProposalPublish.draft)
+      .toList();
+
+  List<PendingProposal> get finalProposals => _pendingProposals
+      .where((e) => e.publishStage == ProposalPublish.published)
+      .toList();
 }
