@@ -94,7 +94,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
             hintText: widget.schema.placeholder,
           ),
           enabled: widget.isEditMode,
-          resizableVertically: _resizable,
+          resizableVertically: false,
           resizableHorizontally: false,
           maxLengthEnforcement: MaxLengthEnforcement.none,
           maxLines: _resizable ? null : 1,
