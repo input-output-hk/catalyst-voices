@@ -217,7 +217,7 @@ class _Tabs extends StatelessWidget {
                   _ProposalsTabSelector>(
                 selector: (state) {
                   return (
-                    items: state.allProposals,
+                    items: state.draftProposals,
                     selectedCategoryId: state.selectedCategoryId,
                   );
                 },
