@@ -1,15 +1,15 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
+import 'package:catalyst_voices/pages/proposals/proposals_pagination.dart';
 import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
-import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
-import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
-import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
-import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
-import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
+import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,8 +30,13 @@ class _ProposalsPageState extends State<ProposalsPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<ProposalsCubit>().load());
     unawaited(context.read<CampaignInfoCubit>().load());
+    unawaited(
+      context.read<ProposalsCubit>().getFavoritesList(),
+    );
+    unawaited(
+      context.read<ProposalsCubit>().getUserProposalsList(),
+    );
   }
 
   @override
@@ -170,192 +175,208 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 2,
+    return DefaultTabController(
+      length: 5,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _TabBar(),
-          SizedBox(height: 24),
+          const SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.end,
+              runSpacing: 10,
+              children: [
+                _TabBar(),
+                _Controls(),
+              ],
+            ),
+          ),
+          Offstage(
+            offstage: MediaQuery.sizeOf(context).width < 1400,
+            child: Container(
+              height: 1,
+              width: double.infinity,
+              color: context.colors.primaryContainer,
+            ),
+          ),
+          const SizedBox(height: 24),
           TabBarStackView(
             children: [
-              _AllProposals(),
-              _FavoriteProposals(),
+              BlocSelector<ProposalsCubit, ProposalsState,
+                  ProposalPaginationItems<ProposalViewModel>>(
+                selector: (state) {
+                  return state.allProposals;
+                },
+                builder: (context, state) {
+                  return ProposalsPagination(
+                    state.items,
+                    state.pageKey,
+                    state.maxResults,
+                    isEmpty: state.isEmpty,
+                  );
+                },
+              ),
+              BlocSelector<ProposalsCubit, ProposalsState,
+                  ProposalPaginationItems<ProposalViewModel>>(
+                selector: (state) {
+                  return state.draftProposals;
+                },
+                builder: (context, state) {
+                  return ProposalsPagination(
+                    state.items,
+                    state.pageKey,
+                    state.maxResults,
+                    isEmpty: state.isEmpty,
+                    stage: ProposalPublish.draft,
+                  );
+                },
+              ),
+              BlocSelector<ProposalsCubit, ProposalsState,
+                  ProposalPaginationItems<ProposalViewModel>>(
+                selector: (state) {
+                  return state.finalProposals;
+                },
+                builder: (context, state) {
+                  return ProposalsPagination(
+                    state.items,
+                    state.pageKey,
+                    state.maxResults,
+                    isEmpty: state.isEmpty,
+                    stage: ProposalPublish.published,
+                  );
+                },
+              ),
+              BlocSelector<ProposalsCubit, ProposalsState,
+                  ProposalPaginationItems<ProposalViewModel>>(
+                selector: (state) {
+                  return state.favoriteProposals;
+                },
+                builder: (context, state) {
+                  return ProposalsPagination(
+                    state.items,
+                    state.pageKey,
+                    state.maxResults,
+                    isEmpty: state.isEmpty,
+                    usersFavorite: true,
+                  );
+                },
+              ),
+              BlocSelector<ProposalsCubit, ProposalsState,
+                  ProposalPaginationItems<ProposalViewModel>>(
+                selector: (state) {
+                  return state.userProposals;
+                },
+                builder: (context, state) {
+                  return ProposalsPagination(
+                    state.items,
+                    state.pageKey,
+                    state.maxResults,
+                    isEmpty: state.isEmpty,
+                    userProposals: true,
+                  );
+                },
+              ),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
         ],
       ),
     );
   }
 }
 
+typedef _ProposalsCount = ({
+  int total,
+  int draft,
+  int finals,
+  int favorites,
+  int my,
+});
+
 class _TabBar extends StatelessWidget {
   const _TabBar();
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, int>(
-      selector: (state) =>
-          state is LoadedProposalsState ? state.proposals.length : 0,
-      builder: (context, proposalsCount) {
-        return TabBar(
-          isScrollable: true,
-          tabAlignment: TabAlignment.start,
-          tabs: [
-            Tab(
-              text: context.l10n.noOfAllProposals(proposalsCount),
-            ),
-            Tab(
-              child: AffixDecorator(
-                gap: 8,
-                prefix: VoicesAssets.icons.starOutlined.buildIcon(),
-                child: Text(context.l10n.favorites),
+    return BlocSelector<ProposalsCubit, ProposalsState, _ProposalsCount>(
+      selector: (state) {
+        return (
+          total: state.allProposals.maxResults,
+          draft: state.draftProposals.maxResults,
+          finals: state.finalProposals.maxResults,
+          favorites: state.favoritesIds.length,
+          my: state.myProposalsIds.length,
+        );
+      },
+      builder: (context, state) {
+        return ConstrainedBox(
+          constraints: const BoxConstraints(),
+          child: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            dividerHeight: 0,
+            tabs: [
+              Tab(
+                text: context.l10n.noOfAll(state.total),
               ),
-            ),
-          ],
+              Tab(
+                text: context.l10n.noOfDraft(state.draft),
+              ),
+              Tab(
+                text: context.l10n.noOfFinal(state.finals),
+              ),
+              Tab(
+                text: context.l10n.noOfFavorites(state.favorites),
+              ),
+              Tab(
+                text: context.l10n.noOfMyProposals(state.my),
+              ),
+            ],
+          ),
         );
       },
     );
   }
 }
 
-class _AllProposals extends StatelessWidget {
-  const _AllProposals();
+class _Controls extends StatelessWidget {
+  const _Controls();
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProposalsCubit, ProposalsState>(
-      builder: (context, state) {
-        return switch (state) {
-          LoadingProposalsState() => const _LoadingProposals(),
-          LoadedProposalsState(:final proposals) => proposals.isEmpty
-              ? const _EmptyProposals()
-              : _AllProposalsList(
-                  proposals: proposals,
-                ),
-        };
-      },
-    );
-  }
-}
-
-class _AllProposalsList extends StatelessWidget {
-  final List<ProposalViewModel> proposals;
-
-  const _AllProposalsList({
-    required this.proposals,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      children: [
-        for (final proposal in proposals)
-          ProposalCard(
-            image: _generateImageForProposal(proposal.id),
-            proposal: proposal,
-            showStatus: false,
-            showLastUpdate: false,
-            showComments: false,
-            showSegments: false,
-            isFavorite: proposal.isFavorite,
-            onFavoriteChanged: (isFavorite) async {
-              await context.read<ProposalsCubit>().onChangeFavoriteProposal(
-                    proposal.id,
-                    isFavorite: isFavorite,
-                  );
-            },
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FilterByDropdown(
+            items: [],
           ),
-      ],
-    );
-  }
-}
-
-class _FavoriteProposals extends StatelessWidget {
-  const _FavoriteProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ProposalsCubit, ProposalsState>(
-      builder: (context, state) {
-        return switch (state) {
-          LoadingProposalsState() => const _LoadingProposals(),
-          LoadedProposalsState(:final proposals) => proposals.favorites.isEmpty
-              ? const _EmptyProposals()
-              : _FavoriteProposalsList(
-                  proposals: proposals.favorites,
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 250,
+            child: VoicesTextField(
+              onFieldSubmitted: (_) {},
+              decoration: VoicesTextFieldDecoration(
+                prefixIcon: VoicesAssets.icons.search.buildIcon(),
+                hintText: context.l10n.searchProposals,
+                filled: true,
+                fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
+                suffixIcon: Offstage(
+                  offstage: false,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(context.l10n.clear),
+                  ),
                 ),
-        };
-      },
-    );
-  }
-}
-
-class _FavoriteProposalsList extends StatelessWidget {
-  final List<ProposalViewModel> proposals;
-
-  const _FavoriteProposalsList({required this.proposals});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
-      children: [
-        for (final proposal in proposals)
-          ProposalCard(
-            image: _generateImageForProposal(proposal.id),
-            proposal: proposal,
-            showStatus: false,
-            showLastUpdate: false,
-            showComments: false,
-            showSegments: false,
-            isFavorite: true,
-            onFavoriteChanged: (isFavorite) async {
-              await context.read<ProposalsCubit>().onChangeFavoriteProposal(
-                    proposal.id,
-                    isFavorite: isFavorite,
-                  );
-            },
+              ),
+            ),
           ),
-      ],
-    );
-  }
-}
-
-class _LoadingProposals extends StatelessWidget {
-  const _LoadingProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(64),
-        child: VoicesCircularProgressIndicator(),
+        ],
       ),
     );
   }
-}
-
-class _EmptyProposals extends StatelessWidget {
-  const _EmptyProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: EmptyState(
-        description: context.l10n.discoverySpaceEmptyProposals,
-      ),
-    );
-  }
-}
-
-AssetGenImage _generateImageForProposal(String id) {
-  return id.codeUnits.last.isEven
-      ? VoicesAssets.images.proposalBackground1
-      : VoicesAssets.images.proposalBackground2;
 }
