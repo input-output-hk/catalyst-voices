@@ -25,6 +25,7 @@ package-schemathesis:
                     --include-operation-id 'getDocument' \
                     --include-operation-id 'cardanoRegistrationCip36' \
                     --include-operation-id 'stakedAssetsGet' \
+                    --include-operation-id 'postDocument' \
                     --exclude-path-regex '\"*/draft/*\"' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
@@ -83,7 +84,6 @@ nightly-package-draft-schemathesis:
 # test-ci-schemathesis - Runs schemathesis in CI only on versioned endpoints
 test-ci-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG wait_for_schema=500
     ARG max_response_time=5000
@@ -98,11 +98,10 @@ test-ci-schemathesis:
                                     --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
                                     --hypothesis_max_examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(./../../+docker) \
-        --load scylla-node:latest=(./../+package-scylla-node) \
-        --service cat-gateway \
+        --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
+        --service cat-gateway-with-scylla \
         --allow-privileged
-        RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
@@ -134,15 +133,15 @@ nightly-test-draft-schemathesis:
                                     --wait_for_schema=$wait_for_schema --max_response_time=$max_response_time \
                                     --hypothesis_max_examples=$hypothesis_max_examples) \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(./../../+docker) \
-        --load scylla-node:latest=(./../+package-scylla-node) \
-        --service cat-gateway \
+        --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
+        --service cat-gateway-with-scylla \
         --allow-privileged
         # --no-cache is only for running in nightly - DO NOT use this in CI
-        RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN --no-cache sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
-            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log
+            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log; \
+            docker container logs -n all scylla-node
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis-nightly.junit-report.xml
