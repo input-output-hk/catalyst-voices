@@ -24,7 +24,7 @@ final class DocumentRef extends Equatable {
 
   @override
   String toString() =>
-      isExact ? 'ExactDocumentRef($id - $version)' : 'LooseDocumentRef($id)';
+      isExact ? 'ExactDocumentRef($id.v$version)' : 'LooseDocumentRef($id)';
 
   @override
   List<Object?> get props => [id, version];
