@@ -1,7 +1,6 @@
 from loguru import logger
 import pytest
-from utils import sync
-from utils import health
+from api_tests.utils import health, sync
 from datetime import datetime, timezone
 import requests
 from api_tests import cat_gateway_endpoint_url

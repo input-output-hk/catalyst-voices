@@ -2,7 +2,7 @@ import requests
 from api_tests import (
     cat_gateway_endpoint_url,
 )
-from utils.auth import BEARER_TOKEN
+from api_tests.utils.auth import BEARER_TOKEN
 
 URL = cat_gateway_endpoint_url("api/draft/document")
 

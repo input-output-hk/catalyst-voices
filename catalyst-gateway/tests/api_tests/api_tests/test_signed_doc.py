@@ -1,7 +1,7 @@
 import pytest
 from loguru import logger
-from utils import health
-from endpoints.draft import document
+from api_tests.utils import health
+from api_tests.endpoints.v1 import document
 
 def test_signed_doc():
     health.is_live()
