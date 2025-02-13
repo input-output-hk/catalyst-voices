@@ -87,11 +87,11 @@ pub(crate) async fn endpoint(
 
             Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
                 docs,
-                page: Some(CurrentPage {
+                page: CurrentPage {
                     page,
                     limit,
                     remaining,
-                }),
+                },
             })))
             .into()
         },
