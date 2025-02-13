@@ -1,4 +1,7 @@
-part of 'voices_rich_text.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
+import 'package:flutter_quill/quill_delta.dart';
 
 /// Heuristic rule to exit current block when user inserts two consecutive
 /// newlines.
@@ -7,8 +10,8 @@ part of 'voices_rich_text.dart';
 /// it always exits the block no matter if it was the last line
 /// of the block or middle one.
 @immutable
-class _AutoAlwaysExitBlockRule extends quill_int.InsertRule {
-  const _AutoAlwaysExitBlockRule();
+class AutoAlwaysExitBlockRule extends quill_int.InsertRule {
+  const AutoAlwaysExitBlockRule();
 
   @override
   Delta? applyRule(

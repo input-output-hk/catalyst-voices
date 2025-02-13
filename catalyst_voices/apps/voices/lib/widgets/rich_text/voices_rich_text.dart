@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_limit.dart';
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text_rules.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -12,14 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
-import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
     as quill_ext;
 
-part 'voices_rich_text_rules.dart';
-
 final class VoicesRichTextController extends quill.QuillController {
-  final _customRules = const <quill_int.Rule>[_AutoAlwaysExitBlockRule()];
+  final _customRules = const <quill_int.Rule>[AutoAlwaysExitBlockRule()];
 
   VoicesRichTextController({
     required super.document,
