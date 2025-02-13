@@ -1,7 +1,9 @@
 //! Implementation of the GET `../assets` endpoint
+
 use std::collections::HashMap;
 
 use anyhow::anyhow;
+use cardano_blockchain_types::{TransactionHash, TxnIndex};
 use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -30,6 +32,8 @@ use crate::{
         types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
     },
 };
+
+type TxosByTxn = HashMap<TransactionHash, HashMap<i16, TxoInfo>>;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -93,9 +97,9 @@ struct TxoInfo {
     /// TXO value.
     value: num_bigint::BigInt,
     /// TXO transaction hash.
-    txn_hash: Vec<u8>,
+    txn_hash: TransactionHash,
     /// TXO transaction index within the slot.
-    txn: i16,
+    txn_index: TxnIndex,
     /// TXO index.
     txo: i16,
     /// TXO transaction slot number.
@@ -139,7 +143,7 @@ async fn calculate_stake_info(
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
     session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNumber>,
-) -> anyhow::Result<HashMap<Vec<u8>, HashMap<i16, TxoInfo>>> {
+) -> anyhow::Result<TxosByTxn> {
     let adjusted_slot_num: u64 = slot_num.unwrap_or(i64::MAX).try_into().unwrap_or(u64::MAX);
 
     let mut txo_map = HashMap::new();
@@ -161,8 +165,8 @@ async fn get_txo_by_txn(
         let key = (row.slot_no.clone(), row.txn_index, row.txo);
         txo_map.insert(key, TxoInfo {
             value: row.value,
-            txn_hash: row.txn_hash,
-            txn: row.txn_index.into(),
+            txn_hash: row.txn_hash.into(),
+            txn_index: row.txn_index.into(),
             txo: row.txo.into(),
             slot_no: row.slot_no.into(),
             spent_slot_no: None,
@@ -215,7 +219,7 @@ async fn get_txo_by_txn(
 
 /// Checks if the given TXOs were spent and mark then as such.
 async fn check_and_set_spent(
-    session: &CassandraSession, txos_by_txn: &mut HashMap<Vec<u8>, HashMap<i16, TxoInfo>>,
+    session: &CassandraSession, txos_by_txn: &mut TxosByTxn,
 ) -> anyhow::Result<()> {
     let txn_hashes = txos_by_txn.keys().cloned().collect::<Vec<_>>();
 
@@ -244,8 +248,7 @@ async fn check_and_set_spent(
 
 /// Sets TXOs as spent in the database if they are marked as spent in the map.
 async fn update_spent(
-    session: &CassandraSession, stake_address: Vec<u8>,
-    txos_by_txn: &HashMap<Vec<u8>, HashMap<i16, TxoInfo>>,
+    session: &CassandraSession, stake_address: Vec<u8>, txos_by_txn: &TxosByTxn,
 ) -> anyhow::Result<()> {
     let mut params = Vec::new();
     for txn_map in txos_by_txn.values() {
@@ -257,7 +260,7 @@ async fn update_spent(
             if let Some(spent_slot) = &txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
                     stake_address: stake_address.clone(),
-                    txn_index: txo_info.txn.into(),
+                    txn_index: txo_info.txn_index.into(),
                     txo: txo_info.txo.into(),
                     slot_no: txo_info.slot_no.clone(),
                     spent_slot: spent_slot.clone(),
@@ -272,9 +275,7 @@ async fn update_spent(
 }
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
-fn build_stake_info(
-    txos_by_txn: HashMap<Vec<u8>, HashMap<i16, TxoInfo>>,
-) -> anyhow::Result<StakeInfo> {
+fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
     let mut stake_info = StakeInfo::default();
     for txn_map in txos_by_txn.into_values() {
         for txo_info in txn_map.into_values() {
