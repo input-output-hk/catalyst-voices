@@ -343,8 +343,17 @@ ThemeData _buildThemeData(
       space: 16,
       thickness: 1,
     ),
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: TabBarTheme(
       tabAlignment: TabAlignment.start,
+      labelStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
+      ),
+      unselectedLabelColor: voicesColorScheme.onPrimaryContainer,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: colorScheme.primary,

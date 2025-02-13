@@ -12,9 +12,9 @@ enum QueryLimitsInner {
     /// Return all entries without any `LIMIT` and `OFFSET` parameters
     All,
     /// Specifies `LIMIT` parameter
-    Limit(u64),
+    Limit(u32),
     /// Specifies `LIMIT` and `OFFSET` parameters
-    LimitAndOffset(u64, u64),
+    LimitAndOffset(u32, u32),
 }
 
 impl Display for QueryLimits {
@@ -72,6 +72,6 @@ impl QueryLimits {
 
 /// Calculate the offset value from page and limit.
 /// offset = limit * page
-fn cal_offset(page: u64, limit: u64) -> u64 {
+fn cal_offset(page: u32, limit: u32) -> u32 {
     limit.saturating_mul(page)
 }
