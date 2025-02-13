@@ -36,7 +36,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_stake_registration.cql");
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
+    /// Stake hash - Binary 28 bytes. 0 bytes = not staked.
     pub(crate) stake_hash: Vec<u8>,
     /// Is the address a script address.
     pub(crate) script: bool,

@@ -38,7 +38,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_cip36_registration_for_vote_k
 pub(crate) struct Params {
     /// Vote key - Binary 28 bytes.
     pub(crate) vote_key: Vec<u8>,
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     pub(crate) stake_address: Vec<u8>,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
