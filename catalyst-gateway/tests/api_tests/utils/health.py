@@ -1,4 +1,4 @@
-from api_tests.endpoints.v1 import health
+from api.v1 import health
 from loguru import logger
 
 def is_live():

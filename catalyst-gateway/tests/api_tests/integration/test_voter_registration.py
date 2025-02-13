@@ -1,8 +1,8 @@
 import json
 from loguru import logger
 import pytest
-from api_tests.utils import health, address, sync
-from api_tests import cat_gateway_endpoint_url
+from utils import health, address, sync
+from api import cat_gateway_endpoint_url
 import requests
 
 def check_delegations(provided, expected):

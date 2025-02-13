@@ -4,8 +4,8 @@ from loguru import logger
 import asyncio
 import asyncpg
 import pytest
-from api_tests import EVENT_DB_TEST_URL
-from api_tests.utils import health
+from integration import EVENT_DB_TEST_URL
+from utils import health
 
 GET_VERSION_QUERY = "SELECT MAX(version) FROM refinery_schema_history"
 UPDATE_QUERY = "UPDATE refinery_schema_history SET version=$1 WHERE version=$2"

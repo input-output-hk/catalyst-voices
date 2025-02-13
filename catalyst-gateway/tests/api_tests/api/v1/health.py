@@ -1,5 +1,5 @@
 import requests
-from api_tests import cat_gateway_endpoint_url
+from api import cat_gateway_endpoint_url
 LIVE_URL = "api/v1/health/live"
 READY_URL = "api/v1/health/ready"
 

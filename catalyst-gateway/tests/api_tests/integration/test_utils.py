@@ -1,4 +1,4 @@
-from api_tests.utils import address
+from utils import address
 import pytest
 
 @pytest.mark.skip('To be refactored when the api is ready')

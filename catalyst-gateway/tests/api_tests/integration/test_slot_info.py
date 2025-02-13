@@ -1,9 +1,9 @@
 from loguru import logger
 import pytest
-from api_tests.utils import health, sync
+from utils import health, sync
 from datetime import datetime, timezone
 import requests
-from api_tests import cat_gateway_endpoint_url
+from api import cat_gateway_endpoint_url
 
 @pytest.mark.skip('To be refactored when the api is ready')
 def test_date_time_to_slot_number_endpoint():

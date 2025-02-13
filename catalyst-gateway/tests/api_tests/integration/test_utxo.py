@@ -2,8 +2,8 @@ import json
 from loguru import logger
 import pytest
 import requests
-from api_tests.utils import health, address, sync
-from api_tests import cat_gateway_endpoint_url
+from utils import health, address, sync
+from api import cat_gateway_endpoint_url
 
 @pytest.mark.skip('To be refactored when the api is ready')
 def test_staked_ada_endpoint():
