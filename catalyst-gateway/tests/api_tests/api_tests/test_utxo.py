@@ -2,9 +2,9 @@ import json
 from loguru import logger
 import pytest
 
+from utils import health
+
 from api_tests import (
-    check_is_live,
-    check_is_ready,
     get_staked_ada,
     sync_to,
     utils,
@@ -12,8 +12,8 @@ from api_tests import (
 
 @pytest.mark.skip
 def test_staked_ada_endpoint():
-    check_is_live()
-    check_is_ready()
+    health.is_live()
+    health.is_ready()
 
     network = "preprod"
     slot_num = 56364174

@@ -2,9 +2,9 @@ import json
 from loguru import logger
 import pytest
 
+from utils import health
+
 from api_tests import (
-    check_is_live,
-    check_is_ready,
     get_voter_registration,
     sync_to,
     utils,
@@ -27,8 +27,8 @@ def check_delegations(provided, expected):
 
 @pytest.mark.skip
 def test_voter_registration_endpoint():
-    check_is_live()
-    check_is_ready()
+    health.is_live()
+    health.is_ready()
 
     network = "preprod"
     slot_num = 56364174

@@ -1,10 +1,7 @@
 import pytest
 from loguru import logger
 
-from api_tests import (
-    check_is_live,
-    check_is_ready,
-)
+from utils import health
 
 from endpoints.draft import document
 URL = "api/draft/document"
@@ -12,8 +9,8 @@ URL = "api/draft/document"
 TOKEN = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
 
 def test_signed_doc():
-    check_is_live()
-    check_is_ready()
+    health.is_live()
+    health.is_ready()
 
     signed_doc = "84585fa6012703183270436f6e74656e742d456e636f64696e676262726474797065d82550913c9265f9f944fcb3cf9d9516ae9baf626964d8255001946ea1818a7e0eb6b16169f02ffd4e63766572d8255001946ea1818a7e0eb6b16169f02ffd4ea0581c8b0b807b22616765223a32392c226e616d65223a22416c6578227d0380"
     # Put a signed document

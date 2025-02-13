@@ -2,17 +2,16 @@ from loguru import logger
 import pytest
 
 from api_tests import (
-    check_is_live,
-    check_is_ready,
     sync_to,
     get_date_time_to_slot_number,
 )
+from utils import health
 from datetime import datetime, timezone
 
 @pytest.mark.skip
 def test_date_time_to_slot_number_endpoint():
-    check_is_live()
-    check_is_ready()
+    health.is_live()
+    health.is_ready()
 
     network = "preprod"
     slot_num = 16010056
