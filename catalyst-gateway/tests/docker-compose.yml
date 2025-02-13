@@ -43,11 +43,6 @@ services:
     hostname: 127.0.0.1
     ports:
       - 3030:3030
-    healthcheck:
-      test: ["CMD-SHELL", "cqlsh -e 'SELECT now() FROM system.local;'"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
     depends_on:
       event-db:
         condition: service_healthy
@@ -58,12 +53,4 @@ services:
     image: alpine:3.20.3
     depends_on:
       event-db:
-        condition: service_healthy
-
-# it is a helper service to wait until the cat-gateway-with-scylla will be ready
-# mainly its a trick for Earthly how to wait until service will be fully functional
-  cat-gateway-with-scylla-is-running:
-    image: alpine:3.20.3
-    depends_on:
-      cat-gateway-with-scylla:
         condition: service_healthy
