@@ -623,8 +623,8 @@ async fn test_txi_by_hash() {
 
     // data
     let data = vec![
-        txi::TxiInsertParams::new(TransactionHash::new(&[0]), 0, 0.into()),
-        txi::TxiInsertParams::new(TransactionHash::new(&[1]), 1, 1.into()),
+        txi::TxiInsertParams::new(TransactionHash::new(&[0]), 0.into(), 0.into()),
+        txi::TxiInsertParams::new(TransactionHash::new(&[1]), 1.into(), 1.into()),
     ];
     let data_len = data.len();
 

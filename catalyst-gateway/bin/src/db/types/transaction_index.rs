@@ -16,6 +16,12 @@ impl From<TxnIndex> for DbTxnIndex {
     }
 }
 
+impl From<i16> for DbTxnIndex {
+    fn from(value: i16) -> Self {
+        Self(value)
+    }
+}
+
 impl From<DbTxnIndex> for TxnIndex {
     fn from(value: DbTxnIndex) -> Self {
         value.0.into()

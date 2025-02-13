@@ -229,8 +229,8 @@ async fn check_and_set_spent(
         while let Some(row_res) = txi_iter.next().await {
             let row = row_res?;
 
-            if let Some(txn_map) = txos_by_txn.get_mut(&row.txn_hash) {
-                if let Some(txo_info) = txn_map.get_mut(&row.txo) {
+            if let Some(txn_map) = txos_by_txn.get_mut(&row.txn_id.into()) {
+                if let Some(txo_info) = txn_map.get_mut(&row.txo.into()) {
                     if row.slot_no >= num_bigint::BigInt::ZERO {
                         txo_info.spent_slot_no = Some(row.slot_no);
                     }
@@ -257,8 +257,8 @@ async fn update_spent(
             if let Some(spent_slot) = &txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
                     stake_address: stake_address.clone(),
-                    txn: txo_info.txn,
-                    txo: txo_info.txo,
+                    txn_index: txo_info.txn.into(),
+                    txo: txo_info.txo.into(),
                     slot_no: txo_info.slot_no.clone(),
                     spent_slot: spent_slot.clone(),
                 });

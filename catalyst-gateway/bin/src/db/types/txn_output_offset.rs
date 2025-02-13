@@ -17,6 +17,12 @@ impl From<TxnOutputOffset> for DbTxnOutputOffset {
     }
 }
 
+impl From<i16> for DbTxnOutputOffset {
+    fn from(value: i16) -> Self {
+        Self(value)
+    }
+}
+
 impl From<DbTxnOutputOffset> for TxnOutputOffset {
     fn from(value: DbTxnOutputOffset) -> Self {
         value.0.into()

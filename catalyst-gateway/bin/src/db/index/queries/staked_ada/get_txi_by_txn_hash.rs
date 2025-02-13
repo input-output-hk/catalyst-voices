@@ -8,9 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbTransactionHash, DbTxnOutputOffset},
 };
 
 /// Get TXI query string.
@@ -34,9 +37,9 @@ impl GetTxiByTxnHashesQueryParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetTxiByTxnHashesQuery {
     /// TXI transaction hash.
-    pub txn_hash: Vec<u8>,
+    pub txn_id: DbTransactionHash,
     /// TXI original TXO index.
-    pub txo: i16,
+    pub txo: DbTxnOutputOffset,
     /// TXI slot number.
     pub slot_no: num_bigint::BigInt,
 }

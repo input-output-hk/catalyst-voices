@@ -6,9 +6,12 @@ use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
-        session::CassandraSession,
+    db::{
+        index::{
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
+        types::{DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -22,9 +25,9 @@ pub(crate) struct UpdateTxoSpentQueryParams {
     /// TXO stake address.
     pub stake_address: Vec<u8>,
     /// TXO transaction index within the slot.
-    pub txn: i16,
+    pub txn_index: DbTxnIndex,
     /// TXO index.
-    pub txo: i16,
+    pub txo: DbTxnOutputOffset,
     /// TXO slot number.
     pub slot_no: num_bigint::BigInt,
     /// TXO spent slot number.
