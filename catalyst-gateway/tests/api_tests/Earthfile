@@ -19,7 +19,8 @@ test:
         --compose docker-compose.yml \
         --load event-db:latest=(./../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
-        --service cat-gateway-with-scylla \
+        --pull alpine:3.20.3 \
+        --service cat-gateway-with-scylla-is-running \
         --allow-privileged
         RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
     END

@@ -55,9 +55,10 @@ test-fuzzer-api:
         --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
-        --service cat-gateway-with-scylla \
+        --pull alpine:3.20.3 \
+        --service cat-gateway-with-scylla-is-running \
         --allow-privileged
-        RUN sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
@@ -116,9 +117,10 @@ nightly-test-fuzzer-api:
         --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed) \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
-        --service cat-gateway-with-scylla \
+        --pull alpine:3.20.3 \
+        --service cat-gateway-with-scylla-is-running \
         --allow-privileged
-        RUN --no-cache sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
             docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log; \
