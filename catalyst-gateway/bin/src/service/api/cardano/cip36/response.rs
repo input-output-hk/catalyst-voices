@@ -103,19 +103,15 @@ pub(crate) struct Cip36Details {
     #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
     /// If the payment address is a script, then it can not be payed rewards.
-    #[oai(default = "common::types::cardano::boolean::IsPayable::default")]
+    #[oai(default)]
     pub is_payable: common::types::cardano::boolean::IsPayable,
     /// If this field is set, then the registration was in CIP15 format.
-    #[oai(default = "common::types::cardano::boolean::IsCip15::default")]
+    #[oai(default)]
     pub cip15: common::types::cardano::boolean::IsCip15,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
-    #[oai(
-        default = "Vec::<common::types::generic::error_msg::ErrorMessage>::new",
-        skip_serializing_if_is_empty,
-        validator(max_items = "10")
-    )]
-    pub errors: Vec<common::types::generic::error_msg::ErrorMessage>,
+    #[oai(default, skip_serializing_if_is_empty)]
+    pub errors: common::types::generic::error_list::ErrorList,
 }
 
 impl Example for Cip36Details {
@@ -136,7 +132,7 @@ impl Example for Cip36Details {
             ),
             is_payable: common::types::cardano::boolean::IsPayable::example(),
             cip15: common::types::cardano::boolean::IsCip15::example(),
-            errors: Vec::<common::types::generic::error_msg::ErrorMessage>::new(),
+            errors: common::types::generic::error_list::ErrorList::default(),
         }
     }
 }
@@ -157,7 +153,7 @@ impl Cip36Details {
             payment_address: None,
             is_payable: common::types::cardano::boolean::IsPayable::example(),
             cip15: common::types::cardano::boolean::IsCip15::example(),
-            errors: vec!["Stake Public Key is required".into()],
+            errors: common::types::generic::error_list::ErrorList::example(),
         }
     }
 }

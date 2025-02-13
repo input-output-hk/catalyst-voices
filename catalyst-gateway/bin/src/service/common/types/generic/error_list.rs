@@ -18,13 +18,14 @@ impl Type for ErrorList {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "SemanticVersion".into()
+        "ErrorList".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
         MetaSchemaRef::Inline(Box::new(MetaSchema::new("array"))).merge(MetaSchema {
             example: Self::example().to_json(),
             max_items: Some(10),
+            items: Some(Box::new(ErrorMessage::schema_ref())),
             ..poem_openapi::registry::MetaSchema::ANY
         })
     }
@@ -62,6 +63,6 @@ impl ToJSON for ErrorList {
 
 impl Example for ErrorList {
     fn example() -> Self {
-        Self(vec!["Stake Public Key is required".into()])
+        Self(vec![Example::example()])
     }
 }

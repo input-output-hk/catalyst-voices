@@ -17,7 +17,7 @@ use crate::{
         auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         objects::config::{frontend_config::FrontendConfig, ConfigUnprocessableContent},
         responses::WithErrorResponses,
-        tags::ApiTags,
+        tags::ApiTags, types::generic::error_msg::ErrorMessage,
     },
 };
 
@@ -213,13 +213,13 @@ async fn set(key: ConfigKey, value: Value) -> SetConfigAllResponses {
             match validate {
                 BasicOutput::Valid(_) => SetConfigResponse::Ok.into(),
                 BasicOutput::Invalid(errors) => {
-                    let schema_errors: Vec<String> = errors
+                    let schema_errors: Vec<ErrorMessage> = errors
                         .iter()
-                        .map(|error| error.error_description().clone().into_inner())
+                        .map(|error| error.error_description().clone().into_inner().into())
                         .collect();
                     SetConfigResponse::UnprocessableContent(Json(ConfigUnprocessableContent::new(
                         "Invalid JSON data validating against JSON schema".to_string(),
-                        Some(schema_errors),
+                        Some(schema_errors.into()),
                     )))
                     .into()
                 },

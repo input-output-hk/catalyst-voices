@@ -215,7 +215,7 @@ async fn get_all_registrations_from_stake_pub_key(
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
-            errors: vec![],
+            errors: vec![].into(),
         };
 
         registrations.push(cip36);
@@ -273,7 +273,8 @@ async fn get_invalid_registrations(
                 .error_report
                 .iter()
                 .map(|e| ErrorMessage::from(e.to_string()))
-                .collect(),
+                .collect::<Vec<_>>()
+                .into(),
         });
     }
 
