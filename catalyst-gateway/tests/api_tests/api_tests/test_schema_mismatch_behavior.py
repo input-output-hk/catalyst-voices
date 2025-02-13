@@ -63,7 +63,7 @@ def test_schema_version_mismatch_changes_cat_gateway_behavior():
     health.is_live()
 
     # Check that the `ready` endpoint is NOT OK
-    is_not_ready()
+    health.is_not_ready()
 
     # Change version back
     change_version(changed_version, initial_version)
@@ -75,4 +75,4 @@ def test_schema_version_mismatch_changes_cat_gateway_behavior():
     logger.info(f"cat-gateway schema version is: {changed_version}.")
 
     # Check that the `ready` endpoint is OK
-    check_is_ready()
+    health.is_ready()

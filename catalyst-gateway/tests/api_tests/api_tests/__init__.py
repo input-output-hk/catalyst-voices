@@ -32,7 +32,6 @@ def cat_gateway_endpoint_url(endpoint: str):
 
 
 
-
 def get_sync_state(network: str):
     resp = requests.get(
         cat_gateway_endpoint_url(f"api/cardano/sync_state?network={network}")
