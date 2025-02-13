@@ -57,7 +57,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _updateContents(widget.property.value ?? '');
+      _updateContents(MarkdownData(widget.property.value ?? ''));
     }
   }
 
@@ -100,38 +100,22 @@ class _MultilineTextEntryMarkdownWidgetState
     );
   }
 
-  void _updateContents(String value) {
-    if (value.isNotEmpty) {
-      final input = MarkdownData(value);
-      final delta = markdown.encoder.convert(input);
-
-      _controller.replaceText(
-        0,
-        _controller.document.length,
-        delta,
-        _controller.document.length <= value.length
-            ? null
-            : TextSelection.collapsed(offset: value.length),
-        shouldNotifyListeners: false,
-      );
-    } else {
-      _controller.clear();
-    }
+  // ignore: use_setters_to_change_properties
+  void _updateContents(MarkdownData markdownData) {
+    _controller.markdownData = markdownData;
   }
 
   void _toggleEditMode() {
     _controller.readOnly = !widget.isEditMode;
   }
 
-  void _onChanged(quill.Document? document) {
-    _onChangedDebouncer.run(() => _dispatchChange(document));
+  void _onChanged(MarkdownData? markdownData) {
+    _onChangedDebouncer.run(() => _dispatchChange(markdownData));
   }
 
-  void _dispatchChange(quill.Document? document) {
-    final delta = document?.toDelta();
-    final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
-    final value = markdownData?.data;
-    final normalizedValue = widget.schema.normalizeValue(value);
+  void _dispatchChange(MarkdownData? markdownData) {
+    final markdownValue = markdownData?.data;
+    final normalizedValue = widget.schema.normalizeValue(markdownValue);
 
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
@@ -141,9 +125,7 @@ class _MultilineTextEntryMarkdownWidgetState
     widget.onChanged([change]);
   }
 
-  String? _validator(quill.Document? document) {
-    final delta = document?.toDelta();
-    final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
+  String? _validator(MarkdownData? markdownData) {
     final markdownValue = markdownData?.data;
     final normalizedValue = widget.schema.normalizeValue(markdownValue);
 

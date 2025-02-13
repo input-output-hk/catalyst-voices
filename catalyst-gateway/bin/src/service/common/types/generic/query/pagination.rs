@@ -27,13 +27,13 @@ pub(crate) use page_description;
 /// Description
 pub(crate) const PAGE_DESCRIPTION: &str = page_description!();
 /// Example.
-const PAGE_EXAMPLE: u64 = 5;
+const PAGE_EXAMPLE: u32 = 5;
 /// Default
-const PAGE_DEFAULT: u64 = 0;
+const PAGE_DEFAULT: u32 = 0;
 /// Page Minimum.
-const PAGE_MINIMUM: u64 = 0;
+const PAGE_MINIMUM: u32 = 0;
 /// Page Maximum.
-const PAGE_MAXIMUM: u64 = u64::MAX;
+const PAGE_MAXIMUM: u32 = u32::MAX;
 
 /// Schema.
 #[allow(clippy::cast_precision_loss)]
@@ -43,15 +43,15 @@ static PAGE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         description: Some(PAGE_DESCRIPTION),
         example: Some(PAGE_EXAMPLE.into()),
         default: Page(PAGE_DEFAULT).to_json(),
-        maximum: Some(PAGE_MAXIMUM as f64),
-        minimum: Some(PAGE_MINIMUM as f64),
+        maximum: Some(f64::from(PAGE_MAXIMUM)),
+        minimum: Some(f64::from(PAGE_MINIMUM)),
         ..poem_openapi::registry::MetaSchema::ANY
     }
 });
 
 /// Page to be returned in the response.
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
-pub(crate) struct Page(u64);
+pub(crate) struct Page(u32);
 
 impl Default for Page {
     fn default() -> Self {
@@ -60,7 +60,7 @@ impl Default for Page {
 }
 
 /// Is the `Page` valid?
-fn is_valid_page(value: u64) -> bool {
+fn is_valid_page(value: u32) -> bool {
     (PAGE_MINIMUM..=PAGE_MAXIMUM).contains(&value)
 }
 
@@ -71,12 +71,12 @@ impl Type for Page {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "integer(u64)".into()
+        "integer(u32)".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
         let schema_ref =
-            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u64")));
+            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u32")));
         schema_ref.merge(PAGE_SCHEMA.clone())
     }
 
@@ -93,7 +93,7 @@ impl Type for Page {
 
 impl ParseFromParameter for Page {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        let page: u64 = value.parse()?;
+        let page: u32 = value.parse()?;
         Ok(Page(page))
     }
 }
@@ -102,7 +102,10 @@ impl ParseFromJSON for Page {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
         if let Value::Number(value) = value {
-            let value = value.as_u64().unwrap_or_default();
+            let value: u32 = value
+                .as_u64()
+                .and_then(|v| v.try_into().ok())
+                .unwrap_or_default();
             if !is_valid_page(value) {
                 return Err("invalid Page".into());
             }
@@ -119,10 +122,10 @@ impl ToJSON for Page {
     }
 }
 
-impl TryFrom<u64> for Page {
+impl TryFrom<u32> for Page {
     type Error = anyhow::Error;
 
-    fn try_from(page: u64) -> Result<Self, Self::Error> {
+    fn try_from(page: u32) -> Result<Self, Self::Error> {
         anyhow::ensure!(
             is_valid_page(page),
             "Invalid `page` value, must be in range {PAGE_MINIMUM}..{PAGE_MAXIMUM}"
@@ -131,7 +134,7 @@ impl TryFrom<u64> for Page {
     }
 }
 
-impl From<Page> for u64 {
+impl From<Page> for u32 {
     fn from(value: Page) -> Self {
         value.0
     }
@@ -163,14 +166,14 @@ pub(crate) use limit_description;
 /// Description
 pub(crate) const LIMIT_DESCRIPTION: &str = limit_description!();
 /// Example.
-const LIMIT_EXAMPLE: u64 = 10;
+const LIMIT_EXAMPLE: u32 = 10;
 /// Default Limit (Should be used by paged responses to set the maximum size of the
 /// response).
-pub(crate) const LIMIT_DEFAULT: u64 = 100;
+pub(crate) const LIMIT_DEFAULT: u32 = 100;
 /// Minimum.
-const LIMIT_MINIMUM: u64 = 1;
+const LIMIT_MINIMUM: u32 = 1;
 /// Maximum.
-const LIMIT_MAXIMUM: u64 = LIMIT_DEFAULT;
+const LIMIT_MAXIMUM: u32 = LIMIT_DEFAULT;
 
 /// Schema.
 #[allow(clippy::cast_precision_loss)]
@@ -180,15 +183,15 @@ static LIMIT_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         description: Some(LIMIT_DESCRIPTION),
         example: Some(LIMIT_EXAMPLE.into()),
         default: Page(LIMIT_DEFAULT).to_json(),
-        maximum: Some(LIMIT_MAXIMUM as f64),
-        minimum: Some(LIMIT_MINIMUM as f64),
+        maximum: Some(f64::from(LIMIT_MAXIMUM)),
+        minimum: Some(f64::from(LIMIT_MINIMUM)),
         ..poem_openapi::registry::MetaSchema::ANY
     }
 });
 
 /// Limit of items to be returned in a page of data.
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-pub(crate) struct Limit(u64);
+pub(crate) struct Limit(u32);
 
 impl Default for Limit {
     fn default() -> Self {
@@ -197,7 +200,7 @@ impl Default for Limit {
 }
 
 /// Is the `Page` valid?
-fn is_valid_limit(value: u64) -> bool {
+fn is_valid_limit(value: u32) -> bool {
     (LIMIT_MINIMUM..=LIMIT_MAXIMUM).contains(&value)
 }
 
@@ -208,12 +211,12 @@ impl Type for Limit {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "integer(u64)".into()
+        "integer(u32)".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
         let schema_ref =
-            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u64")));
+            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u32")));
         schema_ref.merge(LIMIT_SCHEMA.clone())
     }
 
@@ -230,7 +233,7 @@ impl Type for Limit {
 
 impl ParseFromParameter for Limit {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        let limit: u64 = value.parse()?;
+        let limit: u32 = value.parse()?;
         Ok(Limit(limit))
     }
 }
@@ -239,7 +242,10 @@ impl ParseFromJSON for Limit {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
         if let Value::Number(value) = value {
-            let value = value.as_u64().unwrap_or_default();
+            let value: u32 = value
+                .as_u64()
+                .and_then(|v| v.try_into().ok())
+                .unwrap_or_default();
             if !is_valid_limit(value) {
                 return Err("invalid Limit".into());
             }
@@ -256,10 +262,10 @@ impl ToJSON for Limit {
     }
 }
 
-impl TryFrom<u64> for Limit {
+impl TryFrom<u32> for Limit {
     type Error = anyhow::Error;
 
-    fn try_from(limit: u64) -> Result<Self, Self::Error> {
+    fn try_from(limit: u32) -> Result<Self, Self::Error> {
         anyhow::ensure!(
             is_valid_limit(limit),
             "Invalid `limit` value, must be in range {LIMIT_MINIMUM}..{LIMIT_MAXIMUM}"
@@ -268,7 +274,7 @@ impl TryFrom<u64> for Limit {
     }
 }
 
-impl From<Limit> for u64 {
+impl From<Limit> for u32 {
     fn from(value: Limit) -> Self {
         value.0
     }
@@ -295,11 +301,11 @@ pub(crate) use remaining_description;
 /// Description
 pub(crate) const REMAINING_DESCRIPTION: &str = remaining_description!();
 /// Example.
-const REMAINING_EXAMPLE: u64 = 16_384;
+const REMAINING_EXAMPLE: u32 = 16_384;
 /// Minimum.
-const REMAINING_MINIMUM: u64 = 0;
+const REMAINING_MINIMUM: u32 = 0;
 /// Maximum.
-const REMAINING_MAXIMUM: u64 = u64::MAX;
+const REMAINING_MAXIMUM: u32 = u32::MAX;
 
 /// Schema.
 #[allow(clippy::cast_precision_loss)]
@@ -308,18 +314,18 @@ static REMAINING_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         title: Some(REMAINING_TITLE.to_owned()),
         description: Some(REMAINING_DESCRIPTION),
         example: Some(REMAINING_EXAMPLE.into()),
-        maximum: Some(REMAINING_MAXIMUM as f64),
-        minimum: Some(REMAINING_MINIMUM as f64),
+        maximum: Some(f64::from(REMAINING_MAXIMUM)),
+        minimum: Some(f64::from(REMAINING_MINIMUM)),
         ..poem_openapi::registry::MetaSchema::ANY
     }
 });
 
 /// The remaining number of items to be returned after a page.
 #[derive(Debug, Eq, PartialEq, Hash)]
-pub(crate) struct Remaining(u64);
+pub(crate) struct Remaining(u32);
 
 /// Is the `Remaining` valid?
-fn is_valid_remaining(value: u64) -> bool {
+fn is_valid_remaining(value: u32) -> bool {
     (REMAINING_MINIMUM..=REMAINING_MAXIMUM).contains(&value)
 }
 
@@ -330,12 +336,12 @@ impl Type for Remaining {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "integer(u64)".into()
+        "integer(u32)".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
         let schema_ref =
-            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u64")));
+            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("integer", "u32")));
         schema_ref.merge(REMAINING_SCHEMA.clone())
     }
 
@@ -354,7 +360,10 @@ impl ParseFromJSON for Remaining {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
         if let Value::Number(value) = value {
-            let value = value.as_u64().unwrap_or_default();
+            let value: u32 = value
+                .as_u64()
+                .and_then(|v| v.try_into().ok())
+                .unwrap_or_default();
             if !is_valid_remaining(value) {
                 return Err("invalid Remaining".into());
             }
@@ -371,10 +380,10 @@ impl ToJSON for Remaining {
     }
 }
 
-impl TryFrom<u64> for Remaining {
+impl TryFrom<u32> for Remaining {
     type Error = anyhow::Error;
 
-    fn try_from(remaining: u64) -> Result<Self, Self::Error> {
+    fn try_from(remaining: u32) -> Result<Self, Self::Error> {
         anyhow::ensure!(
             is_valid_remaining(remaining),
             "Invalid `remaining` value, must be in range {REMAINING_MINIMUM}..{REMAINING_MAXIMUM}"
@@ -386,15 +395,15 @@ impl TryFrom<u64> for Remaining {
 impl Remaining {
     /// Calculate remaining from total, page, limit, and the number of items returned.
     /// remaining = total - (page * limit) - items
-    pub(crate) fn calculate(page: u64, limit: u64, total: u64, items: u64) -> Self {
-        let remaining: u64 = total
+    pub(crate) fn calculate(page: u32, limit: u32, total: u32, items: u32) -> Self {
+        let remaining: u32 = total
             .saturating_sub(page.saturating_mul(limit))
             .saturating_sub(items);
         Self(remaining)
     }
 }
 
-impl From<Remaining> for u64 {
+impl From<Remaining> for u32 {
     fn from(value: Remaining) -> Self {
         value.0
     }

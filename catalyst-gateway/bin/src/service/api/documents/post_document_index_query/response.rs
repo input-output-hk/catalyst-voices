@@ -19,17 +19,17 @@ pub(crate) struct DocumentIndexList {
     /// List of documents that matched the filter.
     ///
     /// Documents are listed in ascending order.
-    #[oai(validator(max_items = "100"))]
+    #[oai(validator(max_items = "4294967295"))]
     pub docs: Vec<IndexedDocumentDocumented>,
     /// Current Page
-    pub page: Option<common::objects::generic::pagination::CurrentPage>,
+    pub page: common::objects::generic::pagination::CurrentPage,
 }
 
 impl Example for DocumentIndexList {
     fn example() -> Self {
         Self {
             docs: vec![IndexedDocumentDocumented::example()],
-            page: Some(common::objects::generic::pagination::CurrentPage::example()),
+            page: common::objects::generic::pagination::CurrentPage::example(),
         }
     }
 }
