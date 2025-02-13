@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.38 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v3.2.38 AS flutter_rust_bridge
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:chore/upgrade-flutter-3-29-0 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:chore/upgrade-flutter-3-29-0 AS flutter_rust_bridge
 
 builder:
     FROM flutter_rust_bridge+builder
@@ -64,11 +64,7 @@ integration-test-web:
             exit 1
     END
 
-# TODO(dtscalac): disabled integration tests due to them being flaky,
-# reenable when enable-threads.js workaround is removed
-# and the fix for flutter drive from https://github.com/flutter/flutter/issues/159037
-# is released in flutter stable channel
-disabled-test-web-all:
+test-web-all:
     BUILD +integration-test-web \
             --browser=chrome \
             --browser=firefox
