@@ -59,13 +59,9 @@ impl ParseFromParameter for DateTime {
 
 impl ParseFromJSON for DateTime {
     fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
-        let value = value.ok_or(ParseError::custom(
-            "Invalid RFC 3339 date and time. Null or missing value.",
-        ))?;
-        let value = value.as_str().ok_or(ParseError::custom(
-            "Invalid RFC 3339 date and time. Must be string.",
-        ))?;
-        Ok(Self(value.parse()?))
+        chrono::DateTime::<chrono::offset::Utc>::parse_from_json(value)
+            .map_err(|e| ParseError::custom(e.into_message()))
+            .map(Self)
     }
 }
 

@@ -28,7 +28,7 @@ impl Type for SemVer {
         )).merge(
             MetaSchema {
                 description: Some("Semantic Versioning string following semver.org 2.0.0 specification."),
-                example: Some(Self::example().0.into()),
+                example: Self::example().to_json(),
                 max_length: Some(64),
                 pattern: Some("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9A-Za-z-][0-9A-Za-z-]*))*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$".into()),
                 ..poem_openapi::registry::MetaSchema::ANY
