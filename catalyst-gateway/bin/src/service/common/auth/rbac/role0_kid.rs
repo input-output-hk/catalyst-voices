@@ -5,7 +5,6 @@ use std::fmt;
 use as_slice::AsSlice;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use pallas::crypto::hash::Hash;
-use to_vec::ToVec;
 
 use crate::utils::blake2b_hash::blake2b_128;
 
@@ -39,12 +38,6 @@ impl AsSlice for Role0Kid {
 
     fn as_slice(&self) -> &[u8] {
         self.0.as_slice()
-    }
-}
-
-impl ToVec<u8> for Role0Kid {
-    fn to_vec(self) -> Vec<u8> {
-        self.0.to_vec()
     }
 }
 
