@@ -17,7 +17,8 @@ use crate::{
         auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         objects::config::{frontend_config::FrontendConfig, ConfigUnprocessableContent},
         responses::WithErrorResponses,
-        tags::ApiTags, types::generic::error_msg::ErrorMessage,
+        tags::ApiTags,
+        types::generic::error_msg::ErrorMessage,
     },
 };
 
