@@ -130,7 +130,7 @@ jobs:
         with:
           message: |
             ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{lightgreen}Pass: ${{ steps.allure.outputs.test_result_passed }}/${{ steps.allure.outputs.test_result_total }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}/${{ steps.allure.outputs.test_result_total }}}$ |
-          mode: upsert
+          comment-tag: test_report
 
   generate-coverage-report:
     name: Generate coverage report
