@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class VoicesInputDecorationTheme extends InputDecorationTheme {
   VoicesInputDecorationTheme({
     required TextTheme textTheme,
-    required ColorScheme colorsSchema,
+    required ColorScheme colorsScheme,
     required VoicesColorScheme colors,
   }) : super(
           labelStyle: textTheme.titleSmall,
@@ -14,21 +14,20 @@ class VoicesInputDecorationTheme extends InputDecorationTheme {
           ),
           filled: true,
           fillColor: colors.onSurfaceNeutralOpaqueLv1,
-          border: _Border(colorsSchema, colors),
+          border: WidgetStateInputBorder.resolveWith(
+            (states) => _border(
+              states: states,
+              colorsScheme: colorsScheme,
+              colors: colors,
+            ),
+          ),
         );
-}
 
-class _Border extends MaterialStateOutlineInputBorder {
-  final ColorScheme colorScheme;
-  final VoicesColorScheme colors;
-
-  const _Border(
-    this.colorScheme,
-    this.colors,
-  );
-
-  @override
-  InputBorder resolve(Set<WidgetState> states) {
+  static InputBorder _border({
+    required Set<WidgetState> states,
+    required ColorScheme colorsScheme,
+    required VoicesColorScheme colors,
+  }) {
     if (states.contains(WidgetState.disabled)) {
       return OutlineInputBorder(
         borderSide: BorderSide(
@@ -52,7 +51,7 @@ class _Border extends MaterialStateOutlineInputBorder {
     if (states.contains(WidgetState.focused)) {
       return OutlineInputBorder(
         borderSide: BorderSide(
-          color: colorScheme.primary,
+          color: colorsScheme.primary,
           width: 2,
         ),
         borderRadius: BorderRadius.circular(4),

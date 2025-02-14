@@ -1,42 +1,8 @@
-"""Utilities for testing schema mismatch behavior."""
-
-from loguru import logger
 import requests
 import time
+from loguru import logger
 import math
-from datetime import datetime
-
-DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-DEFAULT_TIMEOUT = 10
-CAT_GATEWAY_HOST = "127.0.0.1"
-CAT_GATEWAY_PORT = 3030
-
-
-def printable_time(time: float):
-    return f"{math.floor(time / 3600):02}:{math.floor((time % 3600) / 60):02}:{math.floor(time % 60):02}"
-
-
-def cat_gateway_endpoint_url(endpoint: str):
-    return f"http://{CAT_GATEWAY_HOST}:{CAT_GATEWAY_PORT}/{endpoint}"
-
-
-def check_is_live():
-    resp = requests.get(cat_gateway_endpoint_url("api/v1/health/live"))
-    assert resp.status_code == 204, f"Service is expected to be live: {resp.status_code} - {resp.text}"
-    logger.info("cat-gateway service is LIVE.")
-
-
-def check_is_ready():
-    resp = requests.get(cat_gateway_endpoint_url("api/v1/health/ready"))
-    assert resp.status_code == 204, f"Service is expected to be ready: {resp.status_code} - {resp.text}"
-    logger.info("cat-gateway service is READY.")
-
-
-def check_is_not_ready():
-    resp = requests.get(cat_gateway_endpoint_url("api/v1/health/ready"))
-    assert resp.status_code == 503, f"Service is expected to be unready: {resp.status_code} - {resp.text}"
-    logger.info("cat-gateway service is NOT READY.")
-
+from api import cat_gateway_endpoint_url
 
 def get_sync_state(network: str):
     resp = requests.get(
@@ -46,40 +12,8 @@ def get_sync_state(network: str):
     if resp.status_code == 200:
         return resp.json()
 
-
-def get_staked_ada(address: str, network: str, slot_number: int):
-    resp = requests.get(
-        cat_gateway_endpoint_url(
-            f"api/cardano/staked_ada/{address}?network={network}&slot_number={slot_number}"
-        )
-    )
-    assert resp.status_code == 200 or resp.status_code == 404
-    if resp.status_code == 200:
-        return resp.json()
-
-
-def get_date_time_to_slot_number(network: str, date_time: datetime):
-    # replace special characters
-    date_time = date_time.isoformat().replace(":", "%3A").replace("+", "%2B")
-    resp = requests.get(
-        cat_gateway_endpoint_url(
-            f"api/cardano/date_time_to_slot_number?network={network}&date_time={date_time}"
-        )
-    )
-    assert resp.status_code == 200
-    return resp.json()
-
-
-def get_voter_registration(address: str, network: str, slot_number: int):
-    resp = requests.get(
-        cat_gateway_endpoint_url(
-            f"api/cardano/registration/{address}?network={network}&slot_number={slot_number}"
-        )
-    )
-    assert resp.status_code == 200 or resp.status_code == 404
-    if resp.status_code == 200:
-        return resp.json()
-
+def printable_time(time: float):
+    return f"{math.floor(time / 3600):02}:{math.floor((time % 3600) / 60):02}:{math.floor(time % 60):02}"
 
 # Wait until service will sync to the provided slot number
 def sync_to(network: str, slot_num: int, timeout: int):

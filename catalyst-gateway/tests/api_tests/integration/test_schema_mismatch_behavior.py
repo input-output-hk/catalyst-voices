@@ -4,16 +4,15 @@ from loguru import logger
 import asyncio
 import asyncpg
 import pytest
-
-from api_tests import DB_URL, check_is_live, check_is_ready, check_is_not_ready
+from integration import EVENT_DB_TEST_URL
+from utils import health
 
 GET_VERSION_QUERY = "SELECT MAX(version) FROM refinery_schema_history"
 UPDATE_QUERY = "UPDATE refinery_schema_history SET version=$1 WHERE version=$2"
 
-
 def fetch_schema_version():
     async def get_current_version():
-        conn = await asyncpg.connect(DB_URL)
+        conn = await asyncpg.connect(EVENT_DB_TEST_URL)
         if conn is None:
             raise Exception("no db connection found")
 
@@ -27,7 +26,7 @@ def fetch_schema_version():
 
 def change_version(from_value: int, change_to: int):
     async def change_schema_version():
-        conn = await asyncpg.connect(DB_URL)
+        conn = await asyncpg.connect(EVENT_DB_TEST_URL)
         if conn is None:
             raise Exception("no db connection found for")
 
@@ -37,13 +36,13 @@ def change_version(from_value: int, change_to: int):
 
     return asyncio.run(change_schema_version())
 
-@pytest.mark.skip
+@pytest.mark.skip('To be refactored when the api is ready')
 def test_schema_version_mismatch_changes_cat_gateway_behavior():
     # Check that the `live` endpoint is OK
-    check_is_live()
+    health.is_live()
 
     # Check that the `ready` endpoint is OK
-    check_is_ready()
+    health.is_ready()
 
     # Fetch current schema version from DB
     initial_version = fetch_schema_version()
@@ -60,10 +59,10 @@ def test_schema_version_mismatch_changes_cat_gateway_behavior():
     logger.info(f"cat-gateway schema version is: {changed_version}.")
 
     # Check that the `live` endpoint is OK
-    check_is_live()
+    health.is_live()
 
     # Check that the `ready` endpoint is NOT OK
-    check_is_not_ready()
+    health.is_not_ready()
 
     # Change version back
     change_version(changed_version, initial_version)
@@ -75,4 +74,4 @@ def test_schema_version_mismatch_changes_cat_gateway_behavior():
     logger.info(f"cat-gateway schema version is: {changed_version}.")
 
     # Check that the `ready` endpoint is OK
-    check_is_ready()
+    health.is_ready()

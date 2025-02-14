@@ -13,6 +13,8 @@ This repository contains the Catalyst Voices app and packages.
     * [Environment variables](#environment-variables)
     * [Code Generation](#code-generation)
       * [Running Code Generation](#running-code-generation)
+        * [Basic Generation](#basic-generation)
+        * [Local Saving](#local-saving)
       * [GitHub Token / PAT Setup](#github-token--pat-setup)
       * [Security Notes](#security-notes)
   * [Running Tests](#running-tests)
@@ -20,7 +22,7 @@ This repository contains the Catalyst Voices app and packages.
 
 ## Requirements
 
-* flutter: 3.27.3+
+* flutter: 3.29.0+
 * Dart: 3.5.0+
 * Ruby: 2.5+
 * Xcode: 15.0+
