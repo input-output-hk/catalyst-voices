@@ -297,11 +297,8 @@ fn build_stake_info(
                     });
                 }
 
-                let slot_no = i64::try_from(txo_info.slot_no).map_err(|err| anyhow!(err))?;
-
-                if stake_info.slot_number < slot_no {
-                    stake_info.slot_number = slot_no;
-                }
+                let slot_no = u64::try_from(txo_info.slot_no)?;
+                stake_info.slot_number = slot_no.into();
             }
         }
     }

@@ -3,8 +3,8 @@
 use poem_openapi::{types::Example, Object};
 
 use crate::service::{
-    api::cardano::types::{DateTime, SlotNumber},
-    common::objects::cardano::hash::Hash,
+    api::cardano::types::DateTime,
+    common::{objects::cardano::hash::Hash, types::cardano::slot_no::SlotNo},
 };
 
 /// Cardano follower's sync state info.
@@ -12,9 +12,7 @@ use crate::service::{
 #[oai(example = true)]
 pub(crate) struct SyncState {
     /// Slot number.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
-    pub(crate) slot_number: SlotNumber,
+    pub(crate) slot_number: SlotNo,
 
     /// Block hash.
     pub(crate) block_hash: Hash,
@@ -27,7 +25,7 @@ impl Example for SyncState {
     #[allow(clippy::expect_used)]
     fn example() -> Self {
         Self {
-            slot_number: 5,
+            slot_number: SlotNo::example(),
             block_hash: hex::decode(
                 "0000000000000000000000000000000000000000000000000000000000000000",
             )

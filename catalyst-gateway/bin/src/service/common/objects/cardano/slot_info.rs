@@ -3,8 +3,8 @@
 use poem_openapi::{types::Example, Object};
 
 use crate::service::{
-    api::cardano::types::{DateTime, SlotNumber},
-    common::objects::cardano::hash::Hash,
+    api::cardano::types::DateTime,
+    common::{objects::cardano::hash::Hash, types::cardano::slot_no::SlotNo},
 };
 
 /// Cardano block's slot data.
@@ -13,9 +13,7 @@ use crate::service::{
 #[allow(clippy::struct_field_names)]
 pub(crate) struct Slot {
     /// Slot number.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub(crate) slot_number: SlotNumber,
+    pub(crate) slot_number: SlotNo,
 
     /// Block hash.
     pub(crate) block_hash: Hash,
@@ -28,7 +26,7 @@ impl Example for Slot {
     #[allow(clippy::expect_used)]
     fn example() -> Self {
         Self {
-            slot_number: 121_099_410,
+            slot_number: SlotNo::example(),
             block_hash: hex::decode(
                 "aa34657bf91e04eb5b506d76a66f688dbfbc509dbf70bc38124d4e8832fdd68a",
             )
@@ -62,7 +60,7 @@ impl Example for SlotInfo {
     fn example() -> Self {
         Self {
             previous: Some(Slot {
-                slot_number: 121_099_406,
+                slot_number: 121_099_406.into(),
                 block_hash: hex::decode(
                     "162ae0e2d08dd238233308eef328bf39ba529b82bc0b87c4eeea3c1dae4fc877",
                 )
@@ -72,7 +70,7 @@ impl Example for SlotInfo {
                     .expect("Invalid timestamp"),
             }),
             current: Some(Slot {
-                slot_number: 121_099_409,
+                slot_number: 121_099_409.into(),
                 block_hash: hex::decode(
                     "aa34657bf91e04eb5b506d76a66f688dbfbc509dbf70bc38124d4e8832fdd68a",
                 )
@@ -82,7 +80,7 @@ impl Example for SlotInfo {
                     .expect("Invalid timestamp"),
             }),
             next: Some(Slot {
-                slot_number: 121_099_422,
+                slot_number: 121_099_422.into(),
                 block_hash: hex::decode(
                     "83ad63288ae14e75de1a1f794bda5d317fa59cbdbf1cc4dc83471d76555a5e89",
                 )
