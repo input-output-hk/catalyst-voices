@@ -94,9 +94,7 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
 
   @override
   set value(PagingState<ItemType> newValue) {
-    if (value != newValue) {
-      notifyStateListeners(newValue);
-    }
+    notifyStateListeners(newValue);
 
     super.value = newValue;
   }
@@ -120,7 +118,6 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
   void empty() {
     value = value.copyWith(
       itemList: [],
-      isLoading: false,
       error: null,
     );
   }

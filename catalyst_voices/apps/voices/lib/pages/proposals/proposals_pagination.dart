@@ -18,6 +18,7 @@ class ProposalsPagination extends StatefulWidget {
   final bool isEmpty;
   final bool userProposals;
   final bool usersFavorite;
+  final String? categoryId;
 
   const ProposalsPagination(
     this.proposals,
@@ -28,6 +29,7 @@ class ProposalsPagination extends StatefulWidget {
     this.isEmpty = false,
     this.userProposals = false,
     this.usersFavorite = false,
+    this.categoryId,
   });
 
   @override
@@ -57,6 +59,7 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
         pageSize: pageSize,
         lastId: lastItem?.id,
         stage: widget.stage,
+        categoryId: widget.categoryId,
         usersProposals: widget.userProposals,
         usersFavorite: widget.usersFavorite,
       );
@@ -78,7 +81,11 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
     if (oldWidget.proposals != widget.proposals) {
       _handleItemListChange();
     }
-    if (widget.isEmpty != oldWidget.isEmpty && widget.isEmpty) {
+    if (oldWidget.categoryId != widget.categoryId) {
+      _pagingController.notifyPageRequestListeners(0);
+    }
+    if (widget.isEmpty != oldWidget.isEmpty ||
+        (oldWidget.isEmpty && widget.isEmpty)) {
       _pagingController.empty();
     }
   }
