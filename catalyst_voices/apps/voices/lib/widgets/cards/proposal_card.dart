@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 ///
 /// Designed to work with as many cases as [ProposalViewModel] will support.
 class ProposalCard extends StatelessWidget {
-  final AssetGenImage image;
+  final AssetGenImage? image;
   final ProposalViewModel proposal;
   final bool showStatus;
   final bool showLastUpdate;
@@ -19,7 +19,7 @@ class ProposalCard extends StatelessWidget {
 
   const ProposalCard({
     super.key,
-    required this.image,
+    this.image,
     required this.proposal,
     this.showStatus = true,
     this.showLastUpdate = true,
@@ -42,12 +42,11 @@ class ProposalCard extends StatelessWidget {
           onFavoriteChanged: onFavoriteChanged,
         ),
       FundedProposal() => FundedProposalCard(
-          image: image,
+          image: image ?? VoicesAssets.images.proposalBackground1,
           proposal: proposal,
           isFavorite: isFavorite,
           onFavoriteChanged: onFavoriteChanged,
         ),
-      (_) => const Offstage(),
     };
   }
 }

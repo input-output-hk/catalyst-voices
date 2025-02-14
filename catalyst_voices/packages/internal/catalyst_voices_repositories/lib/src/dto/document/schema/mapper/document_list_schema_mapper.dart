@@ -40,6 +40,7 @@ final class DocumentListSchemaMapper {
         description != null ? MarkdownData(description) : null;
     final placeholder = schema.placeholder;
     final guidance = schema.guidance;
+    final guidanceMarkdown = guidance != null ? MarkdownData(guidance) : null;
     final isSubsection = schema.subsection ?? false;
     final itemsSchema = schema.items!.toModel(
       definitions: definitions,
@@ -61,7 +62,7 @@ final class DocumentListSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
@@ -75,7 +76,7 @@ final class DocumentListSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
@@ -89,7 +90,7 @@ final class DocumentListSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
@@ -103,7 +104,7 @@ final class DocumentListSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
@@ -117,7 +118,7 @@ final class DocumentListSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,
@@ -131,7 +132,7 @@ final class DocumentListSchemaMapper {
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
-          guidance: guidance,
+          guidance: guidanceMarkdown,
           isSubsection: isSubsection,
           isRequired: isRequired,
           itemsSchema: itemsSchema,

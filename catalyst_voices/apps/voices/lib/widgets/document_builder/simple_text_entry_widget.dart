@@ -2,6 +2,7 @@ import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,7 @@ class SimpleTextEntryWidget extends StatefulWidget {
 class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   late final TextEditingController _controller;
   late final FocusNode _focusNode;
+  late final Debouncer _onChangedDebouncer;
 
   String get _title => widget.schema.title;
   bool get _isRequired => widget.schema.isRequired;
@@ -42,6 +44,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
 
     _controller = TextEditingController.fromValue(textValue);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
+    _onChangedDebouncer = Debouncer();
   }
 
   @override
@@ -64,6 +67,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   void dispose() {
     _controller.dispose();
     _focusNode.dispose();
+    _onChangedDebouncer.dispose();
     super.dispose();
   }
 
@@ -90,7 +94,7 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
             hintText: widget.schema.placeholder,
           ),
           enabled: widget.isEditMode,
-          resizableVertically: _resizable,
+          resizableVertically: false,
           resizableHorizontally: false,
           maxLengthEnforcement: MaxLengthEnforcement.none,
           maxLines: _resizable ? null : 1,
@@ -111,6 +115,10 @@ class _SimpleTextEntryWidgetState extends State<SimpleTextEntryWidget> {
   }
 
   void _onChanged(String? value) {
+    _onChangedDebouncer.run(() => _dispatchChange(value));
+  }
+
+  void _dispatchChange(String? value) {
     final normalizedValue = widget.schema.normalizeValue(value);
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,

@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -29,13 +28,10 @@ class MultilineTextEntryMarkdownWidget extends StatefulWidget {
 
 class _MultilineTextEntryMarkdownWidgetState
     extends State<MultilineTextEntryMarkdownWidget> {
-  late VoicesRichTextController _controller;
+  late final VoicesRichTextController _controller;
   late final VoicesRichTextFocusNode _focus;
   late final ScrollController _scrollController;
-
-  quill.Document? _observedDocument;
-  StreamSubscription<quill.DocChange>? _documentChangeSub;
-  quill.Document? _preEditDocument;
+  late final Debouncer _onChangedDebouncer;
 
   String get _title => widget.schema.formattedTitle;
   int? get _maxLength => widget.schema.strLengthRange?.max;
@@ -45,10 +41,9 @@ class _MultilineTextEntryMarkdownWidgetState
     super.initState();
 
     _controller = _buildController(widget.property.value ?? '');
-    _controller.addListener(_onControllerChanged);
-
     _focus = VoicesRichTextFocusNode();
     _scrollController = ScrollController();
+    _onChangedDebouncer = Debouncer();
   }
 
   @override
@@ -62,7 +57,7 @@ class _MultilineTextEntryMarkdownWidgetState
     }
 
     if (widget.property.value != oldWidget.property.value) {
-      _updateContents(widget.property.value ?? '');
+      _updateContents(MarkdownData(widget.property.value ?? ''));
     }
   }
 
@@ -71,6 +66,7 @@ class _MultilineTextEntryMarkdownWidgetState
     _controller.dispose();
     _focus.dispose();
     _scrollController.dispose();
+    _onChangedDebouncer.dispose();
     super.dispose();
   }
 
@@ -83,6 +79,7 @@ class _MultilineTextEntryMarkdownWidgetState
       focusNode: _focus,
       scrollController: _scrollController,
       charsLimit: _maxLength,
+      onChanged: _onChanged,
       validator: _validator,
     );
   }
@@ -103,49 +100,22 @@ class _MultilineTextEntryMarkdownWidgetState
     );
   }
 
-  void _onControllerChanged() {
-    if (_observedDocument != _controller.document) {
-      _updateObservedDocument();
-    }
+  // ignore: use_setters_to_change_properties
+  void _updateContents(MarkdownData markdownData) {
+    _controller.markdownData = markdownData;
   }
 
-  void _updateObservedDocument() {
-    _observedDocument = _controller.document;
-    unawaited(_documentChangeSub?.cancel());
-    _documentChangeSub = _observedDocument?.changes.listen(_onDocumentChanged);
+  void _toggleEditMode() {
+    _controller.readOnly = !widget.isEditMode;
   }
 
-  void _updateContents(String value) {
-    if (value.isNotEmpty) {
-      final input = MarkdownData(value);
-      final delta = markdown.encoder.convert(input);
-      _controller.setContents(delta, changeSource: quill.ChangeSource.remote);
-    } else {
-      _controller.clear();
-    }
+  void _onChanged(MarkdownData? markdownData) {
+    _onChangedDebouncer.run(() => _dispatchChange(markdownData));
   }
 
-  String? _validator(quill.Document? document) {
-    final delta = document?.toDelta();
-    final markdownData = delta != null ? markdown.decoder.convert(delta) : null;
+  void _dispatchChange(MarkdownData? markdownData) {
     final markdownValue = markdownData?.data;
     final normalizedValue = widget.schema.normalizeValue(markdownValue);
-
-    final error = widget.schema.validate(normalizedValue);
-    return LocalizedDocumentValidationResult.from(error).message(context);
-  }
-
-  void _onDocumentChanged(quill.DocChange change) {
-    if (change.change.last.data != '\n') {
-      _notifyChangeListener();
-    }
-  }
-
-  void _notifyChangeListener() {
-    final delta = _controller.document.toDelta();
-    final markdownData = markdown.decoder.convert(delta);
-    final value = markdownData.data;
-    final normalizedValue = widget.schema.normalizeValue(value);
 
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
@@ -155,27 +125,12 @@ class _MultilineTextEntryMarkdownWidgetState
     widget.onChanged([change]);
   }
 
-  void _toggleEditMode() {
-    _controller.readOnly = !widget.isEditMode;
-    if (widget.isEditMode) {
-      _startEdit();
-    } else {
-      _stopEdit();
-    }
-  }
+  String? _validator(MarkdownData? markdownData) {
+    final markdownValue = markdownData?.data;
+    final normalizedValue = widget.schema.normalizeValue(markdownValue);
 
-  void _startEdit() {
-    final currentDocument = _controller.document;
-    _preEditDocument = quill.Document.fromDelta(currentDocument.toDelta());
-  }
-
-  void _stopEdit() {
-    final preEditDocument = _preEditDocument;
-    _preEditDocument = null;
-
-    if (preEditDocument != null) {
-      _controller.document = preEditDocument;
-    }
+    final error = widget.schema.validate(normalizedValue);
+    return LocalizedDocumentValidationResult.from(error).message(context);
   }
 }
 
