@@ -85,7 +85,7 @@ impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let prv_txn_id = match self.prv_txn_id {
             MaybeUnset::Unset => "UNSET".to_owned(),
-            MaybeUnset::Set(v) => format!("{v:?}"),
+            MaybeUnset::Set(v) => format!("{v}"),
         };
         let purpose = match self.purpose {
             MaybeUnset::Unset => "UNSET".to_owned(),
