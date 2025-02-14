@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["chain_root_get","registrations_get"]};

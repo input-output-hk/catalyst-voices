@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["_SELECT_MAX_VERSION_SQL"],"struct":["MismatchedSchemaError"]};

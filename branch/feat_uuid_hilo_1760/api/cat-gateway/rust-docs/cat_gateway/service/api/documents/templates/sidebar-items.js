@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_doc_static_template"],"mod":["proposal"],"static":["TEMPLATES"],"struct":["SignedDocTemplate"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ROLE0_KID_LENGTH"],"struct":["Role0Kid"]};
