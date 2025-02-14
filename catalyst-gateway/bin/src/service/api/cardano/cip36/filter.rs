@@ -155,7 +155,7 @@ pub async fn get_registration_from_stake_addr(
                 vote_pub_key,
                 registrations: vec![registration.clone()].into(),
             }],
-            invalid: invalids_report,
+            invalid: invalids_report.into(),
             page: None,
         },
     )))
@@ -419,7 +419,11 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         Cip36RegistrationList {
             slot: slot_no.unwrap_or_default(),
             voting_key: all_registrations_after_filtering,
-            invalid: all_invalids_after_filtering.into_iter().flatten().collect(),
+            invalid: all_invalids_after_filtering
+                .into_iter()
+                .flatten()
+                .collect::<Vec<_>>()
+                .into(),
             page: None,
         },
     )))

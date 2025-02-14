@@ -26,6 +26,20 @@ macro_rules! impl_array_types {
             }
         }
 
+        impl std::ops::Deref for $ty {
+            type Target = Vec<$item_ty>;
+
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+
+        impl std::ops::DerefMut for $ty {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.0
+            }
+        }
+
         impl poem_openapi::types::Type for $ty {
             const IS_REQUIRED: bool = true;
 
@@ -48,6 +62,11 @@ macro_rules! impl_array_types {
 
             fn as_raw_value(&self) -> Option<&Self::RawValueType> {
                 Some(self)
+            }
+
+            fn register(registry: &mut poem_openapi::registry::Registry) {
+                // note: to prevent `item_ty` from not being attached to the schema.
+                $item_ty::register(registry);
             }
 
             fn raw_element_iter<'a>(

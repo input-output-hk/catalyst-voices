@@ -3,7 +3,7 @@ use anyhow::anyhow;
 use futures::StreamExt;
 use poem_openapi::{
     payload::Json,
-    types::{Example, ToJSON, Type},
+    types::{Example, ToJSON},
     ApiResponse, Object,
 };
 use tracing::error;
@@ -30,15 +30,6 @@ pub(crate) struct RbacRegistration {
     tx_hash: Hash256,
 }
 
-impl RbacRegistration {
-    fn schema() -> poem_openapi::registry::MetaSchema {
-        let mut schema = poem_openapi::registry::MetaSchema::new("object");
-        schema.required = vec!["tx_hash"];
-        schema.properties = vec![("tx_hash", Hash256::schema_ref())];
-        schema
-    }
-}
-
 impl Example for RbacRegistration {
     fn example() -> Self {
         Self {
@@ -54,9 +45,7 @@ impl_array_types!(
     Some(poem_openapi::registry::MetaSchema {
         example: Self::example().to_json(),
         max_items: Some(100000),
-        items: Some(Box::new(poem_openapi::registry::MetaSchemaRef::Inline(
-            Box::new(RbacRegistration::schema())
-        ))),
+        items: Some(Box::new(RbacRegistration::schema_ref())),
         ..poem_openapi::registry::MetaSchema::ANY
     })
 );

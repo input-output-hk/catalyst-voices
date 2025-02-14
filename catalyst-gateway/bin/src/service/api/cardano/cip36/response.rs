@@ -38,8 +38,8 @@ pub(crate) struct Cip36RegistrationList {
     #[oai(validator(max_items = "100"))]
     pub voting_key: Vec<Cip36RegistrationsForVotingPublicKey>,
     /// List of latest invalid registrations that were found, for the requested filter.
-    #[oai(skip_serializing_if_is_empty, validator(max_items = "10"))]
-    pub invalid: Vec<Cip36Details>,
+    #[oai(skip_serializing_if_is_empty)]
+    pub invalid: common::types::cardano::registration_list::RegistrationCip36List,
     /// Current Page
     #[oai(skip_serializing_if_is_none)]
     pub page: Option<common::objects::generic::pagination::CurrentPage>,
@@ -52,7 +52,7 @@ impl Example for Cip36RegistrationList {
                 .try_into()
                 .unwrap_or_default(),
             voting_key: vec![Cip36RegistrationsForVotingPublicKey::example()],
-            invalid: vec![Cip36Details::invalid_example()],
+            invalid: vec![Cip36Details::invalid_example()].into(),
             page: Some(common::objects::generic::pagination::CurrentPage::example()),
         }
     }
