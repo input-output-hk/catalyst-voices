@@ -40,15 +40,11 @@ pub(crate) enum VotingInfo {
 
 /// Block time
 pub(crate) type DateTime = chrono::DateTime<chrono::offset::Utc>;
-/// Slot
-pub(crate) type SlotNumber = i64;
 /// Transaction id
 pub(crate) type TxId = Vec<u8>;
 /// Public voting key
 pub(crate) type PublicVotingInfo = VotingInfo;
 /// Payment address
 pub(crate) type PaymentAddress = Vec<u8>;
-/// Nonce
-pub(crate) type Nonce = i64;
 /// Stake amount.
 pub(crate) type StakeAmount = i64;
