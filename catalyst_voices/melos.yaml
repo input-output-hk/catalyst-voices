@@ -173,7 +173,8 @@ scripts:
       --scope="catalyst_voices_repositories" -- \
           dart run build_runner build --delete-conflicting-outputs \
               --build-filter="lib/src/dto/**" \
-              --build-filter="lib/src/database/**"
+              --build-filter="lib/src/database/**" \
+              --build-filter="lib/src/api/**"
     description: |
       Run `build_runner` in catalyst_voices_repositories package only in selected folders
 
