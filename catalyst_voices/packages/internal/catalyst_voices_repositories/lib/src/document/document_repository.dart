@@ -10,6 +10,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:uuid/uuid.dart';
 
 @visibleForTesting
 typedef DocumentsDataWithRefData = ({DocumentData data, DocumentData refData});
@@ -21,16 +22,45 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
+  /// Observes matching [ProposalDocument] and emits updates.
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Stream<ProposalDocument> watchProposalDocument({
     required DocumentRef ref,
   });
 
+  /// Returns matching [ProposalDocument] for matching [ref].
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Future<ProposalDocument> getProposalDocument({
     required DocumentRef ref,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
+  });
+
+  /// Stores new draft locally and returns ref to it.
+  ///
+  /// At the moment we do not support drafts of templates that's why
+  /// [template] requires [SignedDocumentRef].
+  ///
+  /// If [of] is declared it will be used for this draft and new version
+  /// assigned. Think of it as editing published document.
+  Future<DraftRef> createProposalDraft({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    SignedDocumentRef? of,
+  });
+
+  /// Updates local draft (or drafts if version is not specified)
+  /// matching [ref] with given [content].
+  ///
+  /// If watching same draft with [watchProposalDocument] it will emit
+  /// change.
+  Future<void> updateProposalDraftContent({
+    required DraftRef ref,
+    required DocumentDataContent content,
   });
 }
 
@@ -100,6 +130,40 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     return _buildProposalTemplate(documentData: documentData);
+  }
+
+  @override
+  Future<DraftRef> createProposalDraft({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    SignedDocumentRef? of,
+  }) async {
+    final id = of?.id ?? const Uuid().v7();
+    final version = of != null ? const Uuid().v7() : id;
+
+    final ref = DraftRef(id: id, version: version);
+    final metadata = DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      selfRef: ref,
+      template: template,
+    );
+
+    final data = DocumentData(
+      metadata: metadata,
+      content: content,
+    );
+
+    await _drafts.save(data: data);
+
+    return ref;
+  }
+
+  @override
+  Future<void> updateProposalDraftContent({
+    required DraftRef ref,
+    required DocumentDataContent content,
+  }) async {
+    await _drafts.update(ref: ref, content: content);
   }
 
   ProposalDocument _buildProposalDocument({
@@ -187,6 +251,29 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
     bool synchronizedUpdate = false,
   }) {
+    return switch (ref) {
+      SignedDocumentRef() => _watchSignedDocumentData(
+          ref: ref,
+          synchronizedUpdate: synchronizedUpdate,
+        ),
+      DraftRef() => _watchDraftDocumentData(ref: ref),
+    };
+  }
+
+  @visibleForTesting
+  Future<DocumentData> getDocumentData({
+    required DocumentRef ref,
+  }) {
+    return switch (ref) {
+      SignedDocumentRef() => _getSignedDocumentData(ref: ref),
+      DraftRef() => _getDraftDocumentData(ref: ref),
+    };
+  }
+
+  Stream<DocumentData?> _watchSignedDocumentData({
+    required SignedDocumentRef ref,
+    bool synchronizedUpdate = false,
+  }) {
     /// Make sure we're update to date with document ref.
     final documentDataFuture = synchronizedUpdate
         // ignore: discarded_futures
@@ -200,9 +287,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return StreamGroup.merge([updateStream, localStream]);
   }
 
-  @visibleForTesting
-  Future<DocumentData> getDocumentData({
-    required DocumentRef ref,
+  Stream<DocumentData?> _watchDraftDocumentData({
+    required DraftRef ref,
+  }) {
+    return _drafts.watch(ref: ref);
+  }
+
+  Future<DocumentData> _getSignedDocumentData({
+    required SignedDocumentRef ref,
   }) async {
     // if version is not specified we're asking remote for latest version
     // if remote does not know about this id its probably draft so
@@ -216,10 +308,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     if (isCached) {
       return _localDocuments.get(ref: ref);
     }
+
     final remoteData = await _remoteDocuments.get(ref: ref);
 
     await _localDocuments.save(data: remoteData);
 
     return remoteData;
+  }
+
+  Future<DocumentData> _getDraftDocumentData({
+    required DraftRef ref,
+  }) async {
+    return _drafts.get(ref: ref);
   }
 }

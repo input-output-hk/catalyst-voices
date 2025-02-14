@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class DocumentRef extends Equatable {
+sealed class DocumentRef extends Equatable {
   final String id;
   final String? version;
 
@@ -15,8 +15,47 @@ final class DocumentRef extends Equatable {
   DocumentRef copyWith({
     String? id,
     Optional<String>? version,
+  });
+
+  @override
+  List<Object?> get props => [id, version];
+}
+
+final class SignedDocumentRef extends DocumentRef {
+  const SignedDocumentRef({
+    required super.id,
+    super.version,
+  });
+
+  @override
+  SignedDocumentRef copyWith({
+    String? id,
+    Optional<String>? version,
   }) {
-    return DocumentRef(
+    return SignedDocumentRef(
+      id: id ?? this.id,
+      version: version.dataOr(this.version),
+    );
+  }
+
+  @override
+  String toString() => isExact
+      ? 'ExactSignedDocumentRef($id.v$version)'
+      : 'LooseSignedDocumentRef($id)';
+}
+
+final class DraftRef extends DocumentRef {
+  const DraftRef({
+    required super.id,
+    super.version,
+  });
+
+  @override
+  DraftRef copyWith({
+    String? id,
+    Optional<String>? version,
+  }) {
+    return DraftRef(
       id: id ?? this.id,
       version: version.dataOr(this.version),
     );
@@ -24,10 +63,7 @@ final class DocumentRef extends Equatable {
 
   @override
   String toString() =>
-      isExact ? 'ExactDocumentRef($id.v$version)' : 'LooseDocumentRef($id)';
-
-  @override
-  List<Object?> get props => [id, version];
+      isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
 }
 
 final class SecuredDocumentRef extends Equatable {

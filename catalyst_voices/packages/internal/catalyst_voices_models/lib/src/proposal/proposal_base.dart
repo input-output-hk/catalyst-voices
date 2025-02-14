@@ -82,7 +82,7 @@ base class ProposalBase extends Equatable {
   int get completedSegments => 0;
 
   // TODO(damian-molinski): this should come from api
-  DocumentRef get ref => const DocumentRef(id: 'document');
+  DocumentRef get ref => const SignedDocumentRef(id: 'document');
 
   @override
   @mustCallSuper

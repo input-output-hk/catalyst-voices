@@ -38,12 +38,11 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
         : DocumentType.proposalDocument;
     final ver = ref.version ?? ref.id;
     final template =
-        !isSchema ? const DocumentRef(id: mockedTemplateUuid) : null;
+        !isSchema ? const SignedDocumentRef(id: mockedTemplateUuid) : null;
 
     final metadata = DocumentDataMetadata(
       type: type,
-      id: ref.id,
-      version: ver,
+      selfRef: SignedDocumentRef(id: ref.id, version: ver),
       template: template,
     );
 

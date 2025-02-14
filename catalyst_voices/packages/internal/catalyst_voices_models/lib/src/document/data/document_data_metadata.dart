@@ -7,11 +7,8 @@ final class DocumentDataMetadata extends Equatable {
   /// Type of this signed document
   final DocumentType type;
 
-  /// uuid-v7
-  final String id;
-
-  /// uuid-v7
-  final String version;
+  /// Reference to this document. Have to be exact.
+  final DocumentRef selfRef;
 
   /// Reference to another document. The purpose of the ref will vary depending
   /// on the document type.
@@ -42,10 +39,9 @@ final class DocumentDataMetadata extends Equatable {
   /// "Products & Integrations".
   final String? categoryId;
 
-  const DocumentDataMetadata({
+  DocumentDataMetadata({
     required this.type,
-    required this.id,
-    required this.version,
+    required this.selfRef,
     this.ref,
     this.refHash,
     this.template,
@@ -53,13 +49,19 @@ final class DocumentDataMetadata extends Equatable {
     this.campaignId,
     this.electionId,
     this.categoryId,
-  });
+  }) : assert(
+          selfRef.isExact,
+          'selfRef have to be exact. Make sure version is not null',
+        );
+
+  String get id => selfRef.id;
+
+  String get version => selfRef.version!;
 
   @override
   List<Object?> get props => [
         type,
-        id,
-        version,
+        selfRef,
         ref,
         refHash,
         template,

@@ -30,7 +30,7 @@ void main() {
           2,
           (index) => DraftFactory.build(),
         );
-        final ref = DocumentRef(
+        final ref = DraftRef(
           id: drafts.first.metadata.id,
           version: drafts.first.metadata.version,
         );
@@ -70,19 +70,17 @@ void main() {
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: firstVersionId,
+              selfRef: DraftRef(id: id, version: firstVersionId),
             ),
           ),
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: secondVersionId,
+              selfRef: DraftRef(id: id, version: secondVersionId),
             ),
           ),
         ];
-        final ref = DocumentRef(id: drafts.first.metadata.id);
+        final ref = DraftRef(id: drafts.first.metadata.id);
 
         // When
         await database.draftsDao.saveAll(drafts);
@@ -102,7 +100,7 @@ void main() {
           2,
           (index) => DraftFactory.build(),
         );
-        final ref = DocumentRef(id: const Uuid().v7());
+        final ref = DraftRef(id: const Uuid().v7());
 
         // When
         await database.draftsDao.saveAll(drafts);
@@ -124,13 +122,12 @@ void main() {
             return DraftFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                id: id,
-                version: const Uuid().v7(),
+                selfRef: DocumentRefFactory.buildDraft(id: id),
               ),
             );
           },
         );
-        final ref = DocumentRef(id: id);
+        final ref = DraftRef(id: id);
 
         // When
         await database.draftsDao.saveAll(drafts);
@@ -149,19 +146,17 @@ void main() {
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: version,
+              selfRef: DocumentRefFactory.buildDraft(id: id, version: version),
             ),
           ),
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: const Uuid().v7(),
+              selfRef: DocumentRefFactory.buildDraft(id: id),
             ),
           ),
         ];
-        final ref = DocumentRef(id: id, version: version);
+        final ref = DraftRef(id: id, version: version);
 
         // When
         await database.draftsDao.saveAll(drafts);
@@ -178,7 +173,7 @@ void main() {
           DraftFactory.build(),
           DraftFactory.build(),
         ];
-        final ref = DocumentRef(id: const Uuid().v7());
+        final ref = DraftRef(id: const Uuid().v7());
 
         // When
         await database.draftsDao.saveAll(drafts);
@@ -198,7 +193,7 @@ void main() {
           'title': 'Dev final 2',
           'author': 'dev',
         });
-        final ref = DocumentRef(
+        final ref = DraftRef(
           id: draft.metadata.id,
           version: draft.metadata.version,
         );
@@ -225,8 +220,7 @@ void main() {
           (index) => DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: const Uuid().v7(),
+              selfRef: DocumentRefFactory.buildDraft(id: id),
             ),
           ),
         );
@@ -234,7 +228,7 @@ void main() {
           'title': 'Dev final 2',
           'author': 'dev',
         });
-        final ref = DocumentRef(id: id);
+        final ref = DraftRef(id: id);
 
         // When
         await database.draftsDao.saveAll(drafts);
