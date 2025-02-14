@@ -65,7 +65,7 @@ async fn test_get_invalid_registration_w_stake_addr() {
 
     let mut row_stream = GetInvalidRegistrationQuery::execute(
         &session,
-        GetInvalidRegistrationParams::new(vec![], SlotNo::from(u64::MAX)),
+        GetInvalidRegistrationParams::new(vec![], SlotNo::default()),
     )
     .await
     .unwrap();

@@ -153,9 +153,9 @@ pub async fn get_registration_from_stake_addr(
             slot: slot_no,
             voting_key: vec![Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key,
-                registrations: vec![registration.clone()],
+                registrations: vec![registration.clone()].into(),
             }],
-            invalid: invalids_report,
+            invalid: invalids_report.into(),
             page: None,
         },
     )))
@@ -207,15 +207,15 @@ async fn get_all_registrations_from_stake_pub_key(
         };
 
         let cip36 = Cip36Details {
-            slot_no: SlotNo::from(slot_no),
+            slot_no: SlotNo::try_from(slot_no)?,
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
             txn: Some(TxnIndex::try_from(row.txn)?),
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
-            is_payable: row.is_payable,
-            cip15: !row.cip36,
-            errors: vec![],
+            is_payable: row.is_payable.into(),
+            cip15: (!row.cip36).into(),
+            errors: vec![].into(),
         };
 
         registrations.push(cip36);
@@ -249,11 +249,7 @@ async fn get_invalid_registrations(
 ) -> anyhow::Result<Vec<Cip36Details>> {
     // include any erroneous registrations which occur AFTER the slot# of the last valid
     // registration or return all invalids if NO slot# declared.
-    let slot_no = if let Some(slot_no) = slot_no {
-        slot_no
-    } else {
-        SlotNo::from(0)
-    };
+    let slot_no = slot_no.unwrap_or_default();
 
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
         &session,
@@ -271,13 +267,14 @@ async fn get_invalid_registrations(
             nonce: None,
             txn: None,
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
-            is_payable: row.is_payable,
-            cip15: !row.cip36,
+            is_payable: row.is_payable.into(),
+            cip15: (!row.cip36).into(),
             errors: row
                 .error_report
                 .iter()
                 .map(|e| ErrorMessage::from(e.to_string()))
-                .collect(),
+                .collect::<Vec<_>>()
+                .into(),
         });
     }
 
@@ -389,13 +386,13 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
 
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key: vote_pub_key.clone(),
-                registrations: filtered_registrations,
+                registrations: filtered_registrations.into(),
             });
         } else {
             // No slot filtering, return ALL registrations without constraints.
             all_registrations_after_filtering.push(Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key: vote_pub_key.clone(),
-                registrations: registrations_for_given_stake_pub_key,
+                registrations: registrations_for_given_stake_pub_key.into(),
             });
         }
 
@@ -420,9 +417,13 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
 
     AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
-            slot: slot_no.unwrap_or(SlotNo::from(0)),
+            slot: slot_no.unwrap_or_default(),
             voting_key: all_registrations_after_filtering,
-            invalid: all_invalids_after_filtering.into_iter().flatten().collect(),
+            invalid: all_invalids_after_filtering
+                .into_iter()
+                .flatten()
+                .collect::<Vec<_>>()
+                .into(),
             page: None,
         },
     )))

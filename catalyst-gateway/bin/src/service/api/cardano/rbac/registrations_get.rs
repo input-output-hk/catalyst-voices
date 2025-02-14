@@ -1,7 +1,11 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 use anyhow::anyhow;
 use futures::StreamExt;
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{
+    payload::Json,
+    types::{Example, ToJSON},
+    ApiResponse, Object,
+};
 use tracing::error;
 
 use crate::{
@@ -12,24 +16,60 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
-        objects::cardano::hash::Hash, responses::WithErrorResponses,
-        types::headers::retry_after::RetryAfterOption,
+        objects::cardano::hash::Hash256,
+        responses::WithErrorResponses,
+        types::{array_types::impl_array_types, headers::retry_after::RetryAfterOption},
     },
 };
 
 /// GET RBAC registrations by chain root response list item.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
+#[oai(example = true)]
 pub(crate) struct RbacRegistration {
     /// Registration transaction hash.
-    tx_hash: Hash,
+    tx_hash: Hash256,
+}
+
+impl Example for RbacRegistration {
+    fn example() -> Self {
+        Self {
+            tx_hash: Example::example(),
+        }
+    }
+}
+
+// List of RBAC Registrations
+impl_array_types!(
+    RegistrationRbacList,
+    RbacRegistration,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100000),
+        items: Some(Box::new(RbacRegistration::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for RegistrationRbacList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
+    }
 }
 
 /// GET RBAC registrations by chain root response.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
+#[oai(example = true)]
 pub(crate) struct RbacRegistrationsResponse {
     /// Registrations by RBAC chain root.
-    #[oai(validator(max_items = "100000"))]
-    registrations: Vec<RbacRegistration>,
+    registrations: RegistrationRbacList,
+}
+
+impl Example for RbacRegistrationsResponse {
+    fn example() -> Self {
+        Self {
+            registrations: Example::example(),
+        }
+    }
 }
 
 /// Endpoint responses.
@@ -97,5 +137,8 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
         registrations.push(item);
     }
 
-    Responses::Ok(Json(RbacRegistrationsResponse { registrations })).into()
+    Responses::Ok(Json(RbacRegistrationsResponse {
+        registrations: registrations.into(),
+    }))
+    .into()
 }

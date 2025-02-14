@@ -2,7 +2,7 @@
 use anyhow::anyhow;
 use der_parser::asn1_rs::ToDer;
 use futures::StreamExt;
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 use tracing::error;
 
 use crate::{
@@ -11,6 +11,7 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
+        objects::cardano::hash::Hash256,
         responses::WithErrorResponses,
         types::{
             cardano::cip19_stake_address::Cip19StakeAddress, headers::retry_after::RetryAfterOption,
@@ -20,10 +21,10 @@ use crate::{
 
 /// GET RBAC chain root response.
 #[derive(Object)]
-pub(crate) struct Response {
+#[oai(example = true)]
+pub(crate) struct ChainRootGetResponse {
     /// RBAC certificate chain root.
-    #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
-    chain_root: String,
+    chain_root: Hash256,
 }
 
 /// Endpoint responses.
@@ -33,7 +34,7 @@ pub(crate) enum Responses {
     ///
     /// Success returns the chain root hash.
     #[oai(status = 200)]
-    Ok(Json<Response>),
+    Ok(Json<ChainRootGetResponse>),
     /// ## Not Found
     ///
     /// No chain root found for the given stake address.
@@ -72,8 +73,8 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
                     },
                 };
 
-                let res = Response {
-                    chain_root: format!("0x{}", hex::encode(row.chain_root)),
+                let res = ChainRootGetResponse {
+                    chain_root: Hash256::from(row.chain_root),
                 };
 
                 Responses::Ok(Json(res)).into()
@@ -86,5 +87,13 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
             let err = anyhow!(err);
             AllResponses::internal_error(&err)
         },
+    }
+}
+
+impl Example for ChainRootGetResponse {
+    fn example() -> Self {
+        Self {
+            chain_root: Hash256::example(),
+        }
     }
 }

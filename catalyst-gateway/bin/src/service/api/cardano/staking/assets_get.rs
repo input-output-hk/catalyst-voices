@@ -6,7 +6,6 @@ use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use super::SlotNumber;
 use crate::{
     db::index::{
         queries::staked_ada::{
@@ -27,7 +26,9 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
+        types::cardano::{
+            asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+        },
     },
 };
 
@@ -52,10 +53,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/staked_ada`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: Cip19StakeAddress, _provided_network: Option<Network>,
-    slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNo>,
 ) -> AllResponses {
-    let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num).await;
+    let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num.clone()).await;
     let persistent_stake_info = match persistent_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
@@ -111,7 +111,7 @@ struct TxoInfo {
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_stake_info(
-    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNumber>,
+    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let Some(session) = CassandraSession::get(persistent) else {
         anyhow::bail!("Failed to acquire db session");
@@ -138,9 +138,10 @@ async fn calculate_stake_info(
 
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNumber>,
+    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<HashMap<Vec<u8>, HashMap<i16, TxoInfo>>> {
-    let adjusted_slot_num = num_bigint::BigInt::from(slot_num.unwrap_or(i64::MAX));
+    let adjusted_slot_num =
+        slot_num.map_or(num_bigint::BigInt::from(i64::MAX), num_bigint::BigInt::from);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
@@ -279,14 +280,17 @@ fn build_stake_info(
     for txn_map in txos_by_txn.into_values() {
         for txo_info in txn_map.into_values() {
             if txo_info.spent_slot_no.is_none() {
-                let value = i64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
-                stake_info.ada_amount =
-                    stake_info.ada_amount.checked_add(value).ok_or_else(|| {
+                let value = u64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
+                stake_info.ada_amount = stake_info
+                    .ada_amount
+                    .checked_add(value)
+                    .ok_or_else(|| {
                         anyhow!(
                             "Total stake amount overflow: {} + {value}",
-                            stake_info.ada_amount
+                            stake_info.ada_amount.to_string()
                         )
-                    })?;
+                    })?
+                    .try_into()?;
 
                 for asset in txo_info.assets.into_values().flatten() {
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
@@ -296,7 +300,9 @@ fn build_stake_info(
                     });
                 }
 
-                let slot_no = i64::try_from(txo_info.slot_no).map_err(|err| anyhow!(err))?;
+                let slot_no = i64::try_from(txo_info.slot_no)
+                    .map_err(|err| anyhow!(err))?
+                    .try_into()?;
 
                 if stake_info.slot_number < slot_no {
                     stake_info.slot_number = slot_no;

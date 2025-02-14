@@ -1,4 +1,4 @@
-//! Slot Number on the blockchain.
+//! Stake amount on the blockchain.
 
 use std::sync::LazyLock;
 
@@ -11,9 +11,9 @@ use poem_openapi::{
 use serde_json::Value;
 
 /// Title.
-const TITLE: &str = "Cardano Blockchain Slot Number";
+const TITLE: &str = "Cardano Blockchain Stake Aount";
 /// Description.
-const DESCRIPTION: &str = "The Slot Number of a Cardano Block on the chain.";
+const DESCRIPTION: &str = "The stake amount of a Cardano Block on the chain.";
 /// Example.
 pub(crate) const EXAMPLE: u64 = 1_234_567;
 /// Minimum.
@@ -34,38 +34,47 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Slot Number
+/// Stake Amount
 #[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
 
-pub(crate) struct SlotNo(u64);
+pub(crate) struct StakeAmount(u64);
 
-impl SlotNo {
-    /// Is the Slot Number valid?
+impl StakeAmount {
+    /// Is the Stake Amount valid?
     fn is_valid(value: u64) -> bool {
         (MINIMUM..=MAXIMUM).contains(&value)
     }
+}
 
-    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
-    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
-        value.map(std::convert::Into::into)
+impl std::ops::Deref for StakeAmount {
+    type Target = u64;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
-impl Default for SlotNo {
-    /// Explicit default implementation of `SlotNo` which is `0`.
+impl std::ops::DerefMut for StakeAmount {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl Default for StakeAmount {
+    /// Explicit default implementation of `StakeAmount` which is `0`.
     fn default() -> Self {
         Self(0)
     }
 }
 
-impl Type for SlotNo {
+impl Type for StakeAmount {
     type RawElementValueType = Self;
     type RawValueType = Self;
 
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "SlotNo".into()
+        "StakeAmount".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
@@ -85,14 +94,14 @@ impl Type for SlotNo {
     }
 }
 
-impl ParseFromParameter for SlotNo {
+impl ParseFromParameter for StakeAmount {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
         let slot: u64 = value.parse()?;
         Ok(Self(slot))
     }
 }
 
-impl ParseFromJSON for SlotNo {
+impl ParseFromJSON for StakeAmount {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
         if let Value::Number(value) = value {
@@ -109,56 +118,42 @@ impl ParseFromJSON for SlotNo {
     }
 }
 
-impl From<SlotNo> for BigInt {
-    fn from(val: SlotNo) -> Self {
+impl From<StakeAmount> for BigInt {
+    fn from(val: StakeAmount) -> Self {
         BigInt::from(val.0)
     }
 }
 
-impl ToJSON for SlotNo {
+impl ToJSON for StakeAmount {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())
     }
 }
 
-impl TryFrom<u64> for SlotNo {
+impl TryFrom<u64> for StakeAmount {
     type Error = anyhow::Error;
 
     fn try_from(value: u64) -> Result<Self, Self::Error> {
         if !Self::is_valid(value) {
-            bail!("Invalid Slot Number");
+            bail!("Invalid Stake Amount");
         }
         Ok(Self(value))
     }
 }
 
-impl TryFrom<i64> for SlotNo {
+impl TryFrom<i64> for StakeAmount {
     type Error = anyhow::Error;
 
     fn try_from(value: i64) -> Result<Self, Self::Error> {
         let value: u64 = value.try_into()?;
         if !Self::is_valid(value) {
-            bail!("Invalid Slot Number");
+            bail!("Invalid Stake Amount");
         }
         Ok(Self(value))
     }
 }
 
-impl Into<u64> for SlotNo {
-    fn into(self) -> u64 {
-        // assume that the value is always valid
-        self.0
-    }
-}
-
-impl Into<i64> for SlotNo {
-    fn into(self) -> i64 {
-        // assume that the value is always valid
-        i64::try_from(self.0).unwrap_or_default()
-    }
-}
-
-impl Example for SlotNo {
+impl Example for StakeAmount {
     fn example() -> Self {
         Self(EXAMPLE)
     }

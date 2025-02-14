@@ -142,7 +142,12 @@ impl Example for DocumentIndexQueryFilter {
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
 #[derive(NewType)]
-#[oai(from_multipart = false, from_parameter = false, to_header = false)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
 /// Document Index Query Filter
 ///
 /// A Query Filter which causes documents whose metadata matches the provided
@@ -187,5 +192,11 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
         }
         // TODO process also the rest of the fields like `ref`, `template` etc.
         Ok(db_filter)
+    }
+}
+
+impl Example for DocumentIndexQueryFilterBody {
+    fn example() -> Self {
+        Self(DocumentIndexQueryFilter::example())
     }
 }

@@ -1,16 +1,21 @@
 //! Defines API schemas of stake amount type.
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    Object,
+};
 
-use crate::service::{
-    api::cardano::types::{SlotNumber, StakeAmount},
-    common::types::cardano::{
-        asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28,
+use crate::service::common::types::{
+    array_types::impl_array_types,
+    cardano::{
+        asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28, slot_no::SlotNo,
+        stake_amount::StakeAmount,
     },
 };
 
 /// User's staked native token info.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
+#[oai(example)]
 pub(crate) struct StakedNativeTokenInfo {
     /// Token policy hash.
     pub(crate) policy_hash: HexEncodedHash28,
@@ -20,31 +25,54 @@ pub(crate) struct StakedNativeTokenInfo {
     pub(crate) amount: AssetValue,
 }
 
+impl Example for StakedNativeTokenInfo {
+    fn example() -> Self {
+        Self {
+            policy_hash: Example::example(),
+            asset_name: Example::example(),
+            amount: Example::example(),
+        }
+    }
+}
+
+// List of User's Staked Native Token Info
+impl_array_types!(
+    StakedNativeTokenInfoList,
+    StakedNativeTokenInfo,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(1000),
+        items: Some(Box::new(StakedNativeTokenInfo::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for StakedNativeTokenInfoList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
+    }
+}
+
 /// User's cardano stake info.
 #[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Total stake amount.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) ada_amount: StakeAmount,
 
     /// Block's slot number which contains the latest unspent UTXO.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub(crate) slot_number: SlotNumber,
+    pub(crate) slot_number: SlotNo,
 
     /// Native token infos.
-    #[oai(validator(max_items = "1000"))]
-    pub(crate) native_tokens: Vec<StakedNativeTokenInfo>,
+    pub(crate) native_tokens: StakedNativeTokenInfoList,
 }
 
 impl Example for StakeInfo {
     fn example() -> Self {
         Self {
-            slot_number: 5,
-            ada_amount: 1,
-            native_tokens: Vec::new(),
+            slot_number: 5u64.try_into().unwrap_or_default(),
+            ada_amount: 1u64.try_into().unwrap_or_default(),
+            native_tokens: Example::example(),
         }
     }
 }

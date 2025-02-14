@@ -1,7 +1,7 @@
 //! Implementation of the GET `/rbac/role0_chain_root` endpoint.
 use anyhow::anyhow;
 use futures::StreamExt;
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 use tracing::error;
 
 use crate::{
@@ -12,16 +12,17 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
-        responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption,
+        objects::cardano::hash::Hash256, responses::WithErrorResponses,
+        types::headers::retry_after::RetryAfterOption,
     },
 };
 
 /// GET RBAC chain root response.
 #[derive(Object)]
+#[oai(example = true)]
 pub(crate) struct RbacRole0ChainRootResponse {
     /// RBAC certificate chain root.
-    #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
-    chain_root: String,
+    chain_root: Hash256,
 }
 
 /// Endpoint responses.
@@ -75,7 +76,7 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
                 };
 
                 let res = RbacRole0ChainRootResponse {
-                    chain_root: format!("0x{}", hex::encode(row.chain_root)),
+                    chain_root: Hash256::from(row.chain_root),
                 };
 
                 Responses::Ok(Json(res)).into()
@@ -87,5 +88,13 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
             error!(error = ?err, "Failed to execute get chain root by role0 key query");
             AllResponses::internal_error(&err)
         },
+    }
+}
+
+impl Example for RbacRole0ChainRootResponse {
+    fn example() -> Self {
+        Self {
+            chain_root: Hash256::example(),
+        }
     }
 }
