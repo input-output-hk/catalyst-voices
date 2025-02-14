@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.39 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.40 AS flutter-ci
 
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
@@ -53,14 +53,15 @@ code-generator:
 
     RUN melos l10n
     RUN melos build_runner
+    RUN melos build_runner_repository
 
     IF [ $save_locally = true ]
-        LET generated_patterns = "*.g.dart *.freezed.dart *.chopper.dart *.swagger.dart *.openapi.dart *.gen.dart catalyst_voices_localizations*.dart cat_gateway.*.swagger.* *.drift.dart"
+        # This step saves generated files other then open_api generated services, which is done
+        # in flutter-ci+OPENAPI_CODE_GEN. It copies entire dir gen_code_path (lib/generated/api)
+        RUN find . \( -name "*.g.dart" -o -name "*.chopper.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "*.drift.dart" \)
 
-        RUN find . \( -name "$generated_patterns" -o -type d -name "generated" \)
-
-        FOR generated_item IN $(find . \( -name "$generated_patterns" -o -type d -name "generated" \))
-            SAVE ARTIFACT $generated_item AS LOCAL $generated_item
+        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.chopper.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "*.drift.dart" \))
+            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
         END
     ELSE
         SAVE ARTIFACT .
@@ -69,9 +70,9 @@ code-generator:
     WORKDIR packages/internal/catalyst_voices_repositories
 
     IF [ $filter_openapi = true ]
-        COPY +filter-openapi/filtered-openapi.json "$openapi_spec_path"
+        COPY +filter-openapi/filtered-openapi.json openapi/cat-gateway.json
     ELSE
-        COPY catalyst-gateway+build/doc/cat-gateway-api.json "$openapi_spec_path"
+        COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway.json
     END
 
     DO flutter-ci+OPENAPI_CODE_GEN \
