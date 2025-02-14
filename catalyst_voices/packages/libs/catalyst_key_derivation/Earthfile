@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.38 AS flutter-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v3.2.38 AS flutter_rust_bridge
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.39 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter_rust_bridge:v3.2.39 AS flutter_rust_bridge
 
 builder:
     FROM flutter_rust_bridge+builder
@@ -52,6 +52,10 @@ integration-test-web:
             --web-browser-flag=--disable-gpu \
             --web-browser-flag=--headless=old \
             --web-browser-flag=--disable-search-engine-choice-screen \
+            # flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
+            # drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
+            --web-header Cross-Origin-Opener-Policy=same-origin \
+            --web-header Cross-Origin-Embedder-Policy=require-corp \
             --profile || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
@@ -64,10 +68,7 @@ integration-test-web:
             exit 1
     END
 
-# TODO(dtscalac): disabled integration tests due to them being flaky,
-# reenable when enable-threads.js workaround is removed
-# and the fix for flutter drive from https://github.com/flutter/flutter/issues/159037
-# is released in flutter stable channel
+# TODO(oldgreg): investigate failures in ci
 disabled-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome \

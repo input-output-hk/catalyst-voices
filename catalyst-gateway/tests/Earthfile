@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.38 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.39 AS spectral-ci
 IMPORT .. AS gateway
 
 docker-compose:
@@ -7,10 +7,33 @@ docker-compose:
     COPY ./docker-compose.yml .
     SAVE ARTIFACT ./docker-compose.yml
 
-package-scylla-node:
-    FROM scylladb/scylla:6.2
+# Installs scylla for bookworm-slim/debian
+INSTALL_SCYLLA:
+    FUNCTION
 
-    SAVE IMAGE scylla-node:latest
+    LET VERSION = 6.2
+    
+    RUN apt-get update && \
+        apt-get install -y --no-install-recommends \
+        wget gnupg ca-certificates && \
+        mkdir -p /etc/apt/keyrings && \
+        gpg --homedir /tmp --no-default-keyring --keyring /etc/apt/keyrings/scylladb.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys a43e06657bac99e3 && \
+        wget -O /etc/apt/sources.list.d/scylla.list http://downloads.scylladb.com/deb/debian/scylla-$VERSION.list && \
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+        scylla
+    COPY ./scylla.yaml /etc/scylla/scylla.yaml
+    COPY ./scylla_entry.sh .
+
+package-cat-gateway-with-scylla:
+    FROM python:3.14.0a3-slim-bookworm
+
+    DO +INSTALL_SCYLLA
+    COPY ../+build/cat-gateway .
+
+    ENTRYPOINT ./scylla_entry.sh && ./cat-gateway run
+    SAVE IMAGE cat-gateway-with-scylla:latest
 
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
@@ -44,20 +67,14 @@ test-postgres:
 test-scylla:
     FROM gateway+builder-src
 
-    COPY +docker-compose/docker-compose.yml .
+    DO +INSTALL_SCYLLA
 
     ENV CASSANDRA_PERSISTENT_URL "localhost:9042"
     ENV CASSANDRA_VOLATILE_URL "localhost:9042"
-    ENV CHAIN_NETWORK "Preprod"
 
     # limit the nextest duration to prevent freezing in case of failure.
     RUN sed -i '/\[profile.default\]/a\slow-timeout = { period = "30s", terminate-after = 2 }' .config/nextest.toml
 
-    WITH DOCKER \
-        --compose docker-compose.yml \
-        --load scylla-node:latest=(+package-scylla-node) \
-        --pull alpine:3.20.3 \
-        --service scylla-node-is-running
-        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-            cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge --no-fail-fast
-    END
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        ./scylla_entry.sh && \
+        cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge --no-fail-fast

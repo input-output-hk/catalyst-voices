@@ -1,32 +1,34 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.38 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.39 AS python-ci
 
 builder:
     FROM python-ci+python-base
 
     # prepare tests
-    COPY --dir ./api_tests .
+    COPY --dir ./api .
+    COPY --dir ./integration .
+    COPY --dir ./utils .
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
 test:
     FROM +builder
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     COPY ./../+docker-compose/docker-compose.yml .
 
     ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
+    # cspell: disable-next-line
+    ENV BEARER_TOKEN = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
 
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(./../../event-db+build) \
-        --load cat-gateway:latest=(./../../+docker) \
-        --load scylla-node:latest=(./../+package-scylla-node) \
-        --service cat-gateway \
+        --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
+        --service cat-gateway-with-scylla \
         --allow-privileged
-        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=api_tests --cov-report lcov
+        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=integration --cov-report lcov
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL api-tests.junit-report.xml
@@ -35,7 +37,6 @@ test:
 
 disabled-nightly-test:
     FROM +builder
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     COPY ./docker-compose.yml .
 
