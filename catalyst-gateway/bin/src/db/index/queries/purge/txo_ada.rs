@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXO by Stake Address purge queries.
 
+    use crate::db::types::{DbSlot, DbTxnIndex, DbTxnOutputOffset};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16, i16);
+    pub(crate) type PrimaryKey = (Vec<u8>, DbSlot, DbTxnIndex, DbTxnOutputOffset);
 }
 
 /// Select primary keys for TXO by Stake Address.
@@ -32,21 +37,21 @@ const SELECT_QUERY: &str = include_str!("./cql/get_txo_by_stake_address.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_address: Vec<u8>,
+    pub(crate) stake_key_hash: Vec<u8>,
     /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
+    pub(crate) txn_index: DbTxnIndex,
     /// Transaction Output Offset inside the transaction.
-    pub(crate) txo: i16,
+    pub(crate) txo: DbTxnOutputOffset,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_key_hash", &self.stake_key_hash)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("txo", &self.txo)
             .finish()
     }
@@ -55,9 +60,9 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_address: value.0,
+            stake_key_hash: value.0,
             slot_no: value.1,
-            txn: value.2,
+            txn_index: value.2,
             txo: value.3,
         }
     }
@@ -95,7 +100,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete TXO by Stake Address
-const DELETE_QUERY: &str = include_str!("./cql/delete_txo_by_stake_address.cql");
+const DELETE_QUERY: &str = include_str!("cql/delete_txo_by_stake_hash.cql");
 
 /// Delete TXO by Stake Address Query
 pub(crate) struct DeleteQuery;

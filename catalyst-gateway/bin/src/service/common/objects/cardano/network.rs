@@ -1,5 +1,4 @@
 //! Defines API schemas of Cardano network types.
-
 use poem_openapi::Enum;
 
 /// Cardano network type.
@@ -16,7 +15,7 @@ pub(crate) enum Network {
     Preview,
 }
 
-impl From<Network> for cardano_chain_follower::Network {
+impl From<Network> for cardano_blockchain_types::Network {
     fn from(value: Network) -> Self {
         match value {
             Network::Mainnet => Self::Mainnet,

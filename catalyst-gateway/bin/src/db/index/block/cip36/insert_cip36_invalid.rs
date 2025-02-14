@@ -2,12 +2,16 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::Metadata::cip36::{Cip36, VotingPubKey};
+use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
+use pallas::ledger::addresses::ShelleyAddress;
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTxnIndex},
+    },
     settings::cassandra_db,
 };
 
@@ -19,11 +23,11 @@ const INSERT_CIP36_REGISTRATION_INVALID_QUERY: &str =
 #[derive(SerializeRow, Clone)]
 pub(crate) struct Params {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    stake_address: Vec<u8>,
+    stake_public_key: Vec<u8>,
     /// Slot Number the cert is in.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Index.
-    txn: i16,
+    txn_index: DbTxnIndex,
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
@@ -39,7 +43,7 @@ pub(crate) struct Params {
     /// Signature validates.
     signed: bool,
     /// List of serialization errors.
-    error_report: Vec<String>,
+    problem_report: String,
 }
 
 impl Debug for Params {
@@ -49,9 +53,9 @@ impl Debug for Params {
             MaybeUnset::Set(v) => &format!("{v:?}"),
         };
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_public_key", &self.stake_public_key)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("vote_key", &self.vote_key)
             .field("payment_address", &self.payment_address)
             .field("is_payable", &self.is_payable)
@@ -59,7 +63,7 @@ impl Debug for Params {
             .field("nonce", &self.nonce)
             .field("cip36", &cip36)
             .field("signed", &self.signed)
-            .field("error_report", &self.error_report)
+            .field("problem_report", &self.problem_report)
             .finish()
     }
 }
@@ -67,33 +71,38 @@ impl Debug for Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: Option<&VotingPubKey>, slot_no: u64, txn: i16, cip36: &Cip36,
-        error_report: Vec<String>,
+        vote_key: Option<&VotingPubKey>, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36,
     ) -> Self {
-        let vote_key = if let Some(vote_key) = vote_key {
-            vote_key.voting_pk.to_bytes().to_vec()
-        } else {
-            Vec::new()
-        };
+        let stake_public_key = cip36
+            .stake_pk()
+            .map_or_else(Vec::new, |s| s.to_bytes().to_vec());
+        let vote_key = vote_key
+            .and_then(|k| k.voting_pk().map(|k| k.as_bytes().to_vec()))
+            .unwrap_or_default();
+        let is_cip36 = cip36.is_cip36().map_or(MaybeUnset::Unset, MaybeUnset::Set);
+        let payment_address = cip36
+            .payment_address()
+            .map_or(Vec::new(), ShelleyAddress::to_vec);
+        let problem_report = serde_json::to_string(cip36.err_report()).unwrap_or_else(|e| {
+            error!(
+                "Failed to serialize problem report: {e:?}. Report = {:?}",
+                cip36.err_report()
+            );
+            String::new()
+        });
+
         Params {
-            stake_address: cip36
-                .stake_pk
-                .map(|s| s.to_bytes().to_vec())
-                .unwrap_or_default(),
+            stake_public_key,
             slot_no: slot_no.into(),
-            txn,
+            txn_index: txn_index.into(),
             vote_key,
-            payment_address: cip36.payment_addr.clone(),
-            is_payable: cip36.payable,
-            raw_nonce: cip36.raw_nonce.into(),
-            nonce: cip36.nonce.into(),
-            cip36: if let Some(cip36) = cip36.cip36 {
-                MaybeUnset::Set(cip36)
-            } else {
-                MaybeUnset::Unset
-            },
-            signed: cip36.signed,
-            error_report,
+            payment_address,
+            is_payable: cip36.is_payable().unwrap_or_default(),
+            raw_nonce: cip36.raw_nonce().unwrap_or_default().into(),
+            nonce: cip36.nonce().unwrap_or_default().into(),
+            cip36: is_cip36,
+            signed: cip36.is_valid_signature(),
+            problem_report,
         }
     }
 

@@ -26,7 +26,7 @@ pub(crate) struct GetAllStakesAndVoteKeysParams {}
 #[derive(DeserializeRow)]
 pub(crate) struct GetAllStakesAndVoteKeysQuery {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
 }

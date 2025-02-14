@@ -1,17 +1,17 @@
 -- Create the TXO Record for a stake address, 
 -- Will not overwrite anything if it already exists.
 INSERT INTO txo_assets_by_stake (
-    stake_address,
+    stake_key_hash,
     slot_no,
-    txn,
+    txn_index,
     txo,
     policy_id,
     asset_name,
     value
 ) VALUES (
-    :stake_address,
+    :stake_key_hash,
     :slot_no,
-    :txn,
+    :txn_index,
     :txo,
     :policy_id,
     :asset_name,

@@ -1,15 +1,19 @@
 //! Get assets by stake address.
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
 };
 
 /// Get assets by stake address query string.
@@ -20,17 +24,17 @@ const GET_ASSETS_BY_STAKE_ADDRESS_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetAssetsByStakeAddressParams {
     /// Stake address.
-    stake_address: Vec<u8>,
+    stake_key_hash: Vec<u8>,
     /// Max slot num.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
 }
 
 impl GetAssetsByStakeAddressParams {
     /// Creates a new [`GetAssetsByStakeAddressParams`].
-    pub(crate) fn new(stake_address: Vec<u8>, slot_no: num_bigint::BigInt) -> Self {
+    pub(crate) fn new(stake_key_hash: Vec<u8>, slot_no: Slot) -> Self {
         Self {
-            stake_address,
-            slot_no,
+            stake_key_hash,
+            slot_no: slot_no.into(),
         }
     }
 }
@@ -39,11 +43,11 @@ impl GetAssetsByStakeAddressParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetAssetsByStakeAddressQuery {
     /// TXO transaction index within the slot.
-    pub txn: i16,
+    pub txn_index: DbTxnIndex,
     /// TXO index.
-    pub txo: i16,
+    pub txo: DbTxnOutputOffset,
     /// TXO transaction slot number.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
     /// Asset hash.
     pub policy_id: Vec<u8>,
     /// Asset name.

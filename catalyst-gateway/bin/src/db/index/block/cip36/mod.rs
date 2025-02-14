@@ -6,7 +6,7 @@ pub(crate) mod insert_cip36_invalid;
 
 use std::sync::Arc;
 
-use cardano_chain_follower::{Metadata, MultiEraBlock};
+use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, TxnIndex};
 use scylla::Session;
 
 use crate::{
@@ -55,52 +55,49 @@ impl Cip36InsertQuery {
     }
 
     /// Index the CIP-36 registrations in a transaction.
-    pub(crate) fn index(
-        &mut self, txn: usize, txn_index: i16, slot_no: u64, block: &MultiEraBlock,
-    ) {
-        if let Some(decoded_metadata) = block.txn_metadata(txn, Metadata::cip36::LABEL) {
-            #[allow(irrefutable_let_patterns)]
-            if let Metadata::DecodedMetadataValues::Cip36(cip36) = &decoded_metadata.value {
-                // Check if we are indexing a valid or invalid registration.
-                // Note, we ONLY care about catalyst, we should only have 1 voting key, if not, call
-                // it an error.
-                if decoded_metadata.report.is_empty() && cip36.voting_keys.len() == 1 {
-                    // Always true, because we already checked if the array has only one entry.
-                    if let Some(vote_key) = cip36.voting_keys.first() {
-                        self.registrations.push(insert_cip36::Params::new(
-                            vote_key, slot_no, txn_index, cip36,
+    pub(crate) fn index(&mut self, index: TxnIndex, slot_no: Slot, block: &MultiEraBlock) {
+        // Catalyst strict is set to true
+        match Cip36::new(block, index, true) {
+            // Check for CIP-36 validity and should be strict catalyst (only 1 voting key)
+            // Note that in `validate_voting_keys` we already checked if the array has only one
+            Ok(Some(cip36)) if cip36.is_valid() && cip36.is_cip36().unwrap_or_default() => {
+                // This should always pass, because we already checked if the array has only one
+                if let Some(voting_key) = cip36.voting_pks().first() {
+                    self.registrations.push(insert_cip36::Params::new(
+                        voting_key, slot_no, index, &cip36,
+                    ));
+
+                    self.for_vote_key
+                        .push(insert_cip36_for_vote_key::Params::new(
+                            voting_key, slot_no, index, &cip36, true,
                         ));
-                        self.for_vote_key
-                            .push(insert_cip36_for_vote_key::Params::new(
-                                vote_key, slot_no, txn_index, cip36, true,
-                            ));
-                    }
-                } else if cip36.stake_pk.is_some() {
-                    // We can't index an error, if there is no stake public key.
-                    if cip36.voting_keys.is_empty() {
+                }
+            },
+            // Invalid CIP-36 Registration
+            Ok(Some(cip36)) if cip36.is_cip36().unwrap_or_default() => {
+                // Cannot index an invalid CIP36, if there is no stake public key.
+                if cip36.stake_pk().is_some() {
+                    if cip36.voting_pks().is_empty() {
                         self.invalid.push(insert_cip36_invalid::Params::new(
-                            None,
-                            slot_no,
-                            txn_index,
-                            cip36,
-                            decoded_metadata.report.clone(),
+                            None, slot_no, index, &cip36,
                         ));
-                    }
-                    for vote_key in &cip36.voting_keys {
-                        self.invalid.push(insert_cip36_invalid::Params::new(
-                            Some(vote_key),
-                            slot_no,
-                            txn_index,
-                            cip36,
-                            decoded_metadata.report.clone(),
-                        ));
-                        self.for_vote_key
-                            .push(insert_cip36_for_vote_key::Params::new(
-                                vote_key, slot_no, txn_index, cip36, false,
+                    } else {
+                        for voting_key in cip36.voting_pks() {
+                            self.invalid.push(insert_cip36_invalid::Params::new(
+                                Some(voting_key),
+                                slot_no,
+                                index,
+                                &cip36,
                             ));
+                            self.for_vote_key
+                                .push(insert_cip36_for_vote_key::Params::new(
+                                    voting_key, slot_no, index, &cip36, false,
+                                ));
+                        }
                     }
                 }
-            }
+            },
+            _ => {},
         }
     }
 
@@ -147,5 +144,21 @@ impl Cip36InsertQuery {
         }
 
         query_handles
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::db::index::tests::test_utils;
+
+    #[test]
+    fn index() {
+        let block = test_utils::block_2();
+        let mut query = Cip36InsertQuery::new();
+        query.index(0.into(), 0.into(), &block);
+        assert_eq!(1, query.registrations.len());
+        assert!(query.invalid.is_empty());
+        assert_eq!(1, query.for_vote_key.len());
     }
 }

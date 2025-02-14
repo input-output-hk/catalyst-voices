@@ -2,6 +2,7 @@
 
 use std::{collections::HashSet, sync::Arc};
 
+use cardano_blockchain_types::{Slot, TransactionHash};
 use futures::StreamExt;
 
 use crate::{
@@ -10,39 +11,39 @@ use crate::{
 };
 
 /// Purge Data from Live Index
-pub(crate) async fn purge_live_index(purge_slot: u64) -> anyhow::Result<()> {
+pub(crate) async fn purge_live_index(purge_slot: Slot) -> anyhow::Result<()> {
     let persistent = false; // get volatile session
     let Some(session) = CassandraSession::get(persistent) else {
         anyhow::bail!("Failed to acquire db session");
     };
 
     // Purge data up to this slot
-    let purge_to_slot: num_bigint::BigInt = purge_slot
-        .saturating_sub(Settings::purge_slot_buffer())
-        .into();
+    // Slots arithmetic has saturating semantic, so this is ok.
+    #[allow(clippy::arithmetic_side_effects)]
+    let purge_to_slot = purge_slot - Settings::purge_slot_buffer();
 
-    let txn_hashes = purge_txi_by_hash(&session, &purge_to_slot).await?;
-    purge_chain_root_for_role0_key(&session, &purge_to_slot).await?;
-    purge_chain_root_for_stake_address(&session, &purge_to_slot).await?;
-    purge_chain_root_for_txn_id(&session, &txn_hashes).await?;
-    purge_cip36_registration(&session, &purge_to_slot).await?;
-    purge_cip36_registration_for_vote_key(&session, &purge_to_slot).await?;
-    purge_cip36_registration_invalid(&session, &purge_to_slot).await?;
-    purge_rbac509_registration(&session, &purge_to_slot).await?;
-    purge_stake_registration(&session, &purge_to_slot).await?;
-    purge_txo_ada(&session, &purge_to_slot).await?;
-    purge_txo_assets(&session, &purge_to_slot).await?;
-    purge_unstaked_txo_ada(&session, &purge_to_slot).await?;
-    purge_unstaked_txo_assets(&session, &purge_to_slot).await?;
+    let txn_hashes = purge_txi_by_hash(&session, purge_to_slot).await?;
+    purge_catalyst_id_for_stake_hash(&session, purge_to_slot).await?;
+    purge_catalyst_id_for_txn_id(&session, &txn_hashes).await?;
+    purge_cip36_registration(&session, purge_to_slot).await?;
+    purge_cip36_registration_for_vote_key(&session, purge_to_slot).await?;
+    purge_cip36_registration_invalid(&session, purge_to_slot).await?;
+    purge_rbac509_registration(&session, purge_to_slot).await?;
+    purge_invalid_rbac509_registration(&session, purge_to_slot).await?;
+    purge_stake_registration(&session, purge_to_slot).await?;
+    purge_txo_ada(&session, purge_to_slot).await?;
+    purge_txo_assets(&session, purge_to_slot).await?;
+    purge_unstaked_txo_ada(&session, purge_to_slot).await?;
+    purge_unstaked_txo_assets(&session, purge_to_slot).await?;
 
     Ok(())
 }
 
-/// Purge data from `chain_root_for_role0_key`.
-async fn purge_chain_root_for_role0_key(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+/// Purges the data from `catalyst_id_for_stake_addr`.
+async fn purge_catalyst_id_for_stake_hash(
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
-    use purge::chain_root_for_role0_key::{DeleteQuery, Params, PrimaryKeyQuery};
+    use purge::catalyst_id_for_stake_hash::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
@@ -50,7 +51,7 @@ async fn purge_chain_root_for_role0_key(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -59,11 +60,11 @@ async fn purge_chain_root_for_role0_key(
     Ok(())
 }
 
-/// Purge data from `chain_root_for_stake_address`.
-async fn purge_chain_root_for_stake_address(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+/// Purges the data from `catalyst_id_for_txn_id`.
+async fn purge_catalyst_id_for_txn_id(
+    session: &Arc<CassandraSession>, txn_hashes: &HashSet<TransactionHash>,
 ) -> anyhow::Result<()> {
-    use purge::chain_root_for_stake_address::{DeleteQuery, Params, PrimaryKeyQuery};
+    use purge::catalyst_id_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
@@ -71,28 +72,7 @@ async fn purge_chain_root_for_stake_address(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
-            delete_params.push(params);
-        }
-    }
-    // Delete filtered keys
-    DeleteQuery::execute(session, delete_params).await?;
-    Ok(())
-}
-
-/// Purge data from `chain_root_for_txn_id`.
-async fn purge_chain_root_for_txn_id(
-    session: &Arc<CassandraSession>, txn_hashes: &HashSet<Vec<u8>>,
-) -> anyhow::Result<()> {
-    use purge::chain_root_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
-
-    // Get all keys
-    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
-    // Filter
-    let mut delete_params: Vec<Params> = Vec::new();
-    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        let params: Params = primary_key.into();
-        if txn_hashes.contains(&params.transaction_id) {
+        if txn_hashes.contains(&params.txn_id.into()) {
             delete_params.push(params);
         }
     }
@@ -103,7 +83,7 @@ async fn purge_chain_root_for_txn_id(
 
 /// Purge data from `cip36_registration`.
 async fn purge_cip36_registration(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::cip36_registration::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -113,7 +93,7 @@ async fn purge_cip36_registration(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -124,7 +104,7 @@ async fn purge_cip36_registration(
 
 /// Purge data from `cip36_registration_for_vote_key`.
 async fn purge_cip36_registration_for_vote_key(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::cip36_registration_for_vote_key::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -134,7 +114,7 @@ async fn purge_cip36_registration_for_vote_key(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -145,7 +125,7 @@ async fn purge_cip36_registration_for_vote_key(
 
 /// Purge data from `cip36_registration_invalid`.
 async fn purge_cip36_registration_invalid(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::cip36_registration_invalid::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -155,7 +135,7 @@ async fn purge_cip36_registration_invalid(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -166,7 +146,7 @@ async fn purge_cip36_registration_invalid(
 
 /// Purge data from `rbac509_registration`.
 async fn purge_rbac509_registration(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::rbac509_registration::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -176,7 +156,7 @@ async fn purge_rbac509_registration(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -185,9 +165,28 @@ async fn purge_rbac509_registration(
     Ok(())
 }
 
+/// Purges the data from `rbac509_invalid_registration`.
+async fn purge_invalid_rbac509_registration(
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
+) -> anyhow::Result<()> {
+    use purge::rbac509_invalid_registration::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
+    let mut delete_params: Vec<Params> = Vec::new();
+    while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
+        let params: Params = primary_key.into();
+        if params.slot_no <= purge_to_slot.into() {
+            delete_params.push(params);
+        }
+    }
+
+    DeleteQuery::execute(session, delete_params).await?;
+    Ok(())
+}
+
 /// Purge data from `stake_registration`.
 async fn purge_stake_registration(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::stake_registration::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -197,7 +196,7 @@ async fn purge_stake_registration(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -208,19 +207,19 @@ async fn purge_stake_registration(
 
 /// Purge data from `txi_by_hash`.
 async fn purge_txi_by_hash(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
-) -> anyhow::Result<HashSet<Vec<u8>>> {
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
+) -> anyhow::Result<HashSet<TransactionHash>> {
     use purge::txi_by_hash::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
-    let mut txn_hashes: HashSet<Vec<u8>> = HashSet::new();
+    let mut txn_hashes: HashSet<TransactionHash> = HashSet::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        if &primary_key.2 <= purge_to_slot {
+        if primary_key.2 <= purge_to_slot.into() {
             let params: Params = primary_key.into();
-            txn_hashes.insert(params.txn_hash.clone());
+            txn_hashes.insert(params.txn_id.into());
             delete_params.push(params);
         }
     }
@@ -230,9 +229,7 @@ async fn purge_txi_by_hash(
 }
 
 /// Purge data from `txo_ada`.
-async fn purge_txo_ada(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
-) -> anyhow::Result<()> {
+async fn purge_txo_ada(session: &Arc<CassandraSession>, purge_to_slot: Slot) -> anyhow::Result<()> {
     use purge::txo_ada::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
@@ -241,7 +238,7 @@ async fn purge_txo_ada(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -252,7 +249,7 @@ async fn purge_txo_ada(
 
 /// Purge data from `txo_assets`.
 async fn purge_txo_assets(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::txo_assets::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -262,7 +259,7 @@ async fn purge_txo_assets(
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         let params: Params = primary_key.into();
-        if &params.slot_no <= purge_to_slot {
+        if params.slot_no <= purge_to_slot.into() {
             delete_params.push(params);
         }
     }
@@ -273,7 +270,7 @@ async fn purge_txo_assets(
 
 /// Purge data from `unstaked_txo_ada`.
 async fn purge_unstaked_txo_ada(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::unstaked_txo_ada::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -282,7 +279,7 @@ async fn purge_unstaked_txo_ada(
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        if &primary_key.2 <= purge_to_slot {
+        if primary_key.2 <= purge_to_slot.into() {
             let params: Params = primary_key.into();
             delete_params.push(params);
         }
@@ -294,7 +291,7 @@ async fn purge_unstaked_txo_ada(
 
 /// Purge data from `unstaked_txo_assets`.
 async fn purge_unstaked_txo_assets(
-    session: &Arc<CassandraSession>, purge_to_slot: &num_bigint::BigInt,
+    session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
     use purge::unstaked_txo_assets::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -303,7 +300,7 @@ async fn purge_unstaked_txo_assets(
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        if &primary_key.4 <= purge_to_slot {
+        if primary_key.4 <= purge_to_slot.into() {
             let params: Params = primary_key.into();
             delete_params.push(params);
         }

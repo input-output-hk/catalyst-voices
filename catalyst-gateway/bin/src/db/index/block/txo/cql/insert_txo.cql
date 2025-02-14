@@ -1,16 +1,16 @@
 -- Create the TXO Record for a stake address,
 INSERT INTO txo_by_stake (
-    stake_address,
+    stake_key_hash,
     slot_no,
-    txn,
+    txn_index,
     txo,
     address,
     value,
-    txn_hash
+    txn_id
 ) VALUES (
-    :stake_address,
+    :stake_key_hash,
     :slot_no,
-    :txn,
+    :txn_index,
     :txo,
     :address,
     :value,

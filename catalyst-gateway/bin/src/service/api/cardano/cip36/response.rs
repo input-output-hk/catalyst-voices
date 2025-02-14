@@ -1,4 +1,6 @@
 //! Cip36 Registration Query Endpoint Response
+
+use catalyst_types::problem_report::ProblemReport;
 use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 
 use crate::service::common;
@@ -108,12 +110,8 @@ pub(crate) struct Cip36Details {
     pub cip15: bool,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
-    #[oai(
-        default = "Vec::<common::types::generic::error_msg::ErrorMessage>::new",
-        skip_serializing_if_is_empty,
-        validator(max_items = "10")
-    )]
-    pub errors: Vec<common::types::generic::error_msg::ErrorMessage>,
+    #[oai(skip_serializing_if_is_none)]
+    pub errors: Option<common::types::generic::error_msg::ErrorMessage>,
 }
 
 /// Is the payment address payable by catalyst.
@@ -144,7 +142,7 @@ impl Example for Cip36Details {
             ),
             is_payable: true,
             cip15: false,
-            errors: Vec::<common::types::generic::error_msg::ErrorMessage>::new(),
+            errors: None,
         }
     }
 }
@@ -152,6 +150,10 @@ impl Example for Cip36Details {
 impl Cip36Details {
     /// Example of an invalid registration
     fn invalid_example() -> Self {
+        let problem_report = ProblemReport::new("Cip36");
+        problem_report.other("Error occurred", "Cip36 decoding error");
+        let errors = serde_json::to_string(&problem_report).unwrap_or_default();
+
         Self {
             slot_no: (common::types::cardano::slot_no::EXAMPLE + 135).into(),
             stake_pub_key: None,
@@ -163,7 +165,9 @@ impl Cip36Details {
             payment_address: None,
             is_payable: false,
             cip15: true,
-            errors: vec!["Stake Public Key is required".into()],
+            errors: Some(
+                crate::service::common::types::generic::error_msg::ErrorMessage::from(errors),
+            ),
         }
     }
 }

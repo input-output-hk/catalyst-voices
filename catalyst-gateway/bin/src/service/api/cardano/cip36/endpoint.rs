@@ -3,7 +3,7 @@
 use poem::http::HeaderMap;
 use tracing::error;
 
-use self::cardano::{hash28::HexEncodedHash28, query::stake_or_voter::StakeAddressOrPublicKey};
+use self::cardano::query::stake_or_voter::StakeAddressOrPublicKey;
 use super::{
     cardano::{self},
     filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key, snapshot},
@@ -22,7 +22,7 @@ pub(crate) async fn cip36_registrations(
     lookup: Option<cardano::query::stake_or_voter::StakeOrVoter>, asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
     _limit: common::types::generic::query::pagination::Limit, _headers: &HeaderMap,
-) -> response::AllRegistration {
+) -> AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
         return AllRegistration::service_unavailable(
@@ -40,8 +40,8 @@ pub(crate) async fn cip36_registrations(
                 // We then get the latest registration or from a specific time as optionally
                 // specified in the query parameter. This can be represented as either
                 // the blockchains slot number or a unix timestamp.
-                let stake_hash: HexEncodedHash28 = match cip19_stake_address.try_into() {
-                    Ok(stake_hash) => stake_hash,
+                let address = match cip19_stake_address.try_into() {
+                    Ok(a) => a,
                     Err(err) => {
                         return AllRegistration::handle_error(&anyhow::anyhow!(
                             "Given stake pub key is corrupt {:?}",
@@ -50,7 +50,7 @@ pub(crate) async fn cip36_registrations(
                     },
                 };
 
-                return get_registration_given_stake_key_hash(stake_hash, session, asat).await;
+                return get_registration_given_stake_key_hash(address, session, asat).await;
             },
             StakeAddressOrPublicKey::PublicKey(ed25519_hex_encoded_public_key) => {
                 // As above...

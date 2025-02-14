@@ -1,9 +1,9 @@
 -- Index of CIP-36 registrations that are invalid.
 CREATE TABLE IF NOT EXISTS cip36_registration_invalid (
     -- Primary Key Data
-    stake_address       blob,       -- 32 Bytes of Stake Address.
+    stake_public_key    blob,       -- 32 Bytes of Stake Address.
     slot_no             varint,     -- slot number when the key_was_registered/re-registered.
-    txn                 smallint,   -- Index of the TX which holds the registration data.
+    txn_index           smallint,   -- Index of the TX which holds the registration data.
 
     -- Non-Key Data
     vote_key            blob,       -- 32 Bytes of Vote Key.
@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS cip36_registration_invalid (
     nonce               varint,     -- Nonce that has been slot corrected.
     cip36               boolean,    -- True if CIP-36 Registration format used. CIP-15 = False.
     signed              boolean,    -- Signature validates.
-    error_report        list<text>, -- List of serialization errors in the registration.
+    problem_report      text,       -- JSON encoded string of errors in the registration.
 
-    PRIMARY KEY (stake_address, slot_no, txn)
+    PRIMARY KEY (stake_public_key, slot_no, txn_index)
 )
-WITH CLUSTERING ORDER BY (slot_no DESC, txn DESC);
+WITH CLUSTERING ORDER BY (slot_no DESC, txn_index DESC);

@@ -14,20 +14,19 @@ use crate::db::index::{
 };
 
 /// Get stake addr from stake hash query string.
-const GET_STAKE_ADDR_FROM_STAKE_HASH: &str =
-    include_str!("../cql/get_stake_addr_w_stake_key_hash.cql");
+const GET_STAKE_ADDR_FROM_STAKE_HASH: &str = include_str!("../cql/get_stake_addr_w_stake_hash.cql");
 
 /// Get stake addr
 #[derive(SerializeRow)]
 pub(crate) struct GetStakeAddrParams {
     /// Stake hash.
-    pub stake_hash: Vec<u8>,
+    pub stake_key_hash: Vec<u8>,
 }
 
 impl GetStakeAddrParams {
     /// Create a new instance of [`GetStakeAddrParams`]
-    pub(crate) fn new(stake_hash: Vec<u8>) -> GetStakeAddrParams {
-        Self { stake_hash }
+    pub(crate) fn new(stake_key_hash: Vec<u8>) -> GetStakeAddrParams {
+        Self { stake_key_hash }
     }
 }
 
@@ -35,7 +34,7 @@ impl GetStakeAddrParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetStakeAddrQuery {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
 }
 
 impl GetStakeAddrQuery {
