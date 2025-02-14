@@ -46,7 +46,5 @@ pub(crate) type TxId = Vec<u8>;
 pub(crate) type PublicVotingInfo = VotingInfo;
 /// Payment address
 pub(crate) type PaymentAddress = Vec<u8>;
-/// Nonce
-pub(crate) type Nonce = i64;
 /// Stake amount.
 pub(crate) type StakeAmount = i64;

@@ -3,8 +3,8 @@
 use poem_openapi::{types::Example, Object, Union};
 
 use crate::service::{
-    api::cardano::types::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
-    common::objects::cardano::hash::Hash,
+    api::cardano::types::{PaymentAddress, PublicVotingInfo, TxId},
+    common::{objects::cardano::hash::Hash, types::cardano::nonce::Nonce},
     utilities::as_hex_string,
 };
 
@@ -58,8 +58,6 @@ pub(crate) struct RegistrationInfo {
     tx_hash: Hash,
 
     /// Registration nonce.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     nonce: Nonce,
 
     /// Voting info.
@@ -113,7 +111,7 @@ impl Example for RegistrationInfo {
             )
             .expect("Invalid hex")
             .into(),
-            nonce: 11_623_850,
+            nonce: Nonce::example(),
             voting_info: VotingInfo::Delegated(Delegations {
                 delegations: vec![Delegation {
                     voting_key:
