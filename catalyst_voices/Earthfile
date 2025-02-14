@@ -46,27 +46,32 @@ code-generator:
     ARG save_locally=false
     ARG filter_openapi=true
     FROM +builder
-    LET gen_code_path  = lib/generated/api
+
+    LET gen_code_path = lib/generated/api
     LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
+    LET openapi_spec_path = openapi/cat-gateway.json
 
     RUN melos l10n
     RUN melos build_runner
 
     IF [ $save_locally = true ]
-        RUN find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway.*.swagger.*" -o -name "*.drift.dart" \)
+        LET generated_patterns = "*.g.dart *.freezed.dart *.chopper.dart *.swagger.dart *.openapi.dart *.gen.dart catalyst_voices_localizations*.dart cat_gateway.*.swagger.* *.drift.dart"
 
-        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.freezed.dart" -o -name "*.chopper.dart" -o -name "*.swagger.dart" -o -name "*.openapi.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "cat_gateway_api.*.swagger.*" -o -name "*.drift.dart" \))
-            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
+        RUN find . \( -name "$generated_patterns" -o -type d -name "generated" \)
+
+        FOR generated_item IN $(find . \( -name "$generated_patterns" -o -type d -name "generated" \))
+            SAVE ARTIFACT $generated_item AS LOCAL $generated_item
         END
     ELSE
         SAVE ARTIFACT .
     END
+
     WORKDIR packages/internal/catalyst_voices_repositories
 
     IF [ $filter_openapi = true ]
-        COPY +filter-openapi/filtered-openapi.json openapi/cat-gateway.json
+        COPY +filter-openapi/filtered-openapi.json "$openapi_spec_path"
     ELSE
-        COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway.json
+        COPY catalyst-gateway+build/doc/cat-gateway-api.json "$openapi_spec_path"
     END
 
     DO flutter-ci+OPENAPI_CODE_GEN \
