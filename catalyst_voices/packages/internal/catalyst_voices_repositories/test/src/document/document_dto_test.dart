@@ -28,10 +28,10 @@ void main() {
         final originalJsonString = json.encode(documentJson);
 
         // serialized and deserialized
-        final documentData = DocumentDataDto.fromJson(documentJson);
-        final documentDto = DocumentDto.fromJsonSchema(documentData, schema);
+        final documentContent = DocumentDataContentDto.fromJson(documentJson);
+        final documentDto = DocumentDto.fromJsonSchema(documentContent, schema);
         final documentDtoJson = documentDto.toJson();
-        final serializedJsonString = json.encode(documentDtoJson.json);
+        final serializedJsonString = json.encode(documentDtoJson.data);
 
         // verify they are the same
         expect(serializedJsonString, equals(originalJsonString));
@@ -44,9 +44,11 @@ void main() {
       final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
 
       // original
-      final originalDocData = DocumentDataDto.fromJson(documentJson);
-      final originalDocDto =
-          DocumentDto.fromJsonSchema(originalDocData, schema);
+      final originalDocContent = DocumentDataContentDto.fromJson(documentJson);
+      final originalDocDto = DocumentDto.fromJsonSchema(
+        originalDocContent,
+        schema,
+      );
       final originalDoc = originalDocDto.toModel();
 
       // serialized and deserialized

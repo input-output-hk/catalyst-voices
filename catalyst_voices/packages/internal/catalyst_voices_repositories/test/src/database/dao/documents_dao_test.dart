@@ -1,12 +1,13 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:uuid/data.dart';
 import 'package:uuid/uuid.dart';
 
-import '../test_factories.dart';
+import '../../utils/test_factories.dart';
 
 void main() {
   late DriftCatalystDatabase database;
@@ -62,8 +63,8 @@ void main() {
       });
     });
 
-    group('watch all', () {
-      test('emits data when new entities are saved', () async {
+    group('query', () {
+      test('stream emits data when new entities are saved', () async {
         // Given
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           1,
@@ -86,6 +87,101 @@ void main() {
             equals(expectedDocuments),
           ]),
         );
+      });
+
+      test('returns specific version matching exact ref', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) => DocumentWithMetadataFactory.build(),
+        );
+        final document = documentsWithMetadata.first.document;
+        final ref = DocumentRef(
+          id: document.metadata.id,
+          version: document.metadata.version,
+        );
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final entity = await database.documentsDao.query(ref: ref);
+
+        expect(entity, isNotNull);
+
+        final id = UuidHiLo(high: entity!.idHi, low: entity.idLo);
+        final ver = UuidHiLo(high: entity.verHi, low: entity.verLo);
+
+        expect(id.uuid, ref.id);
+        expect(ver.uuid, ref.version);
+      });
+
+      test('returns newest version when ver is not specified', () async {
+        // Given
+        final id = const Uuid().v7();
+        final firstVersionId = const Uuid().v7(
+          config: V7Options(
+            DateTime(2025, 2, 10).millisecondsSinceEpoch,
+            null,
+          ),
+        );
+        final secondVersionId = const Uuid().v7(
+          config: V7Options(
+            DateTime(2025, 2, 11).millisecondsSinceEpoch,
+            null,
+          ),
+        );
+
+        const secondContent = DocumentDataContent({'title': 'Dev'});
+        final documentsWithMetadata = <DocumentEntityWithMetadata>[
+          DocumentWithMetadataFactory.build(
+            content: const DocumentDataContent({'title': 'D'}),
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: firstVersionId,
+            ),
+          ),
+          DocumentWithMetadataFactory.build(
+            content: secondContent,
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: secondVersionId,
+            ),
+          ),
+        ];
+        final document = documentsWithMetadata.first.document;
+        final ref = DocumentRef(id: document.metadata.id);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final entity = await database.documentsDao.query(ref: ref);
+
+        expect(entity, isNotNull);
+
+        expect(entity!.metadata.id, id);
+        expect(entity.metadata.version, secondVersionId);
+        expect(entity.content, secondContent);
+      });
+
+      test('returns null when id does not match any id', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) => DocumentWithMetadataFactory.build(),
+        );
+        final ref = DocumentRef(id: const Uuid().v7());
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final entity = await database.documentsDao.query(ref: ref);
+
+        expect(entity, isNull);
       });
     });
 
@@ -112,8 +208,8 @@ void main() {
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
           2,
           (index) {
-            final metadata = SignedDocumentMetadata(
-              type: SignedDocumentType.proposalDocument,
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
               id: id,
               version: const Uuid().v7(),
             );
@@ -126,6 +222,88 @@ void main() {
 
         // Then
         final count = await database.documentsDao.countDocuments();
+
+        expect(count, 1);
+      });
+
+      test('where without ver counts all versions', () async {
+        // Given
+        final id = const Uuid().v7();
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) {
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: const Uuid().v7(),
+            );
+            return DocumentWithMetadataFactory.build(metadata: metadata);
+          },
+        );
+
+        final expectedCount = documentsWithMetadata.length;
+        final ref = DocumentRef(id: id);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final count = await database.documentsDao.count(ref: ref);
+
+        expect(count, expectedCount);
+      });
+
+      test('where with ver counts only matching results', () async {
+        // Given
+        final id = const Uuid().v7();
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) {
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: id,
+              version: const Uuid().v7(),
+            );
+            return DocumentWithMetadataFactory.build(metadata: metadata);
+          },
+        );
+        final version = documentsWithMetadata.first.document.metadata.version;
+        final ref = DocumentRef(id: id, version: version);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final count = await database.documentsDao.count(ref: ref);
+
+        expect(count, 1);
+      });
+
+      test(
+          'where returns correct value when '
+          'many different documents are found', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          10,
+          (index) {
+            final metadata = DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              id: const Uuid().v7(),
+              version: const Uuid().v7(),
+            );
+            return DocumentWithMetadataFactory.build(metadata: metadata);
+          },
+        );
+        final document = documentsWithMetadata.last.document;
+        final id = document.metadata.id;
+        final version = document.metadata.version;
+        final ref = DocumentRef(id: id, version: version);
+
+        // When
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        final count = await database.documentsDao.count(ref: ref);
 
         expect(count, 1);
       });

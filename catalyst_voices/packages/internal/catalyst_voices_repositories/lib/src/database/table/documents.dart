@@ -7,7 +7,7 @@ import 'package:drift/drift.dart';
 /// This table stores a record of each document (including its content and
 /// related metadata).
 ///
-/// Its representation of [SignedDocumentData] class.
+/// Its representation of [DocumentData] class.
 @TableIndex(name: 'idx_doc_type', columns: {#type})
 @TableIndex(name: 'idx_unique_ver', columns: {#verHi, #verLo}, unique: true)
 @DataClassName('DocumentEntity')

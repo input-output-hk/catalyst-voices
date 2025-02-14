@@ -8,3 +8,6 @@ import 'package:flutter/widgets.dart';
 ///  * [ResponsiveBuilder], a widget which invokes this builder each time
 ///    a screenSize changes value.
 typedef DataWidgetBuilder<T> = Widget Function(BuildContext context, T data);
+
+/// Returns [R] out of given [data].
+typedef ValueResolver<T, R> = R Function(T data);

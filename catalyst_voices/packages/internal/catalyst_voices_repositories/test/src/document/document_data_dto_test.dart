@@ -3,7 +3,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(DocumentDataDto, () {
+  group(DocumentDataContentDto, () {
     test('getProperty returns correct value for valid path', () {
       final json = {
         'title': 'Test Document',
@@ -13,7 +13,7 @@ void main() {
         'tags': ['test', 'flutter'],
       };
 
-      final dto = DocumentDataDto.fromJson(json);
+      final dto = DocumentDataContentDto.fromJson(json);
       final nodeId = DocumentNodeId.root.child('content').child('text');
 
       expect(dto.getProperty(nodeId), 'This is a test.');
@@ -24,7 +24,7 @@ void main() {
         'tags': ['test', 'flutter'],
       };
 
-      final dto = DocumentDataDto.fromJson(json);
+      final dto = DocumentDataContentDto.fromJson(json);
       final nodeId = DocumentNodeId.root.child('tags').child('1');
 
       expect(dto.getProperty(nodeId), 'flutter');
@@ -35,7 +35,7 @@ void main() {
         'title': 'Test Document',
       };
 
-      final dto = DocumentDataDto.fromJson(json);
+      final dto = DocumentDataContentDto.fromJson(json);
       final nodeId = DocumentNodeId.root.child('content').child('text');
 
       expect(dto.getProperty(nodeId), isNull);
@@ -46,7 +46,7 @@ void main() {
         'tags': ['test', 'flutter'],
       };
 
-      final dto = DocumentDataDto.fromJson(json);
+      final dto = DocumentDataContentDto.fromJson(json);
       final nodeId = DocumentNodeId.root.child('tags').child('invalid_index');
 
       expect(dto.getProperty(nodeId), isNull);
@@ -57,7 +57,7 @@ void main() {
         'title': 'Test Document',
       };
 
-      final dto = DocumentDataDto.fromJson(json);
+      final dto = DocumentDataContentDto.fromJson(json);
       final nodeId = DocumentNodeId.root.child('title').child('extra');
 
       expect(dto.getProperty(nodeId), isNull);
