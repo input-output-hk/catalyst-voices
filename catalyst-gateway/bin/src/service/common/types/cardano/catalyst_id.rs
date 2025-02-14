@@ -12,6 +12,7 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
+/// A schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     MetaSchema {
         title: Some("Catalyst short ID".into()),
