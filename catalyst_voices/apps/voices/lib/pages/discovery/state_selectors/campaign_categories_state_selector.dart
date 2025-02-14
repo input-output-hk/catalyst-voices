@@ -16,6 +16,7 @@ class CampaignCategoriesStateSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: const Key('CampaignCategoriesStateSelector'),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

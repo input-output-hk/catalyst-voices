@@ -46,11 +46,13 @@ class _Header extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('CurrentCampaignTitle'),
             context.l10n.currentCampaign,
             style: context.textTheme.titleSmall,
           ),
           const SizedBox(height: 4),
           Text(
+            key: const Key('Subtitle'),
             context.l10n.catalystF14,
             style: context.textTheme.displayMedium?.copyWith(
               color: context.colorScheme.primary,
@@ -58,6 +60,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
+            key: const Key('Description'),
             context.l10n.currentCampaignDescription,
             style: context.textTheme.bodyLarge,
           ),

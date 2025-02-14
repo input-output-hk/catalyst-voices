@@ -72,17 +72,19 @@ class FundsDetailCard extends StatelessWidget {
               runSpacing: 10,
               children: [
                 _CampaignFundsDetail(
+                  key: const Key('FundsDetailBudget'),
                   title: type.localizedTypeName(context.l10n),
                   description: type.localizedTypeDescription(context.l10n),
                   funds: allFunds,
                 ),
                 _CampaignFundsDetail(
+                  key: const Key('FundsDetailRequested'),
                   title: type.localizedTotalAsk(context.l10n),
                   description: context.l10n.campaignTotalAskDescription,
                   funds: totalAsk,
                   largeFundsText: false,
                 ),
-                _RangeAsk(range: askRange),
+                _RangeAsk(key: const Key('FundsDetailAsk'), range: askRange),
               ],
             ),
           ),
@@ -99,6 +101,7 @@ class _CampaignFundsDetail extends StatelessWidget {
   final bool largeFundsText;
 
   const _CampaignFundsDetail({
+    super.key,
     required this.title,
     required this.description,
     required this.funds,
@@ -115,6 +118,7 @@ class _CampaignFundsDetail extends StatelessWidget {
       children: [
         Skeleton.keep(
           child: Text(
+            key: const Key('Title'),
             title,
             style: context.textTheme.titleMedium?.copyWith(
               color: context.colors.textOnPrimaryLevel1,
@@ -123,6 +127,7 @@ class _CampaignFundsDetail extends StatelessWidget {
         ),
         Skeleton.keep(
           child: Text(
+            key: const Key('Description'),
             description,
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colors.sysColorsNeutralN60,
@@ -131,6 +136,7 @@ class _CampaignFundsDetail extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
+          key: const Key('Funds'),
           '${const Currency.ada().symbol} $_formattedFunds',
           style: _foundsTextStyle(context)?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
@@ -153,6 +159,7 @@ class _RangeAsk extends StatelessWidget {
   final Range<int> range;
 
   const _RangeAsk({
+    super.key,
     required this.range,
   });
 
@@ -172,11 +179,13 @@ class _RangeAsk extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _RangeValue(
+            key: const Key('RangeMax'),
             title: context.l10n.maximumAsk,
             value: range.max ?? 0,
           ),
           const SizedBox(height: 19),
           _RangeValue(
+            key: const Key('RangeMin'),
             title: context.l10n.minimumAsk,
             value: range.min ?? 0,
           ),
@@ -191,6 +200,7 @@ class _RangeValue extends StatelessWidget {
   final int value;
 
   const _RangeValue({
+    super.key,
     required this.title,
     required this.value,
   });
@@ -206,6 +216,7 @@ class _RangeValue extends StatelessWidget {
       children: [
         Skeleton.keep(
           child: Text(
+            key: const Key('Title'),
             title,
             style: context.textTheme.titleSmall?.copyWith(
               color: context.colors.sysColorsNeutralN60,
@@ -213,6 +224,7 @@ class _RangeValue extends StatelessWidget {
           ),
         ),
         Text(
+          key: const Key('Value'),
           '${const Currency.ada().symbol} $_formattedValue',
           style: context.textTheme.bodyMedium?.copyWith(
             color: context.colors.sysColorsNeutralN60,

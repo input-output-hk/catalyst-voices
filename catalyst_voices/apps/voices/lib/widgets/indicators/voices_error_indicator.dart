@@ -22,6 +22,7 @@ class VoicesErrorIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIndicator(
+      key: const Key('ErrorIndicator'),
       type: VoicesIndicatorType.error,
       icon: VoicesAssets.icons.exclamation,
       message: Text(message),

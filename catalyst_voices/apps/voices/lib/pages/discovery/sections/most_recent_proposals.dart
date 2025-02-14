@@ -45,6 +45,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('MostRecentProposals'),
       constraints: const BoxConstraints(maxHeight: 900),
       decoration: BoxDecoration(
         image: DecorationImage(

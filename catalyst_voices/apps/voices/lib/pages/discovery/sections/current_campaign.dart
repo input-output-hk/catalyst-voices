@@ -22,6 +22,7 @@ class CurrentCampaign extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: const Key('CurrentCampaign'),
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
@@ -33,6 +34,7 @@ class CurrentCampaign extends StatelessWidget {
               Skeletonizer(
                 enabled: isLoading,
                 child: FundsDetailCard(
+                  key: const Key('FundsDetailCard'),
                   allFunds: currentCampaignInfo.allFunds,
                   totalAsk: currentCampaignInfo.totalAsk,
                   askRange: currentCampaignInfo.askRange,
@@ -62,6 +64,7 @@ class _SubTitle extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('IdeaSubTitle'),
             context.l10n.ideaJourney,
             style: context.textTheme.headlineMedium,
           ),
@@ -94,6 +97,7 @@ class _CampaignTimelineState extends State<_CampaignTimeline> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      key: const Key('CampaignTimeline'),
       cursor: SystemMouseCursors.click,
       child: SizedBox(
         height: 300,
@@ -162,6 +166,7 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  key: const Key('TimelineCardTopBar'),
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     VoicesAssets.icons.calendar.buildIcon(
@@ -174,6 +179,7 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
                 ),
                 const SizedBox(height: 16),
                 Text(
+                  key: const Key('TimelineCardTitle'),
                   widget.timelineItem.title,
                   style: context.textTheme.titleSmall?.copyWith(
                     color: context.colors.textOnPrimaryLevel1,
@@ -183,6 +189,7 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
+                      key: const Key('TimelineCardDate'),
                       DateFormatter.formatDateRange(
                         MaterialLocalizations.of(context),
                         context.l10n,
@@ -211,6 +218,7 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
                   duration: Durations.medium4,
                   child: isExpanded
                       ? Text(
+                          key: const Key('TimelineCardDescription'),
                           widget.timelineItem.description,
                           style: context.textTheme.bodyMedium?.copyWith(
                             color: context.colors.sysColorsNeutralN60,

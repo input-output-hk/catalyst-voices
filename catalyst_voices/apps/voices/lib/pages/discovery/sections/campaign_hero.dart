@@ -16,6 +16,7 @@ class CampaignHeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
+      key: const Key('CampaignHeroSection'),
       constraints: const BoxConstraints(minHeight: 450),
       child: HeroSection(
         asset: VoicesAssets.videos.heroDesktop,
@@ -48,6 +49,7 @@ class _CampaignBrief extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
+          key: const Key('CampaignBriefTitle'),
           context.l10n.heroSectionTitle,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 color: ThemeBuilder.buildTheme().colorScheme.primary,
@@ -55,6 +57,7 @@ class _CampaignBrief extends StatelessWidget {
         ),
         const SizedBox(height: 32),
         Text(
+          key: const Key('CampaignBriefDescription'),
           context.l10n.projectCatalystDescription,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: ThemeBuilder.buildTheme().colors.textOnPrimaryLevel0,
@@ -64,6 +67,7 @@ class _CampaignBrief extends StatelessWidget {
         Row(
           children: [
             VoicesFilledButton(
+              key: const Key('ViewProposalsButton'),
               onTap: () {
                 const ProposalsRoute().go(context);
               },

@@ -42,6 +42,7 @@ class _VisitorButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
+      key: const Key('VisitorButton'),
       child: Text(context.l10n.visitor),
       onTap: () {},
     );

@@ -34,6 +34,7 @@ class HowItWorks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
+      key: const Key('HowItWorks'),
       decoration: BoxDecoration(
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
       ),
@@ -44,6 +45,7 @@ class HowItWorks extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
+              key: const Key('HowItWorksTitle'),
               context.l10n.howItWorks,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
@@ -77,12 +79,14 @@ class _Item extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           VoicesAvatar(
+            key: Key('${item.name}Avatar'),
             icon: item.icon.buildIcon(size: 60),
             radius: 60,
             backgroundColor: Theme.of(context).colors.onSurfacePrimary08,
           ),
           const SizedBox(height: 32),
           Text(
+            key: Key('${item.name}Title'),
             item.title(context.l10n),
             style: Theme.of(context).textTheme.titleLarge,
           ),
@@ -90,6 +94,7 @@ class _Item extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 300),
             child: Text(
+              key: Key('${item.name}Description'),
               item.description(context.l10n),
               style: Theme.of(context).textTheme.bodyLarge,
               maxLines: 3,

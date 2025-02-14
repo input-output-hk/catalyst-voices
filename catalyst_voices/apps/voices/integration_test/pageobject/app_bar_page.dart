@@ -11,6 +11,7 @@ class AppBarPage {
   final accountPopupBtn = const Key('AccountPopupButton');
   final lockBtn = const Key('LockButton');
   final unlockBtn = const Key('UnlockButton');
+  final visitorBtn = const Key('VisitorButton');
 
   Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
     expect($(spacesDrawerButton).exists, !reverse!);
@@ -22,6 +23,10 @@ class AppBarPage {
 
   Future<void> getStartedBtnClick() async {
     await $(getStartedBtn).tap(settleTimeout: Time.short.duration);
+  }
+
+  Future<void> getStartedBtnIsVisible() async {
+    expect($(getStartedBtn), findsOneWidget);
   }
 
   Future<void> accountPopupBtnClick() async {
@@ -38,5 +43,14 @@ class AppBarPage {
 
   Future<void> unlockBtnClick() async {
     await $(unlockBtn).tap();
+  }
+
+  Future<void> visitorBtnIsVisible() async {
+    expect($(visitorBtn), findsOneWidget);
+  }
+
+  Future<void> looksAsExpectedForVisitor() async {
+    await getStartedBtnIsVisible();
+    await visitorBtnIsVisible();
   }
 }
