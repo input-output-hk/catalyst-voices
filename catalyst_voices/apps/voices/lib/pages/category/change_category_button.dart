@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown_category.dart';
+import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -37,7 +37,7 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
             .toList();
       },
       builder: (context, state) {
-        return VoicesDropdownCategory(
+        return CategoryDropdown(
           popupMenuButtonKey: _popupMenuButtonKey,
           clipBehavior: Clip.hardEdge,
           onSelected: _changeCategory,
@@ -68,6 +68,13 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
     );
   }
 
+  Future<void> _changeCategory(String? categoryId) async {
+    if (categoryId == null) {
+      return;
+    }
+    await context.read<CategoryDetailCubit>().getCategoryDetail(categoryId);
+  }
+
   void _handleClose() {
     setState(() {
       isOpen = false;
@@ -78,12 +85,5 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
     setState(() {
       isOpen = true;
     });
-  }
-
-  Future<void> _changeCategory(String? categoryId) async {
-    if (categoryId == null) {
-      return;
-    }
-    await context.read<CategoryDetailCubit>().getCategoryDetail(categoryId);
   }
 }

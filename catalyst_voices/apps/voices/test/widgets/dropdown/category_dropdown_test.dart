@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown_category.dart';
+import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,8 +17,8 @@ void main() {
     ),
   ];
 
-  group(VoicesDropdownCategory, () {
-    testWidgets('$VoicesDropdownCategory renders correctly',
+  group(CategoryDropdown, () {
+    testWidgets('$CategoryDropdown renders correctly',
         (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
       String? selectedValue;
@@ -26,7 +26,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoicesDropdownCategory(
+            body: CategoryDropdown(
               items: items,
               popupMenuButtonKey: popupMenuButtonKey,
               highlightColor: Colors.blue,
@@ -52,7 +52,7 @@ void main() {
       expect(selectedValue, equals('value1'));
     });
 
-    testWidgets('$VoicesDropdownCategory handles callbacks',
+    testWidgets('$CategoryDropdown handles callbacks',
         (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
       var wasOpened = false;
@@ -61,7 +61,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoicesDropdownCategory(
+            body: CategoryDropdown(
               items: items,
               popupMenuButtonKey: popupMenuButtonKey,
               onOpened: () {
@@ -84,14 +84,14 @@ void main() {
       expect(wasCanceled, isTrue);
     });
 
-    testWidgets('$VoicesDropdownCategory applies highlight color',
+    testWidgets('$CategoryDropdown applies highlight color',
         (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: VoicesDropdownCategory(
+            body: CategoryDropdown(
               items: items,
               popupMenuButtonKey: popupMenuButtonKey,
               highlightColor: Colors.blue,

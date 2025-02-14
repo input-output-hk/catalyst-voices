@@ -2,7 +2,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
     hide PopupMenuItem;
 import 'package:flutter/material.dart';
 
-class VoicesDropdownCategory extends StatelessWidget {
+class CategoryDropdown extends StatelessWidget {
   final List<DropdownMenuViewModel> items;
   final Color? highlightColor;
   final Clip clipBehavior;
@@ -14,7 +14,7 @@ class VoicesDropdownCategory extends StatelessWidget {
   final BoxConstraints constraints;
   final Widget child;
 
-  const VoicesDropdownCategory({
+  const CategoryDropdown({
     super.key,
     required this.items,
     required this.popupMenuButtonKey,
@@ -65,6 +65,17 @@ class VoicesDropdownCategory extends StatelessWidget {
   }
 }
 
+class CustomPopupMenuItemState<T>
+    extends PopupMenuItemState<T, _PopupMenuItemHighlightColor<T>> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: widget.color,
+      child: super.build(context),
+    );
+  }
+}
+
 class _PopupMenuItemHighlightColor<T> extends PopupMenuItem<T> {
   final Color? color;
 
@@ -78,15 +89,4 @@ class _PopupMenuItemHighlightColor<T> extends PopupMenuItem<T> {
 
   @override
   CustomPopupMenuItemState<T> createState() => CustomPopupMenuItemState<T>();
-}
-
-class CustomPopupMenuItemState<T>
-    extends PopupMenuItemState<T, _PopupMenuItemHighlightColor<T>> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: widget.color,
-      child: super.build(context),
-    );
-  }
 }
