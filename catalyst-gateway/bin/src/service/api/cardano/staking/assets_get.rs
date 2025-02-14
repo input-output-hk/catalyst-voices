@@ -33,6 +33,7 @@ use crate::{
     },
 };
 
+/// A `TxoInfo` by transaction ID map.
 type TxosByTxn = HashMap<TransactionHash, HashMap<i16, TxoInfo>>;
 
 /// Endpoint responses.
