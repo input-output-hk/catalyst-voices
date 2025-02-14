@@ -89,7 +89,7 @@ impl Debug for Params {
         };
         let purpose = match self.purpose {
             MaybeUnset::Unset => "UNSET".to_owned(),
-            MaybeUnset::Set(v) => format!("{v:?}"),
+            MaybeUnset::Set(v) => format!("{}", UuidV4::from(v)),
         };
         f.debug_struct("Params")
             .field("catalyst_id", &self.catalyst_id)
