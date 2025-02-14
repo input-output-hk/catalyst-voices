@@ -1,8 +1,6 @@
 # cspell: words convertbits, segwit
-
 from hashlib import blake2b
 from bitcoin.segwit_addr import bech32_encode, convertbits
-
 
 # according to [CIP-19](https://cips.cardano.org/cips/cip19/).
 def stake_public_key_to_address(key: str, is_stake: bool, network_type: str):
