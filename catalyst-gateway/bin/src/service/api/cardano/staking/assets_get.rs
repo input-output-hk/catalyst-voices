@@ -294,14 +294,17 @@ fn build_stake_info(
     for txn_map in txos_by_txn.into_values() {
         for txo_info in txn_map.into_values() {
             if txo_info.spent_slot_no.is_none() {
-                let value = i64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
-                stake_info.ada_amount =
-                    stake_info.ada_amount.checked_add(value).ok_or_else(|| {
+                let value = u64::try_from(txo_info.value)?;
+                stake_info.ada_amount = stake_info
+                    .ada_amount
+                    .checked_add(value)
+                    .ok_or_else(|| {
                         anyhow!(
                             "Total stake amount overflow: {} + {value}",
                             stake_info.ada_amount
                         )
-                    })?;
+                    })?
+                    .into();
 
                 for asset in txo_info.assets.into_values().flatten() {
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
@@ -311,8 +314,10 @@ fn build_stake_info(
                     });
                 }
 
-                let slot_no = u64::try_from(txo_info.slot_no)?;
-                stake_info.slot_number = slot_no.into();
+                let slot_no = u64::try_from(txo_info.slot_no)?.into();
+                if stake_info.slot_number < slot_no {
+                    stake_info.slot_number = slot_no;
+                }
             }
         }
     }

@@ -1,11 +1,9 @@
 //! Defines API schemas of Cardano Slot info types.
 
+use chrono::{DateTime, Utc};
 use poem_openapi::{types::Example, Object};
 
-use crate::service::{
-    api::cardano::types::DateTime,
-    common::{objects::cardano::hash::Hash, types::cardano::slot_no::SlotNo},
-};
+use crate::service::common::{objects::cardano::hash::Hash, types::cardano::slot_no::SlotNo};
 
 /// Cardano block's slot data.
 #[derive(Object)]
@@ -19,7 +17,7 @@ pub(crate) struct Slot {
     pub(crate) block_hash: Hash,
 
     /// Block time.
-    pub(crate) block_time: DateTime,
+    pub(crate) block_time: DateTime<Utc>,
 }
 
 impl Example for Slot {

@@ -1,9 +1,9 @@
 //! Cardano API endpoints
+use chrono::{DateTime, Utc};
 use poem_openapi::{
     param::{Path, Query},
     OpenApi,
 };
-use types::DateTime;
 
 use crate::service::{
     common::{
@@ -23,7 +23,6 @@ mod date_time_to_slot_number_get;
 mod rbac;
 // mod registration_get;
 pub(crate) mod staking;
-pub(crate) mod types;
 
 /// Cardano Follower API Endpoints
 pub(crate) struct Api;
@@ -44,7 +43,7 @@ impl Api {
         &self,
         /// The date-time for which the slot number should be calculated.
         /// If omitted current date time is used.
-        date_time: Query<Option<DateTime>>,
+        date_time: Query<Option<DateTime<Utc>>>,
         /// Cardano network type.
         /// If omitted `mainnet` network type is defined.
         /// As `preprod` and `preview` network types in the stake address encoded as a
