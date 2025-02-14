@@ -6,7 +6,6 @@ use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use super::SlotNumber;
 use crate::{
     db::index::{
         queries::staked_ada::{
@@ -27,7 +26,9 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
+        types::cardano::{
+            asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+        },
     },
 };
 
@@ -52,8 +53,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/staked_ada`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: Cip19StakeAddress, _provided_network: Option<Network>,
-    slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNo>,
 ) -> AllResponses {
     let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num).await;
     let persistent_stake_info = match persistent_res {
@@ -111,7 +111,7 @@ struct TxoInfo {
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_stake_info(
-    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNumber>,
+    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let Some(session) = CassandraSession::get(persistent) else {
         anyhow::bail!("Failed to acquire db session");
@@ -138,9 +138,10 @@ async fn calculate_stake_info(
 
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNumber>,
+    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<HashMap<Vec<u8>, HashMap<i16, TxoInfo>>> {
-    let adjusted_slot_num = num_bigint::BigInt::from(slot_num.unwrap_or(i64::MAX));
+    let slot_num = slot_num.map_or_else(|| u64::MAX, u64::from);
+    let adjusted_slot_num = num_bigint::BigInt::from(slot_num);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
