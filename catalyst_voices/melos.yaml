@@ -86,7 +86,7 @@ command:
     runPubGetInParallel: true
     environment:
       sdk: ">=3.5.0 <4.0.0"
-      flutter: ">=3.27.3"
+      flutter: ">=3.29.0"
     dependencies:
       asn1lib: ^1.5.3
       bip39: ^1.0.6
