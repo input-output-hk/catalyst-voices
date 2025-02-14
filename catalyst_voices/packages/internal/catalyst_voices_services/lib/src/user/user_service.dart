@@ -4,7 +4,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-abstract interface class UserService implements ActiveAware {
+abstract interface class UserService
+    implements ActiveAware, ActiveAccountProvider {
   factory UserService({
     required UserRepository userRepository,
   }) {
@@ -17,11 +18,7 @@ abstract interface class UserService implements ActiveAware {
 
   Stream<User> get watchUser;
 
-  Account? get account;
-
   List<Account> get accounts;
-
-  Stream<Account?> get watchAccount;
 
   Future<User> getUser();
 

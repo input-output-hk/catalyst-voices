@@ -1,3 +1,4 @@
+export 'api/api.dart';
 export 'campaign/campaign_repository.dart' show CampaignRepository;
 export 'config/config_repository.dart' show ConfigRepository;
 export 'database/database.dart';
