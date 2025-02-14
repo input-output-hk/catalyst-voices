@@ -26,8 +26,11 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{
-            asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+        types::{
+            cardano::{
+                asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+            },
+            headers::retry_after::RetryAfterOption,
         },
     },
 };
@@ -55,13 +58,28 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(
     stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNo>,
 ) -> AllResponses {
-    let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num).await;
+    let Some(persistent_session) = CassandraSession::get(true) else {
+        tracing::error!("Failed to acquire persistent db session");
+        return AllResponses::service_unavailable(
+            &anyhow::anyhow!("Failed to acquire db session"),
+            RetryAfterOption::Default,
+        );
+    };
+    let Some(volatile_session) = CassandraSession::get(false) else {
+        tracing::error!("Failed to acquire volatile db session");
+        return AllResponses::service_unavailable(
+            &anyhow::anyhow!("Failed to acquire volatile db session"),
+            RetryAfterOption::Default,
+        );
+    };
+    let persistent_res =
+        calculate_stake_info(&persistent_session, stake_address.clone(), slot_num).await;
     let persistent_stake_info = match persistent_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
     };
 
-    let volatile_res = calculate_stake_info(false, stake_address, slot_num).await;
+    let volatile_res = calculate_stake_info(&volatile_session, stake_address, slot_num).await;
     let volatile_stake_info = match volatile_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
@@ -111,25 +129,21 @@ struct TxoInfo {
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_stake_info(
-    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
+    session: &CassandraSession, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
-    let Some(session) = CassandraSession::get(persistent) else {
-        anyhow::bail!("Failed to acquire db session");
-    };
-
     let address: StakeAddress = stake_address.try_into()?;
     let stake_address_bytes = address.payload().as_hash().to_vec();
 
-    let mut txos_by_txn = get_txo_by_txn(&session, stake_address_bytes.clone(), slot_num).await?;
+    let mut txos_by_txn = get_txo_by_txn(session, stake_address_bytes.clone(), slot_num).await?;
     if txos_by_txn.is_empty() {
         return Ok(None);
     }
 
-    check_and_set_spent(&session, &mut txos_by_txn).await?;
+    check_and_set_spent(session, &mut txos_by_txn).await?;
     // TODO: This could be executed in the background, it does not actually matter if it
     // succeeds. This is just an optimization step to reduce the need to query spent
     // TXO's.
-    update_spent(&session, stake_address_bytes, &txos_by_txn).await?;
+    update_spent(session, stake_address_bytes, &txos_by_txn).await?;
 
     let stake_info = build_stake_info(txos_by_txn)?;
 
