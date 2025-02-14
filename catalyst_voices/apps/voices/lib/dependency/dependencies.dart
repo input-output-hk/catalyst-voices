@@ -27,6 +27,7 @@ final class Dependencies extends DependencyProvider {
 
     _registerStorages();
     _registerUtils();
+    _registerNetwork();
     _registerRepositories();
     _registerServices();
     _registerBlocsWithDependencies();
@@ -119,20 +120,29 @@ final class Dependencies extends DependencyProvider {
       });
   }
 
+  void _registerNetwork() {
+    registerLazySingleton<ApiServices>(() {
+      return ApiServices(
+        config: get<AppConfig>().api,
+        activeAccountProvider: get<ActiveAccountProvider>(),
+      );
+    });
+  }
+
   void _registerRepositories() {
     this
-      ..registerLazySingleton<TransactionConfigRepository>(
-        TransactionConfigRepository.new,
-      )
-      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
-      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
-      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<UserRepository>(() {
         return UserRepository(
           get<UserStorage>(),
           get<KeychainProvider>(),
         );
       })
+      ..registerLazySingleton<TransactionConfigRepository>(
+        TransactionConfigRepository.new,
+      )
+      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<SignedDocumentManager>(),
