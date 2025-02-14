@@ -1,8 +1,8 @@
-import 'package:catalyst_voices/pages/workspace/workspace_empty_state.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_error.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_header.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_loading.dart';
-import 'package:catalyst_voices/pages/workspace/workspace_proposals.dart';
+import 'package:catalyst_voices/pages/workspace/header/workspace_header.dart';
+import 'package:catalyst_voices/pages/workspace/my_proposals/workspace_my_proposals_selector.dart';
+import 'package:catalyst_voices/pages/workspace/page/workspace_empty.dart';
+import 'package:catalyst_voices/pages/workspace/page/workspace_error.dart';
+import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,13 +16,6 @@ class WorkspacePage extends StatefulWidget {
 
 class _WorkspacePageState extends State<WorkspacePage> {
   @override
-  void initState() {
-    super.initState();
-
-    context.read<WorkspaceBloc>().add(const LoadProposalsEvent());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Column(
@@ -32,15 +25,21 @@ class _WorkspacePageState extends State<WorkspacePage> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                WorkspaceErrorSelector(),
-                WorkspaceEmptyStateSelector(),
-                WorkspaceProposalsSelector(),
+                WorkspaceMyProposalsSelector(),
                 WorkspaceLoadingSelector(),
+                WorkspaceEmptyStateSelector(),
+                WorkspaceErrorSelector(),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<WorkspaceBloc>().add(const LoadProposalsEvent());
   }
 }

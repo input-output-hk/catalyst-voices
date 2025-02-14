@@ -21,11 +21,21 @@ final class WorkspaceState extends Equatable {
     this.error,
   });
 
-  bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
+  @override
+  List<Object?> get props => [
+        tab,
+        isLoading,
+        draftProposalCount,
+        finalProposalCount,
+        searchQuery,
+        proposals,
+        error,
+      ];
 
-  bool get showEmptyState => !isLoading && proposals.isEmpty && error == null;
-
-  bool get showError => !isLoading && error != null;
+  bool get showEmptyState => proposals.isEmpty && error == null && !isLoading;
+  bool get showError => error != null && !isLoading;
+  bool get showLoading => isLoading;
+  bool get showProposals => proposals.isNotEmpty && error == null && !isLoading;
 
   WorkspaceState copyWith({
     WorkspaceTabType? tab,
@@ -46,15 +56,4 @@ final class WorkspaceState extends Equatable {
       error: error.dataOr(this.error),
     );
   }
-
-  @override
-  List<Object?> get props => [
-        tab,
-        isLoading,
-        draftProposalCount,
-        finalProposalCount,
-        searchQuery,
-        proposals,
-        error,
-      ];
 }

@@ -6,6 +6,32 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 extension SpaceExt on Space {
+  SvgGenImage get icon => switch (this) {
+        Space.discovery => VoicesAssets.icons.lightBulb,
+        Space.workspace => VoicesAssets.icons.briefcase,
+        Space.voting => VoicesAssets.icons.vote,
+        Space.fundedProjects => VoicesAssets.icons.flag,
+        Space.treasury => VoicesAssets.icons.fund,
+      };
+
+  Color backgroundColor(BuildContext context) => switch (this) {
+        Space.discovery =>
+          Theme.of(context).colors.iconsSecondary.withAlpha(41),
+        Space.workspace => Theme.of(context).colorScheme.primaryContainer,
+        Space.voting => Theme.of(context).colors.warningContainer,
+        Space.fundedProjects =>
+          Theme.of(context).colors.iconsSecondary.withAlpha(41),
+        Space.treasury => Theme.of(context).colors.successContainer,
+      };
+
+  Color foregroundColor(BuildContext context) => switch (this) {
+        Space.discovery => Theme.of(context).colors.iconsSecondary,
+        Space.workspace => Theme.of(context).colorScheme.primary,
+        Space.voting => Theme.of(context).colors.iconsWarning,
+        Space.fundedProjects => Theme.of(context).colors.iconsSecondary,
+        Space.treasury => Theme.of(context).colors.iconsSuccess,
+      };
+
   void go(BuildContext context) {
     switch (this) {
       case Space.discovery:
@@ -30,30 +56,4 @@ extension SpaceExt on Space {
       Space.treasury => localizations.spaceTreasuryName,
     };
   }
-
-  SvgGenImage get icon => switch (this) {
-        Space.discovery => VoicesAssets.icons.lightBulb,
-        Space.workspace => VoicesAssets.icons.briefcase,
-        Space.voting => VoicesAssets.icons.vote,
-        Space.fundedProjects => VoicesAssets.icons.flag,
-        Space.treasury => VoicesAssets.icons.fund,
-      };
-
-  Color backgroundColor(BuildContext context) => switch (this) {
-        Space.discovery =>
-          Theme.of(context).colors.iconsSecondary.withValues(alpha: 0.16),
-        Space.workspace => Theme.of(context).colorScheme.primaryContainer,
-        Space.voting => Theme.of(context).colors.warningContainer,
-        Space.fundedProjects =>
-          Theme.of(context).colors.iconsSecondary.withValues(alpha: 0.16),
-        Space.treasury => Theme.of(context).colors.successContainer,
-      };
-
-  Color foregroundColor(BuildContext context) => switch (this) {
-        Space.discovery => Theme.of(context).colors.iconsSecondary,
-        Space.workspace => Theme.of(context).colorScheme.primary,
-        Space.voting => Theme.of(context).colors.iconsWarning,
-        Space.fundedProjects => Theme.of(context).colors.iconsSecondary,
-        Space.treasury => Theme.of(context).colors.iconsSuccess,
-      };
 }
