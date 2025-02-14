@@ -99,7 +99,7 @@ test-ci-schemathesis:
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
         --service cat-gateway-with-scylla \
         --allow-privileged
-        RUN sleep 110; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN sleep 130; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
@@ -135,7 +135,7 @@ nightly-test-draft-schemathesis:
         --service cat-gateway-with-scylla \
         --allow-privileged
         # --no-cache is only for running in nightly - DO NOT use this in CI
-        RUN --no-cache sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN --no-cache sleep 130; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
             docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log; \
