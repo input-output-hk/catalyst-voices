@@ -23,7 +23,7 @@ const INSERT_CIP36_REGISTRATION_INVALID_QUERY: &str =
 #[derive(SerializeRow, Clone)]
 pub(crate) struct Params {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    stake_address: Vec<u8>,
+    stake_public_key: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
@@ -53,7 +53,7 @@ impl Debug for Params {
             MaybeUnset::Set(v) => &format!("{v:?}"),
         };
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_public_key", &self.stake_public_key)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("vote_key", &self.vote_key)
@@ -73,7 +73,7 @@ impl Params {
     pub fn new(
         vote_key: Option<&VotingPubKey>, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36,
     ) -> Self {
-        let stake_address = cip36
+        let stake_public_key = cip36
             .stake_pk()
             .map_or_else(Vec::new, |s| s.to_bytes().to_vec());
         let vote_key = vote_key
@@ -92,7 +92,7 @@ impl Params {
         });
 
         Params {
-            stake_address,
+            stake_public_key,
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             vote_key,

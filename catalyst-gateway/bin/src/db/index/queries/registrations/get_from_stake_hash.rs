@@ -14,8 +14,7 @@ use crate::db::index::{
 };
 
 /// Get stake addr from stake hash query string.
-const GET_STAKE_ADDR_FROM_STAKE_HASH: &str =
-    include_str!("../cql/get_stake_addr_w_stake_key_hash.cql");
+const GET_STAKE_ADDR_FROM_STAKE_HASH: &str = include_str!("../cql/get_stake_addr_w_stake_hash.cql");
 
 /// Get stake addr
 #[derive(SerializeRow)]

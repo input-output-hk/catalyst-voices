@@ -46,9 +46,9 @@ impl GetInvalidRegistrationParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetInvalidRegistrationQuery {
     /// Error report
-    pub error_report: String,
+    pub problem_report: String,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

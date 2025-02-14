@@ -8,15 +8,15 @@ use cardano_blockchain_types::{TransactionHash, VotingPubKey};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
-use pallas::ledger::addresses::{
-    ShelleyAddress, ShelleyDelegationPart, ShelleyPaymentPart, StakeAddress,
-};
 
 use super::*;
 use crate::db::index::{
     block::*,
     queries::{purge::*, PreparedQuery},
-    tests::test_utils,
+    tests::{
+        test_utils,
+        test_utils::{stake_address_1, stake_address_2},
+    },
 };
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
@@ -28,7 +28,7 @@ async fn catalyst_id_for_stake_address() {
 
     // data
     let data = vec![
-        rbac509::insert_catalyst_id_for_stake_address::Params::new(
+        rbac509::insert_catalyst_id_for_stake_hash::Params::new(
             stake_address_1(),
             0.into(),
             0.into(),
@@ -36,7 +36,7 @@ async fn catalyst_id_for_stake_address() {
                 .parse()
                 .unwrap(),
         ),
-        rbac509::insert_catalyst_id_for_stake_address::Params::new(
+        rbac509::insert_catalyst_id_for_stake_hash::Params::new(
             stake_address_2(),
             1.into(),
             1.into(),
@@ -54,7 +54,7 @@ async fn catalyst_id_for_stake_address() {
         .unwrap();
 
     // read
-    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
+    let mut row_stream = catalyst_id_for_stake_hash::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
@@ -68,9 +68,9 @@ async fn catalyst_id_for_stake_address() {
     // delete
     let delete_params = read_rows
         .into_iter()
-        .map(catalyst_id_for_stake_address::Params::from)
+        .map(catalyst_id_for_stake_hash::Params::from)
         .collect();
-    let row_results = catalyst_id_for_stake_address::DeleteQuery::execute(&session, delete_params)
+    let row_results = catalyst_id_for_stake_hash::DeleteQuery::execute(&session, delete_params)
         .await
         .unwrap()
         .into_iter()
@@ -79,7 +79,7 @@ async fn catalyst_id_for_stake_address() {
     assert!(row_results);
 
     // re-read
-    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
+    let mut row_stream = catalyst_id_for_stake_hash::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
@@ -295,9 +295,9 @@ async fn rbac509_invalid_registration() {
     // delete
     let delete_params = read_rows
         .into_iter()
-        .map(rbac509_registration::Params::from)
+        .map(rbac509_invalid_registration::Params::from)
         .collect();
-    let row_results = rbac509_registration::DeleteQuery::execute(&session, delete_params)
+    let row_results = rbac509_invalid_registration::DeleteQuery::execute(&session, delete_params)
         .await
         .unwrap()
         .into_iter()
@@ -941,48 +941,6 @@ async fn test_unstaked_txo_assets() {
     }
 
     assert!(read_rows.is_empty());
-}
-
-/// Returns a stake address.
-fn stake_address_1() -> StakeAddress {
-    let payment = ShelleyPaymentPart::Key(
-        "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
-            .parse()
-            .unwrap(),
-    );
-    let delegation = ShelleyDelegationPart::Key(
-        "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
-            .parse()
-            .unwrap(),
-    );
-    ShelleyAddress::new(
-        pallas::ledger::addresses::Network::Mainnet,
-        payment,
-        delegation,
-    )
-    .try_into()
-    .unwrap()
-}
-
-/// Returns a different stake address.
-fn stake_address_2() -> StakeAddress {
-    let payment = ShelleyPaymentPart::Key(
-        "0d8d00cdd4657ac84d82f0a56067634a7adfdf43da41cb534bcaa45060973d21"
-            .parse()
-            .unwrap(),
-    );
-    let delegation = ShelleyDelegationPart::Key(
-        "0d8d00cdd4657ac84d82f0a56067634a7adfdf43da41cb534bcaa45060973d21"
-            .parse()
-            .unwrap(),
-    );
-    ShelleyAddress::new(
-        pallas::ledger::addresses::Network::Mainnet,
-        payment,
-        delegation,
-    )
-    .try_into()
-    .unwrap()
 }
 
 /// Creates `VotingPubKey` from the given number.

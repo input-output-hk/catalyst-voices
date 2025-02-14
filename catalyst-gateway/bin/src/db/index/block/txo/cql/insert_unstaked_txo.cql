@@ -7,7 +7,7 @@ INSERT INTO unstaked_txo_by_txn_id (
     address,
     value
 ) VALUES (
-    :txn_hash,
+    :txn_id,
     :txo,
     :slot_no,
     :txn_index,

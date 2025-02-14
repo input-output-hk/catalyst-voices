@@ -6,22 +6,23 @@
 use cardano_blockchain_types::TransactionHash;
 use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
-use pallas::ledger::addresses::{
-    Network, ShelleyAddress, ShelleyDelegationPart, ShelleyPaymentPart, StakeAddress,
-};
 
 use super::*;
 use crate::{
-    db::index::queries::{
-        rbac,
-        registrations::{
-            get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*, get_invalid::*,
+    db::index::{
+        queries::{
+            rbac,
+            registrations::{
+                get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*,
+                get_invalid::*,
+            },
+            staked_ada::{
+                get_assets_by_stake_address::*, get_txi_by_txn_hash::*,
+                get_txo_by_stake_address::*, update_txo_spent::*,
+            },
+            sync_status::update::*,
         },
-        staked_ada::{
-            get_assets_by_stake_address::*, get_txi_by_txn_hash::*, get_txo_by_stake_address::*,
-            update_txo_spent::*,
-        },
-        sync_status::update::*,
+        tests::test_utils::stake_address_1,
     },
     service::common::types::cardano::slot_no::SlotNo,
 };
@@ -35,7 +36,7 @@ async fn test_get_assets_by_stake_addr() {
 
     let mut row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
-        GetAssetsByStakeAddressParams::new(vec![], num_bigint::BigInt::from(i64::MAX)),
+        GetAssetsByStakeAddressParams::new(vec![], u64::MAX.into()),
     )
     .await
     .unwrap();
@@ -47,28 +48,15 @@ async fn test_get_assets_by_stake_addr() {
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn get_catalyst_id_by_stake_address() {
-    use rbac::get_catalyst_id_from_stake_addr::{Query, QueryParams};
+async fn get_catalyst_id_by_stake_hash() {
+    use rbac::get_catalyst_id_from_stake_hash::{Query, QueryParams};
 
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let payment = ShelleyPaymentPart::Key(
-        "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
-            .parse()
-            .unwrap(),
-    );
-    let delegation = ShelleyDelegationPart::Key(
-        "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
-            .parse()
-            .unwrap(),
-    );
-    let address: StakeAddress = ShelleyAddress::new(Network::Mainnet, payment, delegation)
-        .try_into()
-        .unwrap();
     let mut row_stream = Query::execute(&session, QueryParams {
-        stake_address: address.into(),
+        stake_hash: stake_address_1().into(),
     })
     .await
     .unwrap();
@@ -87,8 +75,8 @@ async fn get_catalyst_id_by_transaction_id() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let transaction_id = TransactionHash::new(&[1, 2, 3]).into();
-    let mut row_stream = Query::execute(&session, QueryParams { transaction_id })
+    let txn_id = TransactionHash::new(&[1, 2, 3]).into();
+    let mut row_stream = Query::execute(&session, QueryParams { txn_id })
         .await
         .unwrap();
 
@@ -240,7 +228,7 @@ async fn test_get_txi_by_txn_hashes() {
             .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+        row_res.unwrap();
     }
 }
 

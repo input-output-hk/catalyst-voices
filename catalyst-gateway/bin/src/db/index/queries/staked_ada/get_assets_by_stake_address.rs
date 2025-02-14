@@ -1,6 +1,7 @@
 //! Get assets by stake address.
 use std::sync::Arc;
 
+use cardano_blockchain_types::Slot;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
@@ -23,17 +24,17 @@ const GET_ASSETS_BY_STAKE_ADDRESS_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetAssetsByStakeAddressParams {
     /// Stake address.
-    stake_address: Vec<u8>,
+    stake_key_hash: Vec<u8>,
     /// Max slot num.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
 }
 
 impl GetAssetsByStakeAddressParams {
     /// Creates a new [`GetAssetsByStakeAddressParams`].
-    pub(crate) fn new(stake_address: Vec<u8>, slot_no: num_bigint::BigInt) -> Self {
+    pub(crate) fn new(stake_key_hash: Vec<u8>, slot_no: Slot) -> Self {
         Self {
-            stake_address,
-            slot_no,
+            stake_key_hash,
+            slot_no: slot_no.into(),
         }
     }
 }

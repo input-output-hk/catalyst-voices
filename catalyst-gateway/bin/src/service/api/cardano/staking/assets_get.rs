@@ -2,8 +2,8 @@
 
 use std::collections::HashMap;
 
-use anyhow::anyhow;
-use cardano_blockchain_types::{TransactionHash, TxnIndex};
+use anyhow::{anyhow, Context};
+use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
 use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -103,9 +103,9 @@ struct TxoInfo {
     /// TXO index.
     txo: i16,
     /// TXO transaction slot number.
-    slot_no: num_bigint::BigInt,
+    slot_no: Slot,
     /// Whether the TXO was spent.
-    spent_slot_no: Option<num_bigint::BigInt>,
+    spent_slot_no: Option<Slot>,
     /// TXO assets.
     assets: HashMap<Vec<u8>, Vec<TxoAssetInfo>>,
 }
@@ -162,7 +162,7 @@ async fn get_txo_by_txn(
             continue;
         }
 
-        let key = (row.slot_no.clone(), row.txn_index, row.txo);
+        let key = (row.slot_no, row.txn_index, row.txo);
         txo_map.insert(key, TxoInfo {
             value: row.value,
             txn_hash: row.txn_id.into(),
@@ -184,7 +184,7 @@ async fn get_txo_by_txn(
     while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
 
-        let txo_info_key = (row.slot_no.clone(), row.txn_index, row.txo);
+        let txo_info_key = (row.slot_no, row.txn_index, row.txo);
         let Some(txo_info) = txo_map.get_mut(&txo_info_key) else {
             continue;
         };
@@ -209,7 +209,7 @@ async fn get_txo_by_txn(
     let mut txos_by_txn = HashMap::new();
     for txo_info in txo_map.into_values() {
         let txn_map = txos_by_txn
-            .entry(txo_info.txn_hash.clone())
+            .entry(txo_info.txn_hash)
             .or_insert(HashMap::new());
         txn_map.insert(txo_info.txo, txo_info);
     }
@@ -221,7 +221,7 @@ async fn get_txo_by_txn(
 async fn check_and_set_spent(
     session: &CassandraSession, txos_by_txn: &mut TxosByTxn,
 ) -> anyhow::Result<()> {
-    let txn_hashes = txos_by_txn.keys().cloned().collect::<Vec<_>>();
+    let txn_hashes = txos_by_txn.keys().copied().collect::<Vec<_>>();
 
     for chunk in txn_hashes.chunks(100) {
         let mut txi_iter = GetTxiByTxnHashesQuery::execute(
@@ -235,9 +235,7 @@ async fn check_and_set_spent(
 
             if let Some(txn_map) = txos_by_txn.get_mut(&row.txn_id.into()) {
                 if let Some(txo_info) = txn_map.get_mut(&row.txo.into()) {
-                    if row.slot_no >= num_bigint::BigInt::ZERO {
-                        txo_info.spent_slot_no = Some(row.slot_no);
-                    }
+                    txo_info.spent_slot_no = Some(row.slot_no.into());
                 }
             }
         }
@@ -257,13 +255,13 @@ async fn update_spent(
                 continue;
             }
 
-            if let Some(spent_slot) = &txo_info.spent_slot_no {
+            if let Some(spent_slot) = txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
-                    stake_key_hash: stake_address.clone(),
+                    stake_address: stake_address.clone(),
                     txn_index: txo_info.txn_index.into(),
                     txo: txo_info.txo.into(),
-                    slot_no: txo_info.slot_no.clone(),
-                    spent_slot: spent_slot.clone(),
+                    slot_no: txo_info.slot_no.into(),
+                    spent_slot: spent_slot.into(),
                 });
             }
         }
@@ -297,7 +295,9 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
                     });
                 }
 
-                let slot_no = i64::try_from(txo_info.slot_no).map_err(|err| anyhow!(err))?;
+                let slot_no = u64::from(txo_info.slot_no)
+                    .try_into()
+                    .context("Invalid slot number")?;
 
                 if stake_info.slot_number < slot_no {
                     stake_info.slot_number = slot_no;

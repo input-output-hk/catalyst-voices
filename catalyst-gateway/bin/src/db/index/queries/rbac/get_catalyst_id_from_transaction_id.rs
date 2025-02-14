@@ -35,7 +35,7 @@ const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql"
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
     /// A transaction hash.
-    pub(crate) transaction_id: DbTransactionHash,
+    pub(crate) txn_id: DbTransactionHash,
 }
 
 /// Get Catalyst ID by stake address query.
@@ -78,9 +78,9 @@ impl Query {
     ///
     /// Unless you really know you need an uncached result, use the cached version.
     pub(crate) async fn get_latest_uncached(
-        session: &CassandraSession, transaction_id: DbTransactionHash,
+        session: &CassandraSession, txn_id: DbTransactionHash,
     ) -> Result<Option<Query>> {
-        Self::execute(session, QueryParams { transaction_id })
+        Self::execute(session, QueryParams { txn_id })
             .await?
             .next()
             .await

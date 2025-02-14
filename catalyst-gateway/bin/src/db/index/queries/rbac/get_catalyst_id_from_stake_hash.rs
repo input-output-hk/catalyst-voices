@@ -17,13 +17,13 @@ use crate::db::{
 };
 
 /// Get Catalyst ID by stake address query string.
-const QUERY: &str = include_str!("../cql/get_catalyst_id_for_stake_addr.cql");
+const QUERY: &str = include_str!("../cql/get_catalyst_id_for_stake_hash.cql");
 
 /// Get Catalyst ID by stake address query params.
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
     /// Stake address to get the Catalyst ID for.
-    pub(crate) stake_address: DbCip19StakeAddress,
+    pub(crate) stake_hash: DbCip19StakeAddress,
 }
 
 /// Get Catalyst ID by stake address query.

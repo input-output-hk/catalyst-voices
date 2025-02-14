@@ -18,7 +18,7 @@ const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
 const SCHEMAS: &[(&str, &str)] = &[
     (
         // Catalyst ID for stake address table schema.
-        include_str!("cql/catalyst_id_for_stake_addr.cql"),
+        include_str!("cql/catalyst_id_for_stake_hash.cql"),
         "Create Table Catalyst ID For Stake Address",
     ),
     (
@@ -260,7 +260,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "fc6329aa-d5e8-8f45-b878-2a6d9f152988";
+    const SCHEMA_VERSION: &str = "41031ff0-3711-84df-9330-f1e65da085ca";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.

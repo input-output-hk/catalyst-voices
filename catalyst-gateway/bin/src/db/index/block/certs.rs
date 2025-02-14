@@ -23,13 +23,13 @@ use crate::{
 #[derive(SerializeRow)]
 pub(crate) struct StakeRegistrationInsertQuery {
     /// Stake key hash
-    stake_hash: Vec<u8>,
+    stake_key_hash: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
-    txn: DbTxnIndex,
+    txn_index: DbTxnIndex,
     /// Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
-    stake_address: MaybeUnset<DbVerifyingKey>,
+    stake_public_key: MaybeUnset<DbVerifyingKey>,
     /// Is the stake address a script or not.
     script: bool,
     /// Is the Certificate Registered?
@@ -42,7 +42,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
 
 impl Debug for StakeRegistrationInsertQuery {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        let stake_address = match self.stake_address {
+        let stake_public_key = match self.stake_public_key {
             MaybeUnset::Unset => "UNSET",
             MaybeUnset::Set(ref v) => &hex::encode(v.as_ref()),
         };
@@ -60,10 +60,13 @@ impl Debug for StakeRegistrationInsertQuery {
         };
 
         f.debug_struct("StakeRegistrationInsertQuery")
-            .field("stake_hash", &hex::encode(hex::encode(&self.stake_hash)))
+            .field(
+                "stake_key_hash",
+                &hex::encode(hex::encode(&self.stake_key_hash)),
+            )
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
-            .field("stake_address", &stake_address)
+            .field("txn_index", &self.txn_index)
+            .field("stake_public_key", &stake_public_key)
             .field("script", &self.script)
             .field("register", &register)
             .field("deregister", &deregister)
@@ -79,15 +82,17 @@ impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        stake_hash: Vec<u8>, slot_no: Slot, txn: TxnIndex, stake_address: Option<VerifyingKey>,
-        script: bool, register: bool, deregister: bool, pool_delegation: Option<Vec<u8>>,
+        stake_key_hash: Vec<u8>, slot_no: Slot, txn_index: TxnIndex,
+        stake_public_key: Option<VerifyingKey>, script: bool, register: bool, deregister: bool,
+        pool_delegation: Option<Vec<u8>>,
     ) -> Self {
-        let stake_address = stake_address.map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.into()));
+        let stake_public_key =
+            stake_public_key.map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.into()));
         StakeRegistrationInsertQuery {
-            stake_hash,
+            stake_key_hash,
             slot_no: slot_no.into(),
-            txn: txn.into(),
-            stake_address,
+            txn_index: txn_index.into(),
+            stake_public_key,
             script,
             register: if register {
                 MaybeUnset::Set(true)

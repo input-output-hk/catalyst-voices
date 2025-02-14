@@ -31,13 +31,13 @@ pub(crate) mod result {
 }
 
 /// Select primary keys for Catalyst ID For Stake Address registration.
-const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_stake_addr.cql");
+const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_stake_hash.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A stake address.
-    pub(crate) stake_addr: DbCip19StakeAddress,
+    pub(crate) stake_hash: DbCip19StakeAddress,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -47,7 +47,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_addr", &hex::encode(&self.stake_addr))
+            .field("stake_hash", &hex::encode(&self.stake_hash))
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .finish()
@@ -57,7 +57,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_addr: value.0,
+            stake_hash: value.0,
             slot_no: value.1,
             txn_index: value.2,
         }
@@ -98,7 +98,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete Catalyst ID For Stake Address registration
-const DELETE_QUERY: &str = include_str!("cql/delete_catalyst_id_for_stake_addr.cql");
+const DELETE_QUERY: &str = include_str!("cql/delete_catalyst_id_for_stake_hash.cql");
 
 /// Delete Catalyst ID For Stake Address registration Query
 pub(crate) struct DeleteQuery;

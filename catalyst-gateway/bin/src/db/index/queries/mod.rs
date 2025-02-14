@@ -35,7 +35,7 @@ use super::block::{
 };
 use crate::{
     db::index::queries::rbac::{
-        get_catalyst_id_from_stake_addr, get_catalyst_id_from_transaction_id,
+        get_catalyst_id_from_stake_hash, get_catalyst_id_from_transaction_id,
         get_rbac_invalid_registrations, get_rbac_registrations,
     },
     settings::cassandra_db,
@@ -202,7 +202,7 @@ impl PreparedQueries {
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await?;
         let catalyst_id_by_stake_address_query =
-            get_catalyst_id_from_stake_addr::Query::prepare(session.clone()).await?;
+            get_catalyst_id_from_stake_hash::Query::prepare(session.clone()).await?;
         let catalyst_id_by_transaction_id_query =
             get_catalyst_id_from_transaction_id::Query::prepare(session.clone()).await?;
         let rbac_registrations_by_catalyst_id_query =

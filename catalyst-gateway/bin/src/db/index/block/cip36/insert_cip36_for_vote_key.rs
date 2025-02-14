@@ -24,7 +24,7 @@ pub(crate) struct Params {
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    stake_address: Vec<u8>,
+    stake_public_key: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
@@ -43,7 +43,7 @@ impl Params {
                 .voting_pk()
                 .map(|k| k.to_bytes().to_vec())
                 .unwrap_or_default(),
-            stake_address: cip36
+            stake_public_key: cip36
                 .stake_pk()
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),

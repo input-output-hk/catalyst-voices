@@ -11,7 +11,7 @@ use crate::{
             queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
-        types::{DbTxnIndex, DbTxnOutputOffset},
+        types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -23,15 +23,15 @@ const UPDATE_TXO_SPENT_QUERY: &str = include_str!("../cql/update_txo_spent.cql")
 #[derive(SerializeRow, Debug)]
 pub(crate) struct UpdateTxoSpentQueryParams {
     /// TXO stake address.
-    pub stake_key_hash: Vec<u8>,
+    pub stake_address: Vec<u8>,
     /// TXO transaction index within the slot.
     pub txn_index: DbTxnIndex,
     /// TXO index.
     pub txo: DbTxnOutputOffset,
     /// TXO slot number.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
     /// TXO spent slot number.
-    pub spent_slot: num_bigint::BigInt,
+    pub spent_slot: DbSlot,
 }
 
 /// Update TXO spent query.

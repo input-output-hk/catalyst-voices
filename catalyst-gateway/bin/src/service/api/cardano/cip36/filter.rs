@@ -213,7 +213,7 @@ async fn get_all_registrations_from_stake_pub_key(
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
-            errors: vec![],
+            errors: None,
         };
 
         registrations.push(cip36);
@@ -264,14 +264,14 @@ async fn get_invalid_registrations(
 
         invalid_registrations.push(Cip36Details {
             slot_no: slot_no.clone(),
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
+            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
             txn: None,
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
-            errors: vec![ErrorMessage::from(row.error_report)],
+            errors: Some(ErrorMessage::from(row.problem_report)),
         });
     }
 

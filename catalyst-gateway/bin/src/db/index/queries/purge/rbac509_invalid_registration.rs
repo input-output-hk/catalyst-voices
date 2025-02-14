@@ -27,7 +27,7 @@ pub(crate) mod result {
     use crate::db::types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbCatalystId, DbSlot, DbTxnIndex, DbTransactionHash);
+    pub(crate) type PrimaryKey = (DbCatalystId, DbTransactionHash, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for RBAC 509 invalid registration.
@@ -61,9 +61,9 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             catalyst_id: value.0,
-            slot_no: value.1,
-            txn_index: value.2,
-            txn_id: value.3,
+            txn_id: value.1,
+            slot_no: value.2,
+            txn_index: value.3,
         }
     }
 }

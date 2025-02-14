@@ -115,7 +115,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete TXO Assets by Stake Address
-const DELETE_QUERY: &str = include_str!("./cql/delete_txo_assets_by_stake_addr.cql");
+const DELETE_QUERY: &str = include_str!("cql/delete_txo_assets_by_stake_hash.cql");
 
 /// Delete TXO Assets by Stake Address Query
 pub(crate) struct DeleteQuery;

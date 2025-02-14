@@ -78,7 +78,7 @@ impl TxiInsertQuery {
     pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: Slot) {
         // Index the TXI's.
         for txi in txs.inputs() {
-            let txn_id = Blake2b256Hash::from(txi.hash().clone()).into();
+            let txn_id = Blake2b256Hash::from(*txi.hash()).into();
             let txo = txi.index().try_into().unwrap_or(i16::MAX).into();
 
             self.txi_data

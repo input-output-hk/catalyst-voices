@@ -14,7 +14,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbTransactionHash, DbTxnOutputOffset},
+    types::{DbSlot, DbTransactionHash, DbTxnOutputOffset},
 };
 
 /// Get TXI query string.
@@ -43,7 +43,7 @@ pub(crate) struct GetTxiByTxnHashesQuery {
     /// TXI original TXO index.
     pub txo: DbTxnOutputOffset,
     /// TXI slot number.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
 }
 
 impl GetTxiByTxnHashesQuery {
