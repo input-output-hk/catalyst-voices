@@ -96,8 +96,8 @@ impl ToJSON for CatalystId {
 impl Example for CatalystId {
     fn example() -> Self {
         let secret_key_bytes = [
-            157, 097, 177, 157, 239, 253, 090, 096, 186, 132, 074, 244, 146, 236, 044, 196, 068,
-            073, 197, 105, 123, 050, 105, 025, 112, 059, 172, 003, 028, 174, 127, 096,
+            157, 97, 177, 157, 239, 253, 90, 96, 186, 132, 74, 244, 146, 236, 44, 196, 68, 73, 197,
+            105, 123, 50, 105, 25, 112, 59, 172, 3, 28, 174, 127, 96,
         ];
         let signing_key = &SigningKey::from_bytes(&secret_key_bytes);
         IdUri::new("cardano", None, signing_key.into()).into()
