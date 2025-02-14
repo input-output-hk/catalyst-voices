@@ -205,6 +205,7 @@ class _PropertyListBuilder extends StatefulWidget {
 
 class _PropertyListBuilderState extends State<_PropertyListBuilder> {
   AutovalidateMode _autovalidateMode = AutovalidateMode.onUserInteraction;
+
   @override
   Widget build(BuildContext context) {
     return _PropertyListFormFieldBuilder(
