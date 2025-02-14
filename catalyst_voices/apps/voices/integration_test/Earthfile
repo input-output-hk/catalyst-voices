@@ -34,6 +34,10 @@ integration-test-web:
             --web-browser-flag=--disable-gpu \
             --web-browser-flag=--headless \
             --web-browser-flag=--disable-search-engine-choice-screen \
+            # flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
+            # drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
+            --web-header Cross-Origin-Opener-Policy=same-origin \
+            --web-header Cross-Origin-Embedder-Policy=require-corp \
             --profile || echo fail > fail
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
@@ -46,9 +50,7 @@ integration-test-web:
             exit 1
     END
 
-# TODO(dtscalac): disabled integration tests due to them being flaky,
-# reenable when enable-threads.js workaround is removed
-# and https://github.com/fzyzcjy/flutter_rust_bridge/issues/2407 closed
-disable-nightly-test-web-all:
+# TODO(oldgreg): investigate failures in ci
+disabled-nightly-test-web-all:
     BUILD +integration-test-web \
             --browser=chrome
