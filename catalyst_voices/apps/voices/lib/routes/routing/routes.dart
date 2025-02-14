@@ -19,6 +19,6 @@ abstract final class Routes {
   ];
 
   static String get initialLocation {
-    return const spaces.DiscoveryRoute().location;
+    return const coming_soon.ComingSoonRoute().location;
   }
 }
