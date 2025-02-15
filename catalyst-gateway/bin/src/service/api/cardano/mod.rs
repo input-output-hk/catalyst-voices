@@ -94,27 +94,26 @@ impl Api {
         rbac::registrations_get::endpoint(catalyst_id.into()).await
     }
 
-    #[oai(
-        path = "/draft/rbac/role0_chain_root/:role0_key",
-        method = "get",
-        operation_id = "rbacRole0KeyChainRoot"
-    )]
-    /// Get RBAC chain root for a given role0 key.
-    ///
-    /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
-    // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated or
-    // removed.
-    #[allow(clippy::unused_async)]
-    async fn rbac_role0_key_chain_root(
-        &self,
-        /// Role0 key to get the chain root for.
-        #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
-        Path(_role0_key): Path<String>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> rbac::chain_root_get::AllResponses {
-        rbac::chain_root_get::AllResponses::internal_error(&anyhow::anyhow!("Removed"))
-    }
+    // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
+    // or removed.
+    // #[oai(
+    //     path = "/draft/rbac/role0_chain_root/:role0_key",
+    //     method = "get",
+    //     operation_id = "rbacRole0KeyChainRoot"
+    // )]
+    // /// Get RBAC chain root for a given role0 key.
+    // ///
+    // /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
+    // async fn rbac_role0_key_chain_root(
+    //     &self,
+    //     /// Role0 key to get the chain root for.
+    //     #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
+    //     Path(_role0_key): Path<String>,
+    //     /// No Authorization required, but Token permitted.
+    //     _auth: NoneOrRBAC,
+    // ) -> rbac::chain_root_get::AllResponses {
+    //     rbac::chain_root_get::AllResponses::internal_error(&anyhow::anyhow!("Removed"))
+    // }
 }
 
 /// Cardano API Endpoints
