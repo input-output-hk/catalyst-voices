@@ -12,7 +12,7 @@ INSTALL_SCYLLA:
     FUNCTION
 
     LET VERSION = 6.2
-    
+
     RUN apt-get update && \
         apt-get install -y --no-install-recommends \
         wget gnupg ca-certificates && \
@@ -77,4 +77,4 @@ test-scylla:
 
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         ./scylla_entry.sh && \
-        cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge --no-fail-fast
+        cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge rbac509 --no-fail-fast

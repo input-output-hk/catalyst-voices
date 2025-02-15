@@ -269,8 +269,9 @@ mod tests {
             .parse()
             .unwrap();
         query.index(&session, txn_hash, 0.into(), &block).await;
-        println!("{query:#?}");
-        // TODO: FIXME:
-        assert_eq!(true, false);
+        assert!(query.invalid.is_empty());
+        assert_eq!(1, query.registrations.len());
+        assert_eq!(1, query.catalyst_id_for_txn_id.len());
+        assert_eq!(1, query.catalyst_id_for_stake_hash.len());
     }
 }
