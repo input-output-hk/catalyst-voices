@@ -84,6 +84,8 @@ impl Api {
         operation_id = "rbacRegistrations"
     )]
     /// Get registrations by Catalyst short ID.
+    ///
+    /// This endpoint returns RBAC registrations for the given Catalyst short identifier.
     async fn rbac_registrations_get(
         &self,
         /// A Catalyst short ID to get the registrations for.
