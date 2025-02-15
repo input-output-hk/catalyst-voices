@@ -43,6 +43,7 @@ filter-openapi:
 # It accepts [filter_openapi] ARG that when true filter the openapi spec
 # using filters from /packages/internal/catalyst_voices_repositories/openapi-filters.json
 code-generator:
+    RUN --no-cache
     ARG save_locally=false
     ARG filter_openapi=true
     FROM +builder
