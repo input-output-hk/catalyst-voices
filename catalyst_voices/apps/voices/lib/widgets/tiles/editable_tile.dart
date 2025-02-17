@@ -1,4 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,7 @@ class EditableTile extends StatelessWidget {
   final String title;
   final bool isEditMode;
   final bool isSaveEnabled;
+  final String? errorText;
   final ValueChanged<EditableTileChange>? onChanged;
   final Widget child;
 
@@ -21,24 +24,34 @@ class EditableTile extends StatelessWidget {
     required this.title,
     this.isEditMode = false,
     this.isSaveEnabled = false,
+    this.errorText,
     this.onChanged,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
+    final errorText = this.errorText;
+
+    final Widget? footer;
+    if (isEditMode) {
+      footer = _SaveFooter(
+        isSaveEnabled: isSaveEnabled,
+        onSave: _save,
+      );
+    } else if (errorText != null) {
+      footer = _ErrorFooter(errorText: errorText);
+    } else {
+      footer = null;
+    }
+
     return PropertyTile(
       title: title,
       action: VoicesEditSaveButton(
         onTap: _toggleEditMode,
         isEditing: isEditMode,
       ),
-      footer: isEditMode
-          ? _Footer(
-              isSaveEnabled: isSaveEnabled,
-              onSave: _save,
-            )
-          : null,
+      footer: footer,
       child: child,
     );
   }
@@ -62,11 +75,11 @@ class EditableTile extends StatelessWidget {
   }
 }
 
-class _Footer extends StatelessWidget {
+class _SaveFooter extends StatelessWidget {
   final bool isSaveEnabled;
   final VoidCallback onSave;
 
-  const _Footer({
+  const _SaveFooter({
     required this.isSaveEnabled,
     required this.onSave,
   });
@@ -79,6 +92,35 @@ class _Footer extends StatelessWidget {
         onTap: isSaveEnabled ? onSave : null,
         child: Text(context.l10n.saveButtonText.toUpperCase()),
       ),
+    );
+  }
+}
+
+class _ErrorFooter extends StatelessWidget {
+  final String errorText;
+
+  const _ErrorFooter({
+    required this.errorText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colors.iconsError;
+    return Row(
+      spacing: 10,
+      children: [
+        VoicesAssets.icons.exclamationCircle.buildIcon(
+          size: 24,
+          color: color,
+        ),
+        Flexible(
+          child: Text(
+            errorText,
+            style: theme.textTheme.bodyMedium?.copyWith(color: color),
+          ),
+        ),
+      ],
     );
   }
 }

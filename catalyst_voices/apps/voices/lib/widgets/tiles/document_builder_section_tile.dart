@@ -13,6 +13,7 @@ import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_w
 import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -87,6 +88,7 @@ class _DocumentBuilderSectionTileState
       title: title,
       isEditMode: _isEditMode,
       isSaveEnabled: true,
+      errorText: _errorText,
       onChanged: _onEditModeChange,
       child: Form(
         key: _formKey,
@@ -99,6 +101,15 @@ class _DocumentBuilderSectionTileState
         ),
       ),
     );
+  }
+
+  String? get _errorText {
+    if (widget.autovalidateMode == AutovalidateMode.always &&
+        !_editedSection.isValidExcludingSubsections) {
+      return context.l10n.sectionHasErrorsMessage;
+    }
+
+    return null;
   }
 
   void _onEditModeChange(EditableTileChange value) {

@@ -1247,6 +1247,10 @@
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
   "requestedAmountShouldBeMoreThan": "Requested amount should be at least {min}",
   "requestedAmountShouldBeLessThan": "Requested amount should be at most {max}",
+  "sectionHasErrorsMessage": "Section has input errors that need to be cleared before publishing.",
+  "@sectionHasErrorsMessage": {
+    "description": "A validation error in proposal editor when user wants to publish a proposal with errors."
+  },
   "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
