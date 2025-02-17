@@ -1,4 +1,5 @@
 //! Catalyst Signed Document Endpoint Response Objects.
+use derive_more::{From, Into};
 use poem_openapi::{
     types::{Example, ToJSON},
     NewType, Object,
@@ -27,7 +28,7 @@ pub(crate) struct DocumentIndexList {
     /// Documents are listed in ascending order.
     pub docs: IndexedDocumentDocumentedList,
     /// Current Page
-    pub page: common::objects::generic::pagination::CurrentPage,
+    pub page: DocumentIndexListPage,
 }
 
 impl Example for DocumentIndexList {
@@ -36,6 +37,22 @@ impl Example for DocumentIndexList {
             docs: Example::example(),
             page: Example::example(),
         }
+    }
+}
+
+/// The Page of Document Index List.
+#[derive(NewType, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct DocumentIndexListPage(common::objects::generic::pagination::CurrentPage);
+
+impl Example for DocumentIndexListPage {
+    fn example() -> Self {
+        Self(Example::example())
     }
 }
 

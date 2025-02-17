@@ -1,8 +1,9 @@
 //! Cip36 Registration Query Endpoint Response
+use derive_more::{From, Into};
 use poem_openapi::{
     payload::Json,
     types::{Example, ToJSON},
-    ApiResponse, Object,
+    ApiResponse, NewType, Object,
 };
 
 use crate::service::{common, common::types::array_types::impl_array_types};
@@ -45,7 +46,7 @@ pub(crate) struct Cip36RegistrationList {
     pub invalid: common::types::cardano::registration_list::RegistrationCip36List,
     /// Current Page
     #[oai(skip_serializing_if_is_none)]
-    pub page: Option<common::objects::generic::pagination::CurrentPage>,
+    pub page: Option<Cip36RegistrationListPage>,
 }
 
 impl Example for Cip36RegistrationList {
@@ -56,8 +57,24 @@ impl Example for Cip36RegistrationList {
                 .unwrap_or_default(),
             voting_key: Example::example(),
             invalid: vec![Cip36Details::invalid_example()].into(),
-            page: Some(common::objects::generic::pagination::CurrentPage::example()),
+            page: Some(Example::example()),
         }
+    }
+}
+
+/// The Page of CIP-36 Registration List.
+#[derive(NewType, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct Cip36RegistrationListPage(common::objects::generic::pagination::CurrentPage);
+
+impl Example for Cip36RegistrationListPage {
+    fn example() -> Self {
+        Self(Example::example())
     }
 }
 

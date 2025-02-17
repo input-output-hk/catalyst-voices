@@ -30,7 +30,7 @@ impl Example for FrontendConfig {
     to_header = false,
     example = true
 )]
-struct ConfiguredSentry(Sentry);
+pub(crate) struct ConfiguredSentry(Sentry);
 
 impl Example for ConfiguredSentry {
     fn example() -> Self {
@@ -68,7 +68,7 @@ impl Example for Sentry {
     to_header = false,
     example = true
 )]
-struct SentryConfiguredProfile(ConfigEnvironment);
+pub(crate) struct SentryConfiguredProfile(ConfigEnvironment);
 
 impl Example for SentryConfiguredProfile {
     fn example() -> Self {

@@ -4,7 +4,7 @@ use poem_openapi::{types::Example, Enum};
 
 /// Frontend config environment.
 #[derive(Clone, Enum, Debug)]
-pub(super) enum ConfigEnvironment {
+pub(crate) enum ConfigEnvironment {
     /// Development environment.
     #[oai(rename = "dev")]
     Dev,

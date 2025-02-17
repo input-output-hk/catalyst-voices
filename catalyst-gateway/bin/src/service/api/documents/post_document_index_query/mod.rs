@@ -91,7 +91,8 @@ pub(crate) async fn endpoint(
                     page,
                     limit,
                     remaining,
-                },
+                }
+                .into(),
             })))
             .into()
         },
