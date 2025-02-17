@@ -38,5 +38,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   json_serializable: ^6.7.1
-  mockito: ^5.4.4
+  mocktail: ^1.0.1
   swagger_dart_code_generator: ^3.0.1
