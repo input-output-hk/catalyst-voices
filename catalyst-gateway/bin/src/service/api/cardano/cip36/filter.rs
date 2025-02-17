@@ -4,6 +4,7 @@ use std::{cmp::Reverse, sync::Arc};
 
 use dashmap::DashMap;
 use futures::StreamExt;
+use poem_openapi::types::Example;
 use rayon::prelude::*;
 use tracing::error;
 
@@ -188,9 +189,12 @@ fn cross_reference_key(
 async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
-        stake_address: stake_pub_key.try_into()?,
-    })
+    let mut registrations_iter = GetRegistrationQuery::execute(
+        session,
+        GetRegistrationParams {
+            stake_address: stake_pub_key.try_into()?,
+        },
+    )
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
@@ -537,7 +541,10 @@ async fn get_all_invalid_registrations(
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
             txn: None,
-            payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
+            payment_address: Some(
+                Cip19ShelleyAddress::try_from(row.payment_address)
+                    .unwrap_or(Cip19ShelleyAddress::example()),
+            ),
             is_payable: row.is_payable,
             cip15: !row.cip36,
             errors: row
