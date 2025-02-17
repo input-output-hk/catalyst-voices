@@ -35,7 +35,10 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
                 ),
                 if (field.hasError) ...[
                   const SizedBox(height: 4),
-                  DocumentErrorText(text: field.errorText),
+                  DocumentErrorText(
+                    text: field.errorText,
+                    enabled: enabled,
+                  ),
                 ],
               ],
             );

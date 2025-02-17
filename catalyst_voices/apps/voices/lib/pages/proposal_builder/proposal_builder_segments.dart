@@ -45,12 +45,21 @@ class _ProposalBuilderSegments extends StatelessWidget {
           items: value,
           padding: const EdgeInsets.only(top: 16, bottom: 64),
           sectionBuilder: (context, data) {
-            return DocumentBuilderSectionTile(
-              key: key,
-              section: data.property,
-              onChanged: (value) {
-                final event = SectionChangedEvent(changes: value);
-                context.read<ProposalBuilderBloc>().add(event);
+            return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
+                bool>(
+              selector: (state) => state.showValidationErrors,
+              builder: (context, showValidationErrors) {
+                return DocumentBuilderSectionTile(
+                  key: key,
+                  section: data.property,
+                  onChanged: (value) {
+                    final event = SectionChangedEvent(changes: value);
+                    context.read<ProposalBuilderBloc>().add(event);
+                  },
+                  autovalidateMode: showValidationErrors
+                      ? AutovalidateMode.always
+                      : AutovalidateMode.disabled,
+                );
               },
             );
           },

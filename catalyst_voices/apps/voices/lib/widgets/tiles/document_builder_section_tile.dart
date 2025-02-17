@@ -32,10 +32,14 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// (Usually single property)
   final ValueChanged<List<DocumentChange>> onChanged;
 
+  /// The mode for the validation in this section.
+  final AutovalidateMode autovalidateMode;
+
   const DocumentBuilderSectionTile({
     required super.key,
     required this.section,
     required this.onChanged,
+    this.autovalidateMode = AutovalidateMode.disabled,
   });
 
   @override
@@ -85,6 +89,7 @@ class _DocumentBuilderSectionTileState
       onChanged: _onEditModeChange,
       child: Form(
         key: _formKey,
+        autovalidateMode: widget.autovalidateMode,
         child: _PropertyBuilder(
           key: ValueKey(_editedSection.schema.nodeId),
           property: _editedSection,
@@ -229,7 +234,10 @@ class _PropertyListBuilder extends StatelessWidget {
         ].separatedBy(const SizedBox(height: 24)),
         if (error != null) ...[
           const SizedBox(height: 4),
-          DocumentErrorText(text: error),
+          DocumentErrorText(
+            text: error,
+            enabled: isEditMode,
+          ),
         ],
       ],
     );
@@ -330,7 +338,10 @@ class _GenericPropertyObjectBuilder extends StatelessWidget {
           }).separatedBy(const SizedBox(height: 24)),
           if (error != null) ...[
             if (properties.isNotEmpty) const SizedBox(height: 4),
-            DocumentErrorText(text: error),
+            DocumentErrorText(
+              text: error,
+              enabled: isEditMode,
+            ),
           ],
         ],
       ),

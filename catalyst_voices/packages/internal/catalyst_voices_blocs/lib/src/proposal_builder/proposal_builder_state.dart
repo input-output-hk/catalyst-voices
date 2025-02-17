@@ -16,7 +16,7 @@ final class ProposalBuilderState extends Equatable {
     this.segments = const [],
     this.guidance = const ProposalGuidance(),
     this.activeNodeId,
-    this.showValidationErrors = false,
+    this.showValidationErrors = true,
   });
 
   bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
