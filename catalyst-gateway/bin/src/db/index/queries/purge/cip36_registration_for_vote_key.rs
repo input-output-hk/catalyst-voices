@@ -36,7 +36,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_cip36_registration_for_vote_k
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Vote key - Binary 28 bytes.
+    /// Vote key - Binary 32 bytes.
     pub(crate) vote_key: Vec<u8>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     pub(crate) stake_public_key: Vec<u8>,

@@ -1,4 +1,4 @@
--- Get ALL Primary Keys from Unstaked Transaction Outputs (Native Assets) per stake address.
+-- Get ALL Primary Keys from Unstaked Transaction Outputs (Native Assets) per transaction id (hash).
 SELECT
     txn_id,
     txo,

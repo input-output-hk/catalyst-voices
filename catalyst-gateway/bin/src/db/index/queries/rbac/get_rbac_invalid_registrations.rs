@@ -50,7 +50,7 @@ impl Query {
         PreparedQueries::prepare(session, QUERY, Consistency::All, true)
             .await
             .inspect_err(
-                |e| error!(error=%e, "Failed to prepare get registrations by Catalyst ID query"),
+                |e| error!(error=%e, "Failed to prepare get invalid RBAC registrations by Catalyst ID query"),
             )
     }
 
