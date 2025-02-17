@@ -81,9 +81,9 @@ pub(crate) async fn endpoint(
     ";
 
     Responses::Ok(Json(SlotInfo {
-        previous,
-        current,
-        next,
+        previous: previous.map(Into::into),
+        current: current.map(Into::into),
+        next: next.map(Into::into),
     }))
     .into()
 }
