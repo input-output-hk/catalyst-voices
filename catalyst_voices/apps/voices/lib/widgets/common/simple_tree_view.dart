@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -88,6 +89,7 @@ class SimpleTreeViewRootRow extends StatelessWidget {
 class SimpleTreeViewChildRow extends StatelessWidget {
   final bool hasNext;
   final bool isSelected;
+  final bool hasError;
   final VoidCallback? onTap;
   final Widget child;
 
@@ -95,6 +97,7 @@ class SimpleTreeViewChildRow extends StatelessWidget {
     super.key,
     this.hasNext = true,
     this.isSelected = false,
+    this.hasError = false,
     this.onTap,
     required this.child,
   });
@@ -104,10 +107,8 @@ class SimpleTreeViewChildRow extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    final backgroundColor = isSelected ? theme.colorScheme.primary : null;
-    final foregroundColor = isSelected
-        ? theme.colors.textOnPrimaryWhite
-        : theme.colors.textOnPrimaryLevel0;
+    final backgroundColor = _getBackgroundColor(theme);
+    final foregroundColor = _getForegroundColor(theme);
 
     final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(
       color: foregroundColor,
@@ -133,20 +134,46 @@ class SimpleTreeViewChildRow extends StatelessWidget {
             textStyle: textStyle,
             child: InkWell(
               onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    _SimpleTreeViewIndent(showBottomJoint: hasNext),
-                    Flexible(child: child),
-                  ],
-                ),
+              child: Stack(
+                children: [
+                  if (hasError && isSelected) const _SelectedErrorIndicator(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        _SimpleTreeViewIndent(showBottomJoint: hasNext),
+                        Expanded(child: child),
+                        if (hasError) const _Error(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Color? _getBackgroundColor(ThemeData theme) {
+    if (hasError) {
+      return theme.colors.onSurfaceNeutralOpaqueLv1;
+    } else if (isSelected) {
+      return theme.colorScheme.primary;
+    } else {
+      return null;
+    }
+  }
+
+  Color? _getForegroundColor(ThemeData theme) {
+    if (hasError) {
+      return theme.colors.textOnPrimaryLevel0;
+    } else if (isSelected) {
+      return theme.colors.textOnPrimaryWhite;
+    } else {
+      return theme.colors.textOnPrimaryLevel0;
+    }
   }
 }
 
@@ -200,6 +227,34 @@ class _SimpleTreeViewIndentJoint extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _Error extends StatelessWidget {
+  const _Error();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: VoicesAssets.icons.exclamationCircle.buildIcon(
+        size: 18,
+        color: Theme.of(context).colors.iconsError,
+      ),
+    );
+  }
+}
+
+class _SelectedErrorIndicator extends StatelessWidget {
+  const _SelectedErrorIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 5,
+      height: double.infinity,
+      color: Theme.of(context).colors.iconsError,
     );
   }
 }

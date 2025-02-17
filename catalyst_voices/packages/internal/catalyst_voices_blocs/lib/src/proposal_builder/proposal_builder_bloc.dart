@@ -56,7 +56,10 @@ final class ProposalBuilderBloc
 
     documentBuilder!.addChanges(event.changes);
     final document = documentBuilder.build();
-    final segments = _mapDocumentToSegments(document);
+    final segments = _mapDocumentToSegments(
+      document,
+      state.showValidationErrors,
+    );
 
     emit(state.copyWith(segments: segments));
   }
@@ -139,7 +142,10 @@ final class ProposalBuilderBloc
       _documentBuilder = documentBuilder;
 
       final document = documentBuilder.build();
-      final segments = _mapDocumentToSegments(document);
+      final segments = _mapDocumentToSegments(
+        document,
+        state.showValidationErrors,
+      );
 
       final firstSegment = segments.firstOrNull;
       final firstSection = firstSegment?.sections.firstOrNull;
@@ -161,7 +167,10 @@ final class ProposalBuilderBloc
     }
   }
 
-  List<ProposalBuilderSegment> _mapDocumentToSegments(Document document) {
+  List<ProposalBuilderSegment> _mapDocumentToSegments(
+    Document document,
+    bool showValidationErrors,
+  ) {
     return document.segments.map((segment) {
       final sections = segment.sections
           .expand(_findSectionsAndSubsections)
@@ -172,6 +181,8 @@ final class ProposalBuilderBloc
               schema: section.schema,
               isEnabled: true,
               isEditable: true,
+              hasError:
+                  showValidationErrors && !section.isValidExcludingSubsections,
             ),
           )
           .toList();

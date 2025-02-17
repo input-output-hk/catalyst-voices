@@ -43,6 +43,7 @@ final class ProposalBuilderSection extends BaseSection {
     required this.schema,
     super.isEnabled,
     super.isEditable,
+    super.hasError,
   });
 
   @override

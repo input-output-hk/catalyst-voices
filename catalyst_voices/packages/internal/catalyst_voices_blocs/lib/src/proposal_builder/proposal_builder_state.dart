@@ -8,6 +8,7 @@ final class ProposalBuilderState extends Equatable {
   final List<ProposalBuilderSegment> segments;
   final ProposalGuidance guidance;
   final NodeId? activeNodeId;
+  final bool showValidationErrors;
 
   const ProposalBuilderState({
     this.isLoading = false,
@@ -15,6 +16,7 @@ final class ProposalBuilderState extends Equatable {
     this.segments = const [],
     this.guidance = const ProposalGuidance(),
     this.activeNodeId,
+    this.showValidationErrors = false,
   });
 
   bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
@@ -44,6 +46,7 @@ final class ProposalBuilderState extends Equatable {
         segments,
         guidance,
         activeNodeId,
+        showValidationErrors,
       ];
 }
 
