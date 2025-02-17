@@ -215,10 +215,7 @@ async fn get_all_registrations_from_stake_pub_key(
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
             txn: Some(TxnIndex::try_from(row.txn)?),
-            payment_address: Some(
-                Cip19ShelleyAddress::try_from(row.payment_address)
-                    .unwrap_or(Cip19ShelleyAddress::example()),
-            ),
+            payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
             errors: vec![],
@@ -276,7 +273,10 @@ async fn get_invalid_registrations(
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
             txn: None,
-            payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
+            payment_address: Some(
+                Cip19ShelleyAddress::try_from(row.payment_address)
+                    .unwrap_or(Cip19ShelleyAddress::example()),
+            ),
             is_payable: row.is_payable,
             cip15: !row.cip36,
             errors: row
