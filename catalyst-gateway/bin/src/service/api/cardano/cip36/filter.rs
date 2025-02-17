@@ -154,7 +154,8 @@ pub async fn get_registration_from_stake_addr(
             voting_key: vec![Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key,
                 registrations: vec![registration.clone()].into(),
-            }].into(),
+            }]
+            .into(),
             invalid: invalids_report.into(),
             page: None,
         },

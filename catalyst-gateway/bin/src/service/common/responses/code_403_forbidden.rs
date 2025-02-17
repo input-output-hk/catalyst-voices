@@ -1,9 +1,12 @@
 //! Define `Forbidden` response type.
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    Object,
+};
 use uuid::Uuid;
 
-use crate::service::common;
+use crate::service::{common, common::types::array_types::impl_array_types};
 
 #[derive(Object)]
 #[oai(example)]
@@ -19,8 +22,7 @@ pub(crate) struct Forbidden {
     // TODO: This should be a Vector of defined Roles/Grants.
     // When those are defined, use that type instead of "String"
     // It should look like an enum.
-    #[oai(validator(max_items = 100, max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    required: Option<Vec<String>>,
+    required: Option<RoleList>,
 }
 
 impl Forbidden {
@@ -34,7 +36,7 @@ impl Forbidden {
         Self {
             id: id.into(),
             msg: msg.into(),
-            required: roles,
+            required: roles.map(Into::into),
         }
     }
 }
@@ -46,5 +48,31 @@ impl Example for Forbidden {
             None,
             Some(vec!["VOTER".to_string(), "PROPOSER".to_string()]),
         )
+    }
+}
+
+// List of roles
+impl_array_types!(
+    RoleList,
+    String,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100),
+        items: Some(Box::new(poem_openapi::registry::MetaSchemaRef::Inline(
+            Box::new(poem_openapi::registry::MetaSchema::new("string").merge(
+                poem_openapi::registry::MetaSchema {
+                    max_length: Some(100),
+                    pattern: Some("^[0-9a-zA-Z].*$".into()),
+                    ..poem_openapi::registry::MetaSchema::ANY
+                }
+            ))
+        ))),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for RoleList {
+    fn example() -> Self {
+        Self(vec!["VOTER".to_string(), "PROPOSER".to_string()])
     }
 }
