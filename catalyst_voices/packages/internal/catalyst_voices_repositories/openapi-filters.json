@@ -1,17 +1,5 @@
 {
-    "inverseTags": [
-        "Health",
-        "Legacy"
-    ],
     "operations": [
         "*::/api/draft/*"
-    ],
-    "unusedComponents": [
-        "schemas",
-        "parameters",
-        "examples",
-        "headers",
-        "requestBodies",
-        "responses"
     ]
 }
