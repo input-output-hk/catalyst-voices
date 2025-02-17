@@ -44,6 +44,39 @@ class ProposalsPage extends StatefulWidget {
   State<ProposalsPage> createState() => _ProposalsPageState();
 }
 
+class _ProposalsPageState extends State<ProposalsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProposalsCubit>().changeSelectedCategory(widget.categoryId);
+    unawaited(context.read<CampaignInfoCubit>().load());
+    unawaited(
+      context.read<ProposalsCubit>().getFavoritesList(),
+    );
+    unawaited(
+      context.read<ProposalsCubit>().getUserProposalsList(),
+    );
+    unawaited(context.read<ProposalsCubit>().getCampaignCategories());
+  }
+
+  @override
+  void didUpdateWidget(ProposalsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.categoryId != widget.categoryId) {
+      context.read<ProposalsCubit>().changeSelectedCategory(widget.categoryId);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const CustomScrollView(
+      slivers: [
+        _ActiveAccountBody(),
+      ],
+    );
+  }
+}
+
 class _ActiveAccountBody extends StatelessWidget {
   const _ActiveAccountBody();
 
@@ -62,6 +95,135 @@ class _ActiveAccountBody extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        NavigationBack(),
+        SizedBox(height: 40),
+        _FundInfo(),
+      ],
+    );
+  }
+}
+
+class _FundInfo extends StatelessWidget {
+  const _FundInfo();
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 680),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            context.l10n.catalystF14,
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.currentCampaignDescription,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const _CampaignDetailsButton(),
+        ],
+      ),
+    );
+  }
+}
+
+class _Controls extends StatelessWidget {
+  const _Controls();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _ChangeCategoryButtonSelector(),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 250,
+            child: VoicesTextField(
+              onFieldSubmitted: (_) {},
+              decoration: VoicesTextFieldDecoration(
+                prefixIcon: VoicesAssets.icons.search.buildIcon(),
+                hintText: context.l10n.searchProposals,
+                filled: true,
+                fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
+                suffixIcon: Offstage(
+                  offstage: false,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(context.l10n.clear),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChangeCategoryButtonSelector extends StatelessWidget {
+  const _ChangeCategoryButtonSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<ProposalsCubit, ProposalsState,
+        _CategoryButtonSelector>(
+      selector: (state) {
+        final dropdownItems = state.categories
+            .map(
+              (e) => DropdownMenuViewModel(
+                name: e.formattedName,
+                value: e.id,
+                isSelected: e.id == state.selectedCategoryId,
+              ),
+            )
+            .toList();
+        final dropdownCategories = [
+          DropdownMenuViewModel(
+            name: context.l10n.showAll,
+            value: '-1',
+            isSelected: state.selectedCategoryId == null,
+          ),
+          ...dropdownItems,
+        ];
+        final selectedName =
+            dropdownCategories.firstWhereOrNull((e) => e.isSelected)?.name ??
+                context.l10n.showAll;
+        return (
+          categories: dropdownCategories,
+          selectedName: selectedName,
+        );
+      },
+      builder: (context, state) {
+        return _ChangeCategoryButton(
+          items: state.categories,
+          selectedName: state.selectedName,
+          onChanged: (value) {
+            final categoryId = value == '-1' ? null : value;
+            context.read<ProposalsCubit>().changeSelectedCategory(categoryId);
+          },
+        );
+      },
     );
   }
 }
@@ -112,53 +274,6 @@ class _ChangeCategoryButton extends StatefulWidget {
   State<_ChangeCategoryButton> createState() => _ChangeCategoryButtonState();
 }
 
-class _ChangeCategoryButtonSelector extends StatelessWidget {
-  const _ChangeCategoryButtonSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState,
-        _CategoryButtonSelector>(
-      selector: (state) {
-        final dropdownItems = state.categories
-            .map(
-              (e) => DropdownMenuViewModel(
-                name: e.formattedName,
-                value: e.id,
-                isSelected: e.id == state.selectedCategoryId,
-              ),
-            )
-            .toList();
-        final dropdownCategories = [
-          DropdownMenuViewModel(
-            name: context.l10n.showAll,
-            value: '-1',
-            isSelected: state.selectedCategoryId == null,
-          ),
-          ...dropdownItems,
-        ];
-        final selectedName =
-            dropdownCategories.firstWhereOrNull((e) => e.isSelected)?.name ??
-                context.l10n.showAll;
-        return (
-          categories: dropdownCategories,
-          selectedName: selectedName,
-        );
-      },
-      builder: (context, state) {
-        return _ChangeCategoryButton(
-          items: state.categories,
-          selectedName: state.selectedName,
-          onChanged: (value) {
-            final categoryId = value == '-1' ? null : value;
-            context.read<ProposalsCubit>().changeSelectedCategory(categoryId);
-          },
-        );
-      },
-    );
-  }
-}
-
 class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
   final GlobalKey<PopupMenuButtonState<dynamic>> _popupMenuButtonKey =
       GlobalKey();
@@ -197,121 +312,6 @@ class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
         ),
       ),
     );
-  }
-}
-
-class _Controls extends StatelessWidget {
-  const _Controls();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _ChangeCategoryButtonSelector(),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 250,
-            child: VoicesTextField(
-              onFieldSubmitted: (_) {},
-              decoration: VoicesTextFieldDecoration(
-                prefixIcon: VoicesAssets.icons.search.buildIcon(),
-                hintText: context.l10n.searchProposals,
-                filled: true,
-                fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
-                suffixIcon: Offstage(
-                  offstage: false,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text(context.l10n.clear),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FundInfo extends StatelessWidget {
-  const _FundInfo();
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 680),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            context.l10n.catalystF14,
-            style: Theme.of(context).textTheme.displayMedium,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            context.l10n.currentCampaignDescription,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          const _CampaignDetailsButton(),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        NavigationBack(),
-        SizedBox(height: 40),
-        _FundInfo(),
-      ],
-    );
-  }
-}
-
-class _ProposalsPageState extends State<ProposalsPage> {
-  @override
-  Widget build(BuildContext context) {
-    return const CustomScrollView(
-      slivers: [
-        _ActiveAccountBody(),
-      ],
-    );
-  }
-
-  @override
-  void didUpdateWidget(ProposalsPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.categoryId != widget.categoryId) {
-      context.read<ProposalsCubit>().changeSelectedCategory(widget.categoryId);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    context.read<ProposalsCubit>().changeSelectedCategory(widget.categoryId);
-    unawaited(context.read<CampaignInfoCubit>().load());
-    unawaited(
-      context.read<ProposalsCubit>().getFavoritesList(),
-    );
-    unawaited(
-      context.read<ProposalsCubit>().getUserProposalsList(),
-    );
-    unawaited(context.read<ProposalsCubit>().getCampaignCategories());
   }
 }
 

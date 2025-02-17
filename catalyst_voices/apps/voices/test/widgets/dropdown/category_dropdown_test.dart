@@ -3,6 +3,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../helpers/helpers.dart';
+
 void main() {
   final items = [
     const DropdownMenuViewModel(
@@ -23,7 +25,7 @@ void main() {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
       String? selectedValue;
 
-      await tester.pumpWidget(
+      await tester.pumpApp(
         MaterialApp(
           home: Scaffold(
             body: CategoryDropdown(
@@ -58,7 +60,7 @@ void main() {
       var wasOpened = false;
       var wasCanceled = false;
 
-      await tester.pumpWidget(
+      await tester.pumpApp(
         MaterialApp(
           home: Scaffold(
             body: CategoryDropdown(
@@ -88,7 +90,7 @@ void main() {
         (WidgetTester tester) async {
       final popupMenuButtonKey = GlobalKey<PopupMenuButtonState<dynamic>>();
 
-      await tester.pumpWidget(
+      await tester.pumpApp(
         MaterialApp(
           home: Scaffold(
             body: CategoryDropdown(
