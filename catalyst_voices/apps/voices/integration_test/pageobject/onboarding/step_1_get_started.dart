@@ -19,6 +19,17 @@ class GetStartedPanel extends OnboardingPageBase {
     await $(createNewKeychain).tap();
   }
 
+  @override
+  Future<void> goto() async {
+    await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
+  }
+
   Future<void> verifyInfoPanel() async {
     expect($(registrationInfoPanel).$(headerTitle).text, T.get('Get Started'));
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
@@ -29,13 +40,34 @@ class GetStartedPanel extends OnboardingPageBase {
     expect(await closeButton(), findsOneWidget);
   }
 
-  @override
-  Future<void> goto() async {
-    await $(AppBarPage.getStartedBtn).tap(settleTimeout: Time.short.duration);
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
+  Future<void> verifyDetailsPanel() async {
+    expect(
+      $(registrationDetailsTitle).$(Text).text,
+      T.get('Welcome to Catalyst'),
+    );
+    expect(
+      $(registrationDetailsBody).$(Text).text,
+      T.get(
+        'If you already have a Catalyst keychain you can restore it '
+        'on this device, or you can create a new Catalyst Keychain.',
+      ),
+    );
+    expect($(getStartedQuestion).text, T.get('What do you want to do?'));
+    expect(
+      $(createNewKeychain).$(registrationTileTitle).text,
+      T.get('Create a new \nCatalyst Keychain'),
+    );
+    expect(
+      $(createNewKeychain).$(registrationTileSubtitle).text,
+      T.get('On this device'),
+    );
+    expect(
+      $(recoverKeychain).$(registrationTileTitle).text,
+      T.get('Recover your\nCatalyst Keychain'),
+    );
+    expect(
+      $(recoverKeychain).$(registrationTileSubtitle).text,
+      T.get('On this device'),
+    );
   }
 }
