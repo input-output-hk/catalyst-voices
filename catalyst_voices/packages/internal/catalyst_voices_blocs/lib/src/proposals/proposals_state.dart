@@ -35,8 +35,7 @@ class ProposalsState extends Equatable {
     List<String>? favoritesIds,
     List<String>? myProposalsIds,
     List<CampaignCategoryViewModel>? categories,
-    String? selectedCategoryId,
-    bool clearSelectedCategory = false,
+    Optional<String>? selectedCategoryId,
   }) {
     return ProposalsState(
       draftProposals: draftProposals ?? this.draftProposals,
@@ -47,23 +46,9 @@ class ProposalsState extends Equatable {
       favoritesIds: favoritesIds ?? this.favoritesIds,
       myProposalsIds: myProposalsIds ?? this.myProposalsIds,
       categories: categories ?? this.categories,
-      selectedCategoryId: clearSelectedCategory
-          ? null
-          : (selectedCategoryId ?? this.selectedCategoryId),
-    );
-  }
-
-  ProposalsState resetProposals({
-    String? selectedCategoryId,
-    bool clearSelectedCategory = false,
-  }) {
-    return ProposalsState(
-      favoritesIds: favoritesIds,
-      myProposalsIds: myProposalsIds,
-      categories: categories,
-      selectedCategoryId: clearSelectedCategory
-          ? null
-          : (selectedCategoryId ?? this.selectedCategoryId),
+      selectedCategoryId: selectedCategoryId.dataOr(
+        this.selectedCategoryId,
+      ),
     );
   }
 

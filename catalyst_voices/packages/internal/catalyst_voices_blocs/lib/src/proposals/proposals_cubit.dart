@@ -150,9 +150,8 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
   void changeSelectedCategory(String? categoryId) {
     emit(
-      state.resetProposals(
-        clearSelectedCategory: categoryId == null,
-        selectedCategoryId: categoryId,
+      state.copyWith(
+        selectedCategoryId: Optional(categoryId),
       ),
     );
   }
