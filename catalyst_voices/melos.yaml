@@ -121,6 +121,7 @@ command:
       markdown_quill: ^4.2.0
       meta: ^1.10.0
       result_type: ^0.2.0
+      rxdart: ^0.27.7
       password_strength: ^0.2.0
       plugin_platform_interface: ^2.1.7
       bech32: ^0.2.2

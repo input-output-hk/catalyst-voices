@@ -8,6 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 bool _alwaysAllowRegistration = kDebugMode;
 
@@ -53,7 +54,9 @@ final class SessionCubit extends Cubit<SessionState>
 
     _keychainUnlockedSub = _userService.watchUser
         .map((user) => user.activeAccount)
-        .transform(AccountToKeychainUnlockTransformer())
+        .switchMap((account) {
+          return account?.keychain.watchIsUnlocked ?? Stream.value(false);
+        })
         .distinct()
         .listen(_onActiveKeychainUnlockChanged);
 

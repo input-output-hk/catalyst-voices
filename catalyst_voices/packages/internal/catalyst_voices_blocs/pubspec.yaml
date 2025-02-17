@@ -34,6 +34,7 @@ dependencies:
   formz: ^0.7.0
   meta: ^1.10.0
   result_type: ^0.2.0
+  rxdart: ^0.27.7
   uuid: ^4.5.1
 
 dev_dependencies:

@@ -15,7 +15,6 @@ export 'formatter/cryptocurrency_formatter.dart';
 export 'formatter/wallet_address_formatter.dart';
 export 'keychain/keychain.dart';
 export 'keychain/keychain_provider.dart';
-export 'keychain/keychain_transformers.dart';
 export 'keychain/vault_keychain.dart';
 export 'keychain/vault_keychain_provider.dart';
 export 'logging/logging_service.dart';
