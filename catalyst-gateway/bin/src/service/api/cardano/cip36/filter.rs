@@ -154,7 +154,7 @@ pub async fn get_registration_from_stake_addr(
             voting_key: vec![Cip36RegistrationsForVotingPublicKey {
                 vote_pub_key,
                 registrations: vec![registration.clone()].into(),
-            }],
+            }].into(),
             invalid: invalids_report.into(),
             page: None,
         },
@@ -418,7 +418,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     AllRegistration::With(Cip36Registration::Ok(poem_openapi::payload::Json(
         Cip36RegistrationList {
             slot: slot_no.unwrap_or_default(),
-            voting_key: all_registrations_after_filtering,
+            voting_key: all_registrations_after_filtering.into(),
             invalid: all_invalids_after_filtering
                 .into_iter()
                 .flatten()

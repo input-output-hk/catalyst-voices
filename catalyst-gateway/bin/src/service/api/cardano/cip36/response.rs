@@ -1,7 +1,11 @@
 //! Cip36 Registration Query Endpoint Response
-use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
+use poem_openapi::{
+    payload::Json,
+    types::{Example, ToJSON},
+    ApiResponse, Object,
+};
 
-use crate::service::common;
+use crate::service::{common, common::types::array_types::impl_array_types};
 
 // ToDo: The examples of this response should be taken from representative data from a
 // response generated on pre-prod.
@@ -35,8 +39,7 @@ pub(crate) struct Cip36RegistrationList {
     /// Earlier errors are never reported.
     pub slot: common::types::cardano::slot_no::SlotNo,
     /// List of registrations associated with the query.
-    #[oai(validator(max_items = "100"))]
-    pub voting_key: Vec<Cip36RegistrationsForVotingPublicKey>,
+    pub voting_key: Cip36RegistrationsForVotingPublicKeyList,
     /// List of latest invalid registrations that were found, for the requested filter.
     #[oai(skip_serializing_if_is_empty)]
     pub invalid: common::types::cardano::registration_list::RegistrationCip36List,
@@ -51,15 +54,33 @@ impl Example for Cip36RegistrationList {
             slot: (common::types::cardano::slot_no::EXAMPLE + 635)
                 .try_into()
                 .unwrap_or_default(),
-            voting_key: vec![Cip36RegistrationsForVotingPublicKey::example()],
+            voting_key: Example::example(),
             invalid: vec![Cip36Details::invalid_example()].into(),
             page: Some(common::objects::generic::pagination::CurrentPage::example()),
         }
     }
 }
 
+// List of CIP-36 Registrations for voting public key
+impl_array_types!(
+    Cip36RegistrationsForVotingPublicKeyList,
+    Cip36RegistrationsForVotingPublicKey,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100),
+        items: Some(Box::new(Cip36RegistrationsForVotingPublicKey::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for Cip36RegistrationsForVotingPublicKeyList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
+    }
+}
+
 /// List of CIP36 Registration Data for a Voting Key.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationsForVotingPublicKey {
     /// Voting Public Key
