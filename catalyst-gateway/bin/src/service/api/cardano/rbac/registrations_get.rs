@@ -44,7 +44,7 @@ impl_array_types!(
     RbacRegistration,
     Some(poem_openapi::registry::MetaSchema {
         example: Self::example().to_json(),
-        max_items: Some(100000),
+        max_items: Some(100_000),
         items: Some(Box::new(RbacRegistration::schema_ref())),
         ..poem_openapi::registry::MetaSchema::ANY
     })

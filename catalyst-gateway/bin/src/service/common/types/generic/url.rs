@@ -11,7 +11,8 @@ use poem_openapi::{types::Example, NewType};
 pub(crate) struct Url(url::Url);
 
 impl Example for Url {
+    #[allow(clippy::expect_used)]
     fn example() -> Self {
-        Self(url::Url::from_str("https://example.com").unwrap())
+        Self(url::Url::from_str("https://example.com").expect("Invalid URL example"))
     }
 }

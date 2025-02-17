@@ -5,6 +5,7 @@ use poem_openapi::{
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
 };
 
+/// Represents any JSON object used to interfacing as an API object.
 #[derive(Debug, Clone)]
 pub(crate) struct JSONObject(serde_json::Value);
 
@@ -20,7 +21,7 @@ impl Type for JSONObject {
 
     fn schema_ref() -> MetaSchemaRef {
         MetaSchemaRef::Inline(Box::new(MetaSchema::new("object"))).merge(MetaSchema {
-            description: Some("A JSON object for holding any custom information inside it.".into()),
+            description: Some("A JSON object for holding any custom information inside it."),
             example: Some(Self::example().0),
             ..poem_openapi::registry::MetaSchema::ANY
         })

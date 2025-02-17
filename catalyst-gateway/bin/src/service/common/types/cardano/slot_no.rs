@@ -144,17 +144,17 @@ impl TryFrom<i64> for SlotNo {
     }
 }
 
-impl Into<u64> for SlotNo {
-    fn into(self) -> u64 {
+impl From<SlotNo> for u64 {
+    fn from(val: SlotNo) -> Self {
         // assume that the value is always valid
-        self.0
+        val.0
     }
 }
 
-impl Into<i64> for SlotNo {
-    fn into(self) -> i64 {
+impl From<SlotNo> for i64 {
+    fn from(val: SlotNo) -> Self {
         // assume that the value is always valid
-        i64::try_from(self.0).unwrap_or_default()
+        i64::try_from(val.0).unwrap_or_default()
     }
 }
 

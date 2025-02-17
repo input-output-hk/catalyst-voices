@@ -62,7 +62,7 @@ impl_array_types!(
     IndexedDocumentDocumented,
     Some(poem_openapi::registry::MetaSchema {
         example: Self::example().to_json(),
-        max_items: Some(4294967295),
+        max_items: Some(4_294_967_295),
         items: Some(Box::new(IndexedDocumentDocumented::schema_ref())),
         ..poem_openapi::registry::MetaSchema::ANY
     })
