@@ -1,20 +1,24 @@
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 class VoicesRichTextLimit extends StatelessWidget {
   final VoicesRichTextController controller;
+  final bool enabled;
   final int? charsLimit;
   final String? errorMessage;
 
   const VoicesRichTextLimit({
     super.key,
     required this.controller,
+    this.enabled = true,
     this.charsLimit,
     this.errorMessage,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final error = errorMessage ?? '';
 
     return Padding(
@@ -28,7 +32,10 @@ class VoicesRichTextLimit extends StatelessWidget {
           Expanded(
             child: Text(
               error,
-              style: Theme.of(context).textTheme.bodySmall,
+              style: theme.textTheme.bodySmall!.copyWith(
+                  color: enabled
+                      ? theme.colorScheme.error
+                      : theme.colors.textDisabled),
             ),
           ),
           StreamBuilder(
@@ -40,7 +47,7 @@ class VoicesRichTextLimit extends StatelessWidget {
               final data = snapshot.data;
               return Text(
                 _formatText(data ?? 0),
-                style: Theme.of(context).textTheme.bodySmall,
+                style: theme.textTheme.bodySmall,
               );
             },
           ),
