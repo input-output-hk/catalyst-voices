@@ -9,6 +9,7 @@ import 'package:catalyst_voices/routes/guards/milestone_guard.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
@@ -141,6 +142,17 @@ Future<BootstrapArgs> bootstrap({
 
 Future<void> _testApi() async {
   final apiServices = Dependencies.instance.get<ApiServices>();
+
+  try {
+    final response = await apiServices.cat.apiV1DocumentIndexPost(
+      body: const DocumentIndexQueryFilter(),
+    );
+
+    debugPrint(response.toString());
+  } catch (error, stack) {
+    debugPrint(error.toString());
+    debugPrintStack(stackTrace: stack);
+  }
 }
 
 Future<void> _runApp(Widget app) async {
