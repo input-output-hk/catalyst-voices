@@ -134,7 +134,13 @@ Future<BootstrapArgs> bootstrap({
 
   Bloc.observer = AppBlocObserver();
 
+  unawaited(_testApi());
+
   return BootstrapArgs(routerConfig: router);
+}
+
+Future<void> _testApi() async {
+  final apiServices = Dependencies.instance.get<ApiServices>();
 }
 
 Future<void> _runApp(Widget app) async {
