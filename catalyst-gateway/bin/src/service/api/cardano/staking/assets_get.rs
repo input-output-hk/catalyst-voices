@@ -72,8 +72,8 @@ pub(crate) async fn endpoint(
     }
 
     Responses::Ok(Json(FullStakeInfo {
-        volatile: volatile_stake_info.unwrap_or_default(),
-        persistent: persistent_stake_info.unwrap_or_default(),
+        volatile: volatile_stake_info.map(Into::into).unwrap_or_default(),
+        persistent: persistent_stake_info.map(Into::into).unwrap_or_default(),
     }))
     .into()
 }

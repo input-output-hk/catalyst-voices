@@ -1,8 +1,9 @@
 //! Defines API schemas of stake amount type.
 
+use derive_more::{From, Into};
 use poem_openapi::{
     types::{Example, ToJSON},
-    Object,
+    NewType, Object,
 };
 
 use crate::service::common::types::{
@@ -77,21 +78,53 @@ impl Example for StakeInfo {
     }
 }
 
+/// Volatile stake information.
+#[derive(NewType, Default, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct VolatileStakeInfo(StakeInfo);
+
+impl Example for VolatileStakeInfo {
+    fn example() -> Self {
+        Self(Example::example())
+    }
+}
+
+/// Persistent stake information.
+#[derive(NewType, Default, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct PersistentStakeInfo(StakeInfo);
+
+impl Example for PersistentStakeInfo {
+    fn example() -> Self {
+        Self(Example::example())
+    }
+}
+
 /// Full user's cardano stake info.
 #[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct FullStakeInfo {
     /// Volatile stake information.
-    pub(crate) volatile: StakeInfo,
+    pub(crate) volatile: VolatileStakeInfo,
     /// Persistent stake information.
-    pub(crate) persistent: StakeInfo,
+    pub(crate) persistent: PersistentStakeInfo,
 }
 
 impl Example for FullStakeInfo {
     fn example() -> Self {
         Self {
-            volatile: StakeInfo::example(),
-            persistent: StakeInfo::example(),
+            volatile: Example::example(),
+            persistent: Example::example(),
         }
     }
 }
