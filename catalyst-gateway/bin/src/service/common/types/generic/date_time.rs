@@ -2,14 +2,14 @@
 
 use core::fmt;
 
-use derive_more::{From, FromStr, Into};
+use derive_more::{From, Into};
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 
 /// Newtype for `DateTime<Utc>`. Should be used for API interfacing `DateTime<Utc>` only.
-#[derive(Debug, Clone, From, FromStr, Into)]
+#[derive(Debug, Clone, From, Into)]
 pub(crate) struct DateTime(chrono::DateTime<chrono::offset::Utc>);
 
 impl DateTime {

@@ -1,11 +1,11 @@
 //! Implement API endpoint interfacing `ErrorUuid`.
 
-use derive_more::{From, FromStr, Into};
+use derive_more::{From, Into};
 use poem_openapi::{types::Example, NewType};
 use uuid::Uuid;
 
 /// Error Unique ID
-#[derive(Debug, Clone, NewType, From, FromStr, Into)]
+#[derive(Debug, Clone, NewType, From, Into)]
 #[oai(example)]
 pub(crate) struct ErrorUuid(Uuid);
 
