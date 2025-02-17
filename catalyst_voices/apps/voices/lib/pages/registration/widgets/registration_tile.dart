@@ -56,6 +56,7 @@ class RegistrationTile extends StatelessWidget {
                       ),
                       if (subtitle != null)
                         Text(
+                          key: const Key('RegistrationTileSubtitle'),
                           subtitle,
                           maxLines: 1,
                           overflow: TextOverflow.clip,
