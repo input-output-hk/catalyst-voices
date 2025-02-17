@@ -38,14 +38,14 @@ class PagingState<ItemType> extends Equatable {
   final LocalizedException? error;
   final bool isLoading;
 
-  PagingState({
+  const PagingState({
     required this.maxResults,
     required this.currentPage,
     required this.itemsPerPage,
-    List<ItemType>? itemList,
+    required this.itemList,
     this.error,
     this.isLoading = false,
-  }) : itemList = itemList ?? <ItemType>[];
+  });
 
   PagingState<ItemType> copyWith({
     int? currentPage,

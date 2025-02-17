@@ -19,6 +19,7 @@ class ProposalsPagination extends StatefulWidget {
   final bool userProposals;
   final bool usersFavorite;
   final String? categoryId;
+  final bool shouldReload;
 
   const ProposalsPagination(
     this.proposals,
@@ -30,6 +31,7 @@ class ProposalsPagination extends StatefulWidget {
     this.userProposals = false,
     this.usersFavorite = false,
     this.categoryId,
+    this.shouldReload = false,
   });
 
   @override
@@ -84,9 +86,12 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
     if (oldWidget.categoryId != widget.categoryId) {
       _pagingController.notifyPageRequestListeners(0);
     }
-    if (widget.isEmpty != oldWidget.isEmpty ||
-        (oldWidget.isEmpty && widget.isEmpty)) {
+    if (widget.isEmpty == true) {
       _pagingController.empty();
+    }
+
+    if (oldWidget.shouldReload != widget.shouldReload) {
+      _pagingController.notifyPageRequestListeners(0);
     }
   }
 
@@ -101,19 +106,27 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
     return PaginatedGridView<ProposalViewModel>(
       pagingController: _pagingController,
       builderDelegate: PagedWrapChildBuilder<ProposalViewModel>(
-        builder: (context, item) => ProposalCard(
-          key: ValueKey(item.id),
-          proposal: item,
-          showStatus: false,
-          showLastUpdate: false,
-          showComments: false,
-          showSegments: false,
-          isFavorite: item.isFavorite,
-          onFavoriteChanged: (isFavorite) async {
-            await context.read<ProposalsCubit>().onChangeFavoriteProposal(
-                  item.id,
-                  isFavorite: isFavorite,
-                );
+        builder: (context, item) =>
+            BlocSelector<ProposalsCubit, ProposalsState, bool>(
+          selector: (state) {
+            return state.isFavorite(item.id);
+          },
+          builder: (context, state) {
+            return ProposalCard(
+              key: ValueKey(item.id),
+              proposal: item,
+              showStatus: false,
+              showLastUpdate: false,
+              showComments: false,
+              showSegments: false,
+              isFavorite: state,
+              onFavoriteChanged: (isFavorite) async {
+                await context.read<ProposalsCubit>().onChangeFavoriteProposal(
+                      item.id,
+                      isFavorite: isFavorite,
+                    );
+              },
+            );
           },
         ),
         emptyIndicatorBuilder: (context) => const _EmptyProposals(),

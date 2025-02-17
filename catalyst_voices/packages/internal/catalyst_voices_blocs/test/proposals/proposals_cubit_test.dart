@@ -288,7 +288,6 @@ class _FakeProposalService extends Fake implements ProposalService {
   @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   }) async {
     return ProposalPaginationItems(
       pageKey: request.pageKey,

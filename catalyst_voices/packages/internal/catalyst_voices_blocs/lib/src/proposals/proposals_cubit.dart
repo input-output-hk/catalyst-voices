@@ -23,7 +23,25 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     String proposalId, {
     required bool isFavorite,
   }) async {
-    // TODO(LynxLynxx): implement favorites
+    if (isFavorite) {
+      // ignore: unused_local_variable
+      final favIds = await _proposalService.addFavoriteProposal(proposalId);
+      // TODO(LynxLynxx): to mock data. remove after implementing db
+      final favoritesIds = [...state.favoritesIds, proposalId];
+      emit(state.copyWith(favoritesIds: favoritesIds));
+
+      // TODO(LynxLynxx): to mock data. remove after implementing db
+      final proposal = state.allProposals.items.first.copyWith(id: proposalId);
+      await _favorite(isFavorite, proposal);
+    } else {
+      await _proposalService.removeFavoriteProposal(proposalId);
+      // TODO(LynxLynxx): to mock data. remove after implementing db
+      final favoritesIds = [...state.favoritesIds]..remove(proposalId);
+      emit(state.copyWith(favoritesIds: favoritesIds));
+      // TODO(LynxLynxx): to mock data. remove after implementing db
+      final proposal = state.allProposals.items.first.copyWith(id: proposalId);
+      await _favorite(isFavorite, proposal);
+    }
   }
 
   Future<void> getProposals(
@@ -36,7 +54,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
     final proposals = await _proposalService.getProposals(
       request: request,
-      campaignId: campaign.id,
     );
     await Future.delayed(const Duration(seconds: 1), () {});
 
@@ -149,11 +166,40 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   }
 
   void changeSelectedCategory(String? categoryId) {
-    emit(
-      state.resetProposals(
-        clearSelectedCategory: categoryId == null,
-        selectedCategoryId: categoryId,
-      ),
-    );
+    emit(state.copyWith(selectedCategoryId: Optional(categoryId)));
+  }
+
+  // TODO(LynxLynxx): to mock data. remove after implementing db
+  Future<void> _favorite(
+    bool isFavorite,
+    ProposalViewModel proposal,
+  ) async {
+    final favoritesProposals = state.favoriteProposals;
+
+    if (isFavorite) {
+      emit(
+        state.copyWith(
+          favoriteProposals: favoritesProposals.copyWith(
+            pageKey: 0,
+            maxResults: state.favoritesIds.length,
+            items: [
+              proposal,
+              ...state.favoriteProposals.items,
+            ],
+          ),
+        ),
+      );
+    } else {
+      final items = [...state.favoriteProposals.items]..remove(proposal);
+      emit(
+        state.copyWith(
+          favoriteProposals: favoritesProposals.copyWith(
+            pageKey: 0,
+            maxResults: state.favoritesIds.length,
+            items: items,
+          ),
+        ),
+      );
+    }
   }
 }

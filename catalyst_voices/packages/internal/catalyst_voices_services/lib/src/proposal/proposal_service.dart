@@ -21,14 +21,16 @@ abstract interface class ProposalService {
     required SignedDocumentRef ref,
   });
 
-  /// Fetches proposals for the [campaignId].
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   });
 
   /// Fetches favorites proposals ids of the user
   Future<List<String>> getFavoritesProposalsIds();
+
+  Future<List<String>> addFavoriteProposal(String proposalId);
+
+  Future<List<String>> removeFavoriteProposal(String proposalId);
 
   /// Fetches user's proposals ids  depending on his id that is saved
   /// in metadata of proposal document
@@ -68,11 +70,9 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   }) async {
     final proposalBases = await _proposalRepository.getProposals(
       request: request,
-      campaignId: campaignId,
     );
 
     final futures = proposalBases.proposals.map(_buildProposal);
@@ -104,5 +104,15 @@ final class ProposalServiceImpl implements ProposalService {
     );
 
     return base.toProposal(document: proposalDocument);
+  }
+
+  @override
+  Future<List<String>> addFavoriteProposal(String proposalId) async {
+    return _proposalRepository.addFavoriteProposal(proposalId);
+  }
+
+  @override
+  Future<List<String>> removeFavoriteProposal(String proposalId) async {
+    return _proposalRepository.removeFavoriteProposal(proposalId);
   }
 }

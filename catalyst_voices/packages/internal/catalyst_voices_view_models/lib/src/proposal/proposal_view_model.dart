@@ -39,6 +39,7 @@ sealed class ProposalViewModel extends Equatable {
   }
 
   ProposalViewModel copyWith({
+    String? id,
     bool? isFavorite,
   });
 
@@ -100,6 +101,7 @@ final class PendingProposal extends ProposalViewModel {
 
   @override
   PendingProposal copyWith({
+    String? id,
     bool? isFavorite,
     String? campaignName,
     String? category,
@@ -114,7 +116,7 @@ final class PendingProposal extends ProposalViewModel {
     String? author,
   }) {
     return PendingProposal(
-      id: id,
+      id: id ?? this.id,
       isFavorite: isFavorite ?? this.isFavorite,
       campaignName: campaignName ?? this.campaignName,
       category: category ?? this.category,
@@ -212,6 +214,7 @@ final class FundedProposal extends ProposalViewModel {
 
   @override
   FundedProposal copyWith({
+    String? id,
     bool? isFavorite,
     String? campaignName,
     String? category,
@@ -222,7 +225,7 @@ final class FundedProposal extends ProposalViewModel {
     String? description,
   }) {
     return FundedProposal(
-      id: id,
+      id: id ?? this.id,
       isFavorite: isFavorite ?? this.isFavorite,
       campaignName: campaignName ?? this.campaignName,
       category: category ?? this.category,

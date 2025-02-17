@@ -13,6 +13,7 @@ class ProposalsState extends Equatable {
   final List<String> myProposalsIds;
   final List<CampaignCategoryViewModel> categories;
   final String? selectedCategoryId;
+  final String? searchValue;
 
   const ProposalsState({
     this.draftProposals = const ProposalPaginationItems(),
@@ -24,6 +25,7 @@ class ProposalsState extends Equatable {
     this.myProposalsIds = const [],
     this.categories = const [],
     this.selectedCategoryId,
+    this.searchValue,
   });
 
   ProposalsState copyWith({
@@ -35,8 +37,8 @@ class ProposalsState extends Equatable {
     List<String>? favoritesIds,
     List<String>? myProposalsIds,
     List<CampaignCategoryViewModel>? categories,
-    String? selectedCategoryId,
-    bool clearSelectedCategory = false,
+    Optional<String>? selectedCategoryId,
+    Optional<String>? searchValue,
   }) {
     return ProposalsState(
       draftProposals: draftProposals ?? this.draftProposals,
@@ -47,24 +49,13 @@ class ProposalsState extends Equatable {
       favoritesIds: favoritesIds ?? this.favoritesIds,
       myProposalsIds: myProposalsIds ?? this.myProposalsIds,
       categories: categories ?? this.categories,
-      selectedCategoryId: clearSelectedCategory
-          ? null
-          : (selectedCategoryId ?? this.selectedCategoryId),
+      selectedCategoryId: selectedCategoryId.dataOr(this.selectedCategoryId),
+      searchValue: searchValue.dataOr(this.searchValue),
     );
   }
 
-  ProposalsState resetProposals({
-    String? selectedCategoryId,
-    bool clearSelectedCategory = false,
-  }) {
-    return ProposalsState(
-      favoritesIds: favoritesIds,
-      myProposalsIds: myProposalsIds,
-      categories: categories,
-      selectedCategoryId: clearSelectedCategory
-          ? null
-          : (selectedCategoryId ?? this.selectedCategoryId),
-    );
+  bool isFavorite(String proposalId) {
+    return favoritesIds.contains(proposalId);
   }
 
   @override
@@ -78,5 +69,6 @@ class ProposalsState extends Equatable {
         myProposalsIds,
         categories,
         selectedCategoryId,
+        searchValue,
       ];
 }

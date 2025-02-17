@@ -51,18 +51,21 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
 
           case PagingStatus.ongoing:
           case PagingStatus.completed:
-            child = Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                for (var i = pagingState.currentFrom;
-                    i <= pagingState.currentTo;
-                    i++)
-                  _itemBuilder(
-                    context,
-                    itemList[i],
-                  ),
-              ],
+            child = SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  for (var i = pagingState.currentFrom;
+                      i <= pagingState.currentTo;
+                      i++)
+                    _itemBuilder(
+                      context,
+                      itemList[i],
+                    ),
+                ],
+              ),
             );
             break;
 

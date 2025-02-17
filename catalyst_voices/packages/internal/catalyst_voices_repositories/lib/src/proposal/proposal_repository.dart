@@ -15,10 +15,13 @@ abstract interface class ProposalRepository {
   /// Fetches all proposals.
   Future<ProposalsSearchResult> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   });
 
   Future<List<String>> getFavoritesProposalsIds();
+
+  Future<List<String>> addFavoriteProposal(String proposalId);
+
+  Future<List<String>> removeFavoriteProposal(String proposalId);
 
   Future<List<String>> getUserProposalsIds(String userId);
 }
@@ -30,13 +33,26 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalBase> getProposal({
     required String id,
   }) async {
-    return _proposals.first;
+    return ProposalBase(
+      id: id,
+      category: 'Cardano Use Cases / MVP',
+      title: 'Proposal Title that rocks the world',
+      updateDate: DateTime.now().minusDays(2),
+      fundsRequested: Coin.fromAda(100000),
+      status: ProposalStatus.draft,
+      publish: ProposalPublish.draft,
+      access: ProposalAccess.private,
+      commentsCount: 0,
+      description: _proposalDescription,
+      duration: 6,
+      author: 'Alex Wells',
+      version: 1,
+    );
   }
 
   @override
   Future<ProposalsSearchResult> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   }) async {
     // optionally filter by status.
     final proposals = <ProposalBase>[];
@@ -46,7 +62,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     if (request.usersProposals) {
       return const ProposalsSearchResult(maxResults: 0, proposals: []);
     } else if (request.usersFavorite) {
-      return const ProposalsSearchResult(maxResults: 0, proposals: []);
+      return _getFavoritesProposalsSearchResult(request);
     }
 
     for (var i = 0; i < request.pageSize; i++) {
@@ -90,6 +106,45 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     // TODO(LynxLynxx): read db to get user's proposals
     return <String>[];
   }
+
+  @override
+  Future<List<String>> addFavoriteProposal(String proposalId) async {
+    // TODO(LynxLynxx): add proposal to favorites
+    return getFavoritesProposalsIds();
+  }
+
+  @override
+  Future<List<String>> removeFavoriteProposal(String proposalId) async {
+    // TODO(LynxLynxx): remove proposal from favorites
+    return getFavoritesProposalsIds();
+  }
+
+  Future<ProposalsSearchResult> _getFavoritesProposalsSearchResult(
+    ProposalPaginationRequest request,
+  ) async {
+    final favoritesIds = await getFavoritesProposalsIds();
+    final proposals = <ProposalBase>[];
+    final range = PagingRange.calculateRange(
+      pageKey: request.pageKey,
+      itemsPerPage: request.pageSize,
+      maxResults: favoritesIds.length,
+    );
+    if (favoritesIds.isEmpty) {
+      return const ProposalsSearchResult(
+        maxResults: 0,
+        proposals: [],
+      );
+    }
+    for (var i = range.from; i <= range.to; i++) {
+      final proposal = await getProposal(id: favoritesIds[i]);
+      proposals.add(proposal);
+    }
+
+    return ProposalsSearchResult(
+      maxResults: favoritesIds.length,
+      proposals: proposals,
+    );
+  }
 }
 
 // TODO(LynxLynxx): remove after implementing reading db
@@ -110,126 +165,3 @@ Zanzibar is becoming one of the hotspots for DID's through World Mobile
 and PRISM, but its potential is only barely exploited.
 """
     .replaceAll('\n', ' ');
-
-final _proposals = [
-  ProposalBase(
-    id: '${Random().nextInt(1000)}1',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.draft,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 1,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}2',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.draft,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 2,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}3',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.draft,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}4',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.published,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}5',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.published,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}6',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.published,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}7',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.published,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}8',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.published,
-    access: ProposalAccess.private,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-];
