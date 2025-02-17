@@ -31,27 +31,18 @@ class EditableTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final errorText = this.errorText;
-
-    final Widget? footer;
-    if (isEditMode) {
-      footer = _SaveFooter(
-        isSaveEnabled: isSaveEnabled,
-        onSave: _save,
-      );
-    } else if (errorText != null) {
-      footer = _ErrorFooter(errorText: errorText);
-    } else {
-      footer = null;
-    }
-
     return PropertyTile(
       title: title,
       action: VoicesEditSaveButton(
         onTap: _toggleEditMode,
         isEditing: isEditMode,
       ),
-      footer: footer,
+      footer: _Footer(
+        errorText: errorText,
+        showSaveButton: isEditMode,
+        isSaveEnabled: isSaveEnabled,
+        onSave: _save,
+      ),
       child: child,
     );
   }
@@ -75,32 +66,46 @@ class EditableTile extends StatelessWidget {
   }
 }
 
-class _SaveFooter extends StatelessWidget {
+class _Footer extends StatelessWidget {
+  final String? errorText;
+  final bool showSaveButton;
   final bool isSaveEnabled;
   final VoidCallback onSave;
 
-  const _SaveFooter({
+  const _Footer({
+    required this.errorText,
+    required this.showSaveButton,
     required this.isSaveEnabled,
     required this.onSave,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: VoicesFilledButton(
-        onTap: isSaveEnabled ? onSave : null,
-        child: Text(context.l10n.saveButtonText.toUpperCase()),
-      ),
+    final errorText = this.errorText;
+    return Row(
+      children: [
+        Expanded(
+          child: errorText != null
+              ? _ErrorText(text: errorText)
+              : const SizedBox.shrink(),
+        ),
+        Visibility.maintain(
+          visible: showSaveButton,
+          child: VoicesFilledButton(
+            onTap: isSaveEnabled ? onSave : null,
+            child: Text(context.l10n.saveButtonText.toUpperCase()),
+          ),
+        ),
+      ],
     );
   }
 }
 
-class _ErrorFooter extends StatelessWidget {
-  final String errorText;
+class _ErrorText extends StatelessWidget {
+  final String text;
 
-  const _ErrorFooter({
-    required this.errorText,
+  const _ErrorText({
+    required this.text,
   });
 
   @override
@@ -116,7 +121,7 @@ class _ErrorFooter extends StatelessWidget {
         ),
         Flexible(
           child: Text(
-            errorText,
+            text,
             style: theme.textTheme.bodyMedium?.copyWith(color: color),
           ),
         ),
