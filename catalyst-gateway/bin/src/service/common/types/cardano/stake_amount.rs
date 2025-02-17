@@ -11,7 +11,7 @@ use poem_openapi::{
 use serde_json::Value;
 
 /// Title.
-const TITLE: &str = "Cardano Blockchain Stake Aount";
+const TITLE: &str = "Cardano Blockchain Stake Amount";
 /// Description.
 const DESCRIPTION: &str = "The stake amount of a Cardano Block on the chain.";
 /// Example.
