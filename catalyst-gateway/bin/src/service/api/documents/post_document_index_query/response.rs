@@ -151,22 +151,22 @@ pub(crate) struct IndexedDocumentVersion {
     pub doc_type: DocumentType,
     /// Document Reference that matches the filter
     #[oai(rename = "ref", skip_serializing_if_is_none)]
-    pub doc_ref: Option<DocumentReference>,
+    pub doc_ref: Option<FilteredDocumentReference>,
     /// Document Reply Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub reply: Option<DocumentReference>,
+    pub reply: Option<FilteredDocumentReference>,
     /// Document Template Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub template: Option<DocumentReference>,
+    pub template: Option<FilteredDocumentReference>,
     /// Document Brand Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub brand: Option<DocumentReference>,
+    pub brand: Option<FilteredDocumentReference>,
     /// Document Campaign Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub campaign: Option<DocumentReference>,
+    pub campaign: Option<FilteredDocumentReference>,
     /// Document Category Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub category: Option<DocumentReference>,
+    pub category: Option<FilteredDocumentReference>,
 }
 
 impl Example for IndexedDocumentVersion {
@@ -174,13 +174,35 @@ impl Example for IndexedDocumentVersion {
         Self {
             ver: DocumentVer::example(),
             doc_type: DocumentType::example(),
-            doc_ref: Some(DocumentReference::example()),
+            doc_ref: Some(DocumentReference::example().into()),
             reply: None,
             template: None,
             brand: None,
             campaign: None,
             category: None,
         }
+    }
+}
+
+/// Document Reference for filtered Documents.
+#[derive(NewType, Debug, Clone, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct FilteredDocumentReference(DocumentReference);
+
+impl From<catalyst_signed_doc::DocumentRef> for FilteredDocumentReference {
+    fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
+        Self(value.into())
+    }
+}
+
+impl Example for FilteredDocumentReference {
+    fn example() -> Self {
+        Self(Example::example())
     }
 }
 
