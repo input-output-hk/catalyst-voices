@@ -195,7 +195,7 @@ impl IdAndVerRefDocumented {
     }
 }
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// A Reference to another Signed Document
 pub(crate) struct DocumentReference {

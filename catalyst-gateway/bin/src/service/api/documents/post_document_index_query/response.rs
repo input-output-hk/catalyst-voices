@@ -1,11 +1,17 @@
 //! Catalyst Signed Document Endpoint Response Objects.
-use poem_openapi::{types::Example, NewType, Object};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    NewType, Object,
+};
 
 use super::SignedDocBody;
 use crate::service::common::{
     self,
-    types::document::{
-        doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+    types::{
+        array_types::impl_array_types,
+        document::{
+            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+        },
     },
 };
 
@@ -19,8 +25,7 @@ pub(crate) struct DocumentIndexList {
     /// List of documents that matched the filter.
     ///
     /// Documents are listed in ascending order.
-    #[oai(validator(max_items = "4294967295"))]
-    pub docs: Vec<IndexedDocumentDocumented>,
+    pub docs: IndexedDocumentDocumentedList,
     /// Current Page
     pub page: common::objects::generic::pagination::CurrentPage,
 }
@@ -28,9 +33,27 @@ pub(crate) struct DocumentIndexList {
 impl Example for DocumentIndexList {
     fn example() -> Self {
         Self {
-            docs: vec![IndexedDocumentDocumented::example()],
-            page: common::objects::generic::pagination::CurrentPage::example(),
+            docs: Example::example(),
+            page: Example::example(),
         }
+    }
+}
+
+// List of Indexed Document Documented
+impl_array_types!(
+    IndexedDocumentDocumentedList,
+    IndexedDocumentDocumented,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(4294967295),
+        items: Some(Box::new(IndexedDocumentDocumented::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for IndexedDocumentDocumentedList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
     }
 }
 
@@ -58,7 +81,7 @@ impl Example for DocumentIndexListDocumented {
 }
 
 /// List of Documents that matched the filter
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct IndexedDocument {
     /// Document ID that matches the filter
@@ -67,22 +90,21 @@ pub(crate) struct IndexedDocument {
     /// List of matching versions of the document.
     ///
     /// Versions are listed in ascending order.
-    #[oai(validator(max_items = "100"))]
-    pub ver: Vec<IndexedDocumentVersionDocumented>,
+    pub ver: IndexedDocumentVersionDocumentedList,
 }
 
 impl Example for IndexedDocument {
     fn example() -> Self {
         Self {
-            doc_id: DocumentId::example(),
-            ver: vec![IndexedDocumentVersionDocumented::example()],
+            doc_id: Example::example(),
+            ver: Example::example(),
         }
     }
 }
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType)]
+#[derive(NewType, Debug, Clone)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -102,7 +124,7 @@ impl Example for IndexedDocumentDocumented {
 }
 
 /// List of Documents that matched the filter
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct IndexedDocumentVersion {
     /// Document Version that matches the filter
@@ -145,9 +167,27 @@ impl Example for IndexedDocumentVersion {
     }
 }
 
+// List of Indexed Document Version Documented
+impl_array_types!(
+    IndexedDocumentVersionDocumentedList,
+    IndexedDocumentVersionDocumented,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100),
+        items: Some(Box::new(IndexedDocumentVersionDocumented::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for IndexedDocumentVersionDocumentedList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
+    }
+}
+
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType)]
+#[derive(NewType, Debug, Clone)]
 #[oai(
     from_multipart = false,
     from_parameter = false,

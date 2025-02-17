@@ -15,8 +15,8 @@ pub(crate) struct FrontendConfig {
 
 impl Example for FrontendConfig {
     fn example() -> Self {
-        FrontendConfig {
-            sentry: Some(Sentry::example()),
+        Self {
+            sentry: Some(Example::example()),
         }
     }
 }
@@ -35,10 +35,10 @@ pub(crate) struct Sentry {
 
 impl Example for Sentry {
     fn example() -> Self {
-        Sentry {
-            dsn: common::types::generic::url::Url::example(),
-            release: Some(SemVer::example()),
-            environment: Some(ConfigEnvironment::example()),
+        Self {
+            dsn: Example::example(),
+            release: Some(Example::example()),
+            environment: Some(Example::example()),
         }
     }
 }
