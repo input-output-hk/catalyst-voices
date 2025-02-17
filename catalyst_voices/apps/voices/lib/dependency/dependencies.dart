@@ -124,7 +124,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<ApiServices>(() {
       return ApiServices(
         config: get<AppConfig>().api,
-        activeAccountProvider: get<ActiveAccountProvider>(),
+        userObserver: get<UserObserver>(),
       );
     });
   }
@@ -176,7 +176,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<UserService>(
       () {
         return UserService(
-          userRepository: get<UserRepository>(),
+          get<UserRepository>(),
+          get<UserObserver>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
@@ -209,5 +210,9 @@ final class Dependencies extends DependencyProvider {
 
   void _registerUtils() {
     registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<UserObserver>(
+      StreamUserObserver.new,
+      dispose: (observer) async => observer.dispose(),
+    );
   }
 }

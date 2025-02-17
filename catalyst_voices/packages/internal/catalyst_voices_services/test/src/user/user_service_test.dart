@@ -13,6 +13,7 @@ import 'package:uuid/uuid.dart';
 void main() {
   late final KeychainProvider keychainProvider;
   late final UserRepository userRepository;
+  late final UserObserver userObserver;
 
   late UserService service;
 
@@ -27,15 +28,20 @@ void main() {
       cacheConfig: const CacheConfig(),
     );
     userRepository = UserRepository(SecureUserStorage(), keychainProvider);
+    userObserver = StreamUserObserver();
+  });
+
+  tearDownAll(() async {
+    await userObserver.dispose();
   });
 
   setUp(() {
-    service = UserService(
-      userRepository: userRepository,
-    );
+    service = UserService(userRepository, userObserver);
   });
 
   tearDown(() async {
+    userObserver.user = const User.empty();
+
     await const FlutterSecureStorage().deleteAll();
     await SharedPreferencesAsync().clear();
   });
@@ -52,7 +58,7 @@ void main() {
       await service.useAccount(account);
 
       // Then
-      final currentAccount = service.account;
+      final currentAccount = service.user.activeAccount;
 
       expect(currentAccount?.catalystId, account.catalystId);
       expect(currentAccount?.isActive, isTrue);
@@ -69,7 +75,7 @@ void main() {
       final accountOne = Account.dummy(keychain: keychainOne);
       final accountTwo = Account.dummy(keychain: keychainTwo);
 
-      final accountStream = service.watchAccount;
+      final accountStream = service.watchUser.map((user) => user.activeAccount);
 
       // Then
       expect(
@@ -134,7 +140,7 @@ void main() {
       await service.useLastAccount();
 
       // Then
-      expect(service.account, lastAccount);
+      expect(service.user.activeAccount, lastAccount);
     });
 
     test('use last account does nothing on clear instance', () async {
@@ -144,7 +150,7 @@ void main() {
       await service.useLastAccount();
 
       // Then
-      expect(service.account, isNull);
+      expect(service.user.activeAccount, isNull);
     });
 
     test('remove current account clears current keychain', () async {
@@ -164,11 +170,11 @@ void main() {
       await service.useLastAccount();
 
       // Then
-      expect(service.account, isNotNull);
+      expect(service.user.activeAccount, isNotNull);
 
       await service.removeAccount(account);
 
-      expect(service.account, isNull);
+      expect(service.user.activeAccount, isNull);
       expect(await keychain.isEmpty, isTrue);
       expect(await keychainProvider.exists(keychainId), isFalse);
     });
@@ -208,7 +214,7 @@ void main() {
         const expectedUser = User(accounts: [], settings: settings);
 
         // When
-        await userRepository.saveUser(initialUser);
+        userObserver.user = initialUser;
 
         final userStream = service.watchUser;
 

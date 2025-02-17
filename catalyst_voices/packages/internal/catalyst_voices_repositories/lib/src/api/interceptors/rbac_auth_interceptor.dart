@@ -10,15 +10,15 @@ const _key =
 /* cSpell:enable */
 
 final class RbacAuthInterceptor implements Interceptor {
-  final ActiveAccountProvider _activeAccountProvider;
+  final UserObserver _userObserver;
 
-  const RbacAuthInterceptor(this._activeAccountProvider);
+  const RbacAuthInterceptor(this._userObserver);
 
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
-    final keychain = _activeAccountProvider.account?.keychain;
+    final keychain = _userObserver.user.activeAccount?.keychain;
     final isUnlocked = await keychain?.isUnlocked;
 
     var request = chain.request;

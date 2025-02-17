@@ -12,13 +12,13 @@ final class ApiServices {
 
   factory ApiServices({
     required ApiConfig config,
-    required ActiveAccountProvider activeAccountProvider,
+    required UserObserver userObserver,
   }) {
     final cat = CatGateway.create(
       authenticator: null,
       baseUrl: Uri.parse(config.catGatewayUrl),
       interceptors: [
-        RbacAuthInterceptor(activeAccountProvider),
+        RbacAuthInterceptor(userObserver),
       ],
     );
     final vit = Vit.create(
@@ -28,7 +28,7 @@ final class ApiServices {
       authenticator: null,
       baseUrl: Uri.parse(config.reviewModuleUrl),
       interceptors: [
-        RbacAuthInterceptor(activeAccountProvider),
+        RbacAuthInterceptor(userObserver),
       ],
     );
 
