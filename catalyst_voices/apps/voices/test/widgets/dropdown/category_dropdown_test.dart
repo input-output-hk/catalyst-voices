@@ -40,6 +40,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Dropdown'), findsOneWidget);
 
@@ -77,6 +78,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Dropdown'));
       await tester.pumpAndSettle();
@@ -102,6 +104,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('Dropdown'));
       await tester.pumpAndSettle();
