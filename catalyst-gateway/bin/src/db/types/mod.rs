@@ -7,7 +7,7 @@ pub use transaction_hash::DbTransactionHash;
 pub use transaction_index::DbTxnIndex;
 pub use txn_output_offset::DbTxnOutputOffset;
 pub use uuidv4::DbUuidV4;
-pub use verifying_key::DbVerifyingKey;
+pub use verifying_key::DbPublicKey;
 
 mod catalyst_id;
 mod slot;

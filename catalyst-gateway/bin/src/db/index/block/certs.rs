@@ -14,7 +14,7 @@ use crate::{
             queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
-        types::{DbSlot, DbTxnIndex, DbVerifyingKey},
+        types::{DbPublicKey, DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -29,7 +29,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
     /// Transaction Index.
     txn_index: DbTxnIndex,
     /// Full Stake Public Key (32 byte Ed25519 Public key, not hashed).
-    stake_public_key: MaybeUnset<DbVerifyingKey>,
+    stake_public_key: MaybeUnset<DbPublicKey>,
     /// Is the stake address a script or not.
     script: bool,
     /// Is the Certificate Registered?
