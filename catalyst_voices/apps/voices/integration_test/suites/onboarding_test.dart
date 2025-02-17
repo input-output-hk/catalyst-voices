@@ -135,8 +135,8 @@ void main() async {
       });
 
       patrolWidgetTest(
-          'visitor - create - mnemonic writedown screen next button is disabled',
-          (PatrolTester $) async {
+          'visitor - create - mnemonic writedown '
+          'screen next button is disabled', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
         await WriteDownSeedphrasePanel($).verifyPageElements();
@@ -176,8 +176,8 @@ void main() async {
       });
 
       patrolWidgetTest(
-          'visitor - create - mnemonic input - correct words unlock next button',
-          (PatrolTester $) async {
+          'visitor - create - mnemonic input - '
+          'correct words unlock next button', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
         await InputSeedphrasePanel($).inputSeedPhraseWords();

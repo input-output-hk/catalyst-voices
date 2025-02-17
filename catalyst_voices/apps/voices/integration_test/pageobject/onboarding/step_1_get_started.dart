@@ -8,8 +8,6 @@ import 'onboarding_base_page.dart';
 
 class GetStartedPanel extends OnboardingPageBase {
   GetStartedPanel(super.$);
-  final pictureContainer = const Key('PictureContainer');
-  final learnMoreButton = const Key('LearnMoreButton');
   final getStartedMessage = const Key('GetStartedMessage');
   final getStartedQuestion = const Key('GetStartedQuestion');
   final createNewKeychain = const Key('CreateAccountType.createNew');

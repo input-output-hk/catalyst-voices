@@ -1,14 +1,9 @@
 import json
 from loguru import logger
 import pytest
-
-from api_tests import (
-    check_is_live,
-    check_is_ready,
-    get_voter_registration,
-    sync_to,
-    utils,
-)
+from utils import health, address, sync
+from api import cat_gateway_endpoint_url
+import requests
 
 def check_delegations(provided, expected):
     if type(expected) is list:
@@ -25,23 +20,23 @@ def check_delegations(provided, expected):
     else:
         assert provided["voting_key"] == expected
 
-@pytest.mark.skip
+@pytest.mark.skip('To be refactored when the api is ready')
 def test_voter_registration_endpoint():
-    check_is_live()
-    check_is_ready()
+    health.is_live()
+    health.is_ready()
 
     network = "preprod"
     slot_num = 56364174
 
     # block hash `871b1e4af4c2d433618992fb1c1b5c1182ab829a236d58a4fcc82faf785b58cd`
     # 60 second timeout (3 block times iof syncing from tip)
-    sync_to(network=network, slot_num=slot_num, timeout=60)
+    sync.sync_to(network=network, slot_num=slot_num, timeout=60)
 
     snapshot_tool_data = json.load(open("./snapshot_tool-56364174.json"))
     for entry in snapshot_tool_data:
         expected_rewards_address = entry["rewards_address"]
         expected_nonce = entry["nonce"]
-        stake_address = utils.stake_public_key_to_address(
+        stake_address = address.stake_public_key_to_address(
             key=entry["stake_public_key"][2:], is_stake=True, network_type=network
         )
         res = get_voter_registration(
@@ -56,3 +51,13 @@ def test_voter_registration_endpoint():
             and res["nonce"] == expected_nonce
         )
         check_delegations(res["voting_info"], entry["delegations"])
+
+def get_voter_registration(address: str, network: str, slot_number: int):
+    resp = requests.get(
+        cat_gateway_endpoint_url(
+            f"api/cardano/registration/{address}?network={network}&slot_number={slot_number}"
+        )
+    )
+    assert resp.status_code == 200 or resp.status_code == 404
+    if resp.status_code == 200:
+        return resp.json()
