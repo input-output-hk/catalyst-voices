@@ -123,9 +123,7 @@ async fn calculate_stake_info(
     };
 
     let address: StakeAddress = stake_address.try_into()?;
-    let stake_address_bytes = address.payload().as_hash().to_vec();
-
-    let mut txos_by_txn = get_txo_by_txn(&session, stake_address_bytes.clone(), slot_num).await?;
+    let mut txos_by_txn = get_txo_by_txn(&session, &address, slot_num).await?;
     if txos_by_txn.is_empty() {
         return Ok(None);
     }
@@ -134,7 +132,7 @@ async fn calculate_stake_info(
     // TODO: This could be executed in the background, it does not actually matter if it
     // succeeds. This is just an optimization step to reduce the need to query spent
     // TXO's.
-    update_spent(&session, stake_address_bytes, &txos_by_txn).await?;
+    update_spent(&session, &address, &txos_by_txn).await?;
 
     let stake_info = build_stake_info(txos_by_txn)?;
 
@@ -143,14 +141,14 @@ async fn calculate_stake_info(
 
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNumber>,
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Option<SlotNumber>,
 ) -> anyhow::Result<TxosByTxn> {
     let adjusted_slot_num: u64 = slot_num.unwrap_or(i64::MAX).try_into().unwrap_or(u64::MAX);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), adjusted_slot_num.into()),
+        GetTxoByStakeAddressQueryParams::new(stake_address.to_vec(), adjusted_slot_num.into()),
     )
     .await?;
 
@@ -178,7 +176,7 @@ async fn get_txo_by_txn(
     // Augment TXO info with asset info.
     let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address, adjusted_slot_num.into()),
+        GetAssetsByStakeAddressParams::new(stake_address.to_vec(), adjusted_slot_num.into()),
     )
     .await?;
 
@@ -247,7 +245,7 @@ async fn check_and_set_spent(
 
 /// Sets TXOs as spent in the database if they are marked as spent in the map.
 async fn update_spent(
-    session: &CassandraSession, stake_address: Vec<u8>, txos_by_txn: &TxosByTxn,
+    session: &CassandraSession, stake_address: &StakeAddress, txos_by_txn: &TxosByTxn,
 ) -> anyhow::Result<()> {
     let mut params = Vec::new();
     for txn_map in txos_by_txn.values() {
@@ -258,7 +256,7 @@ async fn update_spent(
 
             if let Some(spent_slot) = txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
-                    stake_address: stake_address.clone(),
+                    stake_hash: stake_address.to_vec(),
                     txn_index: txo_info.txn_index.into(),
                     txo: txo_info.txo.into(),
                     slot_no: txo_info.slot_no.into(),

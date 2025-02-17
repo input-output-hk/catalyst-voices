@@ -20,13 +20,13 @@ const GET_STAKE_ADDR_FROM_STAKE_HASH: &str = include_str!("../cql/get_stake_addr
 #[derive(SerializeRow)]
 pub(crate) struct GetStakeAddrParams {
     /// Stake hash.
-    pub stake_key_hash: Vec<u8>,
+    pub stake_hash: Vec<u8>,
 }
 
 impl GetStakeAddrParams {
     /// Create a new instance of [`GetStakeAddrParams`]
-    pub(crate) fn new(stake_key_hash: Vec<u8>) -> GetStakeAddrParams {
-        Self { stake_key_hash }
+    pub(crate) fn new(stake_hash: Vec<u8>) -> GetStakeAddrParams {
+        Self { stake_hash }
     }
 }
 

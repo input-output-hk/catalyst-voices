@@ -36,8 +36,8 @@ const SELECT_QUERY: &str = include_str!("./cql/get_stake_registration.cql");
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake hash - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_key_hash: Vec<u8>,
+    /// Stake hash - Binary 29 bytes. 0 bytes = not staked.
+    pub(crate) stake_hash: Vec<u8>,
     /// Is the address a script address.
     pub(crate) script: bool,
     /// Block Slot Number
@@ -49,7 +49,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_key_hash", &self.stake_key_hash)
+            .field("stake_hash", &self.stake_hash)
             .field("script", &self.script)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
@@ -60,7 +60,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_key_hash: value.0,
+            stake_hash: value.0,
             script: value.1,
             slot_no: value.2,
             txn_index: value.3,

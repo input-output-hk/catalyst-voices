@@ -5,10 +5,7 @@ use std::{cmp::Reverse, sync::Arc};
 use futures::StreamExt;
 
 use super::{
-    cardano::{
-        cip19_shelley_address::Cip19ShelleyAddress, hash28::HexEncodedHash28, nonce::Nonce,
-        txn_index::TxnIndex,
-    },
+    cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce, txn_index::TxnIndex},
     common::types::generic::error_msg::ErrorMessage,
     response::{
         AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,
@@ -16,23 +13,26 @@ use super::{
     },
     Ed25519HexEncodedPublicKey, SlotNo,
 };
-use crate::db::index::{
-    queries::registrations::{
-        get_all_stakes_and_vote_keys::{
-            GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
+use crate::{
+    db::index::{
+        queries::registrations::{
+            get_all_stakes_and_vote_keys::{
+                GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
+            },
+            get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
+            get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
+            get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
+            get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
         },
-        get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
-        get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
-        get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
-        get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
+        session::CassandraSession,
     },
-    session::CassandraSession,
+    service::common::types::cardano::hash29::HexEncodedHash29,
 };
 
 /// Get registration given a stake key hash, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_stake_key_hash(
-    stake_hash: HexEncodedHash28, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    stake_hash: HexEncodedHash29, session: Arc<CassandraSession>, asat: Option<SlotNo>,
 ) -> AllRegistration {
     // Get stake addr associated with given stake hash.
     let mut stake_addr_iter = match GetStakeAddrQuery::execute(

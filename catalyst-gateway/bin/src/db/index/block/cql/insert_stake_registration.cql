@@ -1,6 +1,6 @@
 -- Index Stake Registrations
 INSERT INTO stake_registration (
-    stake_key_hash,
+    stake_hash,
     slot_no,
     txn_index,
     stake_public_key,
@@ -9,7 +9,7 @@ INSERT INTO stake_registration (
     deregister,
     pool_delegation
 ) VALUES (
-    :stake_key_hash,
+    :stake_hash,
     :slot_no,
     :txn_index,
     :stake_public_key,

@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{MultiEraBlock, Slot, TxnIndex, VKeyHash};
+use cardano_blockchain_types::{MultiEraBlock, Network, Slot, TxnIndex, VKeyHash};
 use ed25519_dalek::VerifyingKey;
 use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
@@ -23,7 +23,7 @@ use crate::{
 #[derive(SerializeRow)]
 pub(crate) struct StakeRegistrationInsertQuery {
     /// Stake key hash
-    stake_key_hash: Vec<u8>,
+    stake_hash: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
@@ -62,7 +62,7 @@ impl Debug for StakeRegistrationInsertQuery {
         f.debug_struct("StakeRegistrationInsertQuery")
             .field(
                 "stake_key_hash",
-                &hex::encode(hex::encode(&self.stake_key_hash)),
+                &hex::encode(hex::encode(&self.stake_hash)),
             )
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
@@ -82,14 +82,14 @@ impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        stake_key_hash: Vec<u8>, slot_no: Slot, txn_index: TxnIndex,
+        stake_hash: Vec<u8>, slot_no: Slot, txn_index: TxnIndex,
         stake_public_key: Option<VerifyingKey>, script: bool, register: bool, deregister: bool,
         pool_delegation: Option<Vec<u8>>,
     ) -> Self {
         let stake_public_key =
             stake_public_key.map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.into()));
         StakeRegistrationInsertQuery {
-            stake_key_hash,
+            stake_hash,
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             stake_public_key,
@@ -161,33 +161,34 @@ impl CertInsertQuery {
         &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex, register: bool,
         deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
-        let (key_hash, pubkey, script) = match cred {
+        let stake_hash = stake_hash(block.network(), cred);
+        let (pubkey, script) = match cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
-                (cred.to_vec(), addr, false)
+                (addr, false)
             },
-            conway::StakeCredential::Scripthash(script) => (script.to_vec(), None, true),
+            conway::StakeCredential::Scripthash(_) => (None, true),
         };
 
         if pubkey.is_none() && !script && deregister {
             error!(
                 "Stake Deregistration Certificate {:?} is NOT Witnessed.",
-                key_hash
+                stake_hash
             );
         }
 
         if pubkey.is_none() && !script && delegation.is_some() {
             error!(
                 "Stake Delegation Certificate {:?} is NOT Witnessed.",
-                key_hash
+                stake_hash
             );
         }
 
         // This may not be witnessed, its normal but disappointing.
         self.stake_reg_data.push(StakeRegistrationInsertQuery::new(
-            key_hash, slot_no, txn, pubkey, script, register, deregister, delegation,
+            stake_hash, slot_no, txn, pubkey, script, register, deregister, delegation,
         ));
     }
 
@@ -286,4 +287,14 @@ impl CertInsertQuery {
 
         query_handles
     }
+}
+
+/// Converts the given stake credential to 29 bytes hash with a header.
+fn stake_hash(network: Network, cred: &alonzo::StakeCredential) -> Vec<u8> {
+    let (type_, hash) = match cred {
+        alonzo::StakeCredential::AddrKeyhash(address) => (0b1110u8 << 4, address.to_vec()),
+        alonzo::StakeCredential::Scripthash(script) => (0b1111 << 4, script.to_vec()),
+    };
+    let header = type_ | network as u8;
+    [&[header], hash.as_slice()].concat()
 }

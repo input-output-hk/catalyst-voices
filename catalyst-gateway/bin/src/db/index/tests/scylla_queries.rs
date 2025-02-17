@@ -175,11 +175,10 @@ async fn test_get_stake_addr_w_stake_key_hash() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams {
-        stake_key_hash: vec![],
-    })
-    .await
-    .unwrap();
+    let mut row_stream =
+        GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
+            .await
+            .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());

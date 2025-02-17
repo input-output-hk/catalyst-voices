@@ -17,7 +17,6 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
-use super::hash28::HexEncodedHash28;
 use crate::service::common::types::{
     cardano::hash29::HexEncodedHash29, string_types::impl_string_types,
 };
@@ -151,9 +150,9 @@ impl TryInto<StakeAddress> for Cip19StakeAddress {
 impl TryInto<HexEncodedHash29> for Cip19StakeAddress {
     type Error = anyhow::Error;
 
-    fn try_into(self) -> Result<HexEncodedHash28, Self::Error> {
+    fn try_into(self) -> Result<HexEncodedHash29, Self::Error> {
         let stake_addr: StakeAddress = self.try_into()?;
-        HexEncodedHash28::try_from(stake_addr.payload().as_hash().to_vec())
+        HexEncodedHash29::try_from(stake_addr.payload().as_hash().to_vec())
     }
 }
 

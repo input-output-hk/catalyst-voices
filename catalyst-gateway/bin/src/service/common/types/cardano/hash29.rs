@@ -42,7 +42,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         max_length: Some(ENCODED_LENGTH),
         min_length: Some(ENCODED_LENGTH),
         pattern: Some(PATTERN.to_string()),
-        ..poem_openapi::registry::MetaSchema::ANY
+        ..MetaSchema::ANY
     }
 });
 

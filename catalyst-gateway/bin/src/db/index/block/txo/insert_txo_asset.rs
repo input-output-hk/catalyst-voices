@@ -21,8 +21,8 @@ const INSERT_TXO_ASSET_QUERY: &str = include_str!("./cql/insert_txo_asset.cql");
 /// (Superset of data to support both Staked and Unstaked TXO records.)
 #[derive(SerializeRow, Debug)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    stake_key_hash: Vec<u8>,
+    /// Stake Address - Binary 29 bytes. 0 bytes = not staked.
+    stake_hash: Vec<u8>,
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -44,11 +44,11 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
-        stake_key_hash: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
+        stake_hash: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
         policy_id: &[u8], asset_name: &[u8], value: i128,
     ) -> Self {
         Self {
-            stake_key_hash: stake_key_hash.to_vec(),
+            stake_hash: stake_hash.to_vec(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             txo: txo.into(),

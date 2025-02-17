@@ -2,7 +2,7 @@
 -- Unstaked Assets are not present in this table.
 CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
     -- Primary Key Fields
-    stake_key_hash  blob,     -- stake address hash (28 bytes stake address hash, zero length if not staked.)
+    stake_hash      blob,     -- 29 Byte stake hash (CIP19), zero length if not staked.
     slot_no         varint,   -- slot number the txo was created in.
     txn_index       smallint, -- Which Transaction in the Slot is the TXO.
     txo             smallint, -- offset in the txo list of the transaction the txo is in.
@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
     -- None Key Data of the asset.
     value           varint,   -- Value of the asset (i128)
 
-    PRIMARY KEY (stake_key_hash, slot_no, txn_index, txo, policy_id, asset_name)
+    PRIMARY KEY (stake_hash, slot_no, txn_index, txo, policy_id, asset_name)
 );
