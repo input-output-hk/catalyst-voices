@@ -18,7 +18,9 @@ use poem_openapi::{
 use serde_json::Value;
 
 use super::hash28::HexEncodedHash28;
-use crate::service::common::types::string_types::impl_string_types;
+use crate::service::common::types::{
+    cardano::hash29::HexEncodedHash29, string_types::impl_string_types,
+};
 
 /// Stake address title.
 const TITLE: &str = "Cardano stake address";
@@ -70,7 +72,7 @@ static STAKE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         min_length: Some(MIN_LENGTH),
         max_length: Some(MAX_LENGTH),
         pattern: Some(PATTERN.to_string()),
-        ..poem_openapi::registry::MetaSchema::ANY
+        ..MetaSchema::ANY
     }
 });
 
@@ -146,7 +148,7 @@ impl TryInto<StakeAddress> for Cip19StakeAddress {
     }
 }
 
-impl TryInto<HexEncodedHash28> for Cip19StakeAddress {
+impl TryInto<HexEncodedHash29> for Cip19StakeAddress {
     type Error = anyhow::Error;
 
     fn try_into(self) -> Result<HexEncodedHash28, Self::Error> {
