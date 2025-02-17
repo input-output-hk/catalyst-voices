@@ -380,7 +380,7 @@ ThemeData _buildThemeData(
     ),
     inputDecorationTheme: VoicesInputDecorationTheme(
       textTheme: textTheme,
-      colorsSchema: colorScheme,
+      colorsScheme: colorScheme,
       colors: voicesColorScheme,
     ),
   ).copyWithButtonsTheme().copyWithTogglesTheme();

@@ -28,7 +28,7 @@ via the [flutter_rust_bridge](https://pub.dev/packages/flutter_rust_bridge).
 ## Requirements
 
 * Dart: 3.5.0+
-* Flutter: 3.27.3+
+* Flutter: 3.29.0+
 
 ## Install
 
