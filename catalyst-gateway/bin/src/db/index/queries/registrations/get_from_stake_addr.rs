@@ -38,8 +38,6 @@ impl From<Vec<u8>> for GetRegistrationParams {
 /// Get registration query.
 #[derive(DeserializeRow)]
 pub(crate) struct GetRegistrationQuery {
-    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_public_key: Vec<u8>,
     /// Nonce value after normalization.
     pub nonce: num_bigint::BigInt,
     /// Slot Number the cert is in.

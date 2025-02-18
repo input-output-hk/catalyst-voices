@@ -186,7 +186,7 @@ async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
     let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
-        stake_public_key: stake_pub_key.try_into()?,
+        stake_public_key: stake_pub_key.clone().try_into()?,
     })
     .await?;
     let mut registrations = Vec::new();
@@ -204,7 +204,7 @@ async fn get_all_registrations_from_stake_pub_key(
 
         let cip36 = Cip36Details {
             slot_no: slot_no.into(),
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?),
+            stake_pub_key: Some(stake_pub_key.clone()),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
             txn: Some(TxnIndex::try_from(txn)?),

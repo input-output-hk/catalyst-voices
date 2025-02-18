@@ -1,5 +1,4 @@
-SELECT stake_public_key,
-       nonce,
+SELECT nonce,
        slot_no,
        txn_index,
        vote_key,
