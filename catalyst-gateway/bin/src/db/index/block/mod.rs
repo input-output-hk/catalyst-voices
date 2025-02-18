@@ -37,7 +37,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
 
     // We add all transactions in the block to their respective index data sets.
     for (index, txn) in block.enumerate_txs() {
-        let txn_hash = Blake2b256Hash::from(txn.hash()).into();
+        let txn_id = Blake2b256Hash::from(txn.hash()).into();
 
         // Index the TXIs.
         txi_index.index(&txn, slot_no);
@@ -52,10 +52,10 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         cert_index.index(&txn, slot_no, index, block);
 
         // Index the TXOs.
-        txo_index.index(block.network(), &txn, slot_no, txn_hash, index);
+        txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
-        rbac509_index.index(&session, txn_hash, index, block).await;
+        rbac509_index.index(&session, txn_id, index, block).await;
     }
 
     // We then execute each batch of data from the block.

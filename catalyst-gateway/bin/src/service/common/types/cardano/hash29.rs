@@ -25,13 +25,13 @@ const TITLE: &str = "29 Byte Hash";
 /// Description.
 const DESCRIPTION: &str = "This is a 29 Byte Hex encoded Hash.";
 /// Example.
-const EXAMPLE: &str = "0x8eee77e5894c22268d5d12e6484ba713e7ddd595abba308d88d36943";
+const EXAMPLE: &str = "0xe18eee77e5894c22268d5d12e6484ba713e7ddd595abba308d88d36943";
 /// Length of the hex encoded string;
 const ENCODED_LENGTH: usize = EXAMPLE.len();
 /// Length of the hash itself;
 const HASH_LENGTH: usize = 29;
 /// Validation Regex Pattern
-const PATTERN: &str = "0x[A-Fa-f0-9]{56}";
+const PATTERN: &str = "0x[A-Fa-f0-9]{58}";
 
 /// Schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {

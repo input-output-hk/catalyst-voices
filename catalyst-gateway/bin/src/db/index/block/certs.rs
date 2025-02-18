@@ -61,10 +61,7 @@ impl Debug for StakeRegistrationInsertQuery {
         };
 
         f.debug_struct("StakeRegistrationInsertQuery")
-            .field(
-                "stake_key_hash",
-                &hex::encode(hex::encode(&self.stake_hash)),
-            )
+            .field("stake_hash", &hex::encode(hex::encode(&self.stake_hash)))
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("stake_public_key", &stake_public_key)
