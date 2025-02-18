@@ -49,12 +49,12 @@ void main() {
       final proposalData = await VoicesDocumentsTemplates.proposalF14Document;
 
       final template = DocumentDataFactory.build(
-        id: mockedTemplateUuid,
+        selfRef: DocumentRefFactory.buildSigned(id: mockedTemplateUuid),
         type: DocumentType.proposalTemplate,
         content: DocumentDataContent(templateData),
       );
       final proposal = DocumentDataFactory.build(
-        id: mockedDocumentUuid,
+        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
         type: DocumentType.proposalDocument,
         template: template.ref,
         content: DocumentDataContent(proposalData),
@@ -78,12 +78,12 @@ void main() {
 
     test('getProposalDocument correctly propagates errors', () async {
       // Given
-      final templateRef = DocumentRef(
+      final templateRef = SignedDocumentRef(
         id: mockedTemplateUuid,
         version: const Uuid().v7(),
       );
       final proposal = DocumentDataFactory.build(
-        id: mockedDocumentUuid,
+        selfRef: DocumentRefFactory.buildSigned(id: mockedDocumentUuid),
         type: DocumentType.proposalDocument,
         template: templateRef,
         content: const DocumentDataContent({}),
@@ -114,8 +114,7 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          id: id,
-          version: version,
+          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
         );
 
         final ref = documentData.ref;
@@ -137,11 +136,10 @@ void main() {
         final version = id;
 
         final documentData = DocumentDataFactory.build(
-          id: id,
-          version: version,
+          selfRef: DocumentRefFactory.buildSigned(id: id, version: version),
         );
 
-        final ref = DocumentRef(id: id);
+        final ref = SignedDocumentRef(id: id);
         final exactRef = ref.copyWith(version: Optional(version));
 
         when(() => remoteDocuments.getLatestVersion(id))
@@ -234,6 +232,135 @@ void main() {
 
         verify(() => remoteDocuments.get(ref: template.ref)).called(1);
       });
+    });
+
+    group('createProposalDraft', () {
+      test('version should equals id', () async {
+        // Given
+        const content = DocumentDataContent({});
+        final templateRef = DocumentRefFactory.buildSigned();
+
+        // When
+        final draftRef = await repository.createProposalDraft(
+          content: content,
+          template: templateRef,
+        );
+
+        // Then
+        expect(draftRef.id, draftRef.version);
+      });
+
+      test(
+          'of document should use same '
+          'id but assign new version', () async {
+        // Given
+        final docRef = DocumentRefFactory.buildSigned();
+        const content = DocumentDataContent({});
+        final templateRef = DocumentRefFactory.buildSigned();
+
+        // When
+        final draftRef = await repository.createProposalDraft(
+          content: content,
+          template: templateRef,
+          of: docRef,
+        );
+
+        // Then
+        expect(draftRef.id, docRef.id);
+        expect(draftRef.version, isNot(docRef.version));
+      });
+
+      test('document data type should be proposal document', () async {
+        // Given
+        const content = DocumentDataContent({});
+        final templateRef = DocumentRefFactory.buildSigned();
+
+        // When
+        final draftRef = await repository.createProposalDraft(
+          content: content,
+          template: templateRef,
+        );
+
+        // Then
+        final documentData = await repository.getDocumentData(ref: draftRef);
+
+        expect(documentData.metadata.type, DocumentType.proposalDocument);
+      });
+    });
+
+    test(
+        'updating proposal draft content '
+        'should change it correctly', () async {
+      // Given
+      const initialContent = DocumentDataContent({});
+      const updatedContent = DocumentDataContent({'title': 'My proposal'});
+
+      final templateRef = DocumentRefFactory.buildSigned();
+
+      // When
+      final draftRef = await repository.createProposalDraft(
+        content: initialContent,
+        template: templateRef,
+      );
+
+      await repository.updateProposalDraftContent(
+        ref: draftRef,
+        content: updatedContent,
+      );
+
+      // Then
+      final documentData = await repository.getDocumentData(ref: draftRef);
+
+      expect(documentData.ref, draftRef);
+      expect(documentData.content, updatedContent);
+    });
+
+    test(
+        'updating proposal draft content '
+        'should emit changes', () async {
+      // Given
+      const initialContent = DocumentDataContent({});
+      const updatedContent = DocumentDataContent({'title': 'My proposal'});
+
+      final templateRef = DocumentRefFactory.buildSigned();
+      final templateData = DocumentDataFactory.build(
+        selfRef: templateRef,
+        type: DocumentType.proposalTemplate,
+      );
+
+      final draftRef = DocumentRefFactory.buildDraft();
+      final draftData = DocumentDataFactory.build(
+        type: DocumentType.proposalDocument,
+        selfRef: draftRef,
+        template: templateRef,
+        content: initialContent,
+      );
+
+      // When
+      await localDocuments.save(data: templateData);
+      await draftsSource.save(data: draftData);
+
+      // Then
+      await repository.updateProposalDraftContent(
+        ref: draftRef,
+        content: updatedContent,
+      );
+      final draftStream = repository.watchDocumentWithRef(
+        ref: draftRef,
+        refGetter: (data) => data.metadata.template!,
+      );
+
+      // Then
+      expect(
+        draftStream,
+        emitsInOrder([
+          predicate<DocumentsDataWithRefData?>((data) {
+            final isRef = data?.data.ref == draftRef;
+            final isContent = data?.data.content == updatedContent;
+            return isRef && isContent;
+          }),
+        ]),
+      );
     });
   });
 }

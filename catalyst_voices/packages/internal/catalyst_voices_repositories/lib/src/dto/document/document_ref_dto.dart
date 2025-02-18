@@ -3,21 +3,33 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'document_ref_dto.g.dart';
 
+enum DocumentRefDtoType { signed, draft }
+
 @JsonSerializable()
 final class DocumentRefDto {
   final String id;
   final String? version;
+  @JsonKey(unknownEnumValue: DocumentRefDtoType.signed)
+  final DocumentRefDtoType type;
 
   const DocumentRefDto({
     required this.id,
     this.version,
+    required this.type,
   });
 
-  DocumentRefDto.fromModel(DocumentRef data)
-      : this(
-          id: data.id,
-          version: data.version,
-        );
+  factory DocumentRefDto.fromModel(DocumentRef data) {
+    final type = switch (data) {
+      SignedDocumentRef() => DocumentRefDtoType.signed,
+      DraftRef() => DocumentRefDtoType.draft,
+    };
+
+    return DocumentRefDto(
+      id: data.id,
+      version: data.version,
+      type: type,
+    );
+  }
 
   factory DocumentRefDto.fromJson(Map<String, dynamic> json) {
     return _$DocumentRefDtoFromJson(json);
@@ -26,10 +38,10 @@ final class DocumentRefDto {
   Map<String, dynamic> toJson() => _$DocumentRefDtoToJson(this);
 
   DocumentRef toModel() {
-    return DocumentRef(
-      id: id,
-      version: version,
-    );
+    return switch (type) {
+      DocumentRefDtoType.signed => SignedDocumentRef(id: id, version: version),
+      DocumentRefDtoType.draft => DraftRef(id: id, version: version),
+    };
   }
 }
 
