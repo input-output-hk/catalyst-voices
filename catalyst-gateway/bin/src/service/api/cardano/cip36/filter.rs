@@ -6,7 +6,7 @@ use dashmap::DashMap;
 use futures::StreamExt;
 use poem_openapi::types::Example;
 use rayon::prelude::*;
-use tracing::error;
+use tracing::{debug, error};
 
 use super::{
     cardano::{
@@ -484,6 +484,17 @@ pub async fn get_all_registrations(
             continue;
         };
 
+        let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address.clone()) {
+            Ok(payment_addr) => Some(payment_addr.clone()),
+            Err(err) => {
+                debug!(
+                    "Valid registration is not a valid cip19 shelley {:?} {:?}",
+                    row.payment_address, err
+                );
+                None
+            },
+        };
+
         let cip36 = Cip36Details {
             slot_no: SlotNo::from(slot_no),
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(
@@ -492,10 +503,7 @@ pub async fn get_all_registrations(
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
             txn: Some(TxnIndex::try_from(row.txn)?),
-            payment_address: Some(
-                Cip19ShelleyAddress::try_from(row.payment_address)
-                    .unwrap_or(Cip19ShelleyAddress::example()),
-            ),
+            payment_address: payment_addr,
             is_payable: row.is_payable,
             cip15: !row.cip36,
             errors: vec![],
@@ -536,6 +544,17 @@ async fn get_all_invalid_registrations(
             continue;
         };
 
+        let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address.clone()) {
+            Ok(payment_addr) => Some(payment_addr.clone()),
+            Err(err) => {
+                debug!(
+                    "Valid registration is not a valid cip19 shelley {:?} {:?}",
+                    row.payment_address, err
+                );
+                None
+            },
+        };
+
         let invalid = Cip36Details {
             slot_no: SlotNo::from(slot_no),
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(
@@ -544,10 +563,7 @@ async fn get_all_invalid_registrations(
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
             txn: None,
-            payment_address: Some(
-                Cip19ShelleyAddress::try_from(row.payment_address)
-                    .unwrap_or(Cip19ShelleyAddress::example()),
-            ),
+            payment_address: payment_addr,
             is_payable: row.is_payable,
             cip15: !row.cip36,
             errors: row
