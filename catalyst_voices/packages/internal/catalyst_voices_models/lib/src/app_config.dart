@@ -21,9 +21,10 @@ final class ApiConfig extends Equatable {
   final String reviewModuleUrl;
 
   // TODO(damian-molinski): review module url have to be updated
+  // TODO(damian-molinski): vit url is invalid
   const ApiConfig({
-    this.catGatewayUrl = 'https://gateway.dev.projectcatalyst.io/api/',
-    this.vitUrl = 'https://core.dev.projectcatalyst.io/api/',
+    this.catGatewayUrl = 'https://gateway.dev.projectcatalyst.io/',
+    this.vitUrl = 'https://core.dev.projectcatalyst.io/',
     this.reviewModuleUrl = 'https://',
   });
 
