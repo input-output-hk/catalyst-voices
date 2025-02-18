@@ -79,7 +79,7 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
   DraftsDao get draftsDao => driftDraftsDao;
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration {
