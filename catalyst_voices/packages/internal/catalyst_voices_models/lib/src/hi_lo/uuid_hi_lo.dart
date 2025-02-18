@@ -22,25 +22,37 @@ final class UuidHiLo extends HiLo<BigInt> {
       throw ArgumentError('Not valid uuid data', 'data');
     }
 
+    /// The reason is that dart2js does not fully support Int64 operations
+    /// and getInt64() throws exception on web.
     final bytes = UuidParsing.parseHexToBytes(sanitized);
-    final high = BigInt.from(ByteData.sublistView(bytes, 0, 8).getInt64(0));
-    final low = BigInt.from(ByteData.sublistView(bytes, 8, 16).getInt64(0));
+
+    var high = 0;
+    for (var i = 0; i < 8; i++) {
+      high = (high << 8) | bytes[i];
+    }
+
+    var low = 0;
+    for (var i = 8; i < 16; i++) {
+      low = (low << 8) | bytes[i];
+    }
 
     return UuidHiLo(
-      high: high,
-      low: low,
+      high: BigInt.from(high),
+      low: BigInt.from(low),
     );
   }
 
-  /// Syntax sugar for working with nullable [data].
-  static UuidHiLo? fromNullable(String? data) {
-    return data != null ? UuidHiLo.from(data) : null;
-  }
+  /// supported for v7 only. Otherwise throws exception
+  DateTime get dateTime {
+    if (_version != 7) {
+      throw StateError('uuid version is not v7');
+    }
 
-  /// Version is always 13th digit of uuid.
-  int get _version {
-    final source = String.fromCharCode(uuid.codeUnitAt(14));
-    return int.parse(source);
+    // Get the first 48 bits (high >> 16)
+    final timestampMillis = (high.toInt() >> 16) & 0xFFFFFFFFFFFF;
+
+    // Convert milliseconds since Unix epoch (1970-01-01)
+    return DateTime.fromMillisecondsSinceEpoch(timestampMillis);
   }
 
   String get uuid {
@@ -57,16 +69,14 @@ final class UuidHiLo extends HiLo<BigInt> {
     return UuidParsing.unparse(bytes);
   }
 
-  /// supported for v7 only. Otherwise throws exception
-  DateTime get dateTime {
-    if (_version != 7) {
-      throw StateError('uuid version is not v7');
-    }
+  /// Version is always 13th digit of uuid.
+  int get _version {
+    final source = String.fromCharCode(uuid.codeUnitAt(14));
+    return int.parse(source);
+  }
 
-    // Get the first 48 bits (high >> 16)
-    final timestampMillis = (high.toInt() >> 16) & 0xFFFFFFFFFFFF;
-
-    // Convert milliseconds since Unix epoch (1970-01-01)
-    return DateTime.fromMillisecondsSinceEpoch(timestampMillis);
+  /// Syntax sugar for working with nullable [data].
+  static UuidHiLo? fromNullable(String? data) {
+    return data != null ? UuidHiLo.from(data) : null;
   }
 }
