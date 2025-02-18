@@ -32,6 +32,84 @@ class SimpleTreeView extends StatelessWidget {
   }
 }
 
+class SimpleTreeViewChildRow extends StatelessWidget {
+  final bool hasNext;
+  final bool isSelected;
+  final bool hasError;
+  final VoidCallback? onTap;
+  final Widget child;
+
+  const SimpleTreeViewChildRow({
+    super.key,
+    this.hasNext = true,
+    this.isSelected = false,
+    this.hasError = false,
+    this.onTap,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    final widgetStates = {
+      if (hasError) WidgetState.error,
+      if (isSelected) WidgetState.selected,
+    };
+
+    final backgroundColor =
+        _BackgroundColor(theme.colors, theme.colorScheme).resolve(widgetStates);
+    final foregroundColor =
+        _ForegroundColor(theme.colors).resolve(widgetStates);
+
+    final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(
+      color: foregroundColor,
+    );
+
+    final dividerTheme = DividerThemeData(
+      color: foregroundColor,
+    );
+
+    return DefaultTextStyle(
+      style: textStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      child: DividerTheme(
+        data: dividerTheme,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints.tightFor(height: 40),
+          child: Material(
+            type: backgroundColor != null
+                ? MaterialType.canvas
+                : MaterialType.transparency,
+            color: backgroundColor,
+            textStyle: textStyle,
+            child: InkWell(
+              onTap: onTap,
+              child: Stack(
+                children: [
+                  if (hasError && isSelected) const _SelectedErrorIndicator(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        _SimpleTreeViewIndent(showBottomJoint: hasNext),
+                        Expanded(child: child),
+                        if (hasError) const _Error(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SimpleTreeViewRootRow extends StatelessWidget {
   final List<Widget> leading;
   final VoidCallback? onTap;
@@ -86,94 +164,66 @@ class SimpleTreeViewRootRow extends StatelessWidget {
   }
 }
 
-class SimpleTreeViewChildRow extends StatelessWidget {
-  final bool hasNext;
-  final bool isSelected;
-  final bool hasError;
-  final VoidCallback? onTap;
-  final Widget child;
+class _BackgroundColor extends WidgetStateProperty<Color?> {
+  final VoicesColorScheme colors;
+  final ColorScheme colorScheme;
 
-  const SimpleTreeViewChildRow({
-    super.key,
-    this.hasNext = true,
-    this.isSelected = false,
-    this.hasError = false,
-    this.onTap,
-    required this.child,
-  });
+  _BackgroundColor(this.colors, this.colorScheme);
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    final backgroundColor = _getBackgroundColor(theme);
-    final foregroundColor = _getForegroundColor(theme);
-
-    final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(
-      color: foregroundColor,
-    );
-
-    final dividerTheme = DividerThemeData(
-      color: foregroundColor,
-    );
-
-    return DefaultTextStyle(
-      style: textStyle,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      child: DividerTheme(
-        data: dividerTheme,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints.tightFor(height: 40),
-          child: Material(
-            type: backgroundColor != null
-                ? MaterialType.canvas
-                : MaterialType.transparency,
-            color: backgroundColor,
-            textStyle: textStyle,
-            child: InkWell(
-              onTap: onTap,
-              child: Stack(
-                children: [
-                  if (hasError && isSelected) const _SelectedErrorIndicator(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        _SimpleTreeViewIndent(showBottomJoint: hasNext),
-                        Expanded(child: child),
-                        if (hasError) const _Error(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color? _getBackgroundColor(ThemeData theme) {
-    if (hasError) {
-      return theme.colors.onSurfaceNeutralOpaqueLv1;
-    } else if (isSelected) {
-      return theme.colorScheme.primary;
+  Color? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.error)) {
+      return colors.onSurfaceNeutralOpaqueLv1;
+    } else if (states.contains(WidgetState.selected)) {
+      return colorScheme.primary;
     } else {
       return null;
     }
   }
+}
 
-  Color? _getForegroundColor(ThemeData theme) {
-    if (hasError) {
-      return theme.colors.textOnPrimaryLevel0;
-    } else if (isSelected) {
-      return theme.colors.textOnPrimaryWhite;
+class _Error extends StatelessWidget {
+  const _Error();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: VoicesAssets.icons.exclamationCircle.buildIcon(
+        size: 18,
+        color: Theme.of(context).colors.iconsError,
+      ),
+    );
+  }
+}
+
+class _ForegroundColor extends WidgetStateProperty<Color?> {
+  final VoicesColorScheme colors;
+
+  _ForegroundColor(this.colors);
+
+  @override
+  Color? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.error)) {
+      return colors.textOnPrimaryLevel0;
+    } else if (states.contains(WidgetState.selected)) {
+      return colors.textOnPrimaryWhite;
     } else {
-      return theme.colors.textOnPrimaryLevel0;
+      return colors.textOnPrimaryLevel0;
     }
+  }
+}
+
+class _SelectedErrorIndicator extends StatelessWidget {
+  const _SelectedErrorIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 5,
+      height: double.infinity,
+      color: Theme.of(context).colors.iconsError,
+    );
   }
 }
 
@@ -227,34 +277,6 @@ class _SimpleTreeViewIndentJoint extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class _Error extends StatelessWidget {
-  const _Error();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: VoicesAssets.icons.exclamationCircle.buildIcon(
-        size: 18,
-        color: Theme.of(context).colors.iconsError,
-      ),
-    );
-  }
-}
-
-class _SelectedErrorIndicator extends StatelessWidget {
-  const _SelectedErrorIndicator();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 5,
-      height: double.infinity,
-      color: Theme.of(context).colors.iconsError,
     );
   }
 }
