@@ -514,7 +514,7 @@ class _FavoritesProposalsState extends State<_FavoritesProposals> {
   void _onSelectionChange() {
     if (!widget.controller.indexIsChanging) {
       setState(() {
-        isTabSelected = widget.controller.index == 1;
+        isTabSelected = widget.controller.index == 3;
       });
     }
   }
