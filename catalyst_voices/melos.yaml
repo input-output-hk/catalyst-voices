@@ -146,7 +146,7 @@ command:
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
-      chopper_generator: ^8.0.3
+      chopper_generator: ^8.0.4
       mocktail: ^1.0.1
 
 scripts:
