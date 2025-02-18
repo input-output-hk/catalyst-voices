@@ -10,7 +10,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -22,7 +22,7 @@ const QUERY: &str = include_str!("cql/insert_catalyst_id_for_txn_id.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A transaction hash.
-    txn_id: DbTransactionHash,
+    txn_id: DbTransactionId,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
     /// A slot number.

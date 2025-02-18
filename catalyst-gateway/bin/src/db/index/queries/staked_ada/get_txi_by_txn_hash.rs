@@ -14,7 +14,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbSlot, DbTransactionHash, DbTxnOutputOffset},
+    types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
 };
 
 /// Get TXI query string.
@@ -24,7 +24,7 @@ const GET_TXI_BY_TXN_HASHES_QUERY: &str = include_str!("../cql/get_txi_by_txn_id
 #[derive(SerializeRow)]
 pub(crate) struct GetTxiByTxnHashesQueryParams {
     /// Transaction hashes.
-    txn_ids: Vec<DbTransactionHash>,
+    txn_ids: Vec<DbTransactionId>,
 }
 
 impl GetTxiByTxnHashesQueryParams {
@@ -39,7 +39,7 @@ impl GetTxiByTxnHashesQueryParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetTxiByTxnHashesQuery {
     /// TXI transaction hash.
-    pub txn_id: DbTransactionHash,
+    pub txn_id: DbTransactionId,
     /// TXI original TXO index.
     pub txo: DbTxnOutputOffset,
     /// TXI slot number.

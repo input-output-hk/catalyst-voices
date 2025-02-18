@@ -17,7 +17,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::DbTransactionHash,
+        types::DbTransactionId,
     },
     settings::cassandra_db,
 };
@@ -26,13 +26,13 @@ pub(crate) mod result {
     //! Return values for Catalyst ID For TX ID registration purge queries.
     use scylla::DeserializeRow;
 
-    use crate::db::types::DbTransactionHash;
+    use crate::db::types::DbTransactionId;
 
     /// Primary Key Row
     #[derive(DeserializeRow)]
     pub(crate) struct PrimaryKey {
         /// A transaction hash.
-        pub(crate) txn_id: DbTransactionHash,
+        pub(crate) txn_id: DbTransactionId,
     }
 }
 
@@ -43,7 +43,7 @@ const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_txn_id.cql");
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A transaction hash.
-    pub(crate) txn_id: DbTransactionHash,
+    pub(crate) txn_id: DbTransactionId,
 }
 
 impl Debug for Params {

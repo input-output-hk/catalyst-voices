@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbSlot, DbTransactionHash, DbTxnIndex, DbTxnOutputOffset},
+    types::{DbSlot, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
 };
 
 /// Get txo by stake address query string.
@@ -42,7 +42,7 @@ impl GetTxoByStakeAddressQueryParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetTxoByStakeAddressQuery {
     /// TXO transaction hash.
-    pub txn_id: DbTransactionHash,
+    pub txn_id: DbTransactionId,
     /// TXO transaction index within the slot.
     pub txn_index: DbTxnIndex,
     /// TXO index.

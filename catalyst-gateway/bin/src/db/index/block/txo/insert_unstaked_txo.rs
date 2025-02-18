@@ -8,7 +8,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbTransactionHash, DbTxnIndex, DbTxnOutputOffset},
+        types::{DbSlot, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -21,7 +21,7 @@ const INSERT_UNSTAKED_TXO_QUERY: &str = include_str!("./cql/insert_unstaked_txo.
 #[derive(SerializeRow, Debug)]
 pub(crate) struct Params {
     /// Transactions hash.
-    txn_id: DbTransactionHash,
+    txn_id: DbTransactionId,
     /// Transaction Output Offset inside the transaction.
     txo: DbTxnOutputOffset,
     /// Block Slot Number

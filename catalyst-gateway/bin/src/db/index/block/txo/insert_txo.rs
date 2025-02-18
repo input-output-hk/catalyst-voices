@@ -11,7 +11,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbTransactionHash, DbTxnIndex, DbTxnOutputOffset},
+        types::{DbSlot, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -36,7 +36,7 @@ pub(crate) struct Params {
     /// Actual TXO Value in lovelace
     value: num_bigint::BigInt,
     /// Transactions hash.
-    txn_hash: DbTransactionHash,
+    txn_hash: DbTransactionId,
 }
 
 impl Params {

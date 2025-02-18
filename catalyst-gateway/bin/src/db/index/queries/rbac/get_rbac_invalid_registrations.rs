@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4},
+    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
 };
 
 /// Get invalid registrations by Catalyst ID query.
@@ -31,13 +31,13 @@ pub(crate) struct QueryParams {
 #[derive(DeserializeRow)]
 pub(crate) struct Query {
     /// Registration transaction id.
-    pub txn_id: DbTransactionHash,
+    pub txn_id: DbTransactionId,
     /// A block slot number.
     pub slot_no: DbSlot,
     /// A transaction index.
     pub txn_index: DbTxnIndex,
     /// A previous  transaction id.
-    pub prv_txn_id: Option<DbTransactionHash>,
+    pub prv_txn_id: Option<DbTransactionId>,
     /// A registration purpose.
     pub purpose: Option<DbUuidV4>,
     /// A problem report.

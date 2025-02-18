@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -24,10 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for RBAC 509 invalid registration purge queries.
 
-    use crate::db::types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex};
+    use crate::db::types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbCatalystId, DbTransactionHash, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (DbCatalystId, DbTransactionId, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for RBAC 509 invalid registration.
@@ -39,7 +39,7 @@ pub(crate) struct Params {
     /// A short Catalyst ID.
     pub catalyst_id: DbCatalystId,
     /// A transaction ID.
-    txn_id: DbTransactionHash,
+    txn_id: DbTransactionId,
     /// A block slot number.
     pub slot_no: DbSlot,
     /// A transaction offset inside the block.

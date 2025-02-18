@@ -10,7 +10,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex, DbUuidV4},
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -24,13 +24,13 @@ pub(crate) struct Params {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
     /// A transaction hash of this registration.
-    txn_id: DbTransactionHash,
+    txn_id: DbTransactionId,
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
     txn_index: DbTxnIndex,
     /// A Hash of the previous transaction.
-    prv_txn_id: MaybeUnset<DbTransactionHash>,
+    prv_txn_id: MaybeUnset<DbTransactionId>,
     /// A registration purpose.
     purpose: MaybeUnset<DbUuidV4>,
     /// JSON encoded `ProblemReport`.

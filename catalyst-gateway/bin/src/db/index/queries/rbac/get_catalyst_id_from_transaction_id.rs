@@ -18,12 +18,12 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbSlot, DbTransactionHash, DbTxnIndex},
+    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
 };
 
 /// Cached data.
 #[allow(dead_code)]
-static CACHE: LazyLock<Cache<DbTransactionHash, Query>> = LazyLock::new(|| {
+static CACHE: LazyLock<Cache<DbTransactionId, Query>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .build()
@@ -36,7 +36,7 @@ const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql"
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
     /// A transaction hash.
-    pub(crate) txn_id: DbTransactionHash,
+    pub(crate) txn_id: DbTransactionId,
 }
 
 /// Get Catalyst ID by stake address query.
@@ -79,7 +79,7 @@ impl Query {
     ///
     /// Unless you really know you need an uncached result, use the cached version.
     pub(crate) async fn get_latest_uncached(
-        session: &CassandraSession, txn_id: DbTransactionHash,
+        session: &CassandraSession, txn_id: DbTransactionId,
     ) -> Result<Option<Query>> {
         Self::execute(session, QueryParams { txn_id })
             .await?
@@ -91,7 +91,7 @@ impl Query {
 
     /// Gets the latest Catalyst ID for the given transaction ID.
     pub(crate) async fn get_latest(
-        session: &CassandraSession, transaction_id: DbTransactionHash,
+        session: &CassandraSession, transaction_id: DbTransactionId,
     ) -> Result<Option<Query>> {
         // TODO: Caching is disabled because we want to measure the performance without it and be
         // sure that the logic is sound. Also caches needs to be tunable.

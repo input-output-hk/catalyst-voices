@@ -16,27 +16,27 @@ use scylla::{
 /// A `TransactionHash` wrapper that can be stored to and load from a database.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DbTransactionHash(TransactionHash);
+pub struct DbTransactionId(TransactionHash);
 
-impl Display for DbTransactionHash {
+impl Display for DbTransactionId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("{}", self.0))
     }
 }
 
-impl From<TransactionHash> for DbTransactionHash {
+impl From<TransactionHash> for DbTransactionId {
     fn from(value: TransactionHash) -> Self {
         Self(value)
     }
 }
 
-impl From<DbTransactionHash> for TransactionHash {
-    fn from(value: DbTransactionHash) -> Self {
+impl From<DbTransactionId> for TransactionHash {
+    fn from(value: DbTransactionId) -> Self {
         value.0
     }
 }
 
-impl SerializeValue for DbTransactionHash {
+impl SerializeValue for DbTransactionId {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
@@ -45,7 +45,7 @@ impl SerializeValue for DbTransactionHash {
     }
 }
 
-impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbTransactionHash {
+impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbTransactionId {
     fn type_check(typ: &ColumnType) -> Result<(), TypeCheckError> {
         <Vec<u8>>::type_check(typ)
     }

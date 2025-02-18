@@ -13,7 +13,7 @@ use crate::{
             queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
-        types::{DbSlot, DbTransactionHash, DbTxnOutputOffset},
+        types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -22,7 +22,7 @@ use crate::{
 #[derive(SerializeRow, Debug)]
 pub(crate) struct TxiInsertParams {
     /// Spent Transactions Hash
-    txn_id: DbTransactionHash,
+    txn_id: DbTransactionId,
     /// TXO Index spent.
     txo: DbTxnOutputOffset,
     /// Block Slot Number when spend occurred.

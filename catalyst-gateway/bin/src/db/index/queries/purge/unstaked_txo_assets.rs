@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbTransactionHash, DbTxnOutputOffset},
+        types::{DbTransactionId, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -24,11 +24,11 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXO Assets by TXN Hash purge queries.
 
-    use crate::db::types::{DbTransactionHash, DbTxnOutputOffset};
+    use crate::db::types::{DbTransactionId, DbTxnOutputOffset};
 
     /// Primary Key Row
     pub(crate) type PrimaryKey = (
-        DbTransactionHash,
+        DbTransactionId,
         DbTxnOutputOffset,
         Vec<u8>,
         Vec<u8>,
@@ -43,7 +43,7 @@ const SELECT_QUERY: &str = include_str!("./cql/get_unstaked_txo_assets_by_txn_ha
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// 32 byte hash of this transaction.
-    pub(crate) txn_id: DbTransactionHash,
+    pub(crate) txn_id: DbTransactionId,
     /// Offset in the txo list of the transaction the txo is in.
     pub(crate) txo: DbTxnOutputOffset,
     /// Asset Policy Hash - Binary 28 bytes.
