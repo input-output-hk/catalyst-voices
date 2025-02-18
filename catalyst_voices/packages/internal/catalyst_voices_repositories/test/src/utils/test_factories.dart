@@ -4,6 +4,28 @@ import 'package:catalyst_voices_repositories/src/database/database.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:uuid/uuid.dart';
 
+abstract final class DocumentRefFactory {
+  static SignedDocumentRef buildSigned({
+    String? id,
+    String? version,
+  }) {
+    return SignedDocumentRef(
+      id: id ?? const Uuid().v7(),
+      version: version ?? const Uuid().v7(),
+    );
+  }
+
+  static DraftRef buildDraft({
+    String? id,
+    String? version,
+  }) {
+    return DraftRef(
+      id: id ?? const Uuid().v7(),
+      version: version ?? const Uuid().v7(),
+    );
+  }
+}
+
 abstract final class DocumentWithMetadataFactory {
   static DocumentEntityWithMetadata build({
     DocumentDataContent? content,
@@ -41,8 +63,7 @@ abstract final class DocumentFactory {
 
     metadata ??= DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      id: const Uuid().v7(),
-      version: const Uuid().v7(),
+      selfRef: DocumentRefFactory.buildSigned(),
     );
 
     final id = UuidHiLo.from(metadata.id);
@@ -90,8 +111,7 @@ abstract final class DraftFactory {
 
     metadata ??= DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      id: const Uuid().v7(),
-      version: const Uuid().v7(),
+      selfRef: DocumentRefFactory.buildDraft(),
     );
 
     title ??= 'Draft[${metadata.id}] title';
@@ -115,16 +135,14 @@ abstract final class DraftFactory {
 abstract final class DocumentDataFactory {
   static DocumentData build({
     DocumentType type = DocumentType.proposalDocument,
-    String? id,
-    String? version,
+    DocumentRef? selfRef,
     DocumentRef? template,
     DocumentDataContent content = const DocumentDataContent({}),
   }) {
     return DocumentData(
       metadata: DocumentDataMetadata(
         type: type,
-        id: id ?? const Uuid().v7(),
-        version: version ?? const Uuid().v7(),
+        selfRef: selfRef ?? DocumentRefFactory.buildSigned(),
         template: template,
       ),
       content: content,
