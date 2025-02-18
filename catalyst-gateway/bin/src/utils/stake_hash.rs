@@ -23,18 +23,19 @@ pub fn stake_hash(network: Network, is_script: bool, hash: &Hash<28>) -> Vec<u8>
 mod tests {
     use super::*;
 
+    #[allow(clippy::indexing_slicing)]
     #[test]
     fn test_stake_hash() {
         let hash: Hash<28> = "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
             .parse()
             .unwrap();
         let test_data = [
-            (Network::Mainnet, true, hash, 0b11100001),
-            (Network::Mainnet, false, hash, 0b11110001),
-            (Network::Preprod, true, hash, 0b11100000),
-            (Network::Preprod, false, hash, 0b11110000),
-            (Network::Preview, true, hash, 0b11100000),
-            (Network::Preview, false, hash, 0b11110000),
+            (Network::Mainnet, true, hash, 0b1110_0001),
+            (Network::Mainnet, false, hash, 0b1111_0001),
+            (Network::Preprod, true, hash, 0b1110_0000),
+            (Network::Preprod, false, hash, 0b1111_0000),
+            (Network::Preview, true, hash, 0b1110_0000),
+            (Network::Preview, false, hash, 0b1111_0000),
         ];
 
         for (network, is_script, hash, expected_header) in test_data {
@@ -45,13 +46,13 @@ mod tests {
                 "Invalid length for {network} {is_script}"
             );
             assert_eq!(
-                stake_hash.get(1..).unwrap(),
+                &stake_hash[1..],
                 hash.as_ref(),
                 "Invalid hash for {network} {is_script}"
             );
             assert_eq!(
                 expected_header,
-                *stake_hash.get(0).unwrap(),
+                *stake_hash.first().unwrap(),
                 "Invalid header for {network} {is_script}"
             );
         }
