@@ -21,12 +21,8 @@ final class DocumentData extends Equatable {
     required this.content,
   });
 
-  DocumentRef get ref {
-    return DocumentRef(
-      id: metadata.id,
-      version: metadata.version,
-    );
-  }
+  /// Syntax sugar. Should use [DocumentDataMetadata.selfRef].
+  DocumentRef get ref => metadata.selfRef;
 
   @override
   List<Object?> get props => [
