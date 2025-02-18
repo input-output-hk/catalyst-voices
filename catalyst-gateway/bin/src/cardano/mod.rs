@@ -187,10 +187,7 @@ impl SyncParams {
             // Update sync status in the Immutable DB.
             // Can fire and forget, because failure to update DB will simply cause the chunk to be
             // re-indexed, on recovery.
-            update_sync_status(
-                self.end.slot_or_default().into(),
-                self.start.slot_or_default().into(),
-            );
+            update_sync_status(self.end.slot_or_default(), self.start.slot_or_default());
         }
 
         let mut done = self.clone();
@@ -485,7 +482,7 @@ impl SyncTask {
                 );
 
                 if let Some((first_point, last_point)) =
-                    self.get_syncable_range(self.start_slot.into(), end_slot.into())
+                    self.get_syncable_range(self.start_slot, end_slot)
                 {
                     self.sync_tasks.push(sync_subchain(SyncParams::new(
                         self.cfg.chain,
@@ -528,20 +525,17 @@ impl SyncTask {
                 // It is not a problem to sync the same data mutiple times, so for simplicity we do
                 // not account for this, if the requested range goes beyond the sync
                 // block it starts within we assume that the rest is not synced.
-                return Some((
-                    Point::fuzzy(sync_block.end_slot.into()),
-                    Point::fuzzy(end.into()),
-                ));
+                return Some((Point::fuzzy(sync_block.end_slot), Point::fuzzy(end)));
             }
         }
 
         let start_slot = if start == 0.into() {
             Point::ORIGIN
         } else {
-            Point::fuzzy(start.into())
+            Point::fuzzy(start)
         };
 
-        Some((start_slot, Point::fuzzy(end.into())))
+        Some((start_slot, Point::fuzzy(end)))
     }
 }
 
