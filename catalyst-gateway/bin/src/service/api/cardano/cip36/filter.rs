@@ -6,7 +6,7 @@ use dashmap::DashMap;
 use futures::StreamExt;
 use poem_openapi::types::Example;
 use rayon::prelude::*;
-use tracing::{debug, error};
+use tracing::error;
 
 use super::{
     cardano::{
@@ -487,7 +487,7 @@ pub async fn get_all_registrations(
         let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address.clone()) {
             Ok(payment_addr) => Some(payment_addr.clone()),
             Err(err) => {
-                debug!(
+                error!(
                     "Valid registration is not a valid cip19 shelley {:?} {:?}",
                     row.payment_address, err
                 );
@@ -547,7 +547,7 @@ async fn get_all_invalid_registrations(
         let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address.clone()) {
             Ok(payment_addr) => Some(payment_addr.clone()),
             Err(err) => {
-                debug!(
+                error!(
                     "Invalid registration is not a valid cip19 shelley {:?} {:?}",
                     row.payment_address, err
                 );
