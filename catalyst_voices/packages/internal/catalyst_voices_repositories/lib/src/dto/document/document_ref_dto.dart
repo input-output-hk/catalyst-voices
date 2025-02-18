@@ -12,7 +12,7 @@ final class DocumentRefDto {
   @JsonKey(unknownEnumValue: DocumentRefDtoType.signed)
   final DocumentRefDtoType type;
 
-  DocumentRefDto({
+  const DocumentRefDto({
     required this.id,
     this.version,
     required this.type,
@@ -50,7 +50,7 @@ final class SecuredDocumentRefDto {
   final DocumentRefDto ref;
   final String hash;
 
-  SecuredDocumentRefDto({
+  const SecuredDocumentRefDto({
     required this.ref,
     required this.hash,
   });

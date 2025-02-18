@@ -102,7 +102,7 @@ abstract final class DocumentMetadataFactory {
 }
 
 abstract final class DraftFactory {
-  static DraftEntity build({
+  static DocumentDraftEntity build({
     DocumentDataContent? content,
     DocumentDataMetadata? metadata,
     String? title,
@@ -119,7 +119,7 @@ abstract final class DraftFactory {
     final id = UuidHiLo.from(metadata.id);
     final ver = UuidHiLo.from(metadata.version);
 
-    return DraftEntity(
+    return DocumentDraftEntity(
       idHi: id.high,
       idLo: id.low,
       verHi: ver.high,

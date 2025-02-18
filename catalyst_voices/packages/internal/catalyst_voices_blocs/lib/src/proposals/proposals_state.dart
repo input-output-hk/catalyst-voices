@@ -1,27 +1,67 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// The state of available proposals.
-sealed class ProposalsState extends Equatable {
-  const ProposalsState();
-}
+class ProposalsState extends Equatable {
+  final ProposalPaginationItems<ProposalViewModel> draftProposals;
+  final ProposalPaginationItems<ProposalViewModel> finalProposals;
+  final ProposalPaginationItems<ProposalViewModel> favoriteProposals;
+  final ProposalPaginationItems<ProposalViewModel> userProposals;
+  final ProposalPaginationItems<ProposalViewModel> allProposals;
+  final List<String> favoritesIds;
+  final List<String> myProposalsIds;
+  final List<CampaignCategoryViewModel> categories;
+  final String? selectedCategoryId;
 
-/// The proposals are loading.
-final class LoadingProposalsState extends ProposalsState {
-  const LoadingProposalsState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-/// The loaded proposals.
-final class LoadedProposalsState extends ProposalsState {
-  final List<ProposalViewModel> proposals;
-
-  const LoadedProposalsState({
-    this.proposals = const [],
+  const ProposalsState({
+    this.draftProposals = const ProposalPaginationItems(),
+    this.finalProposals = const ProposalPaginationItems(),
+    this.favoriteProposals = const ProposalPaginationItems(),
+    this.userProposals = const ProposalPaginationItems(),
+    this.allProposals = const ProposalPaginationItems(),
+    this.favoritesIds = const [],
+    this.myProposalsIds = const [],
+    this.categories = const [],
+    this.selectedCategoryId,
   });
 
+  ProposalsState copyWith({
+    ProposalPaginationItems<ProposalViewModel>? draftProposals,
+    ProposalPaginationItems<ProposalViewModel>? finalProposals,
+    ProposalPaginationItems<ProposalViewModel>? favoriteProposals,
+    ProposalPaginationItems<ProposalViewModel>? userProposals,
+    ProposalPaginationItems<ProposalViewModel>? allProposals,
+    List<String>? favoritesIds,
+    List<String>? myProposalsIds,
+    List<CampaignCategoryViewModel>? categories,
+    Optional<String>? selectedCategoryId,
+  }) {
+    return ProposalsState(
+      draftProposals: draftProposals ?? this.draftProposals,
+      finalProposals: finalProposals ?? this.finalProposals,
+      favoriteProposals: favoriteProposals ?? this.favoriteProposals,
+      userProposals: userProposals ?? this.userProposals,
+      allProposals: allProposals ?? this.allProposals,
+      favoritesIds: favoritesIds ?? this.favoritesIds,
+      myProposalsIds: myProposalsIds ?? this.myProposalsIds,
+      categories: categories ?? this.categories,
+      selectedCategoryId: selectedCategoryId.dataOr(
+        this.selectedCategoryId,
+      ),
+    );
+  }
+
   @override
-  List<Object?> get props => [proposals];
+  List<Object?> get props => [
+        draftProposals,
+        finalProposals,
+        favoriteProposals,
+        userProposals,
+        allProposals,
+        favoritesIds,
+        myProposalsIds,
+        categories,
+        selectedCategoryId,
+      ];
 }
