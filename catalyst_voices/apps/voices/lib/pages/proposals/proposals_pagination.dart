@@ -19,6 +19,7 @@ class ProposalsPagination extends StatefulWidget {
   final bool userProposals;
   final bool usersFavorite;
   final String? categoryId;
+  final String? searchValue;
   final bool shouldReload;
 
   const ProposalsPagination(
@@ -32,6 +33,7 @@ class ProposalsPagination extends StatefulWidget {
     this.usersFavorite = false,
     this.categoryId,
     this.shouldReload = false,
+    this.searchValue,
   });
 
   @override
@@ -84,6 +86,9 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
       _handleItemListChange();
     }
     if (oldWidget.categoryId != widget.categoryId) {
+      _pagingController.notifyPageRequestListeners(0);
+    }
+    if (oldWidget.searchValue != widget.searchValue) {
       _pagingController.notifyPageRequestListeners(0);
     }
     if (widget.isEmpty == true) {

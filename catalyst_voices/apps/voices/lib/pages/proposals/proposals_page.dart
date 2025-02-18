@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/pages/proposals/proposals_pagination.dart';
+import 'package:catalyst_voices/pages/proposals/search_input_field.dart';
 import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -30,6 +31,7 @@ typedef _ProposalsCount = ({
 typedef _ProposalsTabSelector = ({
   ProposalPaginationItems<ProposalViewModel> items,
   String? selectedCategoryId,
+  String? searchValue,
 });
 
 typedef _FavoritesTabSelector = ({
@@ -154,33 +156,15 @@ class _Controls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+    return const Padding(
+      padding: EdgeInsets.only(bottom: 8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _ChangeCategoryButtonSelector(),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 250,
-            child: VoicesTextField(
-              onFieldSubmitted: (_) {},
-              decoration: VoicesTextFieldDecoration(
-                prefixIcon: VoicesAssets.icons.search.buildIcon(),
-                hintText: context.l10n.searchProposals,
-                filled: true,
-                fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
-                suffixIcon: Offstage(
-                  offstage: false,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text(context.l10n.clear),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _ChangeCategoryButtonSelector(),
+          SizedBox(width: 8),
+          SearchInputField(),
         ],
       ),
     );
@@ -377,6 +361,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                   return (
                     items: state.allProposals,
                     selectedCategoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
@@ -386,6 +371,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                     state.items.maxResults,
                     isEmpty: state.items.isEmpty,
                     categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
               ),
@@ -395,6 +381,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                   return (
                     items: state.draftProposals,
                     selectedCategoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
@@ -404,6 +391,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                     state.items.maxResults,
                     isEmpty: state.items.isEmpty,
                     categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                     stage: ProposalPublish.draft,
                   );
                 },
@@ -414,6 +402,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                   return (
                     items: state.finalProposals,
                     selectedCategoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
@@ -423,6 +412,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                     state.items.maxResults,
                     isEmpty: state.items.isEmpty,
                     categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                     stage: ProposalPublish.published,
                   );
                 },
@@ -434,6 +424,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                   return (
                     items: state.userProposals,
                     selectedCategoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
@@ -443,6 +434,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
                     state.items.maxResults,
                     isEmpty: state.items.isEmpty,
                     categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                     userProposals: true,
                   );
                 },

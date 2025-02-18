@@ -51,7 +51,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     if (campaign == null) {
       return;
     }
-
+    print('get proposals');
     final proposals = await _proposalService.getProposals(
       request: request,
     );
@@ -167,6 +167,11 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
   void changeSelectedCategory(String? categoryId) {
     emit(state.copyWith(selectedCategoryId: Optional(categoryId)));
+  }
+
+  void changeSearchValue(String searchValue) {
+    final nullableSearchValue = searchValue.isEmpty ? null : searchValue;
+    emit(state.copyWith(searchValue: Optional(nullableSearchValue)));
   }
 
   // TODO(LynxLynxx): to mock data. remove after implementing db
