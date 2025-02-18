@@ -1514,5 +1514,33 @@
   "startProposal": "Start Proposal",
   "editRolesDialogTitle": "Editing Roles",
   "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
-  "continueText": "Continue"
+  "continueText": "Continue",
+  "proposalEditorStatusDropdownBackTitle": "Back to Proposal Index",
+  "@proposalEditorStatusDropdownBackTitle": {
+    "description": "Action title to navigate back to the proposal index."
+  },
+  "proposalEditorStatusDropdownPublishTitle": "Publish as new iteration · Draft",
+  "@proposalEditorStatusDropdownPublishTitle": {
+    "description": "Action title to publish a new version of the draft proposal."
+  },
+  "proposalEditorStatusDropdownPublishDescription": "Update proposal iteration as a public draft",
+  "@proposalEditorStatusDropdownPublishDescription": {
+    "description": "Action description to publish a new version of the draft proposal."
+  },
+  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Final",
+  "@proposalEditorStatusDropdownSubmitTitle": {
+    "description": "Action title to submit the final proposal."
+  },
+  "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
+  "@proposalEditorStatusDropdownSubmitDescription": {
+    "description": "Action description to submit the final proposal."
+  },
+  "proposalEditorStatusDropdownShareTitle": "Share Proposal",
+  "@proposalEditorStatusDropdownShareTitle": {
+    "description": "Action title to share a proposal."
+  },
+  "proposalEditorStatusDropdownExportTitle": "Export Proposal",
+  "@proposalEditorStatusDropdownExportTitle": {
+    "description": "Action title to export a proposal as a file."
+  }
 }

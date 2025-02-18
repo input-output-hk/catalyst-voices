@@ -30,6 +30,100 @@ final class ProposalBuilderBloc
       transformer: uniqueEvents(),
     );
     on<SectionChangedEvent>(_handleSectionChangedEvent);
+    on<DeleteProposalEvent>(_deleteProposal);
+    on<ExportProposalEvent>(_exportProposal);
+    on<ShareProposalEvent>(_shareProposal);
+    on<PublishProposalEvent>(_publishProposal);
+    on<SubmitProposalEvent>(_submitProposal);
+  }
+
+  Future<void> _deleteProposal(
+    DeleteProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    // TODO(dtscalac): handle event
+  }
+
+  Future<void> _exportProposal(
+    ExportProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    // TODO(dtscalac): handle event
+  }
+
+  Iterable<ProposalGuidanceItem> _findGuidanceItems(
+    ProposalBuilderSegment segment,
+    ProposalBuilderSection section,
+    DocumentProperty property,
+  ) sync* {
+    final guidance = property.schema.guidance;
+    if (guidance != null) {
+      yield ProposalGuidanceItem(
+        segmentTitle: segment.schema.title,
+        sectionTitle: section.schema.title,
+        description: guidance,
+      );
+    }
+
+    switch (property) {
+      case DocumentListProperty():
+        for (final childProperty in property.properties) {
+          yield* _findGuidanceItems(segment, section, childProperty);
+        }
+      case DocumentObjectProperty():
+        for (final childProperty in property.properties) {
+          yield* _findGuidanceItems(segment, section, childProperty);
+        }
+      case DocumentValueProperty():
+      // do nothing, values don't have children
+    }
+  }
+
+  Iterable<DocumentProperty> _findSectionsAndSubsections(
+    DocumentProperty property,
+  ) sync* {
+    if (property.schema.isSectionOrSubsection) {
+      yield property;
+    }
+
+    switch (property) {
+      case DocumentListProperty():
+        for (final childProperty in property.properties) {
+          yield* _findSectionsAndSubsections(childProperty);
+        }
+      case DocumentObjectProperty():
+        for (final childProperty in property.properties) {
+          yield* _findSectionsAndSubsections(childProperty);
+        }
+      case DocumentValueProperty():
+      // value property doesn't have children
+    }
+  }
+
+  ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
+    if (nodeId == null) {
+      return const ProposalGuidance(isNoneSelected: true);
+    } else {
+      final segment =
+          state.segments.firstWhereOrNull((e) => nodeId.isChildOf(e.id));
+      final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
+
+      return _getGuidanceForSection(segment, section);
+    }
+  }
+
+  ProposalGuidance _getGuidanceForSection(
+    ProposalBuilderSegment? segment,
+    ProposalBuilderSection? section,
+  ) {
+    if (segment == null || section == null) {
+      return const ProposalGuidance();
+    } else {
+      return ProposalGuidance(
+        guidanceList:
+            _findGuidanceItems(segment, section, section.property).toList(),
+      );
+    }
   }
 
   void _handleActiveNodeChangedEvent(
@@ -90,42 +184,6 @@ final class ProposalBuilderBloc
     );
   }
 
-  Future<void> _loadProposalTemplate(
-    LoadProposalTemplateEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    await _loadDocument(
-      documentBuilderGetter: () async {
-        _logger.info('Loading proposal template[${event.id}]');
-
-        final ref = SignedDocumentRef(id: event.id);
-        final proposalTemplate = await _proposalService.getProposalTemplate(
-          ref: ref,
-        );
-
-        return DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
-      },
-      emit: emit,
-    );
-  }
-
-  Future<void> _loadProposal(
-    LoadProposalEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    await _loadDocument(
-      documentBuilderGetter: () async {
-        _logger.info('Loading proposal[${event.id}]');
-
-        final proposal = await _proposalService.getProposal(id: event.id);
-        final document = proposal.document.document;
-
-        return DocumentBuilder.fromDocument(document);
-      },
-      emit: emit,
-    );
-  }
-
   Future<void> _loadDocument({
     required AsyncValueGetter<DocumentBuilder> documentBuilderGetter,
     required Emitter<ProposalBuilderState> emit,
@@ -167,6 +225,42 @@ final class ProposalBuilderBloc
     }
   }
 
+  Future<void> _loadProposal(
+    LoadProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    await _loadDocument(
+      documentBuilderGetter: () async {
+        _logger.info('Loading proposal[${event.id}]');
+
+        final proposal = await _proposalService.getProposal(id: event.id);
+        final document = proposal.document.document;
+
+        return DocumentBuilder.fromDocument(document);
+      },
+      emit: emit,
+    );
+  }
+
+  Future<void> _loadProposalTemplate(
+    LoadProposalTemplateEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    await _loadDocument(
+      documentBuilderGetter: () async {
+        _logger.info('Loading proposal template[${event.id}]');
+
+        final ref = SignedDocumentRef(id: event.id);
+        final proposalTemplate = await _proposalService.getProposalTemplate(
+          ref: ref,
+        );
+
+        return DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
+      },
+      emit: emit,
+    );
+  }
+
   List<ProposalBuilderSegment> _mapDocumentToSegments(
     Document document,
     bool showValidationErrors,
@@ -196,78 +290,42 @@ final class ProposalBuilderBloc
     }).toList();
   }
 
-  Iterable<DocumentProperty> _findSectionsAndSubsections(
-    DocumentProperty property,
-  ) sync* {
-    if (property.schema.isSectionOrSubsection) {
-      yield property;
-    }
+  Future<void> _publishProposal(
+    PublishProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final documentBuilder = _documentBuilder;
+    assert(documentBuilder != null, 'DocumentBuilder not initialized');
+    final document = documentBuilder!.build();
 
-    switch (property) {
-      case DocumentListProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentObjectProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentValueProperty():
-      // value property doesn't have children
-    }
-  }
-
-  ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
-    if (nodeId == null) {
-      return const ProposalGuidance(isNoneSelected: true);
+    if (document.isValid) {
+      emit(state.copyWith(showValidationErrors: false));
+      // TODO(dtscalac): handle event
     } else {
-      final segment =
-          state.segments.firstWhereOrNull((e) => nodeId.isChildOf(e.id));
-      final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
-
-      return _getGuidanceForSection(segment, section);
+      emit(state.copyWith(showValidationErrors: true));
     }
   }
 
-  ProposalGuidance _getGuidanceForSection(
-    ProposalBuilderSegment? segment,
-    ProposalBuilderSection? section,
-  ) {
-    if (segment == null || section == null) {
-      return const ProposalGuidance();
+  Future<void> _shareProposal(
+    ShareProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    // TODO(dtscalac): handle event
+  }
+
+  Future<void> _submitProposal(
+    SubmitProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final documentBuilder = _documentBuilder;
+    assert(documentBuilder != null, 'DocumentBuilder not initialized');
+    final document = documentBuilder!.build();
+
+    if (document.isValid) {
+      emit(state.copyWith(showValidationErrors: false));
+      // TODO(dtscalac): handle event
     } else {
-      return ProposalGuidance(
-        guidanceList:
-            _findGuidanceItems(segment, section, section.property).toList(),
-      );
-    }
-  }
-
-  Iterable<ProposalGuidanceItem> _findGuidanceItems(
-    ProposalBuilderSegment segment,
-    ProposalBuilderSection section,
-    DocumentProperty property,
-  ) sync* {
-    final guidance = property.schema.guidance;
-    if (guidance != null) {
-      yield ProposalGuidanceItem(
-        segmentTitle: segment.schema.title,
-        sectionTitle: section.schema.title,
-        description: guidance,
-      );
-    }
-
-    switch (property) {
-      case DocumentListProperty():
-        for (final childProperty in property.properties) {
-          yield* _findGuidanceItems(segment, section, childProperty);
-        }
-      case DocumentObjectProperty():
-        for (final childProperty in property.properties) {
-          yield* _findGuidanceItems(segment, section, childProperty);
-        }
-      case DocumentValueProperty():
-      // do nothing, values don't have children
+      emit(state.copyWith(showValidationErrors: true));
     }
   }
 }

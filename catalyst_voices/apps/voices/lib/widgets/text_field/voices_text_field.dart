@@ -8,6 +8,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// A callback called to validate the input of the [VoicesTextField].
+///
+/// This callback returns a [VoicesTextFieldValidationResult] which defines
+/// both the message to be shown where the [VoicesTextFieldDecoration.errorText]
+/// is traditionally shown and as well the status which might decorate
+/// the text field with success checkmark or error icon depending on the status.
+typedef VoicesTextFieldValidator = VoicesTextFieldValidationResult Function(
+  String value,
+);
+
 /// A replacement for [TextField] and [TextFormField]
 /// that is pre-configured to use Project Catalyst theming.
 ///
@@ -203,11 +213,120 @@ class VoicesTextField extends VoicesFormField<String> {
   VoicesFormFieldState<String> createState() => VoicesTextFieldState();
 }
 
+/// A replacement for [InputDecoration] to only expose parameters
+/// that are supported by [VoicesTextField].
+class VoicesTextFieldDecoration {
+  /// [InputDecoration.border].
+  final InputBorder? border;
+
+  /// [InputDecoration.enabledBorder].
+  final InputBorder? enabledBorder;
+
+  /// [InputDecoration.disabledBorder].
+  final InputBorder? disabledBorder;
+
+  /// [InputDecoration.errorBorder].
+  final InputBorder? errorBorder;
+
+  /// [InputDecoration.focusedBorder].
+  final InputBorder? focusedBorder;
+
+  /// [InputDecoration.focusedErrorBorder].
+  final InputBorder? focusedErrorBorder;
+
+  /// Similar to the [InputDecoration.labelText] but does not use
+  /// the floating behavior and is instead above the text field instead.
+  final String? labelText;
+
+  /// [InputDecoration.helper].
+  final Widget? helper;
+
+  /// [InputDecoration.helperText].
+  final String? helperText;
+
+  /// [InputDecoration.hintText].
+  final String? hintText;
+
+  /// [InputDecoration.hintStyle].
+  final TextStyle? hintStyle;
+
+  /// [InputDecoration.errorText].
+  final String? errorText;
+
+  /// [InputDecoration.errorStyle]
+  final TextStyle? errorStyle;
+
+  /// [InputDecoration.errorMaxLines].
+  final int? errorMaxLines;
+
+  /// [InputDecoration.prefixIcon].
+  final Widget? prefixIcon;
+
+  /// [InputDecoration.prefixText].
+  final String? prefixText;
+
+  /// [InputDecoration.suffixIcon].
+  final Widget? suffixIcon;
+
+  /// [InputDecoration.suffixText].
+  final String? suffixText;
+
+  /// [InputDecoration.counterText].
+  final String? counterText;
+
+  /// Whether the [VoicesTextField] will automatically
+  /// add a status [suffixIcon] based on the results of the validation.
+  final bool showStatusSuffixIcon;
+
+  /// [InputDecoration.filled].
+  final bool? filled;
+
+  /// [InputDecoration.fillColor].
+  final Color? fillColor;
+
+  /// Creates a new text field decoration.
+  const VoicesTextFieldDecoration({
+    this.border,
+    this.enabledBorder,
+    this.disabledBorder,
+    this.errorBorder,
+    this.focusedBorder,
+    this.focusedErrorBorder,
+    this.labelText,
+    this.helper,
+    this.helperText,
+    this.hintText,
+    this.hintStyle,
+    this.errorText,
+    this.errorStyle,
+    this.errorMaxLines,
+    this.prefixIcon,
+    this.prefixText,
+    this.suffixIcon,
+    this.suffixText,
+    this.counterText,
+    this.showStatusSuffixIcon = true,
+    this.filled = true,
+    this.fillColor,
+  });
+}
+
 class VoicesTextFieldState extends VoicesFormFieldState<String> {
   TextEditingController? _customController;
 
   VoicesTextFieldValidationResult _validation =
       const VoicesTextFieldValidationResult.none();
+
+  @override
+  VoicesTextField get widget => super.widget as VoicesTextField;
+
+  bool get _isResizableByDefault {
+    return CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop;
+  }
+
+  bool get _isResizableHorizontally {
+    return widget.resizableHorizontally;
+  }
 
   bool get _isResizableVertically {
     final resizable = widget.resizableVertically ?? _isResizableByDefault;
@@ -220,27 +339,32 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     return resizable && hasNoLineConstraints;
   }
 
-  bool get _isResizableHorizontally {
-    return widget.resizableHorizontally;
+  @override
+  Widget build(BuildContext context) {
+    // Validating in build(), similar workaround is done in the
+    // original FormField build method to make sure validation
+    // errors are shown when needed.
+    if (widget.enabled) {
+      _validateIfValidationModeAllows(_obtainController().text);
+    }
+
+    return super.build(context);
   }
 
-  bool get _isResizableByDefault {
-    return CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop;
+  /// Clears the text field.
+  void clear() {
+    didChange(null);
+    widget.onChanged?.call(null);
   }
 
   @override
-  VoicesTextField get widget => super.widget as VoicesTextField;
+  void didChange(String? value) {
+    super.didChange(value);
 
-  @override
-  void initState() {
-    super.initState();
-
-    final text = widget.initialText ?? widget.controller?.text ?? '';
-    setValue(text);
-
-    _obtainController()
-      ..textWithSelection = text
-      ..addListener(_handleControllerChanged);
+    final controller = _obtainController();
+    if (controller.text != value) {
+      controller.textWithSelection = value ?? '';
+    }
   }
 
   @override
@@ -275,20 +399,34 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     super.dispose();
   }
 
-  @override
-  bool validate() {
-    _validate(_obtainController().text);
-    return super.validate();
+  Widget? getStatusSuffixIcon({required Color color}) {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return null;
+      case VoicesTextFieldStatus.success:
+        return VoicesAssets.icons.checkCircle.buildIcon(
+          color: color,
+          fit: BoxFit.scaleDown,
+        );
+      case VoicesTextFieldStatus.warning:
+        // TODO(dtscalac): this is not the right icon, it should be outlined
+        // & rounded, ask designers to provide it and update it
+        return Icon(Icons.warning_outlined, color: color);
+      case VoicesTextFieldStatus.error:
+        return Icon(Icons.error_outline, color: color);
+    }
   }
 
   @override
-  void didChange(String? value) {
-    super.didChange(value);
+  void initState() {
+    super.initState();
 
-    final controller = _obtainController();
-    if (controller.text != value) {
-      controller.textWithSelection = value ?? '';
-    }
+    final text = widget.initialText ?? widget.controller?.text ?? '';
+    setValue(text);
+
+    _obtainController()
+      ..textWithSelection = text
+      ..addListener(_handleControllerChanged);
   }
 
   @override
@@ -301,22 +439,10 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     widget.onChanged?.call(_obtainController().text);
   }
 
-  /// Clears the text field.
-  void clear() {
-    didChange(null);
-    widget.onChanged?.call(null);
-  }
-
   @override
-  Widget build(BuildContext context) {
-    // Validating in build(), similar workaround is done in the
-    // original FormField build method to make sure validation
-    // errors are shown when needed.
-    if (widget.enabled) {
-      _validateIfValidationModeAllows(_obtainController().text);
-    }
-
-    return super.build(context);
+  bool validate() {
+    _validate(_obtainController().text);
+    return super.validate();
   }
 
   InputDecoration _buildDecoration() {
@@ -453,12 +579,37 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     }
   }
 
+  TextStyle? _getErrorStyle(TextTheme textTheme, ThemeData theme) {
+    if (widget.decoration?.errorStyle != null) {
+      return widget.decoration?.errorStyle;
+    }
+
+    return widget.enabled
+        ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
+        : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
+  }
+
   TextStyle? _getHintStyle(
     TextTheme textTheme,
     ThemeData theme, {
     TextStyle? orDefault,
   }) =>
       widget.decoration?.hintStyle ?? orDefault;
+
+  Color _getStatusColor({required Color orDefault}) {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return orDefault;
+      case VoicesTextFieldStatus.success:
+        return Theme.of(context).colors.success;
+      case VoicesTextFieldStatus.warning:
+        return Theme.of(context).colors.warning;
+      case VoicesTextFieldStatus.error:
+        return widget.enabled
+            ? Theme.of(context).colorScheme.error
+            : Colors.transparent;
+    }
+  }
 
   Widget? _getStatusSuffixWidget() {
     final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
@@ -471,21 +622,47 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     );
   }
 
-  Widget? getStatusSuffixIcon({required Color color}) {
-    switch (_validation.status) {
-      case VoicesTextFieldStatus.none:
-        return null;
-      case VoicesTextFieldStatus.success:
-        return VoicesAssets.icons.checkCircle.buildIcon(
-          color: color,
-          fit: BoxFit.scaleDown,
-        );
-      case VoicesTextFieldStatus.warning:
-        // TODO(dtscalac): this is not the right icon, it should be outlined
-        // & rounded, ask designers to provide it and update it
-        return Icon(Icons.warning_outlined, color: color);
-      case VoicesTextFieldStatus.error:
-        return Icon(Icons.error_outline, color: color);
+  void _handleControllerChanged() {
+    final text = _obtainController().text;
+    if (value != text) {
+      setValue(text);
+    }
+  }
+
+  TextEditingController _obtainController() {
+    final providedController = widget.controller;
+    if (providedController != null) {
+      return providedController;
+    }
+
+    var customController = _customController;
+    if (customController == null) {
+      final textValue =
+          TextEditingValueExt.collapsedAtEndOf(widget.initialText ?? '');
+
+      customController = TextEditingController.fromValue(textValue);
+      _customController = customController;
+    }
+
+    return customController;
+  }
+
+  void _validate(String? value) {
+    final result = widget.textValidator?.call(value ?? '');
+    _validation = result ?? const VoicesTextFieldValidationResult.none();
+  }
+
+  void _validateIfValidationModeAllows(String? value) {
+    switch (widget.autovalidateMode) {
+      case AutovalidateMode.disabled:
+      case AutovalidateMode.onUnfocus:
+        _validation = const VoicesTextFieldValidationResult.none();
+      case AutovalidateMode.always:
+        _validate(value);
+      case AutovalidateMode.onUserInteraction:
+        if (hasInteractedByUser) {
+          _validate(value);
+        }
     }
   }
 
@@ -539,86 +716,25 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       ),
     );
   }
-
-  Color _getStatusColor({required Color orDefault}) {
-    switch (_validation.status) {
-      case VoicesTextFieldStatus.none:
-        return orDefault;
-      case VoicesTextFieldStatus.success:
-        return Theme.of(context).colors.success;
-      case VoicesTextFieldStatus.warning:
-        return Theme.of(context).colors.warning;
-      case VoicesTextFieldStatus.error:
-        return widget.enabled
-            ? Theme.of(context).colorScheme.error
-            : Colors.transparent;
-    }
-  }
-
-  TextEditingController _obtainController() {
-    final providedController = widget.controller;
-    if (providedController != null) {
-      return providedController;
-    }
-
-    var customController = _customController;
-    if (customController == null) {
-      final textValue =
-          TextEditingValueExt.collapsedAtEndOf(widget.initialText ?? '');
-
-      customController = TextEditingController.fromValue(textValue);
-      _customController = customController;
-    }
-
-    return customController;
-  }
-
-  TextStyle? _getErrorStyle(TextTheme textTheme, ThemeData theme) {
-    if (widget.decoration?.errorStyle != null) {
-      return widget.decoration?.errorStyle;
-    }
-
-    return widget.enabled
-        ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
-        : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
-  }
-
-  void _handleControllerChanged() {
-    final text = _obtainController().text;
-    if (value != text) {
-      setValue(text);
-    }
-  }
-
-  void _validateIfValidationModeAllows(String? value) {
-    switch (widget.autovalidateMode) {
-      case AutovalidateMode.disabled:
-      case AutovalidateMode.onUnfocus:
-        _validation = const VoicesTextFieldValidationResult.none();
-      case AutovalidateMode.always:
-        _validate(value);
-      case AutovalidateMode.onUserInteraction:
-        if (hasInteractedByUser) {
-          _validate(value);
-        }
-    }
-  }
-
-  void _validate(String? value) {
-    final result = widget.textValidator?.call(value ?? '');
-    _validation = result ?? const VoicesTextFieldValidationResult.none();
-  }
 }
 
-/// A callback called to validate the input of the [VoicesTextField].
-///
-/// This callback returns a [VoicesTextFieldValidationResult] which defines
-/// both the message to be shown where the [VoicesTextFieldDecoration.errorText]
-/// is traditionally shown and as well the status which might decorate
-/// the text field with success checkmark or error icon depending on the status.
-typedef VoicesTextFieldValidator = VoicesTextFieldValidationResult Function(
-  String value,
-);
+/// Defines the appearance of the [VoicesTextField].
+enum VoicesTextFieldStatus {
+  /// The text field appears as usual.
+  none,
+
+  /// The text field represents a success,
+  /// i.e. if the input text is successfully validated.
+  success,
+
+  /// The text field represents a warning,
+  /// i.e. if the input text is validated with a warning.
+  warning,
+
+  /// The text field represents an error,
+  /// i.e. if the input text is validated with an error.
+  error,
+}
 
 /// The return value of the [VoicesTextField.textValidator].
 class VoicesTextFieldValidationResult with EquatableMixin {
@@ -639,6 +755,25 @@ class VoicesTextFieldValidationResult with EquatableMixin {
                   status == VoicesTextFieldStatus.error) ||
               errorMessage == null,
           'errorMessage can be only used for warning or error status',
+        );
+
+  /// Returns an error validation result.
+  ///
+  /// The method was designed to be used as
+  /// [VoicesTextField.textValidator] param:
+  ///
+  /// ```
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.error();
+  ///   },
+  /// ```
+  ///
+  /// in cases where the text field state is known in advance
+  /// and dynamic validation is not needed.
+  const VoicesTextFieldValidationResult.error([String? message])
+      : this(
+          status: VoicesTextFieldStatus.error,
+          errorMessage: message,
         );
 
   const VoicesTextFieldValidationResult.none()
@@ -683,141 +818,6 @@ class VoicesTextFieldValidationResult with EquatableMixin {
           errorMessage: message,
         );
 
-  /// Returns an error validation result.
-  ///
-  /// The method was designed to be used as
-  /// [VoicesTextField.textValidator] param:
-  ///
-  /// ```
-  ///   validator: (value) {
-  ///       return const VoicesTextFieldValidationResult.error();
-  ///   },
-  /// ```
-  ///
-  /// in cases where the text field state is known in advance
-  /// and dynamic validation is not needed.
-  const VoicesTextFieldValidationResult.error([String? message])
-      : this(
-          status: VoicesTextFieldStatus.error,
-          errorMessage: message,
-        );
-
   @override
   List<Object?> get props => [status, errorMessage];
-}
-
-/// Defines the appearance of the [VoicesTextField].
-enum VoicesTextFieldStatus {
-  /// The text field appears as usual.
-  none,
-
-  /// The text field represents a success,
-  /// i.e. if the input text is successfully validated.
-  success,
-
-  /// The text field represents a warning,
-  /// i.e. if the input text is validated with a warning.
-  warning,
-
-  /// The text field represents an error,
-  /// i.e. if the input text is validated with an error.
-  error,
-}
-
-/// A replacement for [InputDecoration] to only expose parameters
-/// that are supported by [VoicesTextField].
-class VoicesTextFieldDecoration {
-  /// [InputDecoration.border].
-  final InputBorder? border;
-
-  /// [InputDecoration.enabledBorder].
-  final InputBorder? enabledBorder;
-
-  /// [InputDecoration.disabledBorder].
-  final InputBorder? disabledBorder;
-
-  /// [InputDecoration.errorBorder].
-  final InputBorder? errorBorder;
-
-  /// [InputDecoration.focusedBorder].
-  final InputBorder? focusedBorder;
-
-  /// [InputDecoration.focusedErrorBorder].
-  final InputBorder? focusedErrorBorder;
-
-  /// Similar to the [InputDecoration.labelText] but does not use
-  /// the floating behavior and is instead above the text field instead.
-  final String? labelText;
-
-  /// [InputDecoration.helper].
-  final Widget? helper;
-
-  /// [InputDecoration.helperText].
-  final String? helperText;
-
-  /// [InputDecoration.hintText].
-  final String? hintText;
-
-  /// [InputDecoration.hintStyle].
-  final TextStyle? hintStyle;
-
-  /// [InputDecoration.errorText].
-  final String? errorText;
-
-  /// [InputDecoration.errorStyle]
-  final TextStyle? errorStyle;
-
-  /// [InputDecoration.errorMaxLines].
-  final int? errorMaxLines;
-
-  /// [InputDecoration.prefixIcon].
-  final Widget? prefixIcon;
-
-  /// [InputDecoration.prefixText].
-  final String? prefixText;
-
-  /// [InputDecoration.suffixIcon].
-  final Widget? suffixIcon;
-
-  /// [InputDecoration.suffixText].
-  final String? suffixText;
-
-  /// [InputDecoration.counterText].
-  final String? counterText;
-
-  /// Whether the [VoicesTextField] will automatically
-  /// add a status [suffixIcon] based on the results of the validation.
-  final bool showStatusSuffixIcon;
-
-  /// [InputDecoration.filled].
-  final bool? filled;
-
-  /// [InputDecoration.fillColor].
-  final Color? fillColor;
-
-  /// Creates a new text field decoration.
-  const VoicesTextFieldDecoration({
-    this.border,
-    this.enabledBorder,
-    this.disabledBorder,
-    this.errorBorder,
-    this.focusedBorder,
-    this.focusedErrorBorder,
-    this.labelText,
-    this.helper,
-    this.helperText,
-    this.hintText,
-    this.hintStyle,
-    this.errorText,
-    this.errorStyle,
-    this.errorMaxLines,
-    this.prefixIcon,
-    this.prefixText,
-    this.suffixIcon,
-    this.suffixText,
-    this.counterText,
-    this.showStatusSuffixIcon = true,
-    this.filled = true,
-    this.fillColor,
-  });
 }
