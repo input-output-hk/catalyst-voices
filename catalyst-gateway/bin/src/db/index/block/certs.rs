@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{MultiEraBlock, Network, Slot, TxnIndex, VKeyHash};
+use cardano_blockchain_types::{MultiEraBlock, Slot, TxnIndex, VKeyHash};
 use ed25519_dalek::VerifyingKey;
 use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
@@ -17,6 +17,7 @@ use crate::{
         types::{DbPublicKey, DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
+    utils::stake_hash::stake_hash,
 };
 
 /// Insert TXI Query and Parameters
@@ -161,15 +162,17 @@ impl CertInsertQuery {
         &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex, register: bool,
         deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
-        let stake_hash = stake_hash(block.network(), cred);
-        let (pubkey, script) = match cred {
+        let (stake_hash, pubkey, script) = match cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
+                let stake_hash = stake_hash(block.network(), false, cred);
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
-                (addr, false)
+                (stake_hash, addr, false)
             },
-            conway::StakeCredential::Scripthash(_) => (None, true),
+            conway::StakeCredential::Scripthash(h) => {
+                (stake_hash(block.network(), true, h), None, true)
+            },
         };
 
         if pubkey.is_none() && !script && deregister {
@@ -287,14 +290,4 @@ impl CertInsertQuery {
 
         query_handles
     }
-}
-
-/// Converts the given stake credential to 29 bytes hash with a header.
-fn stake_hash(network: Network, cred: &alonzo::StakeCredential) -> Vec<u8> {
-    let (type_, hash) = match cred {
-        alonzo::StakeCredential::AddrKeyhash(address) => (0b1110u8 << 4, address.to_vec()),
-        alonzo::StakeCredential::Scripthash(script) => (0b1111 << 4, script.to_vec()),
-    };
-    let header = type_ | network as u8;
-    [&[header], hash.as_slice()].concat()
 }
