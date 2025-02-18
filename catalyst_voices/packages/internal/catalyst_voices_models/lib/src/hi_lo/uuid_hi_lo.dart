@@ -3,6 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/parsing.dart';
 import 'package:uuid/validation.dart';
 
+// Ensure values are within the signed 64-bit range
+// ignore: unused_element
+final _min64 = BigInt.parse('-9223372036854775808');
+final _max64 = BigInt.parse('9223372036854775807');
+// 2^64 - 1 (Unsigned 64-bit max)
+final _mask = BigInt.parse('18446744073709551615');
+
 /// High and Low representation of uuid as num.
 final class UuidHiLo extends HiLo<BigInt> {
   const UuidHiLo({
@@ -26,19 +33,26 @@ final class UuidHiLo extends HiLo<BigInt> {
     /// and getInt64() throws exception on web.
     final bytes = UuidParsing.parseHexToBytes(sanitized);
 
-    var high = 0;
+    var high = BigInt.zero;
     for (var i = 0; i < 8; i++) {
-      high = (high << 8) | bytes[i];
+      high = (high << 8) | BigInt.from(bytes[i]);
     }
 
-    var low = 0;
+    var low = BigInt.zero;
     for (var i = 8; i < 16; i++) {
-      low = (low << 8) | bytes[i];
+      low = (low << 8) | BigInt.from(bytes[i]);
     }
+
+    high = high & _mask; // Apply mask to limit to 64-bit
+    low = low & _mask;
+
+    // Convert to signed 64-bit range if necessary
+    if (high > _max64) high -= (_mask + BigInt.one);
+    if (low > _max64) low -= (_mask + BigInt.one);
 
     return UuidHiLo(
-      high: BigInt.from(high),
-      low: BigInt.from(low),
+      high: high,
+      low: low,
     );
   }
 
@@ -56,23 +70,31 @@ final class UuidHiLo extends HiLo<BigInt> {
   }
 
   String get uuid {
-    // Convert BigInt back to bytes
-    final highBytes = ByteData(8)..setInt64(0, high.toInt());
-    final lowBytes = ByteData(8)..setInt64(0, low.toInt());
+    // Convert `high` and `low` into 8-byte arrays manually
+    final highBytes = Uint8List(8);
+    final lowBytes = Uint8List(8);
 
-    // Merge them into a single byte array
-    final bytes = Uint8List.fromList([
-      ...highBytes.buffer.asUint8List(),
-      ...lowBytes.buffer.asUint8List(),
-    ]);
+    var tempHigh = high;
+    var tempLow = low;
+
+    for (var i = 7; i >= 0; i--) {
+      highBytes[i] = (tempHigh & BigInt.from(0xFF)).toInt();
+      tempHigh >>= 8;
+
+      lowBytes[i] = (tempLow & BigInt.from(0xFF)).toInt();
+      tempLow >>= 8;
+    }
+
+    // Combine both byte arrays
+    final bytes = Uint8List.fromList([...highBytes, ...lowBytes]);
 
     return UuidParsing.unparse(bytes);
   }
 
   /// Version is always 13th digit of uuid.
   int get _version {
-    final source = String.fromCharCode(uuid.codeUnitAt(14));
-    return int.parse(source);
+    final hexChar = uuid.replaceAll('-', '')[12]; // 13th hex digit
+    return int.parse(hexChar, radix: 16);
   }
 
   /// Syntax sugar for working with nullable [data].
