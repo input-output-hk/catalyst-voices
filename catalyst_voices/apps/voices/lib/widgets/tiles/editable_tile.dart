@@ -4,8 +4,6 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-enum EditableTileChangeSource { cancel, save }
-
 typedef EditableTileChange = ({
   bool isEditMode,
   EditableTileChangeSource source,
@@ -13,6 +11,7 @@ typedef EditableTileChange = ({
 
 class EditableTile extends StatelessWidget {
   final String title;
+  final bool isSelected;
   final bool isEditMode;
   final bool isSaveEnabled;
   final String? errorText;
@@ -22,6 +21,7 @@ class EditableTile extends StatelessWidget {
   const EditableTile({
     super.key,
     required this.title,
+    this.isSelected = false,
     this.isEditMode = false,
     this.isSaveEnabled = false,
     this.errorText,
@@ -33,6 +33,7 @@ class EditableTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return PropertyTile(
       title: title,
+      isSelected: isSelected,
       action: VoicesEditSaveButton(
         onTap: _toggleEditMode,
         isEditing: isEditMode,
@@ -47,6 +48,15 @@ class EditableTile extends StatelessWidget {
     );
   }
 
+  void _save() {
+    const change = (
+      isEditMode: false,
+      source: EditableTileChangeSource.save,
+    );
+
+    onChanged?.call(change);
+  }
+
   void _toggleEditMode() {
     final change = (
       isEditMode: !isEditMode,
@@ -55,14 +65,36 @@ class EditableTile extends StatelessWidget {
 
     onChanged?.call(change);
   }
+}
 
-  void _save() {
-    const change = (
-      isEditMode: false,
-      source: EditableTileChangeSource.save,
+enum EditableTileChangeSource { cancel, save }
+
+class _ErrorText extends StatelessWidget {
+  final String text;
+
+  const _ErrorText({
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colors.iconsError;
+    return Row(
+      spacing: 10,
+      children: [
+        VoicesAssets.icons.exclamationCircle.buildIcon(
+          size: 24,
+          color: color,
+        ),
+        Flexible(
+          child: Text(
+            text,
+            style: theme.textTheme.bodyMedium?.copyWith(color: color),
+          ),
+        ),
+      ],
     );
-
-    onChanged?.call(change);
   }
 }
 
@@ -94,35 +126,6 @@ class _Footer extends StatelessWidget {
           child: VoicesFilledButton(
             onTap: isSaveEnabled ? onSave : null,
             child: Text(context.l10n.saveButtonText.toUpperCase()),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ErrorText extends StatelessWidget {
-  final String text;
-
-  const _ErrorText({
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = theme.colors.iconsError;
-    return Row(
-      spacing: 10,
-      children: [
-        VoicesAssets.icons.exclamationCircle.buildIcon(
-          size: 24,
-          color: color,
-        ),
-        Flexible(
-          child: Text(
-            text,
-            style: theme.textTheme.bodyMedium?.copyWith(color: color),
           ),
         ),
       ],

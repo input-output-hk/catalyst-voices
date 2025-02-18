@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,30 +39,52 @@ class _ProposalBuilderSegments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SegmentsListViewBuilder(
+    return ValueListenableBuilder(
+      valueListenable: SegmentsControllerScope.of(context),
       builder: (context, value, child) {
+        final items = value.listItems;
+        final selectedNodeId = value.activeSectionId;
+
         return SegmentsListView<ProposalBuilderSegment, ProposalBuilderSection>(
           itemScrollController: itemScrollController,
-          items: value,
+          items: items,
           padding: const EdgeInsets.only(top: 16, bottom: 64),
           sectionBuilder: (context, data) {
-            return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-                bool>(
-              selector: (state) => state.showValidationErrors,
-              builder: (context, showValidationErrors) {
-                return DocumentBuilderSectionTile(
-                  key: key,
-                  section: data.property,
-                  onChanged: (value) {
-                    final event = SectionChangedEvent(changes: value);
-                    context.read<ProposalBuilderBloc>().add(event);
-                  },
-                  autovalidateMode: showValidationErrors
-                      ? AutovalidateMode.always
-                      : AutovalidateMode.disabled,
-                );
-              },
+            return _Section(
+              property: data.property,
+              isSelected: data.property.nodeId == selectedNodeId,
             );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _Section extends StatelessWidget {
+  final DocumentProperty property;
+  final bool isSelected;
+
+  const _Section({
+    required this.property,
+    required this.isSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState, bool>(
+      selector: (state) => state.showValidationErrors,
+      builder: (context, showValidationErrors) {
+        return DocumentBuilderSectionTile(
+          key: key,
+          section: property,
+          isSelected: isSelected,
+          autovalidateMode: showValidationErrors
+              ? AutovalidateMode.always
+              : AutovalidateMode.disabled,
+          onChanged: (value) {
+            final event = SectionChangedEvent(changes: value);
+            context.read<ProposalBuilderBloc>().add(event);
           },
         );
       },

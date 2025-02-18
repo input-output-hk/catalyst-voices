@@ -152,7 +152,7 @@ final class ProposalBuilderBloc
     final document = documentBuilder.build();
     final segments = _mapDocumentToSegments(
       document,
-      state.showValidationErrors,
+      showValidationErrors: state.showValidationErrors,
     );
 
     emit(state.copyWith(segments: segments));
@@ -202,7 +202,7 @@ final class ProposalBuilderBloc
       final document = documentBuilder.build();
       final segments = _mapDocumentToSegments(
         document,
-        state.showValidationErrors,
+        showValidationErrors: state.showValidationErrors,
       );
 
       final firstSegment = segments.firstOrNull;
@@ -262,9 +262,9 @@ final class ProposalBuilderBloc
   }
 
   List<ProposalBuilderSegment> _mapDocumentToSegments(
-    Document document,
-    bool showValidationErrors,
-  ) {
+    Document document, {
+    required bool showValidationErrors,
+  }) {
     return document.segments.map((segment) {
       final sections = segment.sections
           .expand(_findSectionsAndSubsections)
@@ -298,12 +298,9 @@ final class ProposalBuilderBloc
     assert(documentBuilder != null, 'DocumentBuilder not initialized');
     final document = documentBuilder!.build();
 
-    if (document.isValid) {
-      emit(state.copyWith(showValidationErrors: false));
-      // TODO(dtscalac): handle event
-    } else {
-      emit(state.copyWith(showValidationErrors: true));
-    }
+    _showErrorsIfInvalid(emit, document);
+
+    // TODO(dtscalac): handle event
   }
 
   Future<void> _shareProposal(
@@ -311,6 +308,25 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     // TODO(dtscalac): handle event
+  }
+
+  void _showErrorsIfInvalid(
+    Emitter<ProposalBuilderState> emit,
+    Document document,
+  ) {
+    final showErrors = !document.isValid;
+
+    final segments = _mapDocumentToSegments(
+      document,
+      showValidationErrors: showErrors,
+    );
+
+    final newState = state.copyWith(
+      segments: segments,
+      showValidationErrors: showErrors,
+    );
+
+    emit(newState);
   }
 
   Future<void> _submitProposal(
@@ -321,11 +337,8 @@ final class ProposalBuilderBloc
     assert(documentBuilder != null, 'DocumentBuilder not initialized');
     final document = documentBuilder!.build();
 
-    if (document.isValid) {
-      emit(state.copyWith(showValidationErrors: false));
-      // TODO(dtscalac): handle event
-    } else {
-      emit(state.copyWith(showValidationErrors: true));
-    }
+    _showErrorsIfInvalid(emit, document);
+
+    // TODO(dtscalac): handle event
   }
 }

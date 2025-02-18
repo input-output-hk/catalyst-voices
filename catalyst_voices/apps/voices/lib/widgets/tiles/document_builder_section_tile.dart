@@ -25,6 +25,12 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// A section of the document that groups [DocumentValueProperty].
   final DocumentProperty section;
 
+  /// True if the section is currently selected.
+  final bool isSelected;
+
+  /// The mode for the validation in this section.
+  final AutovalidateMode autovalidateMode;
+
   /// A callback that should be called with a list of [DocumentChange]
   /// when the user wants to save the changes.
   ///
@@ -34,14 +40,12 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   /// (Usually single property)
   final ValueChanged<List<DocumentChange>> onChanged;
 
-  /// The mode for the validation in this section.
-  final AutovalidateMode autovalidateMode;
-
   const DocumentBuilderSectionTile({
     required super.key,
     required this.section,
-    required this.onChanged,
+    this.isSelected = false,
     this.autovalidateMode = AutovalidateMode.disabled,
+    required this.onChanged,
   });
 
   @override
@@ -76,6 +80,7 @@ class _DocumentBuilderSectionTileState
 
     return EditableTile(
       title: title,
+      isSelected: widget.isSelected,
       isEditMode: _isEditMode,
       isSaveEnabled: true,
       errorText: _errorText,

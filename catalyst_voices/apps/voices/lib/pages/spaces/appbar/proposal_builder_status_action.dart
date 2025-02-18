@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -36,7 +37,7 @@ class ProposalBuilderStatusAction extends StatelessWidget {
   void _onSelected(BuildContext context, _MenuItemEnum item) {
     switch (item) {
       case _MenuItemEnum.back:
-        Navigator.of(context).pop();
+        const WorkspaceRoute().go(context);
       case _MenuItemEnum.publish:
         context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
       case _MenuItemEnum.submit:
