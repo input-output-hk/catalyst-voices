@@ -1,57 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class SignedDocumentContent extends Equatable {
-  final Map<String, dynamic> data;
-
-  const SignedDocumentContent(this.data);
-
-  @override
-  List<Object?> get props => [data];
-}
-
-// List of types and metadata fields is here
-// https://input-output-hk.github.io/catalyst-libs/branch/feat_signed_object/architecture/08_concepts/signed_doc/types/
-enum SignedDocumentType {
-  proposalDocument(uuid: '7808d2ba-d511-40af-84e8-c0d1625fdfdc'),
-  proposalTemplate(uuid: '0ce8ab38-9258-4fbc-a62e-7faa6e58318f'),
-  unknown(uuid: '');
-
-  final String uuid;
-
-  static String toJson(SignedDocumentType type) => type.uuid;
-
-  static SignedDocumentType fromJson(String data) {
-    return SignedDocumentType.values.firstWhere(
-      (element) => element.uuid == data,
-      orElse: () => SignedDocumentType.unknown,
-    );
-  }
-
-  const SignedDocumentType({
-    required this.uuid,
-  });
-}
-
-final class SignedDocumentData extends Equatable {
-  final SignedDocumentMetadata metadata;
-  final SignedDocumentContent content;
-
-  const SignedDocumentData({
-    required this.metadata,
-    required this.content,
-  });
-
-  @override
-  List<Object?> get props => [
-        metadata,
-        content,
-      ];
-}
-
-final class SignedDocumentMetadata extends Equatable {
+/// Describes what [DocumentDataContent] is about. It only makes sens in
+/// context of [type].
+final class DocumentDataMetadata extends Equatable {
   /// Type of this signed document
-  final SignedDocumentType type;
+  final DocumentType type;
 
   /// uuid-v7
   final String id;
@@ -61,14 +15,14 @@ final class SignedDocumentMetadata extends Equatable {
 
   /// Reference to another document. The purpose of the ref will vary depending
   /// on the document type.
-  final SignedDocumentRef? ref;
+  final DocumentRef? ref;
 
   /// This is a cryptographically secured reference to another document.
-  final SecuredSignedDocumentRef? refHash;
+  final SecuredDocumentRef? refHash;
 
   /// If the document was formed from a template, this is a reference to that
   /// template document
-  final SignedDocumentRef? template;
+  final DocumentRef? template;
 
   /// uuid-v4
   /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
@@ -88,7 +42,7 @@ final class SignedDocumentMetadata extends Equatable {
   /// "Products & Integrations".
   final String? categoryId;
 
-  const SignedDocumentMetadata({
+  const DocumentDataMetadata({
     required this.type,
     required this.id,
     required this.version,
