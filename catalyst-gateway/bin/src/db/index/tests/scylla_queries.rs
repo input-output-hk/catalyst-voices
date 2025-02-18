@@ -259,7 +259,7 @@ async fn test_insert_sync_status() {
 
     SyncStatusInsertQuery::execute(
         &session,
-        row::SyncStatusQueryParams::new(u64::MAX, u64::MAX),
+        row::SyncStatusQueryParams::new(u64::MAX.into(), u64::MAX.into()),
     )
     .await
     .unwrap();
