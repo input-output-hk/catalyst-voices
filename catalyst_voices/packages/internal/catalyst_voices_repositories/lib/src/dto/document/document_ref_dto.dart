@@ -8,7 +8,7 @@ final class DocumentRefDto {
   final String id;
   final String? version;
 
-  DocumentRefDto({
+  const DocumentRefDto({
     required this.id,
     this.version,
   });
@@ -38,7 +38,7 @@ final class SecuredDocumentRefDto {
   final DocumentRefDto ref;
   final String hash;
 
-  SecuredDocumentRefDto({
+  const SecuredDocumentRefDto({
     required this.ref,
     required this.hash,
   });

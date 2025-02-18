@@ -121,11 +121,11 @@ final class DocumentDataMetadataDto {
   }
 }
 
-extension _SignedDocumentRefExt on DocumentRef {
+extension on DocumentRef {
   DocumentRefDto toDto() => DocumentRefDto.fromModel(this);
 }
 
-extension _SecuredSignedDocumentRefExt on SecuredDocumentRef {
+extension on SecuredDocumentRef {
   SecuredDocumentRefDto toDto() {
     return SecuredDocumentRefDto.fromModel(this);
   }

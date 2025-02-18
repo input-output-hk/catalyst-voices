@@ -57,7 +57,7 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
   }
 }
 
-extension _DocumentEntityMapper on DocumentEntity {
+extension on DocumentEntity {
   DocumentData toModel() {
     return DocumentData(
       metadata: metadata,

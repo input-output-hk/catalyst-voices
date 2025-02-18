@@ -36,7 +36,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     final idHiLo = UuidHiLo.from(data.metadata.id);
     final verHiLo = UuidHiLo.from(data.metadata.version);
 
-    final draft = DraftEntity(
+    final draft = DocumentDraftEntity(
       idHi: idHiLo.high,
       idLo: idHiLo.low,
       verHi: verHiLo.high,
@@ -59,7 +59,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 }
 
-extension _DraftEntityMapper on DraftEntity {
+extension on DocumentDraftEntity {
   DocumentData toModel() {
     return DocumentData(
       metadata: metadata,

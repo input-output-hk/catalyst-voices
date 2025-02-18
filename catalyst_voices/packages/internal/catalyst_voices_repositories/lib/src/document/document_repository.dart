@@ -167,8 +167,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       final ref = refGetter(document);
       final refDocumentStream = _watchDocumentData(
         ref: ref,
-        // Synchronized because we may have many document which are referring
-        // to same template. When loading multiple documents at same
+        // Synchronized because we may have many documents which are referring
+        // to the same template. When loading multiple documents at the same
         // time we want to fetch only once template.
         synchronizedUpdate: true,
       );
@@ -187,7 +187,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentRef ref,
     bool synchronizedUpdate = false,
   }) {
-    /// Make sure we're update to date with document ref.
+    /// Make sure we're up to date with document ref.
     final documentDataFuture = synchronizedUpdate
         // ignore: discarded_futures
         ? _documentDataLock.synchronized(() => getDocumentData(ref: ref))

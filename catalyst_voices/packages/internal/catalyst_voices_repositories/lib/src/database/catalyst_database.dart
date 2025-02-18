@@ -28,8 +28,8 @@ abstract interface class CatalystDatabase {
   /// Do not confuse it with other documents.
   DocumentsDao get documentsDao;
 
-  /// Contains all operations related to [DraftEntity] which is db specific.
-  /// Do not confuse it with other documents / drafts.
+  /// Contains all operations related to [DocumentDraftEntity] which is db
+  /// specific. Do not confuse it with other documents / drafts.
   DraftsDao get draftsDao;
 
   /// Removes all data from this db.
@@ -79,7 +79,7 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase
   DraftsDao get draftsDao => driftDraftsDao;
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {

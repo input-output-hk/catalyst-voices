@@ -26,7 +26,7 @@ void main() {
     group('query', () {
       test('returns specific version matching exact ref', () async {
         // Given
-        final drafts = List<DraftEntity>.generate(
+        final drafts = List<DocumentDraftEntity>.generate(
           2,
           (index) => DraftFactory.build(),
         );
@@ -66,7 +66,7 @@ void main() {
           ),
         );
 
-        final drafts = <DraftEntity>[
+        final drafts = <DocumentDraftEntity>[
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
@@ -98,7 +98,7 @@ void main() {
 
       test('returns null when id does not match any id', () async {
         // Given
-        final drafts = List<DraftEntity>.generate(
+        final drafts = List<DocumentDraftEntity>.generate(
           2,
           (index) => DraftFactory.build(),
         );
@@ -118,7 +118,7 @@ void main() {
       test('ref without ver includes all versions', () async {
         // Given
         final id = const Uuid().v7();
-        final drafts = List<DraftEntity>.generate(
+        final drafts = List<DocumentDraftEntity>.generate(
           2,
           (index) {
             return DraftFactory.build(
@@ -145,7 +145,7 @@ void main() {
         // Given
         final id = const Uuid().v7();
         final version = const Uuid().v7();
-        final drafts = <DraftEntity>[
+        final drafts = <DocumentDraftEntity>[
           DraftFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
@@ -174,7 +174,7 @@ void main() {
 
       test('returns 0 whe no matching drafts are found', () async {
         // Given
-        final drafts = <DraftEntity>[
+        final drafts = <DocumentDraftEntity>[
           DraftFactory.build(),
           DraftFactory.build(),
         ];

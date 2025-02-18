@@ -9,14 +9,14 @@ import 'package:flutter/foundation.dart';
 /// Exposes only public operation on drafts, and related, tables.
 abstract interface class DraftsDao {
   /// Returns all drafts
-  Future<List<DraftEntity>> queryAll();
+  Future<List<DocumentDraftEntity>> queryAll();
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
-  Future<DraftEntity?> query({required DocumentRef ref});
+  Future<DocumentDraftEntity?> query({required DocumentRef ref});
 
   /// Same as [query] but emits updates.
-  Stream<DraftEntity?> watch({required DocumentRef ref});
+  Stream<DocumentDraftEntity?> watch({required DocumentRef ref});
 
   /// Counts unique drafts. All versions of same document are counted as 1.
   Future<int> countAll();
@@ -28,10 +28,10 @@ abstract interface class DraftsDao {
   Future<int> count({required DocumentRef ref});
 
   /// Inserts all drafts. On conflicts updates.
-  Future<void> saveAll(Iterable<DraftEntity> drafts);
+  Future<void> saveAll(Iterable<DocumentDraftEntity> drafts);
 
   /// Singular version of [saveAll]. Does not run in transaction.
-  Future<void> save(DraftEntity draft);
+  Future<void> save(DocumentDraftEntity draft);
 
   /// Updates matching [ref] records with [content].
   ///
@@ -54,17 +54,17 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDraftsDao(super.attachedDatabase);
 
   @override
-  Future<List<DraftEntity>> queryAll() {
+  Future<List<DocumentDraftEntity>> queryAll() {
     return select(drafts).get();
   }
 
   @override
-  Future<DraftEntity?> query({required DocumentRef ref}) {
+  Future<DocumentDraftEntity?> query({required DocumentRef ref}) {
     return _selectRef(ref).get().then((value) => value.firstOrNull);
   }
 
   @override
-  Stream<DraftEntity?> watch({required DocumentRef ref}) {
+  Stream<DocumentDraftEntity?> watch({required DocumentRef ref}) {
     return _selectRef(ref).watch().map((event) => event.firstOrNull);
   }
 
@@ -79,7 +79,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> saveAll(Iterable<DraftEntity> drafts) async {
+  Future<void> saveAll(Iterable<DocumentDraftEntity> drafts) async {
     await batch((batch) {
       batch.insertAll(
         this.drafts,
@@ -90,7 +90,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> save(DraftEntity draft) async {
+  Future<void> save(DocumentDraftEntity draft) async {
     await into(drafts).insert(draft, mode: InsertMode.insertOrReplace);
   }
 
@@ -109,7 +109,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
   }
 
-  SimpleSelectStatement<$DraftsTable, DraftEntity> _selectRef(
+  SimpleSelectStatement<$DraftsTable, DocumentDraftEntity> _selectRef(
     DocumentRef ref,
   ) {
     return select(drafts)
