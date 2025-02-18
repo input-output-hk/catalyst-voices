@@ -6,8 +6,8 @@ import 'package:uuid/uuid.dart';
 
 abstract final class DocumentWithMetadataFactory {
   static DocumentEntityWithMetadata build({
-    SignedDocumentContent? content,
-    SignedDocumentMetadata? metadata,
+    DocumentDataContent? content,
+    DocumentDataMetadata? metadata,
     DateTime? createdAt,
   }) {
     final document = DocumentFactory.build(
@@ -33,14 +33,14 @@ abstract final class DocumentWithMetadataFactory {
 
 abstract final class DocumentFactory {
   static DocumentEntity build({
-    SignedDocumentContent? content,
-    SignedDocumentMetadata? metadata,
+    DocumentDataContent? content,
+    DocumentDataMetadata? metadata,
     DateTime? createdAt,
   }) {
-    content ??= const SignedDocumentContent({});
+    content ??= const DocumentDataContent({});
 
-    metadata ??= SignedDocumentMetadata(
-      type: SignedDocumentType.proposalDocument,
+    metadata ??= DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
       id: const Uuid().v7(),
       version: const Uuid().v7(),
     );
@@ -81,15 +81,15 @@ abstract final class DocumentMetadataFactory {
 }
 
 abstract final class DraftFactory {
-  static DraftEntity build({
-    SignedDocumentContent? content,
-    SignedDocumentMetadata? metadata,
+  static DocumentDraftEntity build({
+    DocumentDataContent? content,
+    DocumentDataMetadata? metadata,
     String? title,
   }) {
-    content ??= const SignedDocumentContent({});
+    content ??= const DocumentDataContent({});
 
-    metadata ??= SignedDocumentMetadata(
-      type: SignedDocumentType.proposalDocument,
+    metadata ??= DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
       id: const Uuid().v7(),
       version: const Uuid().v7(),
     );
@@ -99,7 +99,7 @@ abstract final class DraftFactory {
     final id = UuidHiLo.from(metadata.id);
     final ver = UuidHiLo.from(metadata.version);
 
-    return DraftEntity(
+    return DocumentDraftEntity(
       idHi: id.high,
       idLo: id.low,
       verHi: ver.high,
@@ -108,6 +108,26 @@ abstract final class DraftFactory {
       content: content,
       metadata: metadata,
       title: title,
+    );
+  }
+}
+
+abstract final class DocumentDataFactory {
+  static DocumentData build({
+    DocumentType type = DocumentType.proposalDocument,
+    String? id,
+    String? version,
+    DocumentRef? template,
+    DocumentDataContent content = const DocumentDataContent({}),
+  }) {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: type,
+        id: id ?? const Uuid().v7(),
+        version: version ?? const Uuid().v7(),
+        template: template,
+      ),
+      content: content,
     );
   }
 }

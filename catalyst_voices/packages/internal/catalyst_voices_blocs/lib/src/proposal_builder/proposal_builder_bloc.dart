@@ -95,7 +95,7 @@ final class ProposalBuilderBloc
       documentBuilderGetter: () async {
         _logger.info('Loading proposal template[${event.id}]');
 
-        final ref = SignedDocumentRef(id: event.id);
+        final ref = DocumentRef(id: event.id);
         final proposalTemplate = await _proposalService.getProposalTemplate(
           ref: ref,
         );
