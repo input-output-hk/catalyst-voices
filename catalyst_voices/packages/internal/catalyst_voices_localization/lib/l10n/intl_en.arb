@@ -513,11 +513,11 @@
   "@walletLinkTransactionSubheader": {
     "description": "A subheader in link wallet flow in registration for RBAC transaction."
   },
-  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles \u2028to you Catalyst Keychain.",
+  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles  to you Catalyst Keychain.",
   "@walletLinkIntroTitle": {
     "description": "A title in link wallet flow on intro screen."
   },
-  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup. \u2028\u2028We're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.  \u2028\u2028We'll start with your Voter/Commenter Key by default. You can decide to add a Proposer Key if you want.",
+  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup.   We're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.    We'll start with your Voter/Commenter Key by default. You can decide to add a Proposer Key if you want.",
   "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
   },
@@ -744,10 +744,10 @@
   "catalystPrivacyPolicy": "Catalyst FC’s Privacy Policy",
   "createBaseProfileAcknowledgementsDataUsage": "I acknowledge that the Catalyst Ops team may use my email only for Catalyst communication.",
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
-  "accountCreationSplashMessage": "Catalyst Keychain is your ticket to participate in innovation on the global stage.  \u2028\u2028These next steps will create your Catalyst keychain so you can enter new spaces, discover awesome ideas, and share your feedback to help improve ideas.",
+  "accountCreationSplashMessage": "Catalyst Keychain is your ticket to participate in innovation on the global stage.    These next steps will create your Catalyst keychain so you can enter new spaces, discover awesome ideas, and share your feedback to help improve ideas.",
   "accountCreationSplashNextButton": "Create your Keychain now",
-  "accountInstructionsTitle": "Great! Your Catalyst Keychain \u2028has been created.",
-  "accountInstructionsMessage": "On the next screen, you're going to see 12 words. \u2028This is called your \"Catalyst seed phrase\".   \u2028\u2028It's like a super secure password that only you know, \u2028that allows you to prove ownership of your keychain.  \u2028\u2028Use your Catalyst seed phrase to login and recover your account on different devices, so be sure to put it somewhere safe!\n\nIt is a super secure password that only you know, so best is to write it down with pen and paper, so get this ready. ",
+  "accountInstructionsTitle": "Great! Your Catalyst Keychain  has been created.",
+  "accountInstructionsMessage": "On the next screen, you're going to see 12 words.  This is called your \"Catalyst seed phrase\".     It's like a super secure password that only you know,  that allows you to prove ownership of your keychain.    Use your Catalyst seed phrase to login and recover your account on different devices, so be sure to put it somewhere safe!\n\nIt is a super secure password that only you know, so best is to write it down with pen and paper, so get this ready. ",
   "previous": "Previous",
   "@previous": {
     "description": "(Action) switch to the previous item."
@@ -932,24 +932,24 @@
   "exportKey": "Export Key",
   "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words",
   "createKeychainSeedPhraseCheckInstructionsTitle": "Write down your Catalyst seed phrase",
-  "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your Catalyst seed phrase correctly.   \u2028\u2028We don't save your Catalyst seed phrase, so it's important \u2028to make sure you have it right. Thats why we don't trust, we verify before continuing.   \u2028\u2028It's also good practice to get familiar with using a \nseed phrase if you're new to crypto.",
+  "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your Catalyst seed phrase correctly.     We don't save your Catalyst seed phrase, so it's important  to make sure you have it right. Thats why we don't trust, we verify before continuing.     It's also good practice to get familiar with using a \nseed phrase if you're new to crypto.",
   "createKeychainSeedPhraseCheckSubtitle": "Input your Catalyst seed phrase",
-  "createKeychainSeedPhraseCheckBody": "Select your 12 written down words in \u2028the correct order.",
+  "createKeychainSeedPhraseCheckBody": "Select your 12 written down words in  the correct order.",
   "importCatalystKey": "Import Catalyst Key",
   "@importCatalystKey": {
     "description": "When user checks correct seed phrase words order he can upload it too"
   },
   "reset": "Reset",
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
-  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
+  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.     It's kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
   "yourNextStep": "Your next step",
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let’s set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
-  "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
   "createBaseProfileCreatedTitle": "Congratulations your Base profile is setup!",
-  "createKeychainCreatedTitle": "Congratulations your Catalyst \u2028Keychain is created!",
+  "createKeychainCreatedTitle": "Congratulations your Catalyst  Keychain is created!",
   "createBaseProfileNextStep": "In the next step you Create your Catalyst Keychain",
-  "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \u2028account to the Cardano Mainnet.",
+  "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and  account to the Cardano Mainnet.",
   "createKeychainLinkWalletAndRoles": "Link your Cardano Wallet & Roles",
   "registrationCreateBaseProfileStepGroup": "Base profile created",
   "registrationCreateKeychainStepGroup": "Catalyst Keychain created",
@@ -974,7 +974,7 @@
   "warning": "Warning",
   "alert": "Alert",
   "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
-  "registrationExitConfirmDialogContent": "Leaving before creating your keychain means account creation is incomplete. \u2028\u2028You cannot login without \u2028completing your key chain.",
+  "registrationExitConfirmDialogContent": "Leaving before creating your keychain means account creation is incomplete.   You cannot login without  completing your key chain.",
   "registrationExitConfirmDialogContinue": "Continue keychain creation",
   "cancelAnyways": "Cancel anyway",
   "recoverCatalystKeychain": "Restore Catalyst keychain",
@@ -982,18 +982,18 @@
   "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
   "recoverKeychainMethodsSubtitle": "Not to worry, in the next step you can choose the recovery option that applies to you for this device!",
   "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
-  "recoverKeychainNonFound": "No Catalyst Keychain found\u2028on this device.",
-  "recoverKeychainFound": "Keychain found!  \u2028Please unlock your device.",
+  "recoverKeychainNonFound": "No Catalyst Keychain found on this device.",
+  "recoverKeychainFound": "Keychain found!   Please unlock your device.",
   "recoverWithSeedPhrase12Words": "Restore/Upload with 12-word seed phrase",
-  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \u2028your 12-word Catalyst seed phrase",
+  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with  your 12-word Catalyst seed phrase",
   "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device.",
-  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \u2028your 12-word Catalyst seed phrase",
+  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with  your 12-word Catalyst seed phrase",
   "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst seed phrase in the right order to bring your Catalyst account to this device.",
   "recoveryAccountTitle": "Catalyst account recovery",
   "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
   "recoveryAccountDetailsAction": "Set unlock password for this device",
   "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
-  "recoveryUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "recoveryUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
   "recoverDifferentKeychain": "Restore a different keychain",
   "unlockDialogHeader": "Unlock Catalyst",
   "@unlockDialogHeader": {
@@ -1035,7 +1035,7 @@
   "@lockSnackbarMessage": {
     "description": "The message shown below the title in confirmation snackbar after locking the keychain."
   },
-  "recoverySuccessTitle": "Congratulations your Catalyst \u2028Keychain is restored!",
+  "recoverySuccessTitle": "Congratulations your Catalyst  Keychain is restored!",
   "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
   "recoverySuccessGoToDashboard": "Jump into the Discovery space / Dashboard",
   "recoverySuccessGoAccount": "Check my account",
@@ -1400,7 +1400,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Found 14",
+  "catalystF14": "Catalyst Found14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1508,7 +1508,7 @@
   "accountFinishedNotificationTitleDesc": "Account blockchain verified",
   "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and…",
   "editRolesDialogTitle": "Editing Roles",
-  "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
+  "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.  To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready. ",
   "continueText": "Continue",
   "importProposal": "Import Proposal",
   "@importProposal": {
@@ -1517,5 +1517,6 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
-  }
+  },
+  "showAll": "Show All"
 }
