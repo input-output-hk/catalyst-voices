@@ -15,7 +15,7 @@ final class DocumentDto {
   });
 
   factory DocumentDto.fromJsonSchema(
-    DocumentDataDto data,
+    DocumentDataContentDto content,
     DocumentSchema schema,
   ) {
     return DocumentDto(
@@ -24,7 +24,7 @@ final class DocumentDto {
           .map(
             (segment) => DocumentPropertyDto.fromJsonSchema(
               segment,
-              data: data,
+              data: content,
             ),
           )
           .toList(),
@@ -48,8 +48,8 @@ final class DocumentDto {
     ).build();
   }
 
-  DocumentDataDto toJson() {
-    return DocumentDataDto.fromDocument(
+  DocumentDataContentDto toJson() {
+    return DocumentDataContentDto.fromDocument(
       schemaUrl: schema.schemaSelfUrl,
       properties: properties.map((e) => e.toJson()),
     );
@@ -61,7 +61,7 @@ sealed class DocumentPropertyDto {
 
   factory DocumentPropertyDto.fromJsonSchema(
     DocumentPropertySchema schema, {
-    required DocumentDataDto data,
+    required DocumentDataContentDto data,
   }) {
     switch (schema) {
       case DocumentObjectSchema():
@@ -112,7 +112,7 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
 
   factory DocumentPropertyListDto.fromJsonSchema(
     DocumentListSchema schema, {
-    required DocumentDataDto data,
+    required DocumentDataContentDto data,
   }) {
     final values = data.getProperty(schema.nodeId) as List? ?? [];
     final itemsSchema = schema.itemsSchema;
@@ -168,7 +168,7 @@ final class DocumentPropertyObjectDto extends DocumentPropertyDto {
 
   factory DocumentPropertyObjectDto.fromJsonSchema(
     DocumentObjectSchema schema, {
-    required DocumentDataDto data,
+    required DocumentDataContentDto data,
   }) {
     return DocumentPropertyObjectDto(
       schema: schema,
@@ -218,7 +218,7 @@ final class DocumentPropertyValueDto<T extends Object>
 
   factory DocumentPropertyValueDto.fromJsonSchema(
     DocumentValueSchema<T> schema, {
-    required DocumentDataDto data,
+    required DocumentDataContentDto data,
   }) {
     final property = data.getProperty(schema.nodeId);
     return DocumentPropertyValueDto<T>(

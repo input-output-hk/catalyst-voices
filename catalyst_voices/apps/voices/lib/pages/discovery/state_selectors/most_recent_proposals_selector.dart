@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/typedefs.dart';
 import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -6,7 +7,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef _StateData = ({bool show, LocalizedException? error});
 typedef _ListItems = List<PendingProposal>;
 
 class MostRecentProposalsSelector extends StatelessWidget {
@@ -20,22 +20,6 @@ class MostRecentProposalsSelector extends StatelessWidget {
         _MostRecentProposalsError(),
         _MostRecentProposalsData(),
       ],
-    );
-  }
-}
-
-class _MostRecentProposalsLoading extends StatelessWidget {
-  const _MostRecentProposalsLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
-      selector: (state) {
-        return state.mostRecentProposals.isLoading;
-      },
-      builder: (context, state) {
-        return const Offstage();
-      },
     );
   }
 }
@@ -62,7 +46,7 @@ class _MostRecentProposalsError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, _StateData>(
+    return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
       selector: (state) {
         return (
           show: state.currentCampaign.showError,
@@ -85,6 +69,22 @@ class _MostRecentProposalsError extends StatelessWidget {
             ),
           ),
         );
+      },
+    );
+  }
+}
+
+class _MostRecentProposalsLoading extends StatelessWidget {
+  const _MostRecentProposalsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<DiscoveryCubit, DiscoveryState, bool>(
+      selector: (state) {
+        return state.mostRecentProposals.isLoading;
+      },
+      builder: (context, state) {
+        return const Offstage();
       },
     );
   }
