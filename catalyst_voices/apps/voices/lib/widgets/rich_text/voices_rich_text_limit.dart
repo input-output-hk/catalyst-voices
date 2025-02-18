@@ -33,9 +33,10 @@ class VoicesRichTextLimit extends StatelessWidget {
             child: Text(
               error,
               style: theme.textTheme.bodySmall!.copyWith(
-                  color: enabled
-                      ? theme.colorScheme.error
-                      : theme.colors.textDisabled),
+                color: enabled
+                    ? theme.colorScheme.error
+                    : theme.colors.textDisabled,
+              ),
             ),
           ),
           StreamBuilder(
