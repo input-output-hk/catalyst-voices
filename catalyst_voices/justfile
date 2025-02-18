@@ -10,6 +10,7 @@ setup-code:
 
 # Builds generated code
 generate-code: setup-code
+    melos l10n
     cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
 # Syntax sugar for linking packages and building generated code
