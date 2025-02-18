@@ -286,35 +286,17 @@ class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
 
   @override
   Widget build(BuildContext context) {
-    return CategoryDropdown(
-      items: widget.items,
-      popupMenuButtonKey: _popupMenuButtonKey,
-      highlightColor: context.colors.onSurfacePrimary08,
-      onSelected: widget.onChanged,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        decoration: BoxDecoration(
-          color: context.colors.elevationsOnSurfaceNeutralLv1White,
-          border: Border.all(color: context.colors.outlineBorderVariant),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              context.l10n.category,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: context.colors.textDisabled,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              widget.selectedName,
-              style: context.textTheme.bodyMedium,
-            ),
-            const SizedBox(width: 8),
-            VoicesAssets.icons.chevronDown.buildIcon(),
-          ],
+    return Align(
+      alignment: Alignment.topRight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: BlocBuilder<CampaignInfoCubit, CampaignInfoState>(
+          builder: (context, state) {
+            final campaign = state.campaign;
+            return campaign != null
+                ? CampaignStageCard(campaign: campaign)
+                : const Offstage();
+          },
         ),
       ),
     );
@@ -333,7 +315,7 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
       TabController(length: _tabLength, vsync: this);
   final _tabLength = 5;
 
-  @override
+ @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -565,6 +547,46 @@ class _TabBar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _Controls extends StatelessWidget {
+  const _Controls();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FilterByDropdown(
+            items: [],
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 250,
+            child: VoicesTextField(
+              onFieldSubmitted: (_) {},
+              decoration: VoicesTextFieldDecoration(
+                prefixIcon: VoicesAssets.icons.search.buildIcon(),
+                hintText: context.l10n.searchProposals,
+                filled: true,
+                fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
+                suffixIcon: Offstage(
+                  offstage: false,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(context.l10n.clear),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
