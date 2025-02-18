@@ -1,5 +1,7 @@
 //! Defines API schemas of Cardano Slot info types.
 
+use std::str::FromStr;
+
 use derive_more::{From, Into};
 use poem_openapi::{types::Example, NewType, Object};
 
@@ -48,11 +50,10 @@ impl Example for PreviousSlot {
     fn example() -> Self {
         Self(Slot {
             slot_number: 121_099_406u64.try_into().unwrap_or_default(),
-            block_hash: hex::decode(
-                "162ae0e2d08dd238233308eef328bf39ba529b82bc0b87c4eeea3c1dae4fc877",
+            block_hash: FromStr::from_str(
+                "0x162ae0e2d08dd238233308eef328bf39ba529b82bc0b87c4eeea3c1dae4fc877",
             )
-            .expect("Invalid hex")
-            .into(),
+            .expect("Invalid hex"),
             block_time: chrono::DateTime::from_timestamp(1_712_676_497, 0)
                 .expect("Invalid timestamp")
                 .into(),
@@ -75,11 +76,10 @@ impl Example for CurrentSlot {
     fn example() -> Self {
         Self(Slot {
             slot_number: 121_099_409u64.try_into().unwrap_or_default(),
-            block_hash: hex::decode(
-                "aa34657bf91e04eb5b506d76a66f688dbfbc509dbf70bc38124d4e8832fdd68a",
+            block_hash: FromStr::from_str(
+                "0xaa34657bf91e04eb5b506d76a66f688dbfbc509dbf70bc38124d4e8832fdd68a",
             )
-            .expect("Invalid hex")
-            .into(),
+            .expect("Invalid hex"),
             block_time: chrono::DateTime::from_timestamp(1_712_676_501, 0)
                 .expect("Invalid timestamp")
                 .into(),
@@ -102,11 +102,10 @@ impl Example for NextSlot {
     fn example() -> Self {
         Self(Slot {
             slot_number: 121_099_422u64.try_into().unwrap_or_default(),
-            block_hash: hex::decode(
-                "83ad63288ae14e75de1a1f794bda5d317fa59cbdbf1cc4dc83471d76555a5e89",
+            block_hash: FromStr::from_str(
+                "0x83ad63288ae14e75de1a1f794bda5d317fa59cbdbf1cc4dc83471d76555a5e89",
             )
-            .expect("Invalid hex")
-            .into(),
+            .expect("Invalid hex"),
             block_time: chrono::DateTime::from_timestamp(1_712_676_513, 0)
                 .expect("Invalid timestamp")
                 .into(),

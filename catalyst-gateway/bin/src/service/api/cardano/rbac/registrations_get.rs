@@ -131,9 +131,15 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
             },
         };
 
-        let item = RbacRegistration {
-            tx_hash: row.transaction_id.into(),
+        let tx_hash = match row.transaction_id.try_into() {
+            Ok(v) => v,
+            Err(err) => {
+                error!(error = ?err, "Failed to parse tx hash from query row");
+                return AllResponses::internal_error(&err);
+            },
         };
+
+        let item = RbacRegistration { tx_hash };
         registrations.push(item);
     }
 

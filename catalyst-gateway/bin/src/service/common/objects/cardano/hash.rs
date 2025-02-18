@@ -13,16 +13,18 @@ use crate::service::utilities::as_hex_string;
 
 /// Cardano Blake2b256 hash encoded in hex.
 #[derive(Debug, Clone, From)]
-pub(crate) struct Hash256(Vec<u8>);
+pub(crate) struct Hash256([u8; Hash256::BYTE_LEN]);
 
 impl Hash256 {
+    /// The byte size for this hash.
+    const BYTE_LEN: usize = 32;
     /// The hex-encoded hash length of this hash type.
-    const HASH_LEN: usize = 64;
+    const HASH_LEN: usize = Self::BYTE_LEN * 2;
 
     /// Creates a `Hash256` schema definition.
     fn schema() -> MetaSchema {
         let mut schema = MetaSchema::new("string");
-        schema.title = Some(format!("Cardano {}-bit Hash", Self::HASH_LEN * 4));
+        schema.title = Some(format!("Cardano {}-bit Hash", Self::BYTE_LEN * 8));
         schema.description = Some("Cardano Blake2b256 hash encoded in hex.");
         schema.example = Some(Self::example().to_string().into());
         schema.min_length = Some(Self::HASH_LEN + 2);
@@ -60,10 +62,21 @@ impl Type for Hash256 {
 impl Example for Hash256 {
     fn example() -> Self {
         // 0xff561c1ce6becf136a5d3063f50d78b8db50b8a1d4c03b18d41a8e98a6a18aed
-        Self::from(vec![
+        Self::from([
             255, 86, 28, 28, 230, 190, 207, 19, 106, 93, 48, 99, 245, 13, 120, 184, 219, 80, 184,
             161, 212, 192, 59, 24, 212, 26, 142, 152, 166, 161, 138, 237,
         ])
+    }
+}
+
+impl TryFrom<Vec<u8>> for Hash256 {
+    type Error = anyhow::Error;
+
+    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
+        value
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("Invalid {}-bit Cardano hash length.", Self::BYTE_LEN * 8))
+            .map(Self)
     }
 }
 
@@ -75,16 +88,9 @@ impl FromStr for Hash256 {
             "Invalid Cardano hash. Hex string must start with `0x`.",
         ))?;
 
-        if hash.len() != Self::HASH_LEN {
-            return Err(anyhow::anyhow!(
-                "Invalid {}-bit Cardano hash length",
-                Self::HASH_LEN * 4
-            ));
-        }
-
         hex::decode(hash)
-            .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))
-            .map(Self)
+            .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))?
+            .try_into()
     }
 }
 
@@ -118,16 +124,18 @@ impl fmt::Display for Hash256 {
 
 /// Cardano Blake2b128 hash encoded in hex.
 #[derive(Debug, Clone, From)]
-pub(crate) struct Hash128(Vec<u8>);
+pub(crate) struct Hash128([u8; Hash128::BYTE_LEN]);
 
 impl Hash128 {
+    /// The byte size for this hash.
+    const BYTE_LEN: usize = 16;
     /// The hex-encoded hash length of this hash type.
-    const HASH_LEN: usize = 32;
+    const HASH_LEN: usize = Self::BYTE_LEN * 2;
 
     /// Creates a `Hash128` schema definition.
     fn schema() -> MetaSchema {
         let mut schema = MetaSchema::new("string");
-        schema.title = Some(format!("Cardano {}-bit Hash", Self::HASH_LEN * 4));
+        schema.title = Some(format!("Cardano {}-bit Hash", Self::BYTE_LEN * 8));
         schema.description = Some("Cardano Blake2b128 hash encoded in hex.");
         schema.example = Some(Self::example().to_string().into());
         schema.min_length = Some(Self::HASH_LEN + 2);
@@ -165,9 +173,20 @@ impl Type for Hash128 {
 impl Example for Hash128 {
     fn example() -> Self {
         // 0xdb50b8a1d4c03b18d41a8e98a6a18aed
-        Self::from(vec![
+        Self::from([
             219, 80, 184, 161, 212, 192, 59, 24, 212, 26, 142, 152, 166, 161, 138, 237,
         ])
+    }
+}
+
+impl TryFrom<Vec<u8>> for Hash128 {
+    type Error = anyhow::Error;
+
+    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
+        value
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("Invalid {}-bit Cardano hash length.", Self::BYTE_LEN * 8))
+            .map(Self)
     }
 }
 
@@ -179,16 +198,9 @@ impl FromStr for Hash128 {
             "Invalid Cardano hash. Hex string must start with `0x`.",
         ))?;
 
-        if hash.len() != Self::HASH_LEN {
-            return Err(anyhow::anyhow!(
-                "Invalid {}-bit Cardano hash length",
-                Self::HASH_LEN * 4
-            ));
-        }
-
         hex::decode(hash)
-            .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))
-            .map(Self)
+            .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))?
+            .try_into()
     }
 }
 

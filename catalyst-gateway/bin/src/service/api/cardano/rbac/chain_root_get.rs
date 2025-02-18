@@ -73,9 +73,15 @@ pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
                     },
                 };
 
-                let res = ChainRootGetResponse {
-                    chain_root: Hash256::from(row.chain_root),
+                let chain_root = match row.chain_root.try_into() {
+                    Ok(v) => v,
+                    Err(err) => {
+                        error!(error = ?err, "Failed to parse chain root from query row");
+                        return AllResponses::internal_error(&err);
+                    },
                 };
+
+                let res = ChainRootGetResponse { chain_root };
 
                 Responses::Ok(Json(res)).into()
             } else {
