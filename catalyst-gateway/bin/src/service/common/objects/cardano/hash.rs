@@ -3,7 +3,6 @@
 use core::fmt;
 use std::str::FromStr;
 
-use derive_more::From;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -12,7 +11,7 @@ use poem_openapi::{
 use crate::service::utilities::as_hex_string;
 
 /// Cardano Blake2b256 hash encoded in hex.
-#[derive(Debug, Clone, From)]
+#[derive(Debug, Clone)]
 pub(crate) struct Hash256([u8; Hash256::BYTE_LEN]);
 
 impl Hash256 {
@@ -62,7 +61,7 @@ impl Type for Hash256 {
 impl Example for Hash256 {
     fn example() -> Self {
         // 0xff561c1ce6becf136a5d3063f50d78b8db50b8a1d4c03b18d41a8e98a6a18aed
-        Self::from([
+        Self([
             255, 86, 28, 28, 230, 190, 207, 19, 106, 93, 48, 99, 245, 13, 120, 184, 219, 80, 184,
             161, 212, 192, 59, 24, 212, 26, 142, 152, 166, 161, 138, 237,
         ])
@@ -91,6 +90,12 @@ impl FromStr for Hash256 {
         hex::decode(hash)
             .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))?
             .try_into()
+    }
+}
+
+impl AsRef<[u8]> for Hash256 {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
     }
 }
 
@@ -123,7 +128,7 @@ impl fmt::Display for Hash256 {
 }
 
 /// Cardano Blake2b128 hash encoded in hex.
-#[derive(Debug, Clone, From)]
+#[derive(Debug, Clone)]
 pub(crate) struct Hash128([u8; Hash128::BYTE_LEN]);
 
 impl Hash128 {
@@ -173,7 +178,7 @@ impl Type for Hash128 {
 impl Example for Hash128 {
     fn example() -> Self {
         // 0xdb50b8a1d4c03b18d41a8e98a6a18aed
-        Self::from([
+        Self([
             219, 80, 184, 161, 212, 192, 59, 24, 212, 26, 142, 152, 166, 161, 138, 237,
         ])
     }
@@ -201,6 +206,12 @@ impl FromStr for Hash128 {
         hex::decode(hash)
             .map_err(|_| anyhow::anyhow!("Invalid Cardano hash. Must be hex string."))?
             .try_into()
+    }
+}
+
+impl AsRef<[u8]> for Hash128 {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
     }
 }
 
