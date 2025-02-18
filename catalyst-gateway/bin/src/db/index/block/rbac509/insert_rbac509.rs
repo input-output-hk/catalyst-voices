@@ -23,12 +23,12 @@ const QUERY: &str = include_str!("cql/insert_rbac509.cql");
 pub(crate) struct Params {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
-    /// A transaction hash
-    txn_id: DbTransactionId,
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
     txn_index: DbTxnIndex,
+    /// A transaction hash
+    txn_id: DbTransactionId,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<DbTransactionId>,
     /// Purpose.`UUIDv4`. 16 bytes.

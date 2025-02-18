@@ -23,12 +23,12 @@ const QUERY: &str = include_str!("cql/insert_rbac509_invalid.cql");
 pub(crate) struct Params {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
-    /// A transaction hash of this registration.
-    txn_id: DbTransactionId,
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
     txn_index: DbTxnIndex,
+    /// A transaction hash of this registration.
+    txn_id: DbTransactionId,
     /// A Hash of the previous transaction.
     prv_txn_id: MaybeUnset<DbTransactionId>,
     /// A registration purpose.

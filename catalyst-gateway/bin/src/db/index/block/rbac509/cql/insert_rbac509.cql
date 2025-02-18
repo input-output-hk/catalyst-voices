@@ -8,9 +8,9 @@ INSERT INTO rbac_registration (
     purpose
 ) VALUES (
     :catalyst_id,
-    :txn_id,
     :slot_no,
     :txn_index,
+    :txn_id,
     :prv_txn_id,
     :purpose
 );

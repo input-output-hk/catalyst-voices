@@ -2,7 +2,7 @@
 -- Can also be used to convert a known stake key hash back to a full stake address.
 CREATE TABLE IF NOT EXISTS stake_registration (
     -- Primary Key Data
-    stake_address    blob,     -- 29 Byte stake hash (CIP19), zero length if not staked.
+    stake_address    blob,     -- 29 Byte stake hash (CIP19).
     slot_no          varint,   -- slot number when the key_was_registered/re-registered.
     txn_index        smallint, -- Index of the TX which holds the registration data.
 

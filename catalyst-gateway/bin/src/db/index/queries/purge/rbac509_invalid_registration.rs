@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -24,10 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for RBAC 509 invalid registration purge queries.
 
-    use crate::db::types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex};
+    use crate::db::types::{DbCatalystId, DbSlot, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbCatalystId, DbTransactionId, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (DbCatalystId, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for RBAC 509 invalid registration.
@@ -38,8 +38,6 @@ const SELECT_QUERY: &str = include_str!("cql/get_rbac_invalid_registration.cql")
 pub(crate) struct Params {
     /// A short Catalyst ID.
     pub catalyst_id: DbCatalystId,
-    /// A transaction ID.
-    txn_id: DbTransactionId,
     /// A block slot number.
     pub slot_no: DbSlot,
     /// A transaction offset inside the block.
@@ -52,7 +50,6 @@ impl Debug for Params {
             .field("catalyst_id", &self.catalyst_id)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
-            .field("txn_id", &self.txn_id)
             .finish()
     }
 }
@@ -61,9 +58,8 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             catalyst_id: value.0,
-            txn_id: value.1,
-            slot_no: value.2,
-            txn_index: value.3,
+            slot_no: value.1,
+            txn_index: value.2,
         }
     }
 }

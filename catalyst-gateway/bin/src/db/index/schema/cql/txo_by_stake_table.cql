@@ -2,7 +2,7 @@
 -- Unstaked ADA is not present in this table.
 CREATE TABLE IF NOT EXISTS txo_by_stake (
     -- Primary Key Fields
-    stake_address   blob,       -- 29 Byte stake hash (CIP19), zero length if not staked.
+    stake_address   blob,       -- 29 Byte stake hash (CIP19).
     slot_no         varint,     -- slot number the txo was created in.
     txn_index       smallint,   -- Which Transaction in the Slot is the TXO.
     txo             smallint,   -- offset in the txo list of the transaction the txo is in.
