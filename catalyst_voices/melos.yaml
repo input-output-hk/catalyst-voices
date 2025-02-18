@@ -197,16 +197,16 @@ scripts:
 
   format-apply:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --fix"
+      melos exec -c 1 --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
+      melos exec -c 1 --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +"
     description: Run `dart format` for all packages.
 
   format-check:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
-      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' ! -path './.dart_tool/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
+      melos exec -c 1 --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
+      melos exec -c 1 --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +"
     description: Run `dart format` checks for all packages.
 
   license-check:
@@ -242,11 +242,11 @@ scripts:
         EXIT_CODE=$? ; \
         cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
         exit $EXIT_CODE'
-      
+
       # store the exit code after running the tests,
       # this is the exit code for the whole script
       EXIT_CODE=$?
-      
+
       # removes code coverage for generated code
       find . -name "*.lcov.info" -exec \
         lcov --remove {} -o {} --ignore-errors unused,unused \
@@ -259,10 +259,10 @@ scripts:
         '*.swagger.*.dart' \
         '*.drift.dart' \
         'lib/generated/**' \;
-      
+
       # merges all coverage reports into a single one and puts it in /coverage/lcov.info
       dart pub global run combine_coverage --repo-path=.
-      
+
       exit $EXIT_CODE
 
     description: |
