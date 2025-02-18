@@ -548,7 +548,7 @@ async fn get_all_invalid_registrations(
             Ok(payment_addr) => Some(payment_addr.clone()),
             Err(err) => {
                 debug!(
-                    "Valid registration is not a valid cip19 shelley {:?} {:?}",
+                    "Invalid registration is not a valid cip19 shelley {:?} {:?}",
                     row.payment_address, err
                 );
                 None
