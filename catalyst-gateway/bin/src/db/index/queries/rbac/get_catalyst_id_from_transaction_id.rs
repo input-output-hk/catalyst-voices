@@ -22,6 +22,7 @@ use crate::db::{
 };
 
 /// Cached data.
+#[allow(dead_code)]
 static CACHE: LazyLock<Cache<DbTransactionHash, Query>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
@@ -92,24 +93,29 @@ impl Query {
     pub(crate) async fn get_latest(
         session: &CassandraSession, transaction_id: DbTransactionHash,
     ) -> Result<Option<Query>> {
-        match CACHE.get(&transaction_id) {
-            Some(v) => Ok(Some(v)),
-            None => {
-                // Look in DB for the stake registration
-                Self::get_latest_uncached(session, transaction_id).await
-            },
-        }
+        // TODO: Caching is disabled because we want to measure the performance without it and be
+        // sure that the logic is sound. Also caches needs to be tunable.
+        Self::get_latest_uncached(session, transaction_id).await
+        // match CACHE.get(&transaction_id) {
+        //     Some(v) => Ok(Some(v)),
+        //     None => {
+        //         // Look in DB for the stake registration
+        //         Self::get_latest_uncached(session, transaction_id).await
+        //     },
+        // }
     }
 }
 
 /// Update the cache when a rbac registration is indexed.
 pub(crate) fn cache_for_transaction_id(
-    transaction_id: TransactionHash, catalyst_id: IdUri, slot_no: Slot, txn_idx: TxnIndex,
+    _transaction_id: TransactionHash, _catalyst_id: IdUri, _slot_no: Slot, _txn_idx: TxnIndex,
 ) {
-    let value = Query {
-        catalyst_id: catalyst_id.into(),
-        slot_no: slot_no.into(),
-        txn_index: txn_idx.into(),
-    };
-    CACHE.insert(transaction_id.into(), value);
+    // TODO: Caching is disabled because we want to measure the performance without it and
+    // be sure that the logic is sound. Also caches needs to be tunable.
+    // let value = Query {
+    //     catalyst_id: catalyst_id.into(),
+    //     slot_no: slot_no.into(),
+    //     txn_index: txn_idx.into(),
+    // };
+    // CACHE.insert(transaction_id.into(), value);
 }
