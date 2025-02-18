@@ -7,13 +7,16 @@ description = ""
 authors = ["Joaquín Rosales <joaquin.rosales@iohk.io>"]
 readme = "Readme.md"
 license = "MIT or Apache-2.0"
+packages = [
+    { include = "integration" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 loguru = "^0.7.2"
 asyncio = "^3.4.3"
-asyncpg = "^0.29.0"
-requests = "^2.32.0"
+asyncpg = "^0.30.0"
+requests = "^2.32.3"
 pytest = "^8.0.0"
 python-bitcoinlib = "^0.12.2"
 pytest-cov = "^5.0.0"

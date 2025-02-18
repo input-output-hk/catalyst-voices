@@ -243,9 +243,45 @@
   "@activeVotingRound": {
     "description": "Title of the voting space."
   },
-  "noOfAllProposals": "All proposals ({count})",
-  "@noOfAllProposals": {
+  "noOfAll": "All ({count})",
+  "@noOfAll": {
     "description": "Tab label for all proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfDraft": "Draft proposals ({count})",
+  "@noOfDraft": {
+    "description": "Tab label for draft proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfFinal": "Final proposals ({count})",
+  "@noOfFinal": {
+    "description": "Tab label for final proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfMyProposals": "My proposals ({count})",
+  "@noOfMyProposals": {
+    "description": "Tab label for my proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfFavorites": "Favorites ({count})",
+  "@noOfFavorites": {
+    "description": "Tab label for draft proposals in voting space",
     "placeholders": {
       "count": {
         "type": "int"
@@ -635,8 +671,8 @@
   "@walletAddress": {
     "description": "A cardano wallet address"
   },
-  "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
-  "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
+  "accountCreationCreate": "Create a new \nCatalyst Keychain",
+  "accountCreationRecover": "Recover your\nCatalyst Keychain",
   "accountCreationOnThisDevice": "On this device",
   "@accountCreationOnThisDevice": {
     "description": "Indicates that created keychain will be stored in this device only"
@@ -1364,7 +1400,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Found 14",
+  "catalystF14": "Catalyst Found14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1474,5 +1510,6 @@
   "startProposal": "Start Proposal",
   "editRolesDialogTitle": "Editing Roles",
   "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
-  "continueText": "Continue"
+  "continueText": "Continue",
+  "showAll": "Show All"
 }

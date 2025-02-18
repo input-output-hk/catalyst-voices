@@ -21,7 +21,9 @@ class InstructionsPanel extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12),
-        _ExplanationText(),
+        _ExplanationText(
+          key: Key('BaseProfileExplanationTest'),
+        ),
         SizedBox(height: 8),
         _EmailRequestCard(),
         SizedBox(height: 24),
@@ -46,7 +48,9 @@ class _PanelMainMessage extends StatelessWidget {
 }
 
 class _ExplanationText extends StatelessWidget {
-  const _ExplanationText();
+  const _ExplanationText({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +62,7 @@ class _ExplanationText extends StatelessWidget {
     );
 
     return Text(
+      key: key ?? const Key('ExplanationText'),
       context.l10n.headsUp,
       style: textStyle,
     );
@@ -70,9 +75,14 @@ class _EmailRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionCard(
+      key: const Key('EmailRequestCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
-      title: Text(context.l10n.createBaseProfileInstructionsEmailRequest),
+      title: Text(
+        context.l10n.createBaseProfileInstructionsEmailRequest,
+        key: const Key('EmailRequestTitle'),
+      ),
       desc: BulletList(
+        key: const Key('EmailRequestList'),
         items: [
           context.l10n.createBaseProfileInstructionsEmailReason1,
           context.l10n.createBaseProfileInstructionsEmailReason2,
