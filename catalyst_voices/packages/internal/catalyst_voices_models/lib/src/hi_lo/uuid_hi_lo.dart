@@ -32,6 +32,11 @@ final class UuidHiLo extends HiLo<BigInt> {
     );
   }
 
+  /// Syntax sugar for working with nullable [data].
+  static UuidHiLo? fromNullable(String? data) {
+    return data != null ? UuidHiLo.from(data) : null;
+  }
+
   /// Version is always 13th digit of uuid.
   int get _version {
     final source = String.fromCharCode(uuid.codeUnitAt(14));
