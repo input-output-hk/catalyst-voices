@@ -75,7 +75,7 @@ code-generator:
         COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway.json
     END
 
-    # saves locally openapi json specs. Useful for debuging.
+    # saves locally openapi json specs. Useful for local diagnostic.
     IF [ $save_locally = true ]
         SAVE ARTIFACT openapi/* AS LOCAL packages/internal/catalyst_voices_repositories/openapi/
     END
