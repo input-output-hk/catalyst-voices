@@ -133,9 +133,26 @@ final class Dependencies extends DependencyProvider {
           get<KeychainProvider>(),
         );
       })
+      ..registerLazySingleton<DatabaseDraftsDataSource>(() {
+        return DatabaseDraftsDataSource(
+          get<CatalystDatabase>(),
+        );
+      })
+      ..registerLazySingleton<DatabaseDocumentsDataSource>(() {
+        return DatabaseDocumentsDataSource(
+          get<CatalystDatabase>(),
+        );
+      })
+      ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
+        return CatGatewayDocumentDataSource(
+          get<SignedDocumentManager>(),
+        );
+      })
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
-          get<SignedDocumentManager>(),
+          get<DatabaseDraftsDataSource>(),
+          get<DocumentDataLocalSource>(),
+          get<CatGatewayDocumentDataSource>(),
         );
       });
   }
