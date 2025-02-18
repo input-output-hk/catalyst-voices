@@ -96,7 +96,7 @@ void main() {
           (index) => DocumentWithMetadataFactory.build(),
         );
         final document = documentsWithMetadata.first.document;
-        final ref = DocumentRef(
+        final ref = SignedDocumentRef(
           id: document.metadata.id,
           version: document.metadata.version,
         );
@@ -138,21 +138,25 @@ void main() {
             content: const DocumentDataContent({'title': 'D'}),
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: firstVersionId,
+              selfRef: DocumentRefFactory.buildSigned(
+                id: id,
+                version: firstVersionId,
+              ),
             ),
           ),
           DocumentWithMetadataFactory.build(
             content: secondContent,
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: secondVersionId,
+              selfRef: DocumentRefFactory.buildSigned(
+                id: id,
+                version: secondVersionId,
+              ),
             ),
           ),
         ];
         final document = documentsWithMetadata.first.document;
-        final ref = DocumentRef(id: document.metadata.id);
+        final ref = SignedDocumentRef(id: document.metadata.id);
 
         // When
         await database.documentsDao.saveAll(documentsWithMetadata);
@@ -173,7 +177,7 @@ void main() {
           2,
           (index) => DocumentWithMetadataFactory.build(),
         );
-        final ref = DocumentRef(id: const Uuid().v7());
+        final ref = SignedDocumentRef(id: const Uuid().v7());
 
         // When
         await database.documentsDao.saveAll(documentsWithMetadata);
@@ -210,8 +214,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: const Uuid().v7(),
+              selfRef: DocumentRefFactory.buildSigned(id: id),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -234,15 +237,14 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: const Uuid().v7(),
+              selfRef: DocumentRefFactory.buildSigned(id: id),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
         );
 
         final expectedCount = documentsWithMetadata.length;
-        final ref = DocumentRef(id: id);
+        final ref = SignedDocumentRef(id: id);
 
         // When
         await database.documentsDao.saveAll(documentsWithMetadata);
@@ -261,14 +263,13 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: id,
-              version: const Uuid().v7(),
+              selfRef: DocumentRefFactory.buildSigned(id: id),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
         );
         final version = documentsWithMetadata.first.document.metadata.version;
-        final ref = DocumentRef(id: id, version: version);
+        final ref = SignedDocumentRef(id: id, version: version);
 
         // When
         await database.documentsDao.saveAll(documentsWithMetadata);
@@ -288,8 +289,7 @@ void main() {
           (index) {
             final metadata = DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              id: const Uuid().v7(),
-              version: const Uuid().v7(),
+              selfRef: DocumentRefFactory.buildSigned(),
             );
             return DocumentWithMetadataFactory.build(metadata: metadata);
           },
@@ -297,7 +297,7 @@ void main() {
         final document = documentsWithMetadata.last.document;
         final id = document.metadata.id;
         final version = document.metadata.version;
-        final ref = DocumentRef(id: id, version: version);
+        final ref = SignedDocumentRef(id: id, version: version);
 
         // When
         await database.documentsDao.saveAll(documentsWithMetadata);
