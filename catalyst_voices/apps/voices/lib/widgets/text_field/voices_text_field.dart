@@ -284,6 +284,10 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.fillColor].
   final Color? fillColor;
 
+  /// The border radius for all borders of the text field.
+  /// If not specified, no radius will be applied.
+  final BorderRadius? borderRadius;
+
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -308,6 +312,7 @@ class VoicesTextFieldDecoration {
     this.showStatusSuffixIcon = true,
     this.filled = true,
     this.fillColor,
+    this.borderRadius,
   });
 }
 
@@ -450,6 +455,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     final textTheme = theme.textTheme;
     final colors = theme.colors;
     final colorScheme = theme.colorScheme;
+    final borderRadius = widget.decoration?.borderRadius;
 
     return InputDecoration(
       filled: widget.decoration?.filled,
@@ -466,6 +472,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       border: widget.decoration?.border ??
           _getBorder(
             orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
               borderSide: BorderSide(
                 color: colorScheme.outlineVariant,
               ),
@@ -474,6 +481,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       enabledBorder: widget.decoration?.enabledBorder ??
           _getBorder(
             orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
               borderSide: BorderSide(
                 color: colorScheme.outlineVariant,
               ),
@@ -481,12 +489,14 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
           ),
       disabledBorder: widget.decoration?.disabledBorder ??
           OutlineInputBorder(
+            borderRadius: borderRadius ?? BorderRadius.zero,
             borderSide: BorderSide(
               color: colorScheme.outline,
             ),
           ),
       errorBorder: widget.decoration?.errorBorder ??
           OutlineInputBorder(
+            borderRadius: borderRadius ?? BorderRadius.zero,
             borderSide: BorderSide(
               width: 2,
               color: _getStatusColor(
@@ -497,6 +507,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       focusedBorder: widget.decoration?.focusedBorder ??
           _getBorder(
             orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
               borderSide: BorderSide(
                 width: 2,
                 color: colorScheme.primary,
@@ -506,6 +517,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
           _getBorder(
             orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
               borderSide: BorderSide(
                 width: 2,
                 color: colorScheme.error,
@@ -569,6 +581,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       case VoicesTextFieldStatus.warning:
       case VoicesTextFieldStatus.error:
         return OutlineInputBorder(
+          borderRadius: widget.decoration?.borderRadius ?? BorderRadius.zero,
           borderSide: BorderSide(
             width: 2,
             color: _getStatusColor(
