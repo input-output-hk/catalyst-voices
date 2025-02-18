@@ -96,8 +96,7 @@ impl Type for StakeAmount {
 
 impl ParseFromParameter for StakeAmount {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        let slot: u64 = value.parse()?;
-        Ok(Self(slot))
+        Ok(Self(value.parse()?))
     }
 }
 
@@ -105,7 +104,7 @@ impl ParseFromJSON for StakeAmount {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         u64::parse_from_json(value)
             .map_err(ParseError::propagate)
-            .map(|v| v.try_into())?
+            .map(TryInto::try_into)?
             .map_err(ParseError::custom)
             .map(Self)
     }
@@ -138,7 +137,7 @@ impl TryFrom<i64> for StakeAmount {
     type Error = anyhow::Error;
 
     fn try_from(value: i64) -> Result<Self, Self::Error> {
-        Ok(Self(value.try_into()?))
+        u64::try_from(value).map(TryInto::try_into)?
     }
 }
 
