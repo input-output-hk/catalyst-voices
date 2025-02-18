@@ -38,13 +38,13 @@ class ProposalBuilderStatusAction extends StatelessWidget {
       case _MenuItemEnum.back:
         Navigator.of(context).pop();
       case _MenuItemEnum.publish:
-        context.read<ProposalBuilderBloc>().add();
+        context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
       case _MenuItemEnum.submit:
-      // TODO(dtscalac): Handle this case.
+        context.read<ProposalBuilderBloc>().add(const SubmitProposalEvent());
       case _MenuItemEnum.share:
-      // TODO(dtscalac): Handle this case.
+        context.read<ProposalBuilderBloc>().add(const ShareProposalEvent());
       case _MenuItemEnum.export:
-      // TODO(dtscalac): Handle this case.
+        context.read<ProposalBuilderBloc>().add(const ExportProposalEvent());
     }
   }
 }
