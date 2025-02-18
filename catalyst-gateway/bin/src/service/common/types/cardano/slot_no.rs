@@ -94,18 +94,11 @@ impl ParseFromParameter for SlotNo {
 
 impl ParseFromJSON for SlotNo {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
-        let value = value.unwrap_or_default();
-        if let Value::Number(value) = value {
-            let value = value
-                .as_u64()
-                .ok_or(ParseError::from("invalid slot number"))?;
-            if !Self::is_valid(value) {
-                return Err("invalid AssetValue".into());
-            }
-            Ok(Self(value))
-        } else {
-            Err(ParseError::expected_type(value))
-        }
+        u64::parse_from_json(value)
+            .map_err(ParseError::propagate)
+            .map(|v| v.try_into())?
+            .map_err(ParseError::custom)
+            .map(Self)
     }
 }
 

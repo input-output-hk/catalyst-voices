@@ -60,7 +60,7 @@ impl ParseFromParameter for DateTime {
 impl ParseFromJSON for DateTime {
     fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
         chrono::DateTime::<chrono::offset::Utc>::parse_from_json(value)
-            .map_err(|e| ParseError::custom(e.into_message()))
+            .map_err(ParseError::propagate)
             .map(Self)
     }
 }

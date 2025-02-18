@@ -41,7 +41,7 @@ impl Type for JSONObject {
 impl ParseFromJSON for JSONObject {
     fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
         serde_json::Value::parse_from_json(value)
-            .map_err(|e| ParseError::custom(e.into_message()))
+            .map_err(ParseError::propagate)
             .map(Self)
     }
 }

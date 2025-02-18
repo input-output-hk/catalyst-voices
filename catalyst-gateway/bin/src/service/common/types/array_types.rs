@@ -83,9 +83,9 @@ macro_rules! impl_array_types {
 
         impl poem_openapi::types::ParseFromJSON for $ty {
             fn parse_from_json(value: Option<serde_json::Value>) -> poem_openapi::types::ParseResult<Self> {
-                Ok(Self(
-                    Vec::parse_from_json(value).map_err(|e| poem_openapi::types::ParseError::custom(e.into_message()))?,
-                ))
+                Vec::parse_from_json(value)
+                    .map_err(poem_openapi::types::ParseError::propagate)
+                    .map(Self)
             }
         }
 

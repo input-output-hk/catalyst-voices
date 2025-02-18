@@ -49,9 +49,9 @@ impl Type for SemVer {
 
 impl ParseFromJSON for SemVer {
     fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
-        Ok(Self(
-            String::parse_from_json(value).map_err(|e| ParseError::custom(e.into_message()))?,
-        ))
+        String::parse_from_json(value)
+            .map_err(ParseError::propagate)
+            .map(Self)
     }
 }
 

@@ -107,10 +107,10 @@ impl ParseFromParameter for Hash256 {
 
 impl ParseFromJSON for Hash256 {
     fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
-        let value =
-            String::parse_from_json(value).map_err(|e| ParseError::custom(e.into_message()))?;
-
-        Self::from_str(&value).map_err(ParseError::custom)
+        String::parse_from_json(value)
+            .map_err(ParseError::propagate)
+            .map(|v| Self::from_str(&v))?
+            .map_err(ParseError::custom)
     }
 }
 
@@ -223,10 +223,10 @@ impl ParseFromParameter for Hash128 {
 
 impl ParseFromJSON for Hash128 {
     fn parse_from_json(value: Option<serde_json::Value>) -> ParseResult<Self> {
-        let value =
-            String::parse_from_json(value).map_err(|e| ParseError::custom(e.into_message()))?;
-
-        Self::from_str(&value).map_err(ParseError::custom)
+        String::parse_from_json(value)
+            .map_err(ParseError::propagate)
+            .map(|v| Self::from_str(&v))?
+            .map_err(ParseError::custom)
     }
 }
 

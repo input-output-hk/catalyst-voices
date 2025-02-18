@@ -103,18 +103,11 @@ impl ParseFromParameter for StakeAmount {
 
 impl ParseFromJSON for StakeAmount {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
-        let value = value.unwrap_or_default();
-        if let Value::Number(value) = value {
-            let value = value
-                .as_u64()
-                .ok_or(ParseError::from("invalid slot number"))?;
-            if !Self::is_valid(value) {
-                return Err("invalid AssetValue".into());
-            }
-            Ok(Self(value))
-        } else {
-            Err(ParseError::expected_type(value))
-        }
+        u64::parse_from_json(value)
+            .map_err(ParseError::propagate)
+            .map(|v| v.try_into())?
+            .map_err(ParseError::custom)
+            .map(Self)
     }
 }
 
@@ -145,11 +138,7 @@ impl TryFrom<i64> for StakeAmount {
     type Error = anyhow::Error;
 
     fn try_from(value: i64) -> Result<Self, Self::Error> {
-        let value: u64 = value.try_into()?;
-        if !Self::is_valid(value) {
-            bail!("Invalid Stake Amount");
-        }
-        Ok(Self(value))
+        Ok(Self(value.try_into()?))
     }
 }
 
