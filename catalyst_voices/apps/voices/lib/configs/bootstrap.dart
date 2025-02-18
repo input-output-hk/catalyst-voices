@@ -134,6 +134,8 @@ Future<BootstrapArgs> bootstrap({
 
   Bloc.observer = AppBlocObserver();
 
+  Dependencies.instance.get<DocumentsService>().sync().last;
+
   return BootstrapArgs(routerConfig: router);
 }
 

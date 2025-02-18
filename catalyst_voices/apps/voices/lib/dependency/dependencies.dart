@@ -206,6 +206,11 @@ final class Dependencies extends DependencyProvider {
         get<ConfigRepository>(),
       );
     });
+    registerLazySingleton<DocumentsService>(() {
+      return DocumentsService(
+        get<DocumentRepository>(),
+      );
+    });
   }
 
   void _registerStorages() {
