@@ -489,7 +489,8 @@ pub async fn get_all_registrations(
             Err(err) => {
                 error!(
                     "Valid registration is not a valid cip19 shelley {:?} {:?}",
-                    row.payment_address, err
+                    hex::encode(row.payment_address),
+                    err
                 );
                 None
             },
@@ -549,7 +550,8 @@ async fn get_all_invalid_registrations(
             Err(err) => {
                 error!(
                     "Invalid registration is not a valid cip19 shelley {:?} {:?}",
-                    row.payment_address, err
+                    hex::encode(row.payment_address),
+                    err
                 );
                 None
             },
