@@ -7,11 +7,8 @@ use std::{
 use anyhow::{bail, Ok};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
-use minicbor::{Decode, Encode};
 use tracing::error;
 use ulid::Ulid;
-
-use super::role0_kid::Role0Kid;
 
 /// Identifier for this token, encodes both the time the token was issued and a random
 /// nonce.
@@ -25,10 +22,6 @@ pub struct SignatureEd25519(pub [u8; 64]);
 /// A Catalyst RBAC Authorization Token.
 #[derive(Debug, Clone)]
 pub(crate) struct CatalystRBACTokenV1 {
-    /// Token Key Identifier
-    // TODO: This needs to be updated/removed.
-    #[allow(dead_code)]
-    pub(crate) kid: Role0Kid,
     /// Tokens ULID (Time and Random Nonce)
     pub(crate) ulid: Ulid,
     /// Ed25519 Signature of the Token
@@ -49,10 +42,7 @@ impl CatalystRBACTokenV1 {
     /// kid, ulid, signature ]. ED25519 Signature over the preceding two fields -
     /// sig(cbor(kid), cbor(ulid))
     #[allow(dead_code, clippy::expect_used)]
-    pub(crate) fn new(sk: &SigningKey, der_cert: &[u8]) -> Self {
-        // Generate the Kid from the der_certificate
-        let kid = Role0Kid::new(der_cert);
-
+    pub(crate) fn new(sk: &SigningKey) -> Self {
         // Create a enw ulid for this token.
         let ulid = Ulid::new();
 
@@ -60,8 +50,6 @@ impl CatalystRBACTokenV1 {
         let mut encoder = minicbor::Encoder::new(out);
 
         // It is safe to use expect here, because the calls are infallible
-        kid.encode(&mut encoder, &mut ())
-            .expect("This should never fail.");
         encoder
             .bytes(&ulid.to_bytes())
             .expect("This should never fail");
@@ -71,7 +59,6 @@ impl CatalystRBACTokenV1 {
         encoder.bytes(&sig.0).expect("This should never fail");
 
         Self {
-            kid,
             ulid,
             sig,
             raw: encoder.writer().clone(),
@@ -94,9 +81,6 @@ impl CatalystRBACTokenV1 {
         // Decode cbor to bytes
         let mut cbor_decoder = minicbor::Decoder::new(&token_cbor_encoded);
 
-        // Raw kid bytes
-        let kid = Role0Kid::decode(&mut cbor_decoder, &mut ())?;
-
         // TODO: Check what happens if the ULID is NOT 28 bytes long
         let ulid_raw: UlidBytes = UlidBytes(
             cbor_decoder
@@ -115,7 +99,6 @@ impl CatalystRBACTokenV1 {
         );
 
         Ok(CatalystRBACTokenV1 {
-            kid,
             ulid,
             sig: signature,
             raw: token_cbor_encoded,
