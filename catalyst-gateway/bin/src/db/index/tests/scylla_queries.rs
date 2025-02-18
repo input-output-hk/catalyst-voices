@@ -13,7 +13,7 @@ use crate::{
         queries::{
             rbac,
             registrations::{
-                get_from_stake_addr::*, get_from_stake_hash::*, get_from_vote_key::*,
+                get_from_stake_addr::*, get_from_stake_address::*, get_from_vote_key::*,
                 get_invalid::*,
             },
             staked_ada::{
@@ -48,15 +48,15 @@ async fn test_get_assets_by_stake_addr() {
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn get_catalyst_id_by_stake_hash() {
-    use rbac::get_catalyst_id_from_stake_hash::{Query, QueryParams};
+async fn get_catalyst_id_by_stake_address() {
+    use rbac::get_catalyst_id_from_stake_address::{Query, QueryParams};
 
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
 
     let mut row_stream = Query::execute(&session, QueryParams {
-        stake_hash: stake_address_1().into(),
+        stake_address: stake_address_1().into(),
     })
     .await
     .unwrap();
@@ -175,10 +175,11 @@ async fn test_get_stake_addr_w_stake_key_hash() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream =
-        GetStakeAddrQuery::execute(&session, GetStakeAddrParams { stake_hash: vec![] })
-            .await
-            .unwrap();
+    let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams {
+        stake_address: vec![],
+    })
+    .await
+    .unwrap();
 
     while let Some(row_res) = row_stream.next().await {
         drop(row_res.unwrap());

@@ -17,14 +17,14 @@ use crate::{
         types::{DbPublicKey, DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
-    utils::stake_hash::stake_hash,
+    utils::stake_address::stake_address,
 };
 
 /// Insert TXI Query and Parameters
 #[derive(SerializeRow)]
 pub(crate) struct StakeRegistrationInsertQuery {
-    /// Stake key hash
-    stake_hash: Vec<u8>,
+    /// Stake address (29 bytes).
+    stake_address: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
@@ -61,7 +61,10 @@ impl Debug for StakeRegistrationInsertQuery {
         };
 
         f.debug_struct("StakeRegistrationInsertQuery")
-            .field("stake_hash", &hex::encode(hex::encode(&self.stake_hash)))
+            .field(
+                "stake_address",
+                &hex::encode(hex::encode(&self.stake_address)),
+            )
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("stake_public_key", &stake_public_key)
@@ -80,14 +83,14 @@ impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        stake_hash: Vec<u8>, slot_no: Slot, txn_index: TxnIndex,
+        stake_address: Vec<u8>, slot_no: Slot, txn_index: TxnIndex,
         stake_public_key: Option<VerifyingKey>, script: bool, register: bool, deregister: bool,
         pool_delegation: Option<Vec<u8>>,
     ) -> Self {
         let stake_public_key =
             stake_public_key.map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.into()));
         StakeRegistrationInsertQuery {
-            stake_hash,
+            stake_address,
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             stake_public_key,
@@ -159,36 +162,43 @@ impl CertInsertQuery {
         &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex, register: bool,
         deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
-        let (stake_hash, pubkey, script) = match cred {
+        let (stake_address, pubkey, script) = match cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
-                let stake_hash = stake_hash(block.network(), false, cred);
+                let stake_address = stake_address(block.network(), false, cred);
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
-                (stake_hash, addr, false)
+                (stake_address, addr, false)
             },
             conway::StakeCredential::Scripthash(h) => {
-                (stake_hash(block.network(), true, h), None, true)
+                (stake_address(block.network(), true, h), None, true)
             },
         };
 
         if pubkey.is_none() && !script && deregister {
             error!(
                 "Stake Deregistration Certificate {:?} is NOT Witnessed.",
-                stake_hash
+                stake_address
             );
         }
 
         if pubkey.is_none() && !script && delegation.is_some() {
             error!(
                 "Stake Delegation Certificate {:?} is NOT Witnessed.",
-                stake_hash
+                stake_address
             );
         }
 
         // This may not be witnessed, its normal but disappointing.
         self.stake_reg_data.push(StakeRegistrationInsertQuery::new(
-            stake_hash, slot_no, txn, pubkey, script, register, deregister, delegation,
+            stake_address,
+            slot_no,
+            txn,
+            pubkey,
+            script,
+            register,
+            deregister,
+            delegation,
         ));
     }
 

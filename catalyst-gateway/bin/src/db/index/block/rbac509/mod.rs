@@ -1,6 +1,6 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
-pub(crate) mod insert_catalyst_id_for_stake_hash;
+pub(crate) mod insert_catalyst_id_for_stake_address;
 pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
@@ -32,7 +32,7 @@ pub(crate) struct Rbac509InsertQuery {
     /// A Catalyst ID for transaction ID Data captured during indexing.
     catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
     /// A Catalyst ID for stake address data captured during indexing.
-    catalyst_id_for_stake_hash: Vec<insert_catalyst_id_for_stake_hash::Params>,
+    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -42,7 +42,7 @@ impl Rbac509InsertQuery {
             registrations: Vec::new(),
             invalid: Vec::new(),
             catalyst_id_for_txn_id: Vec::new(),
-            catalyst_id_for_stake_hash: Vec::new(),
+            catalyst_id_for_stake_address: Vec::new(),
         }
     }
 
@@ -54,7 +54,7 @@ impl Rbac509InsertQuery {
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
             insert_rbac509_invalid::Params::prepare_batch(session, cfg).await?,
             insert_catalyst_id_for_txn_id::Params::prepare_batch(session, cfg).await?,
-            insert_catalyst_id_for_stake_hash::Params::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_stake_address::Params::prepare_batch(session, cfg).await?,
         ))
     }
 
@@ -122,8 +122,8 @@ impl Rbac509InsertQuery {
                         index,
                     ));
                 for address in stake_addresses(&metadata) {
-                    self.catalyst_id_for_stake_hash.push(
-                        insert_catalyst_id_for_stake_hash::Params::new(
+                    self.catalyst_id_for_stake_address.push(
+                        insert_catalyst_id_for_stake_address::Params::new(
                             address,
                             slot,
                             index,
@@ -182,13 +182,13 @@ impl Rbac509InsertQuery {
             }));
         }
 
-        if !self.catalyst_id_for_stake_hash.is_empty() {
+        if !self.catalyst_id_for_stake_address.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
                         PreparedQuery::CatalystIdForStakeAddressInsertQuery,
-                        self.catalyst_id_for_stake_hash,
+                        self.catalyst_id_for_stake_address,
                     )
                     .await
             }));
@@ -272,6 +272,6 @@ mod tests {
         assert!(query.invalid.is_empty());
         assert_eq!(1, query.registrations.len());
         assert_eq!(1, query.catalyst_id_for_txn_id.len());
-        assert_eq!(1, query.catalyst_id_for_stake_hash.len());
+        assert_eq!(1, query.catalyst_id_for_stake_address.len());
     }
 }

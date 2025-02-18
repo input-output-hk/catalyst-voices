@@ -43,8 +43,8 @@ const SELECT_QUERY: &str = include_str!("./cql/get_txo_assets_by_stake_addr.cql"
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_hash: Vec<u8>,
+    /// Stake Address - Binary 29 bytes. 0 bytes = not staked.
+    pub(crate) stake_address: Vec<u8>,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -60,7 +60,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_hash", &self.stake_hash)
+            .field("stake_address", &self.stake_address)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("txo", &self.txo)
@@ -73,7 +73,7 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_hash: value.0,
+            stake_address: value.0,
             slot_no: value.1,
             txn_index: value.2,
             txo: value.3,
@@ -115,7 +115,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete TXO Assets by Stake Address
-const DELETE_QUERY: &str = include_str!("cql/delete_txo_assets_by_stake_hash.cql");
+const DELETE_QUERY: &str = include_str!("cql/delete_txo_assets_by_stake_address.cql");
 
 /// Delete TXO Assets by Stake Address Query
 pub(crate) struct DeleteQuery;

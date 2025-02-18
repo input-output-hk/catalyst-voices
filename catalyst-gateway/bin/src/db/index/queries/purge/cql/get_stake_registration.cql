@@ -1,6 +1,6 @@
 -- Get all primary keys from Stake Registration.
 SELECT 
-    stake_hash,
+    stake_address,
     script,
     slot_no,
     txn_index

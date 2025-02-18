@@ -19,7 +19,7 @@ use crate::{
         session::CassandraSession,
     },
     settings::cassandra_db,
-    utils::stake_hash::stake_hash,
+    utils::stake_address::stake_address,
 };
 
 /// This is used to indicate that there is no stake address.
@@ -100,10 +100,10 @@ impl TxoInsertQuery {
 
                         match address.delegation() {
                             pallas::ledger::addresses::ShelleyDelegationPart::Script(hash) => {
-                                (stake_hash(network, true, hash), address_string)
+                                (stake_address(network, true, hash), address_string)
                             },
                             pallas::ledger::addresses::ShelleyDelegationPart::Key(hash) => {
-                                (stake_hash(network, false, hash), address_string)
+                                (stake_address(network, false, hash), address_string)
                             },
                             pallas::ledger::addresses::ShelleyDelegationPart::Pointer(_pointer) => {
                                 // These are not supported from Conway, so we don't support them

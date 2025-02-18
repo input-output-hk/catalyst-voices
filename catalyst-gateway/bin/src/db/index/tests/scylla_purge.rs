@@ -28,7 +28,7 @@ async fn catalyst_id_for_stake_address() {
 
     // data
     let data = vec![
-        rbac509::insert_catalyst_id_for_stake_hash::Params::new(
+        rbac509::insert_catalyst_id_for_stake_address::Params::new(
             stake_address_1(),
             0.into(),
             0.into(),
@@ -36,7 +36,7 @@ async fn catalyst_id_for_stake_address() {
                 .parse()
                 .unwrap(),
         ),
-        rbac509::insert_catalyst_id_for_stake_hash::Params::new(
+        rbac509::insert_catalyst_id_for_stake_address::Params::new(
             stake_address_2(),
             1.into(),
             1.into(),
@@ -54,7 +54,7 @@ async fn catalyst_id_for_stake_address() {
         .unwrap();
 
     // read
-    let mut row_stream = catalyst_id_for_stake_hash::PrimaryKeyQuery::execute(&session)
+    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 
@@ -68,9 +68,9 @@ async fn catalyst_id_for_stake_address() {
     // delete
     let delete_params = read_rows
         .into_iter()
-        .map(catalyst_id_for_stake_hash::Params::from)
+        .map(catalyst_id_for_stake_address::Params::from)
         .collect();
-    let row_results = catalyst_id_for_stake_hash::DeleteQuery::execute(&session, delete_params)
+    let row_results = catalyst_id_for_stake_address::DeleteQuery::execute(&session, delete_params)
         .await
         .unwrap()
         .into_iter()
@@ -79,7 +79,7 @@ async fn catalyst_id_for_stake_address() {
     assert!(row_results);
 
     // re-read
-    let mut row_stream = catalyst_id_for_stake_hash::PrimaryKeyQuery::execute(&session)
+    let mut row_stream = catalyst_id_for_stake_address::PrimaryKeyQuery::execute(&session)
         .await
         .unwrap();
 

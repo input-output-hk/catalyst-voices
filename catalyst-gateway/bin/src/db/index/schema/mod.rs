@@ -18,7 +18,7 @@ const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
 const SCHEMAS: &[(&str, &str)] = &[
     (
         // Catalyst ID for stake address table schema.
-        include_str!("cql/catalyst_id_for_stake_hash.cql"),
+        include_str!("cql/catalyst_id_for_stake_address.cql"),
         "Create Table Catalyst ID For Stake Address",
     ),
     (

@@ -1,6 +1,6 @@
 -- Get all primary keys from Transaction Output Assets by Stake Address.
 SELECT
-    stake_hash,
+    stake_address,
     slot_no,
     txn_index,
     txo,

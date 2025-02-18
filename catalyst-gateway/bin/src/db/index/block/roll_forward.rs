@@ -23,7 +23,7 @@ pub(crate) async fn purge_live_index(purge_slot: Slot) -> anyhow::Result<()> {
     let purge_to_slot = purge_slot - Settings::purge_slot_buffer();
 
     let txn_hashes = purge_txi_by_hash(&session, purge_to_slot).await?;
-    purge_catalyst_id_for_stake_hash(&session, purge_to_slot).await?;
+    purge_catalyst_id_for_stake_address(&session, purge_to_slot).await?;
     purge_catalyst_id_for_txn_id(&session, &txn_hashes).await?;
     purge_cip36_registration(&session, purge_to_slot).await?;
     purge_cip36_registration_for_vote_key(&session, purge_to_slot).await?;
@@ -40,10 +40,10 @@ pub(crate) async fn purge_live_index(purge_slot: Slot) -> anyhow::Result<()> {
 }
 
 /// Purges the data from `catalyst_id_for_stake_addr`.
-async fn purge_catalyst_id_for_stake_hash(
+async fn purge_catalyst_id_for_stake_address(
     session: &Arc<CassandraSession>, purge_to_slot: Slot,
 ) -> anyhow::Result<()> {
-    use purge::catalyst_id_for_stake_hash::{DeleteQuery, Params, PrimaryKeyQuery};
+    use purge::catalyst_id_for_stake_address::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;

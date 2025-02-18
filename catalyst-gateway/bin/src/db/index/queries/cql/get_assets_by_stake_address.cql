@@ -6,5 +6,5 @@ SELECT
     asset_name,
     value
 FROM txo_assets_by_stake
-WHERE stake_hash = :stake_hash
+WHERE stake_address = :stake_address
 AND slot_no <= :slot_no

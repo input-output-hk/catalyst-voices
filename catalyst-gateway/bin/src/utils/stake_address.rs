@@ -3,8 +3,8 @@
 use cardano_blockchain_types::Network;
 use pallas::crypto::hash::Hash;
 
-/// Converts the given stake credential to 29 bytes hash with a header.
-pub fn stake_hash(network: Network, is_script: bool, hash: &Hash<28>) -> Vec<u8> {
+/// Converts the given stake hash to 29 bytes hash with a header.
+pub fn stake_address(network: Network, is_script: bool, hash: &Hash<28>) -> Vec<u8> {
     let network: u8 = match network {
         Network::Preprod | Network::Preview => 0,
         Network::Mainnet => 1,
@@ -25,7 +25,7 @@ mod tests {
 
     #[allow(clippy::indexing_slicing)]
     #[test]
-    fn test_stake_hash() {
+    fn test_stake_address() {
         let hash: Hash<28> = "276fd18711931e2c0e21430192dbeac0e458093cd9d1fcd7210f64b3"
             .parse()
             .unwrap();
@@ -39,20 +39,20 @@ mod tests {
         ];
 
         for (network, is_script, hash, expected_header) in test_data {
-            let stake_hash = stake_hash(network, is_script, &hash);
+            let stake_address = stake_address(network, is_script, &hash);
             assert_eq!(
                 29,
-                stake_hash.len(),
+                stake_address.len(),
                 "Invalid length for {network} {is_script}"
             );
             assert_eq!(
-                &stake_hash[1..],
+                &stake_address[1..],
                 hash.as_ref(),
                 "Invalid hash for {network} {is_script}"
             );
             assert_eq!(
                 expected_header,
-                *stake_hash.first().unwrap(),
+                *stake_address.first().unwrap(),
                 "Invalid header for {network} {is_script}"
             );
         }

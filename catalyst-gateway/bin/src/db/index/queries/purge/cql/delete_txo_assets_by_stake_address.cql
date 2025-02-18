@@ -1,6 +1,6 @@
 -- Delete Transaction Output Assets by Stake Address.
 DELETE FROM txo_assets_by_stake
-WHERE stake_hash = :stake_hash
+WHERE stake_address = :stake_address
     AND slot_no = :slot_no
     AND txn_index = :txn_index
     AND txo = :txo

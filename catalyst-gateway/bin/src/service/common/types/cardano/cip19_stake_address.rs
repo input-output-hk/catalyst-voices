@@ -193,7 +193,7 @@ mod tests {
     }
 
     #[test]
-    fn test_stake_address_to_stake_hash() {
+    fn cip19_stake_address_to_stake_address() {
         let stake_address_prod =
             Cip19StakeAddress::try_from(VALID_PROD_STAKE_ADDRESS.to_string()).unwrap();
 

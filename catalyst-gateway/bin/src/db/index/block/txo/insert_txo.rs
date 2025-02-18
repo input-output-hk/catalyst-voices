@@ -23,8 +23,8 @@ const INSERT_TXO_QUERY: &str = include_str!("./cql/insert_txo.cql");
 /// (Superset of data to support both Staked and Unstaked TXO records.)
 #[derive(SerializeRow, Debug)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    stake_hash: Vec<u8>,
+    /// Stake Address - Binary 29 bytes. 0 bytes = not staked.
+    stake_address: Vec<u8>,
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -42,11 +42,11 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_hash: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset, address: &str,
-        value: u64, txn_hash: TransactionHash,
+        stake_address: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
+        address: &str, value: u64, txn_hash: TransactionHash,
     ) -> Self {
         Self {
-            stake_hash: stake_hash.to_vec(),
+            stake_address: stake_address.to_vec(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             txo: txo.into(),

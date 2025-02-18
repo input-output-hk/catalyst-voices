@@ -1,4 +1,4 @@
-//! Get stake addr from stake hash
+//! Get stake addr from stake address
 
 use std::sync::Arc;
 
@@ -14,19 +14,19 @@ use crate::db::index::{
 };
 
 /// Get stake addr from stake hash query string.
-const GET_STAKE_ADDR_FROM_STAKE_HASH: &str = include_str!("../cql/get_stake_addr_w_stake_hash.cql");
+const GET_QUERY: &str = include_str!("../cql/get_stake_addr_w_stake_address.cql");
 
 /// Get stake addr
 #[derive(SerializeRow)]
 pub(crate) struct GetStakeAddrParams {
     /// Stake hash.
-    pub stake_hash: Vec<u8>,
+    pub stake_address: Vec<u8>,
 }
 
 impl GetStakeAddrParams {
     /// Create a new instance of [`GetStakeAddrParams`]
-    pub(crate) fn new(stake_hash: Vec<u8>) -> GetStakeAddrParams {
-        Self { stake_hash }
+    pub(crate) fn new(stake_address: Vec<u8>) -> GetStakeAddrParams {
+        Self { stake_address }
     }
 }
 
@@ -42,7 +42,7 @@ impl GetStakeAddrQuery {
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(
             session,
-            GET_STAKE_ADDR_FROM_STAKE_HASH,
+            GET_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
@@ -50,7 +50,7 @@ impl GetStakeAddrQuery {
         .inspect_err(
             |error| error!(error=%error, "Failed to prepare get stake addr from stake hash query."),
         )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_STAKE_ADDR_FROM_STAKE_HASH}"))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_QUERY}"))
     }
 
     /// Executes a get txi by transaction hashes query.

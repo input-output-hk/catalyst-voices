@@ -17,13 +17,13 @@ use crate::{
 };
 
 /// Index RBAC Catalyst ID by Stake Address.
-const QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_hash.cql");
+const QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_address.cql");
 
 /// Insert Catalyst ID For Stake Address Query Parameters
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A stake address.
-    stake_hash: DbCip19StakeAddress,
+    stake_address: DbCip19StakeAddress,
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
@@ -35,7 +35,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_hash", &self.stake_hash)
+            .field("stake_address", &self.stake_address)
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("catalyst_id", &self.catalyst_id)
@@ -46,10 +46,10 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_addr: StakeAddress, slot_no: Slot, txn_index: TxnIndex, catalyst_id: IdUri,
+        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, catalyst_id: IdUri,
     ) -> Self {
         Params {
-            stake_hash: stake_addr.into(),
+            stake_address: stake_address.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             catalyst_id: catalyst_id.into(),

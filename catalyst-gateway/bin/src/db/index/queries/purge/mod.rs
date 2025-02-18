@@ -1,6 +1,6 @@
 //! Queries for purging volatile data.
 
-pub(crate) mod catalyst_id_for_stake_hash;
+pub(crate) mod catalyst_id_for_stake_address;
 pub(crate) mod catalyst_id_for_txn_id;
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
@@ -206,9 +206,9 @@ impl PreparedQueries {
             )
             .await?,
             select_catalyst_id_for_stake_address:
-                catalyst_id_for_stake_hash::PrimaryKeyQuery::prepare(&session).await?,
+                catalyst_id_for_stake_address::PrimaryKeyQuery::prepare(&session).await?,
             delete_catalyst_id_for_stake_address:
-                catalyst_id_for_stake_hash::DeleteQuery::prepare_batch(&session, cfg).await?,
+                catalyst_id_for_stake_address::DeleteQuery::prepare_batch(&session, cfg).await?,
         })
     }
 

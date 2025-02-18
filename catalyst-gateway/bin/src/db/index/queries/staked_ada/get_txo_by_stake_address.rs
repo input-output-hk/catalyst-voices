@@ -23,16 +23,16 @@ const GET_TXO_BY_STAKE_ADDRESS_QUERY: &str = include_str!("../cql/get_txo_by_sta
 #[derive(SerializeRow)]
 pub(crate) struct GetTxoByStakeAddressQueryParams {
     /// Stake address.
-    stake_hash: Vec<u8>,
+    stake_address: Vec<u8>,
     /// Max slot num.
     slot_no: DbSlot,
 }
 
 impl GetTxoByStakeAddressQueryParams {
     /// Creates a new [`GetTxoByStakeAddressQueryParams`].
-    pub(crate) fn new(stake_hash: Vec<u8>, slot_no: Slot) -> Self {
+    pub(crate) fn new(stake_address: Vec<u8>, slot_no: Slot) -> Self {
         Self {
-            stake_hash,
+            stake_address,
             slot_no: slot_no.into(),
         }
     }

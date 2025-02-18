@@ -256,7 +256,7 @@ async fn update_spent(
 
             if let Some(spent_slot) = txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
-                    stake_hash: stake_address.to_vec(),
+                    stake_address: stake_address.to_vec(),
                     txn_index: txo_info.txn_index.into(),
                     txo: txo_info.txo.into(),
                     slot_no: txo_info.slot_no.into(),

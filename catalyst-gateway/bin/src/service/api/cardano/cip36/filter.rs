@@ -20,7 +20,7 @@ use crate::{
                 GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
             },
             get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
-            get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
+            get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
             get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
             get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
         },
@@ -32,22 +32,20 @@ use crate::{
 /// Get registration given a stake key hash, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_stake_key_hash(
-    stake_hash: HexEncodedHash29, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    stake_address: HexEncodedHash29, session: Arc<CassandraSession>, asat: Option<SlotNo>,
 ) -> AllRegistration {
     // Get stake addr associated with given stake hash.
-    let mut stake_addr_iter = match GetStakeAddrQuery::execute(
-        &session,
-        GetStakeAddrParams::new(stake_hash.into()),
-    )
-    .await
-    {
-        Ok(stake_addr) => stake_addr,
-        Err(err) => {
-            return AllRegistration::handle_error(&anyhow::anyhow!(
-                "Failed to query stake addr from stake hash {err:?}",
-            ));
-        },
-    };
+    let mut stake_addr_iter =
+        match GetStakeAddrQuery::execute(&session, GetStakeAddrParams::new(stake_address.into()))
+            .await
+        {
+            Ok(stake_addr) => stake_addr,
+            Err(err) => {
+                return AllRegistration::handle_error(&anyhow::anyhow!(
+                    "Failed to query stake addr from stake hash {err:?}",
+                ));
+            },
+        };
 
     if let Some(row_stake_addr) = stake_addr_iter.next().await {
         let row = match row_stake_addr {

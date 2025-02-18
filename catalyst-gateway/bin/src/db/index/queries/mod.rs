@@ -14,7 +14,7 @@ use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use registrations::{
     get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
-    get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
+    get_from_stake_addr::GetRegistrationQuery, get_from_stake_address::GetStakeAddrQuery,
     get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
 };
 use scylla::{
@@ -35,7 +35,7 @@ use super::block::{
 };
 use crate::{
     db::index::queries::rbac::{
-        get_catalyst_id_from_stake_hash, get_catalyst_id_from_transaction_id,
+        get_catalyst_id_from_stake_address, get_catalyst_id_from_transaction_id,
         get_rbac_invalid_registrations, get_rbac_registrations,
     },
     settings::cassandra_db,
@@ -152,7 +152,7 @@ pub(crate) struct PreparedQueries {
     /// Get registrations
     registration_from_stake_addr_query: PreparedStatement,
     /// stake addr from stake hash
-    stake_addr_from_stake_hash_query: PreparedStatement,
+    stake_addr_from_stake_address_query: PreparedStatement,
     /// stake addr from vote key
     stake_addr_from_vote_key_query: PreparedStatement,
     /// Get invalid registrations
@@ -197,12 +197,12 @@ impl PreparedQueries {
             GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
         let registration_from_stake_addr_query =
             GetRegistrationQuery::prepare(session.clone()).await;
-        let stake_addr_from_stake_hash = GetStakeAddrQuery::prepare(session.clone()).await;
+        let stake_addr_from_stake_address = GetStakeAddrQuery::prepare(session.clone()).await;
         let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await?;
         let catalyst_id_by_stake_address_query =
-            get_catalyst_id_from_stake_hash::Query::prepare(session.clone()).await?;
+            get_catalyst_id_from_stake_address::Query::prepare(session.clone()).await?;
         let catalyst_id_by_transaction_id_query =
             get_catalyst_id_from_transaction_id::Query::prepare(session.clone()).await?;
         let rbac_registrations_by_catalyst_id_query =
@@ -251,7 +251,7 @@ impl PreparedQueries {
             catalyst_id_for_stake_address_insert_queries,
             native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
             registration_from_stake_addr_query: registration_from_stake_addr_query?,
-            stake_addr_from_stake_hash_query: stake_addr_from_stake_hash?,
+            stake_addr_from_stake_address_query: stake_addr_from_stake_address?,
             stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
             invalid_registrations_from_stake_addr_query: invalid_registrations?,
             sync_status_insert,
@@ -340,7 +340,9 @@ impl PreparedQueries {
             PreparedSelectQuery::RegistrationFromStakeAddr => {
                 &self.registration_from_stake_addr_query
             },
-            PreparedSelectQuery::StakeAddrFromStakeHash => &self.stake_addr_from_stake_hash_query,
+            PreparedSelectQuery::StakeAddrFromStakeHash => {
+                &self.stake_addr_from_stake_address_query
+            },
             PreparedSelectQuery::StakeAddrFromVoteKey => &self.stake_addr_from_vote_key_query,
             PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
                 &self.invalid_registrations_from_stake_addr_query
