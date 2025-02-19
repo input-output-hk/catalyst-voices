@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:rxdart/transformers.dart';
 
 final _logger = Logger('SyncManager');
 
@@ -60,7 +61,10 @@ final class SyncManagerImpl implements SyncManager {
   Future<void> _syncDocuments() async {
     final completer = Completer<double>();
 
-    _documentsService.sync().listen(
+    _documentsService
+        .sync()
+        .throttleTime(const Duration(milliseconds: 100))
+        .listen(
       (progress) {
         _logger.finest('Documents sync progress $progress');
       },

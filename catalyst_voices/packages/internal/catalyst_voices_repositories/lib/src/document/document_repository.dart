@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -22,6 +23,14 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
+  /// Returns list of refs to all published and any refs it may hold.
+  ///
+  /// Its using documents index api.
+  Future<List<SignedDocumentRef>> getAllDocumentsRefs();
+
+  /// Returns list of locally saved signed documents refs.
+  Future<List<SignedDocumentRef>> getCachedDocumentsRefs();
+
   /// Observes matching [ProposalDocument] and emits updates.
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
@@ -29,13 +38,16 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
-  /// Returns matching [ProposalDocument] for matching [ref].
+  /// Returns [ProposalDocument] for matching [ref].
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Future<ProposalDocument> getProposalDocument({
     required DocumentRef ref,
   });
 
+  /// Returns [ProposalTemplate] for matching [ref].
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   });
@@ -62,6 +74,11 @@ abstract interface class DocumentRepository {
     required DraftRef ref,
     required DocumentDataContent content,
   });
+
+  /// Making sure document from [ref] is available locally.
+  Future<void> cacheDocument({
+    required SignedDocumentRef ref,
+  });
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
@@ -77,6 +94,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._localDocuments,
     this._remoteDocuments,
   );
+
+  @override
+  Future<List<SignedDocumentRef>> getAllDocumentsRefs() {
+    return Future.delayed(
+      const Duration(seconds: 1),
+      () => List.generate(
+        100,
+        (index) => SignedDocumentRef.first(const Uuid().v7()),
+      ),
+    );
+  }
+
+  @override
+  Future<List<SignedDocumentRef>> getCachedDocumentsRefs() async {
+    return [];
+  }
+
+  @override
+  Future<void> cacheDocument({required SignedDocumentRef ref}) async {
+    await Future<void>.delayed(Duration(milliseconds: Random().nextInt(1000)));
+  }
 
   @override
   Stream<ProposalDocument> watchProposalDocument({

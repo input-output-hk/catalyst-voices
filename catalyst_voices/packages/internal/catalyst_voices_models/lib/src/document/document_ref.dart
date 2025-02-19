@@ -27,6 +27,9 @@ final class SignedDocumentRef extends DocumentRef {
     super.version,
   });
 
+  /// Creates ref for first version of [id] document.
+  const SignedDocumentRef.first(String id) : this(id: id, version: id);
+
   @override
   SignedDocumentRef copyWith({
     String? id,
