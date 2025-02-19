@@ -138,7 +138,7 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
-      ..registerLazySingleton<DatabaseDocumentsDataSource>(() {
+      ..registerLazySingleton<DocumentDataLocalSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
         );
@@ -217,6 +217,19 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
+    registerLazySingleton<CatalystDatabase>(() {
+      final config = get<AppConfig>().database;
+
+      return CatalystDatabase.drift(
+        config: CatalystDriftDatabaseConfig(
+          name: config.name,
+          web: CatalystDriftDatabaseWebConfig(
+            sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
+            driftWorker: Uri.parse(config.webDriftWorker),
+          ),
+        ),
+      );
+    });
   }
 
   void _registerUtils() {
