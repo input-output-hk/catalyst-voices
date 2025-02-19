@@ -1,0 +1,21 @@
+name: example
+description: A sample command-line application.
+version: 1.0.0
+
+environment:
+  sdk: ^3.2.3
+
+dependencies:
+  chopper: ^8.0.0
+  collection: ^1.18.0
+  http: ^1.2.0
+  json_annotation: ^4.8.0
+
+dev_dependencies:
+  swagger_dart_code_generator: ^3.0.1
+  chopper_generator: ^8.0.0
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.1
+  lints: ^3.0.0
+  openapi_builder:
+    path: ../openapi_builder

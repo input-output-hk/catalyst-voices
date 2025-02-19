@@ -1,0 +1,17 @@
+targets:
+  openapi_builder:openapi_builder:
+    builders:
+      openapi_builder:
+        enabled: True
+builders:
+  openapi_builder:
+    import: "package:openapi_builder/src/openapi_builder_base.dart"
+    builder_factories: ["sanitiseBuilderFactory"]
+    build_extensions: {
+      ".json": ["staging_folder/catalyst.json"]
+    }
+    auto_apply: dependents
+    build_to: source
+    defaults:
+      options:
+        sourcepath: "source_folder/"
