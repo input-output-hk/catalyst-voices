@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS rbac_registration (
     txn_id              blob,           -- 32 Bytes of Transaction Hash. (TransactionHash)
     prv_txn_id          blob,           -- 32 Bytes from Previous Transaction Hash.
     purpose             uuid,           -- 16 Bytes of UUIDv4 Purpose.
+    stake_address       blob,       -- 29 Byte stake hash (CIP19) [only set when the registration has a stake address attached]
 
     PRIMARY KEY (catalyst_id, slot_no, txn_index)
 )
