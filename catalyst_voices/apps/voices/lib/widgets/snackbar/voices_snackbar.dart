@@ -38,6 +38,11 @@ class VoicesSnackBar extends StatelessWidget {
   /// The behavior of the [VoicesSnackBar], which can be fixed or floating.
   final SnackBarBehavior? behavior;
 
+  /// The duration of the snackbar before it's automatically dismissed.
+  ///
+  /// Defaults to 4s.
+  final Duration duration;
+
   /// The padding around the the [VoicesSnackBar].
   final EdgeInsetsGeometry? padding;
 
@@ -59,6 +64,7 @@ class VoicesSnackBar extends StatelessWidget {
     this.onClosePressed,
     this.width,
     this.behavior = SnackBarBehavior.fixed,
+    this.duration = const Duration(seconds: 4),
     this.padding = const EdgeInsets.all(16),
   });
 
@@ -132,6 +138,7 @@ class VoicesSnackBar extends StatelessWidget {
       SnackBar(
         content: this,
         behavior: behavior,
+        duration: duration,
         width: _calculateSnackBarWidth(
           screenWidth: MediaQuery.sizeOf(context).width,
         ),

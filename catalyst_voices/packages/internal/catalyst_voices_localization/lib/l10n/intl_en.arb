@@ -1543,6 +1543,10 @@
   "@proposalEditorStatusDropdownExportTitle": {
     "description": "Action title to export a proposal as a file."
   },
+  "proposalEditorValidationSnackbar": "Fix the following input errors",
+  "@proposalEditorValidationSnackbar": {
+    "description": "Snackbar title shown when user tries to save a proposal with errors."
+  },
   "showAll": "Show All",
   "importProposal": "Import Proposal",
   "@importProposal": {
