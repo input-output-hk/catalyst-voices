@@ -26,6 +26,8 @@ abstract interface class Section implements SegmentsListViewItem {
 
   bool get isEditable;
 
+  bool get hasError;
+
   String resolveTitle(BuildContext context);
 }
 
@@ -56,11 +58,14 @@ abstract base class BaseSection extends Equatable implements Section {
   final bool isEnabled;
   @override
   final bool isEditable;
+  @override
+  final bool hasError;
 
   const BaseSection({
     required this.id,
     this.isEnabled = true,
     this.isEditable = true,
+    this.hasError = false,
   });
 
   @override
@@ -69,5 +74,6 @@ abstract base class BaseSection extends Equatable implements Section {
         id,
         isEnabled,
         isEditable,
+        hasError,
       ];
 }
