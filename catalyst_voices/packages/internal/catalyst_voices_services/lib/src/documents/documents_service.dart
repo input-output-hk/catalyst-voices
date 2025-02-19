@@ -21,6 +21,10 @@ final class DocumentsServiceImpl implements DocumentsService {
 
   @override
   Stream<double> sync() async* {
-    //
+    yield 0.5;
+
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    yield 1;
   }
 }

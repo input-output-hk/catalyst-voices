@@ -112,7 +112,7 @@ Future<BootstrapArgs> bootstrap({
   GoRouter? router,
 }) async {
   _loggingService
-    ..level = kDebugMode ? Level.FINER : Level.OFF
+    ..level = kDebugMode ? Level.ALL : Level.OFF
     ..printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -134,7 +134,7 @@ Future<BootstrapArgs> bootstrap({
 
   Bloc.observer = AppBlocObserver();
 
-  Dependencies.instance.get<DocumentsService>().sync().last;
+  Dependencies.instance.get<SyncManager>().start().ignore();
 
   return BootstrapArgs(routerConfig: router);
 }

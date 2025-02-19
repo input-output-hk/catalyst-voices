@@ -6,4 +6,5 @@ export 'proposal/proposal_service.dart' show ProposalService;
 export 'registration/registration_progress_notifier.dart';
 export 'registration/registration_service.dart' show RegistrationService;
 export 'registration/registration_transaction_builder.dart';
+export 'sync/sync_manager.dart' show SyncManager;
 export 'user/user_service.dart' show UserService;
