@@ -10,11 +10,6 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   );
 
   @override
-  Future<List<DraftRef>> index() {
-    return _database.draftsDao.queryAllRefs();
-  }
-
-  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.draftsDao.count(ref: ref).then((count) => count > 0);
   }
@@ -30,10 +25,8 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.draftsDao
-        .watch(ref: ref)
-        .map((entity) => entity?.toModel());
+  Future<List<DraftRef>> index() {
+    return _database.draftsDao.queryAllRefs();
   }
 
   @override
@@ -61,6 +54,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     required DocumentDataContent content,
   }) async {
     await _database.draftsDao.updateContent(ref: ref, content: content);
+  }
+
+  @override
+  Stream<DocumentData?> watch({required DocumentRef ref}) {
+    return _database.draftsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
   }
 }
 

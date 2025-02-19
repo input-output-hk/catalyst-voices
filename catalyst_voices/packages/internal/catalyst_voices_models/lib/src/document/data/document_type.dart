@@ -18,7 +18,9 @@ enum DocumentType {
 
   final String uuid;
 
-  static String toJson(DocumentType type) => type.uuid;
+  const DocumentType({
+    required this.uuid,
+  });
 
   static DocumentType fromJson(String data) {
     return DocumentType.values.firstWhere(
@@ -27,7 +29,5 @@ enum DocumentType {
     );
   }
 
-  const DocumentType({
-    required this.uuid,
-  });
+  static String toJson(DocumentType type) => type.uuid;
 }
