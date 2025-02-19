@@ -132,6 +132,7 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
                   offstage: charsLimit == null && field.errorText == null,
                   child: VoicesRichTextLimit(
                     controller: controller,
+                    enabled: enabled,
                     charsLimit: charsLimit,
                     errorMessage: field.errorText,
                   ),
