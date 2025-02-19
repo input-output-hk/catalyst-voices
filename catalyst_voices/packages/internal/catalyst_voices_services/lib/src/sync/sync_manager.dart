@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:rxdart/transformers.dart';
+import 'package:synchronized/synchronized.dart';
 
 final _logger = Logger('SyncManager');
 
@@ -16,6 +17,8 @@ abstract interface class SyncManager {
 
 final class SyncManagerImpl implements SyncManager {
   final DocumentsService _documentsService;
+
+  final _lock = Lock();
 
   Timer? _syncTimer;
 
@@ -37,11 +40,11 @@ final class SyncManagerImpl implements SyncManager {
       (_) {
         _logger.finest('Scheduled synchronization starts');
         // ignore: discarded_futures
-        _startSynchronization().ignore();
+        _lock.synchronized(_startSynchronization).ignore();
       },
     );
 
-    await _startSynchronization();
+    await _lock.synchronized(_startSynchronization);
   }
 
   Future<void> _startSynchronization() async {
