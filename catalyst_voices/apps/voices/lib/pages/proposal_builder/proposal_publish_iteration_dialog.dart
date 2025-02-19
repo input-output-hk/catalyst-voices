@@ -233,9 +233,9 @@ class _VersionChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesChip.rectangular(
       content: Row(
+        spacing: 6,
         children: [
           VoicesAssets.icons.documentText.buildIcon(size: 18),
-          const SizedBox(width: 6),
           Text(
             version,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
