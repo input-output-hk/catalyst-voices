@@ -155,12 +155,13 @@ nightly-test-draft-schemathesis:
 nightly-test-dev-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
-    COPY schemathesis-docker-compose.yml .
     LET api_spec="https://gateway.dev.projectcatalyst.io/docs/cat-gateway.json"
     ARG wait_for_schema=15
     ARG max_response_time=300
     ARG hypothesis_max_examples=1000
     ARG seed
+
+    COPY ./../+docker-compose/docker-compose.yml .
 
     WITH DOCKER \
         --load schemathesis:latest=(+package-schemathesis --api_spec=$api_spec --seed=$seed \
