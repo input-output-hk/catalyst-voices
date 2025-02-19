@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbCip19StakeAddress, DbSlot, DbTxnIndex},
+        types::{DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -24,10 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for Catalyst ID For Stake Address registration purge queries.
 
-    use crate::db::types::{DbCip19StakeAddress, DbSlot, DbTxnIndex};
+    use crate::db::types::{DbSlot, DbStakeAddress, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbCip19StakeAddress, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (DbStakeAddress, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for Catalyst ID For Stake Address registration.
@@ -37,7 +37,7 @@ const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_stake_address.c
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A stake address.
-    pub(crate) stake_address: DbCip19StakeAddress,
+    pub(crate) stake_address: DbStakeAddress,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.

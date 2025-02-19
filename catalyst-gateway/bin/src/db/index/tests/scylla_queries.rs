@@ -3,7 +3,7 @@
 
 // cSpell:ignoreRegExp cardano/Fftx
 
-use cardano_blockchain_types::TransactionHash;
+use cardano_blockchain_types::TransactionId;
 use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 
@@ -75,7 +75,7 @@ async fn get_catalyst_id_by_transaction_id() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let txn_id = TransactionHash::new(&[1, 2, 3]).into();
+    let txn_id = TransactionId::new(&[1, 2, 3]).into();
     let mut row_stream = Query::execute(&session, QueryParams { txn_id })
         .await
         .unwrap();

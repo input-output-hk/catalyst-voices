@@ -11,7 +11,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbCip19StakeAddress, DbSlot, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -23,7 +23,7 @@ const QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_address.cql")
 #[derive(SerializeRow)]
 pub(crate) struct Params {
     /// A stake address.
-    stake_address: DbCip19StakeAddress,
+    stake_address: DbStakeAddress,
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.

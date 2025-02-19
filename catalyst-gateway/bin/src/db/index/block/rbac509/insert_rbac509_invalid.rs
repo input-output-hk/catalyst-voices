@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
 use catalyst_types::{id_uri::IdUri, problem_report::ProblemReport, uuid::UuidV4};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
@@ -40,8 +40,8 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: IdUri, txn_id: TransactionHash, slot_no: Slot, txn_index: TxnIndex,
-        purpose: Option<UuidV4>, prv_txn_id: Option<TransactionHash>, report: &ProblemReport,
+        catalyst_id: IdUri, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
+        purpose: Option<UuidV4>, prv_txn_id: Option<TransactionId>, report: &ProblemReport,
     ) -> Self {
         let purpose = purpose.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));

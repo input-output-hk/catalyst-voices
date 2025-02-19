@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -44,7 +44,7 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
-        txn_id: TransactionHash, txo: TxnOutputOffset, policy_id: &[u8], asset_name: &[u8],
+        txn_id: TransactionId, txo: TxnOutputOffset, policy_id: &[u8], asset_name: &[u8],
         slot_no: Slot, txn_index: TxnIndex, value: i128,
     ) -> Self {
         Self {

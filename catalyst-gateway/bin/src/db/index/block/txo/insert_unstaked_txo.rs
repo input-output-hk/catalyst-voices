@@ -1,7 +1,7 @@
 //! Insert Unstaked TXOs into the DB.
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -37,7 +37,7 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        txn_id: TransactionHash, txo: TxnOutputOffset, slot_no: Slot, txn_index: TxnIndex,
+        txn_id: TransactionId, txo: TxnOutputOffset, slot_no: Slot, txn_index: TxnIndex,
         address: &str, value: u64,
     ) -> Self {
         Self {

@@ -2,7 +2,7 @@
 
 use std::{collections::HashSet, sync::Arc};
 
-use cardano_blockchain_types::{Slot, TransactionHash};
+use cardano_blockchain_types::{Slot, TransactionId};
 use futures::StreamExt;
 
 use crate::{
@@ -62,7 +62,7 @@ async fn purge_catalyst_id_for_stake_address(
 
 /// Purges the data from `catalyst_id_for_txn_id`.
 async fn purge_catalyst_id_for_txn_id(
-    session: &Arc<CassandraSession>, txn_hashes: &HashSet<TransactionHash>,
+    session: &Arc<CassandraSession>, txn_hashes: &HashSet<TransactionId>,
 ) -> anyhow::Result<()> {
     use purge::catalyst_id_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -208,14 +208,14 @@ async fn purge_stake_registration(
 /// Purge data from `txi_by_hash`.
 async fn purge_txi_by_hash(
     session: &Arc<CassandraSession>, purge_to_slot: Slot,
-) -> anyhow::Result<HashSet<TransactionHash>> {
+) -> anyhow::Result<HashSet<TransactionId>> {
     use purge::txi_by_hash::{DeleteQuery, Params, PrimaryKeyQuery};
 
     // Get all keys
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
-    let mut txn_hashes: HashSet<TransactionHash> = HashSet::new();
+    let mut txn_hashes: HashSet<TransactionId> = HashSet::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
         if primary_key.2 <= purge_to_slot.into() {
             let params: Params = primary_key.into();

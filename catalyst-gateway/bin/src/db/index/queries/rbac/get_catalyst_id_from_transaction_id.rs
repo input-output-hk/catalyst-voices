@@ -3,7 +3,7 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
 use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
@@ -108,7 +108,7 @@ impl Query {
 
 /// Update the cache when a rbac registration is indexed.
 pub(crate) fn cache_for_transaction_id(
-    _transaction_id: TransactionHash, _catalyst_id: IdUri, _slot_no: Slot, _txn_idx: TxnIndex,
+    _transaction_id: TransactionId, _catalyst_id: IdUri, _slot_no: Slot, _txn_idx: TxnIndex,
 ) {
     // TODO: Caching is disabled because we want to measure the performance without it and
     // be sure that the logic is sound. Also caches needs to be tunable.

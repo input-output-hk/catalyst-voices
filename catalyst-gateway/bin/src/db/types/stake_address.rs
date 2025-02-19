@@ -21,28 +21,28 @@ const ADDRESS_LENGTH: usize = 29;
 /// database.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DbCip19StakeAddress(Vec<u8>);
+pub struct DbStakeAddress(Vec<u8>);
 
-impl From<StakeAddress> for DbCip19StakeAddress {
+impl From<StakeAddress> for DbStakeAddress {
     fn from(value: StakeAddress) -> Self {
         // This `to_vec()` call includes both the header and the payload.
         Self(value.to_vec())
     }
 }
 
-impl From<DbCip19StakeAddress> for Vec<u8> {
-    fn from(value: DbCip19StakeAddress) -> Self {
+impl From<DbStakeAddress> for Vec<u8> {
+    fn from(value: DbStakeAddress) -> Self {
         value.0
     }
 }
 
-impl AsRef<[u8]> for DbCip19StakeAddress {
+impl AsRef<[u8]> for DbStakeAddress {
     fn as_ref(&self) -> &[u8] {
         self.0.as_ref()
     }
 }
 
-impl SerializeValue for DbCip19StakeAddress {
+impl SerializeValue for DbStakeAddress {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
@@ -50,7 +50,7 @@ impl SerializeValue for DbCip19StakeAddress {
     }
 }
 
-impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbCip19StakeAddress {
+impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbStakeAddress {
     fn type_check(typ: &ColumnType) -> Result<(), TypeCheckError> {
         <Vec<u8>>::type_check(typ)
     }

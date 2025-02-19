@@ -4,7 +4,7 @@
 
 // cSpell:ignoreRegExp cardano/Fftx
 
-use cardano_blockchain_types::{TransactionHash, VotingPubKey};
+use cardano_blockchain_types::{TransactionId, VotingPubKey};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -104,7 +104,7 @@ async fn catalyst_id_for_txn_id() {
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
-            TransactionHash::new(&[0]),
+            TransactionId::new(&[0]),
             0.into(),
             0.into(),
         ),
@@ -112,7 +112,7 @@ async fn catalyst_id_for_txn_id() {
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
-            TransactionHash::new(&[1]),
+            TransactionId::new(&[1]),
             1.into(),
             1.into(),
         ),
@@ -176,7 +176,7 @@ async fn rbac509_registration() {
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
-            TransactionHash::new(&[0]),
+            TransactionId::new(&[0]),
             0.into(),
             0.into(),
             UuidV4::new(),
@@ -186,7 +186,7 @@ async fn rbac509_registration() {
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
-            TransactionHash::new(&[1]),
+            TransactionId::new(&[1]),
             1.into(),
             1.into(),
             UuidV4::new(),
@@ -253,7 +253,7 @@ async fn rbac509_invalid_registration() {
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
-            TransactionHash::new(&[0]),
+            TransactionId::new(&[0]),
             0.into(),
             0.into(),
             Some(UuidV4::new()),
@@ -264,7 +264,7 @@ async fn rbac509_invalid_registration() {
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
-            TransactionHash::new(&[1]),
+            TransactionId::new(&[1]),
             1.into(),
             1.into(),
             Some(UuidV4::new()),
@@ -623,8 +623,8 @@ async fn test_txi_by_hash() {
 
     // data
     let data = vec![
-        txi::TxiInsertParams::new(TransactionHash::new(&[0]), 0.into(), 0.into()),
-        txi::TxiInsertParams::new(TransactionHash::new(&[1]), 1.into(), 1.into()),
+        txi::TxiInsertParams::new(TransactionId::new(&[0]), 0.into(), 0.into()),
+        txi::TxiInsertParams::new(TransactionId::new(&[1]), 1.into(), 1.into()),
     ];
     let data_len = data.len();
 
@@ -688,7 +688,7 @@ async fn test_txo_ada() {
             0.into(),
             "addr0",
             0,
-            TransactionHash::new(&[0]),
+            TransactionId::new(&[0]),
         ),
         txo::insert_txo::Params::new(
             &[1],
@@ -697,7 +697,7 @@ async fn test_txo_ada() {
             1.into(),
             "addr1",
             1,
-            TransactionHash::new(&[1]),
+            TransactionId::new(&[1]),
         ),
     ];
     let data_len = data.len();
@@ -807,7 +807,7 @@ async fn test_unstaked_txo_ada() {
     // data
     let data = vec![
         txo::insert_unstaked_txo::Params::new(
-            TransactionHash::new(&[0]),
+            TransactionId::new(&[0]),
             0.into(),
             0.into(),
             0.into(),
@@ -815,7 +815,7 @@ async fn test_unstaked_txo_ada() {
             0,
         ),
         txo::insert_unstaked_txo::Params::new(
-            TransactionHash::new(&[1]),
+            TransactionId::new(&[1]),
             1.into(),
             1.into(),
             1.into(),
@@ -879,7 +879,7 @@ async fn test_unstaked_txo_assets() {
     // data
     let data = vec![
         txo::insert_unstaked_txo_asset::Params::new(
-            TransactionHash::new(&[0]),
+            TransactionId::new(&[0]),
             0.into(),
             &[0],
             &[0],
@@ -888,7 +888,7 @@ async fn test_unstaked_txo_assets() {
             0,
         ),
         txo::insert_unstaked_txo_asset::Params::new(
-            TransactionHash::new(&[1]),
+            TransactionId::new(&[1]),
             1.into(),
             &[1],
             &[1],

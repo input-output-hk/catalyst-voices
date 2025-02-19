@@ -1,7 +1,7 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 
 use anyhow::anyhow;
-use cardano_blockchain_types::TransactionHash;
+use cardano_blockchain_types::TransactionId;
 use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse, Object};
@@ -80,7 +80,7 @@ pub(crate) async fn endpoint(catalyst_id: IdUri) -> AllResponses {
             },
         };
 
-        let tx_hash: Vec<_> = TransactionHash::from(row.txn_id).into();
+        let tx_hash: Vec<_> = TransactionId::from(row.txn_id).into();
         let item = RbacRegistration {
             tx_hash: tx_hash.into(),
         };

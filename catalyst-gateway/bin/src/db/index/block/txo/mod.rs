@@ -9,7 +9,7 @@ pub(crate) mod insert_unstaked_txo_asset;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Network, Slot, TransactionHash, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::{Network, Slot, TransactionId, TxnIndex, TxnOutputOffset};
 use scylla::Session;
 use tracing::{error, warn};
 
@@ -140,7 +140,7 @@ impl TxoInsertQuery {
     /// Index the transaction Inputs.
     pub(crate) fn index(
         &mut self, network: Network, txn: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: Slot,
-        txn_hash: TransactionHash, index: TxnIndex,
+        txn_hash: TransactionId, index: TxnIndex,
     ) {
         let txn_id = txn_hash.to_string();
 

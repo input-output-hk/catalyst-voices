@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::TransactionHash;
+use cardano_blockchain_types::TransactionId;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
@@ -29,7 +29,7 @@ pub(crate) struct GetTxiByTxnHashesQueryParams {
 
 impl GetTxiByTxnHashesQueryParams {
     /// Create a new instance of [`GetTxiByTxnHashesQueryParams`]
-    pub(crate) fn new(txn_ids: Vec<TransactionHash>) -> Self {
+    pub(crate) fn new(txn_ids: Vec<TransactionId>) -> Self {
         let txn_ids = txn_ids.into_iter().map(Into::into).collect();
         Self { txn_ids }
     }

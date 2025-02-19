@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnOutputOffset};
+use cardano_blockchain_types::{Slot, TransactionId, TxnOutputOffset};
 use catalyst_types::hashes::Blake2b256Hash;
 use scylla::{SerializeRow, Session};
 use tracing::error;
@@ -31,7 +31,7 @@ pub(crate) struct TxiInsertParams {
 
 impl TxiInsertParams {
     /// Create a new record for this transaction.
-    pub fn new(txn_id: TransactionHash, txo: TxnOutputOffset, slot: Slot) -> Self {
+    pub fn new(txn_id: TransactionId, txo: TxnOutputOffset, slot: Slot) -> Self {
         Self {
             txn_id: txn_id.into(),
             txo: txo.into(),

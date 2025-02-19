@@ -2,7 +2,7 @@
 
 use std::fmt::{Display, Formatter};
 
-use cardano_blockchain_types::TransactionHash;
+use cardano_blockchain_types::TransactionId;
 use scylla::{
     deserialize::{DeserializationError, DeserializeValue, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,
@@ -16,7 +16,7 @@ use scylla::{
 /// A `TransactionHash` wrapper that can be stored to and load from a database.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DbTransactionId(TransactionHash);
+pub struct DbTransactionId(TransactionId);
 
 impl Display for DbTransactionId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -24,13 +24,13 @@ impl Display for DbTransactionId {
     }
 }
 
-impl From<TransactionHash> for DbTransactionId {
-    fn from(value: TransactionHash) -> Self {
+impl From<TransactionId> for DbTransactionId {
+    fn from(value: TransactionId) -> Self {
         Self(value)
     }
 }
 
-impl From<DbTransactionId> for TransactionHash {
+impl From<DbTransactionId> for TransactionId {
     fn from(value: DbTransactionId) -> Self {
         value.0
     }
@@ -54,7 +54,7 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbTransactionId 
         typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let bytes = <Vec<u8>>::deserialize(typ, v)?;
-        let hash = TransactionHash::try_from(bytes).map_err(DeserializationError::new)?;
+        let hash = TransactionId::try_from(bytes).map_err(DeserializationError::new)?;
         Ok(Self(hash))
     }
 }

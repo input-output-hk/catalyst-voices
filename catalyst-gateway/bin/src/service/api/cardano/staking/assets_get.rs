@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use anyhow::{anyhow, Context};
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
 use futures::StreamExt;
 use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -34,7 +34,7 @@ use crate::{
 };
 
 /// A `TxoInfo` by transaction ID map.
-type TxosByTxn = HashMap<TransactionHash, HashMap<i16, TxoInfo>>;
+type TxosByTxn = HashMap<TransactionId, HashMap<i16, TxoInfo>>;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -98,7 +98,7 @@ struct TxoInfo {
     /// TXO value.
     value: num_bigint::BigInt,
     /// TXO transaction hash.
-    txn_hash: TransactionHash,
+    txn_hash: TransactionId,
     /// TXO transaction index within the slot.
     txn_index: TxnIndex,
     /// TXO index.

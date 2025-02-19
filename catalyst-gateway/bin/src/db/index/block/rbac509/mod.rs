@@ -7,7 +7,7 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Cip0134Uri, MultiEraBlock, Slot, TransactionHash, TxnIndex};
+use cardano_blockchain_types::{Cip0134Uri, MultiEraBlock, Slot, TransactionId, TxnIndex};
 use catalyst_types::id_uri::IdUri;
 use pallas::ledger::addresses::{Address, StakeAddress};
 use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
@@ -60,7 +60,7 @@ impl Rbac509InsertQuery {
 
     /// Index the RBAC 509 registrations in a transaction.
     pub(crate) async fn index(
-        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionHash, index: TxnIndex,
+        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionId, index: TxnIndex,
         block: &MultiEraBlock,
     ) {
         let slot = block.slot();
@@ -200,7 +200,7 @@ impl Rbac509InsertQuery {
 
 /// Returns a Catalyst ID of the given registration.
 async fn catalyst_id(
-    session: &Arc<CassandraSession>, cip509: &Cip509, txn_hash: TransactionHash, slot: Slot,
+    session: &Arc<CassandraSession>, cip509: &Cip509, txn_hash: TransactionId, slot: Slot,
     index: TxnIndex,
 ) -> Option<IdUri> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::{

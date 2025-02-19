@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionHash, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
@@ -43,7 +43,7 @@ impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         stake_address: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
-        address: &str, value: u64, txn_hash: TransactionHash,
+        address: &str, value: u64, txn_hash: TransactionId,
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
