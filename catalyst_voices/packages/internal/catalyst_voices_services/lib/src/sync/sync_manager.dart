@@ -45,6 +45,8 @@ final class SyncManagerImpl implements SyncManager {
   }
 
   Future<void> _startSynchronization() async {
+    final stopwatch = Stopwatch()..start();
+
     try {
       _logger.fine('Synchronization started');
 
@@ -54,7 +56,9 @@ final class SyncManagerImpl implements SyncManager {
     } catch (error, stack) {
       _logger.severe('Synchronization failed', error, stack);
     } finally {
-      _logger.fine('Synchronization ended');
+      stopwatch.stop();
+
+      _logger.fine('Synchronization took ${stopwatch.elapsed}');
     }
   }
 
