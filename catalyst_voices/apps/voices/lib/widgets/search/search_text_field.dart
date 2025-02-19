@@ -75,10 +75,6 @@ class _SearchTextFieldState extends State<SearchTextField> {
           searchValue: value,
           isSubmitted: true,
         ),
-        onChanged: (value) => _handleSearchQuery(
-          searchValue: value,
-          isSubmitted: false,
-        ),
       ),
     );
   }
