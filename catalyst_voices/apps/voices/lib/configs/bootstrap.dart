@@ -112,7 +112,7 @@ Future<BootstrapArgs> bootstrap({
   GoRouter? router,
 }) async {
   _loggingService
-    ..level = kDebugMode ? Level.FINE : Level.OFF
+    ..level = kDebugMode ? Level.FINER : Level.OFF
     ..printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
