@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{MultiEraBlock, Slot, TxnIndex, VKeyHash};
+use cardano_blockchain_types::{MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash};
 use ed25519_dalek::VerifyingKey;
 use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
@@ -14,17 +14,16 @@ use crate::{
             queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
-        types::{DbPublicKey, DbSlot, DbTxnIndex},
+        types::{DbPublicKey, DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db,
-    utils::stake_address::stake_address,
 };
 
 /// Insert TXI Query and Parameters
 #[derive(SerializeRow)]
 pub(crate) struct StakeRegistrationInsertQuery {
     /// Stake address (29 bytes).
-    stake_address: Vec<u8>,
+    stake_address: DbStakeAddress,
     /// Slot Number the cert is in.
     slot_no: DbSlot,
     /// Transaction Index.
@@ -61,10 +60,7 @@ impl Debug for StakeRegistrationInsertQuery {
         };
 
         f.debug_struct("StakeRegistrationInsertQuery")
-            .field(
-                "stake_address",
-                &hex::encode(hex::encode(&self.stake_address)),
-            )
+            .field("stake_address", &format!("{}", self.stake_address))
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("stake_public_key", &stake_public_key)
@@ -83,14 +79,14 @@ impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
-        stake_address: Vec<u8>, slot_no: Slot, txn_index: TxnIndex,
+        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex,
         stake_public_key: Option<VerifyingKey>, script: bool, register: bool, deregister: bool,
         pool_delegation: Option<Vec<u8>>,
     ) -> Self {
         let stake_public_key =
             stake_public_key.map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.into()));
         StakeRegistrationInsertQuery {
-            stake_address,
+            stake_address: stake_address.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             stake_public_key,
@@ -164,29 +160,23 @@ impl CertInsertQuery {
     ) {
         let (stake_address, pubkey, script) = match cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
-                let stake_address = stake_address(block.network(), false, cred);
+                let stake_address = StakeAddress::new(block.network(), false, *cred);
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
                 (stake_address, addr, false)
             },
             conway::StakeCredential::Scripthash(h) => {
-                (stake_address(block.network(), true, h), None, true)
+                (StakeAddress::new(block.network(), true, *h), None, true)
             },
         };
 
         if pubkey.is_none() && !script && deregister {
-            error!(
-                "Stake Deregistration Certificate {:?} is NOT Witnessed.",
-                stake_address
-            );
+            error!("Stake Deregistration Certificate {stake_address} is NOT Witnessed.");
         }
 
         if pubkey.is_none() && !script && delegation.is_some() {
-            error!(
-                "Stake Delegation Certificate {:?} is NOT Witnessed.",
-                stake_address
-            );
+            error!("Stake Delegation Certificate {stake_address} is NOT Witnessed.");
         }
 
         // This may not be witnessed, its normal but disappointing.

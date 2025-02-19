@@ -9,17 +9,16 @@ use std::{
 };
 
 use anyhow::bail;
+use cardano_blockchain_types::StakeAddress;
 use const_format::concatcp;
-use pallas::ledger::addresses::{Address, StakeAddress};
+use pallas::ledger::addresses::Address;
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 use serde_json::Value;
 
-use crate::service::common::types::{
-    cardano::hash29::HexEncodedHash29, string_types::impl_string_types,
-};
+use crate::service::common::types::string_types::impl_string_types;
 
 /// Stake address title.
 const TITLE: &str = "Cardano stake address";
@@ -123,14 +122,9 @@ impl TryFrom<String> for Cip19StakeAddress {
     }
 }
 
-impl TryFrom<StakeAddress> for Cip19StakeAddress {
-    type Error = anyhow::Error;
-
-    fn try_from(addr: StakeAddress) -> Result<Self, Self::Error> {
-        let addr_str = addr
-            .to_bech32()
-            .map_err(|e| anyhow::anyhow!(format!("Invalid stake address {e}")))?;
-        Ok(Self(addr_str))
+impl From<StakeAddress> for Cip19StakeAddress {
+    fn from(value: StakeAddress) -> Self {
+        Self(value.to_string())
     }
 }
 
@@ -141,18 +135,9 @@ impl TryInto<StakeAddress> for Cip19StakeAddress {
         let address_str = &self.0;
         let address = Address::from_bech32(address_str)?;
         match address {
-            Address::Stake(address) => Ok(address),
+            Address::Stake(address) => Ok(address.into()),
             _ => Err(anyhow::anyhow!("Invalid stake address")),
         }
-    }
-}
-
-impl TryInto<HexEncodedHash29> for Cip19StakeAddress {
-    type Error = anyhow::Error;
-
-    fn try_into(self) -> Result<HexEncodedHash29, Self::Error> {
-        let stake_addr: StakeAddress = self.try_into()?;
-        HexEncodedHash29::try_from(stake_addr.payload().as_hash().to_vec())
     }
 }
 
@@ -198,7 +183,7 @@ mod tests {
             Cip19StakeAddress::try_from(VALID_PROD_STAKE_ADDRESS.to_string()).unwrap();
 
         let stake_addr: StakeAddress = stake_address_prod.try_into().unwrap();
-
-        assert!(stake_addr.payload().as_hash().len() == 28);
+        let bytes = Vec::from(stake_addr);
+        assert_eq!(bytes.len(), 29);
     }
 }

@@ -3,7 +3,7 @@
 
 use std::fmt::{Debug, Display, Formatter};
 
-use pallas::ledger::addresses::StakeAddress;
+use cardano_blockchain_types::StakeAddress;
 use scylla::{
     deserialize::{DeserializationError, DeserializeValue, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,
@@ -14,31 +14,21 @@ use scylla::{
     },
 };
 
-/// A length in bytes of the address.
-const ADDRESS_LENGTH: usize = 29;
-
 /// A binary `CIP-19` stack address (29  bytes) that can be stored to and load from a
 /// database.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DbStakeAddress(Vec<u8>);
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Hash)]
+pub struct DbStakeAddress(StakeAddress);
 
 impl From<StakeAddress> for DbStakeAddress {
     fn from(value: StakeAddress) -> Self {
-        // This `to_vec()` call includes both the header and the payload.
-        Self(value.to_vec())
+        Self(value)
     }
 }
 
-impl From<DbStakeAddress> for Vec<u8> {
-    fn from(value: DbStakeAddress) -> Self {
-        value.0
-    }
-}
-
-impl AsRef<[u8]> for DbStakeAddress {
-    fn as_ref(&self) -> &[u8] {
-        self.0.as_ref()
+impl Display for DbStakeAddress {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
@@ -46,7 +36,8 @@ impl SerializeValue for DbStakeAddress {
     fn serialize<'b>(
         &self, typ: &ColumnType, writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
-        self.0.serialize(typ, writer)
+        let bytes: Vec<_> = self.0.clone().into();
+        bytes.serialize(typ, writer)
     }
 }
 
@@ -59,30 +50,29 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbStakeAddress {
         typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let bytes = <Vec<u8>>::deserialize(typ, v)?;
-        if bytes.len() != ADDRESS_LENGTH {
-            return Err(DeserializationError::new(InvalidLength {
-                length: bytes.len(),
-            }));
-        }
-        Ok(Self(bytes))
+        let address = bytes
+            .as_slice()
+            .try_into()
+            .map_err(|error| DeserializationError::new(DeserializeError { error }))?;
+        Ok(Self(address))
     }
 }
 
-/// An invalid length error for `DbCip19StakeAddress` deserialization.
+/// An invalid length error for `DbStakeAddress` deserialization.
 #[derive(Debug)]
-struct InvalidLength {
-    /// An incorrect actual length value.
-    length: usize,
+struct DeserializeError {
+    /// An error value.
+    error: anyhow::Error,
 }
 
-impl Display for InvalidLength {
+impl Display for DeserializeError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "Unexpected length {}, expected {ADDRESS_LENGTH}",
-            self.length
+            "Unexpected to deserialize StakeAddress: {:?}",
+            self.error
         )
     }
 }
 
-impl std::error::Error for InvalidLength {}
+impl std::error::Error for DeserializeError {}

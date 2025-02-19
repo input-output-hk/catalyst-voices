@@ -536,32 +536,32 @@ async fn test_stake_registration() {
     };
 
     // data
-    let stake_address_1 = VerifyingKey::from_bytes(&[
+    let stake_public_key_1 = VerifyingKey::from_bytes(&[
         51, 200, 245, 181, 232, 166, 86, 58, 48, 33, 72, 162, 85, 30, 7, 28, 12, 87, 113, 3, 68,
         233, 104, 179, 113, 196, 59, 4, 155, 225, 74, 149,
     ])
     .unwrap();
-    let stake_address_2 = VerifyingKey::from_bytes(&[
+    let stake_public_key_2 = VerifyingKey::from_bytes(&[
         203, 12, 200, 203, 42, 30, 255, 236, 0, 171, 68, 163, 116, 199, 128, 6, 177, 15, 47, 74,
         188, 81, 43, 244, 51, 2, 161, 145, 195, 236, 188, 75,
     ])
     .unwrap();
     let data = vec![
         certs::StakeRegistrationInsertQuery::new(
-            vec![0],
+            stake_address_1(),
             0.into(),
             0.into(),
-            Some(stake_address_1),
+            Some(stake_public_key_1),
             false,
             false,
             false,
             None,
         ),
         certs::StakeRegistrationInsertQuery::new(
-            vec![1],
+            stake_address_2(),
             1.into(),
             1.into(),
-            Some(stake_address_2),
+            Some(stake_public_key_2),
             true,
             true,
             true,
@@ -682,7 +682,7 @@ async fn test_txo_ada() {
     // data
     let data = vec![
         txo::insert_txo::Params::new(
-            &[0],
+            stake_address_1(),
             0.into(),
             0.into(),
             0.into(),
@@ -691,7 +691,7 @@ async fn test_txo_ada() {
             TransactionId::new(&[0]),
         ),
         txo::insert_txo::Params::new(
-            &[1],
+            stake_address_2(),
             1.into(),
             1.into(),
             1.into(),
@@ -748,8 +748,24 @@ async fn test_txo_assets() {
 
     // data
     let data = vec![
-        txo::insert_txo_asset::Params::new(&[0], 0.into(), 0.into(), 0.into(), &[0], &[0], 0),
-        txo::insert_txo_asset::Params::new(&[1], 1.into(), 1.into(), 1.into(), &[1], &[1], 1),
+        txo::insert_txo_asset::Params::new(
+            stake_address_1(),
+            0.into(),
+            0.into(),
+            0.into(),
+            &[0],
+            &[0],
+            0,
+        ),
+        txo::insert_txo_asset::Params::new(
+            stake_address_2(),
+            1.into(),
+            1.into(),
+            1.into(),
+            &[1],
+            &[1],
+            1,
+        ),
     ];
     let data_len = data.len();
 

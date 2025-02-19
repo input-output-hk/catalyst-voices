@@ -36,7 +36,7 @@ async fn test_get_assets_by_stake_addr() {
 
     let mut row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
-        GetAssetsByStakeAddressParams::new(vec![], u64::MAX.into()),
+        GetAssetsByStakeAddressParams::new(stake_address_1(), u64::MAX.into()),
     )
     .await
     .unwrap();
@@ -176,7 +176,7 @@ async fn test_get_stake_addr_w_stake_key_hash() {
     };
 
     let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams {
-        stake_address: vec![],
+        stake_address: stake_address_1().into(),
     })
     .await
     .unwrap();
@@ -241,7 +241,10 @@ async fn test_get_txo_by_stake_address() {
 
     let mut row_stream = GetTxoByStakeAddressQuery::execute(
         &session,
-        GetTxoByStakeAddressQueryParams::new(vec![], u64::try_from(i64::MAX).unwrap().into()),
+        GetTxoByStakeAddressQueryParams::new(
+            stake_address_1(),
+            u64::try_from(i64::MAX).unwrap().into(),
+        ),
     )
     .await
     .unwrap();

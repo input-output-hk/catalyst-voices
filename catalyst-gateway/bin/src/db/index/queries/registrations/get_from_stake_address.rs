@@ -2,15 +2,19 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::StakeAddress;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::DbStakeAddress,
 };
 
 /// Get stake addr from stake hash query string.
@@ -20,13 +24,15 @@ const GET_QUERY: &str = include_str!("../cql/get_stake_addr_w_stake_address.cql"
 #[derive(SerializeRow)]
 pub(crate) struct GetStakeAddrParams {
     /// Stake hash.
-    pub stake_address: Vec<u8>,
+    pub stake_address: DbStakeAddress,
 }
 
 impl GetStakeAddrParams {
     /// Create a new instance of [`GetStakeAddrParams`]
-    pub(crate) fn new(stake_address: Vec<u8>) -> GetStakeAddrParams {
-        Self { stake_address }
+    pub(crate) fn new(stake_address: StakeAddress) -> GetStakeAddrParams {
+        Self {
+            stake_address: stake_address.into(),
+        }
     }
 }
 

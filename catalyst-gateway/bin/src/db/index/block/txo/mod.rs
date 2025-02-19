@@ -9,7 +9,9 @@ pub(crate) mod insert_unstaked_txo_asset;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Network, Slot, TransactionId, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::{
+    Network, Slot, StakeAddress, TransactionId, TxnIndex, TxnOutputOffset,
+};
 use scylla::Session;
 use tracing::{error, warn};
 
@@ -19,11 +21,7 @@ use crate::{
         session::CassandraSession,
     },
     settings::cassandra_db,
-    utils::stake_address::stake_address,
 };
-
-/// This is used to indicate that there is no stake address.
-const NO_STAKE_ADDRESS: &[u8] = &[];
 
 /// Insert TXO Query and Parameters
 ///
@@ -80,7 +78,7 @@ impl TxoInsertQuery {
     fn extract_stake_address(
         network: Network, txo: &pallas::ledger::traverse::MultiEraOutput<'_>, slot_no: Slot,
         txn_id: &str,
-    ) -> Option<(Vec<u8>, String)> {
+    ) -> Option<(Option<StakeAddress>, String)> {
         let stake_address = match txo.address() {
             Ok(address) => {
                 match address {
@@ -98,22 +96,21 @@ impl TxoInsertQuery {
                             },
                         };
 
-                        match address.delegation() {
+                        let address = match address.delegation() {
                             pallas::ledger::addresses::ShelleyDelegationPart::Script(hash) => {
-                                (stake_address(network, true, hash), address_string)
+                                Some(StakeAddress::new(network, true, *hash))
                             },
                             pallas::ledger::addresses::ShelleyDelegationPart::Key(hash) => {
-                                (stake_address(network, false, hash), address_string)
+                                Some(StakeAddress::new(network, false, *hash))
                             },
                             pallas::ledger::addresses::ShelleyDelegationPart::Pointer(_pointer) => {
                                 // These are not supported from Conway, so we don't support them
                                 // either.
-                                (NO_STAKE_ADDRESS.to_vec(), address_string)
+                                None
                             },
-                            pallas::ledger::addresses::ShelleyDelegationPart::Null => {
-                                (NO_STAKE_ADDRESS.to_vec(), address_string)
-                            },
-                        }
+                            pallas::ledger::addresses::ShelleyDelegationPart::Null => None,
+                        };
+                        (address, address_string)
                     },
                     pallas::ledger::addresses::Address::Stake(_) => {
                         // This should NOT appear in a TXO, so report if it does. But don't index it
@@ -153,12 +150,10 @@ impl TxoInsertQuery {
                 continue;
             };
 
-            let staked = stake_address != NO_STAKE_ADDRESS;
             let txo_index = TxnOutputOffset::from(txo_index);
-
-            if staked {
+            if let Some(stake_address) = stake_address.clone() {
                 let params = insert_txo::Params::new(
-                    &stake_address,
+                    stake_address,
                     slot_no,
                     index,
                     txo_index,
@@ -166,7 +161,6 @@ impl TxoInsertQuery {
                     txo.lovelace_amount(),
                     txn_hash,
                 );
-
                 self.staked_txo.push(params);
             } else {
                 let params = insert_unstaked_txo::Params::new(
@@ -177,7 +171,6 @@ impl TxoInsertQuery {
                     &address,
                     txo.lovelace_amount(),
                 );
-
                 self.unstaked_txo.push(params);
             }
 
@@ -188,9 +181,9 @@ impl TxoInsertQuery {
                         let asset_name = policy_asset.name();
                         let value = policy_asset.any_coin();
 
-                        if staked {
+                        if let Some(stake_address) = stake_address.clone() {
                             let params = insert_txo_asset::Params::new(
-                                &stake_address,
+                                stake_address,
                                 slot_no,
                                 index,
                                 txo_index,

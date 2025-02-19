@@ -3,9 +3,8 @@
 use std::collections::HashMap;
 
 use anyhow::{anyhow, Context};
-use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
+use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::StreamExt;
-use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use super::SlotNumber;
@@ -148,7 +147,10 @@ async fn get_txo_by_txn(
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.to_vec(), adjusted_slot_num.into()),
+        GetTxoByStakeAddressQueryParams::new(
+            stake_address.clone().into(),
+            adjusted_slot_num.into(),
+        ),
     )
     .await?;
 
@@ -176,7 +178,7 @@ async fn get_txo_by_txn(
     // Augment TXO info with asset info.
     let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address.to_vec(), adjusted_slot_num.into()),
+        GetAssetsByStakeAddressParams::new(stake_address.clone().into(), adjusted_slot_num.into()),
     )
     .await?;
 
@@ -256,7 +258,7 @@ async fn update_spent(
 
             if let Some(spent_slot) = txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
-                    stake_address: stake_address.to_vec(),
+                    stake_address: stake_address.clone().into(),
                     txn_index: txo_info.txn_index.into(),
                     txo: txo_info.txo.into(),
                     slot_no: txo_info.slot_no.into(),

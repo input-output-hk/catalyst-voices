@@ -47,7 +47,7 @@ pub(crate) struct Params {
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &hex::encode(&self.stake_address))
+            .field("stake_address", &format!("{}", self.stake_address))
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .finish()

@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbSlot, DbTxnIndex},
+        types::{DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -24,10 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for Stake Registration purge queries.
 
-    use crate::db::types::{DbSlot, DbTxnIndex};
+    use crate::db::types::{DbSlot, DbStakeAddress, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, bool, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (DbStakeAddress, bool, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for Stake Registration.
@@ -36,8 +36,8 @@ const SELECT_QUERY: &str = include_str!("./cql/get_stake_registration.cql");
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake hash - Binary 29 bytes. 0 bytes = not staked.
-    pub(crate) stake_address: Vec<u8>,
+    /// Stake hash - Binary 29 bytes.
+    pub(crate) stake_address: DbStakeAddress,
     /// Is the address a script address.
     pub(crate) script: bool,
     /// Block Slot Number

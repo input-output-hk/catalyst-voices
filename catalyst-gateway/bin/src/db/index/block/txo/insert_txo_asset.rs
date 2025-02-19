@@ -2,14 +2,14 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
+        types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -21,8 +21,8 @@ const INSERT_TXO_ASSET_QUERY: &str = include_str!("./cql/insert_txo_asset.cql");
 /// (Superset of data to support both Staked and Unstaked TXO records.)
 #[derive(SerializeRow, Debug)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 29 bytes. 0 bytes = not staked.
-    stake_address: Vec<u8>,
+    /// Stake Address - Binary 29 bytes.
+    stake_address: DbStakeAddress,
     /// Block Slot Number
     slot_no: DbSlot,
     /// Transaction Offset inside the block.
@@ -44,11 +44,11 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
-        stake_address: &[u8], slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
+        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
         policy_id: &[u8], asset_name: &[u8], value: i128,
     ) -> Self {
         Self {
-            stake_address: stake_address.to_vec(),
+            stake_address: stake_address.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             txo: txo.into(),

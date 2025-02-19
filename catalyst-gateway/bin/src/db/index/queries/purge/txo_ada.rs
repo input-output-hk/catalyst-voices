@@ -16,7 +16,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbSlot, DbTxnIndex, DbTxnOutputOffset},
+        types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -24,10 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for TXO by Stake Address purge queries.
 
-    use crate::db::types::{DbSlot, DbTxnIndex, DbTxnOutputOffset};
+    use crate::db::types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, DbSlot, DbTxnIndex, DbTxnOutputOffset);
+    pub(crate) type PrimaryKey = (DbStakeAddress, DbSlot, DbTxnIndex, DbTxnOutputOffset);
 }
 
 /// Select primary keys for TXO by Stake Address.
@@ -36,8 +36,8 @@ const SELECT_QUERY: &str = include_str!("./cql/get_txo_by_stake_address.cql");
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 29 bytes. 0 bytes = not staked.
-    pub(crate) stake_address: Vec<u8>,
+    /// Stake Address - Binary 29 bytes.
+    pub(crate) stake_address: DbStakeAddress,
     /// Block Slot Number
     pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.

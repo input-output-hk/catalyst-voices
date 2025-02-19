@@ -7,9 +7,11 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Cip0134Uri, MultiEraBlock, Slot, TransactionId, TxnIndex};
+use cardano_blockchain_types::{
+    Cip0134Uri, MultiEraBlock, Slot, StakeAddress, TransactionId, TxnIndex,
+};
 use catalyst_types::id_uri::IdUri;
-use pallas::ledger::addresses::{Address, StakeAddress};
+use pallas::ledger::addresses::Address;
 use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
 use scylla::Session;
 use tracing::error;
@@ -244,7 +246,7 @@ fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<StakeAddress> {
     uris.iter()
         .filter_map(|uri| {
             match uri.address() {
-                Address::Stake(a) => Some(a.clone()),
+                Address::Stake(a) => Some(a.clone().into()),
                 _ => None,
             }
         })

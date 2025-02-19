@@ -2,6 +2,7 @@
 
 use std::{cmp::Reverse, sync::Arc};
 
+use cardano_blockchain_types::StakeAddress;
 use futures::StreamExt;
 
 use super::{
@@ -13,26 +14,23 @@ use super::{
     },
     Ed25519HexEncodedPublicKey, SlotNo,
 };
-use crate::{
-    db::index::{
-        queries::registrations::{
-            get_all_stakes_and_vote_keys::{
-                GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
-            },
-            get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
-            get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
-            get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
-            get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
+use crate::db::index::{
+    queries::registrations::{
+        get_all_stakes_and_vote_keys::{
+            GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
         },
-        session::CassandraSession,
+        get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
+        get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
+        get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
+        get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
     },
-    service::common::types::cardano::hash29::HexEncodedHash29,
+    session::CassandraSession,
 };
 
 /// Get registration given a stake key hash, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_stake_key_hash(
-    stake_address: HexEncodedHash29, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
 ) -> AllRegistration {
     // Get stake addr associated with given stake hash.
     let mut stake_addr_iter =

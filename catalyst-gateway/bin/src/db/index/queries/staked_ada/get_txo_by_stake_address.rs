@@ -1,7 +1,7 @@
 //! Get the TXO by Stake Address
 use std::sync::Arc;
 
-use cardano_blockchain_types::Slot;
+use cardano_blockchain_types::{Slot, StakeAddress};
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
@@ -13,7 +13,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbSlot, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
+    types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
 };
 
 /// Get txo by stake address query string.
@@ -23,16 +23,16 @@ const GET_TXO_BY_STAKE_ADDRESS_QUERY: &str = include_str!("../cql/get_txo_by_sta
 #[derive(SerializeRow)]
 pub(crate) struct GetTxoByStakeAddressQueryParams {
     /// Stake address.
-    stake_address: Vec<u8>,
+    stake_address: DbStakeAddress,
     /// Max slot num.
     slot_no: DbSlot,
 }
 
 impl GetTxoByStakeAddressQueryParams {
     /// Creates a new [`GetTxoByStakeAddressQueryParams`].
-    pub(crate) fn new(stake_address: Vec<u8>, slot_no: Slot) -> Self {
+    pub(crate) fn new(stake_address: StakeAddress, slot_no: Slot) -> Self {
         Self {
-            stake_address,
+            stake_address: stake_address.into(),
             slot_no: slot_no.into(),
         }
     }

@@ -2,9 +2,8 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, TxnIndex};
+use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
 use catalyst_types::id_uri::IdUri;
-use pallas::ledger::addresses::StakeAddress;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 

@@ -6,7 +6,6 @@ pub(crate) mod catalyst_id;
 pub(crate) mod cip19_shelley_address;
 pub(crate) mod cip19_stake_address;
 pub(crate) mod hash28;
-pub(crate) mod hash29;
 pub(crate) mod nonce;
 pub(crate) mod query;
 pub(crate) mod slot_no;
