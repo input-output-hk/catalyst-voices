@@ -355,6 +355,7 @@ class _Tabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 5,
+      initialIndex: 0,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -387,7 +388,7 @@ class _Tabs extends StatelessWidget {
                 selector: (state) {
                   return ProposalPaginationViewModel.fromPaginationItems(
                     paginItems: state.allProposals,
-                    isLoading: state.isLoading,
+                    isLoading: state.allProposals.isLoading,
                     categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
@@ -404,7 +405,7 @@ class _Tabs extends StatelessWidget {
                 selector: (state) {
                   return ProposalPaginationViewModel.fromPaginationItems(
                     paginItems: state.draftProposals,
-                    isLoading: state.isLoading,
+                    isLoading: state.draftProposals.isLoading,
                     categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
@@ -422,7 +423,7 @@ class _Tabs extends StatelessWidget {
                 selector: (state) {
                   return ProposalPaginationViewModel.fromPaginationItems(
                     paginItems: state.finalProposals,
-                    isLoading: state.isLoading,
+                    isLoading: state.finalProposals.isLoading,
                     categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
@@ -440,7 +441,7 @@ class _Tabs extends StatelessWidget {
                 selector: (state) {
                   return ProposalPaginationViewModel.fromPaginationItems(
                     paginItems: state.favoriteProposals,
-                    isLoading: state.isLoading,
+                    isLoading: state.favoriteProposals.isLoading,
                     categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
@@ -458,7 +459,7 @@ class _Tabs extends StatelessWidget {
                 selector: (state) {
                   return ProposalPaginationViewModel.fromPaginationItems(
                     paginItems: state.userProposals,
-                    isLoading: state.isLoading,
+                    isLoading: state.userProposals.isLoading,
                     categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );

@@ -55,7 +55,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     if (campaign == null) {
       return;
     }
-    emit(state.copyWith(isLoading: true));
     final proposals = await _proposalService.getProposals(
       request: request,
     );
@@ -73,71 +72,34 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
         .toList();
 
     if (request.usersProposals) {
-      return emit(
-        state.copyWith(
-          userProposals: state.userProposals.copyWith(
-            pageKey: proposals.pageKey,
-            maxResults: proposals.maxResults,
-            items: [
-              ...state.userProposals.items,
-              ...proposalViewModelList,
-            ],
-          ),
-        ),
+      return _emitUserProposals(
+        proposalViewModelList,
+        proposals.pageKey,
+        proposals.maxResults,
       );
     } else if (request.usersFavorite) {
-      final favorite = [
-        ...state.favoriteProposals.items,
-        ...proposalViewModelList,
-      ];
-      return emit(
-        state.copyWith(
-          favoriteProposals: state.favoriteProposals.copyWith(
-            pageKey: proposals.pageKey,
-            maxResults: favorite.length,
-            items: favorite,
-          ),
-        ),
+      return _emitFavoriteProposals(
+        proposalViewModelList,
+        proposals.pageKey,
+        proposals.maxResults,
       );
     } else if (request.stage == ProposalPublish.published) {
-      return emit(
-        state.copyWith(
-          finalProposals: state.finalProposals.copyWith(
-            pageKey: proposals.pageKey,
-            maxResults: proposals.maxResults,
-            items: [
-              ...state.finalProposals.items,
-              ...proposalViewModelList,
-            ],
-          ),
-        ),
+      return _emitFinalProposals(
+        proposalViewModelList,
+        proposals.pageKey,
+        proposals.maxResults,
       );
     } else if (request.stage == ProposalPublish.draft) {
-      return emit(
-        state.copyWith(
-          draftProposals: state.draftProposals.copyWith(
-            pageKey: proposals.pageKey,
-            maxResults: proposals.maxResults,
-            items: [
-              ...state.draftProposals.items,
-              ...proposalViewModelList,
-            ],
-          ),
-        ),
+      return _emitDraftProposals(
+        proposalViewModelList,
+        proposals.pageKey,
+        proposals.maxResults,
       );
     } else {
-      final allProposals = [
-        ...state.allProposals.items,
-        ...proposalViewModelList,
-      ]..shuffled();
-      return emit(
-        state.copyWith(
-          allProposals: state.allProposals.copyWith(
-            pageKey: proposals.pageKey,
-            maxResults: proposals.maxResults,
-            items: allProposals,
-          ),
-        ),
+      return _emitAllProposals(
+        proposalViewModelList,
+        proposals.pageKey,
+        proposals.maxResults,
       );
     }
   }
@@ -183,6 +145,114 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
 
       emit(state.copyWith(favoritesIds: favoritesIds));
     }
+  }
+
+  void _emitAllProposals(
+    List<ProposalViewModel> proposalViewModelList,
+    int pageKey,
+    int maxResults,
+  ) {
+    emit(state.allProposalsLoading);
+    final allProposals = [
+      ...state.allProposals.items,
+      ...proposalViewModelList,
+    ]..shuffled();
+    return emit(
+      state.copyWith(
+        allProposals: state.allProposals.copyWith(
+          pageKey: pageKey,
+          maxResults: maxResults,
+          items: allProposals,
+        ),
+      ),
+    );
+  }
+
+  void _emitDraftProposals(
+    List<ProposalViewModel> proposalViewModelList,
+    int pageKey,
+    int maxResults,
+  ) {
+    emit(state.draftProposalsLoading);
+    final draftProposals = [
+      ...state.draftProposals.items,
+      ...proposalViewModelList,
+    ];
+    return emit(
+      state.copyWith(
+        draftProposals: state.draftProposals.copyWith(
+          pageKey: pageKey,
+          maxResults: maxResults,
+          items: draftProposals,
+        ),
+      ),
+    );
+  }
+
+  void _emitFavoriteProposals(
+    List<ProposalViewModel> proposalViewModelList,
+    int pageKey,
+    int maxResults,
+  ) {
+    emit(state.favoriteProposalsLoading);
+    final favorite = [
+      ...state.favoriteProposals.items,
+      ...proposalViewModelList,
+    ];
+
+    return emit(
+      state.copyWith(
+        favoriteProposals: state.favoriteProposals.copyWith(
+          pageKey: pageKey,
+          // TODO(LynxLynxx): change to maxResults when implementing db
+          maxResults: favorite.length,
+          items: favorite,
+        ),
+      ),
+    );
+  }
+
+  void _emitFinalProposals(
+    List<ProposalViewModel> proposalViewModelList,
+    int pageKey,
+    int maxResults,
+  ) {
+    emit(state.finalProposalsLoading);
+    final finalProposals = [
+      ...state.finalProposals.items,
+      ...proposalViewModelList,
+    ];
+    return emit(
+      state.copyWith(
+        finalProposals: state.finalProposals.copyWith(
+          pageKey: pageKey,
+          maxResults: maxResults,
+          items: finalProposals,
+        ),
+      ),
+    );
+  }
+
+  void _emitUserProposals(
+    List<ProposalViewModel> proposalViewModelList,
+    int pageKey,
+    int maxResults,
+  ) {
+    emit(state.userProposalsLoading);
+    final userProposals = [
+      ...state.userProposals.items,
+      ...proposalViewModelList,
+    ];
+    return emit(
+      state.copyWith(
+        userProposals: state.userProposals.copyWith(
+          pageKey: pageKey,
+          // TODO(LynxLynxx): change to maxResults when implementing db
+          maxResults: userProposals.length,
+          items: userProposals,
+        ),
+      ),
+    );
   }
 
   // TODO(LynxLynxx): to mock data. remove after implementing db

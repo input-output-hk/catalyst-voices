@@ -14,7 +14,6 @@ class ProposalsState extends Equatable {
   final List<CampaignCategoryViewModel> categories;
   final String? selectedCategoryId;
   final String? searchValue;
-  final bool isLoading;
 
   const ProposalsState({
     this.draftProposals = const ProposalPaginationItems(),
@@ -27,7 +26,6 @@ class ProposalsState extends Equatable {
     this.categories = const [],
     this.selectedCategoryId,
     this.searchValue,
-    this.isLoading = false,
   });
 
   @override
@@ -42,7 +40,6 @@ class ProposalsState extends Equatable {
         categories,
         selectedCategoryId,
         searchValue,
-        isLoading,
       ];
 
   ProposalsState copyWith({
@@ -69,11 +66,27 @@ class ProposalsState extends Equatable {
       categories: categories ?? this.categories,
       selectedCategoryId: selectedCategoryId.dataOr(this.selectedCategoryId),
       searchValue: searchValue.dataOr(this.searchValue),
-      isLoading: isLoading,
     );
   }
 
   bool isFavorite(String proposalId) {
     return favoriteProposals.items.any((e) => e.id == proposalId);
   }
+}
+
+extension ProposalsStateLoading on ProposalsState {
+  ProposalsState get allProposalsLoading =>
+      copyWith(allProposals: allProposals.copyWith(isLoading: true));
+
+  ProposalsState get draftProposalsLoading =>
+      copyWith(draftProposals: draftProposals.copyWith(isLoading: true));
+
+  ProposalsState get favoriteProposalsLoading =>
+      copyWith(favoriteProposals: favoriteProposals.copyWith(isLoading: true));
+
+  ProposalsState get finalProposalsLoading =>
+      copyWith(finalProposals: finalProposals.copyWith(isLoading: true));
+
+  ProposalsState get userProposalsLoading =>
+      copyWith(userProposals: userProposals.copyWith(isLoading: true));
 }

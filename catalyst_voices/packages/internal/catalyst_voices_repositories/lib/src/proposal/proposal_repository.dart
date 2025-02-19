@@ -91,7 +91,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     // Return users proposals match his account id with proposals metadata from
     // author field.
     if (request.usersProposals) {
-      return const ProposalsSearchResult(maxResults: 0, proposals: []);
+      return _getUserProposalsSearchResult(request);
     } else if (request.usersFavorite) {
       return _getFavoritesProposalsSearchResult(request);
     }
@@ -161,6 +161,33 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     return ProposalsSearchResult(
       maxResults: favoritesIds.length,
+      proposals: proposals,
+    );
+  }
+
+  Future<ProposalsSearchResult> _getUserProposalsSearchResult(
+    ProposalPaginationRequest request,
+  ) async {
+    final userProposalsIds = await getUserProposalsIds('');
+    final proposals = <ProposalBase>[];
+    final range = PagingRange.calculateRange(
+      pageKey: request.pageKey,
+      itemsPerPage: request.pageSize,
+      maxResults: userProposalsIds.length,
+    );
+    if (userProposalsIds.isEmpty) {
+      return const ProposalsSearchResult(
+        maxResults: 0,
+        proposals: [],
+      );
+    }
+    for (var i = range.from; i <= range.to; i++) {
+      final proposal = await getProposal(id: userProposalsIds[i]);
+      proposals.add(proposal);
+    }
+
+    return ProposalsSearchResult(
+      maxResults: userProposalsIds.length,
       proposals: proposals,
     );
   }

@@ -5,11 +5,13 @@ class ProposalPaginationItems<ProposalType> extends Equatable {
   final int pageKey;
   final int maxResults;
   final List<ProposalType> items;
+  final bool isLoading;
 
   const ProposalPaginationItems({
     this.pageKey = 0,
     this.maxResults = 0,
     this.items = const [],
+    this.isLoading = false,
   });
 
   bool get noItems => items.isEmpty;
@@ -19,17 +21,20 @@ class ProposalPaginationItems<ProposalType> extends Equatable {
         maxResults,
         pageKey,
         items,
+        isLoading,
       ];
 
   ProposalPaginationItems<ProposalType> copyWith({
     int? pageKey,
     int? maxResults,
     List<ProposalType>? items,
+    bool isLoading = false,
   }) {
     return ProposalPaginationItems<ProposalType>(
       pageKey: pageKey ?? this.pageKey,
       maxResults: maxResults ?? this.maxResults,
       items: items ?? this.items,
+      isLoading: isLoading,
     );
   }
 }

@@ -116,6 +116,9 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
         oldWidget.searchValue != widget.searchValue) {
       _pagingController.notifyPageRequestListeners(0);
     }
+    if (widget.isLoading != widget.isLoading) {
+      _pagingController.isLoading = widget.isLoading;
+    }
   }
 
   @override
@@ -133,24 +136,24 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
       initialMaxResults: widget.maxResults,
     );
 
-    _pagingController.addPageRequestListener((
-      newPageKey,
-      pageSize,
-      lastItem,
-    ) async {
-      final request = ProposalPaginationRequest(
-        pageKey: newPageKey,
-        pageSize: pageSize,
-        lastId: lastItem?.id,
-        stage: widget.stage,
-        categoryId: widget.categoryId,
-        usersProposals: widget.userProposals,
-        usersFavorite: widget.usersFavorite,
-      );
-      await _proposalBloc.getProposals(request);
-    });
-    // _handleItemListChange();
-    _pagingController.notifyPageRequestListeners(0);
+    _pagingController
+      ..addPageRequestListener((
+        newPageKey,
+        pageSize,
+        lastItem,
+      ) async {
+        final request = ProposalPaginationRequest(
+          pageKey: newPageKey,
+          pageSize: pageSize,
+          lastId: lastItem?.id,
+          stage: widget.stage,
+          categoryId: widget.categoryId,
+          usersProposals: widget.userProposals,
+          usersFavorite: widget.usersFavorite,
+        );
+        await _proposalBloc.getProposals(request);
+      })
+      ..notifyPageRequestListeners(0);
   }
 
   void _handleItemListChange() {
