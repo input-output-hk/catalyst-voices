@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -50,14 +50,23 @@ class _SearchInputFieldState extends State<SearchInputField> {
           hintText: context.l10n.searchProposals,
           filled: true,
           fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
+          borderRadius: BorderRadius.circular(8),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: context.colors.outlineBorderVariant,
+            ),
+          ),
           suffixIcon: ValueListenableBuilder<TextEditingValue>(
             valueListenable: _controller,
             builder: (context, value, child) {
               return Offstage(
                 offstage: value.text.isEmpty,
-                child: TextButton(
-                  onPressed: _clearTextFiled,
-                  child: Text(context.l10n.clear),
+                child: VoicesTextButton(
+                  onTap: _clearTextFiled,
+                  style: TextButton.styleFrom(
+                    foregroundColor: context.colors.textOnPrimaryLevel0,
+                  ),
+                  child: Text(context.l10n.reset),
                 ),
               );
             },
@@ -71,7 +80,7 @@ class _SearchInputFieldState extends State<SearchInputField> {
     if (_debounce?.isActive ?? false) {
       _debounce?.cancel();
     }
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(const Duration(milliseconds: 300), () {
       _proposalsCubit.changeSearchValue(_controller.text);
     });
   }

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
-import 'package:catalyst_voices/pages/proposals/proposal_pagin_tabview.dart';
+import 'package:catalyst_voices/pages/proposals/proposal_pagination_tabview.dart';
 import 'package:catalyst_voices/pages/proposals/search_input_field.dart';
 import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -338,7 +338,7 @@ class _Tabs extends StatelessWidget {
                   );
                 },
                 builder: (context, state) {
-                  return ProposalPaginTabview(
+                  return ProposalPaginationTabView(
                     key: const Key('allProposalsPagination'),
                     paginationViewModel: state,
                   );
@@ -355,7 +355,7 @@ class _Tabs extends StatelessWidget {
                   );
                 },
                 builder: (context, state) {
-                  return ProposalPaginTabview(
+                  return ProposalPaginationTabView(
                     key: const Key('draftProposalsPagination'),
                     paginationViewModel: state,
                     stage: ProposalPublish.draft,
@@ -373,7 +373,7 @@ class _Tabs extends StatelessWidget {
                   );
                 },
                 builder: (context, state) {
-                  return ProposalPaginTabview(
+                  return ProposalPaginationTabView(
                     key: const Key('finalProposalsPagination'),
                     paginationViewModel: state,
                     stage: ProposalPublish.published,
@@ -391,7 +391,7 @@ class _Tabs extends StatelessWidget {
                   );
                 },
                 builder: (context, state) {
-                  return ProposalPaginTabview(
+                  return ProposalPaginationTabView(
                     key: const Key('favoriteProposalsPagination'),
                     paginationViewModel: state,
                     usersFavorite: true,
@@ -409,7 +409,7 @@ class _Tabs extends StatelessWidget {
                   );
                 },
                 builder: (context, state) {
-                  return ProposalPaginTabview(
+                  return ProposalPaginationTabView(
                     key: const Key('userProposalsPagination'),
                     paginationViewModel: state,
                     userProposals: true,

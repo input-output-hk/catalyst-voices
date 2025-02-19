@@ -29,18 +29,28 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
       // TODO(LynxLynxx): to mock data. remove after implementing db
       final favoritesIds = [...state.favoritesIds, proposalId];
       emit(state.copyWith(favoritesIds: favoritesIds));
+      // TODO(LynxLynxx): to mock data. should read proposal from db and change
+      // isFavorite 
+      // await _proposalService.getProposal(id: proposalId);
 
       // TODO(LynxLynxx): to mock data. remove after implementing db
-      final proposal = state.allProposals.items.first.copyWith(id: proposalId);
+      final proposal = state.allProposals.items.first.copyWith(
+        id: proposalId,
+        isFavorite: isFavorite,
+      );
       await _favorite(isFavorite, proposal);
     } else {
+      // TODO(LynxLynxx): to mock data. remove after implementing db
+      final proposal = state.allProposals.items.first.copyWith(
+        id: proposalId,
+        isFavorite: isFavorite,
+      );
+      await _favorite(isFavorite, proposal);
       await _proposalService.removeFavoriteProposal(proposalId);
       // TODO(LynxLynxx): to mock data. remove after implementing db
       final favoritesIds = [...state.favoritesIds]..remove(proposalId);
+
       emit(state.copyWith(favoritesIds: favoritesIds));
-      // TODO(LynxLynxx): to mock data. remove after implementing db
-      final proposal = state.allProposals.items.first.copyWith(id: proposalId);
-      await _favorite(isFavorite, proposal);
     }
   }
 
@@ -82,15 +92,16 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
         ),
       );
     } else if (request.usersFavorite) {
+      final favorite = [
+        ...state.favoriteProposals.items,
+        ...proposalViewModelList,
+      ];
       return emit(
         state.copyWith(
           favoriteProposals: state.favoriteProposals.copyWith(
             pageKey: proposals.pageKey,
-            maxResults: proposals.maxResults,
-            items: [
-              ...state.favoriteProposals.items,
-              ...proposalViewModelList,
-            ],
+            maxResults: favorite.length,
+            items: favorite,
           ),
         ),
       );
@@ -188,14 +199,15 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
             pageKey: 0,
             maxResults: state.favoritesIds.length,
             items: [
-              proposal,
               ...state.favoriteProposals.items,
+              proposal,
             ],
           ),
         ),
       );
     } else {
-      final items = [...state.favoriteProposals.items]..remove(proposal);
+      final items = [...state.favoriteProposals.items]
+        ..removeWhere((e) => e.id == proposal.id);
       emit(
         state.copyWith(
           favoriteProposals: favoritesProposals.copyWith(

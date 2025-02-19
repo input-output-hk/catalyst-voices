@@ -118,11 +118,7 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
             return ProposalCard(
               key: ValueKey(item.id),
               proposal: item,
-              showStatus: false,
-              showLastUpdate: false,
-              showComments: false,
-              showSegments: false,
-              isFavorite: state,
+              isFavorite: widget.usersFavorite ? item.isFavorite : state,
               onFavoriteChanged: (isFavorite) async {
                 await context.read<ProposalsCubit>().onChangeFavoriteProposal(
                       item.id,

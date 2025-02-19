@@ -940,6 +940,9 @@
     "description": "When user checks correct seed phrase words order he can upload it too"
   },
   "reset": "Reset",
+  "@reset": {
+    "description": "Action to reset value in text field"
+  },
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
   "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
   "yourNextStep": "Your next step",

@@ -3,13 +3,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalPaginTabview extends StatelessWidget {
+class ProposalPaginationTabView extends StatelessWidget {
   final ProposalPaginViewModel paginationViewModel;
   final ProposalPublish? stage;
   final bool userProposals;
   final bool usersFavorite;
 
-  const ProposalPaginTabview({
+  const ProposalPaginationTabView({
     super.key,
     required this.paginationViewModel,
     this.stage,
