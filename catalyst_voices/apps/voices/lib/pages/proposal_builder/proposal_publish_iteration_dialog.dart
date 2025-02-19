@@ -202,17 +202,16 @@ class _ListItems extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 8,
         children: [
           _ListItem(
             icon: VoicesAssets.icons.eye,
             text: context.l10n.publishNewProposalIterationDialogList1,
           ),
-          const SizedBox(height: 8),
           _ListItem(
             icon: VoicesAssets.icons.chatAlt2,
             text: context.l10n.publishNewProposalIterationDialogList2,
           ),
-          const SizedBox(height: 8),
           _ListItem(
             icon: VoicesAssets.icons.exclamationCircle,
             text: context.l10n.publishNewProposalIterationDialogList3,
