@@ -124,9 +124,7 @@ class _Buttons extends StatelessWidget {
 }
 
 class _DraftChip extends StatelessWidget {
-  const _DraftChip({
-    super.key,
-  });
+  const _DraftChip();
 
   @override
   Widget build(BuildContext context) {
