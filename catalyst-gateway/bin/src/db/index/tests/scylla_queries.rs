@@ -13,8 +13,8 @@ use crate::{
         queries::{
             rbac,
             registrations::{
-                get_from_stake_addr::*, get_from_stake_address::*, get_from_vote_key::*,
-                get_invalid::*,
+                get_from_stake_addr::*, get_invalid::*, get_stake_pk_from_stake_address::*,
+                get_stake_pk_from_vote_key::*,
             },
             staked_ada::{
                 get_assets_by_stake_address::*, get_txi_by_txn_hash::*,
@@ -170,14 +170,17 @@ async fn test_get_registrations_w_stake_addr() {
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_stake_addr_w_stake_key_hash() {
+async fn test_get_stake_pk_w_stake_addr() {
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetStakeAddrQuery::execute(&session, GetStakeAddrParams {
-        stake_address: vec![],
-    })
+    let mut row_stream = GetStakePublicKeyFromStakeAddrQuery::execute(
+        &session,
+        GetStakePublicKeyFromStakeAddrParams {
+            stake_address: vec![],
+        },
+    )
     .await
     .unwrap();
 
@@ -188,13 +191,13 @@ async fn test_get_stake_addr_w_stake_key_hash() {
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
 #[tokio::test]
-async fn test_get_stake_addr_w_vote_key() {
+async fn test_get_stake_pk_w_vote_key() {
     let Ok((session, _)) = get_shared_session().await else {
         panic!("{SESSION_ERR_MSG}");
     };
 
     let mut row_stream =
-        GetStakeAddrFromVoteKeyQuery::execute(&session, GetStakeAddrFromVoteKeyParams {
+        GetStakePublicKeyFromVoteKeyQuery::execute(&session, GetStakePublicKeyFromVoteKeyParams {
             vote_key: vec![],
         })
         .await
