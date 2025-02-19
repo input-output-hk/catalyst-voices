@@ -455,7 +455,6 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     final textTheme = theme.textTheme;
     final colors = theme.colors;
     final colorScheme = theme.colorScheme;
-
     final borderRadius = widget.decoration?.borderRadius;
 
     return InputDecoration(
@@ -619,7 +618,9 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
       case VoicesTextFieldStatus.warning:
         return Theme.of(context).colors.warning;
       case VoicesTextFieldStatus.error:
-        return Theme.of(context).colorScheme.error;
+        return widget.enabled
+            ? Theme.of(context).colorScheme.error
+            : Colors.transparent;
     }
   }
 
