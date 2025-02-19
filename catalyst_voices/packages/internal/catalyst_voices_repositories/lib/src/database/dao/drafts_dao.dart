@@ -11,6 +11,9 @@ abstract interface class DraftsDao {
   /// Returns all drafts
   Future<List<DocumentDraftEntity>> queryAll();
 
+  /// Returns all known document drafts refs.
+  Future<List<DraftRef>> queryAllRefs();
+
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
   Future<DocumentDraftEntity?> query({required DocumentRef ref});
@@ -56,6 +59,30 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<List<DocumentDraftEntity>> queryAll() {
     return select(drafts).get();
+  }
+
+  @override
+  Future<List<DraftRef>> queryAllRefs() {
+    final select = selectOnly(drafts)
+      ..addColumns([
+        drafts.idHi,
+        drafts.idLo,
+        drafts.verHi,
+        drafts.verLo,
+      ]);
+
+    return select.map((row) {
+      final id = UuidHiLo(
+        high: row.read(drafts.idHi)!,
+        low: row.read(drafts.idLo)!,
+      );
+      final version = UuidHiLo(
+        high: row.read(drafts.verHi)!,
+        low: row.read(drafts.verLo)!,
+      );
+
+      return DraftRef(id: id.uuid, version: version.uuid);
+    }).get();
   }
 
   @override

@@ -12,6 +12,9 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
 
 /// See [DatabaseDraftsDataSource].
 abstract interface class DraftDataSource implements DocumentDataLocalSource {
+  @override
+  Future<List<DraftRef>> index();
+
   Future<void> update({
     required DraftRef ref,
     required DocumentDataContent content,

@@ -9,6 +9,9 @@ const mockedTemplateUuid = '0194f567-65f5-7d96-ad12-77762fdef00b';
 
 abstract interface class DocumentDataRemoteSource
     implements DocumentDataSource {
+  @override
+  Future<List<SignedDocumentRef>> index();
+
   Future<String?> getLatestVersion(String id);
 }
 
@@ -19,6 +22,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   CatGatewayDocumentDataSource(
     this._signedDocumentManager,
   );
+
+  // TODO(damian-molinski): ask index api
+  @override
+  Future<List<SignedDocumentRef>> index() async {
+    return [];
+  }
 
   // TODO(damian-molinski): ask index api
   @override

@@ -10,6 +10,11 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   );
 
   @override
+  Future<List<DraftRef>> index() {
+    return _database.draftsDao.queryAllRefs();
+  }
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.draftsDao.count(ref: ref).then((count) => count > 0);
   }

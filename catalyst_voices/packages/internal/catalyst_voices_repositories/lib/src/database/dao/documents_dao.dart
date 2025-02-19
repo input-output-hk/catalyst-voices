@@ -17,6 +17,9 @@ abstract interface class DocumentsDao {
   /// all will be returned.
   Future<List<DocumentEntity>> queryAll();
 
+  /// Returns all known document refs.
+  Future<List<SignedDocumentRef>> queryAllRefs();
+
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
   Future<DocumentEntity?> query({required DocumentRef ref});
@@ -67,6 +70,30 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<List<DocumentEntity>> queryAll() {
     return select(documents).get();
+  }
+
+  @override
+  Future<List<SignedDocumentRef>> queryAllRefs() {
+    final select = selectOnly(documents)
+      ..addColumns([
+        documents.idHi,
+        documents.idLo,
+        documents.verHi,
+        documents.verLo,
+      ]);
+
+    return select.map((row) {
+      final id = UuidHiLo(
+        high: row.read(documents.idHi)!,
+        low: row.read(documents.idLo)!,
+      );
+      final version = UuidHiLo(
+        high: row.read(documents.verHi)!,
+        low: row.read(documents.verLo)!,
+      );
+
+      return SignedDocumentRef(id: id.uuid, version: version.uuid);
+    }).get();
   }
 
   @override

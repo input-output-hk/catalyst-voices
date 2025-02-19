@@ -9,6 +9,11 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
   );
 
   @override
+  Future<List<DocumentRef>> index() {
+    return _database.documentsDao.queryAllRefs();
+  }
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
   }
