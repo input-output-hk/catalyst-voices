@@ -31,6 +31,9 @@ class EditableTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showSaveButton = isEditMode;
+    final showFooter = showSaveButton || errorText != null;
+
     return PropertyTile(
       title: title,
       isSelected: isSelected,
@@ -39,12 +42,14 @@ class EditableTile extends StatelessWidget {
         isEditing: isEditMode,
         hasError: errorText != null,
       ),
-      footer: _Footer(
-        errorText: errorText,
-        showSaveButton: isEditMode,
-        isSaveEnabled: isSaveEnabled,
-        onSave: _save,
-      ),
+      footer: showFooter
+          ? _Footer(
+              errorText: errorText,
+              showSaveButton: showSaveButton,
+              isSaveEnabled: isSaveEnabled,
+              onSave: _save,
+            )
+          : null,
       child: child,
     );
   }
@@ -115,6 +120,7 @@ class _Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final errorText = this.errorText;
+
     return Row(
       children: [
         Expanded(
