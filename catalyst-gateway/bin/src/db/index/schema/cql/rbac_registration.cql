@@ -14,3 +14,6 @@ CREATE TABLE IF NOT EXISTS rbac_registration (
     PRIMARY KEY (catalyst_id, slot_no, txn_index)
 )
 WITH CLUSTERING ORDER BY (slot_no DESC, txn_index DESC);
+
+CREATE INDEX cat_id_by_transaction_id ON rbac_registration (txn_id);
+CREATE INDEX cat_id_by_stake_address ON rbac_registration(stake_address);
