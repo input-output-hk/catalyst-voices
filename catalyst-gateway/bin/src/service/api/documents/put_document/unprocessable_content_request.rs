@@ -23,7 +23,7 @@ impl PutDocumentUnprocessableContent {
     pub(crate) fn new(error: &(impl ToString + ?Sized), report: Option<serde_json::Value>) -> Self {
         Self {
             error: error.to_string().into(),
-            report: common::objects::generic::json_object::JSONObject::parse_from_json(report).ok(),
+            report: ParseFromJSON::parse_from_json(report).ok(),
         }
     }
 }
