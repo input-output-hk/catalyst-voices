@@ -147,10 +147,7 @@ async fn get_txo_by_txn(
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(
-            stake_address.clone().into(),
-            adjusted_slot_num.into(),
-        ),
+        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), adjusted_slot_num.into()),
     )
     .await?;
 
@@ -178,7 +175,7 @@ async fn get_txo_by_txn(
     // Augment TXO info with asset info.
     let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address.clone().into(), adjusted_slot_num.into()),
+        GetAssetsByStakeAddressParams::new(stake_address.clone(), adjusted_slot_num.into()),
     )
     .await?;
 

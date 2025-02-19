@@ -34,9 +34,7 @@ pub(crate) async fn get_registration_given_stake_key_hash(
 ) -> AllRegistration {
     // Get stake addr associated with given stake hash.
     let mut stake_addr_iter =
-        match GetStakeAddrQuery::execute(&session, GetStakeAddrParams::new(stake_address.into()))
-            .await
-        {
+        match GetStakeAddrQuery::execute(&session, GetStakeAddrParams::new(stake_address)).await {
             Ok(stake_addr) => stake_addr,
             Err(err) => {
                 return AllRegistration::handle_error(&anyhow::anyhow!(
