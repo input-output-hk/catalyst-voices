@@ -58,6 +58,8 @@ impl Api {
         date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
     }
 
+    // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
+    // or removed.
     #[oai(
         path = "/draft/rbac/chain_root/:stake_address",
         method = "get",
@@ -73,8 +75,6 @@ impl Api {
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::chain_root_get::AllResponses {
-        // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
-        // or removed.
         rbac::chain_root_get::endpoint(stake_address).await
     }
 
@@ -98,24 +98,24 @@ impl Api {
 
     // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
     // or removed.
-    // #[oai(
-    //     path = "/draft/rbac/role0_chain_root/:role0_key",
-    //     method = "get",
-    //     operation_id = "rbacRole0KeyChainRoot"
-    // )]
-    // /// Get RBAC chain root for a given role0 key.
-    // ///
-    // /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
-    // async fn rbac_role0_key_chain_root(
-    //     &self,
-    //     /// Role0 key to get the chain root for.
-    //     #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
-    //     Path(_role0_key): Path<String>,
-    //     /// No Authorization required, but Token permitted.
-    //     _auth: NoneOrRBAC,
-    // ) -> rbac::chain_root_get::AllResponses {
-    //     rbac::chain_root_get::AllResponses::internal_error(&anyhow::anyhow!("Removed"))
-    // }
+    #[oai(
+        path = "/draft/rbac/role0_chain_root/:role0_key",
+        method = "get",
+        operation_id = "rbacRole0KeyChainRoot"
+    )]
+    /// Get RBAC chain root for a given role0 key.
+    ///
+    /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
+    async fn rbac_role0_key_chain_root(
+        &self,
+        /// Role0 key to get the chain root for.
+        #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
+        Path(role0_key): Path<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
+    ) -> rbac::role0_chain_root_get::AllResponses {
+        rbac::role0_chain_root_get::endpoint(role0_key).await
+    }
 }
 
 /// Cardano API Endpoints

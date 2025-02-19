@@ -1,4 +1,5 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
+
 use anyhow::anyhow;
 use cardano_blockchain_types::TransactionHash;
 use catalyst_types::id_uri::IdUri;
