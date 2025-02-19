@@ -60,10 +60,7 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
                   for (var i = pagingState.currentFrom;
                       i <= pagingState.currentTo;
                       i++)
-                    _itemBuilder(
-                      context,
-                      itemList[i],
-                    ),
+                    _itemBuilder(context, itemList[i]),
                 ],
               ),
             );

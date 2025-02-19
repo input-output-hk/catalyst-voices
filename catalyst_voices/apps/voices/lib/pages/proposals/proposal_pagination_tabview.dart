@@ -4,7 +4,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalPaginationTabView extends StatelessWidget {
-  final ProposalPaginViewModel paginationViewModel;
+  final ProposalPaginationViewModel paginationViewModel;
   final ProposalPublish? stage;
   final bool userProposals;
   final bool usersFavorite;

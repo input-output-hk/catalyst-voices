@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/pages/proposals/proposal_pagination_tabview.dart';
-import 'package:catalyst_voices/pages/proposals/search_input_field.dart';
 import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
+import 'package:catalyst_voices/widgets/search/search_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -201,15 +201,24 @@ class _Controls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(bottom: 8),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ChangeCategoryButtonSelector(),
-          SizedBox(width: 8),
-          SearchInputField(),
+          const _ChangeCategoryButtonSelector(),
+          const SizedBox(width: 8),
+          SearchTextField(
+            hintText: context.l10n.searchProposals,
+            showClearButton: true,
+            onSearch: ({
+              required searchValue,
+              required isSubmitted,
+            }) {
+              context.read<ProposalsCubit>().changeSearchValue(searchValue);
+            },
+          ),
         ],
       ),
     );

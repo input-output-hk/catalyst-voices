@@ -101,8 +101,9 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
   @override
   void didUpdateWidget(ProposalsPagination oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.isLoading != widget.isLoading) {
-      _pagingController.isLoading = widget.isLoading;
+
+    if (oldWidget.proposals != widget.proposals) {
+      _handleItemListChange();
     }
     if (oldWidget.pageKey != widget.pageKey) {
       _pagingController.currentPage = widget.pageKey;
@@ -110,17 +111,10 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
     if (oldWidget.maxResults != widget.maxResults) {
       _pagingController.maxResults = widget.maxResults;
     }
-    if (oldWidget.proposals != widget.proposals) {
-      _handleItemListChange();
-    }
 
     if (oldWidget.categoryId != widget.categoryId ||
         oldWidget.searchValue != widget.searchValue) {
       _pagingController.notifyPageRequestListeners(0);
-    }
-
-    if (oldWidget.isLoading != widget.isLoading) {
-      _pagingController.isLoading = widget.isLoading;
     }
   }
 
@@ -155,7 +149,7 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
       );
       await _proposalBloc.getProposals(request);
     });
-    _handleItemListChange();
+    // _handleItemListChange();
     _pagingController.notifyPageRequestListeners(0);
   }
 
