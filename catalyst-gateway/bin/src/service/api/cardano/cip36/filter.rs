@@ -3,7 +3,7 @@
 use std::{cmp::Reverse, sync::Arc};
 
 use dashmap::DashMap;
-use futures::StreamExt;
+use futures::{future, StreamExt};
 use rayon::prelude::*;
 use tracing::error;
 
@@ -346,8 +346,15 @@ pub(crate) async fn get_registration_given_vote_key(
 /// ALL
 /// Get all registrations or constrain if slot# given.
 pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
+    let valid_invalid_queries = future::join(
+        get_all_registrations(session.clone()),
+        get_all_invalid_registrations(session.clone()),
+    );
+
+    let (valids, invalids) = valid_invalid_queries.await;
+
     // Get ALL registrations
-    let all_registrations = match get_all_registrations(&session.clone()).await {
+    let all_registrations = match valids {
         Ok(all_registrations) => all_registrations,
         Err(err) => {
             return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
@@ -355,7 +362,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     };
 
     // Get all invalids
-    let all_invalid_registrations = match get_all_invalid_registrations(session.clone()).await {
+    let all_invalid_registrations = match invalids {
         Ok(invalids) => invalids,
         Err(err) => {
             return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
@@ -458,10 +465,10 @@ fn invalid_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip
 
 /// Get all cip36 registrations.
 pub async fn get_all_registrations(
-    session: &Arc<CassandraSession>,
+    session: Arc<CassandraSession>,
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let mut registrations_iter =
-        GetAllRegistrationsQuery::execute(session, GetAllRegistrationsParams {}).await?;
+        GetAllRegistrationsQuery::execute(&session, GetAllRegistrationsParams {}).await?;
 
     let registrations_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
 
