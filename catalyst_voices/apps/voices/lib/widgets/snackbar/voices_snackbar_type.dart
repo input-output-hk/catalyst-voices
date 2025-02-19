@@ -15,6 +15,7 @@ class _SnackBarData {
   final ColorResolver iconColor;
   final ColorResolver titleColor;
   final ColorResolver messageColor;
+  final ColorResolver actionColor;
   final ColorResolver backgroundColor;
   final L10nResolver title;
   final L10nResolver message;
@@ -24,6 +25,7 @@ class _SnackBarData {
     required this.iconColor,
     required this.titleColor,
     required this.messageColor,
+    required this.actionColor,
     required this.backgroundColor,
     required this.title,
     required this.message,
@@ -37,6 +39,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
       iconColor: (colors, colorScheme) => colors.iconsPrimary,
       titleColor: (colors, colorScheme) => colors.onPrimaryContainer,
       messageColor: (colors, colorScheme) => colors.onPrimaryContainer,
+      actionColor: (colors, colorScheme) => colors.textPrimary,
       backgroundColor: (colors, colorScheme) => colors.primaryContainer,
       title: (l10n) => l10n.snackbarInfoLabelText,
       message: (l10n) => l10n.snackbarInfoMessageText,
@@ -46,6 +49,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
       iconColor: (colors, colorScheme) => colors.iconsSuccess,
       titleColor: (colors, colorScheme) => colors.onSuccessContainer,
       messageColor: (colors, colorScheme) => colors.onSuccessContainer,
+      actionColor: (colors, colorScheme) => colors.textPrimary,
       backgroundColor: (colors, colorScheme) => colors.successContainer,
       title: (l10n) => l10n.snackbarSuccessLabelText,
       message: (l10n) => l10n.snackbarSuccessMessageText,
@@ -55,6 +59,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
       iconColor: (colors, colorScheme) => colors.iconsWarning,
       titleColor: (colors, colorScheme) => colors.onWarningContainer,
       messageColor: (colors, colorScheme) => colors.onWarningContainer,
+      actionColor: (colors, colorScheme) => colors.textPrimary,
       backgroundColor: (colors, colorScheme) => colors.warningContainer,
       title: (l10n) => l10n.snackbarWarningLabelText,
       message: (l10n) => l10n.snackbarWarningMessageText,
@@ -64,6 +69,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
       iconColor: (colors, colorScheme) => colorScheme.onError,
       titleColor: (colors, colorScheme) => colorScheme.onError,
       messageColor: (colors, colorScheme) => colorScheme.onError,
+      actionColor: (colors, colorScheme) => colorScheme.onError,
       backgroundColor: (color, colorScheme) => colorScheme.error,
       title: (l10n) => l10n.snackbarErrorLabelText,
       message: (l10n) => l10n.snackbarErrorMessageText,
@@ -71,6 +77,14 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
   };
 
   _SnackBarData get _snackBarData => _data[this]!;
+
+  Color? actionColor(BuildContext context) {
+    final theme = Theme.of(context);
+    return _snackBarData.actionColor(
+      theme.colors,
+      theme.colorScheme,
+    );
+  }
 
   Color? backgroundColor(BuildContext context) {
     final theme = Theme.of(context);
@@ -101,7 +115,6 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
   }
 
   String title(BuildContext context) => _snackBarData.title(context.l10n);
-
   Color? titleColor(BuildContext context) {
     final theme = Theme.of(context);
     return _snackBarData.titleColor(

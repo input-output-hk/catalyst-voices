@@ -144,6 +144,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       message: error.fields.map((e) => '• $e').join('\n'),
       actions: [
         VoicesSnackBarPrimaryAction(
+          type: VoicesSnackBarType.error,
           onPressed: () => VoicesSnackBar.hideCurrent(context),
           child: Text(context.l10n.cancelButtonText),
         ),

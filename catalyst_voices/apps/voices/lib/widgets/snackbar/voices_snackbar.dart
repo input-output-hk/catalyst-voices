@@ -103,16 +103,14 @@ class VoicesSnackBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (actions.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+                  if (actions.isNotEmpty)
                     Padding(
-                      padding: const EdgeInsets.only(left: 16),
+                      padding: const EdgeInsets.only(left: 16, top: 12),
                       child: Row(
                         spacing: 8,
                         children: actions,
                       ),
                     ),
-                  ],
                 ],
               ),
             ),
