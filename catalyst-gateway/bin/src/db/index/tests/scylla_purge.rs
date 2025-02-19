@@ -105,16 +105,12 @@ async fn catalyst_id_for_txn_id() {
                 .parse()
                 .unwrap(),
             TransactionId::new(&[0]),
-            0.into(),
-            0.into(),
         ),
         rbac509::insert_catalyst_id_for_txn_id::Params::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
             TransactionId::new(&[1]),
-            1.into(),
-            1.into(),
         ),
     ];
     let data_len = data.len();

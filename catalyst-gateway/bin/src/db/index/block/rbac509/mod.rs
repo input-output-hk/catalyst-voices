@@ -120,8 +120,6 @@ impl Rbac509InsertQuery {
                     .push(insert_catalyst_id_for_txn_id::Params::new(
                         catalyst_id.clone(),
                         txn_hash,
-                        slot,
-                        index,
                     ));
                 for address in stake_addresses(&metadata) {
                     self.catalyst_id_for_stake_address.push(

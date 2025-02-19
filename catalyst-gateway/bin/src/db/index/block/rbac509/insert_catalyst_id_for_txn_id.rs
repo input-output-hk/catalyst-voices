@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
+use cardano_blockchain_types::TransactionId;
 use catalyst_types::id_uri::IdUri;
 use scylla::{SerializeRow, Session};
 use tracing::error;
@@ -10,7 +10,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
+        types::{DbCatalystId, DbTransactionId},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -25,10 +25,6 @@ pub(crate) struct Params {
     txn_id: DbTransactionId,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
-    /// A slot number.
-    slot_no: DbSlot,
-    /// A transaction offset inside the block.
-    txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
@@ -36,22 +32,16 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("txn_id", &self.txn_id)
             .field("catalyst_id", &self.catalyst_id)
-            .field("slot_no", &self.slot_no)
-            .field("txn_index", &self.txn_index)
             .finish()
     }
 }
 
 impl Params {
     /// Creates a new record for this transaction.
-    pub(crate) fn new(
-        catalyst_id: IdUri, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
-    ) -> Self {
+    pub(crate) fn new(catalyst_id: IdUri, txn_id: TransactionId) -> Self {
         Params {
             txn_id: txn_id.into(),
             catalyst_id: catalyst_id.into(),
-            slot_no: slot_no.into(),
-            txn_index: txn_index.into(),
         }
     }
 
