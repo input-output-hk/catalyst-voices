@@ -249,20 +249,3 @@ final class FundedProposal extends ProposalViewModel {
         description,
       ];
 }
-
-extension ListProposalViewModelExt on List<ProposalViewModel> {
-  List<ProposalViewModel> get favorites {
-    return where((proposal) => proposal.isFavorite).toList();
-  }
-
-  List<PendingProposal> get _pendingProposals =>
-      whereType<PendingProposal>().toList();
-
-  List<PendingProposal> get draftProposals => _pendingProposals
-      .where((e) => e.publishStage == ProposalPublish.draft)
-      .toList();
-
-  List<PendingProposal> get finalProposals => _pendingProposals
-      .where((e) => e.publishStage == ProposalPublish.published)
-      .toList();
-}

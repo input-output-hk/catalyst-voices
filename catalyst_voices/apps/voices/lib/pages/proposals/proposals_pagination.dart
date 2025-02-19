@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
@@ -15,12 +16,11 @@ class ProposalsPagination extends StatefulWidget {
   final int pageKey;
   final int maxResults;
   final ProposalPublish? stage;
-  final bool isEmpty;
   final bool userProposals;
   final bool usersFavorite;
   final String? categoryId;
   final String? searchValue;
-  final bool shouldReload;
+  final bool isLoading;
 
   const ProposalsPagination(
     this.proposals,
@@ -28,12 +28,11 @@ class ProposalsPagination extends StatefulWidget {
     this.maxResults, {
     super.key,
     this.stage,
-    this.isEmpty = false,
     this.userProposals = false,
     this.usersFavorite = false,
     this.categoryId,
-    this.shouldReload = false,
     this.searchValue,
+    required this.isLoading,
   });
 
   @override
@@ -74,8 +73,11 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
   }
 
   @override
-  void didUpdateWidget(covariant ProposalsPagination oldWidget) {
+  void didUpdateWidget(ProposalsPagination oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.isLoading != widget.isLoading) {
+      _pagingController.isLoading = widget.isLoading;
+    }
     if (oldWidget.pageKey != widget.pageKey) {
       _pagingController.currentPage = widget.pageKey;
     }
@@ -85,18 +87,14 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
     if (oldWidget.proposals != widget.proposals) {
       _handleItemListChange();
     }
-    if (oldWidget.categoryId != widget.categoryId) {
+
+    if (oldWidget.categoryId != widget.categoryId ||
+        oldWidget.searchValue != widget.searchValue) {
       _pagingController.notifyPageRequestListeners(0);
-    }
-    if (oldWidget.searchValue != widget.searchValue) {
-      _pagingController.notifyPageRequestListeners(0);
-    }
-    if (widget.isEmpty == true) {
-      _pagingController.empty();
     }
 
-    if (oldWidget.shouldReload != widget.shouldReload) {
-      _pagingController.notifyPageRequestListeners(0);
+    if (oldWidget.isLoading != widget.isLoading) {
+      _pagingController.isLoading = widget.isLoading;
     }
   }
 
@@ -134,8 +132,33 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
             );
           },
         ),
-        emptyIndicatorBuilder: (context) => const _EmptyProposals(),
-        animateTransition: false,
+        emptyIndicatorBuilder: (context) =>
+            BlocSelector<ProposalsCubit, ProposalsState, bool>(
+          selector: (state) {
+            return state.searchValue?.isNotEmpty ?? false;
+          },
+          builder: (context, state) {
+            if (state) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.l10n.searchResult,
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: context.colors.textOnPrimaryLevel1,
+                    ),
+                  ),
+                  _EmptyProposals(
+                    title: context.l10n.emptySearchResultTitle,
+                    description: context.l10n.tryDifferentSearch,
+                  ),
+                ],
+              );
+            }
+            return const _EmptyProposals();
+          },
+        ),
       ),
     );
   }
@@ -149,13 +172,19 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
 }
 
 class _EmptyProposals extends StatelessWidget {
-  const _EmptyProposals();
+  final String? title;
+  final String? description;
+  const _EmptyProposals({
+    this.title,
+    this.description,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: EmptyState(
-        description: context.l10n.discoverySpaceEmptyProposals,
+        title: title,
+        description: description ?? context.l10n.discoverySpaceEmptyProposals,
       ),
     );
   }

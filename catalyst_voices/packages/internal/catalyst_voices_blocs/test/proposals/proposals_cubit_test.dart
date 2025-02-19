@@ -86,12 +86,12 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(isLoading: true),
         ProposalsState(
           userProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -111,12 +111,12 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(isLoading: true),
         ProposalsState(
           favoriteProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -147,12 +147,12 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(isLoading: true),
         ProposalsState(
           draftProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -172,12 +172,12 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(isLoading: true),
         ProposalsState(
           finalProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -196,12 +196,12 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(isLoading: true),
         ProposalsState(
           allProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -225,12 +225,12 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(isLoading: true),
         const ProposalsState(
           allProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [],
-            isEmpty: true,
           ),
         ),
       ],
@@ -293,7 +293,6 @@ class _FakeProposalService extends Fake implements ProposalService {
       pageKey: request.pageKey,
       maxResults: 10,
       items: _proposals,
-      isEmpty: false,
     );
   }
 

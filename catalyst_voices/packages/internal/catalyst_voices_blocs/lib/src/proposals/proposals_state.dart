@@ -14,6 +14,7 @@ class ProposalsState extends Equatable {
   final List<CampaignCategoryViewModel> categories;
   final String? selectedCategoryId;
   final String? searchValue;
+  final bool isLoading;
 
   const ProposalsState({
     this.draftProposals = const ProposalPaginationItems(),
@@ -26,6 +27,7 @@ class ProposalsState extends Equatable {
     this.categories = const [],
     this.selectedCategoryId,
     this.searchValue,
+    this.isLoading = false,
   });
 
   ProposalsState copyWith({
@@ -39,6 +41,7 @@ class ProposalsState extends Equatable {
     List<CampaignCategoryViewModel>? categories,
     Optional<String>? selectedCategoryId,
     Optional<String>? searchValue,
+    bool isLoading = false,
   }) {
     return ProposalsState(
       draftProposals: draftProposals ?? this.draftProposals,
@@ -51,6 +54,7 @@ class ProposalsState extends Equatable {
       categories: categories ?? this.categories,
       selectedCategoryId: selectedCategoryId.dataOr(this.selectedCategoryId),
       searchValue: searchValue.dataOr(this.searchValue),
+      isLoading: isLoading,
     );
   }
 
@@ -70,5 +74,6 @@ class ProposalsState extends Equatable {
         categories,
         selectedCategoryId,
         searchValue,
+        isLoading,
       ];
 }

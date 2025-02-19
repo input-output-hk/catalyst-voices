@@ -85,6 +85,12 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     value = value.copyWith(currentPage: newPage);
   }
 
+  set isLoading(bool newValue) {
+    value = value.copyWith(isLoading: newValue);
+  }
+
+  bool get isLoading => value.isLoading;
+
   int get maxResults => value.maxResults;
 
   set maxResults(int newMaxResults) {

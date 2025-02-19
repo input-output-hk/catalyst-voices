@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
-import 'package:catalyst_voices/pages/proposals/proposals_pagination.dart';
+import 'package:catalyst_voices/pages/proposals/proposal_pagin_tabview.dart';
 import 'package:catalyst_voices/pages/proposals/search_input_field.dart';
 import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -26,18 +26,6 @@ typedef _ProposalsCount = ({
   int finals,
   int favorites,
   int my,
-});
-
-typedef _ProposalsTabSelector = ({
-  ProposalPaginationItems<ProposalViewModel> items,
-  String? selectedCategoryId,
-  String? searchValue,
-});
-
-typedef _FavoritesTabSelector = ({
-  ProposalPaginationItems<ProposalViewModel> items,
-  String? selectedCategoryId,
-  bool shouldReload,
 });
 
 class ProposalsPage extends StatefulWidget {
@@ -305,41 +293,26 @@ class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
   }
 }
 
-class _Tabs extends StatefulWidget {
+class _Tabs extends StatelessWidget {
   const _Tabs();
-
-  @override
-  State<_Tabs> createState() => _TabsState();
-}
-
-class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
-  late final TabController _controller =
-      TabController(length: _tabLength, vsync: this);
-  final _tabLength = 5;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: _tabLength,
+      length: 5,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
+          const SizedBox(
             width: double.infinity,
             child: Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.end,
               runSpacing: 10,
               children: [
-                _TabBar(_controller),
-                const _Controls(),
+                _TabBar(),
+                _Controls(),
               ],
             ),
           ),
@@ -353,88 +326,92 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 24),
           TabBarStackView(
-            controller: _controller,
             children: [
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.allProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginViewModel.fromPaginationItems(
+                    paginItems: state.allProposals,
+                    isLoading: state.isLoading,
+                    categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
-                    searchValue: state.searchValue,
+                  return ProposalPaginTabview(
+                    key: const Key('allProposalsPagination'),
+                    paginationViewModel: state,
                   );
                 },
               ),
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.draftProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginViewModel.fromPaginationItems(
+                    paginItems: state.draftProposals,
+                    isLoading: state.isLoading,
+                    categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
-                    searchValue: state.searchValue,
+                  return ProposalPaginTabview(
+                    key: const Key('draftProposalsPagination'),
+                    paginationViewModel: state,
                     stage: ProposalPublish.draft,
                   );
                 },
               ),
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.finalProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginViewModel.fromPaginationItems(
+                    paginItems: state.finalProposals,
+                    isLoading: state.isLoading,
+                    categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
-                    searchValue: state.searchValue,
+                  return ProposalPaginTabview(
+                    key: const Key('finalProposalsPagination'),
+                    paginationViewModel: state,
                     stage: ProposalPublish.published,
                   );
                 },
               ),
-              _FavoritesProposals(_controller),
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.userProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginViewModel.fromPaginationItems(
+                    paginItems: state.favoriteProposals,
+                    isLoading: state.isLoading,
+                    categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
+                  return ProposalPaginTabview(
+                    key: const Key('favoriteProposalsPagination'),
+                    paginationViewModel: state,
+                    usersFavorite: true,
+                  );
+                },
+              ),
+              BlocSelector<ProposalsCubit, ProposalsState,
+                  ProposalPaginViewModel>(
+                selector: (state) {
+                  return ProposalPaginViewModel.fromPaginationItems(
+                    paginItems: state.userProposals,
+                    isLoading: state.isLoading,
                     categoryId: state.selectedCategoryId,
                     searchValue: state.searchValue,
+                  );
+                },
+                builder: (context, state) {
+                  return ProposalPaginTabview(
+                    key: const Key('userProposalsPagination'),
+                    paginationViewModel: state,
                     userProposals: true,
                   );
                 },
@@ -448,74 +425,8 @@ class _TabsState extends State<_Tabs> with TickerProviderStateMixin {
   }
 }
 
-class _FavoritesProposals extends StatefulWidget {
-  final TabController controller;
-
-  const _FavoritesProposals(
-    this.controller,
-  );
-
-  @override
-  State<_FavoritesProposals> createState() => _FavoritesProposalsState();
-}
-
-class _FavoritesProposalsState extends State<_FavoritesProposals> {
-  bool isTabSelected = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_onSelectionChange);
-  }
-
-  @override
-  void didUpdateWidget(_FavoritesProposals oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller) {
-      widget.controller.removeListener(_onSelectionChange);
-      widget.controller.addListener(_onSelectionChange);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, _FavoritesTabSelector>(
-      selector: (state) {
-        final items = state.favoriteProposals;
-        final shouldReload = state.favoritesIds.length != items.items.length;
-        return (
-          items: items,
-          selectedCategoryId: state.selectedCategoryId,
-          shouldReload: shouldReload,
-        );
-      },
-      builder: (context, state) {
-        return ProposalsPagination(
-          state.items.items,
-          state.items.pageKey,
-          state.items.maxResults,
-          isEmpty: state.items.items.isEmpty,
-          categoryId: state.selectedCategoryId,
-          usersFavorite: true,
-          shouldReload: state.shouldReload && isTabSelected,
-        );
-      },
-    );
-  }
-
-  void _onSelectionChange() {
-    if (!widget.controller.indexIsChanging) {
-      setState(() {
-        isTabSelected = widget.controller.index == 3;
-      });
-    }
-  }
-}
-
 class _TabBar extends StatelessWidget {
-  final TabController controller;
-
-  const _TabBar(this.controller);
+  const _TabBar();
 
   @override
   Widget build(BuildContext context) {
@@ -533,7 +444,6 @@ class _TabBar extends StatelessWidget {
         return ConstrainedBox(
           constraints: const BoxConstraints(),
           child: TabBar(
-            controller: controller,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
             dividerHeight: 0,

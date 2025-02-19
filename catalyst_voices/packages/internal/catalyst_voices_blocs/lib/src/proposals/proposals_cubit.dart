@@ -51,7 +51,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     if (campaign == null) {
       return;
     }
-    print('get proposals');
+    emit(state.copyWith(isLoading: true));
     final proposals = await _proposalService.getProposals(
       request: request,
     );
@@ -78,7 +78,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
               ...state.userProposals.items,
               ...proposalViewModelList,
             ],
-            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -92,7 +91,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
               ...state.favoriteProposals.items,
               ...proposalViewModelList,
             ],
-            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -106,7 +104,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
               ...state.finalProposals.items,
               ...proposalViewModelList,
             ],
-            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -120,7 +117,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
               ...state.draftProposals.items,
               ...proposalViewModelList,
             ],
-            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -135,7 +131,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
             pageKey: proposals.pageKey,
             maxResults: proposals.maxResults,
             items: allProposals,
-            isEmpty: proposalViewModelList.isEmpty,
           ),
         ),
       );
@@ -170,8 +165,13 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
   }
 
   void changeSearchValue(String searchValue) {
-    final nullableSearchValue = searchValue.isEmpty ? null : searchValue;
-    emit(state.copyWith(searchValue: Optional(nullableSearchValue)));
+    emit(
+      state.copyWith(
+        searchValue: searchValue.isEmpty
+            ? const Optional.empty()
+            : Optional(searchValue),
+      ),
+    );
   }
 
   // TODO(LynxLynxx): to mock data. remove after implementing db
