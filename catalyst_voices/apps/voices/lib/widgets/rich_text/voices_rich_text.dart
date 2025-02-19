@@ -131,9 +131,10 @@ final class VoicesRichTextController extends quill.QuillController {
   void clearFormattingFromSelection() {
     toggledStyle = const quill.Style();
 
-    final markdownAttributes = [
+    final markdownAttributes = <quill.Attribute<dynamic>>[
       quill.Attribute.ul,
       quill.Attribute.ol,
+      quill.Attribute.header,
       quill.Attribute.h1,
       quill.Attribute.h2,
       quill.Attribute.h3,
@@ -142,6 +143,8 @@ final class VoicesRichTextController extends quill.QuillController {
       quill.Attribute.h6,
       quill.Attribute.bold,
       quill.Attribute.italic,
+      quill.Attribute.codeBlock,
+      quill.Attribute.inlineCode,
     ];
 
     for (final attribute in markdownAttributes) {
