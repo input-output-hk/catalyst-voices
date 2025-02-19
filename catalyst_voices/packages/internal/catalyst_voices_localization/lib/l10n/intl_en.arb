@@ -1512,7 +1512,7 @@
   "continueText": "Continue",
   "showAll": "Show All",
   "@showAll": {
-    "description": "Show all for when using filtering by some criteria",
+    "description": "Show all for when using filtering by some criteria"
   },
   "importProposal": "Import Proposal",
   "@importProposal": {
