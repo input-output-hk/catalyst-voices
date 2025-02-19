@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/pages/proposal_builder/proposal_publish_iteration_dialog.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -40,6 +43,17 @@ class ProposalBuilderStatusAction extends StatelessWidget {
         const WorkspaceRoute().go(context);
       case _MenuItemEnum.publish:
         context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
+
+        // TODO(dtscalac): fill in with correct data, provide callback
+        unawaited(
+          ProposalPublishIterationDialog.show(
+            context: context,
+            proposalTitle: 'Proposal title',
+            currentVersion: null,
+            nextVersion: '1',
+            onPublish: () {},
+          ),
+        );
       case _MenuItemEnum.submit:
         context.read<ProposalBuilderBloc>().add(const SubmitProposalEvent());
       case _MenuItemEnum.share:
