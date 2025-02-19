@@ -18,7 +18,7 @@ abstract interface class ProposalService {
   });
 
   Future<ProposalTemplate> getProposalTemplate({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   });
 
   Future<ProposalPaginationItems<Proposal>> getProposals({
@@ -58,7 +58,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   }) async {
     final proposalTemplate = await _documentRepository.getProposalTemplate(
       ref: ref,

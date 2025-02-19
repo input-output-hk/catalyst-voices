@@ -9,6 +9,7 @@ export 'buttons/voices_logical_keyboard_key_button.dart';
 export 'buttons/voices_outlined_button.dart';
 export 'buttons/voices_segmented_button.dart';
 export 'buttons/voices_text_button.dart';
+export 'campaign_timeline/campaign_timeline.dart';
 export 'cards/action_card.dart';
 export 'cards/funded_proposal_card.dart';
 export 'cards/role_chooser_card.dart';
