@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/src/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-class ProposalPaginViewModel extends Equatable {
+class ProposalPaginationViewModel extends Equatable {
   final int pageKey;
   final int maxResults;
   final List<ProposalViewModel> items;
@@ -10,7 +10,7 @@ class ProposalPaginViewModel extends Equatable {
   final String? searchValue;
   final bool isLoading;
 
-  const ProposalPaginViewModel({
+  const ProposalPaginationViewModel({
     required this.pageKey,
     required this.maxResults,
     required this.items,
@@ -19,38 +19,19 @@ class ProposalPaginViewModel extends Equatable {
     this.isLoading = false,
   });
 
-  factory ProposalPaginViewModel.fromPaginationItems({
+  factory ProposalPaginationViewModel.fromPaginationItems({
     required ProposalPaginationItems<ProposalViewModel> paginItems,
     String? categoryId,
     String? searchValue,
     required bool isLoading,
   }) {
-    return ProposalPaginViewModel(
+    return ProposalPaginationViewModel(
       pageKey: paginItems.pageKey,
       maxResults: paginItems.maxResults,
       items: paginItems.items,
       categoryId: categoryId,
       searchValue: searchValue,
       isLoading: isLoading,
-    );
-  }
-
-  ProposalPaginViewModel copyWith({
-    int? pageKey,
-    int? maxResults,
-    List<ProposalViewModel>? items,
-    String? categoryId,
-    String? searchValue,
-    bool? canReload,
-    bool? isLoading,
-  }) {
-    return ProposalPaginViewModel(
-      pageKey: pageKey ?? this.pageKey,
-      maxResults: maxResults ?? this.maxResults,
-      items: items ?? this.items,
-      categoryId: categoryId ?? this.categoryId,
-      searchValue: searchValue ?? this.searchValue,
-      isLoading: isLoading ?? this.isLoading,
     );
   }
 
@@ -63,4 +44,23 @@ class ProposalPaginViewModel extends Equatable {
         searchValue,
         isLoading,
       ];
+
+  ProposalPaginationViewModel copyWith({
+    int? pageKey,
+    int? maxResults,
+    List<ProposalViewModel>? items,
+    String? categoryId,
+    String? searchValue,
+    bool? canReload,
+    bool? isLoading,
+  }) {
+    return ProposalPaginationViewModel(
+      pageKey: pageKey ?? this.pageKey,
+      maxResults: maxResults ?? this.maxResults,
+      items: items ?? this.items,
+      categoryId: categoryId ?? this.categoryId,
+      searchValue: searchValue ?? this.searchValue,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
 }

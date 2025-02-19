@@ -23,22 +23,6 @@ class _SearchInputFieldState extends State<SearchInputField> {
   Timer? _debounce;
 
   @override
-  void initState() {
-    super.initState();
-    _proposalsCubit = context.read<ProposalsCubit>();
-    _controller = TextEditingController();
-    _controller.addListener(_onSearchChanged);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _debounce?.cancel();
-    _debounce = null;
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 250,
@@ -76,6 +60,26 @@ class _SearchInputFieldState extends State<SearchInputField> {
     );
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    _debounce?.cancel();
+    _debounce = null;
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _proposalsCubit = context.read<ProposalsCubit>();
+    _controller = TextEditingController();
+    _controller.addListener(_onSearchChanged);
+  }
+
+  void _clearTextFiled() {
+    _controller.clear();
+  }
+
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) {
       _debounce?.cancel();
@@ -83,9 +87,5 @@ class _SearchInputFieldState extends State<SearchInputField> {
     _debounce = Timer(const Duration(milliseconds: 300), () {
       _proposalsCubit.changeSearchValue(_controller.text);
     });
-  }
-
-  void _clearTextFiled() {
-    _controller.clear();
   }
 }

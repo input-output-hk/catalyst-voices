@@ -47,6 +47,68 @@ class PagingState<ItemType> extends Equatable {
     this.isLoading = false,
   });
 
+  int get currentFrom {
+    return currentPage * itemsPerPage;
+  }
+
+  int get currentLastPage => (_itemCount / itemsPerPage).ceil() - 1;
+
+  int get currentTo {
+    if (itemList.isEmpty) {
+      return 0;
+    }
+    return min(
+      min(currentFrom + itemsPerPage - 1, itemList.length - 1),
+      maxResults - 1,
+    );
+  }
+
+  int get fromValue => currentFrom + 1;
+
+  bool get isCompleted => _hasItems && !_isListingUnfinished;
+
+  bool get isFirstPage => currentPage == 0;
+
+  bool get isLastPage => currentTo >= maxResults - 1;
+
+  @override
+  List<Object?> get props => [
+        currentPage,
+        itemsPerPage,
+        maxResults,
+        itemList,
+        error,
+        isLoading,
+        status,
+      ];
+
+  PagingStatus get status {
+    if (itemList.isEmpty && !isLoading && error == null) {
+      return PagingStatus.empty;
+    } else if (isLoading) {
+      return PagingStatus.loading;
+    } else if (_isOngoing) {
+      return PagingStatus.ongoing;
+    } else if (isCompleted) {
+      return PagingStatus.completed;
+    } else if (_hasError) {
+      return PagingStatus.error;
+    }
+    return PagingStatus.ongoing;
+  }
+
+  int get toValue => currentTo + 1;
+
+  bool get _hasError => error != null;
+
+  bool get _hasItems => itemList.isNotEmpty;
+
+  bool get _isListingUnfinished => _hasItems && _itemCount < maxResults;
+
+  bool get _isOngoing => _isListingUnfinished && !_hasError;
+
+  int get _itemCount => itemList.length;
+
   PagingState<ItemType> copyWith({
     int? currentPage,
     int? currentLastPage,
@@ -65,66 +127,4 @@ class PagingState<ItemType> extends Equatable {
       isLoading: isLoading,
     );
   }
-
-  PagingStatus get status {
-    if (itemList.isEmpty && !isLoading && error == null) {
-      return PagingStatus.empty;
-    } else if (isLoading) {
-      return PagingStatus.loading;
-    } else if (_isOngoing) {
-      return PagingStatus.ongoing;
-    } else if (isCompleted) {
-      return PagingStatus.completed;
-    } else if (_hasError) {
-      return PagingStatus.error;
-    }
-    return PagingStatus.ongoing;
-  }
-
-  bool get isCompleted => _hasItems && !_isListingUnfinished;
-
-  bool get isLastPage => currentTo >= maxResults - 1;
-
-  bool get isFirstPage => currentPage == 0;
-
-  int get currentLastPage => (_itemCount / itemsPerPage).ceil() - 1;
-
-  int get currentFrom {
-    return currentPage * itemsPerPage;
-  }
-
-  int get fromValue => currentFrom + 1;
-
-  int get currentTo {
-    if (itemList.isEmpty) {
-      return 0;
-    }
-    return min(
-      min(currentFrom + itemsPerPage - 1, itemList.length - 1),
-      maxResults - 1,
-    );
-  }
-
-  int get toValue => currentTo + 1;
-
-  int get _itemCount => itemList.length;
-
-  bool get _hasItems => itemList.isNotEmpty;
-
-  bool get _isListingUnfinished => _hasItems && _itemCount < maxResults;
-
-  bool get _isOngoing => _isListingUnfinished && !_hasError;
-
-  bool get _hasError => error != null;
-
-  @override
-  List<Object?> get props => [
-        currentPage,
-        itemsPerPage,
-        maxResults,
-        itemList,
-        error,
-        isLoading,
-        status,
-      ];
 }

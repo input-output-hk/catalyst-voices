@@ -286,6 +286,11 @@ class _FakeProposalService extends Fake implements ProposalService {
   _FakeProposalService(this._proposals);
 
   @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    return ['1', '2'];
+  }
+
+  @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
   }) async {
@@ -294,11 +299,6 @@ class _FakeProposalService extends Fake implements ProposalService {
       maxResults: 10,
       items: _proposals,
     );
-  }
-
-  @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    return ['1', '2'];
   }
 
   @override

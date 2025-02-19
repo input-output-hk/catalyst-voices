@@ -12,6 +12,15 @@ class ProposalPaginationItems<ProposalType> extends Equatable {
     this.items = const [],
   });
 
+  bool get noItems => items.isEmpty;
+
+  @override
+  List<Object?> get props => [
+        maxResults,
+        pageKey,
+        items,
+      ];
+
   ProposalPaginationItems<ProposalType> copyWith({
     int? pageKey,
     int? maxResults,
@@ -23,15 +32,6 @@ class ProposalPaginationItems<ProposalType> extends Equatable {
       items: items ?? this.items,
     );
   }
-
-  bool get noItems => items.isEmpty;
-
-  @override
-  List<Object?> get props => [
-        maxResults,
-        pageKey,
-        items,
-      ];
 }
 
 class ProposalsSearchResult extends Equatable {

@@ -17,15 +17,13 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
     required this.builderDelegate,
   });
 
-  PagingController<ItemType> get _pagingController => pagingController;
-
-  ItemWidgetBuilder<ItemType> get _itemBuilder => builderDelegate.builder;
-
   WidgetBuilder get _errorIndicatorBuilder =>
       builderDelegate.errorIndicatorBuilder ??
       (context) => VoicesErrorIndicator(
             message: context.l10n.somethingWentWrong,
           );
+
+  ItemWidgetBuilder<ItemType> get _itemBuilder => builderDelegate.builder;
 
   WidgetBuilder get _loadingIndicatorBuilder =>
       builderDelegate.loadingIndicatorBuilder ??
@@ -33,6 +31,8 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
             padding: EdgeInsets.all(16),
             child: Center(child: VoicesCircularProgressIndicator()),
           );
+
+  PagingController<ItemType> get _pagingController => pagingController;
 
   @override
   Widget build(BuildContext context) {
@@ -103,10 +103,6 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
     );
   }
 
-  void _onPrevPageTap() {
-    _pagingController.prevPage();
-  }
-
   void _onNextPageTap(PagingState<ItemType> pagingState) {
     if (pagingState.isLoading) return;
     if (pagingState.currentPage < pagingState.currentLastPage) {
@@ -115,6 +111,10 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
       _pagingController
           .notifyPageRequestListeners(_pagingController.nextPageValue);
     }
+  }
+
+  void _onPrevPageTap() {
+    _pagingController.prevPage();
   }
 }
 

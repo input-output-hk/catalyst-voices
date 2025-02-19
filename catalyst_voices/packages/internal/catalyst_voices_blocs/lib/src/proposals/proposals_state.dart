@@ -30,6 +30,21 @@ class ProposalsState extends Equatable {
     this.isLoading = false,
   });
 
+  @override
+  List<Object?> get props => [
+        draftProposals,
+        finalProposals,
+        favoriteProposals,
+        userProposals,
+        allProposals,
+        favoritesIds,
+        myProposalsIds,
+        categories,
+        selectedCategoryId,
+        searchValue,
+        isLoading,
+      ];
+
   ProposalsState copyWith({
     ProposalPaginationItems<ProposalViewModel>? draftProposals,
     ProposalPaginationItems<ProposalViewModel>? finalProposals,
@@ -62,19 +77,4 @@ class ProposalsState extends Equatable {
     return favoriteProposals.items.any((e) => e.id == proposalId);
     // return favoritesIds.contains(proposalId);
   }
-
-  @override
-  List<Object?> get props => [
-        draftProposals,
-        finalProposals,
-        favoriteProposals,
-        userProposals,
-        allProposals,
-        favoritesIds,
-        myProposalsIds,
-        categories,
-        selectedCategoryId,
-        searchValue,
-        isLoading,
-      ];
 }

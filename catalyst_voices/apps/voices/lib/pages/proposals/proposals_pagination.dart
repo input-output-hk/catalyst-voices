@@ -44,67 +44,6 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
   late PagingController<ProposalViewModel> _pagingController;
 
   @override
-  void initState() {
-    super.initState();
-    _proposalBloc = context.read<ProposalsCubit>();
-    _pagingController = PagingController(
-      initialPage: widget.pageKey,
-      initialMaxResults: widget.maxResults,
-    );
-
-    _pagingController.addPageRequestListener((
-      newPageKey,
-      pageSize,
-      lastItem,
-    ) async {
-      final request = ProposalPaginationRequest(
-        pageKey: newPageKey,
-        pageSize: pageSize,
-        lastId: lastItem?.id,
-        stage: widget.stage,
-        categoryId: widget.categoryId,
-        usersProposals: widget.userProposals,
-        usersFavorite: widget.usersFavorite,
-      );
-      await _proposalBloc.getProposals(request);
-    });
-    _handleItemListChange();
-    _pagingController.notifyPageRequestListeners(0);
-  }
-
-  @override
-  void didUpdateWidget(ProposalsPagination oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.isLoading != widget.isLoading) {
-      _pagingController.isLoading = widget.isLoading;
-    }
-    if (oldWidget.pageKey != widget.pageKey) {
-      _pagingController.currentPage = widget.pageKey;
-    }
-    if (oldWidget.maxResults != widget.maxResults) {
-      _pagingController.maxResults = widget.maxResults;
-    }
-    if (oldWidget.proposals != widget.proposals) {
-      _handleItemListChange();
-    }
-
-    if (oldWidget.categoryId != widget.categoryId ||
-        oldWidget.searchValue != widget.searchValue) {
-      _pagingController.notifyPageRequestListeners(0);
-    }
-
-    if (oldWidget.isLoading != widget.isLoading) {
-      _pagingController.isLoading = widget.isLoading;
-    }
-  }
-
-  @override
-  void dispose() {
-    _pagingController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PaginatedGridView<ProposalViewModel>(
       pagingController: _pagingController,
@@ -157,6 +96,67 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
         ),
       ),
     );
+  }
+
+  @override
+  void didUpdateWidget(ProposalsPagination oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isLoading != widget.isLoading) {
+      _pagingController.isLoading = widget.isLoading;
+    }
+    if (oldWidget.pageKey != widget.pageKey) {
+      _pagingController.currentPage = widget.pageKey;
+    }
+    if (oldWidget.maxResults != widget.maxResults) {
+      _pagingController.maxResults = widget.maxResults;
+    }
+    if (oldWidget.proposals != widget.proposals) {
+      _handleItemListChange();
+    }
+
+    if (oldWidget.categoryId != widget.categoryId ||
+        oldWidget.searchValue != widget.searchValue) {
+      _pagingController.notifyPageRequestListeners(0);
+    }
+
+    if (oldWidget.isLoading != widget.isLoading) {
+      _pagingController.isLoading = widget.isLoading;
+    }
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _proposalBloc = context.read<ProposalsCubit>();
+    _pagingController = PagingController(
+      initialPage: widget.pageKey,
+      initialMaxResults: widget.maxResults,
+    );
+
+    _pagingController.addPageRequestListener((
+      newPageKey,
+      pageSize,
+      lastItem,
+    ) async {
+      final request = ProposalPaginationRequest(
+        pageKey: newPageKey,
+        pageSize: pageSize,
+        lastId: lastItem?.id,
+        stage: widget.stage,
+        categoryId: widget.categoryId,
+        usersProposals: widget.userProposals,
+        usersFavorite: widget.usersFavorite,
+      );
+      await _proposalBloc.getProposals(request);
+    });
+    _handleItemListChange();
+    _pagingController.notifyPageRequestListeners(0);
   }
 
   void _handleItemListChange() {

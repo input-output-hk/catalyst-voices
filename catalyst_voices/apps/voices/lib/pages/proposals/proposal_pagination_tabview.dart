@@ -17,31 +17,19 @@ class ProposalPaginationTabView extends StatelessWidget {
     this.usersFavorite = false,
   });
 
-  List<ProposalViewModel> get proposals => paginationViewModel.items;
-
-  int get pageKey => paginationViewModel.pageKey;
-
-  int get maxResults => paginationViewModel.maxResults;
-
-  bool get isLoading => paginationViewModel.isLoading;
-
-  String? get categoryId => paginationViewModel.categoryId;
-
-  String? get searchValue => paginationViewModel.searchValue;
-
   @override
   Widget build(BuildContext context) {
     return ProposalsPagination(
       key: key,
-      proposals,
-      pageKey,
-      maxResults,
-      isLoading: isLoading,
+      paginationViewModel.items,
+      paginationViewModel.pageKey,
+      paginationViewModel.maxResults,
+      isLoading: paginationViewModel.isLoading,
       stage: stage,
       userProposals: userProposals,
       usersFavorite: usersFavorite,
-      categoryId: categoryId,
-      searchValue: searchValue,
+      categoryId: paginationViewModel.categoryId,
+      searchValue: paginationViewModel.searchValue,
     );
   }
 }
