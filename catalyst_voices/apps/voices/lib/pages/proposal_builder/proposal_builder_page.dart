@@ -101,19 +101,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   @override
   void handleError(Object error) {
     if (error is ProposalBuilderValidationException) {
-      VoicesSnackBar(
-        behavior: SnackBarBehavior.floating,
-        type: VoicesSnackBarType.error,
-        duration: const Duration(minutes: 1),
-        title: error.message(context),
-        message: error.fields.map((e) => '• $e').join('\n'),
-        actions: [
-          VoicesSnackBarPrimaryAction(
-            onPressed: () => VoicesSnackBar.hideCurrent(context),
-            child: Text(context.l10n.cancelButtonText),
-          ),
-        ],
-      ).show(context);
+      _showValidationErrorSnackbar(error);
     }
   }
 
@@ -145,6 +133,22 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
+    VoicesSnackBar(
+      behavior: SnackBarBehavior.floating,
+      type: VoicesSnackBarType.error,
+      duration: const Duration(seconds: 30),
+      title: error.message(context),
+      message: error.fields.map((e) => '• $e').join('\n'),
+      actions: [
+        VoicesSnackBarPrimaryAction(
+          onPressed: () => VoicesSnackBar.hideCurrent(context),
+          child: Text(context.l10n.cancelButtonText),
+        ),
+      ],
+    ).show(context);
   }
 
   void _updateSegments(List<Segment> data, NodeId? activeSectionId) {

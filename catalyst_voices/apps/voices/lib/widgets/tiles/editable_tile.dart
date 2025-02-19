@@ -37,6 +37,7 @@ class EditableTile extends StatelessWidget {
       action: VoicesEditSaveButton(
         onTap: _toggleEditMode,
         isEditing: isEditMode,
+        hasError: errorText != null,
       ),
       footer: _Footer(
         errorText: errorText,
