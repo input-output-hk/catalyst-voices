@@ -14,6 +14,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -136,12 +137,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
+    final formattedFields =
+        error.fields.whereNot((e) => e.isEmpty).map((e) => '• $e').join('\n');
+        
     VoicesSnackBar(
       behavior: SnackBarBehavior.floating,
       type: VoicesSnackBarType.error,
       duration: const Duration(seconds: 30),
       title: error.message(context),
-      message: error.fields.map((e) => '• $e').join('\n'),
+      message: formattedFields,
       actions: [
         VoicesSnackBarPrimaryAction(
           type: VoicesSnackBarType.error,
