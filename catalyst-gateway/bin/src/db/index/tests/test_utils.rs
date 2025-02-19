@@ -47,6 +47,11 @@ pub fn block_3() -> MultiEraBlock {
     block(include_str!("test_data/block_3.block"))
 }
 
+/// Returns a decoded block from the `block_4.block` file.
+pub fn block_4() -> MultiEraBlock {
+    block(include_str!("test_data/block_4.block"))
+}
+
 /// Decodes a block from the given string.
 fn block(data: &str) -> MultiEraBlock {
     let data = hex::decode(data).unwrap();

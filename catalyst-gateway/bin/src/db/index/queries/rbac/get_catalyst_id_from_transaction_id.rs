@@ -18,7 +18,7 @@ use crate::db::{
         queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
-    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex},
+    types::{DbCatalystId, DbTransactionId},
 };
 
 /// Cached data.
@@ -44,12 +44,6 @@ pub(crate) struct QueryParams {
 pub(crate) struct Query {
     /// A Catalyst ID.
     pub catalyst_id: DbCatalystId,
-    /// A slot number.
-    #[allow(dead_code)]
-    pub slot_no: DbSlot,
-    /// A transaction index.
-    #[allow(dead_code)]
-    pub txn_index: DbTxnIndex,
 }
 
 impl Query {

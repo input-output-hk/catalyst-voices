@@ -274,4 +274,23 @@ mod tests {
         assert_eq!(1, query.catalyst_id_for_txn_id.len());
         assert_eq!(1, query.catalyst_id_for_stake_address.len());
     }
+
+    #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
+    #[tokio::test]
+    async fn index_invalid() {
+        let Ok((session, _)) = get_shared_session().await else {
+            panic!("{SESSION_ERR_MSG}");
+        };
+
+        let block = test_utils::block_4();
+        let mut query = Rbac509InsertQuery::new();
+        let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
+            .parse()
+            .unwrap();
+        query.index(&session, txn_hash, 0.into(), &block).await;
+        assert_eq!(1, query.invalid.len());
+        assert!(query.registrations.is_empty());
+        assert!(query.catalyst_id_for_txn_id.is_empty());
+        assert!(query.catalyst_id_for_stake_address.is_empty());
+    }
 }
