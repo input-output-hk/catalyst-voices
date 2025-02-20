@@ -170,7 +170,6 @@ jobs:
           parallel: true
 
       - name: Coveralls
-        if: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
