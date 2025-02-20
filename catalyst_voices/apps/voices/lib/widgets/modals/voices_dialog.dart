@@ -7,14 +7,21 @@ abstract final class VoicesDialog {
   static Future<T?> show<T>({
     required BuildContext context,
     required WidgetBuilder builder,
-    RouteSettings? routeSettings,
+    required RouteSettings? routeSettings,
+    bool useRootNavigator = true,
     bool barrierDismissible = true,
+    Color barrierColor = const Color(0x80000000),
   }) {
-    return showGeneralDialog<T>(
-      context: context,
-      pageBuilder: (context, animation, secondaryAnimation) => builder(context),
-      routeSettings: routeSettings,
-      barrierDismissible: barrierDismissible,
+    // Similar to showGeneralDialog() but since it requires
+    // a barrierLabel we reimplemented the same behavior.
+    return Navigator.of(context, rootNavigator: useRootNavigator).push<T>(
+      RawDialogRoute<T>(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            builder(context),
+        barrierDismissible: barrierDismissible,
+        barrierColor: barrierColor,
+        settings: routeSettings,
+      ),
     );
   }
 }
