@@ -17,6 +17,7 @@ The file structure is subject to change as the project evolves.
   * [Running Tests](#running-tests)
     * [Via CLI](#via-cli)
     * [Via Visual Studio Code](#via-visual-studio-code)
+    * [Via earthly](#via-earthly)
   * [Test Approach](#test-approach)
   * [Troubleshooting](#troubleshooting)
   * [Contributing](#contributing)
@@ -103,8 +104,16 @@ add the following configuration to your `.vscode/launch.json` file:
 }
 ```
 
-This configuration ensures the application runs with
-the necessary web headers for cross-origin requirements.
+You can also check the `.vscode/launch.recommended.json` file for a sample configuration
+along with helpful comments.
+
+### Via earthly
+
+From `./integration_test` directory, run the following command:
+
+```bash
+earthly +integration-test-web
+```
 
 ---
 
@@ -124,7 +133,8 @@ This helps maintain a clean and organized test suite.
 
 ## Troubleshooting
 
-* **Chromedriver**: Ensure chromedriver is running on port 4444 before running the tests.
+* **Chromedriver**: Ensure chromedriver is running on port 4444 before running the tests and
+ensure that you have same versions of chromedriver and chrome.
 * **Web Headers**: If you encounter cross-origin issues, ensure the web headers are set correctly.
 * **Other issues**: If you encounter other issues, try the following:
 
