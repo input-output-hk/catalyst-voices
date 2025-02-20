@@ -24,7 +24,8 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
       _SubmitProposalForReviewDialogState();
 
   /// Shows a dialog and returns a [Future] that resolves to `true`
-  /// if the user wants to publish a new iteration or `false` or `null` if not.
+  /// if the user wants to submit the proposal for review
+  /// or `false` or `null` if not.
   static Future<bool?> show({
     required BuildContext context,
     required String proposalTitle,
