@@ -110,6 +110,30 @@ void main() {
 
         expect(entity, isNull);
       });
+
+      test('all refs return as expected', () async {
+        // Given
+        final refs = List.generate(10, (_) => DocumentRefFactory.buildDraft());
+        final drafts = refs.map((ref) {
+          return DraftFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: ref,
+            ),
+          );
+        });
+
+        // When
+        await database.draftsDao.saveAll(drafts);
+
+        // Then
+        final allRefs = await database.draftsDao.queryAllRefs();
+
+        expect(
+          allRefs,
+          allOf(hasLength(refs.length), containsAll(refs)),
+        );
+      });
     });
 
     group('count', () {
