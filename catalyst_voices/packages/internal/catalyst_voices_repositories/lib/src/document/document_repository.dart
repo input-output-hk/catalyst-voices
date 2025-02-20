@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/document/constants.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
@@ -137,9 +136,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     return {
       // Note. categories are mocked on backend so we can't not fetch them.
-      // ...categoriesRefs,
-      ...commentsTemplatesRefs.expand((element) => [element.template]),
-      ...proposalTemplatesRefs.expand((element) => [element.template]),
+      ...categoriesTemplatesRefs.expand((e) => [e.proposal, e.comment]),
       ...remoteRefs,
     }.toList();
   }
