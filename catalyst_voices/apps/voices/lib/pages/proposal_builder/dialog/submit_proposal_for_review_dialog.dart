@@ -7,7 +7,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 /// A dialog for submitting a proposal into review.
-class SubmitProposalForReviewDialog extends StatelessWidget {
+class SubmitProposalForReviewDialog extends StatefulWidget {
   final String proposalTitle;
   final String currentVersion;
   final String nextVersion;
@@ -20,46 +20,8 @@ class SubmitProposalForReviewDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
-      constraints: const BoxConstraints(
-        minWidth: 450,
-        maxWidth: 450,
-        minHeight: 256,
-      ),
-      showClose: false,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          ProposalPublishDialogHeader(
-            title: context.l10n.publishProposalForReviewDialogTitle,
-            subtitle: context.l10n.publishProposalForReviewDialogSubtitle,
-          ),
-          const SizedBox(height: 16),
-          const Divider(),
-          const SizedBox(height: 28),
-          _VersionUpdateSection(
-            proposalTitle: proposalTitle,
-            currentVersion: currentVersion,
-            nextVersion: nextVersion,
-          ),
-          const SizedBox(height: 28),
-          const Divider(),
-          const SizedBox(height: 8),
-          const _ListItems(),
-          const SizedBox(height: 16),
-          const Divider(),
-          const SizedBox(height: 20),
-          const _AgreementConfirmation(),
-          const SizedBox(height: 16),
-          const _Buttons(),
-          const SizedBox(height: 24),
-        ],
-      ),
-    );
-  }
+  State<SubmitProposalForReviewDialog> createState() =>
+      _SubmitProposalForReviewDialogState();
 
   /// Shows a dialog and returns a [Future] that resolves to `true`
   /// if the user wants to publish a new iteration or `false` or `null` if not.
@@ -82,15 +44,14 @@ class SubmitProposalForReviewDialog extends StatelessWidget {
   }
 }
 
-class _AgreementConfirmation extends StatefulWidget {
-  const _AgreementConfirmation();
+class _AgreementConfirmation extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
-  @override
-  State<_AgreementConfirmation> createState() => _AgreementConfirmationState();
-}
-
-class _AgreementConfirmationState extends State<_AgreementConfirmation> {
-  bool _value = false;
+  const _AgreementConfirmation({
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +61,8 @@ class _AgreementConfirmationState extends State<_AgreementConfirmation> {
         spacing: 24,
         children: [
           VoicesCheckbox(
-            value: _value,
-            onChanged: _onChanged,
+            value: value,
+            onChanged: onChanged,
           ),
           Expanded(
             child: Text(
@@ -112,12 +73,6 @@ class _AgreementConfirmationState extends State<_AgreementConfirmation> {
         ],
       ),
     );
-  }
-
-  void _onChanged(bool value) {
-    setState(() {
-      _value = value;
-    });
   }
 }
 
@@ -136,7 +91,9 @@ class _Arrow extends StatelessWidget {
 }
 
 class _Buttons extends StatelessWidget {
-  const _Buttons();
+  final bool submitEnabled;
+
+  const _Buttons({required this.submitEnabled});
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +108,7 @@ class _Buttons extends StatelessWidget {
             child: Text(context.l10n.cancelButtonText),
           ),
           VoicesTextButton(
-            onTap: () => Navigator.of(context).pop(true),
+            onTap: submitEnabled ? () => Navigator.of(context).pop(true) : null,
             child: Text(context.l10n.submitButtonText),
           ),
         ],
@@ -187,6 +144,62 @@ class _ListItems extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _SubmitProposalForReviewDialogState
+    extends State<SubmitProposalForReviewDialog> {
+  bool _agreementConfirmed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesSinglePaneDialog(
+      constraints: const BoxConstraints(
+        minWidth: 450,
+        maxWidth: 450,
+        minHeight: 256,
+      ),
+      showClose: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 24),
+          ProposalPublishDialogHeader(
+            title: context.l10n.publishProposalForReviewDialogTitle,
+            subtitle: context.l10n.publishProposalForReviewDialogSubtitle,
+          ),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 28),
+          _VersionUpdateSection(
+            proposalTitle: widget.proposalTitle,
+            currentVersion: widget.currentVersion,
+            nextVersion: widget.nextVersion,
+          ),
+          const SizedBox(height: 28),
+          const Divider(),
+          const SizedBox(height: 8),
+          const _ListItems(),
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 20),
+          _AgreementConfirmation(
+            value: _agreementConfirmed,
+            onChanged: _onAgreementConfirmationChanged,
+          ),
+          const SizedBox(height: 16),
+          _Buttons(submitEnabled: _agreementConfirmed),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  void _onAgreementConfirmationChanged(bool value) {
+    setState(() {
+      _agreementConfirmed = value;
+    });
   }
 }
 
