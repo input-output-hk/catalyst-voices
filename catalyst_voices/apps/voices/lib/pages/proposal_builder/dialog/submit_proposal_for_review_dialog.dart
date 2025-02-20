@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/proposal_builder/dialog/proposal_builder_dialog_widgets.dart';
 import 'package:catalyst_voices/widgets/painter/arrow_right_painter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -5,17 +6,13 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-/// A dialog for publishing a new iteration of a proposal.
-///
-/// It supports publishing an iteration for the first time,
-/// then [currentVersion] must be null.
-/// For the next iterations the [currentVersion] is not null.
-class ProposalPublishIterationDialog extends StatelessWidget {
+/// A dialog for submitting a proposal into review.
+class SubmitProposalForReviewDialog extends StatelessWidget {
   final String proposalTitle;
-  final String? currentVersion;
+  final String currentVersion;
   final String nextVersion;
 
-  const ProposalPublishIterationDialog({
+  const SubmitProposalForReviewDialog({
     super.key,
     required this.proposalTitle,
     required this.currentVersion,
@@ -36,7 +33,10 @@ class ProposalPublishIterationDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 24),
-          const _Header(),
+          ProposalPublishDialogHeader(
+            title: context.l10n.publishProposalForReviewDialogTitle,
+            subtitle: context.l10n.publishProposalForReviewDialogSubtitle,
+          ),
           const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 28),
@@ -51,6 +51,8 @@ class ProposalPublishIterationDialog extends StatelessWidget {
           const _ListItems(),
           const SizedBox(height: 16),
           const Divider(),
+          const SizedBox(height: 20),
+          const _AgreementConfirmation(),
           const SizedBox(height: 16),
           const _Buttons(),
           const SizedBox(height: 24),
@@ -64,19 +66,58 @@ class ProposalPublishIterationDialog extends StatelessWidget {
   static Future<bool?> show({
     required BuildContext context,
     required String proposalTitle,
-    required String? currentVersion,
+    required String currentVersion,
     required String nextVersion,
   }) {
     return VoicesDialog.show(
       context: context,
-      routeSettings: const RouteSettings(name: '/publish-proposal-iteration'),
-      builder: (context) => ProposalPublishIterationDialog(
+      routeSettings: const RouteSettings(name: '/submit-proposal-for-review'),
+      builder: (context) => SubmitProposalForReviewDialog(
         proposalTitle: proposalTitle,
         currentVersion: currentVersion,
         nextVersion: nextVersion,
       ),
       barrierDismissible: false,
     );
+  }
+}
+
+class _AgreementConfirmation extends StatefulWidget {
+  const _AgreementConfirmation();
+
+  @override
+  State<_AgreementConfirmation> createState() => _AgreementConfirmationState();
+}
+
+class _AgreementConfirmationState extends State<_AgreementConfirmation> {
+  bool _value = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        spacing: 24,
+        children: [
+          VoicesCheckbox(
+            value: _value,
+            onChanged: _onChanged,
+          ),
+          Expanded(
+            child: Text(
+              context.l10n.publishProposalForReviewDialogAgreement,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onChanged(bool value) {
+    setState(() {
+      _value = value;
+    });
   }
 }
 
@@ -88,7 +129,7 @@ class _Arrow extends StatelessWidget {
     return CustomPaint(
       size: const Size(double.infinity, 24),
       painter: ArrowRightPainter(
-        color: Theme.of(context).colorScheme.secondaryContainer,
+        color: Theme.of(context).colorScheme.primaryContainer,
       ),
     );
   }
@@ -111,79 +152,10 @@ class _Buttons extends StatelessWidget {
           ),
           VoicesTextButton(
             onTap: () => Navigator.of(context).pop(true),
-            child: Text(context.l10n.publishButtonText),
+            child: Text(context.l10n.submitButtonText),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DraftChip extends StatelessWidget {
-  const _DraftChip();
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesChip.rectangular(
-      content: Text(
-        context.l10n.draft,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onSecondary,
-        ),
-      ),
-      backgroundColor: Theme.of(context).colors.iconsSecondary,
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            context.l10n.publishNewProposalIterationDialogTitle,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            context.l10n.publishNewProposalIterationDialogSubtitle,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ListItem extends StatelessWidget {
-  final SvgGenImage icon;
-  final String text;
-
-  const _ListItem({
-    required this.icon,
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      spacing: 24,
-      children: [
-        icon.buildIcon(size: 24),
-        Expanded(
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -200,17 +172,17 @@ class _ListItems extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 8,
         children: [
-          _ListItem(
+          ProposalPublishDialogListItem(
             icon: VoicesAssets.icons.eye,
-            text: context.l10n.publishNewProposalIterationDialogList1,
+            text: context.l10n.publishProposalForReviewDialogList1,
           ),
-          _ListItem(
+          ProposalPublishDialogListItem(
             icon: VoicesAssets.icons.chatAlt2,
-            text: context.l10n.publishNewProposalIterationDialogList2,
+            text: context.l10n.publishProposalForReviewDialogList2,
           ),
-          _ListItem(
+          ProposalPublishDialogListItem(
             icon: VoicesAssets.icons.exclamationCircle,
-            text: context.l10n.publishNewProposalIterationDialogList3,
+            text: context.l10n.publishProposalForReviewDialogList3,
           ),
         ],
       ),
@@ -245,7 +217,7 @@ class _VersionChip extends StatelessWidget {
 }
 
 class _VersionUpdate extends StatelessWidget {
-  final String? current;
+  final String current;
   final String next;
 
   const _VersionUpdate({
@@ -257,15 +229,13 @@ class _VersionUpdate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (current != null) ...[
-          const _DraftChip(),
-          const SizedBox(width: 4),
-        ],
-        _VersionChip(version: current ?? context.l10n.local),
+        const ProposalPublishDialogDraftChip(),
+        const SizedBox(width: 4),
+        _VersionChip(version: current),
         const SizedBox(width: 16),
         const Expanded(child: _Arrow()),
         const SizedBox(width: 16),
-        const _DraftChip(),
+        const ProposalPublishDialogFinalChip(),
         const SizedBox(width: 4),
         _VersionChip(version: next),
       ],
@@ -275,7 +245,7 @@ class _VersionUpdate extends StatelessWidget {
 
 class _VersionUpdateSection extends StatelessWidget {
   final String proposalTitle;
-  final String? currentVersion;
+  final String currentVersion;
   final String nextVersion;
 
   const _VersionUpdateSection({
