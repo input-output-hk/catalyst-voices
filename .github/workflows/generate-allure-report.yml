@@ -17,7 +17,7 @@ env:
   COVERAGE_REPORT_PATH: coverage-report
   REPORT_EXT: .junit-report.xml
   COVERAGE_EXT: coverage.info
-  REPO_BASE_PATH: /home/runner/work/catalyst-voices/catalyst-voices/
+  REPO_BASE_PATH: catalyst-voices/
 
 jobs:
   generate-test-reports:
