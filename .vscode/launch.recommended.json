@@ -37,10 +37,7 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/configs/main_dev.dart",
-      "args": [
-        "--flavor",
-        "dev"
-      ]
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "Catalyst Voices [DEV][Profile]",
@@ -49,10 +46,7 @@
       "type": "dart",
       "flutterMode": "profile",
       "program": "lib/configs/main_dev.dart",
-      "args": [
-        "--flavor",
-        "dev"
-      ]
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "Catalyst Voices [DEV][Release]",
@@ -61,10 +55,7 @@
       "type": "dart",
       "flutterMode": "release",
       "program": "lib/configs/main_dev.dart",
-      "args": [
-        "--flavor",
-        "dev"
-      ]
+      "args": ["--flavor", "dev"]
     },
     {
       "name": "Catalyst Voices [QA][Debug]",
@@ -74,7 +65,13 @@
       "program": "lib/configs/main_qa.dart",
       "args": [
         "--flavor",
-        "qa"
+        "qa",
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp"
       ]
     },
     {
@@ -86,7 +83,13 @@
       "program": "lib/configs/main_qa.dart",
       "args": [
         "--flavor",
-        "qa"
+        "qa",
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp"
       ]
     },
     {
@@ -96,10 +99,7 @@
       "type": "dart",
       "flutterMode": "release",
       "program": "lib/configs/main_qa.dart",
-      "args": [
-        "--flavor",
-        "qa"
-      ]
+      "args": ["--flavor", "qa"]
     },
     {
       "name": "Catalyst Voices [PROD][Debug]",
@@ -107,10 +107,7 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/configs/main_prod.dart",
-      "args": [
-        "--flavor",
-        "prod"
-      ]
+      "args": ["--flavor", "prod"]
     },
     {
       "name": "Catalyst Voices [PROD][Profile]",
@@ -119,10 +116,7 @@
       "type": "dart",
       "flutterMode": "profile",
       "program": "lib/configs/main_prod.dart",
-      "args": [
-        "--flavor",
-        "prod"
-      ]
+      "args": ["--flavor", "prod"]
     },
     {
       "name": "Catalyst Voices [PROD][Release]",
@@ -131,10 +125,7 @@
       "type": "dart",
       "flutterMode": "release",
       "program": "lib/configs/main_prod.dart",
-      "args": [
-        "--flavor",
-        "prod"
-      ]
+      "args": ["--flavor", "prod"]
     },
     {
       "name": "Catalyst Voices [PRE:PROD][Debug]",
@@ -142,10 +133,7 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/configs/main_preprod.dart",
-      "args": [
-        "--flavor",
-        "preprod"
-      ]
+      "args": ["--flavor", "preprod"]
     },
     {
       "name": "Catalyst Voices [PRE:PROD][Profile]",
@@ -154,10 +142,7 @@
       "type": "dart",
       "flutterMode": "profile",
       "program": "lib/configs/main_preprod.dart",
-      "args": [
-        "--flavor",
-        "preprod"
-      ]
+      "args": ["--flavor", "preprod"]
     },
     {
       "name": "Catalyst Voices [PRE:PROD][Release]",
@@ -166,10 +151,7 @@
       "type": "dart",
       "flutterMode": "release",
       "program": "lib/configs/main_preprod.dart",
-      "args": [
-        "--flavor",
-        "preprod"
-      ]
+      "args": ["--flavor", "preprod"]
     }
   ]
 }
