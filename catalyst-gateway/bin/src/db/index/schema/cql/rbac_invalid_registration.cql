@@ -1,4 +1,4 @@
--- Index of RBAC 509 registrations. Valid. 
+-- Index of RBAC 509 registrations. Invalid.
 CREATE TABLE IF NOT EXISTS rbac_invalid_registration (
     -- Primary Key Data
     catalyst_id         text,           -- Short Catalyst id
