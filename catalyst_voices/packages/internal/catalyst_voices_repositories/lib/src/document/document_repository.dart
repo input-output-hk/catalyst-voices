@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -97,8 +96,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<void> cacheDocument({required SignedDocumentRef ref}) async {
-    await Future<void>.delayed(Duration(milliseconds: Random().nextInt(1000)));
-
     final documentData = await _remoteDocuments.get(ref: ref);
 
     await _localDocuments.save(data: documentData);
