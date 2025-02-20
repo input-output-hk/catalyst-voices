@@ -44,14 +44,13 @@ class ProposalBuilderStatusAction extends StatelessWidget {
       case _MenuItemEnum.publish:
         context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
 
-        // TODO(dtscalac): fill in with correct data, provide callback
+        // TODO(dtscalac): fill in with correct data
         unawaited(
           ProposalPublishIterationDialog.show(
             context: context,
             proposalTitle: 'Proposal title',
             currentVersion: null,
             nextVersion: '1',
-            onPublish: () {},
           ),
         );
       case _MenuItemEnum.submit:

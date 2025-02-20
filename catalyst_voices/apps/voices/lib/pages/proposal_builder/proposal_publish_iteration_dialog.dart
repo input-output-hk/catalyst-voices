@@ -14,14 +14,12 @@ class ProposalPublishIterationDialog extends StatelessWidget {
   final String proposalTitle;
   final String? currentVersion;
   final String nextVersion;
-  final VoidCallback onPublish;
 
   const ProposalPublishIterationDialog({
     super.key,
     required this.proposalTitle,
     required this.currentVersion,
     required this.nextVersion,
-    required this.onPublish,
   });
 
   @override
@@ -54,19 +52,20 @@ class ProposalPublishIterationDialog extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 16),
-          _Buttons(onPublish: onPublish),
+          const _Buttons(),
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  static Future<void> show({
+  /// Shows a dialog and returns a [Future] that resolves to `true`
+  /// if the user wants to publish a new iteration or `false` or `null` if not.
+  static Future<bool?> show({
     required BuildContext context,
     required String proposalTitle,
     required String? currentVersion,
     required String nextVersion,
-    required VoidCallback onPublish,
   }) {
     return VoicesDialog.show(
       context: context,
@@ -75,7 +74,6 @@ class ProposalPublishIterationDialog extends StatelessWidget {
         proposalTitle: proposalTitle,
         currentVersion: currentVersion,
         nextVersion: nextVersion,
-        onPublish: onPublish,
       ),
       barrierDismissible: false,
     );
@@ -97,9 +95,7 @@ class _Arrow extends StatelessWidget {
 }
 
 class _Buttons extends StatelessWidget {
-  final VoidCallback onPublish;
-
-  const _Buttons({required this.onPublish});
+  const _Buttons();
 
   @override
   Widget build(BuildContext context) {
@@ -110,11 +106,11 @@ class _Buttons extends StatelessWidget {
         spacing: 16,
         children: [
           VoicesTextButton(
-            onTap: () => Navigator.of(context).pop(),
+            onTap: () => Navigator.of(context).pop(false),
             child: Text(context.l10n.cancelButtonText),
           ),
           VoicesTextButton(
-            onTap: onPublish,
+            onTap: () => Navigator.of(context).pop(true),
             child: Text(context.l10n.publishButtonText),
           ),
         ],
