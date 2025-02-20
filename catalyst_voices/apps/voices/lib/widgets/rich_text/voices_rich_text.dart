@@ -16,70 +16,6 @@ import 'package:flutter_quill/flutter_quill_internal.dart' as quill_int;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart'
     as quill_ext;
 
-final class VoicesRichTextController extends quill.QuillController {
-  final _customRules = const <quill_int.Rule>[AutoAlwaysExitBlockRule()];
-
-  VoicesRichTextController({
-    required super.document,
-    required super.selection,
-  }) {
-    document.setCustomRules(_customRules);
-  }
-
-  factory VoicesRichTextController.fromMarkdown({
-    required MarkdownData markdownData,
-    required TextSelection selection,
-  }) {
-    final delta = markdown.encoder.convert(markdownData);
-    final newDocument = quill.Document.fromDelta(delta);
-
-    return VoicesRichTextController(
-      document: newDocument,
-      selection: selection,
-    );
-  }
-
-  MarkdownData get markdownData {
-    final document = this.document;
-    if (document.isEmpty()) {
-      return MarkdownData.empty;
-    }
-
-    final delta = document.toDelta();
-    final markdownData = markdown.decoder.convert(delta);
-    return markdownData;
-  }
-
-  set markdownData(MarkdownData newMarkdownData) {
-    final oldMarkdown = markdownData;
-    if (oldMarkdown == newMarkdownData) {
-      // Don't update the document if the markdown representation didn't change.
-      // When updating the document Quill removes blank lines which conflict
-      // with a user trying to insert a blank line.
-      return;
-    } else if (newMarkdownData.data.isEmpty) {
-      clear();
-    } else {
-      final delta = markdown.encoder.convert(newMarkdownData);
-      document = quill.Document.fromDelta(delta);
-    }
-  }
-
-  void clearFormattingFromSelection() {
-    toggledStyle = const quill.Style();
-    formatSelection(
-      quill.Attribute.clone(quill.Attribute.ul, null),
-      shouldNotifyListeners: false,
-    );
-    formatSelection(
-      quill.Attribute.clone(quill.Attribute.ol, null),
-      shouldNotifyListeners: false,
-    );
-
-    notifyListeners();
-  }
-}
-
 class VoicesRichText extends VoicesFormField<MarkdownData> {
   final VoicesRichTextController controller;
   final String title;
@@ -132,6 +68,7 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
                   offstage: charsLimit == null && field.errorText == null,
                   child: VoicesRichTextLimit(
                     controller: controller,
+                    enabled: enabled,
                     charsLimit: charsLimit,
                     errorMessage: field.errorText,
                   ),
@@ -142,23 +79,100 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
         );
 }
 
-class _Title extends StatelessWidget {
-  final String title;
+final class VoicesRichTextController extends quill.QuillController {
+  final _customRules = const <quill_int.Rule>[AutoAlwaysExitBlockRule()];
 
-  const _Title({
-    required this.title,
+  VoicesRichTextController({
+    required super.document,
+    required super.selection,
+  }) {
+    document.setCustomRules(_customRules);
+  }
+
+  factory VoicesRichTextController.fromMarkdown({
+    required MarkdownData markdownData,
+    required TextSelection selection,
+  }) {
+    final delta = markdown.encoder.convert(markdownData);
+    final newDocument = quill.Document.fromDelta(delta);
+
+    return VoicesRichTextController(
+      document: newDocument,
+      selection: selection,
+    );
+  }
+
+  MarkdownData get markdownData {
+    final document = this.document;
+    if (document.isEmpty()) {
+      return MarkdownData.empty;
+    }
+
+    final delta = document.toDelta();
+    final markdownData = markdown.decoder.convert(delta);
+    return markdownData;
+  }
+
+  set markdownData(MarkdownData newMarkdownData) {
+    final oldMarkdown = markdownData;
+    if (oldMarkdown == newMarkdownData) {
+      // Don't update the document if the markdown representation didn't change.
+      // When updating the document Quill removes blank lines which conflict
+      // with a user trying to insert a blank line.
+      return;
+    } else if (newMarkdownData.data.isEmpty) {
+      clear();
+    } else {
+      final delta = markdown.encoder.convert(newMarkdownData);
+      document = quill.Document.fromDelta(delta);
+    }
+  }
+
+  void clearFormattingFromSelection() {
+    toggledStyle = const quill.Style();
+
+    final markdownAttributes = <quill.Attribute<dynamic>>[
+      quill.Attribute.ul,
+      quill.Attribute.ol,
+      quill.Attribute.header,
+      quill.Attribute.h1,
+      quill.Attribute.h2,
+      quill.Attribute.h3,
+      quill.Attribute.h4,
+      quill.Attribute.h5,
+      quill.Attribute.h6,
+      quill.Attribute.bold,
+      quill.Attribute.italic,
+      quill.Attribute.codeBlock,
+      quill.Attribute.inlineCode,
+    ];
+
+    for (final attribute in markdownAttributes) {
+      formatSelection(
+        quill.Attribute.clone(attribute, null),
+        shouldNotifyListeners: false,
+      );
+    }
+
+    notifyListeners();
+  }
+}
+
+class _Editor extends StatefulWidget {
+  final VoicesRichTextController controller;
+  final FocusNode focusNode;
+  final ScrollController scrollController;
+  final ValueChanged<MarkdownData?>? onChanged;
+
+  const _Editor({
+    required this.controller,
+    required this.focusNode,
+    required this.scrollController,
+    required this.onChanged,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleSmall,
-      ),
-    );
-  }
+  State<_Editor> createState() => _EditorState();
 }
 
 class _EditorDecoration extends StatelessWidget {
@@ -210,69 +224,10 @@ class _EditorDecoration extends StatelessWidget {
   }
 }
 
-class _Editor extends StatefulWidget {
-  final VoicesRichTextController controller;
-  final FocusNode focusNode;
-  final ScrollController scrollController;
-  final ValueChanged<MarkdownData?>? onChanged;
-
-  const _Editor({
-    required this.controller,
-    required this.focusNode,
-    required this.scrollController,
-    required this.onChanged,
-  });
-
-  @override
-  State<_Editor> createState() => _EditorState();
-}
-
 class _EditorState extends State<_Editor> {
   late final FocusNode _keyboardListenerFocus;
   quill.Document? _observedDocument;
   StreamSubscription<quill.DocChange>? _documentChangeSub;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _keyboardListenerFocus = FocusNode();
-    widget.controller.addListener(_onControllerChanged);
-    _updateObservedDocument();
-  }
-
-  @override
-  void didUpdateWidget(_Editor oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (!identical(oldWidget.controller, widget.controller)) {
-      oldWidget.controller.removeListener(_onControllerChanged);
-      widget.controller.addListener(_onControllerChanged);
-      _updateObservedDocument();
-    }
-  }
-
-  @override
-  void dispose() {
-    _keyboardListenerFocus.dispose();
-    super.dispose();
-  }
-
-  void _onControllerChanged() {
-    if (_observedDocument != widget.controller.document) {
-      _updateObservedDocument();
-    }
-  }
-
-  void _updateObservedDocument() {
-    unawaited(_documentChangeSub?.cancel());
-
-    _observedDocument = widget.controller.document;
-    _documentChangeSub = _observedDocument?.changes.listen((change) {
-      final markdownData = widget.controller.markdownData;
-      widget.onChanged?.call(markdownData);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -310,6 +265,38 @@ class _EditorState extends State<_Editor> {
     );
   }
 
+  @override
+  void didUpdateWidget(_Editor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!identical(oldWidget.controller, widget.controller)) {
+      oldWidget.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+      _updateObservedDocument();
+    }
+  }
+
+  @override
+  void dispose() {
+    _keyboardListenerFocus.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _keyboardListenerFocus = FocusNode();
+    widget.controller.addListener(_onControllerChanged);
+    _updateObservedDocument();
+  }
+
+  void _onControllerChanged() {
+    if (_observedDocument != widget.controller.document) {
+      _updateObservedDocument();
+    }
+  }
+
   void _onKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.backspace &&
@@ -320,6 +307,35 @@ class _EditorState extends State<_Editor> {
       // else and only this is remaining.
       widget.controller.clearFormattingFromSelection();
     }
+  }
+
+  void _updateObservedDocument() {
+    unawaited(_documentChangeSub?.cancel());
+
+    _observedDocument = widget.controller.document;
+    _documentChangeSub = _observedDocument?.changes.listen((change) {
+      final markdownData = widget.controller.markdownData;
+      widget.onChanged?.call(markdownData);
+    });
+  }
+}
+
+class _Title extends StatelessWidget {
+  final String title;
+
+  const _Title({
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+    );
   }
 }
 

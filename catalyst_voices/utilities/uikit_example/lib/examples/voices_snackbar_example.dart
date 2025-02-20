@@ -11,20 +11,6 @@ class VoicesSnackbarExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actionsList = [
-      [
-        VoicesSnackBarPrimaryAction(
-          onPressed: () {},
-          child: Text(context.l10n.refresh),
-        ),
-        VoicesSnackBarSecondaryAction(
-          onPressed: () {},
-          child: Text(context.l10n.learnMore),
-        ),
-      ],
-      <Widget>[],
-    ];
-
     return Scaffold(
       appBar: AppBar(title: const Text('Voices Snackbar')),
       body: Padding(
@@ -34,7 +20,7 @@ class VoicesSnackbarExample extends StatelessWidget {
           runSpacing: 16,
           children: [
             for (final type in VoicesSnackBarType.values)
-              for (final actions in actionsList)
+              for (final actions in _actionList(context, type))
                 for (final behavior in SnackBarBehavior.values)
                   OutlinedButton(
                     onPressed: () {
@@ -59,5 +45,26 @@ class VoicesSnackbarExample extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<List<Widget>> _actionList(
+    BuildContext context,
+    VoicesSnackBarType type,
+  ) {
+    return [
+      [
+        VoicesSnackBarPrimaryAction(
+          type: type,
+          onPressed: () {},
+          child: Text(context.l10n.refresh),
+        ),
+        VoicesSnackBarSecondaryAction(
+          type: type,
+          onPressed: () {},
+          child: Text(context.l10n.learnMore),
+        ),
+      ],
+      [],
+    ];
   }
 }

@@ -671,8 +671,8 @@
   "@walletAddress": {
     "description": "A cardano wallet address"
   },
-  "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
-  "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
+  "accountCreationCreate": "Create a new \nCatalyst Keychain",
+  "accountCreationRecover": "Recover your\nCatalyst Keychain",
   "accountCreationOnThisDevice": "On this device",
   "@accountCreationOnThisDevice": {
     "description": "Indicates that created keychain will be stored in this device only"
@@ -1247,6 +1247,10 @@
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
   "requestedAmountShouldBeMoreThan": "Requested amount should be at least {min}",
   "requestedAmountShouldBeLessThan": "Requested amount should be at most {max}",
+  "sectionHasErrorsMessage": "Section has input errors that need to be cleared before publishing.",
+  "@sectionHasErrorsMessage": {
+    "description": "A validation error in proposal editor when user wants to publish a proposal with errors."
+  },
   "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
@@ -1400,7 +1404,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Found 14",
+  "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1510,5 +1514,46 @@
   "startProposal": "Start Proposal",
   "editRolesDialogTitle": "Editing Roles",
   "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
-  "continueText": "Continue"
+  "continueText": "Continue",
+  "proposalEditorStatusDropdownBackTitle": "Back to Proposal Index",
+  "@proposalEditorStatusDropdownBackTitle": {
+    "description": "Action title to navigate back to the proposal index."
+  },
+  "proposalEditorStatusDropdownPublishTitle": "Publish as new iteration · Draft",
+  "@proposalEditorStatusDropdownPublishTitle": {
+    "description": "Action title to publish a new version of the draft proposal."
+  },
+  "proposalEditorStatusDropdownPublishDescription": "Update proposal iteration as a public draft",
+  "@proposalEditorStatusDropdownPublishDescription": {
+    "description": "Action description to publish a new version of the draft proposal."
+  },
+  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Final",
+  "@proposalEditorStatusDropdownSubmitTitle": {
+    "description": "Action title to submit the final proposal."
+  },
+  "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
+  "@proposalEditorStatusDropdownSubmitDescription": {
+    "description": "Action description to submit the final proposal."
+  },
+  "proposalEditorStatusDropdownShareTitle": "Share Proposal",
+  "@proposalEditorStatusDropdownShareTitle": {
+    "description": "Action title to share a proposal."
+  },
+  "proposalEditorStatusDropdownExportTitle": "Export Proposal",
+  "@proposalEditorStatusDropdownExportTitle": {
+    "description": "Action title to export a proposal as a file."
+  },
+  "proposalEditorValidationSnackbar": "Fix the following input errors",
+  "@proposalEditorValidationSnackbar": {
+    "description": "Snackbar title shown when user tries to save a proposal with errors."
+  },
+  "showAll": "Show All",
+  "importProposal": "Import Proposal",
+  "@importProposal": {
+    "description": "Import a proposal from a file"
+  },
+  "catalyst": "Catalyst",
+  "@catalyst": {
+    "description": "Catalyst is a project name"
+  }
 }
