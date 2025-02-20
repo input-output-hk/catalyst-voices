@@ -16,7 +16,8 @@ env:
   ALLURE_REPORT_PATH: allure-report
   COVERAGE_REPORT_PATH: coverage-report
   REPORT_EXT: .junit-report.xml
-  COVERAGE_EXT: .info
+  COVERAGE_EXT: coverage.info
+  REPO_BASE_PATH: /home/runner/work/catalyst-voices/catalyst-voices/
 
 jobs:
   generate-test-reports:
@@ -152,19 +153,20 @@ jobs:
 
       - name: Normalize coverage report paths
         run: |
-          sed -i -e 's/SF:\/root/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info
-          sed -i -e 's/SF:/SF:catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_PATH }}/api-tests.coverage.info
+          sed -i -e 's/SF:\/root/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:/SF:catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_PATH }}/api-tests.${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:/SF:catalyst_voices/g' ${{ env.COVERAGE_REPORT_PATH }}/lcov.${{ env.COVERAGE_EXT }}
 
       - name: Coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: rust-unit-test
-          base-path: "/home/runner/work/catalyst-voices/catalyst-voices/"
+          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
       - name: Coveralls
@@ -173,11 +175,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/api-tests.coverage.info"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/api-tests.${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: api-test
-          base-path: "/home/runner/work/catalyst-voices/catalyst-voices/"
+          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
       - name: Coveralls
@@ -185,11 +187,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/lcov.info"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/lcov.${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: flutter-test
-          base-path: "/home/runner/work/catalyst-voices/catalyst-voices/catalyst_voices/"
+          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
   upload-coverage-report:
@@ -202,4 +204,4 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
-          carryforward: "rust-unit-test,flutter-test"
+          carryforward: "rust-unit-test,flutter-test,api-test"
