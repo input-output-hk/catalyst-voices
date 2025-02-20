@@ -1,9 +1,16 @@
 import 'dart:async';
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
+import 'package:result_type/result_type.dart';
 
 final _logger = Logger('DocumentsService');
+
+typedef _RefFailure = Failure<SignedDocumentRef, Exception>;
+
+typedef _RefSuccess = Success<SignedDocumentRef, Exception>;
 
 // ignore: one_member_abstracts
 abstract interface class DocumentsService {
@@ -13,8 +20,12 @@ abstract interface class DocumentsService {
 
   /// Syncs locally stored documents with api.
   ///
-  /// Emits process from 0.0 to 1.0.
-  Stream<double> sync();
+  /// [onProgress] emits from 0.0 to 1.0.
+  ///
+  /// Returns list of added refs.
+  Future<List<SignedDocumentRef>> sync({
+    ValueChanged<double>? onProgress,
+  });
 }
 
 final class DocumentsServiceImpl implements DocumentsService {
@@ -25,8 +36,10 @@ final class DocumentsServiceImpl implements DocumentsService {
   );
 
   @override
-  Stream<double> sync() async* {
-    yield 0.1;
+  Future<List<SignedDocumentRef>> sync({
+    ValueChanged<double>? onProgress,
+  }) async {
+    onProgress?.call(0.1);
 
     final allRefs = await _documentRepository.getAllDocumentsRefs();
     final cachedRefs = await _documentRepository.getCachedDocumentsRefs();
@@ -38,41 +51,49 @@ final class DocumentsServiceImpl implements DocumentsService {
       'MissingRefs[${missingRefs.length}]',
     );
 
-    yield 0.2;
+    if (missingRefs.isEmpty) {
+      onProgress?.call(1);
+      return [];
+    }
 
-    var cachedCount = 0;
-    final cacheProgressSC = StreamController<double>();
+    onProgress?.call(0.2);
 
-    final docsCacheFutures = [
+    var completed = 0;
+    final total = missingRefs.length;
+
+    // Note. Handling or errors as Outcome because we have to
+    // give a change to all refs to finish and keep all info about what
+    // failed.
+    final futures = <Future<Result<SignedDocumentRef, Exception>>>[
       for (final ref in missingRefs)
         _documentRepository
             .cacheDocument(ref: ref)
-            .then((_) => ref)
-            .whenComplete(() {
-          cachedCount += 1;
-
-          final progress = cachedCount / missingRefs.length;
-          cacheProgressSC.add(progress);
+            .then<Result<SignedDocumentRef, Exception>>((_) => Success(ref))
+            .catchError((Object error, StackTrace stackTrace) {
+          final exception = RefSyncException(
+            ref,
+            error: error,
+            stack: stackTrace,
+          );
+          return _RefFailure(exception);
+        }).whenComplete(() {
+          completed += 1;
+          final progress = completed / total;
+          final totalProgress = 0.2 + (progress * 0.8);
+          onProgress?.call(totalProgress);
         }),
     ];
 
-    final completeFuture = docsCacheFutures.wait.whenComplete(() async {
-      await cacheProgressSC.close();
-    });
+    final outcomes = await futures.wait;
+    final failures = outcomes.whereType<_RefFailure>();
 
-    yield* cacheProgressSC.stream
-        .map((progress) => 0.8 * progress)
-        .map((progress) => 0.2 + progress);
-
-    final successRefs = await completeFuture;
-    final failedRefs = List.of(missingRefs)..removeWhere(successRefs.contains);
-
-    if (failedRefs.isNotEmpty) {
-      _logger
-        ..severe('Failed to sync ${failedRefs.length} refs')
-        ..finest('Failed refs: $failedRefs');
+    if (failures.isNotEmpty) {
+      final errors = failures.map((e) => e.failure).toList();
+      throw RefsSyncException(errors);
     }
 
-    yield 1.0;
+    onProgress?.call(1);
+
+    return outcomes.whereType<_RefSuccess>().map((e) => e.success).toList();
   }
 }

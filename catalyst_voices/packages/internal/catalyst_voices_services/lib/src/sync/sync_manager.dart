@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:rxdart/transformers.dart';
 import 'package:synchronized/synchronized.dart';
 
 final _logger = Logger('SyncManager');
@@ -33,7 +32,7 @@ final class SyncManagerImpl implements SyncManager {
   }
 
   @override
-  Future<void> start() async {
+  Future<void> start() {
     _syncTimer?.cancel();
     _syncTimer = Timer.periodic(
       const Duration(minutes: 1),
@@ -44,7 +43,7 @@ final class SyncManagerImpl implements SyncManager {
       },
     );
 
-    await _lock.synchronized(_startSynchronization);
+    return _lock.synchronized(_startSynchronization);
   }
 
   Future<void> _startSynchronization() async {
@@ -53,41 +52,20 @@ final class SyncManagerImpl implements SyncManager {
     try {
       _logger.fine('Synchronization started');
 
-      await _syncDocuments();
+      final newRefs = await _documentsService.sync(
+        onProgress: (value) {
+          _logger.finest('Documents sync progress[$value]');
+        },
+      );
 
-      _logger.fine('Synchronization completed');
+      _logger.fine('Synchronization completed. NewRefs[${newRefs.length}]');
     } catch (error, stack) {
       _logger.severe('Synchronization failed', error, stack);
+      rethrow;
     } finally {
       stopwatch.stop();
 
       _logger.fine('Synchronization took ${stopwatch.elapsed}');
     }
-  }
-
-  Future<void> _syncDocuments() async {
-    final completer = Completer<double>();
-
-    _documentsService
-        .sync()
-        .throttleTime(const Duration(milliseconds: 100))
-        .listen(
-      (progress) {
-        _logger.finest('Documents sync progress $progress');
-      },
-      onDone: () {
-        _logger.finest('Documents sync completed');
-
-        completer.complete(1);
-      },
-      onError: (Object error, StackTrace stack) {
-        _logger.severe('Documents sync failed', error, stack);
-
-        completer.completeError(error, stack);
-      },
-      cancelOnError: true,
-    );
-
-    await completer.future;
   }
 }
