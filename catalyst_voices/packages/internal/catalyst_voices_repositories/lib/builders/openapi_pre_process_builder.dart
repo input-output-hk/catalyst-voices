@@ -7,7 +7,7 @@ import 'package:path/path.dart' as path;
 
 class OpenApiPreProcessBuilder implements Builder {
   static const _inputFileExtensions = ['.json'];
-  static const _stagingPath = 'staging_folder/';
+  static const _stagingPath = 'openapi/processed';
 
   final String sourcepath;
 
@@ -15,7 +15,7 @@ class OpenApiPreProcessBuilder implements Builder {
 
   OpenApiPreProcessBuilder(BuilderOptions options)
       : sourcepath = path.normalize(
-          options.config['sourcepath'] as String? ?? 'source_folder/',
+          options.config['sourcepath'] as String? ?? 'temp',
         );
 
   @override

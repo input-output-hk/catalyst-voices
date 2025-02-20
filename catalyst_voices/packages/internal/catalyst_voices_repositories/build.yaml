@@ -1,20 +1,26 @@
+global_options:
+  catalyst_voices_repositories|openapi_pre_process_builder:
+    runs_before:
+      - swagger_dart_code_generator:swagger_dart_code_generator
+      - chopper_generator:chopper_generator
+
 targets:
   $default:
     sources:
       - lib/**
       - openapi/**
       - $package$
-      - tool/**
+      - pubspec.*
     builders:
-      openapi_pre_process_builder:
+      catalyst_voices_repositories|openapi_pre_process_builder:
         options:
-          sourcepath: "openapi/"
+          sourcepath: "openapi"
       chopper_generator:
         options:
           header: "// Generated code"
       swagger_dart_code_generator:
         options:
-          input_folder: "openapi/staging_folder/"
+          input_folder: "openapi/processed"
           output_folder: "lib/generated/api"
           separate_models: true
           include_if_null: false
@@ -74,13 +80,11 @@ targets:
 
 builders:
   openapi_pre_process_builder:
-    import: "package:catalyst_voices_repositories/tool/builders.dart"
+    import: "package:catalyst_voices_repositories/builders/builders.dart"
     builder_factories: ["openApiPreProcessBuilder"]
     build_extensions: { ".json": [".processed.json"] }
     auto_apply: root_package
     build_to: source
     defaults:
       options:
-        sourcepath: "openapi/"
-    runs_before:
-      - "swagger_dart_code_generator"
+        sourcepath: "openapi"
