@@ -7,6 +7,10 @@ mod inspection_get;
 mod live_get;
 mod ready_get;
 mod started_get;
+pub(crate) use live_get::{
+    is_live_counter_under_threshold, live_counter_get, live_counter_inc, live_counter_reset,
+    set_not_live,
+};
 pub(crate) use started_get::started;
 
 /// Health API Endpoints
