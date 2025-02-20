@@ -23,6 +23,17 @@ final class Document extends Equatable {
     required this.properties,
   });
 
+  /// Returns all the invalid properties in this document.
+  ///
+  /// The resulting list should only contain the properties
+  /// which are themselves invalid. If a parent property is valid
+  /// but it has a child which is not then only the child should be included.
+  List<DocumentProperty> get invalidProperties {
+    return [
+      for (final property in properties) ...property.invalidProperties,
+    ];
+  }
+
   /// Returns true if all properties in this document are valid,
   /// false otherwise.
   bool get isValid => properties.every((e) => e.isValid);
@@ -73,6 +84,14 @@ final class DocumentListProperty extends DocumentProperty {
     required this.properties,
     required this.validationResult,
   });
+
+  @override
+  List<DocumentProperty> get invalidProperties {
+    return [
+      if (validationResult.isInvalid) this,
+      for (final property in properties) ...property.invalidProperties,
+    ];
+  }
 
   @override
   bool get isValid {
@@ -152,6 +171,14 @@ final class DocumentObjectProperty extends DocumentProperty {
     required this.properties,
     required this.validationResult,
   });
+
+  @override
+  List<DocumentProperty> get invalidProperties {
+    return [
+      if (validationResult.isInvalid) this,
+      for (final property in properties) ...property.invalidProperties,
+    ];
+  }
 
   @override
   bool get isValid {
@@ -237,6 +264,13 @@ sealed class DocumentProperty extends Equatable implements DocumentNode {
   /// The default constructor for the [DocumentProperty].
   const DocumentProperty();
 
+  /// Returns a list of properties that are invalid.
+  ///
+  /// For lists/objects if the parent is valid but the child
+  /// is not then the returned list should only contain the child
+  /// and not the parent.
+  List<DocumentProperty> get invalidProperties;
+
   /// Returns true if the property (including children properties) are valid,
   /// false otherwise.
   bool get isValid;
@@ -284,6 +318,13 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
     required this.value,
     required this.validationResult,
   });
+
+  @override
+  List<DocumentProperty> get invalidProperties {
+    return [
+      if (!isValid) this,
+    ];
+  }
 
   @override
   bool get isValid {
