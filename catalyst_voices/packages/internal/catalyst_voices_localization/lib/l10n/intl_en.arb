@@ -1555,5 +1555,52 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
+  },
+  "copyLink": "Copy Link",
+  "@copyLink": {
+    "description": "Action title to copy a link in share dialog."
+  },
+  "proposal": "Proposal",
+  "@proposal": {
+    "description": "Generic name to describe an type of item. Used in share dialog eg. Share {Proposal}."
+  },
+  "shareDirectLinkToItem": "Share a link directly to this {item}",
+  "@shareDirectLinkToItem": {
+    "description": "Action description to share a link in share dialog.",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkOnSocialMedia": "Share this {itemType} link on {socialMedia}",
+  "@shareLinkOnSocialMedia": {
+    "description": "Action description to share a link in share dialog.",
+    "placeholders": {
+      "itemType": {
+        "type": "String"
+      },
+      "socialMedia": {
+        "type": "String"
+      }
+    }
+  },
+  "shareOnSocialMedia": "Share on {socialMedia}",
+  "@shareOnSocialMedia": {
+    "description": "Action title to share a link in share dialog.",
+    "placeholders": {
+      "socialMedia": {
+        "type": "String"
+      }
+    }
+  },
+  "shareType": "Share {itemType}",
+  "@shareType": {
+    "description": "Action title to share a link in share dialog.",
+    "placeholders": {
+      "itemType": {
+        "type": "String"
+      }
+    }
   }
 }
