@@ -560,7 +560,6 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
         return textStyle;
       }),
-
       suffixIcon: _wrapSuffixIfExists(
         widget.decoration?.suffixIcon,
         const EdgeInsetsDirectional.only(start: 4, end: 8),
