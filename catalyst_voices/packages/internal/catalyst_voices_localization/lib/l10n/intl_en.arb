@@ -1602,5 +1602,13 @@
         "type": "String"
       }
     }
+  },
+  "copied": "Copied!",
+  "@copied": {
+    "description": "Snackbar message shown when user copies a link."
+  },
+  "linkCopiedToClipboard": "Link copied to clipboard",
+  "@linkCopiedToClipboard": {
+    "description": "Snackbar title shown when user copies a link."
   }
 }
