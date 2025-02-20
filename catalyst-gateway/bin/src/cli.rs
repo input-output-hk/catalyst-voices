@@ -67,7 +67,7 @@ impl Cli {
                         tokio::time::sleep(tokio::time::Duration::from_secs(30)).await;
                         live_counter_reset();
                     }
-                })
+                });
                 tasks.push(handle);
 
                 started();
