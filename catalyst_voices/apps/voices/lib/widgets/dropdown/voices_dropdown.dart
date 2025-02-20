@@ -96,6 +96,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
   }) : super(
           builder: (field) {
             final state = field as _DropdownFormFieldState<T>;
+            final theme = Theme.of(field.context);
 
             void onChangedHandler(T? value) {
               field.didChange(value);
@@ -113,17 +114,19 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                 dropdownMenuEntries: items,
                 onSelected: onChangedHandler,
                 inputDecorationTheme: InputDecorationTheme(
-                  hintStyle:
-                      Theme.of(field.context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(field.context).colors.textDisabled,
-                          ),
-                  fillColor: Theme.of(field.context)
-                      .colors
-                      .elevationsOnSurfaceNeutralLv1Grey,
+                  hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colors.textDisabled,
+                  ),
+                  fillColor: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
                   filled: true,
                   enabledBorder: _border(field.context),
                   disabledBorder: _border(field.context),
                   focusedBorder: _border(field.context),
+                  errorStyle: theme.textTheme.bodySmall?.copyWith(
+                    color: enabled
+                        ? theme.colorScheme.error
+                        : theme.colors.textDisabled,
+                  ),
                 ),
                 errorText: field.errorText,
                 // using visibility so that the widget reserves
@@ -136,9 +139,7 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
                 selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
                 menuStyle: MenuStyle(
                   backgroundColor: WidgetStatePropertyAll(
-                    Theme.of(field.context)
-                        .colors
-                        .elevationsOnSurfaceNeutralLv1Grey,
+                    theme.colors.elevationsOnSurfaceNeutralLv1Grey,
                   ),
                   maximumSize:
                       const WidgetStatePropertyAll(Size.fromHeight(350)),

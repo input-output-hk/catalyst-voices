@@ -4,8 +4,6 @@ import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 /// [VoicesSnackBar] is a custom [SnackBar] widget that displays messages with
@@ -38,6 +36,11 @@ class VoicesSnackBar extends StatelessWidget {
   /// The behavior of the [VoicesSnackBar], which can be fixed or floating.
   final SnackBarBehavior? behavior;
 
+  /// The duration of the snackbar before it's automatically dismissed.
+  ///
+  /// Defaults to 4s.
+  final Duration duration;
+
   /// The padding around the the [VoicesSnackBar].
   final EdgeInsetsGeometry? padding;
 
@@ -59,6 +62,7 @@ class VoicesSnackBar extends StatelessWidget {
     this.onClosePressed,
     this.width,
     this.behavior = SnackBarBehavior.fixed,
+    this.duration = const Duration(seconds: 4),
     this.padding = const EdgeInsets.all(16),
   });
 
@@ -94,20 +98,19 @@ class VoicesSnackBar extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 28),
                     child: Text(
                       message ?? type.message(context),
-                      style: textTheme.bodyMedium,
-                    ),
-                  ),
-                  if (actions.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16),
-                      child: Row(
-                        children: actions
-                            .separatedBy(const SizedBox(width: 8))
-                            .toList(),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: type.messageColor(context),
                       ),
                     ),
-                  ],
+                  ),
+                  if (actions.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, top: 12),
+                      child: Row(
+                        spacing: 8,
+                        children: actions,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -117,7 +120,7 @@ class VoicesSnackBar extends StatelessWidget {
             child: IconButton(
               icon: VoicesAssets.icons.x.buildIcon(
                 size: 24,
-                color: theme.colors.iconsForeground,
+                color: type.iconColor(context),
               ),
               onPressed: onClosePressed ?? () => hideCurrent(context),
             ),
@@ -132,6 +135,7 @@ class VoicesSnackBar extends StatelessWidget {
       SnackBar(
         content: this,
         behavior: behavior,
+        duration: duration,
         width: _calculateSnackBarWidth(
           screenWidth: MediaQuery.sizeOf(context).width,
         ),
