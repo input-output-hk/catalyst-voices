@@ -14,7 +14,7 @@ builder:
 
 test:
     FROM +builder
-
+    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     COPY ./../+docker-compose/docker-compose.yml .
 
     ENV EVENT_DB_TEST_URL "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
@@ -37,7 +37,7 @@ test:
 
 disabled-nightly-test:
     FROM +builder
-
+    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     COPY ./docker-compose.yml .
 
     WITH DOCKER \
