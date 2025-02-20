@@ -153,7 +153,7 @@ jobs:
 
       - name: Normalize coverage report paths
         run: |
-          sed -i -e 's/SF:\/root/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:\/root\/build/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.${{ env.COVERAGE_EXT }}
           sed -i -e 's/SF:/SF:catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_PATH }}/api-tests.${{ env.COVERAGE_EXT }}
           sed -i -e 's/SF:/SF:catalyst_voices/g' ${{ env.COVERAGE_REPORT_PATH }}/lcov.${{ env.COVERAGE_EXT }}
 
