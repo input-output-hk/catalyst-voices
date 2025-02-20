@@ -31,14 +31,12 @@ async fn catalyst_id_for_stake_address() {
         rbac509::insert_catalyst_id_for_stake_address::Params::new(
             stake_address_1(),
             0.into(),
-            0.into(),
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()
                 .unwrap(),
         ),
         rbac509::insert_catalyst_id_for_stake_address::Params::new(
             stake_address_2(),
-            1.into(),
             1.into(),
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
                 .parse()

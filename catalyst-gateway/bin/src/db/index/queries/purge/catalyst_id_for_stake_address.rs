@@ -1,4 +1,5 @@
 //! Catalyst ID For Stake Address (RBAC 509 registrations) Queries used in purging data.
+
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
@@ -16,7 +17,7 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::{DbSlot, DbStakeAddress, DbTxnIndex},
+        types::DbStakeAddress,
     },
     settings::cassandra_db,
 };
@@ -24,10 +25,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for Catalyst ID For Stake Address registration purge queries.
 
-    use crate::db::types::{DbSlot, DbStakeAddress, DbTxnIndex};
+    use crate::db::types::{DbSlot, DbStakeAddress};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbStakeAddress, DbSlot, DbTxnIndex);
+    pub(crate) type PrimaryKey = (DbStakeAddress, DbSlot);
 }
 
 /// Select primary keys for Catalyst ID For Stake Address registration.
@@ -38,18 +39,12 @@ const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_stake_address.c
 pub(crate) struct Params {
     /// A stake address.
     pub(crate) stake_address: DbStakeAddress,
-    /// Block Slot Number
-    pub(crate) slot_no: DbSlot,
-    /// Transaction Offset inside the block.
-    pub(crate) txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &format!("{}", self.stake_address))
-            .field("slot_no", &self.slot_no)
-            .field("txn_index", &self.txn_index)
+            .field("stake_address", &self.stake_address.to_string())
             .finish()
     }
 }
@@ -58,8 +53,6 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             stake_address: value.0,
-            slot_no: value.1,
-            txn_index: value.2,
         }
     }
 }

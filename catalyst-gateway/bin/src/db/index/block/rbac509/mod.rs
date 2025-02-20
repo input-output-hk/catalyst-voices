@@ -126,7 +126,6 @@ impl Rbac509InsertQuery {
                         insert_catalyst_id_for_stake_address::Params::new(
                             address,
                             slot,
-                            index,
                             catalyst_id.clone(),
                         ),
                     );
@@ -275,6 +274,8 @@ mod tests {
         assert_eq!(1, query.catalyst_id_for_stake_address.len());
     }
 
+    // This block contains a registration without a Catalyst ID, so it wouldn't be indexed at
+    // all.
     #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
     #[tokio::test]
     async fn index_invalid() {
@@ -288,7 +289,7 @@ mod tests {
             .parse()
             .unwrap();
         query.index(&session, txn_hash, 0.into(), &block).await;
-        assert_eq!(1, query.invalid.len());
+        assert!(query.invalid.is_empty());
         assert!(query.registrations.is_empty());
         assert!(query.catalyst_id_for_txn_id.is_empty());
         assert!(query.catalyst_id_for_stake_address.is_empty());

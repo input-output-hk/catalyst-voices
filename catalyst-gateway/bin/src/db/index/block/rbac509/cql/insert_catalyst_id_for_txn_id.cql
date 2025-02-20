@@ -6,3 +6,4 @@ INSERT INTO catalyst_id_for_txn_id (
     :txn_id,
     :catalyst_id
 );
+

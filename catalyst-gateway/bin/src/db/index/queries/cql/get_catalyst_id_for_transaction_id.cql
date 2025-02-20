@@ -1,4 +1,3 @@
-
 SELECT
     catalyst_id
 FROM

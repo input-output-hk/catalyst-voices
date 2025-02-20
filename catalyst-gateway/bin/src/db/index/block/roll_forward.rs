@@ -50,9 +50,8 @@ async fn purge_catalyst_id_for_stake_address(
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        let params: Params = primary_key.into();
-        if params.slot_no <= purge_to_slot.into() {
-            delete_params.push(params);
+        if primary_key.1 <= purge_to_slot.into() {
+            delete_params.push(primary_key.into());
         }
     }
     // Delete filtered keys
@@ -155,9 +154,8 @@ async fn purge_rbac509_registration(
     // Filter
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        let params: Params = primary_key.into();
-        if params.slot_no <= purge_to_slot.into() {
-            delete_params.push(params);
+        if primary_key.2 <= purge_to_slot.into() {
+            delete_params.push(primary_key.into());
         }
     }
     // Delete filtered keys
@@ -174,9 +172,8 @@ async fn purge_invalid_rbac509_registration(
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
     let mut delete_params: Vec<Params> = Vec::new();
     while let Some(Ok(primary_key)) = primary_keys_stream.next().await {
-        let params: Params = primary_key.into();
-        if params.slot_no <= purge_to_slot.into() {
-            delete_params.push(params);
+        if primary_key.2 <= purge_to_slot.into() {
+            delete_params.push(primary_key.into());
         }
     }
 

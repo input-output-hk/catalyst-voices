@@ -5,3 +5,4 @@ SELECT txn_id,
        purpose
 FROM rbac_registration
 WHERE catalyst_id = :catalyst_id
+

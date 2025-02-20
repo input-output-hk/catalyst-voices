@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
+use cardano_blockchain_types::{Slot, StakeAddress};
 use catalyst_types::id_uri::IdUri;
 use scylla::{SerializeRow, Session};
 use tracing::error;
@@ -10,7 +10,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbStakeAddress},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -23,35 +23,29 @@ const QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_address.cql")
 pub(crate) struct Params {
     /// A stake address.
     stake_address: DbStakeAddress,
-    /// A block slot number.
-    slot_no: DbSlot,
-    /// A transaction offset inside the block.
-    txn_index: DbTxnIndex,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
+    /// A block slot number.
+    slot_no: DbSlot,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("stake_address", &self.stake_address)
-            .field("slot_no", &self.slot_no)
-            .field("txn_index", &self.txn_index)
             .field("catalyst_id", &self.catalyst_id)
+            .field("slot_no", &self.slot_no)
             .finish()
     }
 }
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(crate) fn new(
-        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, catalyst_id: IdUri,
-    ) -> Self {
+    pub(crate) fn new(stake_address: StakeAddress, slot_no: Slot, catalyst_id: IdUri) -> Self {
         Params {
             stake_address: stake_address.into(),
-            slot_no: slot_no.into(),
-            txn_index: txn_index.into(),
             catalyst_id: catalyst_id.into(),
+            slot_no: slot_no.into(),
         }
     }
 
