@@ -8,6 +8,7 @@ environment:
   flutter: ">=3.29.0"
 
 dependencies:
+  build: ^2.4.1
   catalyst_cardano_serialization: ^1.0.0
   # using for document json assets
   catalyst_voices_assets:
@@ -25,6 +26,7 @@ dependencies:
     sdk: flutter
   http: ^1.2.2
   json_annotation: ^4.8.1
+  path: ^1.9.1
   result_type: ^0.2.0
   rxdart: ^0.27.7
   synchronized: ^3.3.0+3

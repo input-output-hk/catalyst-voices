@@ -4,18 +4,23 @@ targets:
       - lib/**
       - openapi/**
       - $package$
+      - tool/**
     builders:
+      openapi_pre_process_builder:
+        options:
+          sourcepath: "openapi/"
       chopper_generator:
         options:
           header: "// Generated code"
       swagger_dart_code_generator:
         options:
-          input_folder: "openapi/"
+          input_folder: "openapi/staging_folder/"
           output_folder: "lib/generated/api"
           separate_models: true
           include_if_null: false
           exclude_paths:
             - /api/draft/*
+            - /api/v1/health/*
           # turn it off when we can get rid of vit. atm its generating classes incorrectly with it.
           use_path_for_request_names: true
           overriden_models:
@@ -35,8 +40,7 @@ targets:
       drift_dev:analyzer:
         enabled: true
         # Drift build options, as per https://drift.simonbinder.eu/docs/advanced-features/builder_options/
-        options: &options
-          # Use ISO 8601 string instead of a unix timestamp
+        options: &options # Use ISO 8601 string instead of a unix timestamp
           store_date_time_values_as_text: true
           # Potentially turn this on if gradual updates will be needed.
           data_class_to_companions: false
@@ -67,3 +71,16 @@ targets:
         enabled: true
         # We use yaml anchors to give the two builders the same options
         options: *options
+
+builders:
+  openapi_pre_process_builder:
+    import: "package:catalyst_voices_repositories/tool/builders.dart"
+    builder_factories: ["openApiPreProcessBuilder"]
+    build_extensions: { ".json": [".processed.json"] }
+    auto_apply: root_package
+    build_to: source
+    defaults:
+      options:
+        sourcepath: "openapi/"
+    runs_before:
+      - "swagger_dart_code_generator"
