@@ -26,7 +26,6 @@ import '../pageobject/onboarding/step_9_writedown_seedphrase_info.dart';
 import '../pageobject/onboarding_page.dart';
 import '../types/password_validation_states.dart';
 import '../types/registration_state.dart';
-import '../utils/constants.dart';
 import '../utils/test_context.dart';
 
 void main() async {
@@ -54,7 +53,7 @@ void main() async {
       patrolWidgetTest('visitor - get started button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await $(AppBarPage.getStartedBtn).tap();
+        await AppBarPage($).getStartedBtnClick();
         expect($(OnboardingPageBase($).registrationInfoPanel), findsOneWidget);
         expect(
           $(
@@ -331,8 +330,7 @@ void main() async {
       patrolWidgetTest('visitor - restore - keychain choice screen looks OK',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await $(AppBarPage.getStartedBtn)
-            .tap(settleTimeout: Time.short.duration);
+        await AppBarPage($).getStartedBtnClick();
         await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
         await OnboardingPage.onboardingScreenLooksAsExpected(
           $,
@@ -344,8 +342,7 @@ void main() async {
           'visitor - restore - keychain choice screen back button works',
           (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await $(AppBarPage.getStartedBtn)
-            .tap(settleTimeout: Time.short.duration);
+        await AppBarPage($).getStartedBtnClick();
         await OnboardingPage.detailsPartGetStartedRecoverBtn($).tap();
         await ($(OnboardingPage.backButton)).waitUntilVisible().tap();
         await OnboardingPage.onboardingScreenLooksAsExpected(
