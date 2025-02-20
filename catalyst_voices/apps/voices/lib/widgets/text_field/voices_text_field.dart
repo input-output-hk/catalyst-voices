@@ -446,7 +446,9 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
   @override
   bool validate() {
+    // Not calling setState() from here, the super.validate() does it.
     _validate(_obtainController().text);
+
     return super.validate();
   }
 

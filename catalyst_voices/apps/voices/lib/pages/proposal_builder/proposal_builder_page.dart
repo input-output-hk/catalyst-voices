@@ -145,7 +145,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     VoicesSnackBar(
       behavior: SnackBarBehavior.floating,
       type: VoicesSnackBarType.error,
-      duration: const Duration(seconds: 30),
+      duration: const Duration(seconds: 15),
       title: error.message(context),
       message: formattedFields,
       actions: [
