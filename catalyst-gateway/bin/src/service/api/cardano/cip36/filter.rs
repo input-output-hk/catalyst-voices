@@ -351,10 +351,10 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         get_all_invalid_registrations(session.clone()),
     );
 
-    let (valids, invalids) = valid_invalid_queries.await;
+    let (valid_registrations, invalid_registrations) = valid_invalid_queries.await;
 
     // Get ALL registrations
-    let all_registrations = match valids {
+    let all_registrations = match valid_registrations {
         Ok(all_registrations) => all_registrations,
         Err(err) => {
             return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
@@ -362,7 +362,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
     };
 
     // Get all invalids
-    let all_invalid_registrations = match invalids {
+    let all_invalid_registrations = match invalid_registrations {
         Ok(invalids) => invalids,
         Err(err) => {
             return AllRegistration::handle_error(&anyhow::anyhow!("Failed to query ALL {err:?}",));
