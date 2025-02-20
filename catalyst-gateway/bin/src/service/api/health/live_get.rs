@@ -19,7 +19,7 @@ static LIVE_COUNTER: ConsistentCounter = ConsistentCounter::new(0);
 const LIVE_COUNTER_THRESHOLD: usize = 100;
 
 /// Get the `IS_LIVE` flag
-fn is_live() -> bool {
+pub(crate) fn is_live() -> bool {
     IS_LIVE.load(Ordering::Acquire) && CassandraSession::is_ready()
 }
 

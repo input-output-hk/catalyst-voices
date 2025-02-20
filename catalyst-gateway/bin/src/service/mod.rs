@@ -11,7 +11,7 @@ pub(crate) mod utilities;
 
 use api::mk_api;
 pub(crate) use api::{
-    live_counter_get, live_counter_inc, live_counter_reset, set_not_live, started,
+    live_counter_get, live_counter_inc, live_counter_reset, set_not_live, started, is_live
 };
 pub(crate) use poem_service::get_app_docs;
 use serde_json::{json, Value};
