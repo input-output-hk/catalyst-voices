@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_state.dart';
@@ -12,7 +13,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final _logger = Logger('ProposalBuilderBloc');
 
 final class ProposalBuilderBloc
-    extends Bloc<ProposalBuilderEvent, ProposalBuilderState> {
+    extends Bloc<ProposalBuilderEvent, ProposalBuilderState>
+    with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
 
@@ -298,7 +300,7 @@ final class ProposalBuilderBloc
     assert(documentBuilder != null, 'DocumentBuilder not initialized');
     final document = documentBuilder!.build();
 
-    _showErrorsIfInvalid(emit, document);
+    _validateDocument(emit, document);
 
     // TODO(dtscalac): handle event
   }
@@ -310,7 +312,20 @@ final class ProposalBuilderBloc
     // TODO(dtscalac): handle event
   }
 
-  void _showErrorsIfInvalid(
+  Future<void> _submitProposal(
+    SubmitProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final documentBuilder = _documentBuilder;
+    assert(documentBuilder != null, 'DocumentBuilder not initialized');
+    final document = documentBuilder!.build();
+
+    _validateDocument(emit, document);
+
+    // TODO(dtscalac): handle event
+  }
+
+  void _validateDocument(
     Emitter<ProposalBuilderState> emit,
     Document document,
   ) {
@@ -321,24 +336,20 @@ final class ProposalBuilderBloc
       showValidationErrors: showErrors,
     );
 
+    if (showErrors) {
+      emitError(
+        ProposalBuilderValidationException(
+          fields:
+              document.invalidProperties.map((e) => e.schema.title).toList(),
+        ),
+      );
+    }
+
     final newState = state.copyWith(
       segments: segments,
       showValidationErrors: showErrors,
     );
 
     emit(newState);
-  }
-
-  Future<void> _submitProposal(
-    SubmitProposalEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    final documentBuilder = _documentBuilder;
-    assert(documentBuilder != null, 'DocumentBuilder not initialized');
-    final document = documentBuilder!.build();
-
-    _showErrorsIfInvalid(emit, document);
-
-    // TODO(dtscalac): handle event
   }
 }
