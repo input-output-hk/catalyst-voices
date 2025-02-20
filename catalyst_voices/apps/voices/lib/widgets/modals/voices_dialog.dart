@@ -10,9 +10,9 @@ abstract final class VoicesDialog {
     RouteSettings? routeSettings,
     bool barrierDismissible = true,
   }) {
-    return showDialog<T>(
+    return showGeneralDialog<T>(
       context: context,
-      builder: builder,
+      pageBuilder: (context, animation, secondaryAnimation) => builder(context),
       routeSettings: routeSettings,
       barrierDismissible: barrierDismissible,
     );
