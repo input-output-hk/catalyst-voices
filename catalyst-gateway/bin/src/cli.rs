@@ -7,7 +7,7 @@ use tracing::{error, info};
 use crate::{
     cardano::start_followers,
     db::{self, index::session::CassandraSession},
-    service::{self, started},
+    service::{self, is_live, live_counter_reset, started},
     settings::{DocsSettings, ServiceSettings, Settings},
 };
 
@@ -58,6 +58,16 @@ impl Cli {
                         },
                     }
                 });
+                tasks.push(handle);
+
+                // Task to reset the counter used to check service liveness.
+                let handle = tokio::spawn(async move {
+                    // run while service is live.
+                    while is_live() {
+                        tokio::time::sleep(tokio::time::Duration::from_secs(30)).await;
+                        live_counter_reset();
+                    }
+                })
                 tasks.push(handle);
 
                 started();
