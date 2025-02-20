@@ -7,7 +7,11 @@ use poem::{http::StatusCode, middleware::PanicHandler, IntoResponse};
 use poem_openapi::payload::Json;
 use serde_json::json;
 
-use crate::service::common::responses::code_500_internal_server_error::InternalServerError;
+use crate::service::{
+    api::is_live_counter_under_threshold,
+    common::responses::code_500_internal_server_error::InternalServerError, live_counter_get,
+    live_counter_inc, set_not_live,
+};
 
 /// Customized Panic handler.
 /// Catches all panics, and turns them into 500.
@@ -49,6 +53,15 @@ impl PanicHandler for ServicePanicHandler {
     /// Handle a panic.
     /// Log the panic and respond with a 500 with appropriate data.
     fn get_response(&self, err: Box<dyn Any + Send + 'static>) -> Self::Response {
+        // Increment the counter used for liveness checks.
+        live_counter_inc();
+
+        // Check if the counter is still below the threshold, otherwise, set the
+        // live service flag to `false`.
+        if !is_live_counter_under_threshold() {
+            set_not_live();
+        }
+
         let server_err = InternalServerError::new(None);
 
         // Get the unique identifier for this panic, so we can find it in the logs.
