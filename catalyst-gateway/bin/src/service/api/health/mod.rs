@@ -9,7 +9,7 @@ mod ready_get;
 mod started_get;
 pub(crate) use live_get::{
     is_live_counter_under_threshold, live_counter_get, live_counter_inc, live_counter_reset,
-    set_not_live,
+    set_not_live, is_live
 };
 pub(crate) use started_get::started;
 
