@@ -16,7 +16,6 @@ class CampaignCategories extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      key: const Key('CampaignCategories'),
       padding: const EdgeInsets.symmetric(horizontal: 120),
       child: Column(
         mainAxisSize: MainAxisSize.min,

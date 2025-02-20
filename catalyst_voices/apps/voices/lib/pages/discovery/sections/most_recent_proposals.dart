@@ -60,6 +60,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
         children: [
           const SizedBox(height: 72),
           Text(
+            key: const Key('MostRecentProposalsTitle'),
             context.l10n.mostRecent,
             style: context.textTheme.headlineLarge?.copyWith(
               color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
@@ -99,6 +100,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
             child: VoicesSlider(
+              key: const Key('MostRecentProposalsSlider'),
               value: _scrollPercentage,
               onChanged: _onSliderChanged,
             ),
@@ -108,6 +110,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
             backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
             foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
             child: Text(
+              key: const Key('ViewAllProposalsButton'),
               context.l10n.viewAllProposals,
             ),
             onTap: () => const ProposalsRoute().go(context),

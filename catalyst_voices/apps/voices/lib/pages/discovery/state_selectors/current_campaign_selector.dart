@@ -15,6 +15,7 @@ class CurrentCampaignSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
+      key: Key('CurrentCampaignRoot'),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -99,6 +100,7 @@ class CurrentCampaignData extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState,
         CurrentCampaignInfoViewModel>(
+      key: const Key('CurrentCampaignData'),
       selector: (state) {
         return state.currentCampaign.currentCampaign;
       },
@@ -129,6 +131,7 @@ class CurrentCampaignError extends StatelessWidget {
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
+          key: const Key('CurrentCampaignError'),
           offstage: !state.show,
           child: Padding(
             padding: const EdgeInsets.all(32),

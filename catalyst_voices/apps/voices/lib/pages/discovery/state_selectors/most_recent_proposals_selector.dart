@@ -72,6 +72,7 @@ class _MostRecentProposalsError extends StatelessWidget {
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
+          key: const Key('MostRecentError'),
           offstage: state.show,
           child: Padding(
             padding: const EdgeInsets.all(16),

@@ -84,7 +84,7 @@ class FundsDetailCard extends StatelessWidget {
                   funds: totalAsk,
                   largeFundsText: false,
                 ),
-                _RangeAsk(key: const Key('FundsDetailAsk'), range: askRange),
+                _RangeAsk(range: askRange),
               ],
             ),
           ),

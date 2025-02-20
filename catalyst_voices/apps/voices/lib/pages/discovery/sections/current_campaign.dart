@@ -22,7 +22,6 @@ class CurrentCampaign extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      key: const Key('CurrentCampaign'),
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
@@ -97,7 +96,6 @@ class _CampaignTimelineState extends State<_CampaignTimeline> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      key: const Key('CampaignTimeline'),
       cursor: SystemMouseCursors.click,
       child: SizedBox(
         height: 300,
@@ -148,6 +146,7 @@ class _CampaignTimelineCardState extends State<_CampaignTimelineCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      key: const Key('TimelineCard'),
       onTap: _toggleExpanded,
       child: SizedBox(
         width: 280,

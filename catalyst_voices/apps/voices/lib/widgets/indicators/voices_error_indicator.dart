@@ -22,13 +22,13 @@ class VoicesErrorIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIndicator(
-      key: const Key('ErrorIndicator'),
       type: VoicesIndicatorType.error,
       icon: VoicesAssets.icons.exclamation,
       message: Text(message),
       action: Offstage(
         offstage: onRetry == null,
         child: VoicesTextButton(
+          key: const Key('ErrorRetryBtn'),
           leading: VoicesAssets.icons.refresh.buildIcon(),
           onTap: onRetry,
           child: Text(context.l10n.retry),

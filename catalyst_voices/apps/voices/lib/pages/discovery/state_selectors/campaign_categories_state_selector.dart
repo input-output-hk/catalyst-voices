@@ -23,6 +23,7 @@ class CampaignCategoriesStateSelector extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 120),
           child: Text(
+            key: const Key('CampaignCategoriesTitle'),
             context.l10n.campaignCategories,
             style: context.textTheme.titleLarge,
           ),
@@ -97,6 +98,7 @@ class _CampaignCategoriesError extends StatelessWidget {
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
+          key: const Key('CampaignCategoriesError'),
           offstage: !state.show,
           child: Padding(
             padding: const EdgeInsets.all(16),
