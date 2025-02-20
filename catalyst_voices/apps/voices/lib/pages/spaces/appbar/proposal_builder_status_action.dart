@@ -43,37 +43,57 @@ class ProposalBuilderStatusAction extends StatelessWidget {
       case _MenuItemEnum.back:
         const WorkspaceRoute().go(context);
       case _MenuItemEnum.publish:
-        context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
-
-        // TODO(dtscalac): fill in with correct data
-        unawaited(
-          PublishProposalIterationDialog.show(
-            context: context,
-            proposalTitle:
-                'Could have a different title, but has the same Proposal '
-                'IDand a longer title to make it.',
-            currentVersion: null,
-            nextVersion: '1',
-          ),
-        );
+        unawaited(_publishIteration(context));
       case _MenuItemEnum.submit:
-        context.read<ProposalBuilderBloc>().add(const SubmitProposalEvent());
-
-        // TODO(dtscalac): fill in with correct data
-        unawaited(
-          SubmitProposalForReviewDialog.show(
-            context: context,
-            proposalTitle:
-                'Could have a different title, but has the same Proposal '
-                'IDand a longer title to make it.',
-            currentVersion: '3',
-            nextVersion: '4',
-          ),
-        );
+        unawaited(_submitForReview(context));
       case _MenuItemEnum.share:
         context.read<ProposalBuilderBloc>().add(const ShareProposalEvent());
       case _MenuItemEnum.export:
         context.read<ProposalBuilderBloc>().add(const ExportProposalEvent());
+    }
+  }
+
+  Future<void> _publishIteration(BuildContext context) async {
+    final bloc = context.read<ProposalBuilderBloc>();
+    if (!bloc.validate()) {
+      return;
+    }
+
+    // TODO(dtscalac): fill in with correct data
+    final shouldPublish = await PublishProposalIterationDialog.show(
+          context: context,
+          proposalTitle:
+              'Could have a different title, but has the same Proposal '
+              'IDand a longer title to make it.',
+          currentVersion: null,
+          nextVersion: '1',
+        ) ??
+        false;
+
+    if (shouldPublish) {
+      bloc.add(const PublishProposalEvent());
+    }
+  }
+
+  Future<void> _submitForReview(BuildContext context) async {
+    final bloc = context.read<ProposalBuilderBloc>();
+    if (!bloc.validate()) {
+      return;
+    }
+
+    // TODO(dtscalac): fill in with correct data
+    final shouldSubmit = await SubmitProposalForReviewDialog.show(
+          context: context,
+          proposalTitle:
+              'Could have a different title, but has the same Proposal '
+              'IDand a longer title to make it.',
+          currentVersion: '3',
+          nextVersion: '4',
+        ) ??
+        false;
+
+    if (shouldSubmit) {
+      bloc.add(const SubmitProposalEvent());
     }
   }
 }
