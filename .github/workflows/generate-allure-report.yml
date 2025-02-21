@@ -174,11 +174,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/api-tests${{ env.COVERAGE_EXT }}"
+          path-to-lcov: "${{ env.REPO_BASE_PATH }}${{ env.COVERAGE_REPORT_PATH }}/api-tests${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: api-test
-          base-path: "${{ env.REPO_BASE_PATH }}"
+          base-path: "catalyst-voices/"
           parallel: true
 
       - name: Coveralls
