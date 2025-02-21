@@ -15,9 +15,6 @@ targets:
       catalyst_voices_repositories|openapi_pre_process_builder:
         options:
           sourcepath: "openapi"
-      chopper_generator:
-        options:
-          header: "// Generated code"
       swagger_dart_code_generator:
         options:
           input_folder: "openapi/processed"
@@ -40,6 +37,10 @@ targets:
       json_serializable:
         options:
           explicit_to_json: true
+      chopper_generator:
+        options:
+          header: "// Generated code"
+
       drift_dev:
         # disable drift's default builder, we're using the modular setup instead.
         enabled: false
@@ -85,6 +86,7 @@ builders:
     build_extensions: { ".json": [".processed.json"] }
     auto_apply: root_package
     build_to: source
+    applies_builders: ["swagger_dart_code_generator"]
     defaults:
       options:
         sourcepath: "openapi"
