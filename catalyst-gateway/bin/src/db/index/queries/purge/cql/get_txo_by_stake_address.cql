@@ -2,6 +2,6 @@
 SELECT
     stake_address,
     slot_no,
-    txn,
+    txn_index,
     txo
 FROM txo_by_stake
