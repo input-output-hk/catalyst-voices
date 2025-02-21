@@ -14,10 +14,11 @@ use serde_json::Value;
 
 /// A schema.
 static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
+    let example = Some(CatalystId::example().0.to_string().into());
     MetaSchema {
         title: Some("Catalyst short ID".into()),
         description: Some("Catalyst short identifier in string format"),
-        example: Some("cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE".into()),
+        example,
         ..MetaSchema::ANY
     }
 });
