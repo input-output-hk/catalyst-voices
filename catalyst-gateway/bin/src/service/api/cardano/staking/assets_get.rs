@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use anyhow::{anyhow, Context};
+use anyhow::anyhow;
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -136,7 +136,7 @@ async fn calculate_stake_info(
     session: &CassandraSession, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let address: StakeAddress = stake_address.try_into()?;
-    let mut txos_by_txn = get_txo_by_txn(&session, &address, slot_num).await?;
+    let mut txos_by_txn = get_txo_by_txn(session, &address, slot_num).await?;
     if txos_by_txn.is_empty() {
         return Ok(None);
     }
@@ -145,7 +145,7 @@ async fn calculate_stake_info(
     // TODO: This could be executed in the background, it does not actually matter if it
     // succeeds. This is just an optimization step to reduce the need to query spent
     // TXO's.
-    update_spent(&session, &address, &txos_by_txn).await?;
+    update_spent(session, &address, &txos_by_txn).await?;
 
     let stake_info = build_stake_info(txos_by_txn)?;
 
@@ -154,10 +154,9 @@ async fn calculate_stake_info(
 
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNo>,
-) -> anyhow::Result<HashMap<Vec<u8>, HashMap<i16, TxoInfo>>> {
-    let slot_num = slot_num.map_or_else(|| u64::MAX, u64::from);
-    let adjusted_slot_num = num_bigint::BigInt::from(slot_num);
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Option<SlotNo>,
+) -> anyhow::Result<TxosByTxn> {
+    let adjusted_slot_num: u64 = slot_num.map_or(u64::MAX, Into::into);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
@@ -311,7 +310,7 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
                     });
                 }
 
-                let slot_no = u64::try_from(txo_info.slot_no)?.into();
+                let slot_no = u64::from(txo_info.slot_no).into();
                 if stake_info.slot_number < slot_no {
                     stake_info.slot_number = slot_no;
                 }

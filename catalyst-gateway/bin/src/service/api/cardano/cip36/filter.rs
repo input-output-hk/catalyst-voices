@@ -257,7 +257,7 @@ async fn get_invalid_registrations(
         let row = row?;
 
         invalid_registrations.push(Cip36Details {
-            slot_no: slot_no.clone(),
+            slot_no,
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
