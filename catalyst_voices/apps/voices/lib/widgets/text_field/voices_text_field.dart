@@ -446,7 +446,9 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
   @override
   bool validate() {
+    // Not calling setState() from here, the super.validate() does it.
     _validate(_obtainController().text);
+
     return super.validate();
   }
 
@@ -560,7 +562,6 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
 
         return textStyle;
       }),
-
       suffixIcon: _wrapSuffixIfExists(
         widget.decoration?.suffixIcon,
         const EdgeInsetsDirectional.only(start: 4, end: 8),

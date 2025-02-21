@@ -1,12 +1,14 @@
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:flutter/material.dart';
 
 class VoicesSnackBarPrimaryAction extends StatelessWidget {
+  final VoicesSnackBarType type;
   final VoidCallback onPressed;
   final Widget child;
 
   const VoicesSnackBarPrimaryAction({
     super.key,
+    required this.type,
     required this.onPressed,
     required this.child,
   });
@@ -17,7 +19,7 @@ class VoicesSnackBarPrimaryAction extends StatelessWidget {
       onPressed: onPressed,
       child: DefaultTextStyle(
         style: TextStyle(
-          color: Theme.of(context).colors.textPrimary,
+          color: type.actionColor(context),
         ),
         child: child,
       ),
@@ -26,11 +28,13 @@ class VoicesSnackBarPrimaryAction extends StatelessWidget {
 }
 
 class VoicesSnackBarSecondaryAction extends StatelessWidget {
+  final VoicesSnackBarType type;
   final VoidCallback onPressed;
   final Widget child;
 
   const VoicesSnackBarSecondaryAction({
     super.key,
+    required this.type,
     required this.onPressed,
     required this.child,
   });
@@ -41,7 +45,7 @@ class VoicesSnackBarSecondaryAction extends StatelessWidget {
       onPressed: onPressed,
       child: DefaultTextStyle(
         style: TextStyle(
-          color: Theme.of(context).colors.textPrimary,
+          color: type.actionColor(context),
           decoration: TextDecoration.underline,
         ),
         child: child,
