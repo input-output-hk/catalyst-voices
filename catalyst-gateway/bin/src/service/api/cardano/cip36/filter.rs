@@ -402,7 +402,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
             // include any erroneous registrations which occur AFTER the slot# of the last valid
             // registration or return all if NO slot# declared.
             // Any registrations that occurred before this Slot are not included in the list.
-            let invalids_report_after_filtering = invalid_filter(invalid_registrations, slot_no);
+            let invalids_report_after_filtering = invalid_filter(invalid_registrations, *slot_no);
             all_invalids_after_filtering.push(invalids_report_after_filtering);
         } else {
             all_invalids_after_filtering.push(invalid_registrations);
@@ -538,7 +538,7 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36De
 fn latest_vote_key(
     mut registrations: Vec<Cip36Details>,
 ) -> anyhow::Result<Ed25519HexEncodedPublicKey> {
-    registrations.sort_by_key(|registration| Reverse(registration.slot_no.clone()));
+    registrations.sort_by_key(|registration| Reverse(registration.slot_no));
     for registration in registrations {
         if let Some(vote_key) = registration.vote_pub_key {
             return Ok(vote_key);
@@ -551,9 +551,9 @@ fn latest_vote_key(
 }
 
 /// Filter out any invalid registrations that occurred before this Slot no
-fn invalid_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36Details> {
+fn invalid_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36Details> {
     registrations
         .into_par_iter()
-        .filter(|registration| registration.slot_no > *slot_no)
+        .filter(|registration| registration.slot_no > slot_no)
         .collect()
 }
