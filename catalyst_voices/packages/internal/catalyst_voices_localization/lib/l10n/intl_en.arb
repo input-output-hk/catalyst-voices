@@ -1559,7 +1559,7 @@
   },
   "searchResult": "Search Result",
   "@searchResult": {
-    "description": "To show that displayed proposals are search result"
+    "description": "To show that displayed items comes from search result"
   },
   "emptySearchResultTitle": "No search results found",
   "@emptySearchResultTitle": {

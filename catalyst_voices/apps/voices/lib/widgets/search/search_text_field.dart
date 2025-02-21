@@ -85,9 +85,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
   void didUpdateWidget(SearchTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.debouncer == null && widget.debouncer != null) {
-      _controller
-        ..removeListener(_listenToTextField)
-        ..addListener(_listenToTextField);
+      _debouncer?.dispose();
     }
   }
 
