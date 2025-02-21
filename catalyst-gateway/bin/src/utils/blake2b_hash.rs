@@ -94,32 +94,6 @@ pub(crate) fn blake2b_256(input_bytes: &[u8]) -> Blake2b256 {
     bytes
 }
 
-/// 128 Byte Blake2b Hash
-pub(crate) type Blake2b128 = [u8; 16];
-
-/// Computes a BLAKE2b-128 hash of the input bytes.
-///
-/// # Arguments
-/// - `input_bytes`: A slice of bytes to be hashed.
-///
-/// # Returns
-/// An array containing the BLAKE2b-128 hash of the input bytes.
-pub(crate) fn blake2b_128(input_bytes: &[u8]) -> Blake2b128 {
-    // Where we will actually store the result.
-    let mut bytes: Blake2b128 = Blake2b128::default();
-
-    // Generate a unique hash of the data.
-    let mut hasher = Params::new().hash_length(bytes.len()).to_state();
-
-    hasher.update(input_bytes);
-    let hash = hasher.finalize();
-
-    // Create a new array containing the first 16 elements from the original array
-    bytes.copy_from_slice(hash.as_bytes());
-
-    bytes
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
