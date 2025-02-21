@@ -169,6 +169,8 @@ scripts:
 
   build_runner_repository:
     run: |
+      melos exec -c 1 --depends-on="build_runner" --scope="catalyst_voices_repositories" -- dart run build_runner clean && \
+      melos exec -c 1 --scope="catalyst_voices_repositories" -- dart run setup_build.dart && \
       melos exec -c 1 \
       --depends-on="build_runner" \
       --scope="catalyst_voices_repositories" -- \

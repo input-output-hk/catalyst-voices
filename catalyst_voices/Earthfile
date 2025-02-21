@@ -21,19 +21,19 @@ builder:
 
 # Creates filtered OpenAPI spec
 # Takes json file from openapi-filter from /packages/internal/catalyst_voices_repositories
-filter-openapi:
-    FROM node:18
-    WORKDIR /packages/internal/catalyst_voices_repositories
+# filter-openapi:
+#     FROM node:18
+#     WORKDIR /packages/internal/catalyst_voices_repositories
 
-    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
-    COPY packages/internal/catalyst_voices_repositories/openapi-filters.json openapi-filters.json
+#     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+#     COPY packages/internal/catalyst_voices_repositories/openapi-filters.json openapi-filters.json
 
-    RUN npm install -g openapi-format
-    RUN openapi-format openapi/cat-gateway-api.json -o openapi/filtered-openapi.json --filterFile openapi-filters.json --verbose
+#     RUN npm install -g openapi-format
+#     RUN openapi-format openapi/cat-gateway-api.json -o openapi/filtered-openapi.json --filterFile openapi-filters.json --verbose
 
-    RUN rm openapi/cat-gateway-api.json
+#     RUN rm openapi/cat-gateway-api.json
 
-    SAVE ARTIFACT openapi/filtered-openapi.json
+#     SAVE ARTIFACT openapi/filtered-openapi.json
 
 # Generates flutter code.
 # Generates codes for Catalyst Gateway OpenAPI, Voices Localization and
@@ -49,7 +49,7 @@ code-generator:
 
     LET gen_code_path = lib/generated/api
     LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
-    LET openapi_spec_path = openapi/cat-gateway.json
+    # LET openapi_spec_path = openapi/cat-gateway.json
 
     RUN melos l10n
     RUN melos build_runner
