@@ -9,6 +9,7 @@ class KeychainDeletedDialog extends StatelessWidget {
   static Future<void> show(BuildContext context) {
     return VoicesDialog.show<void>(
       context: context,
+      routeSettings: const RouteSettings(name: '/deleted-keychain'),
       builder: (context) => const KeychainDeletedDialog._(),
     );
   }

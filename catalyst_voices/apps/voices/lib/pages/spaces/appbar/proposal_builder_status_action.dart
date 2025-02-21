@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/proposal_builder/proposal_publish_iteration_dialog.dart';
+import 'package:catalyst_voices/pages/proposal_builder/dialog/publish_proposal_iteration_dialog.dart';
+import 'package:catalyst_voices/pages/proposal_builder/dialog/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -46,15 +47,29 @@ class ProposalBuilderStatusAction extends StatelessWidget {
 
         // TODO(dtscalac): fill in with correct data
         unawaited(
-          ProposalPublishIterationDialog.show(
+          PublishProposalIterationDialog.show(
             context: context,
-            proposalTitle: 'Proposal title',
+            proposalTitle:
+                'Could have a different title, but has the same Proposal '
+                'IDand a longer title to make it.',
             currentVersion: null,
             nextVersion: '1',
           ),
         );
       case _MenuItemEnum.submit:
         context.read<ProposalBuilderBloc>().add(const SubmitProposalEvent());
+
+        // TODO(dtscalac): fill in with correct data
+        unawaited(
+          SubmitProposalForReviewDialog.show(
+            context: context,
+            proposalTitle:
+                'Could have a different title, but has the same Proposal '
+                'IDand a longer title to make it.',
+            currentVersion: '3',
+            nextVersion: '4',
+          ),
+        );
       case _MenuItemEnum.share:
         context.read<ProposalBuilderBloc>().add(const ShareProposalEvent());
       case _MenuItemEnum.export:
