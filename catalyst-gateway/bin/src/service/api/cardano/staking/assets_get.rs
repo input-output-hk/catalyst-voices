@@ -2,7 +2,6 @@
 
 use std::collections::HashMap;
 
-use anyhow::anyhow;
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
@@ -296,7 +295,7 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
                     .ada_amount
                     .checked_add(value)
                     .ok_or_else(|| {
-                        anyhow!(
+                        anyhow::anyhow!(
                             "Total stake amount overflow: {} + {value}",
                             stake_info.ada_amount
                         )

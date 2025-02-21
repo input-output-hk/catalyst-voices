@@ -97,4 +97,4 @@ def not_a_server_error_custom(ctx, response, case):
     if response.status_code == 500:
         return None
 
-    return schemathesis.specs.openapi.checks.not_a_server_error(ctx, response, case)
+    return schemathesis.checks.not_a_server_error(ctx, response, case)
