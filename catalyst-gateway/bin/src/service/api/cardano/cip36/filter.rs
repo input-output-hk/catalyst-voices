@@ -525,7 +525,7 @@ async fn get_all_invalid_registrations(
 /// Filter out any registrations that occurred after this Slot no
 fn slot_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36Details> {
     registrations
-        .into_iter()
+        .into_par_iter()
         .filter(|registration| registration.slot_no < slot_no)
         .collect()
 }
