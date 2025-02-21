@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show ApiConfig;
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
-import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
+import 'package:catalyst_voices_repositories/generated/api/vit.swagger.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/review_module.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
