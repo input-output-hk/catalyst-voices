@@ -77,4 +77,4 @@ test-scylla:
 
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         ./scylla_entry.sh && \
-        cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge rbac509 --no-fail-fast
+        cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast

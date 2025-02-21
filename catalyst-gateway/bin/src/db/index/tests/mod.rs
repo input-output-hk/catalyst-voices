@@ -9,6 +9,7 @@ use tokio::sync::OnceCell;
 
 use super::session::CassandraSession;
 
+mod rbac_index;
 mod scylla_purge;
 mod scylla_queries;
 mod scylla_session;
@@ -17,7 +18,7 @@ static SHARED_SESSION: OnceCell<Result<(), String>> = OnceCell::const_new();
 
 /// Use this message to prevent a long message from getting a session.
 /// There is already a function that handling the error with its full form.
-pub(crate) const SESSION_ERR_MSG: &str = "Failed to initialize or get a database session.";
+const SESSION_ERR_MSG: &str = "Failed to initialize or get a database session.";
 
 async fn setup_test_database() -> Result<(), String> {
     CassandraSession::init();
@@ -44,8 +45,7 @@ fn get_session() -> Result<(Arc<CassandraSession>, Arc<CassandraSession>), Strin
     Ok((persistent, volatile))
 }
 
-pub async fn get_shared_session() -> Result<(Arc<CassandraSession>, Arc<CassandraSession>), String>
-{
+async fn get_shared_session() -> Result<(Arc<CassandraSession>, Arc<CassandraSession>), String> {
     SHARED_SESSION.get_or_init(setup_test_database).await;
 
     if let Some(Err(err)) = SHARED_SESSION.get() {

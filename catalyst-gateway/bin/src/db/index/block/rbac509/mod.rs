@@ -28,13 +28,13 @@ use crate::{
 #[derive(Debug)]
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
-    registrations: Vec<insert_rbac509::Params>,
+    pub(crate) registrations: Vec<insert_rbac509::Params>,
     /// An invalid RBAC registration data.
-    invalid: Vec<insert_rbac509_invalid::Params>,
+    pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
     /// A Catalyst ID for transaction ID Data captured during indexing.
-    catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
+    pub(crate) catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
     /// A Catalyst ID for stake address data captured during indexing.
-    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    pub(crate) catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -248,50 +248,4 @@ fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<StakeAddress> {
             }
         })
         .collect()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::db::index::tests::{get_shared_session, test_utils, SESSION_ERR_MSG};
-
-    #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
-    #[tokio::test]
-    async fn index() {
-        let Ok((session, _)) = get_shared_session().await else {
-            panic!("{SESSION_ERR_MSG}");
-        };
-
-        let block = test_utils::block_3();
-        let mut query = Rbac509InsertQuery::new();
-        let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
-            .parse()
-            .unwrap();
-        query.index(&session, txn_hash, 0.into(), &block).await;
-        assert!(query.invalid.is_empty());
-        assert_eq!(1, query.registrations.len());
-        assert_eq!(1, query.catalyst_id_for_txn_id.len());
-        assert_eq!(1, query.catalyst_id_for_stake_address.len());
-    }
-
-    // This block contains a registration without a Catalyst ID, so it wouldn't be indexed at
-    // all.
-    #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
-    #[tokio::test]
-    async fn index_invalid() {
-        let Ok((session, _)) = get_shared_session().await else {
-            panic!("{SESSION_ERR_MSG}");
-        };
-
-        let block = test_utils::block_4();
-        let mut query = Rbac509InsertQuery::new();
-        let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
-            .parse()
-            .unwrap();
-        query.index(&session, txn_hash, 0.into(), &block).await;
-        assert!(query.invalid.is_empty());
-        assert!(query.registrations.is_empty());
-        assert!(query.catalyst_id_for_txn_id.is_empty());
-        assert!(query.catalyst_id_for_stake_address.is_empty());
-    }
 }
