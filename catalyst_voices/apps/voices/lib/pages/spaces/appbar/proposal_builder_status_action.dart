@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/proposal_builder/dialog/publish_proposal_iteration_dialog.dart';
-import 'package:catalyst_voices/pages/proposal_builder/dialog/submit_proposal_for_review_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
