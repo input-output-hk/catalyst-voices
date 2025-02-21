@@ -4,12 +4,10 @@ mod data;
 
 use std::{collections::HashMap, env, sync::LazyLock};
 
-use catalyst_signed_doc::{Builder, CatalystSignedDocument, Metadata};
-use catalyst_types::id_uri::IdUri;
+use catalyst_signed_doc::{Builder, CatalystSignedDocument, IdUri, Metadata};
 use data::TEMPLATE_DATA;
 use ed25519_dalek::SigningKey;
 use hex::FromHex;
-use minicbor::{Encode, Encoder};
 use tracing::error;
 use uuid::Uuid;
 
@@ -112,20 +110,11 @@ impl SignedDocTemplate {
 }
 
 /// Get a static document template from ID and version.
-pub(crate) fn get_doc_static_template(document_id: uuid::Uuid) -> Option<Vec<u8>> {
-    let data = TEMPLATES
+pub(crate) fn get_doc_static_template(document_id: &uuid::Uuid) -> Option<CatalystSignedDocument> {
+    TEMPLATES
         .as_ref()
-        .and_then(|templates| templates.get(&document_id));
-
-    if let Some(template) = data {
-        let mut buffer = Vec::new();
-        let mut encoder = Encoder::new(&mut buffer);
-        // Cannot encode the template, return None
-        // Should not happen
-        template.encode(&mut encoder, &mut ()).ok()?;
-        return Some(buffer);
-    }
-    None
+        .and_then(|templates| templates.get(document_id))
+        .cloned()
 }
 
 #[cfg(test)]

@@ -1,10 +1,11 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
-use catalyst_signed_doc::CatalystSignedDocument;
+use catalyst_signed_doc::{error::CatalystSignedDocError, CatalystSignedDocument};
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
+use super::get_document::{DocProvider, DocProviderError};
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
     service::common::responses::WithErrorResponses,
@@ -45,10 +46,17 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
-#[allow(clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
     match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
         Ok(doc) => {
+            if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+                // means that something happend inside the `DocProvider`, some db error.
+                if let Some(e) = e.error().downcast_ref::<DocProviderError>() {
+                    return AllResponses::handle_error(&e.0);
+                }
+                return return_error_report(&e);
+            }
+
             let authors = doc
                 .authors()
                 .into_iter()
@@ -101,20 +109,23 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(e) => {
-            let json_report = match serde_json::to_value(e.report()) {
-                Ok(json_report) => json_report,
-                Err(e) => {
-                    return AllResponses::internal_error(&anyhow!(
-                        "Invalid Signed Document decoding Problem Report, not Json encoded: {e}"
-                    ))
-                },
-            };
-            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Invalid CBOR encoded document",
-                Some(json_report),
-            )))
-            .into()
-        },
+        Err(e) => return_error_report(&e),
     }
+}
+
+/// Return a response with the full error report from `CatalystSignedDocError`
+fn return_error_report(e: &CatalystSignedDocError) -> AllResponses {
+    let json_report = match serde_json::to_value(e.report()) {
+        Ok(json_report) => json_report,
+        Err(e) => {
+            return AllResponses::internal_error(&anyhow!(
+                "Invalid Signed Document Problem Report, not Json encoded: {e}"
+            ))
+        },
+    };
+    Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+        "Invalid Catalyst Signed Document",
+        Some(json_report),
+    )))
+    .into()
 }
