@@ -36,7 +36,9 @@ class SearchTextField extends StatefulWidget {
 
 class _SearchTextFieldState extends State<SearchTextField> {
   late final TextEditingController _controller;
-  Debouncer get _debouncer => widget.debouncer ?? Debouncer();
+  Debouncer? _debouncer;
+  Debouncer get _effectiveDebouncer =>
+      widget.debouncer ?? (_debouncer ??= Debouncer());
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +84,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
   @override
   void didUpdateWidget(SearchTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.debouncer != widget.debouncer) {
+    if (oldWidget.debouncer == null && widget.debouncer != null) {
       _controller
         ..removeListener(_listenToTextField)
         ..addListener(_listenToTextField);
@@ -92,7 +94,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
   @override
   void dispose() {
     _controller.dispose();
-    _debouncer.dispose();
+    _debouncer?.dispose();
     super.dispose();
   }
 
@@ -121,7 +123,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
   }
 
   void _listenToTextField() {
-    _debouncer.run(
+    _effectiveDebouncer.run(
       () => _handleSearchQuery(
         searchValue: _controller.text,
         isSubmitted: false,

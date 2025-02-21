@@ -19,7 +19,6 @@ abstract final class Routes {
   ];
 
   static String get initialLocation {
-    // return const coming_soon.ComingSoonRoute().location;
-    return const spaces.ProposalsRoute().location;
+    return const coming_soon.ComingSoonRoute().location;
   }
 }
