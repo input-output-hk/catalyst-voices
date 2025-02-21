@@ -164,7 +164,7 @@ fn check_stake_addr_voting_key_association(
     registrations: Vec<Cip36Details>, associated_voting_key: &Ed25519HexEncodedPublicKey,
 ) -> Vec<Cip36Details> {
     registrations
-        .into_iter()
+        .into_par_iter()
         .filter(|registration| cross_reference_key(associated_voting_key, registration))
         .collect()
 }
@@ -231,8 +231,8 @@ fn get_registration_given_slot_no(
     registrations: Vec<Cip36Details>, slot_no: SlotNo,
 ) -> anyhow::Result<Cip36Details> {
     registrations
-        .into_iter()
-        .find(|registration| registration.slot_no == slot_no)
+        .into_par_iter()
+        .find_first(|registration| registration.slot_no == slot_no)
         .ok_or(anyhow::anyhow!("Unable to get registration given slot no"))
 }
 
@@ -413,7 +413,10 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         Cip36RegistrationList {
             slot: slot_no.unwrap_or(SlotNo::from(0)),
             voting_key: all_registrations_after_filtering,
-            invalid: all_invalids_after_filtering.into_iter().flatten().collect(),
+            invalid: all_invalids_after_filtering
+                .into_par_iter()
+                .flatten()
+                .collect(),
             page: None,
         },
     )))
