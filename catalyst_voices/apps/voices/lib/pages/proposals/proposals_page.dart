@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
 import 'package:catalyst_voices/pages/proposals/proposals_pagination.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
-import 'package:catalyst_voices/widgets/modals/voices_share_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -272,19 +270,13 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        VoicesShareDialog(
-          shareItemType: context.l10n.proposal,
-          shareUrl:
-              const ProposalBuilderDraftRoute(templateId: 'template').location,
-          title: 'Check this out!🌍 #MustSee #SharingIsCaring',
-        ),
-        const NavigationBack(),
-        const SizedBox(height: 40),
-        const _FundInfo(),
+        NavigationBack(),
+        SizedBox(height: 40),
+        _FundInfo(),
       ],
     );
   }

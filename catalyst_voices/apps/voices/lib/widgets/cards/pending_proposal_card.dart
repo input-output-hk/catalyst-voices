@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/modals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -168,6 +170,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _Topbar(
+                        proposalId: widget.proposal.id,
                         showStatus: widget.showStatus,
                         isFavorite: widget.isFavorite,
                         onFavoriteChanged: widget.onFavoriteChanged,
@@ -397,11 +400,13 @@ class _Title extends StatelessWidget {
 }
 
 class _Topbar extends StatelessWidget {
+  final String proposalId;
   final bool showStatus;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const _Topbar({
+    required this.proposalId,
     required this.showStatus,
     required this.isFavorite,
     required this.onFavoriteChanged,
@@ -414,7 +419,15 @@ class _Topbar extends StatelessWidget {
       children: [
         const Spacer(),
         VoicesIconButton.filled(
-          onTap: () {},
+          onTap: () async {
+            // TODO(LynxLynxx): Change to proposal view route when implemented
+            final url =
+                ProposalBuilderDraftRoute(templateId: proposalId).location;
+            await ShareProposalDialog.show(
+              context,
+              url,
+            );
+          },
           style: _buttonStyle(context),
           child: VoicesAssets.icons.share.buildIcon(
             color: context.colorScheme.primary,

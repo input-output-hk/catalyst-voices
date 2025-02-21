@@ -17,6 +17,7 @@ enum ShareType {
   reddit('Reddit');
 
   final String name;
+
   const ShareType(this.name);
 
   SvgGenImage get icon => switch (this) {
@@ -36,13 +37,21 @@ enum ShareType {
         ShareType.reddit => l10n.shareLinkOnSocialMedia(itemType, name),
       };
 
-  String shareUrl(String title, String url) => switch (this) {
+  String shareMessage(VoicesLocalizations l10n) => switch (this) {
+        ShareType.clipboard => l10n.shareOnSocialMedia(name),
+        ShareType.xTwitter => l10n.shareOnSocialMedia(name),
+        ShareType.linkedin => l10n.shareOnSocialMedia(name),
+        ShareType.facebook => l10n.shareOnSocialMedia(name),
+        ShareType.reddit => l10n.shareOnSocialMedia(name),
+      };
+
+  String shareUrl(String shareMessage, String url) => switch (this) {
         ShareType.xTwitter => Uri.https(
             'twitter.com',
             'intent/tweet',
             {
               'url': url,
-              'text': title,
+              'text': shareMessage,
             },
           ).toString(),
         ShareType.linkedin => Uri.https(
@@ -64,32 +73,29 @@ enum ShareType {
             'submit',
             {
               'url': url,
-              'title': title,
+              'shareMessage': shareMessage,
             },
           ).toString(),
         _ => '',
-      };
-
-  String title(VoicesLocalizations l10n) => switch (this) {
-        ShareType.clipboard => l10n.shareOnSocialMedia(name),
-        ShareType.xTwitter => l10n.shareOnSocialMedia(name),
-        ShareType.linkedin => l10n.shareOnSocialMedia(name),
-        ShareType.facebook => l10n.shareOnSocialMedia(name),
-        ShareType.reddit => l10n.shareOnSocialMedia(name),
       };
 }
 
 class VoicesShareDialog extends StatelessWidget {
   final EdgeInsets bodyPadding;
+
+  /// Information what is being shared for example
+  /// proposal, campaign
+  /// Its used in header of the dialog
   final String shareItemType;
   final String shareUrl;
-  final String title;
+  final String shareMessage;
+
   const VoicesShareDialog({
     super.key,
     this.bodyPadding = const EdgeInsets.all(24),
     required this.shareItemType,
     required this.shareUrl,
-    required this.title,
+    required this.shareMessage,
   });
 
   @override
@@ -105,19 +111,21 @@ class VoicesShareDialog extends StatelessWidget {
       ),
       body: Padding(
         padding: bodyPadding,
-        child: Column(
-          spacing: 16,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ...ShareType.values.map<Widget>(
-              (e) => _ShareItem(
-                shareType: e,
-                itemType: context.l10n.proposal.toLowerCase(),
-                shareUrl: shareUrl,
-                title: title,
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 16,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ...ShareType.values.map<Widget>(
+                (e) => _ShareItem(
+                  shareType: e,
+                  itemType: context.l10n.proposal.toLowerCase(),
+                  shareUrl: shareUrl,
+                  shareMessage: shareMessage,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -128,12 +136,13 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
   final ShareType shareType;
   final String itemType;
   final String shareUrl;
-  final String title;
+  final String shareMessage;
+
   const _ShareItem({
     required this.shareType,
     required this.itemType,
     required this.shareUrl,
-    required this.title,
+    required this.shareMessage,
   });
 
   @override
@@ -167,7 +176,7 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    shareType.title(context.l10n),
+                    shareType.shareMessage(context.l10n),
                   ),
                   Text(
                     shareType.description(context.l10n, itemType),
@@ -202,7 +211,7 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
       _showSnackbar(context);
       return Clipboard.setData(ClipboardData(text: url));
     } else {
-      await launchUri(shareType.shareUrl(title, url).getUri());
+      await launchUri(shareType.shareUrl(shareMessage, url).getUri());
     }
   }
 }

@@ -1610,5 +1610,9 @@
   "linkCopiedToClipboard": "Link copied to clipboard",
   "@linkCopiedToClipboard": {
     "description": "Snackbar title shown when user copies a link."
+  },
+  "proposalShareMessage": "Check this out!🌍 #MustSee #SharingIsCaring",
+  "@proposalShareMessage": {
+    "description": "Share message for proposals."
   }
 }
