@@ -98,7 +98,7 @@ test-ci-schemathesis:
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
         --service cat-gateway-with-scylla \
         --allow-privileged
-        RUN sleep 110; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN --no-cache sleep 110; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
