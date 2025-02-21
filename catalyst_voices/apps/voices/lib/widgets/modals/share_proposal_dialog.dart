@@ -22,6 +22,7 @@ class ShareProposalDialog extends StatelessWidget {
   static Future<void> show(BuildContext context, String shareUrl) async {
     final result = await showDialog<void>(
       context: context,
+      routeSettings: const RouteSettings(name: 'share-proposal'),
       builder: (context) => ShareProposalDialog(
         shareUrl: shareUrl,
       ),
