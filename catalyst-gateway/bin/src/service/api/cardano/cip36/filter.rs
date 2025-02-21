@@ -183,12 +183,9 @@ fn cross_reference_key(
 async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
-    let mut registrations_iter = GetRegistrationQuery::execute(
-        session,
-        GetRegistrationParams {
-            stake_public_key: stake_pub_key.clone().try_into()?,
-        },
-    )
+    let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
+        stake_public_key: stake_pub_key.clone().try_into()?,
+    })
     .await?;
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
