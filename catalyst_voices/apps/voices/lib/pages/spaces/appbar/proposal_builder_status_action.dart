@@ -66,7 +66,7 @@ class ProposalBuilderStatusAction extends StatelessWidget {
               'Could have a different title, but has the same Proposal '
               'IDand a longer title to make it.',
           currentVersion: null,
-          nextVersion: '1',
+          nextVersion: 1,
         ) ??
         false;
 
@@ -87,8 +87,8 @@ class ProposalBuilderStatusAction extends StatelessWidget {
           proposalTitle:
               'Could have a different title, but has the same Proposal '
               'IDand a longer title to make it.',
-          currentVersion: '3',
-          nextVersion: '4',
+          currentVersion: 3,
+          nextVersion: 4,
         ) ??
         false;
 

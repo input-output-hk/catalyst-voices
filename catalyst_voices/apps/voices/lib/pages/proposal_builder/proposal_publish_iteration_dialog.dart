@@ -1,5 +1,3 @@
-import 'package:catalyst_voices/pages/proposal_builder/dialog/proposal_builder_dialog_widgets.dart';
-import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/painter/arrow_right_painter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -12,12 +10,12 @@ import 'package:flutter/material.dart';
 /// It supports publishing an iteration for the first time,
 /// then [currentVersion] must be null.
 /// For the next iterations the [currentVersion] is not null.
-class PublishProposalIterationDialog extends StatelessWidget {
+class ProposalPublishIterationDialog extends StatelessWidget {
   final String proposalTitle;
-  final int? currentVersion;
-  final int nextVersion;
+  final String? currentVersion;
+  final String nextVersion;
 
-  const PublishProposalIterationDialog({
+  const ProposalPublishIterationDialog({
     super.key,
     required this.proposalTitle,
     required this.currentVersion,
@@ -38,10 +36,7 @@ class PublishProposalIterationDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 24),
-          ProposalPublishDialogHeader(
-            title: context.l10n.publishNewProposalIterationDialogTitle,
-            subtitle: context.l10n.publishNewProposalIterationDialogSubtitle,
-          ),
+          const _Header(),
           const SizedBox(height: 16),
           const Divider(),
           const SizedBox(height: 28),
@@ -69,13 +64,13 @@ class PublishProposalIterationDialog extends StatelessWidget {
   static Future<bool?> show({
     required BuildContext context,
     required String proposalTitle,
-    required int? currentVersion,
-    required int nextVersion,
+    required String? currentVersion,
+    required String nextVersion,
   }) {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(name: '/publish-proposal-iteration'),
-      builder: (context) => PublishProposalIterationDialog(
+      builder: (context) => ProposalPublishIterationDialog(
         proposalTitle: proposalTitle,
         currentVersion: currentVersion,
         nextVersion: nextVersion,
@@ -124,6 +119,75 @@ class _Buttons extends StatelessWidget {
   }
 }
 
+class _DraftChip extends StatelessWidget {
+  const _DraftChip();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesChip.rectangular(
+      content: Text(
+        context.l10n.draft,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSecondary,
+        ),
+      ),
+      backgroundColor: Theme.of(context).colors.iconsSecondary,
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            context.l10n.publishNewProposalIterationDialogTitle,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.publishNewProposalIterationDialogSubtitle,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ListItem extends StatelessWidget {
+  final SvgGenImage icon;
+  final String text;
+
+  const _ListItem({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: 24,
+      children: [
+        icon.buildIcon(size: 24),
+        Expanded(
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ListItems extends StatelessWidget {
   const _ListItems();
 
@@ -136,15 +200,15 @@ class _ListItems extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 8,
         children: [
-          ProposalPublishDialogListItem(
+          _ListItem(
             icon: VoicesAssets.icons.eye,
             text: context.l10n.publishNewProposalIterationDialogList1,
           ),
-          ProposalPublishDialogListItem(
+          _ListItem(
             icon: VoicesAssets.icons.chatAlt2,
             text: context.l10n.publishNewProposalIterationDialogList2,
           ),
-          ProposalPublishDialogListItem(
+          _ListItem(
             icon: VoicesAssets.icons.exclamationCircle,
             text: context.l10n.publishNewProposalIterationDialogList3,
           ),
@@ -154,9 +218,35 @@ class _ListItems extends StatelessWidget {
   }
 }
 
+class _VersionChip extends StatelessWidget {
+  final String version;
+
+  const _VersionChip({
+    required this.version,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesChip.rectangular(
+      content: Row(
+        spacing: 6,
+        children: [
+          VoicesAssets.icons.documentText.buildIcon(size: 18),
+          Text(
+            version,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: Theme.of(context).colors.textOnPrimaryLevel1,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _VersionUpdate extends StatelessWidget {
-  final int? current;
-  final int next;
+  final String? current;
+  final String next;
 
   const _VersionUpdate({
     required this.current,
@@ -168,16 +258,16 @@ class _VersionUpdate extends StatelessWidget {
     return Row(
       children: [
         if (current != null) ...[
-          const DraftProposalChip(),
+          const _DraftChip(),
           const SizedBox(width: 4),
         ],
-        ProposalVersionChip(version: current?.toString() ?? context.l10n.local),
+        _VersionChip(version: current ?? context.l10n.local),
         const SizedBox(width: 16),
         const Expanded(child: _Arrow()),
         const SizedBox(width: 16),
-        const DraftProposalChip(),
+        const _DraftChip(),
         const SizedBox(width: 4),
-        ProposalVersionChip(version: next.toString()),
+        _VersionChip(version: next),
       ],
     );
   }
@@ -185,8 +275,8 @@ class _VersionUpdate extends StatelessWidget {
 
 class _VersionUpdateSection extends StatelessWidget {
   final String proposalTitle;
-  final int? currentVersion;
-  final int nextVersion;
+  final String? currentVersion;
+  final String nextVersion;
 
   const _VersionUpdateSection({
     required this.proposalTitle,

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
+import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -30,43 +31,114 @@ class PendingProposalCard extends StatefulWidget {
   State<PendingProposalCard> createState() => _PendingProposalCardState();
 }
 
-class _PendingProposalCardState extends State<PendingProposalCard> {
-  late final WidgetStatesController _statesController;
-  late final _ProposalBorderColor _border;
+class _Author extends StatelessWidget {
+  final String author;
+
+  const _Author({
+    required this.author,
+  });
 
   @override
-  void initState() {
-    super.initState();
-    _statesController = WidgetStatesController();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _border = _ProposalBorderColor(
-      publishStage: widget.proposal.publishStage,
-      colorScheme: context.colorScheme,
-      colors: context.colors,
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          VoicesAvatar(
+            icon: Text(author[0]),
+            backgroundColor: context.colors.primaryContainer,
+            foregroundColor: context.colors.textOnPrimaryWhite,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            author,
+            style: context.textTheme.titleSmall?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
+
+class _Category extends StatelessWidget {
+  final String category;
+
+  const _Category({
+    required this.category,
+  });
 
   @override
-  void didUpdateWidget(PendingProposalCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
-      _border = _ProposalBorderColor(
-        publishStage: widget.proposal.publishStage,
-        colors: context.colors,
-        colorScheme: context.colorScheme,
-      );
-    }
+  Widget build(BuildContext context) {
+    return Text(
+      category,
+      style: context.textTheme.labelMedium?.copyWith(
+        color: context.colors.textDisabled,
+      ),
+    );
   }
+}
+
+class _Description extends StatelessWidget {
+  final String text;
+
+  const _Description({required this.text});
 
   @override
-  void dispose() {
-    _statesController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colors.textOnPrimaryLevel0,
+          ),
+      maxLines: 5,
+      overflow: TextOverflow.ellipsis,
+    );
   }
+}
+
+class _FundsAndDuration extends StatelessWidget {
+  final String funds;
+  final int duration;
+
+  const _FundsAndDuration({
+    required this.funds,
+    required this.duration,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          children: [
+            _PropertyValue(
+              title: context.l10n.fundsRequested,
+              formattedValue: funds,
+            ),
+            _PropertyValue(
+              title: context.l10n.duration,
+              formattedValue: context.l10n.valueMonths(duration),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingProposalCardState extends State<PendingProposalCard> {
+  late final WidgetStatesController _statesController;
+  late _ProposalBorderColor _border;
 
   bool isHovered = false;
 
@@ -131,6 +203,73 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
       ),
     );
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _border = _ProposalBorderColor(
+      publishStage: widget.proposal.publishStage,
+      colorScheme: context.colorScheme,
+      colors: context.colors,
+    );
+  }
+
+  @override
+  void didUpdateWidget(PendingProposalCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
+      _border = _ProposalBorderColor(
+        publishStage: widget.proposal.publishStage,
+        colors: context.colors,
+        colorScheme: context.colorScheme,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _statesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _statesController = WidgetStatesController();
+  }
+}
+
+class _PropertyValue extends StatelessWidget {
+  final String title;
+  final String formattedValue;
+
+  const _PropertyValue({
+    required this.title,
+    required this.formattedValue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+        Text(
+          formattedValue,
+          style: context.textTheme.titleLarge?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 final class _ProposalBorderColor extends WidgetStateColor {
@@ -154,6 +293,77 @@ final class _ProposalBorderColor extends WidgetStateColor {
     }
 
     return colors.elevationsOnSurfaceNeutralLv1White;
+  }
+}
+
+class _ProposalInfo extends StatelessWidget {
+  final ProposalPublish proposalStage;
+  final int version;
+  final DateTime lastUpdate;
+  final int commentsCount;
+  final bool showLastUpdate;
+
+  const _ProposalInfo({
+    required this.proposalStage,
+    required this.version,
+    required this.lastUpdate,
+    required this.commentsCount,
+    required this.showLastUpdate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (proposalStage.isDraft)
+          const DraftProposalChip()
+        else
+          const FinalProposalChip(),
+        const SizedBox(width: 4),
+        ProposalVersionChip(version: version.toString()),
+        if (showLastUpdate) ...[
+          const SizedBox(width: 4),
+          VoicesPlainTooltip(
+            message: _tooltipMessage(context),
+            child: DayMonthTimeText(
+              dateTime: lastUpdate,
+            ),
+          ),
+        ],
+        const Spacer(),
+        VoicesChip.rectangular(
+          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
+          leading: VoicesAssets.icons.chatAlt2.buildIcon(),
+          content: Text(
+            version.toString(),
+            style: context.textTheme.labelLarge,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _tooltipMessage(BuildContext context) {
+    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
+
+    return context.l10n.publishedOn(dt.date, dt.time);
+  }
+}
+
+class _Title extends StatelessWidget {
+  final String text;
+
+  const _Title({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.titleLarge,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 }
 
@@ -208,244 +418,5 @@ class _Topbar extends StatelessWidget {
       ),
       iconSize: 18,
     );
-  }
-}
-
-class _Category extends StatelessWidget {
-  final String category;
-
-  const _Category({
-    required this.category,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      category,
-      style: context.textTheme.labelMedium?.copyWith(
-        color: context.colors.textDisabled,
-      ),
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  final String text;
-
-  const _Title({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.titleLarge,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-}
-
-class _Author extends StatelessWidget {
-  final String author;
-
-  const _Author({
-    required this.author,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          VoicesAvatar(
-            icon: Text(author[0]),
-            backgroundColor: context.colors.primaryContainer,
-            foregroundColor: context.colors.textOnPrimaryWhite,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            author,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FundsAndDuration extends StatelessWidget {
-  final String funds;
-  final int duration;
-
-  const _FundsAndDuration({
-    required this.funds,
-    required this.duration,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          children: [
-            _PropertyValue(
-              title: context.l10n.fundsRequested,
-              formattedValue: funds,
-            ),
-            _PropertyValue(
-              title: context.l10n.duration,
-              formattedValue: context.l10n.valueMonths(duration),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PropertyValue extends StatelessWidget {
-  final String title;
-  final String formattedValue;
-
-  const _PropertyValue({
-    required this.title,
-    required this.formattedValue,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: context.textTheme.bodySmall?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-        ),
-        Text(
-          formattedValue,
-          style: context.textTheme.titleLarge?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Description extends StatelessWidget {
-  final String text;
-
-  const _Description({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colors.textOnPrimaryLevel0,
-          ),
-      maxLines: 5,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-}
-
-class _ProposalInfo extends StatelessWidget {
-  final ProposalPublish proposalStage;
-  final int version;
-  final DateTime lastUpdate;
-  final int commentsCount;
-  final bool showLastUpdate;
-
-  const _ProposalInfo({
-    required this.proposalStage,
-    required this.version,
-    required this.lastUpdate,
-    required this.commentsCount,
-    required this.showLastUpdate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        VoicesChip.rectangular(
-          backgroundColor: proposalStage.isDraft
-              ? context.colorScheme.secondary
-              : context.colorScheme.primary,
-          content: Text(
-            _localizedProposalStage(
-              proposalStage,
-              context.l10n,
-            ),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.onWarning,
-            ),
-          ),
-        ),
-        const SizedBox(width: 4),
-        VoicesChip.rectangular(
-          leading: VoicesAssets.icons.documentText.buildIcon(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-          content: Text(
-            version.toString(),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
-          ),
-        ),
-        if (showLastUpdate) ...[
-          const SizedBox(width: 4),
-          VoicesPlainTooltip(
-            message: _tooltipMessage(context),
-            child: DayMonthTimeText(
-              dateTime: lastUpdate,
-            ),
-          ),
-        ],
-        const Spacer(),
-        VoicesChip.rectangular(
-          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
-          leading: VoicesAssets.icons.chatAlt2.buildIcon(),
-          content: Text(
-            version.toString(),
-            style: context.textTheme.labelLarge,
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _localizedProposalStage(
-    ProposalPublish proposalStage,
-    VoicesLocalizations l10n,
-  ) {
-    return switch (proposalStage) {
-      ProposalPublish.draft => l10n.draft,
-      ProposalPublish.published => l10n.finalProposal,
-    };
-  }
-
-  String _tooltipMessage(BuildContext context) {
-    final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
-
-    return context.l10n.publishedOn(dt.date, dt.time);
   }
 }
