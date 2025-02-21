@@ -21,6 +21,10 @@
   "@editButtonText": {
     "description": "Text shown in edit button"
   },
+  "publishButtonText": "Publish",
+  "@publishButtonText": {
+    "description": "Text shown in publish button"
+  },
   "headerTooltipText": "Header",
   "@headerTooltipText": {
     "description": "Text shown in header tooltip"
@@ -1555,5 +1559,29 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
+  },
+  "publishNewProposalIterationDialogTitle": "Publish New Iteration?",
+  "@publishNewProposalIterationDialogTitle": {
+    "description": "Title for the dialog for publishing a new proposal iteration."
+  },
+  "publishNewProposalIterationDialogSubtitle": "Published proposal drafts are public to other users, including all previous iterations.",
+  "@publishNewProposalIterationDialogSubtitle": {
+    "description": "Subtitle for the dialog for publishing a new proposal iteration."
+  },
+  "publishNewProposalIterationDialogList1": "Published iterations are always public.",
+  "@publishNewProposalIterationDialogList1": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about proposals being public."
+  },
+  "publishNewProposalIterationDialogList2": "Voters can comment on the latest iteration.",
+  "@publishNewProposalIterationDialogList2": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration voters being able to comment on drafts."
+  },
+  "publishNewProposalIterationDialogList3": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
+  "@publishNewProposalIterationDialogList3": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about drafts not being automatically submitted for voting."
+  },
+  "change": "Change",
+  "@change": {
+    "description": "An action to change/modify something."
   }
 }

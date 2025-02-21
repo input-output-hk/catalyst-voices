@@ -48,6 +48,7 @@ class CurrentCampaign extends StatelessWidget {
           child: CampaignTimeline(
             timelineItems: CampaignTimelineViewModelX.mockData,
             placement: CampaignTimelinePlacement.discovery,
+            horizontalPadding: const SizedBox(width: 120),
           ),
         ),
       ],

@@ -30,50 +30,120 @@ class PendingProposalCard extends StatefulWidget {
   State<PendingProposalCard> createState() => _PendingProposalCardState();
 }
 
-class _PendingProposalCardState extends State<PendingProposalCard> {
-  late final WidgetStatesController _statesController;
-  late final _ProposalBorderColor _border;
+class _Author extends StatelessWidget {
+  final String author;
+
+  const _Author({
+    required this.author,
+  });
 
   @override
-  void initState() {
-    super.initState();
-    _statesController = WidgetStatesController();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _border = _ProposalBorderColor(
-      publishStage: widget.proposal.publishStage,
-      colorScheme: context.colorScheme,
-      colors: context.colors,
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          VoicesAvatar(
+            icon: Text(author[0]),
+            backgroundColor: context.colors.primaryContainer,
+            foregroundColor: context.colors.textOnPrimaryWhite,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            author,
+            style: context.textTheme.titleSmall?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
+
+class _Category extends StatelessWidget {
+  final String category;
+
+  const _Category({
+    required this.category,
+  });
 
   @override
-  void didUpdateWidget(PendingProposalCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
-      _border = _ProposalBorderColor(
-        publishStage: widget.proposal.publishStage,
-        colors: context.colors,
-        colorScheme: context.colorScheme,
-      );
-    }
+  Widget build(BuildContext context) {
+    return Text(
+      category,
+      style: context.textTheme.labelMedium?.copyWith(
+        color: context.colors.textDisabled,
+      ),
+    );
   }
+}
+
+class _Description extends StatelessWidget {
+  final String text;
+
+  const _Description({required this.text});
 
   @override
-  void dispose() {
-    _statesController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colors.textOnPrimaryLevel0,
+          ),
+      maxLines: 5,
+      overflow: TextOverflow.ellipsis,
+    );
   }
+}
+
+class _FundsAndDuration extends StatelessWidget {
+  final String funds;
+  final int duration;
+
+  const _FundsAndDuration({
+    required this.funds,
+    required this.duration,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          children: [
+            _PropertyValue(
+              title: context.l10n.fundsRequested,
+              formattedValue: funds,
+            ),
+            _PropertyValue(
+              title: context.l10n.duration,
+              formattedValue: context.l10n.valueMonths(duration),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingProposalCardState extends State<PendingProposalCard> {
+  late final WidgetStatesController _statesController;
+  late _ProposalBorderColor _border;
 
   bool isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      key: const Key('PendingProposalCard'),
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,
@@ -132,194 +202,39 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
       ),
     );
   }
-}
-
-final class _ProposalBorderColor extends WidgetStateColor {
-  final ProposalPublish publishStage;
-  final VoicesColorScheme colors;
-  final ColorScheme colorScheme;
-
-  _ProposalBorderColor({
-    required this.publishStage,
-    required this.colors,
-    required this.colorScheme,
-  }) : super(colors.outlineBorder.toARGB32());
 
   @override
-  Color resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.hovered)) {
-      return switch (publishStage) {
-        ProposalPublish.draft => colorScheme.secondary,
-        ProposalPublish.published => colorScheme.primary,
-      };
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _border = _ProposalBorderColor(
+      publishStage: widget.proposal.publishStage,
+      colorScheme: context.colorScheme,
+      colors: context.colors,
+    );
+  }
+
+  @override
+  void didUpdateWidget(PendingProposalCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.proposal.publishStage != oldWidget.proposal.publishStage) {
+      _border = _ProposalBorderColor(
+        publishStage: widget.proposal.publishStage,
+        colors: context.colors,
+        colorScheme: context.colorScheme,
+      );
     }
-
-    return colors.elevationsOnSurfaceNeutralLv1White;
   }
-}
-
-class _Topbar extends StatelessWidget {
-  final bool showStatus;
-  final bool isFavorite;
-  final ValueChanged<bool>? onFavoriteChanged;
-
-  const _Topbar({
-    required this.showStatus,
-    required this.isFavorite,
-    required this.onFavoriteChanged,
-  });
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Spacer(),
-        VoicesIconButton.filled(
-          key: const Key('ShareButton'),
-          onTap: () {},
-          style: _buttonStyle(context),
-          child: VoicesAssets.icons.share.buildIcon(
-            color: context.colorScheme.primary,
-          ),
-        ),
-        if (onFavoriteChanged != null) ...[
-          const SizedBox(width: 4),
-          VoicesIconButton.filled(
-            key: const Key('FavoriteButton'),
-            onTap: () => onFavoriteChanged?.call(!isFavorite),
-            style: _buttonStyle(context),
-            child: CatalystSvgIcon.asset(
-              isFavorite
-                  ? VoicesAssets.icons.starFilled.path
-                  : VoicesAssets.icons.starOutlined.path,
-              color: context.colorScheme.primary,
-            ),
-          ),
-        ],
-      ],
-    );
+  void dispose() {
+    _statesController.dispose();
+    super.dispose();
   }
-
-  ButtonStyle _buttonStyle(BuildContext context) {
-    return IconButton.styleFrom(
-      padding: const EdgeInsets.all(10),
-      backgroundColor: context.colors.onSurfacePrimary08,
-      foregroundColor: context.colorScheme.primary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      iconSize: 18,
-    );
-  }
-}
-
-class _Category extends StatelessWidget {
-  final String category;
-
-  const _Category({
-    required this.category,
-  });
 
   @override
-  Widget build(BuildContext context) {
-    return Text(
-      key: const Key('Category'),
-      category,
-      style: context.textTheme.labelMedium?.copyWith(
-        color: context.colors.textDisabled,
-      ),
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  final String text;
-
-  const _Title({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      key: const Key('Title'),
-      text,
-      style: Theme.of(context).textTheme.titleLarge,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-    );
-  }
-}
-
-class _Author extends StatelessWidget {
-  final String author;
-
-  const _Author({
-    required this.author,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          VoicesAvatar(
-            key: const Key('AuthorAvatar'),
-            icon: Text(author[0]),
-            backgroundColor: context.colors.primaryContainer,
-            foregroundColor: context.colors.textOnPrimaryWhite,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            key: const Key('Author'),
-            author,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FundsAndDuration extends StatelessWidget {
-  final String funds;
-  final int duration;
-
-  const _FundsAndDuration({
-    required this.funds,
-    required this.duration,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          children: [
-            _PropertyValue(
-              key: const Key('FundsRequested'),
-              title: context.l10n.fundsRequested,
-              formattedValue: funds,
-            ),
-            _PropertyValue(
-              key: const Key('Duration'),
-              title: context.l10n.duration,
-              formattedValue: context.l10n.valueMonths(duration),
-            ),
-          ],
-        ),
-      ),
-    );
+  void initState() {
+    super.initState();
+    _statesController = WidgetStatesController();
   }
 }
 
@@ -359,22 +274,27 @@ class _PropertyValue extends StatelessWidget {
   }
 }
 
-class _Description extends StatelessWidget {
-  final String text;
+final class _ProposalBorderColor extends WidgetStateColor {
+  final ProposalPublish publishStage;
+  final VoicesColorScheme colors;
+  final ColorScheme colorScheme;
 
-  const _Description({required this.text});
+  _ProposalBorderColor({
+    required this.publishStage,
+    required this.colors,
+    required this.colorScheme,
+  }) : super(colors.outlineBorder.toARGB32());
 
   @override
-  Widget build(BuildContext context) {
-    return Text(
-      key: const Key('Description'),
-      text,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colors.textOnPrimaryLevel0,
-          ),
-      maxLines: 5,
-      overflow: TextOverflow.ellipsis,
-    );
+  Color resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.hovered)) {
+      return switch (publishStage) {
+        ProposalPublish.draft => colorScheme.secondary,
+        ProposalPublish.published => colorScheme.primary,
+      };
+    }
+
+    return colors.elevationsOnSurfaceNeutralLv1White;
   }
 }
 
@@ -463,5 +383,75 @@ class _ProposalInfo extends StatelessWidget {
     final dt = DateFormatter.formatDateTimeParts(lastUpdate, includeYear: true);
 
     return context.l10n.publishedOn(dt.date, dt.time);
+  }
+}
+
+class _Title extends StatelessWidget {
+  final String text;
+
+  const _Title({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.titleLarge,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _Topbar extends StatelessWidget {
+  final bool showStatus;
+  final bool isFavorite;
+  final ValueChanged<bool>? onFavoriteChanged;
+
+  const _Topbar({
+    required this.showStatus,
+    required this.isFavorite,
+    required this.onFavoriteChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Spacer(),
+        VoicesIconButton.filled(
+          onTap: () {},
+          style: _buttonStyle(context),
+          child: VoicesAssets.icons.share.buildIcon(
+            color: context.colorScheme.primary,
+          ),
+        ),
+        if (onFavoriteChanged != null) ...[
+          const SizedBox(width: 4),
+          VoicesIconButton.filled(
+            onTap: () => onFavoriteChanged?.call(!isFavorite),
+            style: _buttonStyle(context),
+            child: CatalystSvgIcon.asset(
+              isFavorite
+                  ? VoicesAssets.icons.starFilled.path
+                  : VoicesAssets.icons.starOutlined.path,
+              color: context.colorScheme.primary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  ButtonStyle _buttonStyle(BuildContext context) {
+    return IconButton.styleFrom(
+      padding: const EdgeInsets.all(10),
+      backgroundColor: context.colors.onSurfacePrimary08,
+      foregroundColor: context.colorScheme.primary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      iconSize: 18,
+    );
   }
 }

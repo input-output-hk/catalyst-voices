@@ -100,6 +100,7 @@ class _DiscoveryMyProposalsButton extends StatelessWidget {
             },
             style: OutlinedButton.styleFrom(
               backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+              foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
             ),
             child: Text(context.l10n.myProposals),
           ),
