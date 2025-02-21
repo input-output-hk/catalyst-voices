@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::{DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for CIP-36 registration purge queries.
 
+    use crate::db::types::{DbSlot, DbTxnIndex};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, num_bigint::BigInt, i16);
+    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for CIP-36 registration.
@@ -31,23 +36,23 @@ const SELECT_QUERY: &str = include_str!("./cql/get_cip36_registration.cql");
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_address: Vec<u8>,
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    pub(crate) stake_public_key: Vec<u8>,
     /// Nonce that has been slot corrected.
     pub(crate) nonce: num_bigint::BigInt,
     /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
+    pub(crate) txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_public_key", &self.stake_public_key)
             .field("nonce", &self.nonce)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .finish()
     }
 }
@@ -55,10 +60,10 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_address: value.0,
+            stake_public_key: value.0,
             nonce: value.1,
             slot_no: value.2,
-            txn: value.3,
+            txn_index: value.3,
         }
     }
 }
