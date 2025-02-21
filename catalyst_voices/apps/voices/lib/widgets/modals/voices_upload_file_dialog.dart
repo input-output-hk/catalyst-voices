@@ -42,6 +42,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
   }) {
     return VoicesDialog.show<VoicesFile?>(
       context: context,
+      routeSettings: const RouteSettings(name: '/upload-file'),
       builder: (context) {
         return VoicesUploadFileDialog(
           title: title,

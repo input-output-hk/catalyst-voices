@@ -44,6 +44,7 @@ class VoicesModalsExample extends StatelessWidget {
               onTap: () async {
                 await VoicesDialog.show<void>(
                   context: context,
+                  routeSettings: const RouteSettings(name: '/desktop-info'),
                   builder: (context) {
                     return VoicesDesktopInfoDialog(
                       icon: VoicesAssets.icons.x.buildIcon(),
@@ -63,6 +64,7 @@ class VoicesModalsExample extends StatelessWidget {
               onTap: () => unawaited(
                 VoicesDialog.show<void>(
                   context: context,
+                  routeSettings: const RouteSettings(name: '/alert-dialog'),
                   builder: (context) {
                     return VoicesAlertDialog(
                       title: const Text('WARNING'),
