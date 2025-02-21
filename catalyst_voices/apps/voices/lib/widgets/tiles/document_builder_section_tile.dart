@@ -13,6 +13,7 @@ import 'package:catalyst_voices/widgets/document_builder/single_line_https_url_w
 import 'package:catalyst_voices/widgets/document_builder/yes_no_choice_widget.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -23,6 +24,12 @@ import 'package:flutter/material.dart';
 class DocumentBuilderSectionTile extends StatefulWidget {
   /// A section of the document that groups [DocumentValueProperty].
   final DocumentProperty section;
+
+  /// True if the section is currently selected.
+  final bool isSelected;
+
+  /// The mode for the validation in this section.
+  final AutovalidateMode autovalidateMode;
 
   /// A callback that should be called with a list of [DocumentChange]
   /// when the user wants to save the changes.
@@ -36,6 +43,8 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   const DocumentBuilderSectionTile({
     required super.key,
     required this.section,
+    this.isSelected = false,
+    this.autovalidateMode = AutovalidateMode.disabled,
     required this.onChanged,
   });
 
@@ -56,12 +65,37 @@ class _DocumentBuilderSectionTileState
 
   bool _isEditMode = false;
 
-  @override
-  void initState() {
-    super.initState();
+  String? get _errorText {
+    if (widget.autovalidateMode == AutovalidateMode.always &&
+        !_editedSection.isValidExcludingSubsections) {
+      return context.l10n.sectionHasErrorsMessage;
+    }
 
-    _editedSection = widget.section;
-    _builder = _editedSection.toBuilder();
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final title = _editedSection.schema.title;
+
+    return EditableTile(
+      title: title,
+      isSelected: widget.isSelected,
+      isEditMode: _isEditMode,
+      isSaveEnabled: true,
+      errorText: _errorText,
+      onChanged: _onEditModeChange,
+      child: Form(
+        key: _formKey,
+        autovalidateMode: widget.autovalidateMode,
+        child: _PropertyBuilder(
+          key: ValueKey(_editedSection.schema.nodeId),
+          property: _editedSection,
+          isEditMode: _isEditMode,
+          onChanged: _handlePropertyChanges,
+        ),
+      ),
+    );
   }
 
   @override
@@ -76,42 +110,21 @@ class _DocumentBuilderSectionTileState
   }
 
   @override
-  Widget build(BuildContext context) {
-    final title = _editedSection.schema.title;
+  void initState() {
+    super.initState();
 
-    return EditableTile(
-      title: title,
-      isEditMode: _isEditMode,
-      isSaveEnabled: true,
-      onChanged: _onEditModeChange,
-      child: Form(
-        key: _formKey,
-        child: _PropertyBuilder(
-          key: ValueKey(_editedSection.schema.nodeId),
-          property: _editedSection,
-          isEditMode: _isEditMode,
-          onChanged: _handlePropertyChanges,
-        ),
-      ),
-    );
+    _editedSection = widget.section;
+    _builder = _editedSection.toBuilder();
   }
 
-  void _onEditModeChange(EditableTileChange value) {
-    switch (value.source) {
-      case EditableTileChangeSource.cancel:
-        if (!value.isEditMode) {
-          _onCancel();
-        } else {
-          setState(() {
-            _isEditMode = value.isEditMode;
-          });
-        }
-
-      case EditableTileChangeSource.save:
-        if (_formKey.currentState!.validate()) {
-          _onSave();
-        }
-    }
+  void _handlePropertyChanges(List<DocumentChange> changes) {
+    setState(() {
+      for (final change in changes) {
+        _builder.addChange(change);
+      }
+      _editedSection = _builder.build();
+      _pendingChanges.addAll(changes);
+    });
   }
 
   void _onCancel() {
@@ -131,6 +144,23 @@ class _DocumentBuilderSectionTileState
     });
   }
 
+  void _onEditModeChange(EditableTileChange value) {
+    switch (value.source) {
+      case EditableTileChangeSource.cancel:
+        if (!value.isEditMode) {
+          _onCancel();
+        } else {
+          setState(() {
+            _isEditMode = value.isEditMode;
+          });
+        }
+
+      case EditableTileChangeSource.save:
+        _formKey.currentState!.validate();
+        _onSave();
+    }
+  }
+
   void _onSave() {
     setState(() {
       widget.onChanged(List.of(_pendingChanges));
@@ -138,16 +168,119 @@ class _DocumentBuilderSectionTileState
       _isEditMode = false;
     });
   }
+}
 
-  void _handlePropertyChanges(List<DocumentChange> changes) {
-    setState(() {
-      for (final change in changes) {
-        _builder.addChange(change);
-      }
-      _editedSection = _builder.build();
-      _pendingChanges.addAll(changes);
-    });
+class _GenericPropertyObjectBuilder extends StatefulWidget {
+  final DocumentObjectSchema schema;
+  final DocumentObjectProperty property;
+  final bool isEditMode;
+  final ValueChanged<List<DocumentChange>> onChanged;
+
+  const _GenericPropertyObjectBuilder({
+    required this.schema,
+    required this.property,
+    required this.isEditMode,
+    required this.onChanged,
+  });
+
+  @override
+  State<_GenericPropertyObjectBuilder> createState() =>
+      _GenericPropertyObjectBuilderState();
+}
+
+class _GenericPropertyObjectBuilderState
+    extends State<_GenericPropertyObjectBuilder> {
+  AutovalidateMode _autovalidateMode = AutovalidateMode.onUserInteraction;
+
+  @override
+  Widget build(BuildContext context) {
+    return _GenericPropertyObjectFormFieldBuilder(
+      value: widget.property,
+      validator: (property) => _validator(context, property),
+      autovalidateMode: _autovalidateMode,
+      isEditMode: widget.isEditMode,
+      onDocumentChanged: _onDocumentChanged,
+    );
   }
+
+  void _onDocumentChanged(List<DocumentChange> changes) {
+    setState(() {
+      _autovalidateMode = AutovalidateMode.always;
+    });
+    widget.onChanged(changes);
+  }
+
+  String? _validator(BuildContext context, DocumentObjectProperty? property) {
+    if (property == null) {
+      return null;
+    }
+
+    return LocalizedDocumentValidationResult.from(property.validationResult)
+        .message(context);
+  }
+}
+
+class _GenericPropertyObjectFormFieldBuilder
+    extends VoicesFormField<DocumentObjectProperty> {
+  _GenericPropertyObjectFormFieldBuilder({
+    required super.value,
+    super.validator,
+    super.autovalidateMode,
+    required bool isEditMode,
+    required ValueChanged<List<DocumentChange>> onDocumentChanged,
+  }) : super(
+          enabled: isEditMode,
+          builder: (field) {
+            final context = field.context;
+            final property = field.value!;
+            final schema = property.schema;
+            final title = schema.title;
+            final properties = property.properties
+                .whereNot((child) => child.schema.isSectionOrSubsection);
+
+            final showBorder = schema is DocumentBorderGroupSchema;
+            final error = field.errorText;
+
+            return Container(
+              width: double.infinity,
+              padding: showBorder ? const EdgeInsets.all(16) : null,
+              decoration: showBorder
+                  ? BoxDecoration(
+                      border: Border.all(color: Theme.of(context).dividerColor),
+                      borderRadius: BorderRadius.circular(8),
+                    )
+                  : null,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (title.isNotEmpty && !schema.isSectionOrSubsection) ...[
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  ...properties.map<Widget>((child) {
+                    return _PropertyBuilder(
+                      key: ValueKey(child.nodeId),
+                      property: child,
+                      isEditMode: isEditMode,
+                      onChanged: onDocumentChanged,
+                    );
+                  }).separatedBy(const SizedBox(height: 24)),
+                  if (error != null) ...[
+                    if (properties.isNotEmpty) const SizedBox(height: 4),
+                    DocumentErrorText(
+                      text: error,
+                      enabled: isEditMode,
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        );
 }
 
 class _PropertyBuilder extends StatelessWidget {
@@ -217,6 +350,13 @@ class _PropertyListBuilderState extends State<_PropertyListBuilder> {
     );
   }
 
+  void _onDocumentChanged(List<DocumentChange> changes) {
+    setState(() {
+      _autovalidateMode = AutovalidateMode.always;
+    });
+    widget.onChanged(changes);
+  }
+
   String? _validator(BuildContext context, DocumentListProperty? property) {
     if (property == null) {
       return null;
@@ -224,13 +364,6 @@ class _PropertyListBuilderState extends State<_PropertyListBuilder> {
 
     return LocalizedDocumentValidationResult.from(property.validationResult)
         .message(context);
-  }
-
-  void _onDocumentChanged(List<DocumentChange> changes) {
-    setState(() {
-      _autovalidateMode = AutovalidateMode.always;
-    });
-    widget.onChanged(changes);
   }
 }
 
@@ -273,7 +406,10 @@ class _PropertyListFormFieldBuilder
                 ].separatedBy(const SizedBox(height: 24)),
                 if (error != null) ...[
                   const SizedBox(height: 4),
-                  DocumentErrorText(text: error),
+                  DocumentErrorText(
+                    text: error,
+                    enabled: isEditMode,
+                  ),
                 ],
               ],
             );
@@ -318,116 +454,6 @@ class _PropertyObjectBuilder extends StatelessWidget {
         );
     }
   }
-}
-
-class _GenericPropertyObjectBuilder extends StatefulWidget {
-  final DocumentObjectSchema schema;
-  final DocumentObjectProperty property;
-  final bool isEditMode;
-  final ValueChanged<List<DocumentChange>> onChanged;
-
-  const _GenericPropertyObjectBuilder({
-    required this.schema,
-    required this.property,
-    required this.isEditMode,
-    required this.onChanged,
-  });
-
-  @override
-  State<_GenericPropertyObjectBuilder> createState() =>
-      _GenericPropertyObjectBuilderState();
-}
-
-class _GenericPropertyObjectBuilderState
-    extends State<_GenericPropertyObjectBuilder> {
-  AutovalidateMode _autovalidateMode = AutovalidateMode.onUserInteraction;
-
-  @override
-  Widget build(BuildContext context) {
-    return _GenericPropertyObjectFormFieldBuilder(
-      value: widget.property,
-      validator: (property) => _validator(context, property),
-      autovalidateMode: _autovalidateMode,
-      isEditMode: widget.isEditMode,
-      onDocumentChanged: _onDocumentChanged,
-    );
-  }
-
-  String? _validator(BuildContext context, DocumentObjectProperty? property) {
-    if (property == null) {
-      return null;
-    }
-
-    return LocalizedDocumentValidationResult.from(property.validationResult)
-        .message(context);
-  }
-
-  void _onDocumentChanged(List<DocumentChange> changes) {
-    setState(() {
-      _autovalidateMode = AutovalidateMode.always;
-    });
-    widget.onChanged(changes);
-  }
-}
-
-class _GenericPropertyObjectFormFieldBuilder
-    extends VoicesFormField<DocumentObjectProperty> {
-  _GenericPropertyObjectFormFieldBuilder({
-    required super.value,
-    super.validator,
-    super.autovalidateMode,
-    required bool isEditMode,
-    required ValueChanged<List<DocumentChange>> onDocumentChanged,
-  }) : super(
-          enabled: isEditMode,
-          builder: (field) {
-            final context = field.context;
-            final property = field.value!;
-            final schema = property.schema;
-            final title = schema.title;
-            final properties = property.properties
-                .whereNot((child) => child.schema.isSectionOrSubsection);
-
-            final showBorder = schema is DocumentBorderGroupSchema;
-            final error = field.errorText;
-
-            return Container(
-              width: double.infinity,
-              padding: showBorder ? const EdgeInsets.all(16) : null,
-              decoration: showBorder
-                  ? BoxDecoration(
-                      border: Border.all(color: Theme.of(context).dividerColor),
-                      borderRadius: BorderRadius.circular(8),
-                    )
-                  : null,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (title.isNotEmpty && !schema.isSectionOrSubsection) ...[
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  ...properties.map<Widget>((child) {
-                    return _PropertyBuilder(
-                      key: ValueKey(child.nodeId),
-                      property: child,
-                      isEditMode: isEditMode,
-                      onChanged: onDocumentChanged,
-                    );
-                  }).separatedBy(const SizedBox(height: 24)),
-                  if (error != null) ...[
-                    if (properties.isNotEmpty) const SizedBox(height: 4),
-                    DocumentErrorText(text: error),
-                  ],
-                ],
-              ),
-            );
-          },
-        );
 }
 
 class _PropertyValueBuilder extends StatelessWidget {

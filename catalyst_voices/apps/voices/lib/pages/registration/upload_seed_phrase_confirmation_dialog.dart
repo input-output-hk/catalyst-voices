@@ -16,6 +16,7 @@ class UploadSeedPhraseConfirmationDialog extends StatelessWidget {
   static Future<bool> show(BuildContext context) async {
     final result = await VoicesDialog.show<bool>(
       context: context,
+      routeSettings: const RouteSettings(name: '/upload-seed-phrase'),
       builder: (context) => const UploadSeedPhraseConfirmationDialog(),
     );
 

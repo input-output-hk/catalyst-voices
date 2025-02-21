@@ -8,38 +8,23 @@ import 'package:flutter/material.dart';
 class ExportCatalystKeyConfirmDialog extends StatefulWidget {
   const ExportCatalystKeyConfirmDialog._();
 
-  static Future<bool> show(BuildContext context) {
-    return VoicesQuestionDialog.show(
-      context,
-      builder: (_) => const ExportCatalystKeyConfirmDialog._(),
-    );
-  }
-
   @override
   State<ExportCatalystKeyConfirmDialog> createState() {
     return _ExportCatalystKeyConfirmDialogState();
+  }
+
+  static Future<bool> show(BuildContext context) {
+    return VoicesQuestionDialog.show(
+      context,
+      routeSettings: const RouteSettings(name: '/export-catalyst-key'),
+      builder: (_) => const ExportCatalystKeyConfirmDialog._(),
+    );
   }
 }
 
 class _ExportCatalystKeyConfirmDialogState
     extends State<ExportCatalystKeyConfirmDialog> with LaunchUrlMixin {
   late final TapGestureRecognizer _recognizer;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _recognizer = TapGestureRecognizer();
-    _recognizer.onTap = () {
-      // TODO(damian-molinski): open url when available
-    };
-  }
-
-  @override
-  void dispose() {
-    _recognizer.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,5 +52,21 @@ class _ExportCatalystKeyConfirmDialogState
       positive: l10n.exportKey,
       negative: l10n.cancelAnyways,
     );
+  }
+
+  @override
+  void dispose() {
+    _recognizer.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _recognizer = TapGestureRecognizer();
+    _recognizer.onTap = () {
+      // TODO(damian-molinski): open url when available
+    };
   }
 }

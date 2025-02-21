@@ -2,13 +2,11 @@
 
 use std::{cmp::Reverse, sync::Arc};
 
+use cardano_blockchain_types::StakeAddress;
 use futures::StreamExt;
 
 use super::{
-    cardano::{
-        cip19_shelley_address::Cip19ShelleyAddress, hash28::HexEncodedHash28, nonce::Nonce,
-        txn_index::TxnIndex,
-    },
+    cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce, txn_index::TxnIndex},
     common::types::generic::error_msg::ErrorMessage,
     response::{
         AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,
@@ -22,7 +20,7 @@ use crate::db::index::{
             GetAllStakesAndVoteKeysParams, GetAllStakesAndVoteKeysQuery,
         },
         get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
-        get_from_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
+        get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
         get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
         get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
     },
@@ -32,22 +30,18 @@ use crate::db::index::{
 /// Get registration given a stake key hash, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_stake_key_hash(
-    stake_hash: HexEncodedHash28, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
 ) -> AllRegistration {
     // Get stake addr associated with given stake hash.
-    let mut stake_addr_iter = match GetStakeAddrQuery::execute(
-        &session,
-        GetStakeAddrParams::new(stake_hash.into()),
-    )
-    .await
-    {
-        Ok(stake_addr) => stake_addr,
-        Err(err) => {
-            return AllRegistration::handle_error(&anyhow::anyhow!(
-                "Failed to query stake addr from stake hash {err:?}",
-            ));
-        },
-    };
+    let mut stake_addr_iter =
+        match GetStakeAddrQuery::execute(&session, GetStakeAddrParams::new(stake_address)).await {
+            Ok(stake_addr) => stake_addr,
+            Err(err) => {
+                return AllRegistration::handle_error(&anyhow::anyhow!(
+                    "Failed to query stake addr from stake hash {err:?}",
+                ));
+            },
+        };
 
     if let Some(row_stake_addr) = stake_addr_iter.next().await {
         let row = match row_stake_addr {
@@ -61,7 +55,8 @@ pub(crate) async fn get_registration_given_stake_key_hash(
 
         // Stake hash successfully converted into associated stake pub key which we use to lookup
         // registrations.
-        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_address.clone()) {
+        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone())
+        {
             Ok(key) => key,
             Err(err) => {
                 return AllRegistration::internal_error(&anyhow::anyhow!(
@@ -187,7 +182,7 @@ async fn get_all_registrations_from_stake_pub_key(
     session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
     let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
-        stake_address: stake_pub_key.try_into()?,
+        stake_public_key: stake_pub_key.clone().try_into()?,
     })
     .await?;
     let mut registrations = Vec::new();
@@ -200,22 +195,19 @@ async fn get_all_registrations_from_stake_pub_key(
             continue;
         };
 
-        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
-            *slot_no
-        } else {
-            continue;
-        };
+        let slot_no: u64 = row.slot_no.into();
+        let txn: i16 = row.txn_index.into();
 
         let cip36 = Cip36Details {
-            slot_no: SlotNo::from(slot_no),
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
+            slot_no: slot_no.into(),
+            stake_pub_key: Some(stake_pub_key.clone()),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
-            txn: Some(TxnIndex::try_from(row.txn)?),
+            txn: Some(TxnIndex::try_from(txn)?),
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
-            errors: vec![],
+            errors: None,
         };
 
         registrations.push(cip36);
@@ -265,19 +257,15 @@ async fn get_invalid_registrations(
         let row = row?;
 
         invalid_registrations.push(Cip36Details {
-            slot_no,
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_address)?),
+            slot_no: slot_no.clone(),
+            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
             txn: None,
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
-            errors: row
-                .error_report
-                .iter()
-                .map(|e| ErrorMessage::from(e.to_string()))
-                .collect(),
+            errors: Some(ErrorMessage::from(row.problem_report)),
         });
     }
 
@@ -325,7 +313,8 @@ pub(crate) async fn get_registration_given_vote_key(
 
         // Stake hash successfully converted into associated stake pub key which we use to lookup
         // registrations.
-        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_address.clone()) {
+        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone())
+        {
             Ok(key) => key,
             Err(err) => {
                 return AllRegistration::internal_error(&anyhow::anyhow!(
@@ -449,7 +438,7 @@ pub async fn get_all_stake_addrs_and_vote_keys(
     while let Some(row) = stake_addr_iter.next().await {
         let row = row?;
 
-        let stake_addr = Ed25519HexEncodedPublicKey::try_from(row.stake_address)?;
+        let stake_addr = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?;
         let vote_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key)?;
 
         vote_key_stake_addr_pair.push((stake_addr, vote_key));

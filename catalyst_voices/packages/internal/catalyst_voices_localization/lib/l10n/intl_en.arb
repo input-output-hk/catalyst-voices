@@ -21,6 +21,14 @@
   "@editButtonText": {
     "description": "Text shown in edit button"
   },
+  "publishButtonText": "Publish",
+  "@publishButtonText": {
+    "description": "Text shown in publish button"
+  },
+  "submitButtonText": "Submit",
+  "@submitButtonText": {
+    "description": "Text shown in submit button"
+  },
   "headerTooltipText": "Header",
   "@headerTooltipText": {
     "description": "Text shown in header tooltip"
@@ -1247,6 +1255,10 @@
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
   "requestedAmountShouldBeMoreThan": "Requested amount should be at least {min}",
   "requestedAmountShouldBeLessThan": "Requested amount should be at most {max}",
+  "sectionHasErrorsMessage": "Section has input errors that need to be cleared before publishing.",
+  "@sectionHasErrorsMessage": {
+    "description": "A validation error in proposal editor when user wants to publish a proposal with errors."
+  },
   "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
@@ -1400,7 +1412,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Found14",
+  "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1511,6 +1523,38 @@
   "editRolesDialogTitle": "Editing Roles",
   "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
   "continueText": "Continue",
+  "proposalEditorStatusDropdownBackTitle": "Back to Proposal Index",
+  "@proposalEditorStatusDropdownBackTitle": {
+    "description": "Action title to navigate back to the proposal index."
+  },
+  "proposalEditorStatusDropdownPublishTitle": "Publish as new iteration · Draft",
+  "@proposalEditorStatusDropdownPublishTitle": {
+    "description": "Action title to publish a new version of the draft proposal."
+  },
+  "proposalEditorStatusDropdownPublishDescription": "Update proposal iteration as a public draft",
+  "@proposalEditorStatusDropdownPublishDescription": {
+    "description": "Action description to publish a new version of the draft proposal."
+  },
+  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Final",
+  "@proposalEditorStatusDropdownSubmitTitle": {
+    "description": "Action title to submit the final proposal."
+  },
+  "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
+  "@proposalEditorStatusDropdownSubmitDescription": {
+    "description": "Action description to submit the final proposal."
+  },
+  "proposalEditorStatusDropdownShareTitle": "Share Proposal",
+  "@proposalEditorStatusDropdownShareTitle": {
+    "description": "Action title to share a proposal."
+  },
+  "proposalEditorStatusDropdownExportTitle": "Export Proposal",
+  "@proposalEditorStatusDropdownExportTitle": {
+    "description": "Action title to export a proposal as a file."
+  },
+  "proposalEditorValidationSnackbar": "Fix the following input errors",
+  "@proposalEditorValidationSnackbar": {
+    "description": "Snackbar title shown when user tries to save a proposal with errors."
+  },
   "showAll": "Show All",
   "importProposal": "Import Proposal",
   "@importProposal": {
@@ -1519,5 +1563,53 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
+  },
+  "publishNewProposalIterationDialogTitle": "Publish New Iteration?",
+  "@publishNewProposalIterationDialogTitle": {
+    "description": "Title for the dialog for publishing a new proposal iteration."
+  },
+  "publishNewProposalIterationDialogSubtitle": "Published proposal drafts are public to other users, including all previous iterations.",
+  "@publishNewProposalIterationDialogSubtitle": {
+    "description": "Subtitle for the dialog for publishing a new proposal iteration."
+  },
+  "publishNewProposalIterationDialogList1": "Published iterations are always public.",
+  "@publishNewProposalIterationDialogList1": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about proposals being public."
+  },
+  "publishNewProposalIterationDialogList2": "Voters can comment on the latest iteration.",
+  "@publishNewProposalIterationDialogList2": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about voters being able to comment on drafts."
+  },
+  "publishNewProposalIterationDialogList3": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
+  "@publishNewProposalIterationDialogList3": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about drafts not being automatically submitted for voting."
+  },
+  "publishProposalForReviewDialogTitle": "Submit For Review?",
+  "@publishProposalForReviewDialogTitle": {
+    "description": "Title for the dialog for submitting a proposal for review."
+  },
+  "publishProposalForReviewDialogSubtitle": "Submitted final proposals are entered into the community review stage and are eligible for funding.",
+  "@publishProposalForReviewDialogSubtitle": {
+    "description": "Subtitle for the dialog for submitting a proposal for review."
+  },
+  "publishProposalForReviewDialogList1": "Published iterations are always public.",
+  "@publishProposalForReviewDialogList1": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about proposals being public."
+  },
+  "publishProposalForReviewDialogList2": "Voters can only comment on the latest iteration.",
+  "@publishProposalForReviewDialogList2": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about voters being able to comment on drafts."
+  },
+  "publishProposalForReviewDialogList3": "Proposals are entered into the review stage unless a later iteration is published before the deadline.",
+  "@publishProposalForReviewDialogList3": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about drafts not being automatically submitted for voting."
+  },
+  "publishProposalForReviewDialogAgreement": "I confirm that I am ready to submit my finalized proposal into the review stage.",
+  "@publishProposalForReviewDialogAgreement": {
+    "description": "The agreement confirmation in the dialog for submitting a proposal into review."
+  },
+  "change": "Change",
+  "@change": {
+    "description": "An action to change/modify something."
   }
 }

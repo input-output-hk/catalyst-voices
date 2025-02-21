@@ -1,14 +1,15 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
+
 use anyhow::anyhow;
+use cardano_blockchain_types::TransactionId;
+use catalyst_types::id_uri::IdUri;
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
 
 use crate::{
     db::index::{
-        queries::rbac::get_registrations::{
-            GetRegistrationsByChainRootQuery, GetRegistrationsByChainRootQueryParams,
-        },
+        queries::rbac::get_rbac_registrations::{Query, QueryParams},
         session::CassandraSession,
     },
     service::common::{
@@ -40,33 +41,21 @@ pub(crate) enum Responses {
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
     Ok(Json<RbacRegistrationsResponse>),
-    /// ## Unprocessable Content
-    ///
-    /// Response for unprocessable content.
-    #[oai(status = 422)]
-    UnprocessableContent,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// Get chain root endpoint.
-pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
+pub(crate) async fn endpoint(catalyst_id: IdUri) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
         let err = anyhow::anyhow!("Failed to acquire db session");
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
 
-    let Ok(decoded_chain_root) = hex::decode(chain_root) else {
-        return Responses::UnprocessableContent.into();
-    };
-
-    let query_res = GetRegistrationsByChainRootQuery::execute(
-        &session,
-        GetRegistrationsByChainRootQueryParams {
-            chain_root: decoded_chain_root,
-        },
-    )
+    let query_res = Query::execute(&session, QueryParams {
+        catalyst_id: catalyst_id.into(),
+    })
     .await;
 
     let mut row_iter = match query_res {
@@ -91,8 +80,9 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
             },
         };
 
+        let tx_hash: Vec<_> = TransactionId::from(row.txn_id).into();
         let item = RbacRegistration {
-            tx_hash: row.transaction_id.into(),
+            tx_hash: tx_hash.into(),
         };
         registrations.push(item);
     }
