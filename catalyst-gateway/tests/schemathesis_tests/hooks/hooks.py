@@ -65,6 +65,8 @@ def negative_data_rejection_custom(ctx, response, case):
     ctx.config.negative_data_rejection.allowed_statuses = list(
         [code for code in status_codes if code.startswith("4")]
     )
+    # Allow 503 status for this validation
+    ctx.config.negative_data_rejection.allowed_statuses.append("503")
 
     if case.data_generation_method and case.data_generation_method.is_negative:
         # if only headers are included
