@@ -155,7 +155,7 @@ jobs:
         run: |
           sed -i -e 's/SF:\/root\/build/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_FOLDER }}/cat-gateway${{ env.COVERAGE_EXT }}
           sed -i -e 's/SF:/SF:catalyst-voices\/catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_FOLDER }}/api-tests${{ env.COVERAGE_EXT }}
-          sed -i -e 's/SF:/SF:catalyst_voices/g' ${{ env.COVERAGE_REPORT_FOLDER }}/lcov${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:/SF:catalyst-voices\/catalyst_voices/g' ${{ env.COVERAGE_REPORT_FOLDER }}/lcov${{ env.COVERAGE_EXT }}
 
       - name: Coveralls
         env:
