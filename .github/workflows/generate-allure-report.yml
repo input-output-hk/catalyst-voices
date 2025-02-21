@@ -174,7 +174,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "./${{ env.COVERAGE_REPORT_FOLDER }}/api-tests${{ env.COVERAGE_EXT }}"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_FOLDER }}/api-tests${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: api-test
