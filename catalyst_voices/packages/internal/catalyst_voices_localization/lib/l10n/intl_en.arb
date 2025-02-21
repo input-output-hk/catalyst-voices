@@ -25,6 +25,10 @@
   "@publishButtonText": {
     "description": "Text shown in publish button"
   },
+  "submitButtonText": "Submit",
+  "@submitButtonText": {
+    "description": "Text shown in submit button"
+  },
   "headerTooltipText": "Header",
   "@headerTooltipText": {
     "description": "Text shown in header tooltip"
@@ -1591,11 +1595,35 @@
   },
   "publishNewProposalIterationDialogList2": "Voters can comment on the latest iteration.",
   "@publishNewProposalIterationDialogList2": {
-    "description": "The bullet point in the dialog for publishing a proposal iteration voters being able to comment on drafts."
+    "description": "The bullet point in the dialog for publishing a proposal iteration about voters being able to comment on drafts."
   },
   "publishNewProposalIterationDialogList3": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
   "@publishNewProposalIterationDialogList3": {
     "description": "The bullet point in the dialog for publishing a proposal iteration about drafts not being automatically submitted for voting."
+  },
+  "publishProposalForReviewDialogTitle": "Submit For Review?",
+  "@publishProposalForReviewDialogTitle": {
+    "description": "Title for the dialog for submitting a proposal for review."
+  },
+  "publishProposalForReviewDialogSubtitle": "Submitted final proposals are entered into the community review stage and are eligible for funding.",
+  "@publishProposalForReviewDialogSubtitle": {
+    "description": "Subtitle for the dialog for submitting a proposal for review."
+  },
+  "publishProposalForReviewDialogList1": "Published iterations are always public.",
+  "@publishProposalForReviewDialogList1": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about proposals being public."
+  },
+  "publishProposalForReviewDialogList2": "Voters can only comment on the latest iteration.",
+  "@publishProposalForReviewDialogList2": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about voters being able to comment on drafts."
+  },
+  "publishProposalForReviewDialogList3": "Proposals are entered into the review stage unless a later iteration is published before the deadline.",
+  "@publishProposalForReviewDialogList3": {
+    "description": "The bullet point in the dialog for submitting a proposal into review about drafts not being automatically submitted for voting."
+  },
+  "publishProposalForReviewDialogAgreement": "I confirm that I am ready to submit my finalized proposal into the review stage.",
+  "@publishProposalForReviewDialogAgreement": {
+    "description": "The agreement confirmation in the dialog for submitting a proposal into review."
   },
   "change": "Change",
   "@change": {
