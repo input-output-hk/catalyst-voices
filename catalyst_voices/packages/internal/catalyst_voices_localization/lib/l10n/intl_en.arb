@@ -1566,7 +1566,7 @@
   },
   "proposal": "Proposal",
   "@proposal": {
-    "description": "Generic name to describe an type of item. Used in share dialog eg. Share {Proposal}."
+    "description": "Generic name to describe an type of item."
   },
   "shareDirectLinkToItem": "Share a link directly to this {item}",
   "@shareDirectLinkToItem": {

@@ -38,46 +38,59 @@ enum ShareType {
       };
 
   String shareMessage(VoicesLocalizations l10n) => switch (this) {
-        ShareType.clipboard => l10n.shareOnSocialMedia(name),
-        ShareType.xTwitter => l10n.shareOnSocialMedia(name),
-        ShareType.linkedin => l10n.shareOnSocialMedia(name),
-        ShareType.facebook => l10n.shareOnSocialMedia(name),
-        ShareType.reddit => l10n.shareOnSocialMedia(name),
+        ShareType.clipboard => l10n.copyLink,
+        _ => l10n.shareOnSocialMedia(name),
       };
 
   String shareUrl(String shareMessage, String url) => switch (this) {
-        ShareType.xTwitter => Uri.https(
-            'twitter.com',
-            'intent/tweet',
-            {
-              'url': url,
-              'text': shareMessage,
-            },
-          ).toString(),
-        ShareType.linkedin => Uri.https(
-            'linkedin.com',
-            'sharing/share-offsite',
-            {
-              'url': url,
-            },
-          ).toString(),
-        ShareType.facebook => Uri.https(
-            'facebook.com',
-            'sharer.php',
-            {
-              'u': url,
-            },
-          ).toString(),
-        ShareType.reddit => Uri.https(
-            'reddit.com',
-            'submit',
-            {
-              'url': url,
-              'shareMessage': shareMessage,
-            },
-          ).toString(),
+        ShareType.xTwitter => _twitterShareUrl(url, shareMessage).toString(),
+        ShareType.linkedin => _linkedinShareUrl(url).toString(),
+        ShareType.facebook => _facebookShareUrl(url).toString(),
+        ShareType.reddit => _redditShareUrl(url, shareMessage).toString(),
         _ => '',
       };
+
+  Uri _facebookShareUrl(String url) {
+    return Uri.https(
+      'facebook.com',
+      'sharer.php',
+      {
+        'u': url,
+      },
+    );
+  }
+
+  Uri _linkedinShareUrl(String url) {
+    return Uri.https(
+      'linkedin.com',
+      'sharing/share-offsite',
+      {
+        'url': url,
+      },
+    );
+  }
+
+  Uri _redditShareUrl(String url, String shareMessage) {
+    return Uri.https(
+      'reddit.com',
+      'submit',
+      {
+        'url': url,
+        'shareMessage': shareMessage,
+      },
+    );
+  }
+
+  Uri _twitterShareUrl(String url, String shareMessage) {
+    return Uri.https(
+      'twitter.com',
+      'intent/tweet',
+      {
+        'url': url,
+        'text': shareMessage,
+      },
+    );
+  }
 }
 
 class VoicesShareDialog extends StatelessWidget {
