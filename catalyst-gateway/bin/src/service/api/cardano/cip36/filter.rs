@@ -99,7 +99,7 @@ pub async fn get_registration_from_stake_addr(
 
     // Query requires the registration to be bound by time.
     let registration = if let Some(slot_no) = asat {
-        match get_registration_given_slot_no(registrations, &slot_no) {
+        match get_registration_given_slot_no(registrations, slot_no) {
             Ok(registration) => registration,
             Err(err) => {
                 return AllRegistration::internal_error(&anyhow::anyhow!(
@@ -136,7 +136,7 @@ pub async fn get_registration_from_stake_addr(
     // include any erroneous registrations which occur AFTER the slot# of the last valid
     // registration
     let invalids_report =
-        match get_invalid_registrations(stake_pub_key, Some(slot_no.clone()), session).await {
+        match get_invalid_registrations(stake_pub_key, Some(slot_no), session).await {
             Ok(invalids) => invalids,
             Err(err) => {
                 return AllRegistration::handle_error(&anyhow::anyhow!(
@@ -220,7 +220,7 @@ async fn get_all_registrations_from_stake_pub_key(
 /// Sort latest registrations for a given stake address, sort by slot no and return
 /// latest.
 fn sort_latest_registration(mut registrations: Vec<Cip36Details>) -> anyhow::Result<Cip36Details> {
-    registrations.sort_by_key(|registration| Reverse(registration.slot_no.clone()));
+    registrations.sort_by_key(|registration| Reverse(registration.slot_no));
     registrations.into_iter().next().ok_or(anyhow::anyhow!(
         "Can't sort latest registrations by slot no"
     ))
@@ -228,11 +228,11 @@ fn sort_latest_registration(mut registrations: Vec<Cip36Details>) -> anyhow::Res
 
 /// Get registration given slot#
 fn get_registration_given_slot_no(
-    registrations: Vec<Cip36Details>, slot_no: &SlotNo,
+    registrations: Vec<Cip36Details>, slot_no: SlotNo,
 ) -> anyhow::Result<Cip36Details> {
     registrations
         .into_iter()
-        .find(|registration| registration.slot_no == *slot_no)
+        .find(|registration| registration.slot_no == slot_no)
         .ok_or(anyhow::anyhow!("Unable to get registration given slot no"))
 }
 
@@ -251,7 +251,7 @@ async fn get_invalid_registrations(
 
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
         &session,
-        GetInvalidRegistrationParams::new(stake_pub_key.try_into()?, slot_no.clone()),
+        GetInvalidRegistrationParams::new(stake_pub_key.try_into()?, slot_no),
     )
     .await?;
     let mut invalid_registrations = Vec::new();
@@ -259,7 +259,7 @@ async fn get_invalid_registrations(
         let row = row?;
 
         invalid_registrations.push(Cip36Details {
-            slot_no: slot_no.clone(),
+            slot_no,
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
@@ -372,7 +372,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
         };
 
         // ALL: Snapshot can be constrained into a subset with a time constraint or NOT.
-        if let Some(ref slot_no) = slot_no {
+        if let Some(slot_no) = slot_no {
             // Any registrations that occurred after this Slot are not included in the list.
             let filtered_registrations = slot_filter(registrations, slot_no);
 
@@ -523,10 +523,10 @@ async fn get_all_invalid_registrations(
 }
 
 /// Filter out any registrations that occurred after this Slot no
-fn slot_filter(registrations: Vec<Cip36Details>, slot_no: &SlotNo) -> Vec<Cip36Details> {
-    registrations
-        .into_par_iter()
-        .filter(|registration| registration.slot_no < *slot_no)
+fn slot_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36Details> {
+  registrations
+        .into_iter()
+        .filter(|registration| registration.slot_no < slot_no)
         .collect()
 }
 
