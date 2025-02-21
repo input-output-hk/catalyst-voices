@@ -16,7 +16,7 @@ concurrency:
 
 env:
     REPORT_EXT: .junit-report.xml
-    ALLURE_REPORT_PATH: nightly-allure-report
+    ALLURE_REPORT_FOLDER: nightly-allure-report
 
 jobs:
   ci_nightly:
@@ -93,10 +93,10 @@ jobs:
 
       - name: Setup Allure report
         run: |
-              mkdir -p ${{ env.ALLURE_REPORT_PATH }}
+              mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
               shopt -s globstar
-              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
-              ls ${{ env.ALLURE_REPORT_PATH }}
+              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_FOLDER }}
+              ls ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -110,7 +110,7 @@ jobs:
         with:
           report_id: 'nightly-test-report'
           gh_pages: 'gh-pages-dir'
-          report_dir: ${{ env.ALLURE_REPORT_PATH }}
+          report_dir: ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Git push to gh-pages
         uses: mgrybyk/git-commit-pull-push-action@v1

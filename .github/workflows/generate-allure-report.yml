@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ALLURE_REPORT_PATH: allure-report
-  COVERAGE_REPORT_PATH: coverage-report
+  ALLURE_REPORT_FOLDER: allure-report
+  COVERAGE_REPORT_FOLDER: coverage-report
   REPORT_EXT: .junit-report.xml
   COVERAGE_EXT: .coverage.info
   REPO_BASE_PATH: /home/runner/work/catalyst-voices/catalyst-voices/
@@ -99,10 +99,10 @@ jobs:
 
       - name: Setup Allure report
         run: |
-          mkdir -p ${{ env.ALLURE_REPORT_PATH }}
+          mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
           shopt -s globstar
-          cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
-          ls ${{ env.ALLURE_REPORT_PATH }}
+          cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_FOLDER }}
+          ls ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -116,7 +116,7 @@ jobs:
         with:
           report_id: "test-report"
           gh_pages: "gh-pages-dir"
-          report_dir: ${{ env.ALLURE_REPORT_PATH }}
+          report_dir: ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Git push to gh-pages
         uses: mgrybyk/git-commit-pull-push-action@v1
@@ -146,23 +146,23 @@ jobs:
 
       - name: Collect coverage report
         run: |
-          mkdir -p ${{ env.COVERAGE_REPORT_PATH }}
+          mkdir -p ${{ env.COVERAGE_REPORT_FOLDER }}
           shopt -s globstar
-          cp **/*${{ env.COVERAGE_EXT }} ${{ env.COVERAGE_REPORT_PATH }}
-          ls ${{ env.COVERAGE_REPORT_PATH }}
+          cp **/*${{ env.COVERAGE_EXT }} ${{ env.COVERAGE_REPORT_FOLDER }}
+          ls ${{ env.COVERAGE_REPORT_FOLDER }}
 
       - name: Normalize coverage report paths
         run: |
-          sed -i -e 's/SF:\/root\/build/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway${{ env.COVERAGE_EXT }}
-          sed -i -e 's/SF:/SF:catalyst-voices/catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_PATH }}/api-tests${{ env.COVERAGE_EXT }}
-          sed -i -e 's/SF:/SF:catalyst_voices/g' ${{ env.COVERAGE_REPORT_PATH }}/lcov${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:\/root\/build/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_FOLDER }}/cat-gateway${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:/SF:catalyst-voices\/catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_FOLDER }}/api-tests${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:/SF:catalyst_voices/g' ${{ env.COVERAGE_REPORT_FOLDER }}/lcov${{ env.COVERAGE_EXT }}
 
       - name: Coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/cat-gateway${{ env.COVERAGE_EXT }}"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_FOLDER }}/cat-gateway${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: rust-unit-test
@@ -174,7 +174,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "./${{ env.COVERAGE_REPORT_PATH }}/api-tests${{ env.COVERAGE_EXT }}"
+          path-to-lcov: "./${{ env.COVERAGE_REPORT_FOLDER }}/api-tests${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: api-test
@@ -185,7 +185,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/lcov${{ env.COVERAGE_EXT }}"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_FOLDER }}/lcov${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: flutter-test
