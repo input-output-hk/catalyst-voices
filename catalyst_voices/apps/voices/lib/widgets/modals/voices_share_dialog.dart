@@ -131,6 +131,7 @@ class VoicesShareDialog extends StatelessWidget {
             children: [
               ...ShareType.values.map<Widget>(
                 (e) => _ShareItem(
+                  key: Key(e.name),
                   shareType: e,
                   itemType: context.l10n.proposal.toLowerCase(),
                   shareUrl: shareUrl,
@@ -152,6 +153,7 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
   final String shareMessage;
 
   const _ShareItem({
+    super.key,
     required this.shareType,
     required this.itemType,
     required this.shareUrl,
@@ -184,17 +186,19 @@ class _ShareItem extends StatelessWidget with LaunchUrlMixin {
                     context.colors.elevationsOnSurfaceNeutralLv1Grey,
                 foregroundColor: context.colors.iconsForeground,
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    shareType.shareMessage(context.l10n),
-                  ),
-                  Text(
-                    shareType.description(context.l10n, itemType),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      shareType.shareMessage(context.l10n),
+                    ),
+                    Text(
+                      shareType.description(context.l10n, itemType),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
