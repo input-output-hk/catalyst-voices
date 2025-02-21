@@ -29,6 +29,12 @@ project: {
 							"RBAC_OFF": {
 								value: "True"
 							}
+							"SIGNED_DOC_SK": {
+    							secret: {
+        							name: "gateway"
+        							key:  "signed-doc-secret-key"
+    							}
+							}
 							"RUST_LOG": {
 								value: "debug,cat_gateway=debug,cardano_chain_follower=info"
 							}
