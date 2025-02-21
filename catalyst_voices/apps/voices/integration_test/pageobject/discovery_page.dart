@@ -16,7 +16,7 @@ class DiscoveryPage {
 
   Future<void> looksAsExpectedForVisitor() async {
     await AppBarPage($).looksAsExpectedForVisitor();
-    await CampainHeroSection($).looksAsExpectedForVisitor();
+    await CampaignHeroSection($).looksAsExpectedForVisitor();
     await HowItWorksSection($).looksAsExpectedForVisitor();
     await CurrentCampaignSelector($).looksAsExpectedForVisitor();
     await CampaignCategoriesSection($).looksAsExpectedForVisitor();

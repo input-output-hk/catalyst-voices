@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 import '../../utils/translations_utils.dart';
 
-class CampainHeroSection {
-  CampainHeroSection(this.$);
+class CampaignHeroSection {
+  CampaignHeroSection(this.$);
   late PatrolTester $;
   final heroBackgroundVideo = const Key('HeroBackgroundVideo');
   final campaignBriefTitle = const Key('CampaignBriefTitle');
