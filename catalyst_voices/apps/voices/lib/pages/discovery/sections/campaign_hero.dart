@@ -67,7 +67,7 @@ class _CampaignBrief extends StatelessWidget {
         Row(
           children: [
             VoicesFilledButton(
-              key: const Key('ViewProposalsButton'),
+              key: const Key('ViewProposalsBtn'),
               onTap: () {
                 const ProposalsRoute().go(context);
               },

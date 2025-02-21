@@ -428,7 +428,7 @@ class _Topbar extends StatelessWidget {
       children: [
         const Spacer(),
         VoicesIconButton.filled(
-          key: const Key('ShareButton'),
+          key: const Key('ShareBtn'),
           onTap: () {},
           style: _buttonStyle(context),
           child: VoicesAssets.icons.share.buildIcon(
@@ -438,7 +438,7 @@ class _Topbar extends StatelessWidget {
         if (onFavoriteChanged != null) ...[
           const SizedBox(width: 4),
           VoicesIconButton.filled(
-            key: const Key('FavoriteButton'),
+            key: const Key('FavoriteBtn'),
             onTap: () => onFavoriteChanged?.call(!isFavorite),
             style: _buttonStyle(context),
             child: CatalystSvgIcon.asset(

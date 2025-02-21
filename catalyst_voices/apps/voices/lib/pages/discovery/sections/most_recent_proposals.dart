@@ -110,7 +110,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
             backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
             foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
             child: Text(
-              key: const Key('ViewAllProposalsButton'),
+              key: const Key('ViewAllProposalsBtn'),
               context.l10n.viewAllProposals,
             ),
             onTap: () => const ProposalsRoute().go(context),

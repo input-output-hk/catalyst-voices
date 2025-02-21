@@ -11,8 +11,8 @@ class MostRecentSection {
   final mostRecentProposalsTitle = const Key('MostRecentProposalsTitle');
   final pendingProposalCard = const Key('PendingProposalCard');
   final mostRecentOffstage = const Key('MostRecentOffstage');
-  final shareButton = const Key('ShareButton');
-  final favoriteButton = const Key('FavoriteButton');
+  final shareButton = const Key('ShareBtn');
+  final favoriteButton = const Key('FavoriteBtn');
   final category = const Key('Category');
   final title = const Key('Title');
   final value = const Key('Value');
@@ -24,7 +24,7 @@ class MostRecentSection {
   final proposalStage = const Key('ProposalStage');
   final version = const Key('Version');
   final timezoneDateTimeText = const Key('TimezoneDateTimeText');
-  final viewAllProposalsButton = const Key('ViewAllProposalsButton');
+  final viewAllProposalsButton = const Key('ViewAllProposalsBtn');
   final mostRecentProposalsSlider = const Key('MostRecentProposalsSlider');
   final commentsCount = const Key('CommentsCount');
   final mostRecentLoadingError = const Key('MostRecentError');

@@ -11,7 +11,7 @@ class AppBarPage {
   final accountPopupBtn = const Key('AccountPopupButton');
   final lockBtn = const Key('LockButton');
   final unlockBtn = const Key('UnlockButton');
-  final visitorBtn = const Key('VisitorButton');
+  final visitorBtn = const Key('VisitorBtn');
 
   Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
     expect($(spacesDrawerButton).exists, !reverse!);

@@ -82,7 +82,7 @@ class _Buttons extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         VoicesFilledButton(
-          key: const Key('CategoryDetailsButton'),
+          key: const Key('CategoryDetailsBtn'),
           onTap: () {
             CategoryDetailRoute(categoryId).go(context);
           },
@@ -90,7 +90,7 @@ class _Buttons extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         VoicesFilledButton(
-          key: const Key('ViewProposalsButton'),
+          key: const Key('ViewProposalsBtn'),
           onTap: () {
             ProposalsRoute(categoryId: categoryId).go(context);
           },

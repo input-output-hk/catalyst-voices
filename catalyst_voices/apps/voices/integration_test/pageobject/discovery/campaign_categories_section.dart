@@ -18,8 +18,8 @@ class CampaignCategoriesSection {
   final title = const Key('CategoryTitle');
   final subname = const Key('CategorySubname');
   final description = const Key('Description');
-  final categoryDetailsButton = const Key('CategoryDetailsButton');
-  final viewProposalsButton = const Key('ViewProposalsButton');
+  final categoryDetailsButton = const Key('CategoryDetailsBtn');
+  final viewProposalsButton = const Key('ViewProposalsBtn');
   final categoriesLoadingError = const Key('CampaignCategoriesError');
 
   Future<void> titleIsRenderedCorrectly() async {
