@@ -1,7 +1,7 @@
 SELECT stake_public_key,
        nonce,
        slot_no,
-       txn,
+       txn_index,
        vote_key,
        payment_address,
        is_payable,
