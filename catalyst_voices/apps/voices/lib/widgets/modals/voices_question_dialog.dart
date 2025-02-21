@@ -5,22 +5,20 @@ import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-enum VoicesQuestionActionType { filled, text }
-
 final class VoicesQuestionActionItem extends Equatable {
   final String name;
   final bool isPositive;
   final VoicesQuestionActionType type;
 
-  const VoicesQuestionActionItem.positive(
-    this.name, {
-    this.type = VoicesQuestionActionType.filled,
-  }) : isPositive = true;
-
   const VoicesQuestionActionItem.negative(
     this.name, {
     this.type = VoicesQuestionActionType.text,
   }) : isPositive = false;
+
+  const VoicesQuestionActionItem.positive(
+    this.name, {
+    this.type = VoicesQuestionActionType.filled,
+  }) : isPositive = true;
 
   @override
   List<Object?> get props => [
@@ -29,6 +27,8 @@ final class VoicesQuestionActionItem extends Equatable {
         type,
       ];
 }
+
+enum VoicesQuestionActionType { filled, text }
 
 /// Simple dialog when working with yes/no type of dialogs.
 ///
@@ -55,19 +55,6 @@ class VoicesQuestionDialog extends StatelessWidget {
   /// List of yes/no actions, usually only 2 make sense.
   /// See [VoicesQuestionActionItem] for config details.
   final List<VoicesQuestionActionItem> actions;
-
-  static Future<bool> show(
-    BuildContext context, {
-    required WidgetBuilder builder,
-    bool fallback = false,
-  }) async {
-    final result = await VoicesDialog.show<bool>(
-      context: context,
-      builder: builder,
-    );
-
-    return result ?? fallback;
-  }
 
   const VoicesQuestionDialog({
     super.key,
@@ -105,5 +92,20 @@ class VoicesQuestionDialog extends StatelessWidget {
           child: Text(item.name),
         );
     }
+  }
+
+  static Future<bool> show(
+    BuildContext context, {
+    required RouteSettings routeSettings,
+    required WidgetBuilder builder,
+    bool fallback = false,
+  }) async {
+    final result = await VoicesDialog.show<bool>(
+      context: context,
+      routeSettings: routeSettings,
+      builder: builder,
+    );
+
+    return result ?? fallback;
   }
 }
