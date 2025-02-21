@@ -1,17 +1,18 @@
 //! Cardano API endpoints
+
 use poem_openapi::{
     param::{Path, Query},
     OpenApi,
 };
-use types::DateTime;
 
 use crate::service::{
+    api::cardano::types::DateTime,
     common::{
         auth::none_or_rbac::NoneOrRBAC,
         objects::cardano::network::Network,
         tags::ApiTags,
         types::{
-            cardano::cip19_stake_address::Cip19StakeAddress,
+            cardano::{catalyst_id::CatalystId, cip19_stake_address::Cip19StakeAddress},
             generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
         },
     },
@@ -57,6 +58,8 @@ impl Api {
         date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
     }
 
+    // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
+    // or removed.
     #[oai(
         path = "/draft/rbac/chain_root/:stake_address",
         method = "get",
@@ -76,24 +79,25 @@ impl Api {
     }
 
     #[oai(
-        path = "/draft/rbac/registrations/:chain_root",
+        path = "/draft/rbac/registrations/:catalyst_id",
         method = "get",
         operation_id = "rbacRegistrations"
     )]
-    /// Get registrations by RBAC chain root
+    /// Get registrations by Catalyst short ID.
     ///
-    /// This endpoint returns the registrations for a given chain root.
+    /// This endpoint returns RBAC registrations for the given Catalyst short identifier.
     async fn rbac_registrations_get(
         &self,
-        /// Chain root to get the registrations for.
-        #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
-        Path(chain_root): Path<String>,
+        /// A Catalyst short ID to get the registrations for.
+        Path(catalyst_id): Path<CatalystId>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::registrations_get::AllResponses {
-        rbac::registrations_get::endpoint(chain_root).await
+        rbac::registrations_get::endpoint(catalyst_id.into()).await
     }
 
+    // TODO: "Chain root" was replaced by "Catalyst ID", so this endpoint needs to be updated
+    // or removed.
     #[oai(
         path = "/draft/rbac/role0_chain_root/:role0_key",
         method = "get",

@@ -8,7 +8,8 @@ pub(crate) mod roll_forward;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
-use cardano_chain_follower::MultiEraBlock;
+use cardano_blockchain_types::MultiEraBlock;
+use catalyst_types::hashes::Blake2b256Hash;
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
 use rbac509::Rbac509InsertQuery;
@@ -17,12 +18,11 @@ use txi::TxiInsertQuery;
 use txo::TxoInsertQuery;
 
 use super::{queries::FallibleQueryTasks, session::CassandraSession};
-use crate::service::utilities::convert::from_saturating;
 
 /// Add all data needed from the block into the indexes.
 pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
-    let Some(session) = CassandraSession::get(block.immutable()) else {
+    let Some(session) = CassandraSession::get(block.is_immutable()) else {
         anyhow::bail!("Failed to get Index DB Session.  Can not index block.");
     };
 
@@ -33,32 +33,29 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     let mut txi_index = TxiInsertQuery::new();
     let mut txo_index = TxoInsertQuery::new();
 
-    let block_data = block.decode();
-    let slot_no = block_data.slot();
+    let slot_no = block.point().slot_or_default();
 
     // We add all transactions in the block to their respective index data sets.
-    for (txn_index, txs) in block_data.txs().iter().enumerate() {
-        let txn = from_saturating(txn_index);
-
-        let txn_hash = txs.hash().to_vec();
+    for (index, txn) in block.enumerate_txs() {
+        let txn_id = Blake2b256Hash::from(txn.hash()).into();
 
         // Index the TXIs.
-        txi_index.index(txs, slot_no);
+        txi_index.index(&txn, slot_no);
 
         // TODO: Index minting.
         // let mint = txs.mints().iter() {};
 
         // TODO: Index Metadata.
-        cip36_index.index(txn_index, txn, slot_no, block);
+        cip36_index.index(index, slot_no, block);
 
         // Index Certificates inside the transaction.
-        cert_index.index(txs, slot_no, txn, block);
+        cert_index.index(&txn, slot_no, index, block);
 
         // Index the TXOs.
-        txo_index.index(txs, slot_no, &txn_hash, txn);
+        txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
-        rbac509_index.index(&txn_hash, txn_index, txn, slot_no, block);
+        rbac509_index.index(&session, txn_id, index, block).await;
     }
 
     // We then execute each batch of data from the block.
