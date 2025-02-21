@@ -21,7 +21,7 @@ class CurrentCampaignSelector {
   final timelineCardTitle = const Key('TimelineCardTitle');
   final timelineCardDate = const Key('TimelineCardDate');
   final timelineCardDescription = const Key('TimelineCardDescription');
-  final currentCampainLoadingError = const Key('CurrentCampaignError');
+  final currentCampaignLoadingError = const Key('CurrentCampaignError');
 
   Future<void> titleIsRenderedCorrectly() async {
     await $(title).scrollTo();
@@ -51,7 +51,7 @@ class CurrentCampaignSelector {
   }
 
   Future<void> loadingErrorClick() async {
-    await $(currentCampainLoadingError).$(#ErrorRetryBtn).tap();
+    await $(currentCampaignLoadingError).$(#ErrorRetryBtn).tap();
   }
 
   Future<void> loadRetryOnError() async {
@@ -67,7 +67,7 @@ class CurrentCampaignSelector {
       expect(
         await loadingErrorIsVisible(),
         false,
-        reason: 'Max ${i-1} retries exceeded',
+        reason: 'Max ${i - 1} retries exceeded',
       );
     }
   }

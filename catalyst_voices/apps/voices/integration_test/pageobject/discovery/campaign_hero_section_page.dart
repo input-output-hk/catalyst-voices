@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
-import '../../utils/constants.dart';
 import '../../utils/translations_utils.dart';
 
 class CampainHeroSection {

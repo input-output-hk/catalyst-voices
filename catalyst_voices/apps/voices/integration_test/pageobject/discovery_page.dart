@@ -4,7 +4,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 
 import 'app_bar_page.dart';
 import 'discovery/campaign_categories_section.dart';
-import 'discovery/campain_hero_section_page.dart';
+import 'discovery/campaign_hero_section_page.dart';
 import 'discovery/current_campaign_selector_page.dart';
 import 'discovery/how_it_works_section_page.dart';
 import 'discovery/most_recent_section.dart';
@@ -22,5 +22,4 @@ class DiscoveryPage {
     await CampaignCategoriesSection($).looksAsExpectedForVisitor();
     await MostRecentSection($).looksAsExpectedForVisitor();
   }
-
 }

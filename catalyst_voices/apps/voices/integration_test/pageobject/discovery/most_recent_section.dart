@@ -187,7 +187,7 @@ class MostRecentSection {
       expect(
         await loadingErrorIsVisible(),
         false,
-        reason: 'Max ${i-1} retries exceeded',
+        reason: 'Max ${i - 1} retries exceeded',
       );
     }
   }
