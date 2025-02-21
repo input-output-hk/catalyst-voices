@@ -94,7 +94,7 @@ def negative_data_rejection_custom(ctx, response, case):
 @schemathesis.check
 def not_a_server_error_custom(ctx, response, case):
     # Allow 503 status for this validation
-    if response.status_code == 500:
+    if response.status_code == 503:
         return None
 
     return schemathesis.checks.not_a_server_error(ctx, response, case)
