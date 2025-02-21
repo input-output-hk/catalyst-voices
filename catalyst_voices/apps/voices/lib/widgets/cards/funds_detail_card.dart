@@ -159,7 +159,6 @@ class _RangeAsk extends StatelessWidget {
   final Range<int> range;
 
   const _RangeAsk({
-    super.key,
     required this.range,
   });
 

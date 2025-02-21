@@ -5,13 +5,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
-
-import '../pageobject/account_dropdown_page.dart';
-import '../pageobject/app_bar_page.dart';
 import '../pageobject/discovery_page.dart';
-import '../pageobject/overall_spaces_page.dart';
-import '../pageobject/unlock_modal_page.dart';
-import '../utils/constants.dart';
 
 void main() async {
   late final GoRouter router;

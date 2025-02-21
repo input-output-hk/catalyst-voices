@@ -174,7 +174,7 @@ class MostRecentSection {
       await $(mostRecentLoadingError)
           .$(#ErrorRetryBtn)
           .scrollTo(step: 300, maxScrolls: 5);
-    } catch (e) {}
+    } finally {}
     if (await loadingErrorIsVisible()) {
       var i = 0;
       for (i = 0; i < 9; i++) {
