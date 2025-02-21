@@ -76,14 +76,15 @@ pub(crate) async fn endpoint(
             RetryAfterOption::Default,
         );
     };
-    let persistent_res =
-        calculate_stake_info(&persistent_session, stake_address.clone(), slot_num).await;
+
+    let (persistent_res, volatile_res) = futures::join!(
+        calculate_stake_info(&persistent_session, stake_address.clone(), slot_num),
+        calculate_stake_info(&volatile_session, stake_address, slot_num)
+    );
     let persistent_stake_info = match persistent_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
     };
-
-    let volatile_res = calculate_stake_info(&volatile_session, stake_address, slot_num).await;
     let volatile_stake_info = match volatile_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
