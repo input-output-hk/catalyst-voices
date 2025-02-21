@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/cards/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/widgets.dart';
@@ -25,6 +26,8 @@ class MyProposals extends StatelessWidget {
             maxCount: 5,
             submittedCount: 2,
           ),
+          const WorkspaceProposalCard(isSubmitted: true),
+          const WorkspaceProposalCard(isSubmitted: false),
           const _SharedForPublicHeader(),
           const _NotPublishedHeader(),
         ],

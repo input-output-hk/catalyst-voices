@@ -1611,5 +1611,34 @@
   "change": "Change",
   "@change": {
     "description": "An action to change/modify something."
+  },
+  "submittedForReview": "Submitted for Review ({submittedCount}/{maxCount})",
+  "@submittedForReview": {
+    "description": "Label for the submitted for review section",
+    "placeholders": {
+      "submittedCount": {
+        "type": "int"
+      },
+      "maxCount": {
+        "type": "int"
+      }
+    }
+  },
+  "sharedForPublicInProgress": "Shared for public feedback / In progress",
+  "@sharedForPublicInProgress": {
+    "description": "Label for shared for public feedback or in progress proposals in workspace"
+  },
+  "notPublished": "Not published",
+  "@notPublished": {
+    "description": "Label for not published proposals in workspace"
+  },
+  "lastEditDate": "Last edit {date}.",
+  "@lastEditDate": {
+    "description": "Indicated when item was last updated",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }
