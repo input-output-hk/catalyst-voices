@@ -10,6 +10,7 @@ class FundedProposalCard extends StatelessWidget {
   final AssetGenImage image;
   final FundedProposal proposal;
   final bool isFavorite;
+  final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const FundedProposalCard({
@@ -17,50 +18,54 @@ class FundedProposalCard extends StatelessWidget {
     required this.image,
     required this.proposal,
     this.isFavorite = false,
+    this.onTap,
     this.onFavoriteChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 326,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _Header(
-            image: image,
-            isFavorite: isFavorite,
-            onFavoriteChanged: onFavoriteChanged,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _FundCategory(
-                  fund: proposal.campaignName,
-                  category: proposal.category,
-                ),
-                const SizedBox(height: 4),
-                _Title(text: proposal.title),
-                const SizedBox(height: 4),
-                _FundedDate(dateTime: proposal.fundedDate),
-                const SizedBox(height: 24),
-                _FundsAndComments(
-                  funds: proposal.fundsRequested,
-                  commentsCount: proposal.commentsCount,
-                ),
-                const SizedBox(height: 24),
-                _Description(text: proposal.description),
-              ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 326,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _Header(
+              image: image,
+              isFavorite: isFavorite,
+              onFavoriteChanged: onFavoriteChanged,
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _FundCategory(
+                    fund: proposal.campaignName,
+                    category: proposal.category,
+                  ),
+                  const SizedBox(height: 4),
+                  _Title(text: proposal.title),
+                  const SizedBox(height: 4),
+                  _FundedDate(dateTime: proposal.fundedDate),
+                  const SizedBox(height: 24),
+                  _FundsAndComments(
+                    funds: proposal.fundsRequested,
+                    commentsCount: proposal.commentsCount,
+                  ),
+                  const SizedBox(height: 24),
+                  _Description(text: proposal.description),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

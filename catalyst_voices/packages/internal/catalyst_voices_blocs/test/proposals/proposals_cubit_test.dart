@@ -41,7 +41,7 @@ void main() {
     );
 
     final proposal = Proposal(
-      id: '1',
+      id: const Uuid().v7(),
       title: 'Proposal 1',
       description: 'Description 1',
       category: '',

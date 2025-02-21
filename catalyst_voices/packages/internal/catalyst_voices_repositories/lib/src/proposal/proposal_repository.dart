@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:uuid/uuid.dart';
 
 // ignore: one_member_abstracts
 abstract interface class ProposalRepository {
@@ -56,7 +57,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           : ProposalPublish.draft;
       proposals.add(
         ProposalBase(
-          id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
+          id: const Uuid().v7(),
           category: 'Cardano Use Cases / MVP',
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
@@ -113,7 +114,7 @@ and PRISM, but its potential is only barely exploited.
 
 final _proposals = [
   ProposalBase(
-    id: '${Random().nextInt(1000)}1',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -128,7 +129,7 @@ final _proposals = [
     version: 1,
   ),
   ProposalBase(
-    id: '${Random().nextInt(1000)}2',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -143,7 +144,7 @@ final _proposals = [
     version: 2,
   ),
   ProposalBase(
-    id: '${Random().nextInt(1000)}3',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -158,7 +159,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(1000)}4',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -173,7 +174,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(1000)}5',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -188,7 +189,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(1000)}6',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -203,7 +204,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(1000)}7',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),
@@ -218,7 +219,7 @@ final _proposals = [
     version: 3,
   ),
   ProposalBase(
-    id: '${Random().nextInt(1000)}8',
+    id: const Uuid().v7(),
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
     updateDate: DateTime.now().minusDays(2),

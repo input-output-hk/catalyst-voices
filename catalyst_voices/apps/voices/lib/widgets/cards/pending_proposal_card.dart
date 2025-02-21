@@ -15,6 +15,7 @@ class PendingProposalCard extends StatefulWidget {
   final bool showStatus;
   final bool showLastUpdate;
   final bool isFavorite;
+  final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const PendingProposalCard({
@@ -23,6 +24,7 @@ class PendingProposalCard extends StatefulWidget {
     this.showStatus = true,
     this.showLastUpdate = true,
     this.isFavorite = false,
+    this.onTap,
     this.onFavoriteChanged,
   });
 
@@ -76,7 +78,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,
-        onTap: () {},
+        onTap: widget.onTap,
         child: ValueListenableBuilder(
           valueListenable: _statesController,
           builder: (context, value, child) => Container(

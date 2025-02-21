@@ -3,14 +3,17 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
 
 /// A proposal view model spanning proposals in different stages.
 sealed class ProposalViewModel extends Equatable {
   final String id;
+  final bool isDraft;
   final bool isFavorite;
 
   const ProposalViewModel({
     required this.id,
+    required this.isDraft,
     required this.isFavorite,
   });
 
@@ -43,7 +46,7 @@ sealed class ProposalViewModel extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, isFavorite];
+  List<Object?> get props => [id, isDraft, isFavorite];
 }
 
 /// Defines the pending proposal that is not funded yet.
@@ -62,6 +65,7 @@ final class PendingProposal extends ProposalViewModel {
 
   const PendingProposal({
     required super.id,
+    required super.isDraft,
     super.isFavorite = false,
     required this.campaignName,
     required this.category,
@@ -81,6 +85,7 @@ final class PendingProposal extends ProposalViewModel {
     required String campaignName,
   }) : this(
           id: proposal.id,
+          isDraft: proposal.status == ProposalStatus.draft,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -115,6 +120,7 @@ final class PendingProposal extends ProposalViewModel {
   }) {
     return PendingProposal(
       id: id,
+      isDraft: isDraft,
       isFavorite: isFavorite ?? this.isFavorite,
       campaignName: campaignName ?? this.campaignName,
       category: category ?? this.category,
@@ -132,7 +138,8 @@ final class PendingProposal extends ProposalViewModel {
 
   factory PendingProposal.dummy() {
     return PendingProposal(
-      id: 'f14/2',
+      id: const Uuid().v7(),
+      isDraft: false,
       campaignName: 'F14',
       category: 'Cardano Use Cases: Concept',
       title: 'Proposal Title that rocks the world',
@@ -190,7 +197,8 @@ final class FundedProposal extends ProposalViewModel {
     required Coin fundsRequested,
     required this.commentsCount,
     required this.description,
-  }) : _fundsRequested = fundsRequested;
+  })  : _fundsRequested = fundsRequested,
+        super(isDraft: false);
 
   FundedProposal.fromProposal(
     Proposal proposal, {

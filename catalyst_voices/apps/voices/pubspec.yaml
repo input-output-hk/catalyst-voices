@@ -66,6 +66,7 @@ dependencies:
   skeletonizer: ^1.4.3
   url_launcher: ^6.2.2
   url_strategy: ^0.3.0
+  uuid: ^4.5.1
   video_player: ^2.9.2
   # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
   # but here we import it explicitly to make sure the latest version is used which addresses
