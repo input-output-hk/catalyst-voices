@@ -9,6 +9,7 @@ class EditRolesDialog extends StatelessWidget {
   static Future<bool> show(BuildContext context) async {
     final result = await VoicesDialog.show<bool>(
       context: context,
+      routeSettings: const RouteSettings(name: '/edit-roles'),
       builder: (context) => const EditRolesDialog._(),
     );
 
