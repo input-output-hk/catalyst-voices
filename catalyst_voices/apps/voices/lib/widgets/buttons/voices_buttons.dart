@@ -10,6 +10,59 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+class ChevronDownButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const ChevronDownButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: VoicesAssets.icons.chevronDown.buildIcon(),
+    );
+  }
+}
+
+class ChevronExpandButton extends StatelessWidget {
+  final bool isExpanded;
+  final VoidCallback? onTap;
+
+  const ChevronExpandButton({
+    super.key,
+    this.isExpanded = true,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: AnimatedExpandChevron(isExpanded: isExpanded),
+    );
+  }
+}
+
+class ChevronRightButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const ChevronRightButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: VoicesAssets.icons.chevronRight.buildIcon(),
+    );
+  }
+}
+
 class DrawerToggleButton extends StatelessWidget {
   const DrawerToggleButton({super.key});
 
@@ -40,6 +93,34 @@ class LeftArrowButton extends StatelessWidget {
   }
 }
 
+class MoreOptionsButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const MoreOptionsButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: VoicesAssets.icons.dotsVertical.buildIcon(),
+    );
+  }
+}
+
+class NavigationPopButton extends StatelessWidget {
+  const NavigationPopButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LeftArrowButton(
+      onTap: () => unawaited(Navigator.maybeOf(context)?.maybePop()),
+    );
+  }
+}
+
 class RightArrowButton extends StatelessWidget {
   final VoidCallback? onTap;
 
@@ -57,101 +138,55 @@ class RightArrowButton extends StatelessWidget {
   }
 }
 
-class ChevronDownButton extends StatelessWidget {
+class VoicesBackButton extends StatelessWidget {
   final VoidCallback? onTap;
 
-  const ChevronDownButton({
+  const VoicesBackButton({
     super.key,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return VoicesIconButton(
+    return VoicesOutlinedButton(
       onTap: onTap,
-      child: VoicesAssets.icons.chevronDown.buildIcon(),
+      child: Text(context.l10n.back),
     );
   }
 }
 
-class ChevronRightButton extends StatelessWidget {
+class VoicesEditSaveButton extends StatelessWidget {
   final VoidCallback? onTap;
+  final bool isEditing;
+  final bool hasError;
 
-  const ChevronRightButton({
+  const VoicesEditSaveButton({
     super.key,
     this.onTap,
+    required this.isEditing,
+    this.hasError = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return VoicesIconButton(
-      onTap: onTap,
-      child: VoicesAssets.icons.chevronRight.buildIcon(),
-    );
-  }
-}
+    final text =
+        isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText;
 
-class ChevronExpandButton extends StatelessWidget {
-  final bool isExpanded;
-  final VoidCallback? onTap;
-
-  const ChevronExpandButton({
-    super.key,
-    this.isExpanded = true,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesIconButton(
-      onTap: onTap,
-      child: AnimatedExpandChevron(isExpanded: isExpanded),
-    );
-  }
-}
-
-class NavigationPopButton extends StatelessWidget {
-  const NavigationPopButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return LeftArrowButton(
-      onTap: () => unawaited(Navigator.maybeOf(context)?.maybePop()),
-    );
-  }
-}
-
-class XButton extends StatelessWidget {
-  final VoidCallback? onTap;
-
-  const XButton({
-    super.key,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesIconButton(
-      onTap: onTap,
-      child: VoicesAssets.icons.x.buildIcon(),
-    );
-  }
-}
-
-class MoreOptionsButton extends StatelessWidget {
-  final VoidCallback? onTap;
-
-  const MoreOptionsButton({
-    super.key,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesIconButton(
-      onTap: onTap,
-      child: VoicesAssets.icons.dotsVertical.buildIcon(),
-    );
+    if (hasError) {
+      return VoicesFilledButton(
+        backgroundColor: Theme.of(context).colorScheme.error,
+        onTap: onTap,
+        child: Text(text),
+      );
+    } else {
+      return VoicesTextButton(
+        onTap: onTap,
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.labelSmall,
+        ),
+      );
+    }
   }
 }
 
@@ -192,45 +227,6 @@ class VoicesNextButton extends StatelessWidget {
   }
 }
 
-class VoicesBackButton extends StatelessWidget {
-  final VoidCallback? onTap;
-
-  const VoicesBackButton({
-    super.key,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesOutlinedButton(
-      onTap: onTap,
-      child: Text(context.l10n.back),
-    );
-  }
-}
-
-class VoicesEditSaveButton extends StatelessWidget {
-  final VoidCallback? onTap;
-  final bool isEditing;
-
-  const VoicesEditSaveButton({
-    super.key,
-    this.onTap,
-    required this.isEditing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesTextButton(
-      onTap: onTap,
-      child: Text(
-        isEditing ? context.l10n.cancelButtonText : context.l10n.editButtonText,
-        style: Theme.of(context).textTheme.labelSmall,
-      ),
-    );
-  }
-}
-
 class VoicesStartProposalButton extends StatelessWidget {
   const VoicesStartProposalButton({super.key});
 
@@ -239,6 +235,23 @@ class VoicesStartProposalButton extends StatelessWidget {
     return VoicesOutlinedButton(
       onTap: () => const ProposalBuilderDraftRoute().go(context),
       child: Text(context.l10n.startProposal),
+    );
+  }
+}
+
+class XButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const XButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: VoicesAssets.icons.x.buildIcon(),
     );
   }
 }

@@ -21,6 +21,10 @@
   "@editButtonText": {
     "description": "Text shown in edit button"
   },
+  "publishButtonText": "Publish",
+  "@publishButtonText": {
+    "description": "Text shown in publish button"
+  },
   "headerTooltipText": "Header",
   "@headerTooltipText": {
     "description": "Text shown in header tooltip"
@@ -1545,6 +1549,10 @@
   "@proposalEditorStatusDropdownExportTitle": {
     "description": "Action title to export a proposal as a file."
   },
+  "proposalEditorValidationSnackbar": "Fix the following input errors",
+  "@proposalEditorValidationSnackbar": {
+    "description": "Snackbar title shown when user tries to save a proposal with errors."
+  },
   "showAll": "Show All",
   "@showAll": {
     "description": "Show all for when using filtering by some criteria"
@@ -1568,5 +1576,29 @@
   "tryDifferentSearch": "Please try another search.",
   "@tryDifferentSearch": {
     "description": "Description of empty search result. Try different search"
+  },
+  "publishNewProposalIterationDialogTitle": "Publish New Iteration?",
+  "@publishNewProposalIterationDialogTitle": {
+    "description": "Title for the dialog for publishing a new proposal iteration."
+  },
+  "publishNewProposalIterationDialogSubtitle": "Published proposal drafts are public to other users, including all previous iterations.",
+  "@publishNewProposalIterationDialogSubtitle": {
+    "description": "Subtitle for the dialog for publishing a new proposal iteration."
+  },
+  "publishNewProposalIterationDialogList1": "Published iterations are always public.",
+  "@publishNewProposalIterationDialogList1": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about proposals being public."
+  },
+  "publishNewProposalIterationDialogList2": "Voters can comment on the latest iteration.",
+  "@publishNewProposalIterationDialogList2": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration voters being able to comment on drafts."
+  },
+  "publishNewProposalIterationDialogList3": "Drafts are not submitted for voting. Use 'Submit for review' to enter the community review stage.",
+  "@publishNewProposalIterationDialogList3": {
+    "description": "The bullet point in the dialog for publishing a proposal iteration about drafts not being automatically submitted for voting."
+  },
+  "change": "Change",
+  "@change": {
+    "description": "An action to change/modify something."
   }
 }

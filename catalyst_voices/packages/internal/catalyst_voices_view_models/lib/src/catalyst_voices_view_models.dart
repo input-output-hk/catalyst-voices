@@ -19,6 +19,7 @@ export 'menu/popup_menu_item.dart';
 export 'proposal/comment.dart';
 export 'proposal/proposal_pagination_view_model.dart';
 export 'proposal/proposal_view_model.dart';
+export 'proposal_builder/exception/proposal_builder_exception.dart';
 export 'proposal_builder/proposal_builder_segments.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/registration.dart';
