@@ -18,7 +18,6 @@ class CurrentCampaignSelector {
   final fundsDetailAskRangeMin = const Key('RangeMin');
   final ideaSubTitle = const Key('IdeaSubTitle');
   final timelineCard = const Key('TimelineCard');
-  final timelineCardTopBar = const Key('TimelineCardTopBar');
   final timelineCardTitle = const Key('TimelineCardTitle');
   final timelineCardDate = const Key('TimelineCardDate');
   final timelineCardDescription = const Key('TimelineCardDescription');
@@ -34,7 +33,7 @@ class CurrentCampaignSelector {
   }
 
   Future<void> descriptionIsRenderedCorrectly() async {
-    await $(description).scrollTo(step: 90);
+    await $(description).scrollTo(step: 90, maxScrolls: 2);
     expect(
       $(description).text,
       T.get('Project Catalyst turns economic power '
@@ -74,7 +73,7 @@ class CurrentCampaignSelector {
   }
 
   Future<void> campaignDetailsAreRenderedCorrectly() async {
-    await $(fundsDetailCard).scrollTo();
+    await $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Title).scrollTo();
     expect(
       $(fundsDetailCard).$(fundsDetailBudget).$(#Title).text,
       T.get('Campaign Treasury'),
@@ -115,7 +114,7 @@ class CurrentCampaignSelector {
       $(fundsDetailCard).$(fundsDetailAskRangeMax).$(#Value).text!.isNotEmpty,
       isTrue,
     );
-    await $(currentCampaignRoot).$(timelineCard).first.scrollTo();
+    await $(currentCampaignRoot).$(ideaSubTitle).scrollTo(step: 150);
     expect(
       $(currentCampaignRoot).$(ideaSubTitle).text,
       T.get('Idea Journey'),
@@ -147,12 +146,6 @@ class CurrentCampaignSelector {
         $(currentCampaignRoot).$(timelineCard).at(i).$(timelineCardDate).text,
         isNotEmpty,
       );
-      //TODO(oldgreg): check text on expanded card
-      // $(currentCampaignRoot)
-      //     .$(timelineCard)
-      //     .at(i)
-      //     .$(timelineCardTopBar);
-      //     .tap();
     }
   }
 

@@ -45,12 +45,14 @@ class _Author extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           VoicesAvatar(
+            key: const Key('AuthorAvatar'),
             icon: Text(author[0]),
             backgroundColor: context.colors.primaryContainer,
             foregroundColor: context.colors.textOnPrimaryWhite,
           ),
           const SizedBox(width: 8),
           Text(
+            key: const Key('Author'),
             author,
             style: context.textTheme.titleSmall?.copyWith(
               color: context.colors.textOnPrimaryLevel1,
@@ -72,6 +74,7 @@ class _Category extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: const Key('Category'),
       category,
       style: context.textTheme.labelMedium?.copyWith(
         color: context.colors.textDisabled,
@@ -88,6 +91,7 @@ class _Description extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: const Key('Description'),
       text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colors.textOnPrimaryLevel0,
@@ -121,10 +125,12 @@ class _FundsAndDuration extends StatelessWidget {
           alignment: WrapAlignment.spaceBetween,
           children: [
             _PropertyValue(
+              key: const Key('FundsRequested'),
               title: context.l10n.fundsRequested,
               formattedValue: funds,
             ),
             _PropertyValue(
+              key: const Key('Duration'),
               title: context.l10n.duration,
               formattedValue: context.l10n.valueMonths(duration),
             ),
@@ -144,6 +150,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
+      key: const Key('PendingProposalCard'),
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,
@@ -394,6 +401,7 @@ class _Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      key: const Key('Title'),
       text,
       style: Theme.of(context).textTheme.titleLarge,
       maxLines: 2,
@@ -420,6 +428,7 @@ class _Topbar extends StatelessWidget {
       children: [
         const Spacer(),
         VoicesIconButton.filled(
+          key: const Key('ShareButton'),
           onTap: () {},
           style: _buttonStyle(context),
           child: VoicesAssets.icons.share.buildIcon(
@@ -429,6 +438,7 @@ class _Topbar extends StatelessWidget {
         if (onFavoriteChanged != null) ...[
           const SizedBox(width: 4),
           VoicesIconButton.filled(
+            key: const Key('FavoriteButton'),
             onTap: () => onFavoriteChanged?.call(!isFavorite),
             style: _buttonStyle(context),
             child: CatalystSvgIcon.asset(
