@@ -173,13 +173,9 @@ scripts:
       melos exec -c 1 --scope="catalyst_voices_repositories" -- dart run setup_build.dart && \
       melos exec -c 1 \
       --depends-on="build_runner" \
-      --scope="catalyst_voices_repositories" -- \
-          dart run build_runner build --delete-conflicting-outputs \
-              --build-filter="lib/src/dto/**" \
-              --build-filter="lib/src/database/**" \
-              --build-filter="lib/src/api/**"
+      --scope="catalyst_voices_repositories" -- dart run build_runner build --delete-conflicting-outputs
     description: |
-      Run `build_runner` in catalyst_voices_repositories package only in selected folders
+      Run `build_runner` in catalyst_voices_repositories package
 
   db-make-migration:
     run: |
@@ -237,7 +233,7 @@ scripts:
       # cleanup old coverage files and create empty folder where coverage files will be stored
       find . -type d -name coverage -prune -exec rm -rf {} \;
       mkdir $MELOS_ROOT_PATH/coverage
-            
+      
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
       ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
