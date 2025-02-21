@@ -32,58 +32,63 @@ const SCHEMAS: &[(&str, &str)] = &[
     ),
     (
         // TXO Unstaked Table Schema
-        include_str!("./cql/unstaked_txo_by_txn_hash.cql"),
+        include_str!("cql/unstaked_txo_by_txn_id.cql"),
         "Create Table Unstaked TXO By Txn Hash",
     ),
     (
         // TXO Unstaked Assets Table Schema
-        include_str!("./cql/unstaked_txo_assets_by_txn_hash.cql"),
+        include_str!("cql/unstaked_txo_assets_by_txn_id.cql"),
         "Create Table Unstaked TXO Assets By Txn Hash",
     ),
     (
-        // TXI by Stake Address Table Schema
-        include_str!("./cql/txi_by_txn_hash_table.cql"),
+        // TXI by Stake Address table schema.
+        include_str!("cql/txi_by_txn_id_table.cql"),
         "Create Table TXI By Stake Address",
     ),
     (
         // Stake Address/Registration Table Schema
-        include_str!("./cql/stake_registration.cql"),
+        include_str!("cql/stake_registration.cql"),
         "Create Table Stake Registration",
     ),
     (
         // CIP-36 Registration Table Schema
-        include_str!("./cql/cip36_registration.cql"),
+        include_str!("cql/cip36_registration.cql"),
         "Create Table CIP-36 Registration",
     ),
     (
-        // CIP-36 Registration Table Schema
-        include_str!("./cql/cip36_registration_invalid.cql"),
+        // CIP-36 invalid registration table schema.
+        include_str!("cql/cip36_registration_invalid.cql"),
         "Create Table CIP-36 Registration Invalid",
     ),
     (
-        // CIP-36 Registration Table Schema
-        include_str!("./cql/cip36_registration_for_vote_key.cql"),
+        // CIP-36 registration for vote key table schema.
+        include_str!("cql/cip36_registration_for_vote_key.cql"),
         "Create Table CIP-36 Registration For a stake address",
     ),
     (
-        // RBAC 509 Registration Table Schema
-        include_str!("./cql/rbac509_registration.cql"),
-        "Create Table RBAC 509 Registration",
+        // RBAC registration table schema.
+        include_str!("cql/rbac_registration.cql"),
+        "Create Table RBAC Registration",
     ),
     (
-        // RBAC 509. Chain Root For TX ID Registration Table Schema
-        include_str!("./cql/chain_root_for_txn_id.cql"),
-        "Create Table Chain Root For TX ID Registration",
+        // RBAC invalid registration table schema.
+        include_str!("cql/rbac_invalid_registration.cql"),
+        "Create Table Invalid RBAC Registration",
     ),
     (
-        // RBAC 509. Chain Root For Role 0 Key Registration Table Schema
-        include_str!("./cql/chain_root_for_role0_key.cql"),
-        "Create Table Chain Root For Role 0 Key Registration",
+        // Catalyst ID for transaction ID table schema.
+        include_str!("cql/catalyst_id_for_txn_id.cql"),
+        "Create Table Catalyst ID For TX ID",
     ),
     (
-        // RBAC 509. Chain Root For Stake Address Registration Table Schema
-        include_str!("./cql/chain_root_for_stake_addr.cql"),
-        "Create Table Chain Root For Stake Address Registration",
+        // Catalyst ID for stake address table schema.
+        include_str!("cql/catalyst_id_for_stake_address.cql"),
+        "Create Table Catalyst ID For Stake Address",
+    ),
+    (
+        // Secondary index for RBAC 509 registrations table.
+        include_str!("cql/rbac_registration_cat_id_by_txn_id_index.cql"),
+        "Create secondary index Catalyst ID for transaction ID on rbac_registration",
     ),
 ];
 
@@ -259,7 +264,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "75ae6ac9-ddd8-8472-8a7a-8676d04f8679";
+    const SCHEMA_VERSION: &str = "772902fc-d5ec-871e-aaca-5b26c96a8cf6";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.

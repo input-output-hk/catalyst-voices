@@ -1,6 +1,6 @@
-//! `UUIDv7` Type.
+//! `UUIDv4` Type.
 //!
-//! String Encoded `UUIDv7`
+//! String Encoded `UUIDv4`
 
 use std::{
     borrow::Cow,

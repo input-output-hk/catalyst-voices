@@ -9,9 +9,12 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::DbSlot,
     },
     service::common::types::cardano::slot_no::SlotNo,
 };
@@ -24,17 +27,17 @@ const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetInvalidRegistrationParams {
     /// Stake address.
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
     /// Block Slot Number when spend occurred.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
 }
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(stake_address: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
+    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
         Self {
-            stake_address,
-            slot_no: slot_no.into(),
+            stake_public_key,
+            slot_no: u64::from(slot_no).into(),
         }
     }
 }
@@ -43,9 +46,9 @@ impl GetInvalidRegistrationParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetInvalidRegistrationQuery {
     /// Error report
-    pub error_report: Vec<String>,
+    pub problem_report: String,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

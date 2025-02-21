@@ -1,9 +1,10 @@
 //! Implementation of the GET `../assets` endpoint
+
 use std::collections::HashMap;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Context};
+use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::StreamExt;
-use pallas::ledger::addresses::StakeAddress;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use super::SlotNumber;
@@ -30,6 +31,9 @@ use crate::{
         types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
     },
 };
+
+/// A `TxoInfo` by transaction ID map.
+type TxosByTxn = HashMap<TransactionId, HashMap<i16, TxoInfo>>;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -93,15 +97,15 @@ struct TxoInfo {
     /// TXO value.
     value: num_bigint::BigInt,
     /// TXO transaction hash.
-    txn_hash: Vec<u8>,
+    txn_hash: TransactionId,
     /// TXO transaction index within the slot.
-    txn: i16,
+    txn_index: TxnIndex,
     /// TXO index.
     txo: i16,
     /// TXO transaction slot number.
-    slot_no: num_bigint::BigInt,
+    slot_no: Slot,
     /// Whether the TXO was spent.
-    spent_slot_no: Option<num_bigint::BigInt>,
+    spent_slot_no: Option<Slot>,
     /// TXO assets.
     assets: HashMap<Vec<u8>, Vec<TxoAssetInfo>>,
 }
@@ -118,9 +122,7 @@ async fn calculate_stake_info(
     };
 
     let address: StakeAddress = stake_address.try_into()?;
-    let stake_address_bytes = address.payload().as_hash().to_vec();
-
-    let mut txos_by_txn = get_txo_by_txn(&session, stake_address_bytes.clone(), slot_num).await?;
+    let mut txos_by_txn = get_txo_by_txn(&session, &address, slot_num).await?;
     if txos_by_txn.is_empty() {
         return Ok(None);
     }
@@ -129,7 +131,7 @@ async fn calculate_stake_info(
     // TODO: This could be executed in the background, it does not actually matter if it
     // succeeds. This is just an optimization step to reduce the need to query spent
     // TXO's.
-    update_spent(&session, stake_address_bytes, &txos_by_txn).await?;
+    update_spent(&session, &address, &txos_by_txn).await?;
 
     let stake_info = build_stake_info(txos_by_txn)?;
 
@@ -138,14 +140,14 @@ async fn calculate_stake_info(
 
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNumber>,
-) -> anyhow::Result<HashMap<Vec<u8>, HashMap<i16, TxoInfo>>> {
-    let adjusted_slot_num = num_bigint::BigInt::from(slot_num.unwrap_or(i64::MAX));
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Option<SlotNumber>,
+) -> anyhow::Result<TxosByTxn> {
+    let adjusted_slot_num: u64 = slot_num.unwrap_or(i64::MAX).try_into().unwrap_or(u64::MAX);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), adjusted_slot_num.clone()),
+        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), adjusted_slot_num.into()),
     )
     .await?;
 
@@ -158,13 +160,13 @@ async fn get_txo_by_txn(
             continue;
         }
 
-        let key = (row.slot_no.clone(), row.txn, row.txo);
+        let key = (row.slot_no, row.txn_index, row.txo);
         txo_map.insert(key, TxoInfo {
             value: row.value,
-            txn_hash: row.txn_hash,
-            txn: row.txn,
-            txo: row.txo,
-            slot_no: row.slot_no,
+            txn_hash: row.txn_id.into(),
+            txn_index: row.txn_index.into(),
+            txo: row.txo.into(),
+            slot_no: row.slot_no.into(),
             spent_slot_no: None,
             assets: HashMap::new(),
         });
@@ -173,14 +175,14 @@ async fn get_txo_by_txn(
     // Augment TXO info with asset info.
     let mut assets_txos_iter = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address, adjusted_slot_num),
+        GetAssetsByStakeAddressParams::new(stake_address.clone(), adjusted_slot_num.into()),
     )
     .await?;
 
     while let Some(row_res) = assets_txos_iter.next().await {
         let row = row_res?;
 
-        let txo_info_key = (row.slot_no.clone(), row.txn, row.txo);
+        let txo_info_key = (row.slot_no, row.txn_index, row.txo);
         let Some(txo_info) = txo_map.get_mut(&txo_info_key) else {
             continue;
         };
@@ -205,7 +207,7 @@ async fn get_txo_by_txn(
     let mut txos_by_txn = HashMap::new();
     for txo_info in txo_map.into_values() {
         let txn_map = txos_by_txn
-            .entry(txo_info.txn_hash.clone())
+            .entry(txo_info.txn_hash)
             .or_insert(HashMap::new());
         txn_map.insert(txo_info.txo, txo_info);
     }
@@ -215,9 +217,9 @@ async fn get_txo_by_txn(
 
 /// Checks if the given TXOs were spent and mark then as such.
 async fn check_and_set_spent(
-    session: &CassandraSession, txos_by_txn: &mut HashMap<Vec<u8>, HashMap<i16, TxoInfo>>,
+    session: &CassandraSession, txos_by_txn: &mut TxosByTxn,
 ) -> anyhow::Result<()> {
-    let txn_hashes = txos_by_txn.keys().cloned().collect::<Vec<_>>();
+    let txn_hashes = txos_by_txn.keys().copied().collect::<Vec<_>>();
 
     for chunk in txn_hashes.chunks(100) {
         let mut txi_iter = GetTxiByTxnHashesQuery::execute(
@@ -229,11 +231,9 @@ async fn check_and_set_spent(
         while let Some(row_res) = txi_iter.next().await {
             let row = row_res?;
 
-            if let Some(txn_map) = txos_by_txn.get_mut(&row.txn_hash) {
-                if let Some(txo_info) = txn_map.get_mut(&row.txo) {
-                    if row.slot_no >= num_bigint::BigInt::ZERO {
-                        txo_info.spent_slot_no = Some(row.slot_no);
-                    }
+            if let Some(txn_map) = txos_by_txn.get_mut(&row.txn_id.into()) {
+                if let Some(txo_info) = txn_map.get_mut(&row.txo.into()) {
+                    txo_info.spent_slot_no = Some(row.slot_no.into());
                 }
             }
         }
@@ -244,8 +244,7 @@ async fn check_and_set_spent(
 
 /// Sets TXOs as spent in the database if they are marked as spent in the map.
 async fn update_spent(
-    session: &CassandraSession, stake_address: Vec<u8>,
-    txos_by_txn: &HashMap<Vec<u8>, HashMap<i16, TxoInfo>>,
+    session: &CassandraSession, stake_address: &StakeAddress, txos_by_txn: &TxosByTxn,
 ) -> anyhow::Result<()> {
     let mut params = Vec::new();
     for txn_map in txos_by_txn.values() {
@@ -254,13 +253,13 @@ async fn update_spent(
                 continue;
             }
 
-            if let Some(spent_slot) = &txo_info.spent_slot_no {
+            if let Some(spent_slot) = txo_info.spent_slot_no {
                 params.push(UpdateTxoSpentQueryParams {
-                    stake_address: stake_address.clone(),
-                    txn: txo_info.txn,
-                    txo: txo_info.txo,
-                    slot_no: txo_info.slot_no.clone(),
-                    spent_slot: spent_slot.clone(),
+                    stake_address: stake_address.clone().into(),
+                    txn_index: txo_info.txn_index.into(),
+                    txo: txo_info.txo.into(),
+                    slot_no: txo_info.slot_no.into(),
+                    spent_slot: spent_slot.into(),
                 });
             }
         }
@@ -272,9 +271,7 @@ async fn update_spent(
 }
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
-fn build_stake_info(
-    txos_by_txn: HashMap<Vec<u8>, HashMap<i16, TxoInfo>>,
-) -> anyhow::Result<StakeInfo> {
+fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
     let mut stake_info = StakeInfo::default();
     for txn_map in txos_by_txn.into_values() {
         for txo_info in txn_map.into_values() {
@@ -296,7 +293,9 @@ fn build_stake_info(
                     });
                 }
 
-                let slot_no = i64::try_from(txo_info.slot_no).map_err(|err| anyhow!(err))?;
+                let slot_no = u64::from(txo_info.slot_no)
+                    .try_into()
+                    .context("Invalid slot number")?;
 
                 if stake_info.slot_number < slot_no {
                     stake_info.slot_number = slot_no;
