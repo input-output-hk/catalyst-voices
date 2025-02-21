@@ -2,11 +2,9 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::service::{
-    api::cardano::types::{SlotNumber, StakeAmount},
-    common::types::cardano::{
-        asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28,
-    },
+use crate::service::common::types::cardano::{
+    ada_value::AdaValue, asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28,
+    slot_no::SlotNo,
 };
 
 /// User's staked native token info.
@@ -25,14 +23,10 @@ pub(crate) struct StakedNativeTokenInfo {
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Total stake amount.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub(crate) ada_amount: StakeAmount,
+    pub(crate) ada_amount: AdaValue,
 
     /// Block's slot number which contains the latest unspent UTXO.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub(crate) slot_number: SlotNumber,
+    pub(crate) slot_number: SlotNo,
 
     /// Native token infos.
     #[oai(validator(max_items = "1000"))]
@@ -42,8 +36,8 @@ pub(crate) struct StakeInfo {
 impl Example for StakeInfo {
     fn example() -> Self {
         Self {
-            slot_number: 5,
-            ada_amount: 1,
+            slot_number: SlotNo::example(),
+            ada_amount: AdaValue::example(),
             native_tokens: Vec::new(),
         }
     }
