@@ -315,7 +315,7 @@ final class ProposalBuilderBloc
     ShareProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    // TODO(dtscalac): handle event
+    // TODO(LynxLynxx): share proposal
   }
 
   Future<void> _submitProposal(
