@@ -8,6 +8,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// A callback called to validate the input of the [VoicesTextField].
+///
+/// This callback returns a [VoicesTextFieldValidationResult] which defines
+/// both the message to be shown where the [VoicesTextFieldDecoration.errorText]
+/// is traditionally shown and as well the status which might decorate
+/// the text field with success checkmark or error icon depending on the status.
+typedef VoicesTextFieldValidator = VoicesTextFieldValidationResult Function(
+  String value,
+);
+
 /// A replacement for [TextField] and [TextFormField]
 /// that is pre-configured to use Project Catalyst theming.
 ///
@@ -203,525 +213,6 @@ class VoicesTextField extends VoicesFormField<String> {
   VoicesFormFieldState<String> createState() => VoicesTextFieldState();
 }
 
-class VoicesTextFieldState extends VoicesFormFieldState<String> {
-  TextEditingController? _customController;
-
-  VoicesTextFieldValidationResult _validation =
-      const VoicesTextFieldValidationResult.none();
-
-  bool get _isResizableVertically {
-    final resizable = widget.resizableVertically ?? _isResizableByDefault;
-
-    // expands property is not supported if any of these are specified,
-    // both must be null
-    final hasNoLineConstraints =
-        widget.maxLines == null && widget.minLines == null;
-
-    return resizable && hasNoLineConstraints;
-  }
-
-  bool get _isResizableHorizontally {
-    return widget.resizableHorizontally;
-  }
-
-  bool get _isResizableByDefault {
-    return CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop;
-  }
-
-  @override
-  VoicesTextField get widget => super.widget as VoicesTextField;
-
-  @override
-  void initState() {
-    super.initState();
-
-    final text = widget.initialText ?? widget.controller?.text ?? '';
-    setValue(text);
-
-    _obtainController()
-      ..textWithSelection = text
-      ..addListener(_handleControllerChanged);
-  }
-
-  @override
-  void didUpdateWidget(VoicesTextField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    final newController = _obtainController();
-
-    // unregister listener from potentially old controllers
-    _customController?.removeListener(_handleControllerChanged);
-    oldWidget.controller?.removeListener(_handleControllerChanged);
-
-    // the widget got controller from the parent, lets dispose our own
-    if (widget.controller != null) {
-      _customController?.dispose();
-      _customController = null;
-    }
-
-    // register for a new one
-    newController.addListener(_handleControllerChanged);
-
-    if (oldWidget.controller?.text != newController.text) {
-      setValue(newController.text);
-    }
-  }
-
-  @override
-  void dispose() {
-    _customController?.dispose();
-    _customController = null;
-    widget.controller?.removeListener(_handleControllerChanged);
-    super.dispose();
-  }
-
-  @override
-  bool validate() {
-    _validate(_obtainController().text);
-    return super.validate();
-  }
-
-  @override
-  void didChange(String? value) {
-    super.didChange(value);
-
-    final controller = _obtainController();
-    if (controller.text != value) {
-      controller.textWithSelection = value ?? '';
-    }
-  }
-
-  @override
-  void reset() {
-    // Set the controller value before calling super.reset() to let
-    // _handleControllerChanged suppress the change.
-    _validation = const VoicesTextFieldValidationResult.none();
-    _obtainController().text = widget.initialValue ?? '';
-    super.reset();
-    widget.onChanged?.call(_obtainController().text);
-  }
-
-  /// Clears the text field.
-  void clear() {
-    didChange(null);
-    widget.onChanged?.call(null);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Validating in build(), similar workaround is done in the
-    // original FormField build method to make sure validation
-    // errors are shown when needed.
-    if (widget.enabled) {
-      _validateIfValidationModeAllows(_obtainController().text);
-    }
-
-    return super.build(context);
-  }
-
-  InputDecoration _buildDecoration() {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-    final colors = theme.colors;
-    final colorScheme = theme.colorScheme;
-
-    return InputDecoration(
-      filled: widget.decoration?.filled,
-      fillColor: widget.decoration?.fillColor,
-      // Note. prefixText is not visible when field is not focused without
-      // this.
-      // Should be removed once this is resolved
-      // https://github.com/flutter/flutter/issues/64552#issuecomment-2074034179
-      floatingLabelBehavior: FloatingLabelBehavior.always,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
-      border: widget.decoration?.border ??
-          _getBorder(
-            orDefault: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: colorScheme.outlineVariant,
-              ),
-            ),
-          ),
-      enabledBorder: widget.decoration?.enabledBorder ??
-          _getBorder(
-            orDefault: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: colorScheme.outlineVariant,
-              ),
-            ),
-          ),
-      disabledBorder: widget.decoration?.disabledBorder ??
-          OutlineInputBorder(
-            borderSide: BorderSide(
-              color: colorScheme.outline,
-            ),
-          ),
-      errorBorder: widget.decoration?.errorBorder ??
-          OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 2,
-              color: _getStatusColor(
-                orDefault: colorScheme.error,
-              ),
-            ),
-          ),
-      focusedBorder: widget.decoration?.focusedBorder ??
-          _getBorder(
-            orDefault: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: 2,
-                color: colorScheme.primary,
-              ),
-            ),
-          ),
-      focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
-          _getBorder(
-            orDefault: OutlineInputBorder(
-              borderSide: BorderSide(
-                width: 2,
-                color: colorScheme.error,
-              ),
-            ),
-          ),
-      helper: widget.decoration?.helper != null
-          ? DefaultTextStyle(
-              style: widget.enabled
-                  ? textTheme.bodySmall!
-                  : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
-              child: widget.decoration!.helper!,
-            )
-          : null,
-      helperText: widget.decoration?.helperText,
-      helperStyle: widget.enabled
-          ? textTheme.bodySmall
-          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
-      hintText: widget.decoration?.hintText,
-      hintStyle: _getHintStyle(
-        textTheme,
-        theme,
-        orDefault: textTheme.bodyLarge!.copyWith(color: colors.textDisabled),
-      ),
-      errorText: widget.decoration?.errorText ?? _validation.errorMessage,
-      errorMaxLines: widget.decoration?.errorMaxLines,
-      errorStyle: _getErrorStyle(textTheme, theme),
-      prefixIcon: _wrapIconIfExists(
-        widget.decoration?.prefixIcon,
-        const EdgeInsetsDirectional.only(start: 8, end: 4),
-      ),
-      prefixText: widget.decoration?.prefixText,
-      prefixStyle: WidgetStateTextStyle.resolveWith((states) {
-        var textStyle = textTheme.bodyLarge ?? const TextStyle();
-
-        if (!states.contains(WidgetState.focused) &&
-            _obtainController().text.isEmpty) {
-          textStyle = textStyle.copyWith(color: colors.textDisabled);
-        }
-
-        return textStyle;
-      }),
-
-      suffixIcon: _wrapSuffixIfExists(
-        widget.decoration?.suffixIcon,
-        const EdgeInsetsDirectional.only(start: 4, end: 8),
-      ),
-      suffixText: widget.decoration?.suffixText,
-      counterText: widget.decoration?.counterText,
-      counterStyle: widget.enabled
-          ? textTheme.bodySmall
-          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
-    );
-  }
-
-  InputBorder _getBorder({required InputBorder orDefault}) {
-    switch (_validation.status) {
-      case VoicesTextFieldStatus.none:
-        return orDefault;
-      case VoicesTextFieldStatus.success:
-      case VoicesTextFieldStatus.warning:
-      case VoicesTextFieldStatus.error:
-        return OutlineInputBorder(
-          borderSide: BorderSide(
-            width: 2,
-            color: _getStatusColor(
-              orDefault: Colors.transparent,
-            ),
-          ),
-        );
-    }
-  }
-
-  TextStyle? _getHintStyle(
-    TextTheme textTheme,
-    ThemeData theme, {
-    TextStyle? orDefault,
-  }) =>
-      widget.decoration?.hintStyle ?? orDefault;
-
-  Widget? _getStatusSuffixWidget() {
-    final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
-    if (!showStatusIcon) {
-      return null;
-    }
-
-    return getStatusSuffixIcon(
-      color: _getStatusColor(orDefault: Colors.transparent),
-    );
-  }
-
-  Widget? getStatusSuffixIcon({required Color color}) {
-    switch (_validation.status) {
-      case VoicesTextFieldStatus.none:
-        return null;
-      case VoicesTextFieldStatus.success:
-        return VoicesAssets.icons.checkCircle.buildIcon(
-          color: color,
-          fit: BoxFit.scaleDown,
-        );
-      case VoicesTextFieldStatus.warning:
-        // TODO(dtscalac): this is not the right icon, it should be outlined
-        // & rounded, ask designers to provide it and update it
-        return Icon(Icons.warning_outlined, color: color);
-      case VoicesTextFieldStatus.error:
-        return Icon(Icons.error_outline, color: color);
-    }
-  }
-
-  Widget? _wrapIconIfExists(Widget? child, EdgeInsetsDirectional padding) {
-    if (child == null) return null;
-
-    return IconTheme(
-      data: IconThemeData(
-        size: 24,
-        color: Theme.of(context).colors.iconsForeground,
-      ),
-      child: Padding(
-        padding: padding,
-        child: Align(
-          widthFactor: 1,
-          heightFactor: 1,
-          child: child,
-        ),
-      ),
-    );
-  }
-
-  Widget? _wrapSuffixIfExists(Widget? child, EdgeInsetsDirectional padding) {
-    final statusSuffixWidget = _getStatusSuffixWidget();
-    if (child == null) {
-      return statusSuffixWidget;
-    }
-
-    return Padding(
-      padding: padding,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconTheme(
-            data: IconThemeData(
-              size: 24,
-              color: Theme.of(context).colors.iconsForeground,
-            ),
-            child: Align(
-              widthFactor: 1,
-              heightFactor: 1,
-              child: child,
-            ),
-          ),
-          if (statusSuffixWidget != null) ...[
-            const SizedBox(width: 2),
-            statusSuffixWidget,
-          ],
-        ],
-      ),
-    );
-  }
-
-  Color _getStatusColor({required Color orDefault}) {
-    switch (_validation.status) {
-      case VoicesTextFieldStatus.none:
-        return orDefault;
-      case VoicesTextFieldStatus.success:
-        return Theme.of(context).colors.success;
-      case VoicesTextFieldStatus.warning:
-        return Theme.of(context).colors.warning;
-      case VoicesTextFieldStatus.error:
-        return Theme.of(context).colorScheme.error;
-    }
-  }
-
-  TextEditingController _obtainController() {
-    final providedController = widget.controller;
-    if (providedController != null) {
-      return providedController;
-    }
-
-    var customController = _customController;
-    if (customController == null) {
-      final textValue =
-          TextEditingValueExt.collapsedAtEndOf(widget.initialText ?? '');
-
-      customController = TextEditingController.fromValue(textValue);
-      _customController = customController;
-    }
-
-    return customController;
-  }
-
-  TextStyle? _getErrorStyle(TextTheme textTheme, ThemeData theme) {
-    if (widget.decoration?.errorStyle != null) {
-      return widget.decoration?.errorStyle;
-    }
-
-    return widget.enabled
-        ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
-        : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
-  }
-
-  void _handleControllerChanged() {
-    final text = _obtainController().text;
-    if (value != text) {
-      setValue(text);
-    }
-  }
-
-  void _validateIfValidationModeAllows(String? value) {
-    switch (widget.autovalidateMode) {
-      case AutovalidateMode.disabled:
-      case AutovalidateMode.onUnfocus:
-        _validation = const VoicesTextFieldValidationResult.none();
-      case AutovalidateMode.always:
-        _validate(value);
-      case AutovalidateMode.onUserInteraction:
-        if (hasInteractedByUser) {
-          _validate(value);
-        }
-    }
-  }
-
-  void _validate(String? value) {
-    final result = widget.textValidator?.call(value ?? '');
-    _validation = result ?? const VoicesTextFieldValidationResult.none();
-  }
-}
-
-/// A callback called to validate the input of the [VoicesTextField].
-///
-/// This callback returns a [VoicesTextFieldValidationResult] which defines
-/// both the message to be shown where the [VoicesTextFieldDecoration.errorText]
-/// is traditionally shown and as well the status which might decorate
-/// the text field with success checkmark or error icon depending on the status.
-typedef VoicesTextFieldValidator = VoicesTextFieldValidationResult Function(
-  String value,
-);
-
-/// The return value of the [VoicesTextField.textValidator].
-class VoicesTextFieldValidationResult with EquatableMixin {
-  /// The status of the validation.
-  ///
-  /// The validation can be either a success, a warning or an error.
-  final VoicesTextFieldStatus status;
-
-  /// The error message to be used in case of a [VoicesTextFieldStatus.warning]
-  /// or an [VoicesTextFieldStatus.error].
-  final String? errorMessage;
-
-  const VoicesTextFieldValidationResult({
-    required this.status,
-    this.errorMessage,
-  }) : assert(
-          (status == VoicesTextFieldStatus.warning ||
-                  status == VoicesTextFieldStatus.error) ||
-              errorMessage == null,
-          'errorMessage can be only used for warning or error status',
-        );
-
-  const VoicesTextFieldValidationResult.none()
-      : this(
-          status: VoicesTextFieldStatus.none,
-        );
-
-  /// Returns a successful validation result.
-  ///
-  /// The method was designed to be used as
-  /// [VoicesTextField.textValidator] param:
-  ///
-  /// ```
-  ///   validator: (value) {
-  ///       return const VoicesTextFieldValidationResult.success();
-  ///   },
-  /// ```
-  ///
-  /// in cases where the text field state is known in advance
-  /// and dynamic validation is not needed.
-  const VoicesTextFieldValidationResult.success()
-      : this(
-          status: VoicesTextFieldStatus.success,
-        );
-
-  /// Returns a warning validation result.
-  ///
-  /// The method was designed to be used as
-  /// [VoicesTextField.textValidator] param:
-  ///
-  /// ```
-  ///   validator: (value) {
-  ///       return const VoicesTextFieldValidationResult.warning();
-  ///   },
-  /// ```
-  ///
-  /// in cases where the text field state is known in advance
-  /// and dynamic validation is not needed.
-  const VoicesTextFieldValidationResult.warning([String? message])
-      : this(
-          status: VoicesTextFieldStatus.warning,
-          errorMessage: message,
-        );
-
-  /// Returns an error validation result.
-  ///
-  /// The method was designed to be used as
-  /// [VoicesTextField.textValidator] param:
-  ///
-  /// ```
-  ///   validator: (value) {
-  ///       return const VoicesTextFieldValidationResult.error();
-  ///   },
-  /// ```
-  ///
-  /// in cases where the text field state is known in advance
-  /// and dynamic validation is not needed.
-  const VoicesTextFieldValidationResult.error([String? message])
-      : this(
-          status: VoicesTextFieldStatus.error,
-          errorMessage: message,
-        );
-
-  @override
-  List<Object?> get props => [status, errorMessage];
-}
-
-/// Defines the appearance of the [VoicesTextField].
-enum VoicesTextFieldStatus {
-  /// The text field appears as usual.
-  none,
-
-  /// The text field represents a success,
-  /// i.e. if the input text is successfully validated.
-  success,
-
-  /// The text field represents a warning,
-  /// i.e. if the input text is validated with a warning.
-  warning,
-
-  /// The text field represents an error,
-  /// i.e. if the input text is validated with an error.
-  error,
-}
-
 /// A replacement for [InputDecoration] to only expose parameters
 /// that are supported by [VoicesTextField].
 class VoicesTextFieldDecoration {
@@ -793,6 +284,10 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.fillColor].
   final Color? fillColor;
 
+  /// The border radius for all borders of the text field.
+  /// If not specified, no radius will be applied.
+  final BorderRadius? borderRadius;
+
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -817,5 +312,526 @@ class VoicesTextFieldDecoration {
     this.showStatusSuffixIcon = true,
     this.filled = true,
     this.fillColor,
+    this.borderRadius,
   });
+}
+
+class VoicesTextFieldState extends VoicesFormFieldState<String> {
+  TextEditingController? _customController;
+
+  VoicesTextFieldValidationResult _validation =
+      const VoicesTextFieldValidationResult.none();
+
+  @override
+  VoicesTextField get widget => super.widget as VoicesTextField;
+
+  bool get _isResizableByDefault {
+    return CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop;
+  }
+
+  bool get _isResizableHorizontally {
+    return widget.resizableHorizontally;
+  }
+
+  bool get _isResizableVertically {
+    final resizable = widget.resizableVertically ?? _isResizableByDefault;
+
+    // expands property is not supported if any of these are specified,
+    // both must be null
+    final hasNoLineConstraints =
+        widget.maxLines == null && widget.minLines == null;
+
+    return resizable && hasNoLineConstraints;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Validating in build(), similar workaround is done in the
+    // original FormField build method to make sure validation
+    // errors are shown when needed.
+    if (widget.enabled) {
+      _validateIfValidationModeAllows(_obtainController().text);
+    }
+
+    return super.build(context);
+  }
+
+  /// Clears the text field.
+  void clear() {
+    didChange(null);
+    widget.onChanged?.call(null);
+  }
+
+  @override
+  void didChange(String? value) {
+    super.didChange(value);
+
+    final controller = _obtainController();
+    if (controller.text != value) {
+      controller.textWithSelection = value ?? '';
+    }
+  }
+
+  @override
+  void didUpdateWidget(VoicesTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final newController = _obtainController();
+
+    // unregister listener from potentially old controllers
+    _customController?.removeListener(_handleControllerChanged);
+    oldWidget.controller?.removeListener(_handleControllerChanged);
+
+    // the widget got controller from the parent, lets dispose our own
+    if (widget.controller != null) {
+      _customController?.dispose();
+      _customController = null;
+    }
+
+    // register for a new one
+    newController.addListener(_handleControllerChanged);
+
+    if (oldWidget.controller?.text != newController.text) {
+      setValue(newController.text);
+    }
+  }
+
+  @override
+  void dispose() {
+    _customController?.dispose();
+    _customController = null;
+    widget.controller?.removeListener(_handleControllerChanged);
+    super.dispose();
+  }
+
+  Widget? getStatusSuffixIcon({required Color color}) {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return null;
+      case VoicesTextFieldStatus.success:
+        return VoicesAssets.icons.checkCircle.buildIcon(
+          color: color,
+          fit: BoxFit.scaleDown,
+        );
+      case VoicesTextFieldStatus.warning:
+        // TODO(dtscalac): this is not the right icon, it should be outlined
+        // & rounded, ask designers to provide it and update it
+        return Icon(Icons.warning_outlined, color: color);
+      case VoicesTextFieldStatus.error:
+        return Icon(Icons.error_outline, color: color);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final text = widget.initialText ?? widget.controller?.text ?? '';
+    setValue(text);
+
+    _obtainController()
+      ..textWithSelection = text
+      ..addListener(_handleControllerChanged);
+  }
+
+  @override
+  void reset() {
+    // Set the controller value before calling super.reset() to let
+    // _handleControllerChanged suppress the change.
+    _validation = const VoicesTextFieldValidationResult.none();
+    _obtainController().text = widget.initialValue ?? '';
+    super.reset();
+    widget.onChanged?.call(_obtainController().text);
+  }
+
+  @override
+  bool validate() {
+    // Not calling setState() from here, the super.validate() does it.
+    _validate(_obtainController().text);
+
+    return super.validate();
+  }
+
+  InputDecoration _buildDecoration() {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colors = theme.colors;
+    final colorScheme = theme.colorScheme;
+    final borderRadius = widget.decoration?.borderRadius;
+
+    return InputDecoration(
+      filled: widget.decoration?.filled,
+      fillColor: widget.decoration?.fillColor,
+      // Note. prefixText is not visible when field is not focused without
+      // this.
+      // Should be removed once this is resolved
+      // https://github.com/flutter/flutter/issues/64552#issuecomment-2074034179
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
+      border: widget.decoration?.border ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+      enabledBorder: widget.decoration?.enabledBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+              ),
+            ),
+          ),
+      disabledBorder: widget.decoration?.disabledBorder ??
+          OutlineInputBorder(
+            borderRadius: borderRadius ?? BorderRadius.zero,
+            borderSide: BorderSide(
+              color: colorScheme.outline,
+            ),
+          ),
+      errorBorder: widget.decoration?.errorBorder ??
+          OutlineInputBorder(
+            borderRadius: borderRadius ?? BorderRadius.zero,
+            borderSide: BorderSide(
+              width: 2,
+              color: _getStatusColor(
+                orDefault: colorScheme.error,
+              ),
+            ),
+          ),
+      focusedBorder: widget.decoration?.focusedBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
+              borderSide: BorderSide(
+                width: 2,
+                color: colorScheme.primary,
+              ),
+            ),
+          ),
+      focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
+          _getBorder(
+            orDefault: OutlineInputBorder(
+              borderRadius: borderRadius ?? BorderRadius.zero,
+              borderSide: BorderSide(
+                width: 2,
+                color: colorScheme.error,
+              ),
+            ),
+          ),
+      helper: widget.decoration?.helper != null
+          ? DefaultTextStyle(
+              style: widget.enabled
+                  ? textTheme.bodySmall!
+                  : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+              child: widget.decoration!.helper!,
+            )
+          : null,
+      helperText: widget.decoration?.helperText,
+      helperStyle: widget.enabled
+          ? textTheme.bodySmall
+          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+      hintText: widget.decoration?.hintText,
+      hintStyle: _getHintStyle(
+        textTheme,
+        theme,
+        orDefault: textTheme.bodyLarge!.copyWith(color: colors.textDisabled),
+      ),
+      errorText: widget.decoration?.errorText ?? _validation.errorMessage,
+      errorMaxLines: widget.decoration?.errorMaxLines,
+      errorStyle: _getErrorStyle(textTheme, theme),
+      prefixIcon: _wrapIconIfExists(
+        widget.decoration?.prefixIcon,
+        const EdgeInsetsDirectional.only(start: 8, end: 4),
+      ),
+      prefixText: widget.decoration?.prefixText,
+      prefixStyle: WidgetStateTextStyle.resolveWith((states) {
+        var textStyle = textTheme.bodyLarge ?? const TextStyle();
+
+        if (!states.contains(WidgetState.focused) &&
+            _obtainController().text.isEmpty) {
+          textStyle = textStyle.copyWith(color: colors.textDisabled);
+        }
+
+        return textStyle;
+      }),
+      suffixIcon: _wrapSuffixIfExists(
+        widget.decoration?.suffixIcon,
+        const EdgeInsetsDirectional.only(start: 4, end: 8),
+      ),
+      suffixText: widget.decoration?.suffixText,
+      counterText: widget.decoration?.counterText,
+      counterStyle: widget.enabled
+          ? textTheme.bodySmall
+          : textTheme.bodySmall!.copyWith(color: colors.textDisabled),
+    );
+  }
+
+  InputBorder _getBorder({required InputBorder orDefault}) {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return orDefault;
+      case VoicesTextFieldStatus.success:
+      case VoicesTextFieldStatus.warning:
+      case VoicesTextFieldStatus.error:
+        return OutlineInputBorder(
+          borderRadius: widget.decoration?.borderRadius ?? BorderRadius.zero,
+          borderSide: BorderSide(
+            width: 2,
+            color: _getStatusColor(
+              orDefault: Colors.transparent,
+            ),
+          ),
+        );
+    }
+  }
+
+  TextStyle? _getErrorStyle(TextTheme textTheme, ThemeData theme) {
+    if (widget.decoration?.errorStyle != null) {
+      return widget.decoration?.errorStyle;
+    }
+
+    return widget.enabled
+        ? textTheme.bodySmall!.copyWith(color: theme.colorScheme.error)
+        : textTheme.bodySmall!.copyWith(color: theme.colors.textDisabled);
+  }
+
+  TextStyle? _getHintStyle(
+    TextTheme textTheme,
+    ThemeData theme, {
+    TextStyle? orDefault,
+  }) =>
+      widget.decoration?.hintStyle ?? orDefault;
+
+  Color _getStatusColor({required Color orDefault}) {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return orDefault;
+      case VoicesTextFieldStatus.success:
+        return Theme.of(context).colors.success;
+      case VoicesTextFieldStatus.warning:
+        return Theme.of(context).colors.warning;
+      case VoicesTextFieldStatus.error:
+        return widget.enabled
+            ? Theme.of(context).colorScheme.error
+            : Colors.transparent;
+    }
+  }
+
+  Widget? _getStatusSuffixWidget() {
+    final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
+    if (!showStatusIcon) {
+      return null;
+    }
+
+    return getStatusSuffixIcon(
+      color: _getStatusColor(orDefault: Colors.transparent),
+    );
+  }
+
+  void _handleControllerChanged() {
+    final text = _obtainController().text;
+    if (value != text) {
+      setValue(text);
+    }
+  }
+
+  TextEditingController _obtainController() {
+    final providedController = widget.controller;
+    if (providedController != null) {
+      return providedController;
+    }
+
+    var customController = _customController;
+    if (customController == null) {
+      final textValue =
+          TextEditingValueExt.collapsedAtEndOf(widget.initialText ?? '');
+
+      customController = TextEditingController.fromValue(textValue);
+      _customController = customController;
+    }
+
+    return customController;
+  }
+
+  void _validate(String? value) {
+    final result = widget.textValidator?.call(value ?? '');
+    _validation = result ?? const VoicesTextFieldValidationResult.none();
+  }
+
+  void _validateIfValidationModeAllows(String? value) {
+    switch (widget.autovalidateMode) {
+      case AutovalidateMode.disabled:
+      case AutovalidateMode.onUnfocus:
+        _validation = const VoicesTextFieldValidationResult.none();
+      case AutovalidateMode.always:
+        _validate(value);
+      case AutovalidateMode.onUserInteraction:
+        if (hasInteractedByUser) {
+          _validate(value);
+        }
+    }
+  }
+
+  Widget? _wrapIconIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    if (child == null) return null;
+
+    return IconTheme(
+      data: IconThemeData(
+        size: 24,
+        color: Theme.of(context).colors.iconsForeground,
+      ),
+      child: Padding(
+        padding: padding,
+        child: Align(
+          widthFactor: 1,
+          heightFactor: 1,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget? _wrapSuffixIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    final statusSuffixWidget = _getStatusSuffixWidget();
+    if (child == null) {
+      return statusSuffixWidget;
+    }
+
+    return Padding(
+      padding: padding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconTheme(
+            data: IconThemeData(
+              size: 24,
+              color: Theme.of(context).colors.iconsForeground,
+            ),
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: child,
+            ),
+          ),
+          if (statusSuffixWidget != null) ...[
+            const SizedBox(width: 2),
+            statusSuffixWidget,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Defines the appearance of the [VoicesTextField].
+enum VoicesTextFieldStatus {
+  /// The text field appears as usual.
+  none,
+
+  /// The text field represents a success,
+  /// i.e. if the input text is successfully validated.
+  success,
+
+  /// The text field represents a warning,
+  /// i.e. if the input text is validated with a warning.
+  warning,
+
+  /// The text field represents an error,
+  /// i.e. if the input text is validated with an error.
+  error,
+}
+
+/// The return value of the [VoicesTextField.textValidator].
+class VoicesTextFieldValidationResult with EquatableMixin {
+  /// The status of the validation.
+  ///
+  /// The validation can be either a success, a warning or an error.
+  final VoicesTextFieldStatus status;
+
+  /// The error message to be used in case of a [VoicesTextFieldStatus.warning]
+  /// or an [VoicesTextFieldStatus.error].
+  final String? errorMessage;
+
+  const VoicesTextFieldValidationResult({
+    required this.status,
+    this.errorMessage,
+  }) : assert(
+          (status == VoicesTextFieldStatus.warning ||
+                  status == VoicesTextFieldStatus.error) ||
+              errorMessage == null,
+          'errorMessage can be only used for warning or error status',
+        );
+
+  /// Returns an error validation result.
+  ///
+  /// The method was designed to be used as
+  /// [VoicesTextField.textValidator] param:
+  ///
+  /// ```
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.error();
+  ///   },
+  /// ```
+  ///
+  /// in cases where the text field state is known in advance
+  /// and dynamic validation is not needed.
+  const VoicesTextFieldValidationResult.error([String? message])
+      : this(
+          status: VoicesTextFieldStatus.error,
+          errorMessage: message,
+        );
+
+  const VoicesTextFieldValidationResult.none()
+      : this(
+          status: VoicesTextFieldStatus.none,
+        );
+
+  /// Returns a successful validation result.
+  ///
+  /// The method was designed to be used as
+  /// [VoicesTextField.textValidator] param:
+  ///
+  /// ```
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.success();
+  ///   },
+  /// ```
+  ///
+  /// in cases where the text field state is known in advance
+  /// and dynamic validation is not needed.
+  const VoicesTextFieldValidationResult.success()
+      : this(
+          status: VoicesTextFieldStatus.success,
+        );
+
+  /// Returns a warning validation result.
+  ///
+  /// The method was designed to be used as
+  /// [VoicesTextField.textValidator] param:
+  ///
+  /// ```
+  ///   validator: (value) {
+  ///       return const VoicesTextFieldValidationResult.warning();
+  ///   },
+  /// ```
+  ///
+  /// in cases where the text field state is known in advance
+  /// and dynamic validation is not needed.
+  const VoicesTextFieldValidationResult.warning([String? message])
+      : this(
+          status: VoicesTextFieldStatus.warning,
+          errorMessage: message,
+        );
+
+  @override
+  List<Object?> get props => [status, errorMessage];
 }

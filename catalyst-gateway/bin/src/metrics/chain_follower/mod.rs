@@ -5,7 +5,8 @@ use std::{
     thread,
 };
 
-use cardano_chain_follower::{Network, Statistics};
+use cardano_blockchain_types::Network;
+use cardano_chain_follower::Statistics;
 
 use crate::settings::Settings;
 
@@ -79,7 +80,7 @@ fn report_mithril(
         .set(i64::try_from(stats.updates).unwrap_or(-1));
     reporter::MITHRIL_TIP[net_idx]
         .with_label_values(&[api_host_names, service_id, &network])
-        .set(i64::try_from(stats.tip).unwrap_or(-1));
+        .set(i64::try_from(u64::from(stats.tip)).unwrap_or(-1));
     reporter::MITHRIL_DL_START[net_idx]
         .with_label_values(&[api_host_names, service_id, &network])
         .set(stats.dl_start.timestamp());
@@ -187,10 +188,10 @@ fn report_live(
         .set(i64::try_from(stats.blocks).unwrap_or(-1));
     reporter::LIVE_HEAD_SLOT[net_idx]
         .with_label_values(&[api_host_names, service_id, &network])
-        .set(i64::try_from(stats.head_slot).unwrap_or(-1));
+        .set(i64::try_from(u64::from(stats.head_slot)).unwrap_or(-1));
     reporter::LIVE_TIP[net_idx]
         .with_label_values(&[api_host_names, service_id, &network])
-        .set(i64::try_from(stats.tip).unwrap_or(-1));
+        .set(i64::try_from(u64::from(stats.tip)).unwrap_or(-1));
     reporter::LIVE_RECONNECTS[net_idx]
         .with_label_values(&[api_host_names, service_id, &network])
         .set(i64::try_from(stats.reconnects).unwrap_or(-1));

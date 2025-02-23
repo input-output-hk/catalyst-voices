@@ -2,31 +2,36 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::TransactionId;
 use scylla::{
     prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
     SerializeRow, Session,
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
 };
 
 /// Get TXI query string.
-const GET_TXI_BY_TXN_HASHES_QUERY: &str = include_str!("../cql/get_txi_by_txn_hashes.cql");
+const GET_TXI_BY_TXN_HASHES_QUERY: &str = include_str!("../cql/get_txi_by_txn_ids.cql");
 
 /// Get TXI query parameters.
 #[derive(SerializeRow)]
 pub(crate) struct GetTxiByTxnHashesQueryParams {
     /// Transaction hashes.
-    txn_hashes: Vec<Vec<u8>>,
+    txn_ids: Vec<DbTransactionId>,
 }
 
 impl GetTxiByTxnHashesQueryParams {
     /// Create a new instance of [`GetTxiByTxnHashesQueryParams`]
-    pub(crate) fn new(txn_hashes: Vec<Vec<u8>>) -> Self {
-        Self { txn_hashes }
+    pub(crate) fn new(txn_ids: Vec<TransactionId>) -> Self {
+        let txn_ids = txn_ids.into_iter().map(Into::into).collect();
+        Self { txn_ids }
     }
 }
 
@@ -34,11 +39,11 @@ impl GetTxiByTxnHashesQueryParams {
 #[derive(DeserializeRow)]
 pub(crate) struct GetTxiByTxnHashesQuery {
     /// TXI transaction hash.
-    pub txn_hash: Vec<u8>,
+    pub txn_id: DbTransactionId,
     /// TXI original TXO index.
-    pub txo: i16,
+    pub txo: DbTxnOutputOffset,
     /// TXI slot number.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
 }
 
 impl GetTxiByTxnHashesQuery {

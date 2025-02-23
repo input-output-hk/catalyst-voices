@@ -1,16 +1,16 @@
 -- Index RBAC 509 Registrations (Valid)
-INSERT INTO RBAC509_registration (
-    chain_root,
+INSERT INTO rbac_registration (
+    catalyst_id,
+    txn_id,
     slot_no,
-    txn,
-    transaction_id,
-    purpose,
-    prv_txn_id
+    txn_index,
+    prv_txn_id,
+    purpose
 ) VALUES (
-    :chain_root,
+    :catalyst_id,
+    :txn_id,
     :slot_no,
-    :txn,
-    :transaction_id,
-    :purpose,
-    :prv_txn_id
+    :txn_index,
+    :prv_txn_id,
+    :purpose
 );

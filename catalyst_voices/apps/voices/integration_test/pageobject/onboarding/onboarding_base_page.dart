@@ -20,6 +20,10 @@ class OnboardingPageBase {
   final progressBar = const Key('ProgressBar');
   final registrationDetailsTitle = const Key('RegistrationDetailsTitle');
   final registrationDetailsBody = const Key('RegistrationDetailsBody');
+  final registrationTileTitle = const Key('RegistrationTileTitle');
+  final registrationTileSubtitle = const Key('RegistrationTileSubtitle');
+  final pictureContainer = const Key('PictureContainer');
+  final learnMoreButton = const Key('LearnMoreButton');
 
   Future<String?> infoPartHeaderTitleText() async {
     return $(registrationInfoPanel).$(headerTitle).text;

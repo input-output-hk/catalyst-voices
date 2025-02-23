@@ -22,6 +22,7 @@ class AccountRoleDialog extends StatelessWidget {
   }) async {
     return VoicesDialog.show<void>(
       context: context,
+      routeSettings: const RouteSettings(name: '/account-role'),
       builder: (context) {
         return AccountRoleDialog(
           role: role,
