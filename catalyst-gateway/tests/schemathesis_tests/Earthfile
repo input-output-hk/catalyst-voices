@@ -20,13 +20,11 @@ package-schemathesis:
 
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
                 && st run --checks=all $api_spec \
-                    # remove these includes when endpoints will be not "draft"
-                    --include-operation-id 'cardanoRegistrationCip36' \
-                    --include-operation-id 'stakedAssetsGet' \
-                    --exclude-path-regex '\"*/draft/*\"' \
+                    --exclude-path-regex '.*\/draft\/.*' \
                     --exclude-path '/api/v1/health/inspection' \ #excluding since this is a internal debug endpoint
                     --exclude-checks=ignored_auth \ # overridden check with ignored_auth_custom
                     --exclude-checks=negative_data_rejection \ # overridden check with negative_data_rejection_custom
+                    --exclude-checks=not_a_server_error \ # overridden check with not_a_server_error_custom
                     --workers=2 \
                     --wait-for-schema=$wait_for_schema \
                     --max-response-time=$max_response_time \
@@ -98,7 +96,7 @@ test-ci-schemathesis:
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
         --service cat-gateway-with-scylla \
         --allow-privileged
-        RUN sleep 110; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
@@ -134,7 +132,7 @@ nightly-test-draft-schemathesis:
         --service cat-gateway-with-scylla \
         --allow-privileged
         # --no-cache is only for running in nightly - DO NOT use this in CI
-        RUN --no-cache sleep 120; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
+        RUN --no-cache sleep 130; docker run --net=host --name=st schemathesis:latest || echo fail > fail; \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml && \
             docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log; \
