@@ -1,5 +1,7 @@
 //! RBAC indexing tests that require a database connection.
 
+use std::collections::HashMap;
+
 use crate::db::index::{
     block::rbac509::Rbac509InsertQuery,
     tests::{get_shared_session, test_utils, SESSION_ERR_MSG},
@@ -17,7 +19,16 @@ async fn index() {
     let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
         .parse()
         .unwrap();
-    query.index(&session, txn_hash, 0.into(), &block).await;
+    let mut catalyst_id_by_txn_id = HashMap::new();
+    query
+        .index(
+            &session,
+            txn_hash,
+            0.into(),
+            &block,
+            &mut catalyst_id_by_txn_id,
+        )
+        .await;
     assert!(query.invalid.is_empty());
     assert_eq!(1, query.registrations.len());
     assert_eq!(1, query.catalyst_id_for_txn_id.len());
@@ -38,7 +49,16 @@ async fn index_invalid() {
     let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
         .parse()
         .unwrap();
-    query.index(&session, txn_hash, 0.into(), &block).await;
+    let mut catalyst_id_by_txn_id = HashMap::new();
+    query
+        .index(
+            &session,
+            txn_hash,
+            0.into(),
+            &block,
+            &mut catalyst_id_by_txn_id,
+        )
+        .await;
     assert!(query.invalid.is_empty());
     assert!(query.registrations.is_empty());
     assert!(query.catalyst_id_for_txn_id.is_empty());

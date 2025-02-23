@@ -8,6 +8,8 @@ pub(crate) mod roll_forward;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
+use std::collections::HashMap;
+
 use cardano_blockchain_types::MultiEraBlock;
 use catalyst_types::hashes::Blake2b256Hash;
 use certs::CertInsertQuery;
@@ -29,6 +31,10 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     let mut cert_index = CertInsertQuery::new();
     let mut cip36_index = Cip36InsertQuery::new();
     let mut rbac509_index = Rbac509InsertQuery::new();
+    // There can potentially be several consecutive registrations in one block. In that case
+    // the transaction ID to Catalyst ID mapping will be absent in the database because it is
+    // populated after indexing the whole block, so we need to have this map.
+    let mut catalyst_id_by_txn_id = HashMap::new();
 
     let mut txi_index = TxiInsertQuery::new();
     let mut txo_index = TxoInsertQuery::new();
@@ -55,7 +61,9 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
-        rbac509_index.index(&session, txn_id, index, block).await;
+        rbac509_index
+            .index(&session, txn_id, index, block, &mut catalyst_id_by_txn_id)
+            .await;
     }
 
     // We then execute each batch of data from the block.

@@ -5,7 +5,7 @@ pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
 
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use cardano_blockchain_types::{
     Cip0134Uri, MultiEraBlock, Slot, StakeAddress, TransactionId, TxnIndex,
@@ -63,7 +63,7 @@ impl Rbac509InsertQuery {
     /// Index the RBAC 509 registrations in a transaction.
     pub(crate) async fn index(
         &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionId, index: TxnIndex,
-        block: &MultiEraBlock,
+        block: &MultiEraBlock, catalyst_id_by_txn_id: &mut HashMap<TransactionId, IdUri>,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -99,7 +99,16 @@ impl Rbac509InsertQuery {
             );
         }
 
-        let Some(catalyst_id) = catalyst_id(session, &cip509, txn_hash, slot, index).await else {
+        let Some(catalyst_id) = catalyst_id(
+            session,
+            &cip509,
+            txn_hash,
+            slot,
+            index,
+            catalyst_id_by_txn_id,
+        )
+        .await
+        else {
             error!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
             return;
         };
@@ -200,7 +209,7 @@ impl Rbac509InsertQuery {
 /// Returns a Catalyst ID of the given registration.
 async fn catalyst_id(
     session: &Arc<CassandraSession>, cip509: &Cip509, txn_hash: TransactionId, slot: Slot,
-    index: TxnIndex,
+    index: TxnIndex, catalyst_id_by_txn_id: &mut HashMap<TransactionId, IdUri>,
 ) -> Option<IdUri> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::{
         cache_for_transaction_id, Query,
@@ -208,17 +217,22 @@ async fn catalyst_id(
 
     let id = match cip509.previous_transaction() {
         Some(previous) => {
-            Query::get_latest(session, previous.into())
-                .await
-                .inspect_err(|e| error!("{e:?}"))
-                .ok()
-                .flatten()?
-                .catalyst_id
-                .into()
+            if let Some(id) = catalyst_id_by_txn_id.get(&txn_hash) {
+                id.clone()
+            } else {
+                Query::get_latest(session, previous.into())
+                    .await
+                    .inspect_err(|e| error!("{e:?}"))
+                    .ok()
+                    .flatten()?
+                    .catalyst_id
+                    .into()
+            }
         },
         None => cip509.catalyst_id()?.as_short_id(),
     };
 
+    catalyst_id_by_txn_id.insert(txn_hash, id.clone());
     cache_for_transaction_id(txn_hash, id.clone(), slot, index);
 
     Some(id)
