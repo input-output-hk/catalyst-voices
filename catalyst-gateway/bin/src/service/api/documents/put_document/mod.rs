@@ -1,11 +1,10 @@
 //! Implementation of the PUT `/document` endpoint
 
 use anyhow::anyhow;
-use catalyst_signed_doc::{error::CatalystSignedDocError, CatalystSignedDocument};
 use poem_openapi::{payload::Json, ApiResponse};
 use unprocessable_content_request::PutDocumentUnprocessableContent;
 
-use super::get_document::{DocProvider, DocProviderError};
+use super::get_document::DocProvider;
 use crate::{
     db::event::signed_docs::{FullSignedDoc, SignedDocBody, StoreError},
     service::common::responses::WithErrorResponses,
@@ -47,56 +46,19 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
-    match CatalystSignedDocument::try_from(doc_bytes.as_slice()) {
+    match minicbor::decode(doc_bytes.as_slice()) {
         Ok(doc) => {
             if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
                 // means that something happend inside the `DocProvider`, some db error.
-                if let Some(e) = e.error().downcast_ref::<DocProviderError>() {
-                    return AllResponses::handle_error(&e.0);
-                }
-                return return_error_report(&e);
+                return AllResponses::handle_error(&e);
             }
 
-            let authors = doc
-                .authors()
-                .into_iter()
-                .map(|kid| kid.to_string())
-                .collect();
+            let report = doc.problem_report();
+            if report.is_problematic() {
+                return return_error_report(&report);
+            }
 
-            let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
-                Ok(json) => json,
-                Err(e) => {
-                    return AllResponses::internal_error(&anyhow!(
-                        "Cannot decode document metadata into JSON, err: {e}"
-                    ))
-                },
-            };
-
-            let doc_body = SignedDocBody::new(
-                doc.doc_id().into(),
-                doc.doc_ver().into(),
-                doc.doc_type().into(),
-                authors,
-                Some(doc_meta_json),
-            );
-
-            let payload = if doc.doc_content().is_json() {
-                match serde_json::from_slice(doc.doc_content().decoded_bytes()) {
-                    Ok(payload) => Some(payload),
-                    Err(e) => {
-                        return AllResponses::internal_error(&anyhow!(
-                            "Invalid Document Content, not Json encoded: {e}"
-                        ))
-                    },
-                }
-            } else {
-                None
-            };
-
-            match FullSignedDoc::new(doc_body, payload, doc_bytes)
-                .store()
-                .await
-            {
+            match store_document_in_db(&doc, doc_bytes).await {
                 Ok(true) => Responses::Created.into(),
                 Ok(false) => Responses::NoContent.into(),
                 Err(err) if err.is::<StoreError>() => {
@@ -109,13 +71,65 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
                 Err(err) => AllResponses::handle_error(&err),
             }
         },
-        Err(e) => return_error_report(&e),
+        Err(_) => {
+            Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                "Invalid CBOR bytes, cannot decode Catalyst Signed Document.",
+                None,
+            )))
+            .into()
+        },
     }
 }
 
+/// Store a provided and validated document inside the db.
+/// Returns `true` if its a new document.
+/// Returns `false` if the same document already exists.
+async fn store_document_in_db(
+    doc: &catalyst_signed_doc::CatalystSignedDocument, doc_bytes: Vec<u8>,
+) -> anyhow::Result<bool> {
+    let authors = doc
+        .authors()
+        .into_iter()
+        .map(|kid| kid.to_string())
+        .collect();
+
+    let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
+        Ok(json) => json,
+        Err(e) => {
+            anyhow::bail!("Cannot decode document metadata into JSON, err: {e}");
+        },
+    };
+
+    let payload = if matches!(
+        doc.doc_content_type()?,
+        catalyst_signed_doc::ContentType::Json
+    ) {
+        match serde_json::from_slice(doc.doc_content().decoded_bytes()?) {
+            Ok(payload) => Some(payload),
+            Err(e) => {
+                anyhow::bail!("Invalid Document Content, not Json encoded: {e}");
+            },
+        }
+    } else {
+        None
+    };
+
+    let doc_body = SignedDocBody::new(
+        doc.doc_id()?.into(),
+        doc.doc_ver()?.into(),
+        doc.doc_type()?.into(),
+        authors,
+        Some(doc_meta_json),
+    );
+
+    FullSignedDoc::new(doc_body, payload, doc_bytes)
+        .store()
+        .await
+}
+
 /// Return a response with the full error report from `CatalystSignedDocError`
-fn return_error_report(e: &CatalystSignedDocError) -> AllResponses {
-    let json_report = match serde_json::to_value(e.report()) {
+fn return_error_report(report: &catalyst_signed_doc::ProblemReport) -> AllResponses {
+    let json_report = match serde_json::to_value(report) {
         Ok(json_report) => json_report,
         Err(e) => {
             return AllResponses::internal_error(&anyhow!(

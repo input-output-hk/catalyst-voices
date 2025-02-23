@@ -4,7 +4,7 @@ mod data;
 
 use std::{collections::HashMap, env, sync::LazyLock};
 
-use catalyst_signed_doc::{Builder, CatalystSignedDocument, IdUri, Metadata};
+use catalyst_signed_doc::{Builder, CatalystSignedDocument, ContentEncoding, ContentType, IdUri};
 use data::TEMPLATE_DATA;
 use ed25519_dalek::SigningKey;
 use hex::FromHex;
@@ -16,12 +16,6 @@ const BRAND_ID: &str = "0194cfcd-bddc-7bb3-b5e9-455168bd3ff7";
 
 /// Fund 14 Campaign ID.
 const CAMPAIGN_ID: &str = "0194cfcf-15a2-7e32-b559-386b93d0724e";
-
-/// Content type.
-const CONTENT_TYPE: &str = "application/json";
-
-/// Content encoding.
-const CONTENT_ENCODING: &str = "br";
 
 /// A map of signed document templates to its ID.
 pub(crate) static TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
@@ -48,11 +42,7 @@ pub(crate) static TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocumen
             };
             let sk = SigningKey::from_bytes(&byte_array);
 
-            let mut map = HashMap::new();
-            for t in TEMPLATE_DATA.iter() {
-                let signed_doc = t.to_signed_doc(&sk);
-                map.insert(signed_doc.doc_id().uuid(), signed_doc);
-            }
+            let map = TEMPLATE_DATA.iter().map(|t| t.to_signed_doc(&sk)).collect();
             Some(map)
         } else {
             error!(
@@ -71,7 +61,7 @@ pub(crate) struct SignedDocTemplate {
     /// Version.
     ver: String,
     /// Document type.
-    doc_type: String,
+    doc_type: Uuid,
     /// Content bytes.
     content: Vec<u8>,
     /// Category ID.
@@ -79,33 +69,37 @@ pub(crate) struct SignedDocTemplate {
 }
 
 impl SignedDocTemplate {
-    /// Convert the template to a catalyst signed document.
+    /// Convert the template to a catalyst signed document with its id.
     /// This function should not fail, because template details are hardcoded.
     #[allow(clippy::expect_used)]
-    fn to_signed_doc(&self, sk: &SigningKey) -> CatalystSignedDocument {
+    fn to_signed_doc(&self, sk: &SigningKey) -> (Uuid, CatalystSignedDocument) {
         /// ID URI network.
         const KID_NETWORK: &str = "cardano";
 
-        let metadata: Metadata = serde_json::from_value(serde_json::json!({
+        let metadata = serde_json::json!({
             "type": self.doc_type,
             "id": self.id,
             "ver": self.ver,
             "category_id": {"id": self.category_id},
-            "content-type": CONTENT_TYPE,
-            "content-encoding": CONTENT_ENCODING,
+            "content-type": ContentType::Json.to_string(),
+            "content-encoding": ContentEncoding::Brotli.to_string(),
             "campaign_id": {"id": CAMPAIGN_ID},
             "brand_id":  {"id": BRAND_ID},
-        }))
-        .expect("Failed to build Metadata from template");
+        });
 
         let kid = IdUri::new(KID_NETWORK, None, sk.verifying_key());
-        Builder::new()
-            .with_metadata(metadata.clone())
+        let doc = Builder::new()
+            .with_json_metadata(metadata.clone())
+            .expect("Failed to build Metadata from template")
             .with_decoded_content(self.content.clone())
             .add_signature(sk.to_bytes(), kid)
             .expect("Failed to add signature for template")
-            .build()
-            .expect("Failed to build CatalystSignedDocument from template")
+            .build();
+        let doc_id = doc
+            .doc_id()
+            .expect("Template document must have id field")
+            .uuid();
+        (doc_id, doc)
     }
 }
 
@@ -133,8 +127,8 @@ mod tests {
         unsafe {
             env::set_var("SIGNED_DOC_SK", sk_hex);
         }
-        for value in TEMPLATES.as_ref().unwrap().values() {
-            assert!(value.doc_content().is_json());
+        for doc in TEMPLATES.as_ref().unwrap().values() {
+            assert!(!doc.problem_report().is_problematic());
         }
     }
 }

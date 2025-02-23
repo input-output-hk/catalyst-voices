@@ -1,8 +1,6 @@
 //! Implementation of the GET `/document` endpoint
 
-use std::fmt::Display;
-
-use catalyst_signed_doc::{error::CatalystSignedDocError, CatalystSignedDocument};
+use catalyst_signed_doc::CatalystSignedDocument;
 use poem_openapi::ApiResponse;
 
 use super::templates::get_doc_static_template;
@@ -54,27 +52,13 @@ pub(crate) async fn get_document(
 
     // If doesn't exist in the static templates, try to find it in the database
     let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
-    CatalystSignedDocument::try_from(db_doc.raw()).map_err(CatalystSignedDocError::owned_error)
+    let doc = minicbor::decode(db_doc.raw())?;
+    Ok(doc)
 }
 
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
 pub(crate) struct DocProvider;
-/// A specific `DocProvider` error type.
-#[derive(Debug)]
-pub(crate) struct DocProviderError(pub(crate) anyhow::Error);
-
-impl Display for DocProviderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl core::error::Error for DocProviderError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        self.0.source()
-    }
-}
 
 impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvider {
     async fn try_get_doc(
@@ -85,7 +69,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         match get_document(&id, ver.as_ref()).await {
             Ok(doc) => Ok(Some(doc)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
-            Err(err) => Err(DocProviderError(err).into()),
+            Err(err) => Err(err),
         }
     }
 }

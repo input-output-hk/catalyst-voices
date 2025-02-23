@@ -4,13 +4,6 @@ use std::sync::LazyLock;
 
 use super::SignedDocTemplate;
 
-/// Proposal document type.
-const PROPOSAL_DOC_TYPE: &str = "0ce8ab38-9258-4fbc-a62e-7faa6e58318f";
-/// Category document type.
-const CATEGORY_DOC_TYPE: &str = "65b1e8b0-51f1-46a5-9970-72cdf26884be";
-/// Comment document type.
-const COMMENT_DOC_TYPE: &str = "0b8424d4-ebfd-46e3-9577-1775a69d290c";
-
 /// List of category templates, 12 categories for Fund 14.
 #[rustfmt::skip]
 // TODO: Fix Content once it is added
@@ -75,7 +68,7 @@ pub(crate) static TEMPLATE_DATA: LazyLock<Vec<SignedDocTemplate>> = LazyLock::ne
         templates.push(SignedDocTemplate {
             id: tem.0.to_owned(),
             ver: tem.0.to_owned(),
-            doc_type: CATEGORY_DOC_TYPE.to_owned(),
+            doc_type: catalyst_signed_doc::doc_types::CATEGORY_TEMPLATE_UUID_TYPE,
             content: tem.1.to_vec(),
             category_id: tem.0.to_owned(),
         });
@@ -86,7 +79,7 @@ pub(crate) static TEMPLATE_DATA: LazyLock<Vec<SignedDocTemplate>> = LazyLock::ne
         templates.push(SignedDocTemplate {
             id: tem.0.to_owned(),
             ver: tem.0.to_owned(),
-            doc_type: PROPOSAL_DOC_TYPE.to_owned(),
+            doc_type: catalyst_signed_doc::doc_types::PROPOSAL_TEMPLATE_UUID_TYPE,
             content: proposal_template.to_vec(),
             category_id: tem.1.to_owned(),
         });
@@ -97,7 +90,7 @@ pub(crate) static TEMPLATE_DATA: LazyLock<Vec<SignedDocTemplate>> = LazyLock::ne
         templates.push(SignedDocTemplate {
             id: tem.0.to_owned(),
             ver: tem.0.to_owned(),
-            doc_type: COMMENT_DOC_TYPE.to_owned(),
+            doc_type: catalyst_signed_doc::doc_types::COMMENT_TEMPLATE_UUID_TYPE,
             content: comment_template.to_vec(),
             category_id: tem.1.to_owned(),
         });
