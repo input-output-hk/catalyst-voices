@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'onboarding_base_page.dart';
+import '../onboarding_base_page.dart';
 import 'step_4_acknowledgments.dart';
 
 class BaseProfileFinalPanel extends OnboardingPageBase {
