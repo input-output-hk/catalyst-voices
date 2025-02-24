@@ -23,6 +23,8 @@
 **/*.swagger.*.dart
 **/*.drift.dart
 **/openapi/processed/
+**/catalyst_voices_localizations_*.dart
+**/catalyst_voices_localizations.dart
 
 # node related
 
