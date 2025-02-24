@@ -17,19 +17,16 @@ use super::{
     },
     Ed25519HexEncodedPublicKey, SlotNo,
 };
-use crate::{
-    db::index::{
-        queries::registrations::{
-            get_all_invalids::{GetAllInvalidRegistrationsParams, GetAllInvalidRegistrationsQuery},
-            get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
-            get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
-            get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
-            get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
-            get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
-        },
-        session::CassandraSession,
+use crate::db::index::{
+    queries::registrations::{
+        get_all_invalids::{GetAllInvalidRegistrationsParams, GetAllInvalidRegistrationsQuery},
+        get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
+        get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
+        get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
+        get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
+        get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
     },
-    service::common::types::cardano::txn_index::TxnIndex,
+    session::CassandraSession,
 };
 
 /// Get registration given a stake key hash, it can be time specific based on asat param,
@@ -208,7 +205,7 @@ async fn get_all_registrations_from_stake_pub_key(
             stake_pub_key: Some(stake_pub_key.clone()),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
-            txn: Some(TxnIndex::try_from(i16::from(row.txn_index))?),
+            txn: Some(row.txn_index.into()),
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
@@ -453,7 +450,7 @@ pub async fn get_all_registrations(
             )?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
-            txn: Some(TxnIndex::try_from(i16::from(row.txn_index))?),
+            txn: Some(row.txn_index.into()),
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
@@ -495,31 +492,20 @@ async fn get_all_invalid_registrations(
             continue;
         };
 
-        let mut problem_report = format!("{:?}", row.problem_report);
-
         let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address) {
             Ok(payment_addr) => Some(payment_addr),
-            Err(err) => {
-                problem_report = format!("{problem_report} \n Corrupt payment addr:{err}");
-                None
-            },
+            Err(_) => None,
         };
 
         let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
             Ok(vote_pub_key) => Some(vote_pub_key),
-            Err(err) => {
-                problem_report = format!("{problem_report} \n Corrupt vote pub key:{err}");
-                None
-            },
+            Err(_) => None,
         };
 
         let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone())
         {
             Ok(stake_pub_key) => Some(stake_pub_key),
-            Err(err) => {
-                problem_report = format!("{problem_report} \n Corrupt stake pub key:{err}");
-                None
-            },
+            Err(_) => None,
         };
 
         let invalid = Cip36Details {
@@ -531,7 +517,7 @@ async fn get_all_invalid_registrations(
             payment_address: payment_addr,
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
-            errors: Some(ErrorMessage::from(problem_report)),
+            errors: Some(ErrorMessage::from(row.problem_report)),
         };
 
         if let Some(mut v) = invalids_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(
