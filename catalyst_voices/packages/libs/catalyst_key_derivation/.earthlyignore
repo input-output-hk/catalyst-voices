@@ -13,6 +13,17 @@
 **/test_reports/
 **/*.log
 
+# Generated files from code generation tools
+**/*.g.dart
+**/*.freezed.dart
+**/*.chopper.dart
+**/*.swagger.dart
+**/*.openapi.dart
+**/*.gen.dart
+**/*.swagger.*.dart
+**/*.drift.dart
+**/openapi/processed/
+
 # node related
 
 **/node_modules/
