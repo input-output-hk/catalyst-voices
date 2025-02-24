@@ -63,8 +63,7 @@ impl ToJSON for SemVer {
 
 impl fmt::Display for SemVer {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.0)?;
-        Ok(())
+        self.0.fmt(f)
     }
 }
 

@@ -73,8 +73,7 @@ impl ToJSON for DateTime {
 
 impl fmt::Display for DateTime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.0.to_rfc3339())?;
-        Ok(())
+        self.0.to_rfc3339().fmt(f)
     }
 }
 

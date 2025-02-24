@@ -122,8 +122,7 @@ impl ToJSON for Hash256 {
 
 impl fmt::Display for Hash256 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(as_hex_string(&self.0).as_str())?;
-        Ok(())
+        as_hex_string(&self.0).fmt(f)
     }
 }
 
@@ -238,7 +237,6 @@ impl ToJSON for Hash128 {
 
 impl fmt::Display for Hash128 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(as_hex_string(&self.0).as_str())?;
-        Ok(())
+        as_hex_string(&self.0).fmt(f)
     }
 }
