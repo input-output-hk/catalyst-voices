@@ -107,3 +107,7 @@ x509-cert = { version = "0.2.5", features = ["builder"] }
 
 [build-dependencies]
 build-info-build = "0.0.39"
+
+[package.metadata.cargo-machete]
+# remove that after fixing issues with latest "poem-openapi-derive" crate
+ignored = ["poem-openapi-derive"]
