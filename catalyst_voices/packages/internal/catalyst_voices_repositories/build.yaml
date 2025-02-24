@@ -25,6 +25,10 @@ targets:
                 - SimpleProposal$Proposer
                 - CommunityChoiceProposal$ProposalCategory
                 - CommunityChoiceProposal$Proposer
+          response_override_value_map:
+            - url: /api/v1/document/index
+              method: post
+              overridden_value: 'DocumentIndexList'
       json_serializable:
         options:
           explicit_to_json: true
