@@ -121,8 +121,13 @@ pub(crate) async fn endpoint(catalyst_id: IdUri) -> AllResponses {
         };
 
         let tx_hash: Vec<_> = TransactionId::from(row.txn_id).into();
-        let item = RbacRegistration {
-            tx_hash: tx_hash.into(),
+        let tx_hash = match TryFrom::try_from(tx_hash) {
+            Ok(tx_hash) => tx_hash,
+            Err(err) => {
+                error!(error = ?err, "Failed to parse tx hash value from row");
+                let err = anyhow::Error::from(err);
+                return AllResponses::internal_error(&err);
+            },
         };
 
         let item = RbacRegistration { tx_hash };

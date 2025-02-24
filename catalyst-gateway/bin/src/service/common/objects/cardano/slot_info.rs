@@ -22,7 +22,7 @@ pub(crate) struct Slot {
     pub(crate) block_hash: Hash256,
 
     /// Block time.
-    pub(crate) block_time: DateTime<Utc>,
+    pub(crate) block_time: DateTime,
 }
 
 impl Example for Slot {

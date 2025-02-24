@@ -3,6 +3,7 @@ use poem_openapi::{param::Path, OpenApi};
 
 use crate::service::common::{
     auth::none_or_rbac::NoneOrRBAC,
+    objects::cardano::hash::Hash128,
     tags::ApiTags,
     types::{
         cardano::{catalyst_id::CatalystId, cip19_stake_address::Cip19StakeAddress},

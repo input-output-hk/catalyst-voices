@@ -1,7 +1,12 @@
 //! Cip36 Registration Query Endpoint Response
 
 use catalyst_types::problem_report::ProblemReport;
-use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
+use derive_more::{From, Into};
+use poem_openapi::{
+    payload::Json,
+    types::{Example, ToJSON},
+    ApiResponse, NewType, Object,
+};
 
 use crate::service::{common, common::types::array_types::impl_array_types};
 
@@ -147,16 +152,6 @@ pub(crate) struct Cip36Details {
     pub errors: Option<common::types::generic::error_msg::ErrorMessage>,
 }
 
-/// Is the payment address payable by catalyst.
-fn is_payable_default() -> bool {
-    true
-}
-
-/// Is the registration using CIP15 format.
-fn cip15_default() -> bool {
-    false
-}
-
 impl Example for Cip36Details {
     /// Example of a valid registration
     fn example() -> Self {
@@ -173,8 +168,8 @@ impl Example for Cip36Details {
             payment_address: Some(
                 common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
             ),
-            is_payable: true,
-            cip15: false,
+            is_payable: true.into(),
+            cip15: false.into(),
             errors: None,
         }
     }
@@ -198,8 +193,8 @@ impl Cip36Details {
             nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
             txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: None,
-            is_payable: false,
-            cip15: true,
+            is_payable: false.into(),
+            cip15: true.into(),
             errors: Some(
                 crate::service::common::types::generic::error_msg::ErrorMessage::from(errors),
             ),

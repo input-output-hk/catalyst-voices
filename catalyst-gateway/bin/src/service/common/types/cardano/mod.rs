@@ -12,5 +12,4 @@ pub(crate) mod nonce;
 pub(crate) mod query;
 pub(crate) mod registration_list;
 pub(crate) mod slot_no;
-pub(crate) mod stake_amount;
 pub(crate) mod txn_index;

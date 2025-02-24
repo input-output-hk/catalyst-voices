@@ -36,7 +36,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Slot number
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord, Default)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub(crate) struct SlotNo(u64);
 
 impl SlotNo {
@@ -135,13 +135,6 @@ impl TryFrom<i64> for SlotNo {
 impl From<SlotNo> for u64 {
     fn from(value: SlotNo) -> Self {
         value.0
-    }
-}
-
-impl SlotNo {
-    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
-    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
-        value.map(std::convert::Into::into)
     }
 }
 

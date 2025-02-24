@@ -6,9 +6,12 @@ use poem_openapi::{
     NewType, Object,
 };
 
-use crate::service::common::types::cardano::{
-    ada_value::AdaValue, asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28,
-    slot_no::SlotNo,
+use crate::service::common::types::{
+    array_types::impl_array_types,
+    cardano::{
+        ada_value::AdaValue, asset_name::AssetName, asset_value::AssetValue,
+        hash28::HexEncodedHash28, slot_no::SlotNo,
+    },
 };
 
 /// User's staked native token info.
@@ -70,7 +73,7 @@ impl Example for StakeInfo {
         Self {
             slot_number: SlotNo::example(),
             ada_amount: AdaValue::example(),
-            native_tokens: Vec::new(),
+            native_tokens: Vec::new().into(),
         }
     }
 }

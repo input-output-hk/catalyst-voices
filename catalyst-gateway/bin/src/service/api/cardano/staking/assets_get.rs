@@ -26,7 +26,12 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
+        types::{
+            cardano::{
+                asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+            },
+            headers::retry_after::RetryAfterOption,
+        },
     },
 };
 
@@ -56,7 +61,25 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(
     stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNo>,
 ) -> AllResponses {
-    let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num).await;
+    let Some(persistent_session) = CassandraSession::get(true) else {
+        tracing::error!("Failed to acquire persistent db session");
+        return AllResponses::service_unavailable(
+            &anyhow::anyhow!("Failed to acquire db session"),
+            RetryAfterOption::Default,
+        );
+    };
+    let Some(volatile_session) = CassandraSession::get(false) else {
+        tracing::error!("Failed to acquire volatile db session");
+        return AllResponses::service_unavailable(
+            &anyhow::anyhow!("Failed to acquire volatile db session"),
+            RetryAfterOption::Default,
+        );
+    };
+
+    let (persistent_res, volatile_res) = futures::join!(
+        calculate_stake_info(&persistent_session, stake_address.clone(), slot_num),
+        calculate_stake_info(&volatile_session, stake_address, slot_num)
+    );
     let persistent_stake_info = match persistent_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
@@ -71,8 +94,8 @@ pub(crate) async fn endpoint(
     }
 
     Responses::Ok(Json(FullStakeInfo {
-        volatile: volatile_stake_info.map(Into::into).unwrap_or_default(),
-        persistent: persistent_stake_info.map(Into::into).unwrap_or_default(),
+        volatile: volatile_stake_info.unwrap_or_default().into(),
+        persistent: persistent_stake_info.unwrap_or_default().into(),
     }))
     .into()
 }
@@ -110,7 +133,7 @@ struct TxoInfo {
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_stake_info(
-    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNumber>,
+    session: &CassandraSession, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let address: StakeAddress = stake_address.try_into()?;
     let mut txos_by_txn = get_txo_by_txn(session, &address, slot_num).await?;
@@ -131,9 +154,9 @@ async fn calculate_stake_info(
 
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: Vec<u8>, slot_num: Option<SlotNumber>,
-) -> anyhow::Result<HashMap<Vec<u8>, HashMap<i16, TxoInfo>>> {
-    let adjusted_slot_num = num_bigint::BigInt::from(slot_num.unwrap_or(i64::MAX));
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Option<SlotNo>,
+) -> anyhow::Result<TxosByTxn> {
+    let adjusted_slot_num: u64 = slot_num.map_or(u64::MAX, Into::into);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
@@ -267,14 +290,17 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
     for txn_map in txos_by_txn.into_values() {
         for txo_info in txn_map.into_values() {
             if txo_info.spent_slot_no.is_none() {
-                let value = i64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
-                stake_info.ada_amount =
-                    stake_info.ada_amount.checked_add(value).ok_or_else(|| {
-                        anyhow!(
+                let value = u64::try_from(txo_info.value)?;
+                stake_info.ada_amount = stake_info
+                    .ada_amount
+                    .checked_add(value)
+                    .ok_or_else(|| {
+                        anyhow::anyhow!(
                             "Total stake amount overflow: {} + {value}",
-                            stake_info.ada_amount.to_string()
+                            stake_info.ada_amount
                         )
-                    })?;
+                    })?
+                    .into();
 
                 for asset in txo_info.assets.into_values().flatten() {
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
@@ -284,8 +310,7 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
                     });
                 }
 
-                let slot_no = i64::try_from(txo_info.slot_no).map_err(|err| anyhow!(err))?;
-
+                let slot_no = u64::from(txo_info.slot_no).try_into()?;
                 if stake_info.slot_number < slot_no {
                     stake_info.slot_number = slot_no;
                 }

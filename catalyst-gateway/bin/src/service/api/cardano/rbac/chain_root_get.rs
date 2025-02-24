@@ -1,6 +1,6 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
 
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 use tracing::error;
 
 use crate::{
