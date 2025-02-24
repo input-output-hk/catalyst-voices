@@ -76,14 +76,11 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Collect and upload test coverage
-        uses: actions/upload-artifact@v4
+      - name: Collect and merge test coverage
+        uses: kukkok3/collect-coverage
         if: always()
         with:
-          name: coverage-reports
-          path: "**/*${{ env.COVERAGE_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
+          extension: ${{ env.COVERAGE_EXT }}
 
   generate-allure-report:
     name: Generate allure report
@@ -178,6 +175,7 @@ jobs:
           allow-empty: true
           debug: true
           flag-name: api-test
+          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
       - name: Coveralls
@@ -189,6 +187,7 @@ jobs:
           allow-empty: true
           debug: true
           flag-name: flutter-test
+          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
   upload-coverage-report:
