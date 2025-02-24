@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +24,7 @@ class AccountPageTitle extends StatelessWidget {
         Text(
           context.l10n.profileAndKeychain,
           style: context.textTheme.displaySmall
-              ?.copyWith(color: context.theme.linksPrimary),
+              ?.copyWith(color: context.colorScheme.primary),
         ),
       ],
     );
