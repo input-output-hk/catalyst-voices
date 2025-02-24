@@ -1,9 +1,8 @@
-//! Slot Number on the blockchain.
+//! ADA coins value on the blockchain.
 
-use std::sync::LazyLock;
+use std::{fmt::Display, ops::Deref, sync::LazyLock};
 
 use anyhow::bail;
-use cardano_blockchain_types::Slot;
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -12,9 +11,9 @@ use poem_openapi::{
 use serde_json::Value;
 
 /// Title.
-const TITLE: &str = "Cardano Blockchain Slot Number";
+const TITLE: &str = "Cardano Blockchain ADA coins value";
 /// Description.
-const DESCRIPTION: &str = "The Slot Number of a Cardano Block on the chain.";
+const DESCRIPTION: &str = "The ADA coins value of a Cardano Block on the chain.";
 /// Example.
 pub(crate) const EXAMPLE: u64 = 1_234_567;
 /// Minimum.
@@ -31,20 +30,35 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         example: Some(EXAMPLE.into()),
         maximum: Some(MAXIMUM as f64),
         minimum: Some(MINIMUM as f64),
-        ..MetaSchema::ANY
+        ..poem_openapi::registry::MetaSchema::ANY
     }
 });
 
 /// Slot number
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord, Default)]
-pub(crate) struct SlotNo(u64);
+
+pub(crate) struct AdaValue(u64);
+
+impl Deref for AdaValue {
+    type Target = u64;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Display for AdaValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 /// Is the Slot Number valid?
 fn is_valid(_value: u64) -> bool {
     true
 }
 
-impl Type for SlotNo {
+impl Type for AdaValue {
     type RawElementValueType = Self;
     type RawValueType = Self;
 
@@ -71,22 +85,22 @@ impl Type for SlotNo {
     }
 }
 
-impl ParseFromParameter for SlotNo {
+impl ParseFromParameter for AdaValue {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
         let slot: u64 = value.parse()?;
         Ok(Self(slot))
     }
 }
 
-impl ParseFromJSON for SlotNo {
+impl ParseFromJSON for AdaValue {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
         let value = value.unwrap_or_default();
         if let Value::Number(value) = value {
             let value = value
                 .as_u64()
-                .ok_or(ParseError::from("invalid slot number"))?;
+                .ok_or(ParseError::from("invalid ada value"))?;
             if !is_valid(value) {
-                return Err("invalid slot number".into());
+                return Err("invalid ada value".into());
             }
             Ok(Self(value))
         } else {
@@ -95,63 +109,44 @@ impl ParseFromJSON for SlotNo {
     }
 }
 
-impl From<SlotNo> for BigInt {
-    fn from(val: SlotNo) -> Self {
+impl From<AdaValue> for BigInt {
+    fn from(val: AdaValue) -> Self {
         BigInt::from(val.0)
     }
 }
 
-impl ToJSON for SlotNo {
+impl ToJSON for AdaValue {
     fn to_json(&self) -> Option<Value> {
         Some(self.0.into())
     }
 }
 
-impl TryFrom<i64> for SlotNo {
+impl TryFrom<i64> for AdaValue {
     type Error = anyhow::Error;
 
     fn try_from(value: i64) -> Result<Self, Self::Error> {
         let value: u64 = value.try_into()?;
         if !is_valid(value) {
-            bail!("Invalid Slot Number");
+            bail!("Invalid ADA Value");
         }
         Ok(Self(value))
     }
 }
 
-impl From<u64> for SlotNo {
+impl From<u64> for AdaValue {
     fn from(value: u64) -> Self {
         Self(value)
     }
 }
 
-impl From<SlotNo> for u64 {
-    fn from(value: SlotNo) -> Self {
+impl From<AdaValue> for u64 {
+    fn from(value: AdaValue) -> Self {
         value.0
     }
 }
 
-impl SlotNo {
-    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
-    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
-        value.map(std::convert::Into::into)
-    }
-}
-
-impl Example for SlotNo {
+impl Example for AdaValue {
     fn example() -> Self {
         Self(EXAMPLE)
-    }
-}
-
-impl From<Slot> for SlotNo {
-    fn from(value: Slot) -> Self {
-        Self(value.into())
-    }
-}
-
-impl From<SlotNo> for Slot {
-    fn from(value: SlotNo) -> Self {
-        value.0.into()
     }
 }

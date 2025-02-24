@@ -2,12 +2,10 @@
 
 use std::collections::HashMap;
 
-use anyhow::{anyhow, Context};
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use super::SlotNumber;
 use crate::{
     db::index::{
         queries::staked_ada::{
@@ -28,7 +26,12 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::{asset_name::AssetName, cip19_stake_address::Cip19StakeAddress},
+        types::{
+            cardano::{
+                asset_name::AssetName, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo,
+            },
+            headers::retry_after::RetryAfterOption,
+        },
     },
 };
 
@@ -56,16 +59,31 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/staked_ada`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: Cip19StakeAddress, _provided_network: Option<Network>,
-    slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNo>,
 ) -> AllResponses {
-    let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num).await;
+    let Some(persistent_session) = CassandraSession::get(true) else {
+        tracing::error!("Failed to acquire persistent db session");
+        return AllResponses::service_unavailable(
+            &anyhow::anyhow!("Failed to acquire db session"),
+            RetryAfterOption::Default,
+        );
+    };
+    let Some(volatile_session) = CassandraSession::get(false) else {
+        tracing::error!("Failed to acquire volatile db session");
+        return AllResponses::service_unavailable(
+            &anyhow::anyhow!("Failed to acquire volatile db session"),
+            RetryAfterOption::Default,
+        );
+    };
+
+    let (persistent_res, volatile_res) = futures::join!(
+        calculate_stake_info(&persistent_session, stake_address.clone(), slot_num),
+        calculate_stake_info(&volatile_session, stake_address, slot_num)
+    );
     let persistent_stake_info = match persistent_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
     };
-
-    let volatile_res = calculate_stake_info(false, stake_address, slot_num).await;
     let volatile_stake_info = match volatile_res {
         Ok(stake_info) => stake_info,
         Err(err) => return AllResponses::handle_error(&err),
@@ -115,23 +133,19 @@ struct TxoInfo {
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_stake_info(
-    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNumber>,
+    session: &CassandraSession, stake_address: Cip19StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<StakeInfo>> {
-    let Some(session) = CassandraSession::get(persistent) else {
-        anyhow::bail!("Failed to acquire db session");
-    };
-
     let address: StakeAddress = stake_address.try_into()?;
-    let mut txos_by_txn = get_txo_by_txn(&session, &address, slot_num).await?;
+    let mut txos_by_txn = get_txo_by_txn(session, &address, slot_num).await?;
     if txos_by_txn.is_empty() {
         return Ok(None);
     }
 
-    check_and_set_spent(&session, &mut txos_by_txn).await?;
+    check_and_set_spent(session, &mut txos_by_txn).await?;
     // TODO: This could be executed in the background, it does not actually matter if it
     // succeeds. This is just an optimization step to reduce the need to query spent
     // TXO's.
-    update_spent(&session, &address, &txos_by_txn).await?;
+    update_spent(session, &address, &txos_by_txn).await?;
 
     let stake_info = build_stake_info(txos_by_txn)?;
 
@@ -140,9 +154,9 @@ async fn calculate_stake_info(
 
 /// Returns a map of TXO infos by transaction hash for the given stake address.
 async fn get_txo_by_txn(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Option<SlotNumber>,
+    session: &CassandraSession, stake_address: &StakeAddress, slot_num: Option<SlotNo>,
 ) -> anyhow::Result<TxosByTxn> {
-    let adjusted_slot_num: u64 = slot_num.unwrap_or(i64::MAX).try_into().unwrap_or(u64::MAX);
+    let adjusted_slot_num: u64 = slot_num.map_or(u64::MAX, Into::into);
 
     let mut txo_map = HashMap::new();
     let mut txos_iter = GetTxoByStakeAddressQuery::execute(
@@ -276,14 +290,17 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
     for txn_map in txos_by_txn.into_values() {
         for txo_info in txn_map.into_values() {
             if txo_info.spent_slot_no.is_none() {
-                let value = i64::try_from(txo_info.value).map_err(|err| anyhow!(err))?;
-                stake_info.ada_amount =
-                    stake_info.ada_amount.checked_add(value).ok_or_else(|| {
-                        anyhow!(
+                let value = u64::try_from(txo_info.value)?;
+                stake_info.ada_amount = stake_info
+                    .ada_amount
+                    .checked_add(value)
+                    .ok_or_else(|| {
+                        anyhow::anyhow!(
                             "Total stake amount overflow: {} + {value}",
                             stake_info.ada_amount
                         )
-                    })?;
+                    })?
+                    .into();
 
                 for asset in txo_info.assets.into_values().flatten() {
                     stake_info.native_tokens.push(StakedNativeTokenInfo {
@@ -293,10 +310,7 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
                     });
                 }
 
-                let slot_no = u64::from(txo_info.slot_no)
-                    .try_into()
-                    .context("Invalid slot number")?;
-
+                let slot_no = u64::from(txo_info.slot_no).into();
                 if stake_info.slot_number < slot_no {
                     stake_info.slot_number = slot_no;
                 }

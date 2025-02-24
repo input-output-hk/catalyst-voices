@@ -13,9 +13,10 @@ use std::{fmt::Debug, sync::Arc};
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use registrations::{
-    get_all_stakes_and_vote_keys::GetAllStakesAndVoteKeysQuery,
-    get_from_stake_addr::GetRegistrationQuery, get_from_stake_address::GetStakeAddrQuery,
-    get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
+    get_all_invalids::GetAllInvalidRegistrationsQuery,
+    get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
+    get_from_stake_address::GetStakeAddrQuery, get_from_vote_key::GetStakeAddrFromVoteKeyQuery,
+    get_invalid::GetInvalidRegistrationQuery,
 };
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
@@ -102,8 +103,10 @@ pub(crate) enum PreparedSelectQuery {
     RbacRegistrationsByCatalystId,
     /// Get invalid RBAC registrations by Catalyst ID.
     RbacInvalidRegistrationsByCatalystId,
-    /// Get all stake and vote keys for snapshot (`stake_pub_key,vote_key`)
-    GetAllStakesAndVoteKeys,
+    /// Get all registrations for snapshot
+    GetAllRegistrations,
+    /// Get all invalid registrations for snapshot
+    GetAllInvalidRegistrations,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -167,8 +170,10 @@ pub(crate) struct PreparedQueries {
     rbac_registrations_by_catalyst_id_query: PreparedStatement,
     /// Get invalid RBAC registrations by Catalyst ID.
     rbac_invalid_registrations_by_catalyst_id_query: PreparedStatement,
-    /// Get all stake and vote keys (`stake_key,vote_key`) for snapshot
-    get_all_stakes_and_vote_keys_query: PreparedStatement,
+    /// Get all registrations for snapshot
+    get_all_registrations_query: PreparedStatement,
+    /// Get all invalid registrations for snapshot
+    get_all_invalid_registrations_query: PreparedStatement,
 }
 
 /// A set of query responses that can fail.
@@ -200,6 +205,9 @@ impl PreparedQueries {
         let stake_addr_from_stake_address = GetStakeAddrQuery::prepare(session.clone()).await;
         let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
+        let get_all_registrations_query = GetAllRegistrationsQuery::prepare(session.clone()).await;
+        let get_all_invalid_registrations_query =
+            GetAllInvalidRegistrationsQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await?;
         let catalyst_id_by_stake_address_query =
             get_catalyst_id_from_stake_address::Query::prepare(session.clone()).await?;
@@ -209,8 +217,6 @@ impl PreparedQueries {
             get_rbac_registrations::Query::prepare(session.clone()).await?;
         let rbac_invalid_registrations_by_catalyst_id_query =
             get_rbac_invalid_registrations::Query::prepare(session.clone()).await?;
-        let get_all_stakes_and_vote_keys_query =
-            GetAllStakesAndVoteKeysQuery::prepare(session).await?;
 
         let (
             txo_insert_queries,
@@ -257,9 +263,10 @@ impl PreparedQueries {
             sync_status_insert,
             rbac_registrations_by_catalyst_id_query,
             rbac_invalid_registrations_by_catalyst_id_query,
-            get_all_stakes_and_vote_keys_query,
             catalyst_id_by_stake_address_query,
             catalyst_id_by_transaction_id_query,
+            get_all_registrations_query: get_all_registrations_query?,
+            get_all_invalid_registrations_query: get_all_invalid_registrations_query?,
         })
     }
 
@@ -359,8 +366,9 @@ impl PreparedQueries {
             PreparedSelectQuery::CatalystIdByStakeAddress => {
                 &self.catalyst_id_by_stake_address_query
             },
-            PreparedSelectQuery::GetAllStakesAndVoteKeys => {
-                &self.get_all_stakes_and_vote_keys_query
+            PreparedSelectQuery::GetAllRegistrations => &self.get_all_registrations_query,
+            PreparedSelectQuery::GetAllInvalidRegistrations => {
+                &self.get_all_invalid_registrations_query
             },
         };
         session_execute_iter(session, prepared_stmt, params).await
