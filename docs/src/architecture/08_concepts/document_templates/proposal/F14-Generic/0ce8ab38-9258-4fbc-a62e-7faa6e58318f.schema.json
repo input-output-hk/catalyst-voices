@@ -23,6 +23,25 @@
             "$comment": "UI - Logical Document Section Break.",
             "type": "object",
             "additionalProperties": false,
+            "properties": {
+                "title": { "type": "object" },
+                "proposer": { "type": "object" },
+                "budget": { "type": "object" },
+                "time": { "type": "object" },
+                "translation": { "type": "object" },
+                "problem": { "type": "object" },
+                "solution": { "type": "object" },
+                "supportingLinks": { "type": "object" },
+                "dependencies": { "type": "object" },
+                "open_source": { "type": "object" },
+                "theme": { "type": "object" },
+                "impact": { "type": "object" },
+                "feasibility": { "type": "object" },
+                "milestones": { "type": "object" },
+                "team": { "type": "object" },
+                "value": { "type": "object" },
+                "mandatory": { "type": "object" }
+            },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
         },
         "section": {
