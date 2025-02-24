@@ -8,6 +8,7 @@
 //! Simple types can be enums, if the intended underlying type is simple, such as a string
 //! or integer.
 
+pub(crate) mod array_types;
 pub(crate) mod cardano;
 pub(crate) mod document;
 pub(crate) mod generic;

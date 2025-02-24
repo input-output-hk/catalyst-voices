@@ -14,6 +14,7 @@ class CurrentCampaignSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Column(
+      key: Key('CurrentCampaignRoot'),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,11 +46,13 @@ class _Header extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('CurrentCampaignTitle'),
             context.l10n.currentCampaign,
             style: context.textTheme.titleSmall,
           ),
           const SizedBox(height: 4),
           Text(
+            key: const Key('Subtitle'),
             context.l10n.catalystF14,
             style: context.textTheme.displayMedium?.copyWith(
               color: context.colorScheme.primary,
@@ -57,6 +60,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
+            key: const Key('Description'),
             context.l10n.currentCampaignDescription,
             style: context.textTheme.bodyLarge,
           ),
@@ -95,6 +99,7 @@ class CurrentCampaignData extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState,
         CurrentCampaignInfoViewModel>(
+      key: const Key('CurrentCampaignData'),
       selector: (state) {
         return state.currentCampaign.currentCampaign;
       },
@@ -125,6 +130,7 @@ class CurrentCampaignError extends StatelessWidget {
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
+          key: const Key('CurrentCampaignError'),
           offstage: !state.show,
           child: Padding(
             padding: const EdgeInsets.all(32),
