@@ -2,11 +2,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 final class Proposal extends ProposalBase {
   /// A hardcoded [NodeId] of the title property.
-  /// 
+  ///
   /// Since properties are dynamic the application cannot determine
   /// which property is the title in any other way than
   /// by hardcoding it's node ID.
   static final titleNodeId = DocumentNodeId.fromString('setup.title.title');
+
+  /// The first [version] numerical value.
+  static const initialVersion = 1;
 
   final ProposalDocument document;
 

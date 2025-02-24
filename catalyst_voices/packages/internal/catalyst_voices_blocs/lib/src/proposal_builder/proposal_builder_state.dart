@@ -5,12 +5,12 @@ import 'package:equatable/equatable.dart';
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
   final DocumentRef? documentRef;
-  final int version;
+  final int? version;
 
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
     this.documentRef,
-    this.version = 0,
+    this.version,
   });
 
   @override

@@ -161,11 +161,13 @@ enum _MenuItemEnum {
       case ProposalPublish.localDraft:
         return context.l10n.proposalEditorStatusDropdownViewDescriptionLocal;
       case ProposalPublish.publishedDraft:
-        return context.l10n
-            .proposalEditorStatusDropdownViewDescriptionDraft(metadata.version);
+        return context.l10n.proposalEditorStatusDropdownViewDescriptionDraft(
+          metadata.version ?? Proposal.initialVersion,
+        );
       case ProposalPublish.submittedProposal:
-        return context.l10n
-            .proposalEditorStatusDropdownViewDescriptionFinal(metadata.version);
+        return context.l10n.proposalEditorStatusDropdownViewDescriptionFinal(
+          metadata.version ?? Proposal.initialVersion,
+        );
     }
   }
 
@@ -242,14 +244,16 @@ class _ProposalBuilderStatusActionState
       return;
     }
 
-    // TODO(dtscalac): fill in with correct data
+    final state = bloc.state;
+    final proposalTitle = state.proposalTitle ??
+        context.l10n.proposalEditorStatusDropdownViewTitle;
+    final version = state.metadata.version;
+
     final shouldPublish = await PublishProposalIterationDialog.show(
           context: context,
-          proposalTitle:
-              'Could have a different title, but has the same Proposal '
-              'IDand a longer title to make it.',
-          currentVersion: null,
-          nextVersion: 1,
+          proposalTitle: proposalTitle,
+          currentVersion: version,
+          nextVersion: (version ?? Proposal.initialVersion) + 1,
         ) ??
         false;
 
@@ -268,14 +272,16 @@ class _ProposalBuilderStatusActionState
       return;
     }
 
-    // TODO(dtscalac): fill in with correct data
+    final state = bloc.state;
+    final proposalTitle = state.proposalTitle ??
+        context.l10n.proposalEditorStatusDropdownViewTitle;
+    final version = state.metadata.version ?? Proposal.initialVersion;
+
     final shouldSubmit = await SubmitProposalForReviewDialog.show(
           context: context,
-          proposalTitle:
-              'Could have a different title, but has the same Proposal '
-              'IDand a longer title to make it.',
-          currentVersion: 3,
-          nextVersion: 4,
+          proposalTitle: proposalTitle,
+          currentVersion: version,
+          nextVersion: version + 1,
         ) ??
         false;
 
