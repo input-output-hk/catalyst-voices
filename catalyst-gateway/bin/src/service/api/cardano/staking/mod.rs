@@ -10,7 +10,7 @@ use crate::service::{
         auth::none_or_rbac::NoneOrRBAC,
         objects::cardano::network::Network,
         tags::ApiTags,
-        types::cardano::{cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo},
+        types::cardano::{self, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo},
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };
@@ -27,7 +27,7 @@ impl Api {
     /// This endpoint returns the total Cardano's staked assets to the corresponded
     /// user's stake address.
     #[oai(
-        path = "/draft/cardano/assets/:stake_address",
+        path = "/v1/cardano/assets/:stake_address",
         method = "get",
         operation_id = "stakedAssetsGet",
         transform = "schema_version_validation"
@@ -45,12 +45,12 @@ impl Api {
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
-        /// Slot number at which the staked ADA amount should be calculated.
+        /// A time point at which the assets should be calculated.
         /// If omitted latest slot number is used.
-        slot_number: Query<Option<SlotNo>>,
+        asat: Query<Option<cardano::query::AsAt>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> assets_get::AllResponses {
-        assets_get::endpoint(stake_address.0, network.0, slot_number.0.map(Into::into)).await
+        assets_get::endpoint(stake_address.0, network.0, SlotNo::into_option(asat.0)).await
     }
 }

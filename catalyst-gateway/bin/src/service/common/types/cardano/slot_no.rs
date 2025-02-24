@@ -3,6 +3,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use cardano_blockchain_types::Slot;
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -30,13 +31,12 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         example: Some(EXAMPLE.into()),
         maximum: Some(MAXIMUM as f64),
         minimum: Some(MINIMUM as f64),
-        ..poem_openapi::registry::MetaSchema::ANY
+        ..MetaSchema::ANY
     }
 });
 
-/// Slot Number
-#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
-
+/// Slot number
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord, Default)]
 pub(crate) struct SlotNo(u64);
 
 impl SlotNo {
@@ -133,21 +133,32 @@ impl TryFrom<i64> for SlotNo {
 }
 
 impl From<SlotNo> for u64 {
-    fn from(val: SlotNo) -> Self {
-        // assume that the value is always valid
-        val.0
+    fn from(value: SlotNo) -> Self {
+        value.0
     }
 }
 
-impl From<SlotNo> for i64 {
-    fn from(val: SlotNo) -> Self {
-        // assume that the value is always valid
-        i64::try_from(val.0).unwrap_or_default()
+impl SlotNo {
+    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
+    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
+        value.map(std::convert::Into::into)
     }
 }
 
 impl Example for SlotNo {
     fn example() -> Self {
         Self(EXAMPLE)
+    }
+}
+
+impl From<Slot> for SlotNo {
+    fn from(value: Slot) -> Self {
+        Self(value.into())
+    }
+}
+
+impl From<SlotNo> for Slot {
+    fn from(value: SlotNo) -> Self {
+        value.0.into()
     }
 }

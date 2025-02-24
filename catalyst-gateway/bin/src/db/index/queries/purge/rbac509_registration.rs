@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::{DbCatalystId, DbTransactionId},
     },
     settings::cassandra_db,
 };
@@ -21,36 +24,29 @@ use crate::{
 pub(crate) mod result {
     //! Return values for RBAC 509 registration purge queries.
 
+    use crate::db::types::{DbCatalystId, DbSlot, DbTransactionId};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, num_bigint::BigInt, i16, Vec<u8>, Vec<u8>);
+    pub(crate) type PrimaryKey = (DbCatalystId, DbTransactionId, DbSlot);
 }
 
 /// Select primary keys for RBAC 509 registration.
-const SELECT_QUERY: &str = include_str!("./cql/get_rbac509_registration.cql");
+const SELECT_QUERY: &str = include_str!("cql/get_rbac_registration.cql");
 
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Chain Root - Binary 32 bytes.
-    pub(crate) chain_root: Vec<u8>,
-    /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
-    /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
-    /// Transaction Hash ID - Binary 32 bytes.
-    transaction_id: Vec<u8>,
-    /// `UUIDv4` Purpose - Binary 16 bytes.
-    purpose: Vec<u8>,
+    /// A short Catalyst ID.
+    pub catalyst_id: DbCatalystId,
+    /// A transaction ID.
+    pub txn_id: DbTransactionId,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("chain_root", &self.chain_root)
-            .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
-            .field("transaction_id", &self.transaction_id)
-            .field("purpose", &self.purpose)
+            .field("catalyst_id", &self.catalyst_id)
+            .field("txn_id", &self.txn_id)
             .finish()
     }
 }
@@ -58,11 +54,8 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            chain_root: value.0,
-            slot_no: value.1,
-            txn: value.2,
-            transaction_id: value.3,
-            purpose: value.4,
+            catalyst_id: value.0,
+            txn_id: value.1,
         }
     }
 }
@@ -99,7 +92,7 @@ impl PrimaryKeyQuery {
 }
 
 /// Delete RBAC 509 registration
-const DELETE_QUERY: &str = include_str!("./cql/delete_rbac509_registration.cql");
+const DELETE_QUERY: &str = include_str!("cql/delete_rbac_registration.cql");
 
 /// Delete RBAC 509 registration Query
 pub(crate) struct DeleteQuery;

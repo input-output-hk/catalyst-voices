@@ -1,10 +1,7 @@
 //! Cip36 Registration Query Endpoint Response
-use derive_more::{From, Into};
-use poem_openapi::{
-    payload::Json,
-    types::{Example, ToJSON},
-    ApiResponse, NewType, Object,
-};
+
+use catalyst_types::problem_report::ProblemReport;
+use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 
 use crate::service::{common, common::types::array_types::impl_array_types};
 
@@ -146,8 +143,18 @@ pub(crate) struct Cip36Details {
     pub cip15: common::types::cardano::boolean::IsCip15,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
-    #[oai(default, skip_serializing_if_is_empty)]
-    pub errors: common::types::generic::error_list::ErrorList,
+    #[oai(skip_serializing_if_is_none)]
+    pub errors: Option<common::types::generic::error_msg::ErrorMessage>,
+}
+
+/// Is the payment address payable by catalyst.
+fn is_payable_default() -> bool {
+    true
+}
+
+/// Is the registration using CIP15 format.
+fn cip15_default() -> bool {
+    false
 }
 
 impl Example for Cip36Details {
@@ -166,9 +173,9 @@ impl Example for Cip36Details {
             payment_address: Some(
                 common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
             ),
-            is_payable: Example::example(),
-            cip15: Example::example(),
-            errors: common::types::generic::error_list::ErrorList::default(),
+            is_payable: true,
+            cip15: false,
+            errors: None,
         }
     }
 }
@@ -176,6 +183,10 @@ impl Example for Cip36Details {
 impl Cip36Details {
     /// Example of an invalid registration
     fn invalid_example() -> Self {
+        let problem_report = ProblemReport::new("Cip36");
+        problem_report.other("Error occurred", "Cip36 decoding error");
+        let errors = serde_json::to_string(&problem_report).unwrap_or_default();
+
         Self {
             slot_no: (common::types::cardano::slot_no::EXAMPLE + 135)
                 .try_into()
@@ -187,9 +198,11 @@ impl Cip36Details {
             nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
             txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: None,
-            is_payable: Example::example(),
-            cip15: Example::example(),
-            errors: Example::example(),
+            is_payable: false,
+            cip15: true,
+            errors: Some(
+                crate::service::common::types::generic::error_msg::ErrorMessage::from(errors),
+            ),
         }
     }
 }

@@ -14,6 +14,7 @@ class DeleteKeychainDialog extends StatefulWidget {
   static Future<bool> show(BuildContext context) async {
     final result = await VoicesDialog.show<bool>(
       context: context,
+      routeSettings: const RouteSettings(name: '/delete-keychain'),
       builder: (context) => const DeleteKeychainDialog._(),
     );
 
