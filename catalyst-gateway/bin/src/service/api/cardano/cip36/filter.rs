@@ -523,14 +523,14 @@ async fn get_all_invalid_registrations(
         };
 
         let invalid = Cip36Details {
-            slot_no: SlotNo::from(slot_no),
+            slot_no: SlotNo::try_from(slot_no)?,
             stake_pub_key,
             vote_pub_key,
             nonce: None,
             txn: None,
             payment_address: payment_addr,
-            is_payable: row.is_payable,
-            cip15: !row.cip36,
+            is_payable: row.is_payable.into(),
+            cip15: (!row.cip36).into(),
             errors: Some(ErrorMessage::from(problem_report)),
         };
 
