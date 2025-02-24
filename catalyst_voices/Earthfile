@@ -31,7 +31,7 @@ code-generator:
     LET gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api
     LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
 
-    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/source/cat-gateway.json
+    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway.json
 
     RUN melos l10n
     RUN melos build_runner
@@ -50,7 +50,7 @@ code-generator:
 
     # saves locally openapi json specs. Useful for local diagnostic.
     IF [ $save_locally = true ]
-        SAVE ARTIFACT openapi/source/cat-gateway.json AS LOCAL packages/internal/catalyst_voices_repositories/openapi/source/cat-gateway.json
+        SAVE ARTIFACT openapi/cat-gateway.json AS LOCAL packages/internal/catalyst_voices_repositories/openapi/cat-gateway.json
     END
 
     IF [ $save_locally = true ]

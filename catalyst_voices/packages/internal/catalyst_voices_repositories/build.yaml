@@ -14,7 +14,7 @@ targets:
     builders:
       catalyst_voices_repositories|openapi_pre_process_builder:
         options:
-          sourcepath: "openapi/source"
+          sourcepath: "openapi"
       swagger_dart_code_generator:
         options:
           input_folder: "openapi/processed"
@@ -89,4 +89,4 @@ builders:
     applies_builders: [ "swagger_dart_code_generator" ]
     defaults:
       options:
-        sourcepath: "openapi/source"
+        sourcepath: "openapi"

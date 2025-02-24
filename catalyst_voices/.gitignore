@@ -12,11 +12,10 @@ devtools_options.yaml
 *.swagger.*.dart
 *.drift.dart
 **/generated/*
-**/openapi/processed/*
-**/openapi/source/*
+**/openapi/**
 
 # Un-ignore vit openapi spec as they're not generated
-!**/openapi/source/vit.json
+!**/openapi/vit.json
 
 # Un-ignore generated files in public packages
 !**/packages/libs/**/*.g.dart

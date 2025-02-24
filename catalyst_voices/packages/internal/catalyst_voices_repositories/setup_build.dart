@@ -8,20 +8,20 @@ void main() {
   }
 
   // Create empty placeholder files for each source JSON
-  final sourceDir = Directory('openapi/source');
+  final sourceDir = Directory('openapi');
   if (sourceDir.existsSync()) {
     for (final entity in sourceDir.listSync()) {
       if (entity is File && entity.path.endsWith('.json')) {
         final baseName = entity.path.split('/').last.replaceAll('.json', '');
         final placeholderPath = 'openapi/processed/$baseName.processed.json';
 
-        final file = File(placeholderPath);
+        // final file = File(placeholderPath);
 
-        if (file.existsSync()) {
-          file.deleteSync();
-        }
+        // if (file.existsSync()) {
+        //   file.deleteSync();
+        // }
         // File(placeholderPath).deleteSync();
-        File(placeholderPath).writeAsStringSync('{}');
+        // File(placeholderPath).writeAsStringSync('{}');
       }
     }
   }
