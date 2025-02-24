@@ -2,11 +2,7 @@
 
 use poem_openapi::{types::Example, Object, Union};
 
-use crate::service::{
-    api::cardano::types::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
-    common::objects::cardano::hash::Hash,
-    utilities::as_hex_string,
-};
+use crate::service::common::{objects::cardano::hash::Hash, types::cardano::nonce::Nonce};
 
 /// The Voting power and voting key of a Delegated voter.
 #[derive(Object)]
@@ -58,48 +54,10 @@ pub(crate) struct RegistrationInfo {
     tx_hash: Hash,
 
     /// Registration nonce.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     nonce: Nonce,
 
     /// Voting info.
     voting_info: VotingInfo,
-}
-
-impl RegistrationInfo {
-    /// Creates a new `RegistrationInfo`
-    #[allow(dead_code)]
-    pub(crate) fn new(
-        tx_hash: TxId, rewards_address: &PaymentAddress, voting_info: PublicVotingInfo,
-        nonce: Nonce,
-    ) -> Self {
-        let voting_info = match voting_info {
-            PublicVotingInfo::Direct(voting_key) => {
-                VotingInfo::Direct(DirectVoter {
-                    voting_key: as_hex_string(voting_key.bytes()),
-                })
-            },
-            PublicVotingInfo::Delegated(delegations) => {
-                VotingInfo::Delegated(Delegations {
-                    delegations: delegations
-                        .into_iter()
-                        .map(|(voting_key, power)| {
-                            Delegation {
-                                voting_key: as_hex_string(voting_key.bytes()),
-                                power,
-                            }
-                        })
-                        .collect(),
-                })
-            },
-        };
-        Self {
-            tx_hash: tx_hash.into(),
-            rewards_address: as_hex_string(rewards_address),
-            nonce,
-            voting_info,
-        }
-    }
 }
 
 impl Example for RegistrationInfo {
@@ -113,7 +71,7 @@ impl Example for RegistrationInfo {
             )
             .expect("Invalid hex")
             .into(),
-            nonce: 11_623_850,
+            nonce: Nonce::example(),
             voting_info: VotingInfo::Delegated(Delegations {
                 delegations: vec![Delegation {
                     voting_key:
