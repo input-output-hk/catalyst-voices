@@ -125,7 +125,6 @@ pub(crate) async fn endpoint(catalyst_id: IdUri) -> AllResponses {
             Ok(tx_hash) => tx_hash,
             Err(err) => {
                 error!(error = ?err, "Failed to parse tx hash value from row");
-                let err = anyhow::Error::from(err);
                 return AllResponses::internal_error(&err);
             },
         };

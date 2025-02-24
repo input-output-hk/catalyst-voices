@@ -152,7 +152,7 @@ impl ParseFromParameter for AsAt {
         } else {
             Slot::from_saturating(when)
         };
-        let slot_no: SlotNo = slot.try_into().map_err(ParseError::from)?;
+        let slot_no: SlotNo = slot.into();
         Ok(Self((whence, when, slot_no)))
     }
 }

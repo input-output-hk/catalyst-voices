@@ -310,7 +310,7 @@ fn build_stake_info(txos_by_txn: TxosByTxn) -> anyhow::Result<StakeInfo> {
                     });
                 }
 
-                let slot_no = u64::from(txo_info.slot_no).try_into()?;
+                let slot_no = txo_info.slot_no.into();
                 if stake_info.slot_number < slot_no {
                     stake_info.slot_number = slot_no;
                 }
