@@ -11,6 +11,8 @@ class ProposalsState extends Equatable {
   final ProposalPaginationItems<ProposalViewModel> allProposals;
   final List<String> favoritesIds;
   final List<String> myProposalsIds;
+  final List<CampaignCategoryViewModel> categories;
+  final String? selectedCategoryId;
 
   const ProposalsState({
     this.draftProposals = const ProposalPaginationItems(),
@@ -20,6 +22,8 @@ class ProposalsState extends Equatable {
     this.allProposals = const ProposalPaginationItems(),
     this.favoritesIds = const [],
     this.myProposalsIds = const [],
+    this.categories = const [],
+    this.selectedCategoryId,
   });
 
   ProposalsState copyWith({
@@ -30,6 +34,8 @@ class ProposalsState extends Equatable {
     ProposalPaginationItems<ProposalViewModel>? allProposals,
     List<String>? favoritesIds,
     List<String>? myProposalsIds,
+    List<CampaignCategoryViewModel>? categories,
+    Optional<String>? selectedCategoryId,
   }) {
     return ProposalsState(
       draftProposals: draftProposals ?? this.draftProposals,
@@ -39,6 +45,10 @@ class ProposalsState extends Equatable {
       allProposals: allProposals ?? this.allProposals,
       favoritesIds: favoritesIds ?? this.favoritesIds,
       myProposalsIds: myProposalsIds ?? this.myProposalsIds,
+      categories: categories ?? this.categories,
+      selectedCategoryId: selectedCategoryId.dataOr(
+        this.selectedCategoryId,
+      ),
     );
   }
 
@@ -51,5 +61,7 @@ class ProposalsState extends Equatable {
         allProposals,
         favoritesIds,
         myProposalsIds,
+        categories,
+        selectedCategoryId,
       ];
 }

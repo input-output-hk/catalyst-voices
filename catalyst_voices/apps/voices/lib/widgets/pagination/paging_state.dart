@@ -125,5 +125,6 @@ class PagingState<ItemType> extends Equatable {
         itemList,
         error,
         isLoading,
+        status,
       ];
 }

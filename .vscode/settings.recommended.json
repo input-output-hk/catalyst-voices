@@ -2,33 +2,30 @@
   // Recommended `settings.json` configuration
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
-    "source.sortMembers": true,
-    "source.fixAll": true,
-    "source.fixAll.markdownlint": true
+    "source.organizeImports": "explicit",
+    "source.sortMembers": "explicit",
+    "source.fixAll": "explicit",
+    "source.fixAll.markdownlint": "explicit"
   },
   "files.autoSave": "afterDelay",
   "editor.formatOnType": true,
-  "editor.rulers": [
-    100
-  ],
+  "editor.rulers": [100],
   "editor.tabSize": 4,
   "debug.openDebug": "openOnDebugBreak",
   "debug.internalConsoleOptions": "openOnSessionStart",
-  "dart.debugSdkLibraries": false,
   "[dart]": {
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
-    "editor.rulers": [
-      80
-    ],
+    "editor.rulers": [80],
     "editor.codeActionsOnSave": {
-      "source.fixAll": true,
-      "source.organizeImports": true
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit",
+      "source.addMissingImports": "explicit",
+      "source.sortMembers": "explicit"
     },
     "editor.selectionHighlight": false,
     "editor.suggestSelection": "first",
-    "editor.wordBasedSuggestions": false,
+    "editor.wordBasedSuggestions": "currentDocument",
     "editor.tabCompletion": "onlySnippets",
     "editor.defaultFormatter": "Dart-Code.dart-code"
   },
@@ -57,14 +54,8 @@
     ".pages": "yaml",
     ".earthlyignore": "ignore"
   },
-  "rust-analyzer.linkedProjects": [
-    "./catalyst-gateway/Cargo.toml"
-  ],
-  "rust-analyzer.check.overrideCommand": [
-    "bash",
-    "-c",
-    "cargo lint-vscode"
-  ],
+  "rust-analyzer.linkedProjects": ["./catalyst-gateway/Cargo.toml"],
+  "rust-analyzer.check.overrideCommand": ["bash", "-c", "cargo lint-vscode"],
   "yaml.schemas": {
     "https://squidfunk.github.io/mkdocs-material/schema.json": "mkdocs.yml"
   },
@@ -92,9 +83,7 @@
     "files.trimTrailingWhitespace": true,
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
   },
-  "rust-analyzer.rustfmt.extraArgs": [
-    "+nightly"
-  ],
+  "rust-analyzer.rustfmt.extraArgs": ["+nightly"],
   "rust-analyzer.lens.enable": true,
   "vs-kubernetes": {
     "vs-kubernetes.kubeconfig": "utilities/local-cluster/shared/k3s.yaml"

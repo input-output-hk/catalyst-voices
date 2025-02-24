@@ -117,6 +117,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     if (step.isRegistrationFlow) {
       return VoicesQuestionDialog.show(
         context,
+        routeSettings: const RouteSettings(name: '/registration-confirm-exit'),
         builder: (_) => const RegistrationExitConfirmDialog(),
       );
     }
@@ -124,6 +125,7 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     if (step.isRecoverFlow) {
       return VoicesQuestionDialog.show(
         context,
+        routeSettings: const RouteSettings(name: '/recovery-confirm-exit'),
         builder: (_) => const RecoveryExitConfirmDialog(),
       );
     }

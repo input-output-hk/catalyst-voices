@@ -18,7 +18,7 @@ abstract interface class ProposalService {
   });
 
   Future<ProposalTemplate> getProposalTemplate({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   });
 
   /// Fetches proposals for the [campaignId].
@@ -56,7 +56,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<ProposalTemplate> getProposalTemplate({
-    required SignedDocumentRef ref,
+    required DocumentRef ref,
   }) async {
     final proposalTemplate = await _documentRepository.getProposalTemplate(
       ref: ref,

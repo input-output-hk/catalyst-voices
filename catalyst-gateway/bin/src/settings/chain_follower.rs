@@ -2,7 +2,8 @@
 
 use std::{cmp::min, time::Duration};
 
-use cardano_chain_follower::{turbo_downloader::DlConfig, ChainSyncConfig, Network};
+use cardano_blockchain_types::Network;
+use cardano_chain_follower::{turbo_downloader::DlConfig, ChainSyncConfig};
 use tracing::info;
 
 use super::str_env_var::StringEnvVar;

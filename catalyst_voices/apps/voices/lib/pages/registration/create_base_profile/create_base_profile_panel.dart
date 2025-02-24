@@ -16,7 +16,9 @@ class CreateBaseProfilePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (stage) {
       CreateBaseProfileStage.instructions => const InstructionsPanel(),
-      CreateBaseProfileStage.setup => const SetupPanel(),
+      CreateBaseProfileStage.setup => const SetupPanel(
+          key: Key('BaseProfileDetailsPanel'),
+        ),
       CreateBaseProfileStage.acknowledgements => const AcknowledgementsPanel(),
     };
   }

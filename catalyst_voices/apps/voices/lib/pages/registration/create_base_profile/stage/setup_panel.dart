@@ -52,6 +52,7 @@ class _Title extends StatelessWidget {
     );
 
     return Text(
+      key: const Key('TitleText'),
       context.l10n.createBaseProfileSetupTitle,
       style: textStyle,
     );
@@ -82,6 +83,7 @@ class _DisplayNameTextField extends StatelessWidget {
     final l10n = context.l10n;
 
     return VoicesDisplayNameTextField(
+      key: const Key('DisplayNameTextField'),
       initialText: displayName.value,
       onChanged: (value) {
         RegistrationCubit.of(context)
@@ -124,6 +126,7 @@ class _EmailTextField extends StatelessWidget {
     final l10n = context.l10n;
 
     return VoicesEmailTextField(
+      key: const Key('EmailTextField'),
       initialText: email.value,
       onChanged: (value) {
         RegistrationCubit.of(context)
@@ -158,9 +161,14 @@ class _IdeascaleInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionCard(
+      key: const Key('IdeascaleInfoCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
-      title: Text(context.l10n.createBaseProfileSetupIdeascaleAccount),
+      title: Text(
+        context.l10n.createBaseProfileSetupIdeascaleAccount,
+        key: const Key('InfoCardTitle'),
+      ),
       desc: BulletList(
+        key: const Key('InfoCardDesc'),
         items: [
           context.l10n.createBaseProfileSetupIdeascaleReason1,
         ],

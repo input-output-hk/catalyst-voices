@@ -1,10 +1,10 @@
 -- Index of CIP-36 registrations. Valid. 
 CREATE TABLE IF NOT EXISTS cip36_registration (
     -- Primary Key Data
-    stake_address       blob,       -- 32 Bytes of Stake Address.
+    stake_public_key    blob,       -- 32 Bytes of Stake Address.
     nonce               varint,     -- Nonce that has been slot corrected.
     slot_no             varint,     -- slot number when the key_was_registered/re-registered.
-    txn                 smallint,   -- Index of the TX which holds the registration data.
+    txn_index           smallint,   -- Index of the TX which holds the registration data.
 
     -- Non-Key Data
     vote_key            blob,       -- 32 Bytes of Vote Key.
@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS cip36_registration (
     raw_nonce           varint,     -- Nonce that has not been slot corrected.
     cip36               boolean,    -- True if the registration is CIP-36 format, Cip-15=False.
 
-    PRIMARY KEY (stake_address, nonce, slot_no, txn)
+    PRIMARY KEY (stake_public_key, nonce, slot_no, txn_index)
 )
-WITH CLUSTERING ORDER BY (nonce DESC, slot_no DESC, txn DESC);
+WITH CLUSTERING ORDER BY (nonce DESC, slot_no DESC, txn_index DESC);

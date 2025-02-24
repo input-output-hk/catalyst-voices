@@ -1,47 +1,45 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/signed_document_data_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:drift/drift.dart';
 
 typedef DocumentContentJsonBConverter
-    = JsonTypeConverter2<SignedDocumentContent, Uint8List, Object?>;
+    = JsonTypeConverter2<DocumentDataContent, Uint8List, Object?>;
 
 typedef DocumentMetadataJsonBConverter
-    = JsonTypeConverter2<SignedDocumentMetadata, Uint8List, Object?>;
+    = JsonTypeConverter2<DocumentDataMetadata, Uint8List, Object?>;
 
 abstract final class DocumentConverters {
-  /// Converts [SignedDocumentType] to String for text column.
-  static const TypeConverter<SignedDocumentType, String> type =
+  /// Converts [DocumentType] to String for text column.
+  static const TypeConverter<DocumentType, String> type =
       _DocumentTypeConverter();
 
-  /// Converts [SignedDocumentContent] into json for bloc column.
+  /// Converts [DocumentDataContent] into json for bloc column.
   /// Required for jsonb queries.
   static final DocumentContentJsonBConverter content = TypeConverter.jsonb(
-    fromJson: (json) => SignedDocumentContent(json! as Map<String, Object?>),
+    fromJson: (json) => DocumentDataContent(json! as Map<String, Object?>),
     toJson: (content) => content.data,
   );
 
-  /// Converts [SignedDocumentMetadata] into json for bloc column.
+  /// Converts [DocumentDataMetadata] into json for bloc column.
   /// Required for jsonb queries.
   static final DocumentMetadataJsonBConverter metadata = TypeConverter.jsonb(
     fromJson: (json) =>
-        SignedDocumentMetadataDto.fromJson(json! as Map<String, Object?>)
+        DocumentDataMetadataDto.fromJson(json! as Map<String, Object?>)
             .toModel(),
-    toJson: (metadata) =>
-        SignedDocumentMetadataDto.fromModel(metadata).toJson(),
+    toJson: (metadata) => DocumentDataMetadataDto.fromModel(metadata).toJson(),
   );
 }
 
-final class _DocumentTypeConverter
-    extends TypeConverter<SignedDocumentType, String> {
+final class _DocumentTypeConverter extends TypeConverter<DocumentType, String> {
   const _DocumentTypeConverter();
 
   @override
-  SignedDocumentType fromSql(String fromDb) {
-    return SignedDocumentType.fromJson(fromDb);
+  DocumentType fromSql(String fromDb) {
+    return DocumentType.fromJson(fromDb);
   }
 
   @override
-  String toSql(SignedDocumentType value) {
-    return SignedDocumentType.toJson(value);
+  String toSql(DocumentType value) {
+    return DocumentType.toJson(value);
   }
 }

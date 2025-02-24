@@ -2,12 +2,15 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::Metadata::cip36::{Cip36, VotingPubKey};
+use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTxnIndex},
+    },
     settings::cassandra_db,
 };
 
@@ -18,13 +21,13 @@ const INSERT_CIP36_REGISTRATION_QUERY: &str = include_str!("./cql/insert_cip36.c
 #[derive(SerializeRow, Clone)]
 pub(crate) struct Params {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    stake_address: Vec<u8>,
+    stake_public_key: Vec<u8>,
     /// Nonce value after normalization.
     nonce: num_bigint::BigInt,
     /// Slot Number the cert is in.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Index.
-    txn: i16,
+    txn_index: DbTxnIndex,
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
@@ -44,10 +47,10 @@ impl Debug for Params {
             MaybeUnset::Set(ref v) => &hex::encode(v),
         };
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("stake_public_key", &self.stake_public_key)
             .field("nonce", &self.nonce)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("vote_key", &self.vote_key)
             .field("payment_address", &payment_address)
             .field("is_payable", &self.is_payable)
@@ -59,24 +62,27 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new Insert Query.
-    pub fn new(vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36) -> Self {
+    pub fn new(vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36) -> Self {
+        let stake_public_key = cip36
+            .stake_pk()
+            .map_or_else(Vec::new, |s| s.to_bytes().to_vec());
+        let vote_key = vote_key
+            .voting_pk()
+            .map_or_else(Vec::new, |v| v.to_bytes().to_vec());
+        let payment_address = cip36
+            .payment_address()
+            .map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.to_vec()));
+        let is_cip36 = cip36.is_cip36().unwrap_or_default();
         Params {
-            stake_address: cip36
-                .stake_pk
-                .map(|s| s.to_bytes().to_vec())
-                .unwrap_or_default(),
-            nonce: cip36.nonce.into(),
+            stake_public_key,
+            nonce: cip36.nonce().unwrap_or_default().into(),
             slot_no: slot_no.into(),
-            txn,
-            vote_key: vote_key.voting_pk.to_bytes().to_vec(),
-            payment_address: if cip36.payment_addr.is_empty() {
-                MaybeUnset::Unset
-            } else {
-                MaybeUnset::Set(cip36.payment_addr.clone())
-            },
-            is_payable: cip36.payable,
-            raw_nonce: cip36.raw_nonce.into(),
-            cip36: cip36.cip36.unwrap_or_default(),
+            txn_index: txn_index.into(),
+            vote_key,
+            payment_address,
+            is_payable: cip36.is_payable().unwrap_or_default(),
+            raw_nonce: cip36.raw_nonce().unwrap_or_default().into(),
+            cip36: is_cip36,
         }
     }
 

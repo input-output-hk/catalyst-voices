@@ -38,7 +38,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Value of a Cardano Native Asset (may not be zero)
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub(crate) struct AssetValue(i128);
 
 /// Is the `AssetValue` valid?
