@@ -39,7 +39,7 @@ Files have to be generated with build runner command.
 
 ```bash
 dart run build_runner clean && \
-dart run setup_build.dart && \
+dart run process_openapi.dart && \
 dart run build_runner build --delete-conflicting-outputs
 ```
 

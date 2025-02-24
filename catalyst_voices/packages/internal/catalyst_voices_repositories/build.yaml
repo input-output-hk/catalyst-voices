@@ -1,9 +1,3 @@
-global_options:
-  catalyst_voices_repositories|openapi_pre_process_builder:
-    runs_before:
-      - swagger_dart_code_generator:swagger_dart_code_generator
-      - chopper_generator:chopper_generator
-
 targets:
   $default:
     sources:
@@ -12,9 +6,6 @@ targets:
       - $package$
       - pubspec.*
     builders:
-      catalyst_voices_repositories|openapi_pre_process_builder:
-        options:
-          sourcepath: "openapi"
       swagger_dart_code_generator:
         options:
           input_folder: "openapi/processed"
@@ -78,15 +69,3 @@ targets:
         enabled: true
         # We use yaml anchors to give the two builders the same options
         options: *options
-
-builders:
-  openapi_pre_process_builder:
-    import: "package:catalyst_voices_repositories/builders/builders.dart"
-    builder_factories: [ "openApiPreProcessBuilder" ]
-    build_extensions: { ".json": [ ".processed.json" ] }
-    auto_apply: root_package
-    build_to: source
-    applies_builders: [ "swagger_dart_code_generator" ]
-    defaults:
-      options:
-        sourcepath: "openapi"
