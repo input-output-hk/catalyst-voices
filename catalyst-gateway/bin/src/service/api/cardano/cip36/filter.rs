@@ -9,7 +9,7 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use tracing::error;
 
 use super::{
-    cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce, txn_index::TxnIndex},
+    cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
     common::types::generic::error_msg::ErrorMessage,
     response::{
         AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,
@@ -17,16 +17,19 @@ use super::{
     },
     Ed25519HexEncodedPublicKey, SlotNo,
 };
-use crate::db::index::{
-    queries::registrations::{
-        get_all_invalids::{GetAllInvalidRegistrationsParams, GetAllInvalidRegistrationsQuery},
-        get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
-        get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
-        get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
-        get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
-        get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
+use crate::{
+    db::index::{
+        queries::registrations::{
+            get_all_invalids::{GetAllInvalidRegistrationsParams, GetAllInvalidRegistrationsQuery},
+            get_all_registrations::{GetAllRegistrationsParams, GetAllRegistrationsQuery},
+            get_from_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
+            get_from_stake_address::{GetStakeAddrParams, GetStakeAddrQuery},
+            get_from_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
+            get_invalid::{GetInvalidRegistrationParams, GetInvalidRegistrationQuery},
+        },
+        session::CassandraSession,
     },
-    session::CassandraSession,
+    service::common::types::cardano::txn_index::TxnIndex,
 };
 
 /// Get registration given a stake key hash, it can be time specific based on asat param,
@@ -198,14 +201,13 @@ async fn get_all_registrations_from_stake_pub_key(
         };
 
         let slot_no: u64 = row.slot_no.into();
-        let txn: i16 = row.txn_index.into();
 
         let cip36 = Cip36Details {
             slot_no: slot_no.into(),
             stake_pub_key: Some(stake_pub_key.clone()),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
-            txn: Some(TxnIndex::try_from(txn)?),
+            txn: Some(TxnIndex::try_from(i16::from(row.txn_index))?),
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
@@ -449,11 +451,11 @@ pub async fn get_all_registrations(
         let cip36 = Cip36Details {
             slot_no: SlotNo::from(slot_no),
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(
-                row.stake_address.clone(),
+                row.stake_public_key.clone(),
             )?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: Some(Nonce::from(nonce)),
-            txn: Some(TxnIndex::try_from(row.txn)?),
+            txn: Some(TxnIndex::try_from(i16::from(row.txn_index))?),
             payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
             is_payable: row.is_payable,
             cip15: !row.cip36,
@@ -461,14 +463,14 @@ pub async fn get_all_registrations(
         };
 
         if let Some(mut v) = registrations_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(
-            row.stake_address.clone(),
+            row.stake_public_key.clone(),
         )?) {
             v.push(cip36);
             continue;
         };
 
         registrations_map.insert(
-            Ed25519HexEncodedPublicKey::try_from(row.stake_address)?,
+            Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?,
             vec![cip36],
         );
     }
@@ -495,29 +497,37 @@ async fn get_all_invalid_registrations(
             continue;
         };
 
+        let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address) {
+            Ok(cip) => cip,
+            Err(err) => {
+                error!("Cip19 Shelley payment addr {:?}", err);
+                continue;
+            },
+        };
+
         let invalid = Cip36Details {
             slot_no: SlotNo::from(slot_no),
             stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(
-                row.stake_address.clone(),
+                row.stake_public_key.clone(),
             )?),
             vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
             nonce: None,
             txn: None,
-            payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
+            payment_address: Some(payment_addr),
             is_payable: row.is_payable,
             cip15: !row.cip36,
-            errors: Some(ErrorMessage::from(format!("{:?}", row.error_report))),
+            errors: Some(ErrorMessage::from(format!("{:?}", row.problem_report))),
         };
 
         if let Some(mut v) = invalids_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(
-            row.stake_address.clone(),
+            row.stake_public_key.clone(),
         )?) {
             v.push(invalid);
             continue;
         };
 
         invalids_map.insert(
-            Ed25519HexEncodedPublicKey::try_from(row.stake_address)?,
+            Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?,
             vec![invalid],
         );
     }
