@@ -39,7 +39,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.userShortcutBtn)
               .tap(settleTimeout: Time.long.duration);
-          await $(AppBarPage.accountPopupBtn).tap();
+          await AppBarPage($).accountPopupBtnClick();
           await AccountDropdownPage.accountDropdownLooksAsExpected($);
           await AccountDropdownPage.accountDropdownContainsSpecificData($);
         },
@@ -52,8 +52,8 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(OverallSpacesPage.userShortcutBtn)
             .tap(settleTimeout: const Duration(seconds: 10));
-        await $(AppBarPage.lockBtn).tap();
-        expect($(AppBarPage.unlockBtn), findsOneWidget);
+        await AppBarPage($).lockBtnClick();
+        await AppBarPage($).unlockBtnIsVisible();
       });
 
       patrolWidgetTest(
@@ -63,11 +63,11 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await $(OverallSpacesPage.userShortcutBtn)
             .tap(settleTimeout: const Duration(seconds: 10));
-        await $(AppBarPage.lockBtn).tap();
-        await $(AppBarPage.unlockBtn).tap();
+        await AppBarPage($).lockBtnClick();
+        await AppBarPage($).unlockBtnClick();
         await $(UnlockModalPage.unlockPasswordTextField).enterText('Test1234');
         await $(UnlockModalPage.unlockConfirmPasswordButton).tap();
-        expect($(AppBarPage.lockBtn), findsOneWidget);
+        await AppBarPage($).unlockBtnIsVisible();
       });
     },
   );
