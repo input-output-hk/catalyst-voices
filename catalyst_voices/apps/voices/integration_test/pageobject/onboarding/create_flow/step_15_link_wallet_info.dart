@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/translations_utils.dart';
-import '../common_page.dart';
-import 'onboarding_base_page.dart';
-import 'step_15_link_wallet_info.dart';
+import '../../../utils/translations_utils.dart';
+import '../../common_page.dart';
+import '../onboarding_base_page.dart';
+import 'step_14_keychain_final.dart';
 
-class WalletListPanel extends OnboardingPageBase {
-  WalletListPanel(super.$);
+class LinkWalletInfoPanel extends OnboardingPageBase {
+  LinkWalletInfoPanel(super.$);
+
+  static const chooseCardanoWalletButton = Key('ChooseCardanoWalletButton');
+
+  Future<void> clickChooseCardanoWallet() async {
+    await $(chooseCardanoWalletButton).tap();
+  }
 
   @override
   Future<void> goto() async {
-    await LinkWalletInfoPanel($).goto();
-    await LinkWalletInfoPanel($).clickChooseCardanoWallet();
+    await KeychainFinalPanel($).goto();
+    await KeychainFinalPanel($).clickLinkWalletAndRoles();
   }
 
   @override
@@ -20,6 +26,8 @@ class WalletListPanel extends OnboardingPageBase {
     await verifyInfoPanel();
     await verifyDetailsPanel();
   }
+
+  Future<void> verifyDetailsPanel() async {}
 
   Future<void> verifyInfoPanel() async {
     expect(
@@ -38,6 +46,4 @@ class WalletListPanel extends OnboardingPageBase {
       T.get('Learn More'),
     );
   }
-
-  Future<void> verifyDetailsPanel() async {}
 }

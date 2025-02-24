@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/translations_utils.dart';
-import 'onboarding_base_page.dart';
-import 'step_1_get_started.dart';
+import '../../../utils/translations_utils.dart';
+import '../onboarding_base_page.dart';
+import '../step_1_get_started.dart';
 
 class BaseProfileInfoPanel extends OnboardingPageBase {
   BaseProfileInfoPanel(super.$);

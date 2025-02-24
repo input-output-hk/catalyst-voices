@@ -1,4 +1,4 @@
-import 'onboarding_base_page.dart';
+import '../onboarding_base_page.dart';
 import 'step_3_setup_base_profile.dart';
 
 class AcknowledgmentsPanel extends OnboardingPageBase {
