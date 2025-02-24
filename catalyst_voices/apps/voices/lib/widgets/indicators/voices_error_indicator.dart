@@ -28,6 +28,7 @@ class VoicesErrorIndicator extends StatelessWidget {
       action: Offstage(
         offstage: onRetry == null,
         child: VoicesTextButton(
+          key: const Key('ErrorRetryBtn'),
           leading: VoicesAssets.icons.refresh.buildIcon(),
           onTap: onRetry,
           child: Text(context.l10n.retry),
