@@ -494,16 +494,9 @@ async fn get_all_invalid_registrations(
 
         let payment_addr = Cip19ShelleyAddress::try_from(row.payment_address).ok();
 
-        let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
-            Ok(vote_pub_key) => Some(vote_pub_key),
-            Err(_) => None,
-        };
+        let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
 
-        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone())
-        {
-            Ok(stake_pub_key) => Some(stake_pub_key),
-            Err(_) => None,
-        };
+        let stake_pub_key = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
 
         let invalid = Cip36Details {
             slot_no: SlotNo::try_from(slot_no)?,
