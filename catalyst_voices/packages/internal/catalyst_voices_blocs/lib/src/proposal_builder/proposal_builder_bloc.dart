@@ -37,6 +37,18 @@ final class ProposalBuilderBloc
     on<ShareProposalEvent>(_shareProposal);
     on<PublishProposalEvent>(_publishProposal);
     on<SubmitProposalEvent>(_submitProposal);
+    on<ValidateProposalEvent>(_validateProposal);
+  }
+
+  bool validate() {
+    final documentBuilder = _documentBuilder;
+    assert(documentBuilder != null, 'DocumentBuilder not initialized');
+
+    final document = documentBuilder!.build();
+    final isValid = document.isValid;
+    add(const ValidateProposalEvent());
+
+    return isValid;
   }
 
   Future<void> _deleteProposal(
@@ -296,12 +308,6 @@ final class ProposalBuilderBloc
     PublishProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final documentBuilder = _documentBuilder;
-    assert(documentBuilder != null, 'DocumentBuilder not initialized');
-    final document = documentBuilder!.build();
-
-    _validateDocument(emit, document);
-
     // TODO(dtscalac): handle event
   }
 
@@ -309,26 +315,24 @@ final class ProposalBuilderBloc
     ShareProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    // TODO(dtscalac): handle event
+    // TODO(LynxLynxx): share proposal
   }
 
   Future<void> _submitProposal(
     SubmitProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
+    // TODO(dtscalac): handle event
+  }
+
+  Future<void> _validateProposal(
+    ValidateProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
     final documentBuilder = _documentBuilder;
     assert(documentBuilder != null, 'DocumentBuilder not initialized');
     final document = documentBuilder!.build();
 
-    _validateDocument(emit, document);
-
-    // TODO(dtscalac): handle event
-  }
-
-  void _validateDocument(
-    Emitter<ProposalBuilderState> emit,
-    Document document,
-  ) {
     final showErrors = !document.isValid;
 
     final segments = _mapDocumentToSegments(
