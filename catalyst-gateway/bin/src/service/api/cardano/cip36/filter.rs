@@ -492,10 +492,7 @@ async fn get_all_invalid_registrations(
             continue;
         };
 
-        let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address) {
-            Ok(payment_addr) => Some(payment_addr),
-            Err(_) => None,
-        };
+        let payment_addr = Cip19ShelleyAddress::try_from(row.payment_address).ok();
 
         let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
             Ok(vote_pub_key) => Some(vote_pub_key),
