@@ -3,27 +3,28 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-abstract interface class UserObserver implements ActiveAware {
-  User get user;
-
-  set user(User newValue);
-
-  Stream<User> get watchUser;
-
-  FutureOr<void> dispose();
-}
-
 final class StreamUserObserver implements UserObserver {
+  final _logger = Logger('StreamUserObserver');
+
+  User _user;
+
+  final _userSC = StreamController<User>.broadcast();
+  bool _isActive = true;
+
   StreamUserObserver({
     User user = const User.empty(),
   }) : _user = user;
 
-  final _logger = Logger('StreamUserObserver');
+  @override
+  bool get isActive => _isActive;
 
-  User _user;
-  final _userSC = StreamController<User>.broadcast();
-
-  bool _isActive = true;
+  @override
+  set isActive(bool value) {
+    if (_isActive != value) {
+      _isActive = value;
+      _user.activeAccount?.keychain.isActive = value;
+    }
+  }
 
   @override
   User get user => _user;
@@ -58,18 +59,17 @@ final class StreamUserObserver implements UserObserver {
   }
 
   @override
-  bool get isActive => _isActive;
-
-  @override
-  set isActive(bool value) {
-    if (_isActive != value) {
-      _isActive = value;
-      _user.activeAccount?.keychain.isActive = value;
-    }
-  }
-
-  @override
   FutureOr<void> dispose() async {
     await _userSC.close();
   }
+}
+
+abstract interface class UserObserver implements ActiveAware {
+  User get user;
+
+  set user(User newValue);
+
+  Stream<User> get watchUser;
+
+  FutureOr<void> dispose();
 }
