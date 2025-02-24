@@ -182,14 +182,10 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     if (proposalId != null) {
       bloc.add(LoadProposalEvent(id: proposalId));
-      return;
-    }
-
-    if (templateId != null) {
+    } else if (templateId != null) {
       bloc.add(LoadProposalTemplateEvent(id: templateId));
-      return;
+    } else {
+      bloc.add(const LoadDefaultProposalTemplateEvent());
     }
-
-    bloc.add(const LoadDefaultProposalTemplateEvent());
   }
 }

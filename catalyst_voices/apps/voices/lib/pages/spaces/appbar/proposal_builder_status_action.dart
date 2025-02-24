@@ -172,7 +172,7 @@ enum _MenuItemEnum {
   static List<_MenuItemEnum> availableOptions(ProposalPublish proposalPublish) {
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
-        return [view, publish, export];
+        return [view, publish, export, delete];
       case ProposalPublish.publishedDraft:
       case ProposalPublish.submittedProposal:
         return [view, publish, submit, share, export, delete];
