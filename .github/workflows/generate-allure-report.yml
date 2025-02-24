@@ -74,7 +74,7 @@ jobs:
           name: test-reports
           path: "**/*${{ env.REPORT_EXT }}"
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 2
 
       - name: Collect and merge test coverage
         uses: kukkok3/collect-coverage@main
