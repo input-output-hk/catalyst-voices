@@ -48,8 +48,7 @@ void main() {
       updateDate: DateTime.now(),
       fundsRequested: const Coin(100000),
       status: ProposalStatus.draft,
-      publish: ProposalPublish.draft,
-      access: ProposalAccess.private,
+      publish: ProposalPublish.publishedDraft,
       commentsCount: 0,
       document: proposalDocument,
       version: 1,
@@ -142,7 +141,7 @@ void main() {
             pageKey: 1,
             pageSize: 10,
             lastId: null,
-            stage: ProposalPublish.draft,
+            stage: ProposalPublish.publishedDraft,
           ),
         );
       },
@@ -167,7 +166,7 @@ void main() {
             pageKey: 1,
             pageSize: 10,
             lastId: null,
-            stage: ProposalPublish.published,
+            stage: ProposalPublish.submittedProposal,
           ),
         );
       },
@@ -286,6 +285,11 @@ class _FakeProposalService extends Fake implements ProposalService {
   _FakeProposalService(this._proposals);
 
   @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    return ['1', '2'];
+  }
+
+  @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
     required String campaignId,
@@ -296,11 +300,6 @@ class _FakeProposalService extends Fake implements ProposalService {
       items: _proposals,
       isEmpty: false,
     );
-  }
-
-  @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    return ['1', '2'];
   }
 
   @override
