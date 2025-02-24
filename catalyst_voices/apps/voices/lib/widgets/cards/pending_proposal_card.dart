@@ -407,12 +407,8 @@ class _Topbar extends StatelessWidget {
           key: const Key('ShareBtn'),
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
-            final url =
-                ProposalBuilderDraftRoute(templateId: proposalId).location;
-            await ShareProposalDialog.show(
-              context,
-              url,
-            );
+            final url = ProposalBuilderRoute(proposalId: proposalId).location;
+            await ShareProposalDialog.show(context, url);
           },
           style: _buttonStyle(context),
           child: VoicesAssets.icons.share.buildIcon(

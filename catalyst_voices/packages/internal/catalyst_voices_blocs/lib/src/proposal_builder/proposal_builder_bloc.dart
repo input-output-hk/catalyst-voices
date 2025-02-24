@@ -33,7 +33,6 @@ final class ProposalBuilderBloc
     on<SectionChangedEvent>(_handleSectionChangedEvent);
     on<DeleteProposalEvent>(_deleteProposal);
     on<ExportProposalEvent>(_exportProposal);
-    on<ShareProposalEvent>(_shareProposal);
     on<PublishProposalEvent>(_publishProposal);
     on<SubmitProposalEvent>(_submitProposal);
     on<ValidateProposalEvent>(_validateProposal);
@@ -321,13 +320,6 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     // TODO(dtscalac): handle event
-  }
-
-  Future<void> _shareProposal(
-    ShareProposalEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    // TODO(LynxLynxx): share proposal
   }
 
   Future<void> _submitProposal(

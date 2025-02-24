@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -230,7 +232,7 @@ class _ProposalBuilderStatusActionState
       case _MenuItemEnum.submit:
         unawaited(_submitForReview(context));
       case _MenuItemEnum.share:
-        context.read<ProposalBuilderBloc>().add(const ShareProposalEvent());
+        unawaited(_shareProposal(context));
       case _MenuItemEnum.export:
         context.read<ProposalBuilderBloc>().add(const ExportProposalEvent());
       case _MenuItemEnum.delete:
@@ -259,6 +261,16 @@ class _ProposalBuilderStatusActionState
 
     if (shouldPublish) {
       bloc.add(const PublishProposalEvent());
+    }
+  }
+
+  Future<void> _shareProposal(BuildContext context) async {
+    final state = context.read<ProposalBuilderBloc>().state;
+    final proposalId = state.metadata.documentRef?.id;
+    if (proposalId != null) {
+      // TODO(LynxLynxx): Change to proposal view route when implemented
+      final url = ProposalBuilderRoute(proposalId: proposalId).location;
+      await ShareProposalDialog.show(context, url);
     }
   }
 
