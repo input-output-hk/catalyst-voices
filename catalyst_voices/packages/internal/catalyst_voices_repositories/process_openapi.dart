@@ -5,8 +5,11 @@ import 'dart:io';
 
 import 'package:path/path.dart' as path;
 
-const _supportedOpenApiVersion = '3.0.0';
-
+/// Adapts OpenAPI specs produced by backend to something that code
+/// generators can work with.
+///
+/// For example this bug:
+/// - https://github.com/epam-cross-platform-lab/swagger-dart-code-generator/issues/721
 void main() {
   // Ensure the processed directory exists
   final sourceDir = Directory('openapi');
@@ -64,6 +67,8 @@ void main() {
     print('Processed [$baseName] --> [$fileName]');
   }
 }
+
+const _supportedOpenApiVersion = '3.0.0';
 
 /// Processor for OpenAPI specifications
 class OpenApiProcessor {

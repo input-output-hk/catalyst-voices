@@ -9,6 +9,8 @@ const _key =
     'XWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ';
 /* cSpell:enable */
 
+// TODO(damian-molinski): If token will be cached we may need to implement
+//  handling 401 response.
 final class RbacAuthInterceptor implements Interceptor {
   final UserObserver _userObserver;
 
