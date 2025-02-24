@@ -36,7 +36,7 @@ void main() async {
         'visitor - no drawer button',
         (PatrolTester $) async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
-          expect($(AppBarPage.spacesDrawerButton).exists, false);
+          await AppBarPage($).spacesDrawerButtonExists();
         },
       );
 
@@ -48,7 +48,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.guestShortcutBtn)
               .tap(settleTimeout: Time.long.duration);
-          await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+          await AppBarPage($).spacesDrawerButtonClick();
           SpacesDrawerPage.commonElementsLookAsExpected($);
 
           // iterate thru spaces by clicking on spaces icons directly
@@ -68,7 +68,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.guestShortcutBtn)
               .tap(settleTimeout: Time.long.duration);
-          await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+          await AppBarPage($).spacesDrawerButtonClick();
 
           // iterate thru spaces by clicking next
           for (final space in Space.values) {
@@ -96,7 +96,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.userShortcutBtn)
               .tap(settleTimeout: Time.long.duration);
-          await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+          await AppBarPage($).spacesDrawerButtonClick();
           SpacesDrawerPage.commonElementsLookAsExpected($);
           for (final space in Space.values) {
             await $(SpacesDrawerPage.chooserItem(space)).tap();
@@ -113,7 +113,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.guestShortcutBtn)
               .tap(settleTimeout: Time.long.duration);
-          await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+          await AppBarPage($).spacesDrawerButtonClick();
           await $(SpacesDrawerPage.allSpacesBtn).tap();
           expect($(OverallSpacesPage.spacesListView), findsOneWidget);
         },
@@ -127,7 +127,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.userShortcutBtn)
               .tap(settleTimeout: Time.long.duration);
-          await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+          await AppBarPage($).spacesDrawerButtonClick();
           await $(SpacesDrawerPage.allSpacesBtn).tap();
           expect($(OverallSpacesPage.spacesListView), findsOneWidget);
         },
@@ -148,7 +148,7 @@ void main() async {
           await $.pumpWidgetAndSettle(App(routerConfig: router));
           await $(OverallSpacesPage.userShortcutBtn)
               .tap(settleTimeout: Time.long.duration);
-          await $(AppBarPage.spacesDrawerButton).waitUntilVisible().tap();
+          await AppBarPage($).spacesDrawerButtonClick();
           for (final space in Space.values) {
             await $(SpacesDrawerPage.chooserItem(space)).tap();
             await $(SpacesDrawerPage.chooserIcon(space)).longPress();

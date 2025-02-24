@@ -12,6 +12,7 @@ class DraftProposalChip extends StatelessWidget {
     return VoicesChip.rectangular(
       content: Text(
         context.l10n.draft,
+        key: const Key('ProposalStage'),
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSecondary,
         ),
@@ -29,6 +30,7 @@ class FinalProposalChip extends StatelessWidget {
     return VoicesChip.rectangular(
       content: Text(
         context.l10n.finalProposal,
+        key: const Key('ProposalStage'),
         style: TextStyle(
           color: Theme.of(context).colorScheme.onPrimary,
         ),
@@ -55,6 +57,7 @@ class ProposalVersionChip extends StatelessWidget {
           VoicesAssets.icons.documentText.buildIcon(size: 18),
           Text(
             version,
+            key: const Key('Version'),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Theme.of(context).colors.textOnPrimaryLevel1,
                 ),
