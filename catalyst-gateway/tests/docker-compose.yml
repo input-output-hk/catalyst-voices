@@ -24,6 +24,14 @@ services:
       timeout: 5s
       retries: 10
 
+  scylla-node:
+    image: scylladb/scylla:latest
+    container_name: scylla-node
+    restart: unless-stopped
+    command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
+    ports:
+      - "9042:9042"
+
   cat-gateway-with-scylla:
     image: cat-gateway-with-scylla:latest
     container_name: cat-gateway-with-scylla
