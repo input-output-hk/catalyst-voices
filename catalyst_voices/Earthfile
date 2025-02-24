@@ -28,8 +28,11 @@ code-generator:
     ARG save_locally=false
     FROM +builder
 
-    LET gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api
+    LET gen_code_path = lib/generated/api
     LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
+    LET openapi_spec_path = packages/internal/catalyst_voices_repositories/openapi/cat-gateway.json
+
+    WORKDIR packages/internal/catalyst_voices_repositories
 
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway.json
 
@@ -38,7 +41,7 @@ code-generator:
     RUN melos build_runner_repository
 
     IF [ $save_locally = true ]
-       # This step saves generated files other then open_api generated services
+       # This step saves generated files other then OpenApi Services
        RUN find . \( -name "*.g.dart" -o -name "*.chopper.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "*.drift.dart" \)
 
        FOR generated_file IN $(find . \( -name "*.g.dart" -o -name "*.chopper.dart" -o -name "*.gen.dart" -o -name "catalyst_voices_localizations*.dart" -o -name "*.drift.dart" \))
@@ -48,11 +51,14 @@ code-generator:
        SAVE ARTIFACT .
     END
 
-    # saves locally openapi json specs. Useful for local diagnostic.
+    # Saves locally openapi json specs. Useful for local diagnostic.
     IF [ $save_locally = true ]
-        SAVE ARTIFACT openapi/cat-gateway.json AS LOCAL packages/internal/catalyst_voices_repositories/openapi/cat-gateway.json
+        SAVE ARTIFACT openapi/cat-gateway.json AS LOCAL $openapi_spec_path
+    ELSE
+        SAVE ARTIFACT openapi/cat-gateway.json
     END
 
+    # Saves generated OpenApi Services
     IF [ $save_locally = true ]
         SAVE ARTIFACT "$gen_code_path/*" AS LOCAL $local_gen_code_path
     ELSE
