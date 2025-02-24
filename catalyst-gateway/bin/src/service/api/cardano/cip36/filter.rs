@@ -497,26 +497,43 @@ async fn get_all_invalid_registrations(
             continue;
         };
 
+        let mut problem_report = format!("{:?}", row.problem_report);
+
         let payment_addr = match Cip19ShelleyAddress::try_from(row.payment_address) {
-            Ok(cip) => cip,
+            Ok(payment_addr) => Some(payment_addr),
             Err(err) => {
-                error!("Cip19 Shelley payment addr {:?}", err);
-                continue;
+                problem_report = format!("{problem_report} \n Corrupt payment addr:{err}");
+                None
+            },
+        };
+
+        let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
+            Ok(vote_pub_key) => Some(vote_pub_key),
+            Err(err) => {
+                problem_report = format!("{problem_report} \n Corrupt vote pub key:{err}");
+                None
+            },
+        };
+
+        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone())
+        {
+            Ok(stake_pub_key) => Some(stake_pub_key),
+            Err(err) => {
+                problem_report = format!("{problem_report} \n Corrupt stake pub key:{err}");
+                None
             },
         };
 
         let invalid = Cip36Details {
             slot_no: SlotNo::from(slot_no),
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(
-                row.stake_public_key.clone(),
-            )?),
-            vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
+            stake_pub_key,
+            vote_pub_key,
             nonce: None,
             txn: None,
-            payment_address: Some(payment_addr),
+            payment_address: payment_addr,
             is_payable: row.is_payable,
             cip15: !row.cip36,
-            errors: Some(ErrorMessage::from(format!("{:?}", row.problem_report))),
+            errors: Some(ErrorMessage::from(problem_report)),
         };
 
         if let Some(mut v) = invalids_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(
