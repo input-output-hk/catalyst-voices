@@ -1523,8 +1523,8 @@
   "editRolesDialogTitle": "Editing Roles",
   "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
   "continueText": "Continue",
-  "proposalEditorStatusDropdownBackTitle": "Back to Proposal Index",
-  "@proposalEditorStatusDropdownBackTitle": {
+  "proposalEditorBackToProposals": "Back to Proposals",
+  "@proposalEditorBackToProposals": {
     "description": "Action title to navigate back to the proposal index."
   },
   "proposalEditorStatusDropdownPublishTitle": "Publish as new iteration · Draft",
@@ -1550,6 +1550,10 @@
   "proposalEditorStatusDropdownExportTitle": "Export Proposal",
   "@proposalEditorStatusDropdownExportTitle": {
     "description": "Action title to export a proposal as a file."
+  },
+  "proposalEditorStatusDropdownDeleteTitle": "Delete Proposal",
+  "@proposalEditorStatusDropdownDeleteTitle": {
+    "description": "Action title to delete a proposal."
   },
   "proposalEditorValidationSnackbar": "Fix the following input errors",
   "@proposalEditorValidationSnackbar": {
@@ -1611,5 +1615,21 @@
   "change": "Change",
   "@change": {
     "description": "An action to change/modify something."
+  },
+  "proposalStatusLocal": "Private Draft",
+  "@proposalStatusLocal": {
+    "description": "A label for a proposal draft that is only stored locally and not published."
+  },
+  "proposalStatusDraft": "Published Draft",
+  "@proposalStatusDraft": {
+    "description": "A label for a proposal that has been published but not yet submitted into review."
+  },
+  "proposalStatusFinal": "Submitted Proposal",
+  "@proposalStatusFinal": {
+    "description": "A label for a proposal that is both published and submitted into review."
+  },
+  "proposalOptions": "Proposal Options",
+  "@proposalOptions": {
+    "description": "Actions related to a proposal like publishing, sharing, exporting, etc."
   }
 }

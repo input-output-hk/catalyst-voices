@@ -7,7 +7,6 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('ProposalBuilderBloc');
@@ -49,6 +48,28 @@ final class ProposalBuilderBloc
     add(const ValidateProposalEvent());
 
     return isValid;
+  }
+
+  ProposalBuilderState _createState({
+    required Document document,
+    required ProposalBuilderMetadata metadata,
+  }) {
+    final segments = _mapDocumentToSegments(
+      document,
+      showValidationErrors: state.showValidationErrors,
+    );
+
+    final firstSegment = segments.firstOrNull;
+    final firstSection = firstSegment?.sections.firstOrNull;
+    final guidance = _getGuidanceForSection(firstSegment, firstSection);
+
+    return ProposalBuilderState(
+      segments: segments,
+      guidance: guidance,
+      document: document,
+      metadata: metadata,
+      activeNodeId: firstSection?.id,
+    );
   }
 
   Future<void> _deleteProposal(
@@ -169,67 +190,94 @@ final class ProposalBuilderBloc
       showValidationErrors: state.showValidationErrors,
     );
 
-    emit(state.copyWith(segments: segments));
+    final newState = state.copyWith(
+      document: Optional(document),
+      segments: segments,
+    );
+
+    emit(newState);
   }
 
   Future<void> _loadDefaultProposalTemplate(
     LoadDefaultProposalTemplateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    await _loadDocument(
-      documentBuilderGetter: () async {
-        _logger.info('Loading default proposal template');
+    _logger.info('Loading default proposal template');
 
-        final campaign = await _campaignService.getActiveCampaign();
+    await _loadState(emit, () async {
+      final campaign = await _campaignService.getActiveCampaign();
+      final proposalTemplateRef = campaign?.proposalTemplateRef;
+      if (proposalTemplateRef == null) {
+        throw const ActiveCampaignNotFoundException();
+      }
 
-        final proposalTemplateRef = campaign?.proposalTemplateRef;
+      final proposalTemplate = await _proposalService.getProposalTemplate(
+        ref: proposalTemplateRef,
+      );
 
-        if (proposalTemplateRef == null) {
-          throw const ActiveCampaignNotFoundException();
-        }
+      final documentBuilder =
+          DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
-        final proposalTemplate = await _proposalService.getProposalTemplate(
-          ref: proposalTemplateRef,
-        );
-
-        return DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
-      },
-      emit: emit,
-    );
+      return _createState(
+        document: documentBuilder.build(),
+        metadata: const ProposalBuilderMetadata(),
+      );
+    });
   }
 
-  Future<void> _loadDocument({
-    required AsyncValueGetter<DocumentBuilder> documentBuilderGetter,
-    required Emitter<ProposalBuilderState> emit,
-  }) async {
-    try {
-      _logger.finer('Changing source to new document');
+  Future<void> _loadProposal(
+    LoadProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    _logger.info('Loading proposal[${event.id}]');
 
-      emit(const ProposalBuilderState(isLoading: true));
+    await _loadState(emit, () async {
+      final proposal = await _proposalService.getProposal(id: event.id);
 
-      _documentBuilder = null;
-
-      final documentBuilder = await documentBuilderGetter();
-
-      _documentBuilder = documentBuilder;
-
-      final document = documentBuilder.build();
-      final segments = _mapDocumentToSegments(
-        document,
-        showValidationErrors: state.showValidationErrors,
-      );
-
-      final firstSegment = segments.firstOrNull;
-      final firstSection = firstSegment?.sections.firstOrNull;
-      final guidance = _getGuidanceForSection(firstSegment, firstSection);
-
-      emit(
-        ProposalBuilderState(
-          segments: segments,
-          guidance: guidance,
-          activeNodeId: firstSection?.id,
+      return _createState(
+        document: proposal.document.document,
+        metadata: ProposalBuilderMetadata(
+          publish: proposal.publish,
+          documentRef: proposal.ref,
+          version: proposal.version,
         ),
       );
+    });
+  }
+
+  Future<void> _loadProposalTemplate(
+    LoadProposalTemplateEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    _logger.info('Loading proposal template[${event.id}]');
+
+    await _loadState(emit, () async {
+      final ref = SignedDocumentRef(id: event.id);
+      final proposalTemplate = await _proposalService.getProposalTemplate(
+        ref: ref,
+      );
+
+      final documentBuilder =
+          DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
+
+      return _createState(
+        document: documentBuilder.build(),
+        metadata: const ProposalBuilderMetadata(),
+      );
+    });
+  }
+
+  Future<void> _loadState(
+    Emitter<ProposalBuilderState> emit,
+    Future<ProposalBuilderState> Function() stateBuilder,
+  ) async {
+    try {
+      emit(const ProposalBuilderState(isLoading: true));
+      _documentBuilder = null;
+
+      final newState = await stateBuilder();
+      _documentBuilder = newState.document?.toBuilder();
+      emit(newState);
     } on LocalizedException catch (error) {
       emit(ProposalBuilderState(error: error));
     } catch (error) {
@@ -237,42 +285,6 @@ final class ProposalBuilderBloc
     } finally {
       emit(state.copyWith(isLoading: false));
     }
-  }
-
-  Future<void> _loadProposal(
-    LoadProposalEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    await _loadDocument(
-      documentBuilderGetter: () async {
-        _logger.info('Loading proposal[${event.id}]');
-
-        final proposal = await _proposalService.getProposal(id: event.id);
-        final document = proposal.document.document;
-
-        return DocumentBuilder.fromDocument(document);
-      },
-      emit: emit,
-    );
-  }
-
-  Future<void> _loadProposalTemplate(
-    LoadProposalTemplateEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    await _loadDocument(
-      documentBuilderGetter: () async {
-        _logger.info('Loading proposal template[${event.id}]');
-
-        final ref = SignedDocumentRef(id: event.id);
-        final proposalTemplate = await _proposalService.getProposalTemplate(
-          ref: ref,
-        );
-
-        return DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
-      },
-      emit: emit,
-    );
   }
 
   List<ProposalBuilderSegment> _mapDocumentToSegments(

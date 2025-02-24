@@ -18,12 +18,28 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     this._proposalService,
   ) : super(const ProposalsState());
 
-  /// Changes the favorite status of the proposal with [proposalId].
-  Future<void> onChangeFavoriteProposal(
-    String proposalId, {
-    required bool isFavorite,
-  }) async {
-    // TODO(LynxLynxx): implement favorites
+  void changeSelectedCategory(String? categoryId) {
+    emit(
+      state.copyWith(
+        selectedCategoryId: Optional(categoryId),
+      ),
+    );
+  }
+
+  Future<void> getCampaignCategories() async {
+    await _campaignService.getCampaignCategories();
+    final categories = List.generate(
+      6,
+      (index) => CampaignCategoryViewModel.dummy(id: '$index'),
+    );
+
+    emit(state.copyWith(categories: categories));
+  }
+
+  Future<void> getFavoritesList() async {
+    final favoritesList = await _proposalService.getFavoritesProposalsIds();
+
+    emit(state.copyWith(favoritesIds: favoritesList));
   }
 
   Future<void> getProposals(
@@ -79,7 +95,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
           ),
         ),
       );
-    } else if (request.stage == ProposalPublish.published) {
+    } else if (request.stage == ProposalPublish.submittedProposal) {
       return emit(
         state.copyWith(
           finalProposals: state.finalProposals.copyWith(
@@ -93,7 +109,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
           ),
         ),
       );
-    } else if (request.stage == ProposalPublish.draft) {
+    } else if (request.stage == ProposalPublish.publishedDraft) {
       return emit(
         state.copyWith(
           draftProposals: state.draftProposals.copyWith(
@@ -125,12 +141,6 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     }
   }
 
-  Future<void> getFavoritesList() async {
-    final favoritesList = await _proposalService.getFavoritesProposalsIds();
-
-    emit(state.copyWith(favoritesIds: favoritesList));
-  }
-
   Future<void> getUserProposalsList() async {
     // TODO(LynxLynxx): pass user id? or we read it inside of the service?
     final favoritesList = await _proposalService.getUserProposalsIds('');
@@ -138,21 +148,11 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
     emit(state.copyWith(favoritesIds: favoritesList));
   }
 
-  Future<void> getCampaignCategories() async {
-    await _campaignService.getCampaignCategories();
-    final categories = List.generate(
-      6,
-      (index) => CampaignCategoryViewModel.dummy(id: '$index'),
-    );
-
-    emit(state.copyWith(categories: categories));
-  }
-
-  void changeSelectedCategory(String? categoryId) {
-    emit(
-      state.copyWith(
-        selectedCategoryId: Optional(categoryId),
-      ),
-    );
+  /// Changes the favorite status of the proposal with [proposalId].
+  Future<void> onChangeFavoriteProposal(
+    String proposalId, {
+    required bool isFavorite,
+  }) async {
+    // TODO(LynxLynxx): implement favorites
   }
 }

@@ -2,9 +2,30 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class ProposalBuilderMetadata extends Equatable {
+  final ProposalPublish publish;
+  final DocumentRef? documentRef;
+  final int version;
+
+  const ProposalBuilderMetadata({
+    this.publish = ProposalPublish.localDraft,
+    this.documentRef,
+    this.version = 0,
+  });
+
+  @override
+  List<Object?> get props => [
+        publish,
+        documentRef,
+        version,
+      ];
+}
+
 final class ProposalBuilderState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
+  final Document? document;
+  final ProposalBuilderMetadata metadata;
   final List<ProposalBuilderSegment> segments;
   final ProposalGuidance guidance;
   final NodeId? activeNodeId;
@@ -13,16 +34,27 @@ final class ProposalBuilderState extends Equatable {
   const ProposalBuilderState({
     this.isLoading = false,
     this.error,
+    this.document,
+    this.metadata = const ProposalBuilderMetadata(),
     this.segments = const [],
     this.guidance = const ProposalGuidance(),
     this.activeNodeId,
     this.showValidationErrors = false,
   });
 
+  String get proposalTitle {
+    final property = document?.getProperty(Proposal.titleNodeId)
+        as DocumentValueProperty<String>?;
+
+    return property?.value ?? '';
+  }
+
   @override
   List<Object?> get props => [
         isLoading,
         error,
+        document,
+        metadata,
         segments,
         guidance,
         activeNodeId,
@@ -36,6 +68,8 @@ final class ProposalBuilderState extends Equatable {
   ProposalBuilderState copyWith({
     bool? isLoading,
     Optional<LocalizedException>? error,
+    Optional<Document>? document,
+    ProposalBuilderMetadata? metadata,
     List<ProposalBuilderSegment>? segments,
     ProposalGuidance? guidance,
     Optional<NodeId>? activeNodeId,
@@ -44,6 +78,8 @@ final class ProposalBuilderState extends Equatable {
     return ProposalBuilderState(
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
+      document: document.dataOr(this.document),
+      metadata: metadata ?? this.metadata,
       segments: segments ?? this.segments,
       guidance: guidance ?? this.guidance,
       activeNodeId: activeNodeId.dataOr(this.activeNodeId),

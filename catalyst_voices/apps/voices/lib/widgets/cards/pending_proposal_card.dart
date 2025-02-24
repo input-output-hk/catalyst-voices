@@ -287,8 +287,10 @@ final class _ProposalBorderColor extends WidgetStateColor {
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.hovered)) {
       return switch (publishStage) {
-        ProposalPublish.draft => colorScheme.secondary,
-        ProposalPublish.published => colorScheme.primary,
+        ProposalPublish.localDraft ||
+        ProposalPublish.publishedDraft =>
+          colorScheme.secondary,
+        ProposalPublish.submittedProposal => colorScheme.primary,
       };
     }
 
