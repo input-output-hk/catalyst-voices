@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["full_signed_doc","query_filter","signed_doc_body"]};

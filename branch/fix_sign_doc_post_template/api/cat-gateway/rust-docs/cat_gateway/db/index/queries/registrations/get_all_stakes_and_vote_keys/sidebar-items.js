@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_ALL_STAKES_AND_VOTE_KEYS"],"struct":["GetAllStakesAndVoteKeysParams","GetAllStakesAndVoteKeysQuery"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_ROLE0_KEY_CHAIN_ROOT_CQL"],"struct":["GetRole0ChainRootQuery","GetRole0ChainRootQueryParams"]};

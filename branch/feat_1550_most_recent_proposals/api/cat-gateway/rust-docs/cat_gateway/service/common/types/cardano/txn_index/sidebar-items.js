@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","EXAMPLE","INVALID_MSG","MAXIMUM","MINIMUM","TITLE"],"fn":["is_valid"],"static":["SCHEMA"],"struct":["TxnIndex"]};

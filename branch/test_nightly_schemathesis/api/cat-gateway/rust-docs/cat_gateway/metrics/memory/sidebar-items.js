@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["init_metrics_updater"],"mod":["reporter"],"static":["GLOBAL","IS_INITIALIZED"]};
