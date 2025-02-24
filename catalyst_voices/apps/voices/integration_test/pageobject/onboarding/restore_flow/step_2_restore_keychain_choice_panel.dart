@@ -12,15 +12,20 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
   final recoverKeychainMethodsTitle = const Key('RecoverKeychainMethodsTitle');
   final onDeviceKeychainsWidget = const Key('BlocOnDeviceKeychains');
   final keychainNotFoundIndicator = const Key('KeychainNotFoundIndicator');
-  final recoverKeychainMethodsSubtitle =
+  final recoverKeychainMethodsSubtitleKey =
       const Key('RecoverKeychainMethodsSubtitle');
-  final recoverKeychainMethodsListTitle =
+  final recoverKeychainMethodsListTitleKey =
       const Key('RecoverKeychainMethodsListTitle');
+  final registrationTileKey = const Key('RegistrationRecoverMethod.seedPhrase');
 
   @override
   Future<void> goto() async {
     await GetStartedPanel($).goto();
     await GetStartedPanel($).clickRecoverKeychain();
+  }
+
+  Future<void> clickRestoreSeedPhrase() async {
+    await $(registrationTileKey).$(registrationTileTitle).tap();
   }
 
   @override
@@ -39,12 +44,12 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
       T.get('No Catalyst Keychain found on this device.'),
     );
     expect(
-      $(recoverKeychainMethodsSubtitle).text,
+      $(recoverKeychainMethodsSubtitleKey).text,
       T.get('Not to worry, in the next step you can choose the recovery '
           'option that applies to you for this device!'),
     );
     expect(
-      $(recoverKeychainMethodsListTitle).text,
+      $(recoverKeychainMethodsListTitleKey).text,
       T.get('How do you want Restore your Catalyst Keychain?'),
     );
     expect(
