@@ -1527,6 +1527,32 @@
   "@proposalEditorBackToProposals": {
     "description": "Action title to navigate back to the proposal index."
   },
+  "proposalEditorStatusDropdownViewTitle": "Unnamed proposal",
+  "@proposalEditorStatusDropdownViewTitle": {
+    "description": "Placeholder for the proposal title in the proposal actions dropdown if the proposal title is empty."
+  },
+  "proposalEditorStatusDropdownViewDescriptionLocal": "Private Draft",
+  "@proposalEditorStatusDropdownViewDescriptionLocal": {
+    "description": "Description of a local proposal in t he proposal actions dropdown."
+  },
+  "proposalEditorStatusDropdownViewDescriptionDraft": "Published Draft, Iteration {iteration}",
+  "@proposalEditorStatusDropdownViewDescriptionDraft": {
+    "description": "Description of a local proposal in t he proposal actions dropdown.",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalEditorStatusDropdownViewDescriptionFinal": "Submitted Proposal, Iteration {iteration}",
+  "@proposalEditorStatusDropdownViewDescriptionFinal": {
+    "description": "Description of a local proposal in t he proposal actions dropdown.",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      }
+    }
+  },
   "proposalEditorStatusDropdownPublishTitle": "Publish as new iteration · Draft",
   "@proposalEditorStatusDropdownPublishTitle": {
     "description": "Action title to publish a new version of the draft proposal."
@@ -1554,6 +1580,10 @@
   "proposalEditorStatusDropdownDeleteTitle": "Delete Proposal",
   "@proposalEditorStatusDropdownDeleteTitle": {
     "description": "Action title to delete a proposal."
+  },
+  "proposalOptions": "Proposal Options",
+  "@proposalOptions": {
+    "description": "Actions related to a proposal like publishing, sharing, exporting, etc."
   },
   "proposalEditorValidationSnackbar": "Fix the following input errors",
   "@proposalEditorValidationSnackbar": {
@@ -1615,21 +1645,5 @@
   "change": "Change",
   "@change": {
     "description": "An action to change/modify something."
-  },
-  "proposalStatusLocal": "Private Draft",
-  "@proposalStatusLocal": {
-    "description": "A label for a proposal draft that is only stored locally and not published."
-  },
-  "proposalStatusDraft": "Published Draft",
-  "@proposalStatusDraft": {
-    "description": "A label for a proposal that has been published but not yet submitted into review."
-  },
-  "proposalStatusFinal": "Submitted Proposal",
-  "@proposalStatusFinal": {
-    "description": "A label for a proposal that is both published and submitted into review."
-  },
-  "proposalOptions": "Proposal Options",
-  "@proposalOptions": {
-    "description": "Actions related to a proposal like publishing, sharing, exporting, etc."
   }
 }

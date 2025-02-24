@@ -42,11 +42,11 @@ final class ProposalBuilderState extends Equatable {
     this.showValidationErrors = false,
   });
 
-  String get proposalTitle {
+  String? get proposalTitle {
     final property = document?.getProperty(Proposal.titleNodeId)
         as DocumentValueProperty<String>?;
 
-    return property?.value ?? '';
+    return property?.value;
   }
 
   @override
