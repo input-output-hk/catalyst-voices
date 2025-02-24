@@ -27,6 +27,7 @@ final class Dependencies extends DependencyProvider {
 
     _registerStorages();
     _registerUtils();
+    _registerNetwork();
     _registerRepositories();
     _registerServices();
     _registerBlocsWithDependencies();
@@ -119,14 +120,17 @@ final class Dependencies extends DependencyProvider {
       });
   }
 
+  void _registerNetwork() {
+    registerLazySingleton<ApiServices>(() {
+      return ApiServices(
+        config: get<AppConfig>().api,
+        userObserver: get<UserObserver>(),
+      );
+    });
+  }
+
   void _registerRepositories() {
     this
-      ..registerLazySingleton<TransactionConfigRepository>(
-        TransactionConfigRepository.new,
-      )
-      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
-      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
-      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<UserRepository>(() {
         return UserRepository(
           get<UserStorage>(),
@@ -148,6 +152,12 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
+      ..registerLazySingleton<TransactionConfigRepository>(
+        TransactionConfigRepository.new,
+      )
+      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
@@ -183,7 +193,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<UserService>(
       () {
         return UserService(
-          userRepository: get<UserRepository>(),
+          get<UserRepository>(),
+          get<UserObserver>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
@@ -229,5 +240,9 @@ final class Dependencies extends DependencyProvider {
 
   void _registerUtils() {
     registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<UserObserver>(
+      StreamUserObserver.new,
+      dispose: (observer) async => observer.dispose(),
+    );
   }
 }

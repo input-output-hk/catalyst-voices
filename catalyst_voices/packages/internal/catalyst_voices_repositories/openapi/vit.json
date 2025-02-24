@@ -1,0 +1,1840 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VIT as a Service Rest API",
+    "description": "Voting Implementation Testnet Rest API v0\n\n## This API is *DEPRECATED*\n\n## This API will no longer be available following Catalyst Fund 10.",
+    "version": "0.2.2",
+    "contact": {
+      "url": "http://github.com/input-output-hk/vit-servicing-station"
+    }
+  },
+  "tags": [
+    {
+      "name": "fund",
+      "description": "Information on treasury fund campaigns."
+    },
+    {
+      "name": "challenge",
+      "description": "Information on challenges, structuring proposals within a fund."
+    },
+    {
+      "name": "proposal",
+      "description": "Information on funding proposals."
+    },
+    {
+      "name": "reviews",
+      "description": "Information on reviews."
+    },
+    {
+      "name": "snapshot",
+      "description": "Continuous snapshot related information."
+    },
+    {
+      "name": "vote",
+      "description": "Historic votes related information."
+    },
+    {
+      "name": "search",
+      "description": "Search challenges and proposals information."
+    }
+  ],
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/api/v0/fund": {
+      "get": {
+        "operationId": "getCurrentFund",
+        "summary": "Get available fund",
+        "tags": [
+          "fund"
+        ],
+        "description": "Retrieves information on the current treasury fund campaign.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Fund"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NextFundInfo"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/fund/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "integer"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "getFund",
+        "summary": "Get fund by id",
+        "tags": [
+          "fund"
+        ],
+        "description": "Retrieves information on the identified treasury fund campaign.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Fund"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested fund was not found"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/funds": {
+      "get": {
+        "operationId": "getFunds",
+        "summary": "Get list of the fund id",
+        "tags": [
+          "fund"
+        ],
+        "description": "Get list of all the funds in the db.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Identifier of the fund campaign."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested fund was not found"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/proposals": {
+      "post": {
+        "summary": "Get proposals by chain id",
+        "operationId": "getProposalsByChainInfo",
+        "tags": [
+          "proposal"
+        ],
+        "description": "Retrieves queried proposals.\n",
+        "requestBody": {
+          "description": "List of voteplan id and indexes query",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalsByVoteplanIdAndIndexQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalWithChallengeInfo"
+                }
+              }
+            }
+          }
+        },
+        "x-internal": false,
+        "deprecated": true
+      }
+    },
+    "/api/v0/proposals/{voter_group_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "voter_group_id",
+          "description": "Get proposals only for the specified vote group.",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "getAllProposals",
+        "summary": "Get all available proposals",
+        "tags": [
+          "proposal"
+        ],
+        "description": "Lists all available proposals.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProposalWithChallengeInfo"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/proposal/{id}/{voter_group_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "integer"
+          },
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "voter_group_id",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "getProposal",
+        "summary": "Get proposal by id filtered by group",
+        "tags": [
+          "proposal"
+        ],
+        "description": "Retrieves information on the identified proposal if it belongs to the provided group.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalWithChallengeInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested proposal was not found"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/challenges": {
+      "get": {
+        "operationId": "getAllChallenges",
+        "summary": "Get all available challenges",
+        "tags": [
+          "challenge"
+        ],
+        "description": "Lists all available challenges following insertion order.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Challenge"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested challenge was not found"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/challenges/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "integer"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "getChallengeById",
+        "summary": "Get challenge by id",
+        "tags": [
+          "challenge"
+        ],
+        "description": "Retrieves information on the identified challenge,\nincluding the proposals submitted for it.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChallengeWithProposals"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested challenge was not found"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/challenges/{id}/{voter_group_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type": "integer"
+          },
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "voter_group_id",
+          "description": "Get proposals only for the specified vote group.",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "getChallengeByIdAndVoterGroupId",
+        "summary": "Get challenge by id and voter group id",
+        "tags": [
+          "challenge"
+        ],
+        "description": "Retrieves information on the identified challenge,\nincluding the proposals submitted for it filtered by the provided voter group id.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChallengeWithProposals"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested challenge was not found"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/reviews/{proposal_id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "proposal_id",
+          "schema": {
+            "type": "integer"
+          },
+          "required": true
+        }
+      ],
+      "get": {
+        "operationId": "getProposalReviews",
+        "summary": "Get reviews related to a proposal",
+        "tags": [
+          "reviews"
+        ],
+        "description": "Retrieves advisor reviews information for the provided proposal id.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvisorReviews"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/search": {
+      "post": {
+        "summary": "Search various resources with various constraints",
+        "operationId": "search",
+        "tags": [
+          "search"
+        ],
+        "description": "Search various resources especially challenges and proposals with various constraints like contains some string etc.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Challenge"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProposalWithChallengeInfo"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid combination of table/column (e.g. using funds column on challenges table)"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/search_count": {
+      "post": {
+        "summary": "Returns count of the result set of search operation",
+        "description": "Search various resources with various constraints and returns count of the result set",
+        "operationId": "searchCount",
+        "tags": [
+          "search"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchCountQuery"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "i32",
+                  "description": "Count of the result set"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid combination of table/column (e.g. using funds column on challenges table)"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/v0/snapshot/voter/{event}/{voting_key}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "event",
+          "in": "path",
+          "required": true,
+          "description": "The event id to get voting info for,  can be `latest` or the name of the event, or its unique id."
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "voting_key",
+          "in": "path",
+          "required": true,
+          "description": "The voters voting key to query."
+        }
+      ],
+      "get": {
+        "operationId": "getVoterInfo",
+        "summary": "Get voter's info by voting key",
+        "tags": [
+          "snapshot"
+        ],
+        "description": "Get voter's current voting power by voting key\n",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VotersInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "There is an error with the request."
+          },
+          "404": {
+            "description": "Voting Key not found for requested event."
+          }
+        },
+        "deprecated": true,
+        "x-internal": true
+      }
+    },
+    "/api/v0/snapshot/delegator/{event}/{stake_public_key}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "event",
+          "schema": {
+            "type": "string",
+            "example": "latest"
+          },
+          "required": true,
+          "description": "The event id to get voting info for, can be `latest` or the name of the event, or its unique id."
+        },
+        {
+          "in": "path",
+          "name": "stake_public_key",
+          "schema": {
+            "type": "string"
+          },
+          "required": true,
+          "description": "The voters staked public key."
+        }
+      ],
+      "get": {
+        "operationId": "getDelegatorInfo",
+        "summary": "Get voters info by stake public key",
+        "tags": [
+          "snapshot"
+        ],
+        "description": "Get voters delegation info by stake public key\n",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DelegatorInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "An error occured"
+          },
+          "404": {
+            "description": "Stake Address for the event was not found in the snapshot."
+          }
+        },
+        "deprecated": true,
+        "x-internal": true
+      }
+    },
+    "/api/v0/snapshot": {
+      "get": {
+        "operationId": "getSnapshotTags",
+        "summary": "Get list of available versions",
+        "tags": [
+          "snapshot"
+        ],
+        "description": "Get list of available snapshots, which can be used to retrieve\nvoting power (used in the `event` path parameter).\n",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "x-examples": {
+                    "Example 1": [
+                      "latest",
+                      "Fund-11",
+                      "1",
+                      "Fund-10",
+                      "0"
+                    ]
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "description": "An array of snapshots which can be retrieved.</br>\n`\"latest\"` = The latest snapshot of the latest running event.</br>\n`\"<number>\"` = The raw ID of a particular event, eg \"7\".</br>\n`\"<event name>\"` = The name of a particular event, eg \"Fund-10\".",
+                  "items": {
+                    "type": "string",
+                    "example": "latest"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true,
+        "x-internal": true
+      }
+    },
+    "/api/v0/admin/snapshot/snapshot_info/{tag}": {
+      "put": {
+        "operationId": "updateSnapshotFromSnapshotInfo",
+        "summary": "Replace the snapshot data for the given tag",
+        "tags": [
+          "snapshot"
+        ],
+        "description": "Replace the snapshot data for the given tag\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tag",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnapshotInfoUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "x-internal": true,
+        "deprecated": true
+      }
+    },
+    "/api/v0/admin/snapshot/raw_snapshot/{tag}": {
+      "put": {
+        "operationId": "updateSnapshotFromRawSnapshot",
+        "summary": "Replace the snapshot data for the given tag",
+        "tags": [
+          "snapshot"
+        ],
+        "description": "Replace the snapshot data for the given tag\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tag",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RawSnapshotUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        },
+        "x-internal": true,
+        "deprecated": true
+      }
+    },
+    "/api/v0/admin/proposals": {
+      "put": {
+        "operationId": "putProposals",
+        "summary": "Submit proposals",
+        "tags": [
+          "proposal"
+        ],
+        "description": "Submit a new proposals data, replace an existing entries\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "description": "List of Proposals entries in json format",
+                "items": {
+                  "$ref": "#/components/schemas/Proposal"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "The input is malformed."
+          }
+        },
+        "x-internal": true,
+        "deprecated": true
+      }
+    },
+    "/api/v0/admin/fund": {
+      "put": {
+        "operationId": "putFund",
+        "summary": "Update or create fund",
+        "tags": [
+          "fund"
+        ],
+        "description": "Update or replace the fund in the db with the one provided.\n",
+        "responses": {
+          "200": {
+            "description": "Valid response"
+          },
+          "400": {
+            "description": "The input is malformed."
+          }
+        },
+        "x-internal": true,
+        "deprecated": true
+      }
+    },
+    "/api/v0/votes": {
+      "post": {
+        "summary": "Get voted by chain id",
+        "operationId": "getVotesByChainIdAndCaster",
+        "tags": [
+          "proposal"
+        ],
+        "description": "Retrieves queried proposals.\n",
+        "requestBody": {
+          "description": "List of votes by voteplan id and caster (wallet)",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VotesByVoteCasterAndVoteplanId"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Valid response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoteInfo"
+                }
+              }
+            }
+          }
+        },
+        "x-internal": true,
+        "deprecated": true
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Fund": {
+        "description": "Note, ANY date-time formatted field in this API may report:\n\"1970-01-01T00:00:00Z\"\nWhich is The unix Epoch.         This date is to be interpreted that the date-time for the event the  field represents is not yet known.\nThe UI may either not display anything for this field, or TBD or an  equivalent message.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Identifier of the fund campaign."
+          },
+          "fund_name": {
+            "type": "string",
+            "description": "Human-readable name of the fund campaign."
+          },
+          "fund_goal": {
+            "type": "string",
+            "description": "Description of the campaign's goals."
+          },
+          "voting_power_info": {
+            "type": "string",
+            "deprecated": true,
+            "description": "Deprecated, same as registration_snapshot_time."
+          },
+          "voting_power_threshold": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Minimal amount of funds required for a valid voter registration.\nThis amount is in lovelace.\n"
+          },
+          "rewards_info": {
+            "type": "string"
+          },
+          "fund_start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the start of the current voting period."
+          },
+          "fund_end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the end of the current voting period."
+          },
+          "next_fund_start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the start of the next voting period."
+          },
+          "registration_snapshot_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for blockchain state snapshot capturing voter registrations."
+          },
+          "next_registration_snapshot_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for next blockchain state snapshot capturing voter registrations."
+          },
+          "chain_vote_plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VotePlan"
+            },
+            "description": "Vote plans registered for voting in this fund campaign."
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoterGroup"
+            }
+          },
+          "challenges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Challenge"
+            },
+            "description": "A list of campaign challenges structuring the proposals."
+          },
+          "goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Goal"
+            },
+            "description": "The list of campaign goals for this fund."
+          },
+          "insight_sharing_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "proposal_submission_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "refine_proposals_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finalize_proposals_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "proposal_assessment_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "assessment_qa_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "snapshot_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "voting_start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "voting_end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tallying_end": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "VotePlan": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "API identifier of the vote plan."
+          },
+          "chain_voteplan_id": {
+            "type": "string",
+            "format": "hash",
+            "description": "Blockchain ID of the vote plan transaction."
+          },
+          "chain_vote_start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the start of voting on this vote plan."
+          },
+          "chain_vote_end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the end of voting on this vote plan."
+          },
+          "chain_committee_end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the end of tallying on this vote plan."
+          },
+          "chain_voteplan_payload": {
+            "type": "string",
+            "description": "Whether the voting is done using the public or the privacy-preserving protocol.\n"
+          },
+          "fund_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The fund ID this vote plan belongs to."
+          },
+          "voting_token": {
+            "type": "string",
+            "pattern": "[0-9a-f]{56}(\\.[0-9a-f]{1,64})?",
+            "description": "The identifier of voting power token used withing this plan.\n"
+          }
+        }
+      },
+      "Proposal": {
+        "properties": {
+          "internal_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The API identifier for this proposal."
+          },
+          "proposal_id": {
+            "type": "string",
+            "description": "Unique identifier for this proposal."
+          },
+          "proposal_category": {
+            "type": "object",
+            "properties": {
+              "category_id": {
+                "type": "string"
+              },
+              "category_name": {
+                "type": "string"
+              },
+              "category_description": {
+                "type": "string"
+              }
+            }
+          },
+          "proposal_title": {
+            "type": "string",
+            "description": "Short title of the proposal."
+          },
+          "proposal_summary": {
+            "type": "string",
+            "description": "Brief description of the proposal."
+          },
+          "proposal_public_key": {
+            "type": "string",
+            "format": "binary"
+          },
+          "proposal_funds": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The amount of funds requested by this proposal."
+          },
+          "proposal_url": {
+            "type": "string",
+            "description": "URL to a web page with details on this proposal."
+          },
+          "proposal_files": {
+            "type": "string"
+          },
+          "proposal_files_url": {
+            "type": "string",
+            "description": "proposals files url."
+          },
+          "proposal_impact_score": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Impact score of this proposal."
+          },
+          "proposer": {
+            "type": "object",
+            "properties": {
+              "proposer_name": {
+                "type": "string",
+                "description": "Name of the author of the proposal."
+              },
+              "proposer_email": {
+                "type": "string",
+                "description": "Email address of the author of the proposal."
+              },
+              "proposer_url": {
+                "type": "string",
+                "description": "URL to a web resource with details about the author of the proposal."
+              }
+            }
+          },
+          "chain_proposal_id": {
+            "type": "string",
+            "description": "Identifier of the proposal on the blockchain."
+          },
+          "chain_vote_options": {
+            "description": "Map of named vote options to choice indices.",
+            "type": "object"
+          },
+          "chain_vote_start_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the start of voting on this proposal's vote plan."
+          },
+          "chain_vote_end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the start of voting on this proposal's vote plan."
+          },
+          "chain_committee_end_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the end of tallying on this proposal's vote plan."
+          },
+          "chain_voteplan_payload": {
+            "type": "string",
+            "description": "Whether the voting is done using the public or the privacy-preserving protocol.\n"
+          },
+          "chain_vote_encryption_key": {
+            "type": "string",
+            "description": "Encryption key for this proposal's vote plan."
+          },
+          "fund_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The fund ID this proposal belongs to."
+          },
+          "challenge_id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reviews_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total amount of individual reviews per assessor"
+          },
+          "extra": {
+            "type": "object",
+            "description": "Additional information."
+          }
+        }
+      },
+      "ChallengeType": {
+        "type": "string",
+        "enum": [
+          "simple",
+          "community-choice"
+        ]
+      },
+      "ProposalWithChallengeInfo": {
+        "discriminator": {
+          "propertyName": "challenge_type",
+          "mapping": {
+            "simple": "#/components/schemas/SimpleProposal",
+            "community-choice": "#/components/schemas/CommunityChoiceProposal"
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Proposal"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "chain_voteplan_id": {
+                "type": "string",
+                "description": "Identifier of the vote plan a proposal belongs to."
+              },
+              "chain_proposal_index": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Index of a proposal in the vote plan."
+              },
+              "group_id": {
+                "type": "string",
+                "description": "Group identifier."
+              },
+              "challenge_type": {
+                "$ref": "#/components/schemas/ChallengeType"
+              }
+            }
+          }
+        ]
+      },
+      "SimpleProposal": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ProposalWithChallengeInfo"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "proposal_solution": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "example": {
+          "internal_id": 22,
+          "proposal_id": "4af0e6b3452cd4ee822b2ec1859fd57b5512f85c14875f408081aa9b796dfc6e",
+          "proposal_title": "Authentication for DeepFake Defense",
+          "proposal_summary": "Deepfake videos are dangerous.",
+          "proposal_solution": "We will create a cryptographic proof on Cardano that verifies videos are real by connecting their blockchain ID.",
+          "proposal_public_key": "Fvd8zI3DH85qnaChQE6Aymt1diMJP32LB0AdpheZh/Q=",
+          "proposal_funds": 12000,
+          "proposal_url": "http://ideascale.com/t/UM5UZBd2t",
+          "proposal_files_url": "",
+          "proposal_impact_score": 0,
+          "proposer": {
+            "proposer_name": "Community Member",
+            "proposer_email": "example@vit.iohk.io",
+            "proposer_url": "",
+            "proposer_relevant_experience": "Cryptography student, website development, blockchain technologist."
+          },
+          "chain_proposal_id": "4af0e6b3452cd4ee822b2ec1859fd57b5512f85c14875f408081aa9b796dfc6e",
+          "chain_vote_options": {
+            "blank": 0,
+            "yes": 1,
+            "no": 2
+          },
+          "chain_vote_start_time": "2021-02-10T14:40:27+00:00",
+          "chain_vote_end_time": "2021-02-11T10:10:27+00:00",
+          "chain_committee_end_time": "2021-02-11T11:40:27+00:00",
+          "chain_voteplan_payload": "public",
+          "chain_vote_encryption_key": "",
+          "fund_id": 20,
+          "challenge_id": 2,
+          "challenge_type": "simple"
+        }
+      },
+      "CommunityChoiceProposal": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ProposalWithChallengeInfo"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "proposal_brief": {
+                "type": "string"
+              },
+              "proposal_importance": {
+                "type": "string"
+              },
+              "proposal_goal": {
+                "type": "string"
+              },
+              "proposal_metrics": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "example": {
+          "internal_id": 31,
+          "proposal_id": "494d8d685e3b195eb5610494f1721db7747df0517cb1b6a705bb3cebfef3c998",
+          "proposal_title": "A for ADA Cryptoalphabet 4 children",
+          "proposal_summary": "How to increase general awareness about Cardano and cryptocurrencies?\nHow to make fun community-building incentives?",
+          "proposal_brief": "A for ADA",
+          "proposal_importance": "We need to get them while they're young.",
+          "proposal_goal": "Nebulous.",
+          "proposal_metrics": "\\- Number of people engaged into the creation of Cryptoalphabet",
+          "proposal_public_key": "zqUCWwguCt6+NHYjkpvasvccuA7l2SuabE+1C0bzf3Y=",
+          "proposal_funds": 4800,
+          "proposal_url": "http://ideascale.com/t/UM5UZBd1p",
+          "proposal_files_url": "",
+          "proposal_impact_score": 133,
+          "proposer": {
+            "proposer_name": "Community Member",
+            "proposer_email": "example@vit.iohk.io",
+            "proposer_url": "",
+            "proposer_relevant_experience": ""
+          },
+          "chain_proposal_id": "494d8d685e3b195eb5610494f1721db7747df0517cb1b6a705bb3cebfef3c998",
+          "chain_proposal_index": 9,
+          "chain_vote_options": {
+            "no": 2,
+            "yes": 1,
+            "blank": 0
+          },
+          "chain_voteplan_id": "b1eeb620baf1445672f6c9422481aff0f6babaf775760d187a7703027e098166",
+          "chain_vote_start_time": "2021-02-10T14:40:27+00:00",
+          "chain_vote_end_time": "2021-02-11T10:10:27+00:00",
+          "chain_committee_end_time": "2021-02-11T11:40:27+00:00",
+          "chain_voteplan_payload": "public",
+          "chain_vote_encryption_key": "",
+          "fund_id": 20,
+          "challenge_id": 1,
+          "challenge_type": "community-choice"
+        }
+      },
+      "Challenge": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "challenge_type": {
+            "$ref": "#/components/schemas/ChallengeType"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "rewards_total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fund_id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "challenge_url": {
+            "type": "string"
+          },
+          "highlights": {
+            "$ref": "#/components/schemas/ChallengeHighlights"
+          }
+        }
+      },
+      "ChallengeWithProposals": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Challenge"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "proposals": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Proposal"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AdvisorReview": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "i32"
+          },
+          "proposal_id": {
+            "type": "integer",
+            "format": "i32"
+          },
+          "assessor": {
+            "type": "string"
+          },
+          "impact_alignment_rating_given": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "impact_alignment_note": {
+            "type": "string"
+          },
+          "feasibility_rating_given": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "feasibility_note": {
+            "type": "string"
+          },
+          "auditability_rating_given": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "auditability_note": {
+            "type": "string"
+          },
+          "ranking": {
+            "description": "Measure of quality of this review according to veteran community advisors",
+            "type": "string",
+            "enum": [
+              "Excellent",
+              "Good",
+              "FilteredOut",
+              "NA"
+            ]
+          }
+        }
+      },
+      "Rating": {
+        "type": "integer",
+        "format": "i32",
+        "minimum": 0,
+        "maximum": 500,
+        "description": "Rating in range [0, 500] (0 stars to 5 stars)"
+      },
+      "AdvisorReviews": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AdvisorReview"
+        },
+        "example": [
+          {
+            "id": 1,
+            "proposal_id": 1234,
+            "rating_given": 0,
+            "assessor": "za_assessor_432",
+            "note": "foo bar",
+            "tag": "Alignment"
+          }
+        ]
+      },
+      "ChallengeHighlights": {
+        "properties": {
+          "sponsor": {
+            "type": "string"
+          }
+        }
+      },
+      "ProposalsByVoteplanIdAndIndexQuery": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ProposalVoteplanIdAndIndex"
+        }
+      },
+      "ProposalVoteplanIdAndIndex": {
+        "properties": {
+          "voteplan_id": {
+            "type": "string"
+          },
+          "indexes": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "i64"
+            }
+          }
+        }
+      },
+      "VotesByVoteCasterAndVoteplanId": {
+        "properties": {
+          "vote_plan_id": {
+            "type": "string",
+            "format": "hash",
+            "description": "Blockchain ID of the vote plan transaction."
+          },
+          "caster": {
+            "type": "string",
+            "format": "hash",
+            "description": "public key of caster wallet"
+          }
+        }
+      },
+      "VoteInfo": {
+        "properties": {
+          "fragment_id": {
+            "type": "string",
+            "format": "hash",
+            "description": "Blockchain ID of the vote plan transaction"
+          },
+          "caster": {
+            "type": "string",
+            "format": "hash",
+            "description": "public key of caster wallet"
+          },
+          "proposal": {
+            "type": "integer",
+            "format": "int32",
+            "description": "proposal index within voteplan"
+          },
+          "voteplan_id": {
+            "type": "string",
+            "format": "hash",
+            "description": "Blockchain ID of the vote plan transaction"
+          },
+          "time": {
+            "type": "number",
+            "format": "f32",
+            "description": "block date in format epoch.slot_no"
+          },
+          "choice": {
+            "type": "string",
+            "format": "byte",
+            "description": "vote choice (only visible for public voting)"
+          },
+          "raw_fragment": {
+            "type": "string",
+            "format": "hash",
+            "description": "raw bytes of transaction"
+          }
+        }
+      },
+      "SearchQuery": {
+        "properties": {
+          "table": {
+            "$ref": "#/components/schemas/SearchConstraint"
+          },
+          "filter": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchConstraint"
+            }
+          },
+          "order-by": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchOrderBy"
+            }
+          },
+          "limit": {
+            "type": "integer",
+            "format": "i32",
+            "description": "Sets the limit clause of the search query."
+          },
+          "offset": {
+            "type": "integer",
+            "format": "i32",
+            "description": "Sets the offset clause of the search query."
+          }
+        },
+        "required": [
+          "table"
+        ]
+      },
+      "SearchCountQuery": {
+        "properties": {
+          "table": {
+            "$ref": "#/components/schemas/SearchConstraint"
+          },
+          "filter": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchConstraint"
+            }
+          },
+          "order-by": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SearchOrderBy"
+            }
+          }
+        },
+        "required": [
+          "table"
+        ]
+      },
+      "SearchConstraint": {
+        "properties": {
+          "column": {
+            "$ref": "#/components/schemas/SearchColumn"
+          },
+          "search": {
+            "type": "string",
+            "description": "Text which must be present in the given column (case insensitive)"
+          }
+        },
+        "required": [
+          "column",
+          "search"
+        ]
+      },
+      "SearchOrderBy": {
+        "properties": {
+          "column": {
+            "$ref": "#/components/schemas/SearchColumn"
+          },
+          "descending": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "column"
+        ]
+      },
+      "SearchTable": {
+        "type": "string",
+        "enum": [
+          "challenges",
+          "proposals"
+        ]
+      },
+      "SearchColumn": {
+        "type": "string",
+        "enum": [
+          "title",
+          "type",
+          "desc",
+          "author",
+          "funds"
+        ]
+      },
+      "NextFundInfo": {
+        "properties": {
+          "next": {
+            "description": "Note, ANY date-time formatted field in this API may report:\n\"1970-01-01T00:00:00Z\"\nWhich is The unix Epoch.         This date is to be interpreted that the date-time for the event the  field represents is not yet known.\nThe UI may either not display anything for this field, or TBD or an  equivalent message.",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Identifier of the fund campaign."
+              },
+              "fund_name": {
+                "type": "string",
+                "description": "Human-readable name of the fund campaign."
+              },
+              "insight_sharing_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "proposal_submission_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "refine_proposals_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "finalize_proposals_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "proposal_assessment_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "assessment_qa_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "snapshot_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "voting_start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "voting_end": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "tallying_end": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "Goal": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "goal_name": {
+            "type": "string"
+          },
+          "fund_id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SnapshotInfoUpdate": {
+        "properties": {
+          "snapshot": {
+            "type": "array",
+            "description": "list of SnapshotInfo entries in json format",
+            "items": {
+              "description": "SnapshotInfo entry in json format"
+            }
+          },
+          "update_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the latest update to this snapshot information."
+          }
+        }
+      },
+      "RawSnapshotUpdate": {
+        "required": [
+          "snapshot",
+          "min_stake_threshold",
+          "voting_power_cap"
+        ],
+        "properties": {
+          "snapshot": {
+            "type": "object",
+            "description": "RawSnapshot in json format"
+          },
+          "min_stake_threshold": {
+            "type": "integer",
+            "description": "Registrations voting power threshold for eligibility"
+          },
+          "voting_power_cap": {
+            "type": "string",
+            "description": "Voting power cap for each account"
+          },
+          "direct_voters_group": {
+            "type": "string",
+            "description": "Voter group to assign direct voters to. If empty, defaults to \"voter\""
+          },
+          "representatives_group": {
+            "type": "string",
+            "description": "Voter group to assign representatives to. If empty, defaults to \"rep\""
+          },
+          "update_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the latest update to this snapshot information."
+          }
+        }
+      },
+      "VoterGroupId": {
+        "title": "VoterGroupId",
+        "x-stoplight": {
+          "id": "zm2mm5do7yqyr"
+        },
+        "type": "string",
+        "default": "direct",
+        "example": "rep",
+        "x-examples": {
+          "Direct Voter": "direct",
+          "Registered Delegated Representative": "rep"
+        },
+        "enum": [
+          "direct",
+          "rep"
+        ],
+        "description": "Voters Group ID.</br>`direct` = Direct voter.</br>`rep` = Delegated Representative."
+      },
+      "VoterGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/VoterGroupId"
+          },
+          "voting_token": {
+            "type": "string",
+            "pattern": "[0-9a-f]{56}(\\.[0-9a-f]{1,64})?",
+            "description": "The identifier of voting power token used withing this group. All vote plans within a\ngroup are guaranteed to use the same token.\n"
+          }
+        }
+      },
+      "VotersInfo": {
+        "type": "object",
+        "description": "The voting power for the requested voting key.",
+        "properties": {
+          "voter_info": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoterInfo"
+            }
+          },
+          "last_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the latest update to this snapshot information."
+          },
+          "as_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time the latest snapshot represents."
+          },
+          "final": {
+            "type": "boolean",
+            "description": "`True` = this is the final snapshot which will be used for voting power in the event.</br>`False` =This is an interim snapshot, subject to change."
+          }
+        },
+        "required": [
+          "voter_info",
+          "last_updated"
+        ]
+      },
+      "VoterInfo": {
+        "type": "object",
+        "description": "voter's info",
+        "example": {
+          "voting_power": 1000,
+          "voting_group": "rep",
+          "delegations_power": 400,
+          "delegations_count": 200,
+          "voting_power_saturation": 0.5
+        },
+        "properties": {
+          "voting_power": {
+            "description": "voter's voting power",
+            "type": "integer",
+            "format": "u64"
+          },
+          "voting_group": {
+            "$ref": "#/components/schemas/VoterGroupId"
+          },
+          "delegations_power": {
+            "description": "voter's delegation's power, which represents total voting power which was delegated to this voter",
+            "type": "integer",
+            "format": "u64"
+          },
+          "delegations_count": {
+            "description": "amount of delegators, who was delegated to this voter",
+            "type": "integer",
+            "format": "u64"
+          },
+          "voting_power_saturation": {
+            "description": "voting power's share of the total voting power corresponds to the current voting group",
+            "type": "number",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "voting_power",
+          "voting_group",
+          "delegations_power",
+          "delegations_count",
+          "voting_power_saturation"
+        ]
+      },
+      "DelegationInfo": {
+        "type": "object",
+        "description": "voters delegation info",
+        "example": {
+          "voting_key": "f5285eeead8b5885a1420800de14b0d1960db1a990a6c2f7b517125bedc000db",
+          "group": "rep",
+          "weight": 5,
+          "value": 12345
+        },
+        "properties": {
+          "voting_key": {
+            "type": "string",
+            "pattern": "[0-9a-f]{64}",
+            "description": "Hex encoded voting key"
+          },
+          "group": {
+            "$ref": "#/components/schemas/VoterGroupId"
+          },
+          "weight": {
+            "type": "number",
+            "format": "u64",
+            "description": "Relative weight assigned to this voting key."
+          },
+          "value": {
+            "type": "number",
+            "format": "u64",
+            "description": "Raw voting power distributed to this voting key."
+          }
+        },
+        "required": [
+          "voting_key",
+          "group",
+          "weight",
+          "value"
+        ],
+        "x-stoplight": {
+          "id": "68d7e039c9974"
+        }
+      },
+      "DelegatorInfo": {
+        "title": "DelegatorInfo",
+        "x-stoplight": {
+          "id": "tyhr3mvj1qnxi"
+        },
+        "type": "object",
+        "properties": {
+          "delegations": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/DelegationInfo"
+            }
+          },
+          "raw_power": {
+            "type": "number",
+            "description": "Raw total voting power from stake address"
+          },
+          "total_power": {
+            "type": "number",
+            "description": "Total voting power, across all registered voters."
+          },
+          "last_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the latest update to this snapshot information."
+          },
+          "as_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time the latest snapshot represents."
+          },
+          "final": {
+            "type": "boolean",
+            "description": "`True` = this is the final snapshot which will be used for voting power in the event.</br>`False` =This is an interim snapshot, subject to change."
+          }
+        }
+      }
+    }
+  }
+}

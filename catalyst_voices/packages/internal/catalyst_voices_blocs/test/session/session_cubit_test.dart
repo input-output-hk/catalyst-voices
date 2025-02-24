@@ -15,6 +15,7 @@ import 'package:shared_preferences_platform_interface/shared_preferences_async_p
 void main() {
   late final KeychainProvider keychainProvider;
   late final UserRepository userRepository;
+  late final UserObserver userObserver;
 
   late final UserService userService;
   late final RegistrationService registrationService;
@@ -41,9 +42,11 @@ void main() {
       SecureUserStorage(),
       keychainProvider,
     );
+    userObserver = StreamUserObserver();
 
     userService = UserService(
-      userRepository: userRepository,
+      userRepository,
+      userObserver,
     );
     registrationService = _MockRegistrationService(
       keychainProvider,
@@ -53,6 +56,13 @@ void main() {
     );
     notifier = RegistrationProgressNotifier();
     accessControl = const AccessControl();
+  });
+
+  tearDownAll(() async {
+    await userObserver.dispose();
+    await userService.dispose();
+
+    notifier.dispose();
   });
 
   setUp(() {
@@ -94,13 +104,13 @@ void main() {
       // Given
 
       // When
-      final account = userService.account;
+      final account = userService.user.activeAccount;
       if (account != null) {
         await userService.removeAccount(account);
       }
 
       // Then
-      expect(userService.account, isNull);
+      expect(userService.user.activeAccount, isNull);
       expect(sessionCubit.state.status, SessionStatus.visitor);
     });
 
@@ -108,7 +118,7 @@ void main() {
       // Given
 
       // When
-      final account = userService.account;
+      final account = userService.user.activeAccount;
       if (account != null) {
         await userService.removeAccount(account);
       }
@@ -117,7 +127,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.account, isNull);
+      expect(userService.user.activeAccount, isNull);
       expect(sessionCubit.state.status, SessionStatus.visitor);
       expect(
         sessionCubit.state,
@@ -140,7 +150,7 @@ void main() {
       // When
       notifier.value = RegistrationProgress(keychainProgress: keychainProgress);
 
-      final account = userService.account;
+      final account = userService.user.activeAccount;
       if (account != null) {
         await userService.removeAccount(account);
       }
@@ -149,7 +159,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.account, isNull);
+      expect(userService.user.activeAccount, isNull);
       expect(sessionCubit.state.status, SessionStatus.visitor);
       expect(
         sessionCubit.state,
@@ -178,9 +188,9 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.account, isNotNull);
+      expect(userService.user.activeAccount, isNotNull);
 
-      expect(userService.account?.keychain.id, account.keychain.id);
+      expect(userService.user.activeAccount?.keychain.id, account.keychain.id);
       expect(sessionCubit.state.status, SessionStatus.guest);
     });
 
@@ -202,7 +212,7 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 100));
 
       // Then
-      expect(userService.account, isNotNull);
+      expect(userService.user.activeAccount, isNotNull);
       expect(sessionCubit.state.status, SessionStatus.actor);
     });
 

@@ -5,23 +5,14 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class UserService implements ActiveAware {
-  factory UserService({
-    required UserRepository userRepository,
-  }) {
-    return UserServiceImpl(
-      userRepository,
-    );
-  }
+  factory UserService(
+    UserRepository userRepository,
+    UserObserver userObserver,
+  ) = UserServiceImpl;
 
   User get user;
 
   Stream<User> get watchUser;
-
-  Account? get account;
-
-  List<Account> get accounts;
-
-  Stream<Account?> get watchAccount;
 
   Future<User> getUser();
 
@@ -38,49 +29,24 @@ abstract interface class UserService implements ActiveAware {
 
 final class UserServiceImpl implements UserService {
   final UserRepository _userRepository;
-
-  final _logger = Logger('UserService');
-
-  User _user = const User.empty();
-  final _userSC = StreamController<User>.broadcast();
-
-  bool _isActive = true;
+  final UserObserver _userObserver;
 
   UserServiceImpl(
     this._userRepository,
+    this._userObserver,
   );
 
   @override
-  User get user => _user;
+  User get user => _userObserver.user;
 
   @override
-  Stream<User> get watchUser async* {
-    yield user;
-    yield* _userSC.stream;
-  }
+  Stream<User> get watchUser => _userObserver.watchUser;
 
   @override
-  Account? get account => _user.activeAccount;
+  bool get isActive => _userObserver.isActive;
 
   @override
-  List<Account> get accounts => List.unmodifiable(_user.accounts);
-
-  @override
-  Stream<Account?> get watchAccount async* {
-    yield account;
-    yield* _userSC.stream.map((user) => user.activeAccount).distinct();
-  }
-
-  @override
-  bool get isActive => _isActive;
-
-  @override
-  set isActive(bool value) {
-    if (_isActive != value) {
-      _isActive = value;
-      _user.activeAccount?.keychain.isActive = value;
-    }
-  }
+  set isActive(bool value) => _userObserver.isActive = value;
 
   @override
   Future<User> getUser() => _userRepository.getUser();
@@ -135,23 +101,10 @@ final class UserServiceImpl implements UserService {
   }
 
   Future<void> _updateUser(User user) async {
-    if (_user != user) {
-      _logger.info('Changing user to [$user]');
-
-      if (_user.activeAccount?.keychain.id != user.activeAccount?.keychain.id) {
-        _user.activeAccount?.keychain.isActive = false;
-        user.activeAccount?.keychain.isActive = _isActive;
-      }
-
-      await _userRepository.saveUser(user);
-
-      _user = user;
-      _userSC.add(user);
-    }
+    await _userRepository.saveUser(user);
+    _userObserver.user = user;
   }
 
   @override
-  Future<void> dispose() async {
-    await _userSC.close();
-  }
+  Future<void> dispose() async {}
 }

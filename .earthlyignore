@@ -13,6 +13,19 @@
 **/test_reports/
 **/*.log
 
+# Generated files from code generation tools
+**/*.g.dart
+**/*.freezed.dart
+**/*.chopper.dart
+**/*.swagger.dart
+**/*.openapi.dart
+**/*.gen.dart
+**/*.swagger.*.dart
+**/*.drift.dart
+**/openapi/processed/
+**/catalyst_voices_localizations_*.dart
+**/catalyst_voices_localizations.dart
+
 # node related
 
 **/node_modules/
