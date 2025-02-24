@@ -2,15 +2,15 @@
 INSERT INTO txo_by_stake (
     stake_address,
     slot_no,
-    txn,
+    txn_index,
     txo,
     address,
     value,
-    txn_hash
+    txn_id
 ) VALUES (
     :stake_address,
     :slot_no,
-    :txn,
+    :txn_index,
     :txo,
     :address,
     :value,

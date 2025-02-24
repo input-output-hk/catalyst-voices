@@ -2,17 +2,24 @@ import 'package:equatable/equatable.dart';
 
 final class AppConfig extends Equatable {
   final ApiConfig api;
-  final SentryConfig sentry;
   final CacheConfig cache;
+  final DatabaseConfig database;
+  final SentryConfig sentry;
 
   const AppConfig({
     this.api = const ApiConfig(),
-    this.sentry = const SentryConfig(),
     this.cache = const CacheConfig(),
+    this.database = const DatabaseConfig(),
+    this.sentry = const SentryConfig(),
   });
 
   @override
-  List<Object?> get props => [api, sentry, cache];
+  List<Object?> get props => [
+        api,
+        cache,
+        database,
+        sentry,
+      ];
 }
 
 final class ApiConfig extends Equatable {
@@ -36,6 +43,47 @@ final class ApiConfig extends Equatable {
       ];
 }
 
+final class CacheConfig extends Equatable {
+  final ExpiryDuration expiryDuration;
+
+  const CacheConfig({
+    this.expiryDuration = const ExpiryDuration(),
+  });
+
+  @override
+  List<Object?> get props => [expiryDuration];
+}
+
+final class DatabaseConfig extends Equatable {
+  final String name;
+  final String webSqlite3Wasm;
+  final String webDriftWorker;
+
+  const DatabaseConfig({
+    this.name = 'catalyst_db',
+    this.webSqlite3Wasm = 'sqlite3.wasm',
+    this.webDriftWorker = 'drift_worker.js',
+  });
+
+  @override
+  List<Object?> get props => [
+        name,
+        webSqlite3Wasm,
+        webDriftWorker,
+      ];
+}
+
+final class ExpiryDuration extends Equatable {
+  final Duration keychainUnlock;
+
+  const ExpiryDuration({
+    this.keychainUnlock = const Duration(hours: 1),
+  });
+
+  @override
+  List<Object?> get props => [keychainUnlock];
+}
+
 final class SentryConfig extends Equatable {
   final String dns;
   final String environment;
@@ -54,26 +102,4 @@ final class SentryConfig extends Equatable {
         environment,
         release,
       ];
-}
-
-final class CacheConfig extends Equatable {
-  final ExpiryDuration expiryDuration;
-
-  const CacheConfig({
-    this.expiryDuration = const ExpiryDuration(),
-  });
-
-  @override
-  List<Object?> get props => [expiryDuration];
-}
-
-final class ExpiryDuration extends Equatable {
-  final Duration keychainUnlock;
-
-  const ExpiryDuration({
-    this.keychainUnlock = const Duration(hours: 1),
-  });
-
-  @override
-  List<Object?> get props => [keychainUnlock];
 }

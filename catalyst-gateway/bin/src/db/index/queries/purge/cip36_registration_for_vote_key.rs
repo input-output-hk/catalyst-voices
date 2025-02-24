@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::{DbSlot, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for CIP-36 registration by Vote key purge queries.
 
+    use crate::db::types::{DbSlot, DbTxnIndex};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, Vec<u8>, num_bigint::BigInt, i16, bool);
+    pub(crate) type PrimaryKey = (Vec<u8>, Vec<u8>, DbSlot, DbTxnIndex, bool);
 }
 
 /// Select primary keys for CIP-36 registration by Vote key.
@@ -31,14 +36,14 @@ const SELECT_QUERY: &str = include_str!("./cql/get_cip36_registration_for_vote_k
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Vote key - Binary 28 bytes.
+    /// Vote key - Binary 32 bytes.
     pub(crate) vote_key: Vec<u8>,
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_address: Vec<u8>,
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    pub(crate) stake_public_key: Vec<u8>,
     /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
+    pub(crate) txn_index: DbTxnIndex,
     /// True if registration is valid.
     pub(crate) valid: bool,
 }
@@ -47,9 +52,9 @@ impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("vote_key", &self.vote_key)
-            .field("stake_address", &self.stake_address)
+            .field("stake_public_key", &self.stake_public_key)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("valid", &self.valid)
             .finish()
     }
@@ -59,9 +64,9 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             vote_key: value.0,
-            stake_address: value.1,
+            stake_public_key: value.1,
             slot_no: value.2,
-            txn: value.3,
+            txn_index: value.3,
             valid: value.4,
         }
     }

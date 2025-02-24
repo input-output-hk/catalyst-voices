@@ -99,7 +99,10 @@ class _AgreementConfirmationFormField extends VoicesFormField<bool> {
                 ),
                 if (field.hasError) ...[
                   const SizedBox(height: 4),
-                  DocumentErrorText(text: field.errorText),
+                  DocumentErrorText(
+                    text: field.errorText,
+                    enabled: enabled,
+                  ),
                 ],
               ],
             );

@@ -137,6 +137,21 @@ final class Dependencies extends DependencyProvider {
           get<KeychainProvider>(),
         );
       })
+      ..registerLazySingleton<DatabaseDraftsDataSource>(() {
+        return DatabaseDraftsDataSource(
+          get<CatalystDatabase>(),
+        );
+      })
+      ..registerLazySingleton<DocumentDataLocalSource>(() {
+        return DatabaseDocumentsDataSource(
+          get<CatalystDatabase>(),
+        );
+      })
+      ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
+        return CatGatewayDocumentDataSource(
+          get<SignedDocumentManager>(),
+        );
+      })
       ..registerLazySingleton<TransactionConfigRepository>(
         TransactionConfigRepository.new,
       )
@@ -145,7 +160,9 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
-          get<SignedDocumentManager>(),
+          get<DatabaseDraftsDataSource>(),
+          get<DocumentDataLocalSource>(),
+          get<CatGatewayDocumentDataSource>(),
         );
       });
   }
@@ -206,6 +223,19 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
+    registerLazySingleton<CatalystDatabase>(() {
+      final config = get<AppConfig>().database;
+
+      return CatalystDatabase.drift(
+        config: CatalystDriftDatabaseConfig(
+          name: config.name,
+          web: CatalystDriftDatabaseWebConfig(
+            sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
+            driftWorker: Uri.parse(config.webDriftWorker),
+          ),
+        ),
+      );
+    });
   }
 
   void _registerUtils() {

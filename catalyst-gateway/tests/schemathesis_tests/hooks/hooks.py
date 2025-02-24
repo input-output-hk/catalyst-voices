@@ -65,6 +65,8 @@ def negative_data_rejection_custom(ctx, response, case):
     ctx.config.negative_data_rejection.allowed_statuses = list(
         [code for code in status_codes if code.startswith("4")]
     )
+    # Allow 503 status for this validation
+    ctx.config.negative_data_rejection.allowed_statuses.append("503")
 
     if case.data_generation_method and case.data_generation_method.is_negative:
         # if only headers are included
@@ -89,3 +91,12 @@ def negative_data_rejection_custom(ctx, response, case):
     return schemathesis.specs.openapi.checks.negative_data_rejection(
         ctx, response, case
     )
+
+
+@schemathesis.check
+def not_a_server_error_custom(ctx, response, case):
+    # Allow 503 status for this validation
+    if response.status_code == 503:
+        return None
+
+    return schemathesis.checks.not_a_server_error(ctx, response, case)

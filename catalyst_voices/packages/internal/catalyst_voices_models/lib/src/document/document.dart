@@ -23,6 +23,24 @@ final class Document extends Equatable {
     required this.properties,
   });
 
+  /// Returns all the invalid properties in this document.
+  ///
+  /// The resulting list should only contain the properties
+  /// which are themselves invalid. If a parent property is valid
+  /// but it has a child which is not then only the child should be included.
+  List<DocumentProperty> get invalidProperties {
+    return [
+      for (final property in properties) ...property.invalidProperties,
+    ];
+  }
+
+  /// Returns true if all properties in this document are valid,
+  /// false otherwise.
+  bool get isValid => properties.every((e) => e.isValid);
+
+  @override
+  List<Object?> get props => [schema, properties];
+
   /// Returns the list of segments from filtered [properties].
   List<DocumentObjectProperty> get segments => properties
       .whereType<DocumentObjectProperty>()
@@ -44,47 +62,6 @@ final class Document extends Equatable {
   DocumentBuilder toBuilder() {
     return DocumentBuilder.fromDocument(this);
   }
-
-  @override
-  List<Object?> get props => [schema, properties];
-}
-
-/// A property of the [Document].
-///
-/// See:
-/// - [DocumentListProperty]
-/// - [DocumentObjectProperty]
-/// - [DocumentValueProperty].
-sealed class DocumentProperty extends Equatable implements DocumentNode {
-  /// The default constructor for the [DocumentProperty].
-  const DocumentProperty();
-
-  @override
-  DocumentNodeId get nodeId => schema.nodeId;
-
-  /// The schema of the property.
-  DocumentPropertySchema get schema;
-
-  /// Returns true if the property (including children properties) are valid,
-  /// false otherwise.
-  bool get isValid;
-
-  /// Return true if the property (including children properties but excluding
-  /// children which are standalone sections) are valid, false otherwise.
-  bool get isValidExcludingSubsections;
-
-  /// Returns the value related to this property.
-  ///
-  /// [DocumentListProperty] - returns a list of values.
-  /// [DocumentObjectProperty] - returns a list of values.
-  /// [DocumentValueProperty] - returns a singular value.
-  Object? get value;
-
-  /// Queries this property and it's children for a property with [nodeId].
-  DocumentProperty? getProperty(DocumentNodeId nodeId);
-
-  /// Returns a builder that can update the property state.
-  DocumentPropertyBuilder toBuilder();
 }
 
 /// A list of properties, each property in [properties]
@@ -109,6 +86,14 @@ final class DocumentListProperty extends DocumentProperty {
   });
 
   @override
+  List<DocumentProperty> get invalidProperties {
+    return [
+      if (validationResult.isInvalid) this,
+      for (final property in properties) ...property.invalidProperties,
+    ];
+  }
+
+  @override
   bool get isValid {
     if (validationResult.isInvalid) {
       return false;
@@ -130,6 +115,9 @@ final class DocumentListProperty extends DocumentProperty {
 
     return true;
   }
+
+  @override
+  List<Object?> get props => [schema, properties];
 
   @override
   Object? get value {
@@ -162,9 +150,6 @@ final class DocumentListProperty extends DocumentProperty {
   DocumentListPropertyBuilder toBuilder() {
     return DocumentListPropertyBuilder.fromProperty(this);
   }
-
-  @override
-  List<Object?> get props => [schema, properties];
 }
 
 /// A list of properties, each property can be a different type.
@@ -186,6 +171,14 @@ final class DocumentObjectProperty extends DocumentProperty {
     required this.properties,
     required this.validationResult,
   });
+
+  @override
+  List<DocumentProperty> get invalidProperties {
+    return [
+      if (validationResult.isInvalid) this,
+      for (final property in properties) ...property.invalidProperties,
+    ];
+  }
 
   @override
   bool get isValid {
@@ -213,6 +206,15 @@ final class DocumentObjectProperty extends DocumentProperty {
 
     return true;
   }
+
+  @override
+  List<Object?> get props => [schema, properties, validationResult];
+
+  /// Returns the list of sections from filtered [properties].
+  List<DocumentObjectProperty> get sections => properties
+      .whereType<DocumentObjectProperty>()
+      .where((e) => e.schema is DocumentSectionSchema)
+      .toList();
 
   @override
   Object? get value {
@@ -246,19 +248,55 @@ final class DocumentObjectProperty extends DocumentProperty {
     return properties.firstWhereOrNull((e) => e.schema is T);
   }
 
-  /// Returns the list of sections from filtered [properties].
-  List<DocumentObjectProperty> get sections => properties
-      .whereType<DocumentObjectProperty>()
-      .where((e) => e.schema is DocumentSectionSchema)
-      .toList();
-
   @override
   DocumentObjectPropertyBuilder toBuilder() {
     return DocumentObjectPropertyBuilder.fromProperty(this);
   }
+}
+
+/// A property of the [Document].
+///
+/// See:
+/// - [DocumentListProperty]
+/// - [DocumentObjectProperty]
+/// - [DocumentValueProperty].
+sealed class DocumentProperty extends Equatable implements DocumentNode {
+  /// The default constructor for the [DocumentProperty].
+  const DocumentProperty();
+
+  /// Returns a list of properties that are invalid.
+  ///
+  /// For lists/objects if the parent is valid but the child
+  /// is not then the returned list should only contain the child
+  /// and not the parent.
+  List<DocumentProperty> get invalidProperties;
+
+  /// Returns true if the property (including children properties) are valid,
+  /// false otherwise.
+  bool get isValid;
+
+  /// Return true if the property (including children properties but excluding
+  /// children which are standalone sections) are valid, false otherwise.
+  bool get isValidExcludingSubsections;
 
   @override
-  List<Object?> get props => [schema, properties, validationResult];
+  DocumentNodeId get nodeId => schema.nodeId;
+
+  /// The schema of the property.
+  DocumentPropertySchema get schema;
+
+  /// Returns the value related to this property.
+  ///
+  /// [DocumentListProperty] - returns a list of values.
+  /// [DocumentObjectProperty] - returns a list of values.
+  /// [DocumentValueProperty] - returns a singular value.
+  Object? get value;
+
+  /// Queries this property and it's children for a property with [nodeId].
+  DocumentProperty? getProperty(DocumentNodeId nodeId);
+
+  /// Returns a builder that can update the property state.
+  DocumentPropertyBuilder toBuilder();
 }
 
 /// A property with a value with no additional children.
@@ -282,6 +320,13 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
   });
 
   @override
+  List<DocumentProperty> get invalidProperties {
+    return [
+      if (!isValid) this,
+    ];
+  }
+
+  @override
   bool get isValid {
     return validationResult.isValid;
   }
@@ -290,6 +335,9 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
   bool get isValidExcludingSubsections {
     return validationResult.isValid;
   }
+
+  @override
+  List<Object?> get props => [schema, value, validationResult];
 
   @override
   DocumentProperty? getProperty(DocumentNodeId nodeId) {
@@ -301,7 +349,4 @@ final class DocumentValueProperty<T extends Object> extends DocumentProperty {
   DocumentValuePropertyBuilder toBuilder() {
     return DocumentValuePropertyBuilder.fromProperty(this);
   }
-
-  @override
-  List<Object?> get props => [schema, value, validationResult];
 }

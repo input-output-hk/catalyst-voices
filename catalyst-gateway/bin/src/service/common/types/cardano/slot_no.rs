@@ -3,6 +3,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
+use cardano_blockchain_types::Slot;
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -30,13 +31,12 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         example: Some(EXAMPLE.into()),
         maximum: Some(MAXIMUM as f64),
         minimum: Some(MINIMUM as f64),
-        ..poem_openapi::registry::MetaSchema::ANY
+        ..MetaSchema::ANY
     }
 });
 
 /// Slot number
-#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
-
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord, Default)]
 pub(crate) struct SlotNo(u64);
 
 /// Is the Slot Number valid?
@@ -86,7 +86,7 @@ impl ParseFromJSON for SlotNo {
                 .as_u64()
                 .ok_or(ParseError::from("invalid slot number"))?;
             if !is_valid(value) {
-                return Err("invalid AssetValue".into());
+                return Err("invalid slot number".into());
             }
             Ok(Self(value))
         } else {
@@ -125,6 +125,12 @@ impl From<u64> for SlotNo {
     }
 }
 
+impl From<SlotNo> for u64 {
+    fn from(value: SlotNo) -> Self {
+        value.0
+    }
+}
+
 impl SlotNo {
     /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
     pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
@@ -135,5 +141,17 @@ impl SlotNo {
 impl Example for SlotNo {
     fn example() -> Self {
         Self(EXAMPLE)
+    }
+}
+
+impl From<Slot> for SlotNo {
+    fn from(value: Slot) -> Self {
+        Self(value.into())
+    }
+}
+
+impl From<SlotNo> for Slot {
+    fn from(value: SlotNo) -> Self {
+        value.0.into()
     }
 }

@@ -14,17 +14,21 @@ class _SnackBarData {
   final SvgGenImage icon;
   final ColorResolver iconColor;
   final ColorResolver titleColor;
+  final ColorResolver messageColor;
+  final ColorResolver actionColor;
   final ColorResolver backgroundColor;
-  final L10nResolver message;
   final L10nResolver title;
+  final L10nResolver message;
 
   const _SnackBarData({
     required this.icon,
     required this.iconColor,
     required this.titleColor,
+    required this.messageColor,
+    required this.actionColor,
     required this.backgroundColor,
-    required this.message,
     required this.title,
+    required this.message,
   });
 }
 
@@ -32,52 +36,90 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
   static final Map<VoicesSnackBarType, _SnackBarData> _data = {
     VoicesSnackBarType.info: _SnackBarData(
       icon: VoicesAssets.icons.informationCircle,
-      iconColor: (colors) => colors.iconsPrimary,
-      titleColor: (colors) => colors.onPrimaryContainer,
-      backgroundColor: (colors) => colors.primaryContainer,
-      message: (l10n) => l10n.snackbarInfoMessageText,
+      iconColor: (colors, colorScheme) => colors.iconsPrimary,
+      titleColor: (colors, colorScheme) => colors.onPrimaryContainer,
+      messageColor: (colors, colorScheme) => colors.onPrimaryContainer,
+      actionColor: (colors, colorScheme) => colors.textPrimary,
+      backgroundColor: (colors, colorScheme) => colors.primaryContainer,
       title: (l10n) => l10n.snackbarInfoLabelText,
+      message: (l10n) => l10n.snackbarInfoMessageText,
     ),
     VoicesSnackBarType.success: _SnackBarData(
       icon: VoicesAssets.icons.checkCircle,
-      iconColor: (colors) => colors.iconsSuccess,
-      titleColor: (colors) => colors.onSuccessContainer,
-      backgroundColor: (colors) => colors.successContainer,
-      message: (l10n) => l10n.snackbarSuccessMessageText,
+      iconColor: (colors, colorScheme) => colors.iconsSuccess,
+      titleColor: (colors, colorScheme) => colors.onSuccessContainer,
+      messageColor: (colors, colorScheme) => colors.onSuccessContainer,
+      actionColor: (colors, colorScheme) => colors.textPrimary,
+      backgroundColor: (colors, colorScheme) => colors.successContainer,
       title: (l10n) => l10n.snackbarSuccessLabelText,
+      message: (l10n) => l10n.snackbarSuccessMessageText,
     ),
     VoicesSnackBarType.warning: _SnackBarData(
       icon: VoicesAssets.icons.exclamation,
-      iconColor: (colors) => colors.iconsWarning,
-      titleColor: (colors) => colors.onWarningContainer,
-      backgroundColor: (colors) => colors.warningContainer,
-      message: (l10n) => l10n.snackbarWarningMessageText,
+      iconColor: (colors, colorScheme) => colors.iconsWarning,
+      titleColor: (colors, colorScheme) => colors.onWarningContainer,
+      messageColor: (colors, colorScheme) => colors.onWarningContainer,
+      actionColor: (colors, colorScheme) => colors.textPrimary,
+      backgroundColor: (colors, colorScheme) => colors.warningContainer,
       title: (l10n) => l10n.snackbarWarningLabelText,
+      message: (l10n) => l10n.snackbarWarningMessageText,
     ),
     VoicesSnackBarType.error: _SnackBarData(
       icon: VoicesAssets.icons.exclamationCircle,
-      iconColor: (colors) => colors.iconsError,
-      titleColor: (colors) => colors.onErrorContainer,
-      backgroundColor: (colors) => colors.errorContainer,
-      message: (l10n) => l10n.snackbarErrorMessageText,
+      iconColor: (colors, colorScheme) => colorScheme.onError,
+      titleColor: (colors, colorScheme) => colorScheme.onError,
+      messageColor: (colors, colorScheme) => colorScheme.onError,
+      actionColor: (colors, colorScheme) => colorScheme.onError,
+      backgroundColor: (color, colorScheme) => colorScheme.error,
       title: (l10n) => l10n.snackbarErrorLabelText,
+      message: (l10n) => l10n.snackbarErrorMessageText,
     ),
   };
 
   _SnackBarData get _snackBarData => _data[this]!;
 
-  Color? backgroundColor(BuildContext context) =>
-      _snackBarData.backgroundColor(Theme.of(context).colors);
+  Color? actionColor(BuildContext context) {
+    final theme = Theme.of(context);
+    return _snackBarData.actionColor(
+      theme.colors,
+      theme.colorScheme,
+    );
+  }
+
+  Color? backgroundColor(BuildContext context) {
+    final theme = Theme.of(context);
+    return _snackBarData.backgroundColor(
+      theme.colors,
+      theme.colorScheme,
+    );
+  }
 
   SvgGenImage icon() => _snackBarData.icon;
 
-  Color? iconColor(BuildContext context) =>
-      _snackBarData.iconColor(Theme.of(context).colors);
+  Color? iconColor(BuildContext context) {
+    final theme = Theme.of(context);
+    return _snackBarData.iconColor(
+      theme.colors,
+      theme.colorScheme,
+    );
+  }
 
   String message(BuildContext context) => _snackBarData.message(context.l10n);
 
-  String title(BuildContext context) => _snackBarData.title(context.l10n);
+  Color? messageColor(BuildContext context) {
+    final theme = Theme.of(context);
+    return _snackBarData.titleColor(
+      theme.colors,
+      theme.colorScheme,
+    );
+  }
 
-  Color? titleColor(BuildContext context) =>
-      _snackBarData.titleColor(Theme.of(context).colors);
+  String title(BuildContext context) => _snackBarData.title(context.l10n);
+  Color? titleColor(BuildContext context) {
+    final theme = Theme.of(context);
+    return _snackBarData.titleColor(
+      theme.colors,
+      theme.colorScheme,
+    );
+  }
 }

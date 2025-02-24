@@ -8,8 +8,12 @@ final class Debouncer {
   Timer? _timer;
 
   Debouncer({
-    this.delay = const Duration(milliseconds: 400),
+    this.delay = const Duration(milliseconds: 200),
   });
+
+  void dispose() {
+    _cancel();
+  }
 
   void run(VoidCallback callback) {
     _cancel();
@@ -19,10 +23,6 @@ final class Debouncer {
     } else {
       _timer = Timer(delay, callback);
     }
-  }
-
-  void dispose() {
-    _cancel();
   }
 
   void _cancel() {

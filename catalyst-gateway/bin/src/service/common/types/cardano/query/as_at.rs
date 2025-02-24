@@ -13,6 +13,7 @@ use std::{
 };
 
 use anyhow::{bail, Result};
+use cardano_blockchain_types::Slot;
 use chrono::DateTime;
 use const_format::concatcp;
 use poem_openapi::{
@@ -149,7 +150,7 @@ impl ParseFromParameter for AsAt {
             };
             slot
         } else {
-            when
+            Slot::from_saturating(when)
         };
         let slot_no: SlotNo = slot.into();
         Ok(Self((whence, when, slot_no)))

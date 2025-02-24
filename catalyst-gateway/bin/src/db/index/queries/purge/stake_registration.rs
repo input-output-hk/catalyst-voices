@@ -8,12 +8,15 @@ use scylla::{
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{
-            purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-            FallibleQueryResults, SizedBatch,
+    db::{
+        index::{
+            queries::{
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
+                FallibleQueryResults, SizedBatch,
+            },
+            session::CassandraSession,
         },
-        session::CassandraSession,
+        types::{DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db,
 };
@@ -21,8 +24,10 @@ use crate::{
 pub(crate) mod result {
     //! Return values for Stake Registration purge queries.
 
+    use crate::db::types::{DbSlot, DbStakeAddress, DbTxnIndex};
+
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (Vec<u8>, bool, num_bigint::BigInt, i16);
+    pub(crate) type PrimaryKey = (DbStakeAddress, bool, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for Stake Registration.
@@ -31,23 +36,23 @@ const SELECT_QUERY: &str = include_str!("./cql/get_stake_registration.cql");
 /// Primary Key Value.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    pub(crate) stake_hash: Vec<u8>,
+    /// Stake hash - Binary 29 bytes.
+    pub(crate) stake_address: DbStakeAddress,
     /// Is the address a script address.
     pub(crate) script: bool,
     /// Block Slot Number
-    pub(crate) slot_no: num_bigint::BigInt,
+    pub(crate) slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    pub(crate) txn: i16,
+    pub(crate) txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_hash", &self.stake_hash)
+            .field("stake_address", &self.stake_address)
             .field("script", &self.script)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .finish()
     }
 }
@@ -55,10 +60,10 @@ impl Debug for Params {
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
-            stake_hash: value.0,
+            stake_address: value.0,
             script: value.1,
             slot_no: value.2,
-            txn: value.3,
+            txn_index: value.3,
         }
     }
 }

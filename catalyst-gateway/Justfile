@@ -49,6 +49,7 @@ run-cat-gateway: build-cat-gateway
     RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
     CHAIN_NETWORK="Preprod" \
     INTERNAL_API_KEY=123 \
+    RBAC_OFF="True" \
     ./target/release/cat-gateway run --log-level debug
 
 # Run cat-gateway natively on mainnet
