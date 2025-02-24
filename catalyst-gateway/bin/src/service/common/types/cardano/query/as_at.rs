@@ -41,7 +41,7 @@ const EXAMPLE_TIME: u64 = 1_730_861_339; // Date and time (UTC): November 6, 202
 static EXAMPLE: LazyLock<String> = LazyLock::new(|| {
     // Note, the SlotNumber here is wrong, but its not used for generating the example, so
     // thats OK.
-    let example = AsAt((EXAMPLE_WHENCE.to_owned(), EXAMPLE_TIME, 0.into()));
+    let example = AsAt((EXAMPLE_WHENCE.to_owned(), EXAMPLE_TIME, SlotNo::default()));
     format!("{example}")
 });
 /// Time Discriminator
