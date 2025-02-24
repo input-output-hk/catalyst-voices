@@ -1,6 +1,7 @@
 VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.39 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-libs/rust:feat/cat-sign-doc-validator-tests AS cat-libs-rust
 
 builder:
     FROM python-ci+python-base
@@ -21,6 +22,8 @@ test:
     ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
     # cspell: disable-next-line
     ENV BEARER_TOKEN = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
+
+    COPY cat-libs-rust+build/mk_signed_doc .
 
     WITH DOCKER \
         --compose docker-compose.yml \
