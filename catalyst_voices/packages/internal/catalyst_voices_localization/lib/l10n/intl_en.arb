@@ -1581,6 +1581,65 @@
   "@tryDifferentSearch": {
     "description": "Description of empty search result. Try different search"
   },
+  "copyLink": "Copy Link",
+  "@copyLink": {
+    "description": "Action title to copy a link in share dialog."
+  },
+  "proposal": "Proposal",
+  "@proposal": {
+    "description": "Generic name to describe an type of item."
+  },
+  "shareDirectLinkToItem": "Share a link directly to this {item}",
+  "@shareDirectLinkToItem": {
+    "description": "Action description to share a link in share dialog.",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkOnSocialMedia": "Share this {itemType} link on {socialMedia}",
+  "@shareLinkOnSocialMedia": {
+    "description": "Action description to share a link in share dialog.",
+    "placeholders": {
+      "itemType": {
+        "type": "String"
+      },
+      "socialMedia": {
+        "type": "String"
+      }
+    }
+  },
+  "shareOnSocialMedia": "Share on {socialMedia}",
+  "@shareOnSocialMedia": {
+    "description": "Action title to share a link in share dialog.",
+    "placeholders": {
+      "socialMedia": {
+        "type": "String"
+      }
+    }
+  },
+  "shareType": "Share {itemType}",
+  "@shareType": {
+    "description": "Action title to share a link in share dialog.",
+    "placeholders": {
+      "itemType": {
+        "type": "String"
+      }
+    }
+  },
+  "copied": "Copied!",
+  "@copied": {
+    "description": "Snackbar message shown when user copies a link."
+  },
+  "linkCopiedToClipboard": "Link copied to clipboard",
+  "@linkCopiedToClipboard": {
+    "description": "Snackbar title shown when user copies a link."
+  },
+  "proposalShareMessage": "Check this out!🌍 #MustSee #SharingIsCaring",
+  "@proposalShareMessage": {
+    "description": "Share message for proposals."
+  },
   "publishNewProposalIterationDialogTitle": "Publish New Iteration?",
   "@publishNewProposalIterationDialogTitle": {
     "description": "Title for the dialog for publishing a new proposal iteration."
