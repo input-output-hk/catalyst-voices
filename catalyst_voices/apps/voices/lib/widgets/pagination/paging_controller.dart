@@ -57,6 +57,7 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
             maxResults: initialMaxResults,
             itemsPerPage: itemsPerPage,
             isLoading: true,
+            itemList: const [],
           ),
         );
 
@@ -84,6 +85,12 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     value = value.copyWith(currentPage: newPage);
   }
 
+  set isLoading(bool newValue) {
+    value = value.copyWith(isLoading: newValue);
+  }
+
+  bool get isLoading => value.isLoading;
+
   int get maxResults => value.maxResults;
 
   set maxResults(int newMaxResults) {
@@ -91,13 +98,6 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
   }
 
   int get nextPageValue => currentPage + 1;
-
-  @override
-  set value(PagingState<ItemType> newValue) {
-    notifyStateListeners(newValue);
-
-    super.value = newValue;
-  }
 
   void nextPage() {
     currentPage = nextPageValue;

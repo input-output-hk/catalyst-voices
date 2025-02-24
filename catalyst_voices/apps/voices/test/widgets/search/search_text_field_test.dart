@@ -57,7 +57,7 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.enterText(find.byType(TextField), 'test query');
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
         expect(lastSearchValue, equals('test query'));
         expect(lastIsSubmitted, isFalse);
@@ -88,6 +88,7 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.enterText(find.byType(TextField), 'test query');
+        await tester.pump(const Duration(milliseconds: 500));
         await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pumpAndSettle();
 
@@ -120,8 +121,9 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.enterText(find.byType(TextField), 'test query');
+        await tester.pump(const Duration(milliseconds: 500));
         await tester.testTextInput.receiveAction(TextInputAction.search);
-        await tester.pumpAndSettle();
+        await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
         expect(lastSearchValue, equals('test query'));
         expect(lastIsSubmitted, isTrue);
@@ -163,4 +165,71 @@ void main() {
       },
     );
   });
+
+  testWidgets(
+    'reset button visibility and functionality',
+    (tester) async {
+      String? lastSearchValue;
+
+      await tester.pumpApp(
+        Material(
+          child: SearchTextField(
+            hintText: 'Search...',
+            showClearButton: true,
+            onSearch: ({
+              required String searchValue,
+              required bool isSubmitted,
+            }) {
+              lastSearchValue = searchValue;
+            },
+          ),
+        ),
+        voicesColors: lightVoicesColorScheme,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('SearchTextFieldResetButton')), findsNothing);
+
+      await tester.enterText(find.byType(TextField), 'test query');
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+
+      expect(
+        find.byKey(const Key('SearchTextFieldResetButton')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('SearchTextFieldResetButton')));
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+
+      expect(lastSearchValue, '');
+      expect(find.byKey(const Key('SearchTextFieldResetButton')), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'reset button remains hidden when showClearButton is false',
+    (tester) async {
+      await tester.pumpApp(
+        Material(
+          child: SearchTextField(
+            hintText: 'Search...',
+            showClearButton: false,
+            onSearch: ({
+              required String searchValue,
+              required bool isSubmitted,
+            }) {},
+          ),
+        ),
+        voicesColors: lightVoicesColorScheme,
+      );
+      await tester.pumpAndSettle();
+
+      // Enter text
+      await tester.enterText(find.byType(TextField), 'test query');
+      await tester.pumpAndSettle(const Duration(milliseconds: 500));
+
+      // Reset button should remain hidden
+      expect(find.text('reset'), findsNothing);
+    },
+  );
 }
