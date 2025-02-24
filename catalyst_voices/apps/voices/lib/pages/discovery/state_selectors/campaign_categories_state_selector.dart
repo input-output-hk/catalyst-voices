@@ -16,12 +16,14 @@ class CampaignCategoriesStateSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: const Key('CampaignCategoriesStateSelector'),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 120),
           child: Text(
+            key: const Key('CampaignCategoriesTitle'),
             context.l10n.campaignCategories,
             style: context.textTheme.titleLarge,
           ),
@@ -96,6 +98,7 @@ class _CampaignCategoriesError extends StatelessWidget {
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
+          key: const Key('CampaignCategoriesError'),
           offstage: !state.show,
           child: Padding(
             padding: const EdgeInsets.all(16),
