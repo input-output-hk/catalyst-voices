@@ -9,8 +9,13 @@ const _key =
     'XWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ';
 /* cSpell:enable */
 
-// TODO(damian-molinski): If token will be cached we may need to implement
-//  handling 401 response.
+/// Token specification:
+/// https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/permissionless-auth/auth-header.md
+///
+/// - 401: The token is either invalidly formatted, or we don't know who that is
+/// (likely they have not registered on chain).
+/// - 403: The token is valid, we know who they are but either the timestamp is
+/// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor implements Interceptor {
   final UserObserver _userObserver;
 
@@ -27,6 +32,7 @@ final class RbacAuthInterceptor implements Interceptor {
 
     if (isUnlocked ?? false) {
       // TODO(damian-molinski): key should come from keychain
+      // TODO(damian-molinski): react to 401 and 403 statuses.
       request = applyHeader(request, 'Authorization', 'Bearer $_key');
     }
 
