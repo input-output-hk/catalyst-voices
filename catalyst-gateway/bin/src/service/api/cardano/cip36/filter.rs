@@ -443,15 +443,19 @@ pub async fn get_all_registrations(
             continue;
         };
 
+        let payment_address = Cip19ShelleyAddress::try_from(row.payment_address).ok();
+
+        let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
+
+        let stake_pub_key = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
+
         let cip36 = Cip36Details {
             slot_no: SlotNo::try_from(slot_no)?,
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(
-                row.stake_public_key.clone(),
-            )?),
-            vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
+            stake_pub_key,
+            vote_pub_key,
             nonce: Some(Nonce::from(nonce)),
             txn: Some(row.txn_index.into()),
-            payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
+            payment_address,
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
             errors: None,
