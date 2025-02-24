@@ -20,7 +20,7 @@ pub(crate) const EXAMPLE: u64 = 1_234_567;
 /// Minimum.
 const MINIMUM: u64 = 0;
 /// Maximum.
-const MAXIMUM: u64 = u64::MAX;
+const MAXIMUM: u64 = u64::MAX / 2;
 
 /// Schema.
 #[allow(clippy::cast_precision_loss)]
@@ -36,12 +36,26 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Slot number
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord, Default)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub(crate) struct SlotNo(u64);
 
-/// Is the Slot Number valid?
-fn is_valid(_value: u64) -> bool {
-    true
+impl SlotNo {
+    /// Is the Slot Number valid?
+    fn is_valid(value: u64) -> bool {
+        (MINIMUM..=MAXIMUM).contains(&value)
+    }
+
+    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
+    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
+        value.map(std::convert::Into::into)
+    }
+}
+
+impl Default for SlotNo {
+    /// Explicit default implementation of `SlotNo` which is `0`.
+    fn default() -> Self {
+        Self(0)
+    }
 }
 
 impl Type for SlotNo {
@@ -51,7 +65,7 @@ impl Type for SlotNo {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "integer(u64)".into()
+        "SlotNo".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
@@ -73,25 +87,17 @@ impl Type for SlotNo {
 
 impl ParseFromParameter for SlotNo {
     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-        let slot: u64 = value.parse()?;
-        Ok(Self(slot))
+        Ok(Self(value.parse()?))
     }
 }
 
 impl ParseFromJSON for SlotNo {
     fn parse_from_json(value: Option<Value>) -> ParseResult<Self> {
-        let value = value.unwrap_or_default();
-        if let Value::Number(value) = value {
-            let value = value
-                .as_u64()
-                .ok_or(ParseError::from("invalid slot number"))?;
-            if !is_valid(value) {
-                return Err("invalid slot number".into());
-            }
-            Ok(Self(value))
-        } else {
-            Err(ParseError::expected_type(value))
-        }
+        u64::parse_from_json(value)
+            .map_err(ParseError::propagate)
+            .map(TryInto::try_into)?
+            .map_err(ParseError::custom)
+            .map(Self)
     }
 }
 
@@ -107,34 +113,28 @@ impl ToJSON for SlotNo {
     }
 }
 
-impl TryFrom<i64> for SlotNo {
+impl TryFrom<u64> for SlotNo {
     type Error = anyhow::Error;
 
-    fn try_from(value: i64) -> Result<Self, Self::Error> {
-        let value: u64 = value.try_into()?;
-        if !is_valid(value) {
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        if !Self::is_valid(value) {
             bail!("Invalid Slot Number");
         }
         Ok(Self(value))
     }
 }
 
-impl From<u64> for SlotNo {
-    fn from(value: u64) -> Self {
-        Self(value)
+impl TryFrom<i64> for SlotNo {
+    type Error = anyhow::Error;
+
+    fn try_from(value: i64) -> Result<Self, Self::Error> {
+        u64::try_from(value).map(TryInto::try_into)?
     }
 }
 
 impl From<SlotNo> for u64 {
     fn from(value: SlotNo) -> Self {
         value.0
-    }
-}
-
-impl SlotNo {
-    /// Generic conversion of `Option<T>` to `Option<SlotNo>`.
-    pub(crate) fn into_option<T: Into<SlotNo>>(value: Option<T>) -> Option<SlotNo> {
-        value.map(std::convert::Into::into)
     }
 }
 

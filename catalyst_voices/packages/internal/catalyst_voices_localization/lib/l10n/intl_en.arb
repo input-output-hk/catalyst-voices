@@ -780,23 +780,15 @@
   "@noWalletFound": {
     "description": "A description when no wallet extension was found."
   },
-  "deleteKeychainDialogTitle": "Delete Keychain?",
-  "@deleteKeychainDialogTitle": {
+  "removeKeychainDialogTitle": "Remove Keychain?",
+  "@removeKeychainDialogTitle": {
     "description": "A title on delete keychain dialog"
   },
-  "deleteKeychainDialogSubtitle": "Are you sure you wants to delete your\nCatalyst Keychain from this device?",
-  "@deleteKeychainDialogSubtitle": {
+  "removeKeychainDialogSubtitle": "Are you sure you wants to delete your Catalyst Keychain from this device? Make sure you have a working Catalyst 12-word seed-phrase!\nYour Catalyst account will be removed, this action cannot be undone!",
+  "@removeKeychainDialogSubtitle": {
     "description": "A subtitle on delete keychain dialog"
   },
-  "deleteKeychainDialogWarning": "Make sure you have a working Catalyst 12-word seedphrase!",
-  "@deleteKeychainDialogWarning": {
-    "description": "A warning on delete keychain dialog"
-  },
-  "deleteKeychainDialogWarningInfo": "Your Catalyst account will be removed,\nthis action cannot be undone!",
-  "@deleteKeychainDialogWarningInfo": {
-    "description": "A warning info on delete keychain dialog"
-  },
-  "deleteKeychainDialogTypingInfo": "To avoid mistakes, please type ‘Remove Keychain’ below.",
+  "deleteKeychainDialogTypingInfo": "To continue with the removal type: ‘Remove Keychain’.",
   "@deleteKeychainDialogTypingInfo": {
     "description": "A typing info on delete keychain dialog"
   },
@@ -1412,7 +1404,7 @@
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
   "projectCatalystDescription": "Project Catalyst is an experiment in community innovation, providing a framework to turn ideas into impactful real world projects.\n\nWe're putting the community at the heart of Cardano's future development. Are you ready for the Challenge?",
   "viewCurrentCampaign": "View Current Campaign",
-  "catalystF14": "Catalyst Fund14",
+  "catalystF14": "Catalyst Fund 14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
@@ -1519,10 +1511,12 @@
   "accountFinishedNotificationTitle": "Account Finalized",
   "accountFinishedNotificationTitleDesc": "Account blockchain verified",
   "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and…",
-  "startProposal": "Start Proposal",
   "editRolesDialogTitle": "Editing Roles",
   "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes. \nPlease have your passphrase ready.\u2028",
   "continueText": "Continue",
+  "@continueText": {
+    "description": "Action to move to the next step"
+  },
   "proposalEditorStatusDropdownBackTitle": "Back to Proposal Index",
   "@proposalEditorStatusDropdownBackTitle": {
     "description": "Action title to navigate back to the proposal index."
@@ -1563,6 +1557,65 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
+  },
+  "copyLink": "Copy Link",
+  "@copyLink": {
+    "description": "Action title to copy a link in share dialog."
+  },
+  "proposal": "Proposal",
+  "@proposal": {
+    "description": "Generic name to describe an type of item."
+  },
+  "shareDirectLinkToItem": "Share a link directly to this {item}",
+  "@shareDirectLinkToItem": {
+    "description": "Action description to share a link in share dialog.",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "shareLinkOnSocialMedia": "Share this {itemType} link on {socialMedia}",
+  "@shareLinkOnSocialMedia": {
+    "description": "Action description to share a link in share dialog.",
+    "placeholders": {
+      "itemType": {
+        "type": "String"
+      },
+      "socialMedia": {
+        "type": "String"
+      }
+    }
+  },
+  "shareOnSocialMedia": "Share on {socialMedia}",
+  "@shareOnSocialMedia": {
+    "description": "Action title to share a link in share dialog.",
+    "placeholders": {
+      "socialMedia": {
+        "type": "String"
+      }
+    }
+  },
+  "shareType": "Share {itemType}",
+  "@shareType": {
+    "description": "Action title to share a link in share dialog.",
+    "placeholders": {
+      "itemType": {
+        "type": "String"
+      }
+    }
+  },
+  "copied": "Copied!",
+  "@copied": {
+    "description": "Snackbar message shown when user copies a link."
+  },
+  "linkCopiedToClipboard": "Link copied to clipboard",
+  "@linkCopiedToClipboard": {
+    "description": "Snackbar title shown when user copies a link."
+  },
+  "proposalShareMessage": "Check this out!🌍 #MustSee #SharingIsCaring",
+  "@proposalShareMessage": {
+    "description": "Share message for proposals."
   },
   "publishNewProposalIterationDialogTitle": "Publish New Iteration?",
   "@publishNewProposalIterationDialogTitle": {
@@ -1611,5 +1664,9 @@
   "change": "Change",
   "@change": {
     "description": "An action to change/modify something."
+  },
+  "enterPhrase": "Enter phrase",
+  "@enterPhrase": {
+    "description": "Action to enter the seed phrase"
   }
 }
