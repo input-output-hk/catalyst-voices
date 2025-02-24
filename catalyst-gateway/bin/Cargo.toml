@@ -75,7 +75,7 @@ poem-openapi = { version = "=5.1.5", features = [
     "url",
     "chrono",
 ] }
-# Its a transetive dependency of the "poem-openapi" crate,
+# Its a transitive dependency of the "poem-openapi" crate,
 # but its breaks API after version "5.1.8".
 poem-openapi-derive = { version = "=5.1.4"}
 uuid = { version = "1.11.0", features = ["v4", "v7", "serde"] }
