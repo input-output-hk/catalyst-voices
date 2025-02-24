@@ -1,5 +1,5 @@
-import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_dialog_widgets.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_dialog_widgets.dart';
 import 'package:catalyst_voices/widgets/painter/arrow_right_painter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
