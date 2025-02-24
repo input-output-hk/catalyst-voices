@@ -6,6 +6,7 @@ from tempfile import NamedTemporaryFile
 import subprocess
 import json
 from typing import Dict, Any
+from uuid_extensions import uuid7str
 
 
 def build_signed_doc(
@@ -39,7 +40,7 @@ def test_signed_doc():
     health.is_live()
     health.is_ready()
 
-    doc_id = "01946ea1-818a-7e0e-b6b1-6169f02ffd4e"
+    doc_id = uuid7str()
     metadata_json = {
         "alg": "EdDSA",
         "id": doc_id,
