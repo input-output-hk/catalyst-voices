@@ -23,30 +23,6 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
   StreamSubscription<String>? _sub;
 
   @override
-  void initState() {
-    super.initState();
-
-    final bloc = context.read<AccountCubit>();
-    final text = bloc.state.walletConnected;
-
-    _controller = TextEditingController(text: text);
-
-    _sub = bloc.stream
-        .map((event) => event.walletConnected)
-        .distinct()
-        .listen((event) => _controller.text = event);
-  }
-
-  @override
-  void dispose() {
-    unawaited(_sub?.cancel());
-    _sub = null;
-
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return PropertyTile(
       title: context.l10n.catalystKeychain,
@@ -65,6 +41,30 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
         maxLines: 3,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    unawaited(_sub?.cancel());
+    _sub = null;
+
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final bloc = context.read<AccountCubit>();
+    final text = bloc.state.walletConnected;
+
+    _controller = TextEditingController(text: text);
+
+    _sub = bloc.stream
+        .map((event) => event.walletConnected)
+        .distinct()
+        .listen((event) => _controller.text = event);
   }
 
   Future<void> _removeKeychain() async {
