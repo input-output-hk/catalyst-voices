@@ -134,6 +134,8 @@ Future<BootstrapArgs> bootstrap({
 
   Bloc.observer = AppBlocObserver();
 
+  Dependencies.instance.get<SyncManager>().start().ignore();
+
   return BootstrapArgs(routerConfig: router);
 }
 

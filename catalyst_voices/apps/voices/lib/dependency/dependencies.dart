@@ -206,6 +206,11 @@ final class Dependencies extends DependencyProvider {
         get<ConfigRepository>(),
       );
     });
+    registerLazySingleton<DocumentsService>(() {
+      return DocumentsService(
+        get<DocumentRepository>(),
+      );
+    });
   }
 
   void _registerStorages() {
@@ -229,5 +234,13 @@ final class Dependencies extends DependencyProvider {
 
   void _registerUtils() {
     registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<SyncManager>(
+      () {
+        return SyncManager(
+          get<DocumentsService>(),
+        );
+      },
+      dispose: (manager) async => manager.dispose(),
+    );
   }
 }
