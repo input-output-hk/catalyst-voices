@@ -20,8 +20,7 @@ mod documents;
 mod health;
 
 pub(crate) use health::{
-    is_live, is_live_counter_under_threshold, live_counter_get, live_counter_inc,
-    live_counter_reset, set_not_live, started,
+    get_live_counter, is_live_counter_under_threshold, set_live_counter, set_not_live, started,
 };
 
 /// The name of the API

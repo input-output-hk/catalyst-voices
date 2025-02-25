@@ -1,22 +1,24 @@
 //! Implementation of the `GET /health/live` endpoint.
 
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::{
+    sync::atomic::{AtomicBool, AtomicU64, Ordering},
+    time::Duration,
+};
 
-use atomic_counter::{AtomicCounter, ConsistentCounter};
 use poem_openapi::ApiResponse;
 
-use crate::{db::index::session::CassandraSession, service::common::responses::WithErrorResponses};
+use crate::{
+    db::index::session::CassandraSession, service::common::responses::WithErrorResponses,
+    settings::Settings,
+};
 
 /// Flag to determine if the service is live.
 ///
 /// Defaults to `true`.
 static IS_LIVE: AtomicBool = AtomicBool::new(true);
 
-/// Counter to determine if the service is live.
-static LIVE_COUNTER: ConsistentCounter = ConsistentCounter::new(0);
-
-/// Pre-defined threshold after which `IS_LIVE` is set to `false`.
-const LIVE_COUNTER_THRESHOLD: usize = 100;
+/// Timestamp in seconds used to determine if the service is live.
+static LIVE_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 /// Get the `IS_LIVE` flag
 pub(crate) fn is_live() -> bool {
@@ -28,24 +30,19 @@ pub(crate) fn set_not_live() {
     IS_LIVE.store(false, Ordering::Release);
 }
 
-/// Increment the `LIVE_COUNTER` by one.
-pub(crate) fn live_counter_inc() -> usize {
-    LIVE_COUNTER.inc()
+/// Get the `LIVE_COUNTER` timestamp value in seconds.
+pub(crate) fn get_live_counter() -> u64 {
+    LIVE_COUNTER.load(Ordering::SeqCst)
 }
 
-/// Get the `LIVE_COUNTER` value.
-pub(crate) fn live_counter_get() -> usize {
-    LIVE_COUNTER.get()
-}
-
-/// Reset the `LIVE_COUNTER` to zero.
-pub(crate) fn live_counter_reset() -> usize {
-    LIVE_COUNTER.reset()
+/// Set the `LIVE_COUNTER` to current timestamp in seconds.
+pub(crate) fn set_live_counter(now: u64) {
+    LIVE_COUNTER.store(now, Ordering::SeqCst);
 }
 
 /// Returns `true` when `LIVE_COUNTER` is under the pre-defined threshold.
 pub(crate) fn is_live_counter_under_threshold() -> bool {
-    LIVE_COUNTER.get() < LIVE_COUNTER_THRESHOLD
+    Duration::from_secs(get_live_counter()) < Settings::service_live_timeout_interval()
 }
 
 /// Endpoint responses.
@@ -57,6 +54,9 @@ pub(crate) enum Responses {
     /// Service is OK and can keep running.
     #[oai(status = 204)]
     NoContent,
+    /// Service is not running.
+    #[oai(status = 503)]
+    ServiceUnavailable,
 }
 
 /// All responses.
