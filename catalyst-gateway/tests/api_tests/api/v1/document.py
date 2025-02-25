@@ -9,7 +9,6 @@ def get(document_id: str):
     headers = {
         "Authorization": f"Bearer {BEARER_TOKEN}"
     }
-    print(document_url)
     return requests.get(document_url, headers=headers)
 
 # Signed document PUT
