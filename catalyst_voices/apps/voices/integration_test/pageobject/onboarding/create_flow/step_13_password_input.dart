@@ -2,9 +2,9 @@ import 'package:catalyst_voices/widgets/text_field/voices_password_text_field.da
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../types/password_validation_states.dart';
-import '../../utils/translations_utils.dart';
-import 'onboarding_base_page.dart';
+import '../../../types/password_validation_states.dart';
+import '../../../utils/translations_utils.dart';
+import '../onboarding_base_page.dart';
 import 'step_12_password_info.dart';
 
 class PasswordInputPanel extends OnboardingPageBase {

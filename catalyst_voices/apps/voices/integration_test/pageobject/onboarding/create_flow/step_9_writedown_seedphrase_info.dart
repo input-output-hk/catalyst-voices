@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/translations_utils.dart';
-import '../common_page.dart';
-import 'onboarding_base_page.dart';
-import 'step_6_catalyst_keychain_info.dart';
+import '../../../utils/translations_utils.dart';
+import '../../common_page.dart';
+import '../onboarding_base_page.dart';
+import 'step_8_writedown_seedphrase.dart';
 
-class CatalystKeychainSuccessPanel extends OnboardingPageBase {
-  CatalystKeychainSuccessPanel(super.$);
+class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
+  WritedownSeedphraseInfoPanel(super.$);
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -15,14 +15,15 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
 
   @override
   Future<void> goto() async {
-    await CatalystKeychainInfoPanel($).goto();
-    await CatalystKeychainInfoPanel($).clickCreateKeychain();
+    await WriteDownSeedphrasePanel($).goto();
+    await WriteDownSeedphrasePanel($).storeSeedPhraseWords();
+    await WriteDownSeedphrasePanel($).clickSeedPhraseStoredCheckbox();
+    await WriteDownSeedphrasePanel($).clickNext();
   }
 
   @override
   Future<void> verifyPageElements() async {
     await verifyInfoPanel();
-    expect(await closeButton(), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {
@@ -33,5 +34,8 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
       $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
       T.get('Learn More'),
     );
+    expect(await closeButton(), findsOneWidget);
   }
+
+  Future<void> verifyDetailsPanel() async {}
 }
