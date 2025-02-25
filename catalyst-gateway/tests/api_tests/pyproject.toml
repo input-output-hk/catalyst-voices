@@ -20,6 +20,7 @@ requests = "^2.32.3"
 pytest = "^8.0.0"
 python-bitcoinlib = "^0.12.2"
 pytest-cov = "^5.0.0"
+uuid7 = "^0.1.0"
 
 [build-system]
 requires = ["poetry-core"]
