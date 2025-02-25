@@ -103,13 +103,13 @@ def test_signed_doc():
     with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
         comment_json = json.load(comment_json_file)
 
-    temlates_doc_check(proposal_templates + comment_templates)
+    templates_doc_check(proposal_templates + comment_templates)
     proposal_doc_check(proposal_metadata_json, proposal_json)
     comment_doc_check(comment_metadata_json, comment_json)
     pagination_out_of_range_check()
 
 
-def temlates_doc_check(template_ids: List[str]):
+def templates_doc_check(template_ids: List[str]):
     for template_id in template_ids:
         resp = document.get(document_id=template_id)
         assert (
