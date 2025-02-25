@@ -1668,5 +1668,14 @@
   "enterPhrase": "Enter phrase",
   "@enterPhrase": {
     "description": "Action to enter the seed phrase"
+  },
+  "nrOfIteration": "Iteration {nr}",
+  "@nrOfIteration": {
+    "description": "In context of which version of document is presented",
+    "placeholders": {
+      "nr": {
+        "type": "int"
+      }
+    }
   }
 }

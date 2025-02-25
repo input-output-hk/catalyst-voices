@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProposalViewHeader extends Equatable {
@@ -5,7 +6,7 @@ final class ProposalViewHeader extends Equatable {
   final String authorDisplayName;
   final DateTime? createdAt;
   final int commentsCount;
-  final int iteration;
+  final DocumentVersions versions;
   final bool isFavourite;
 
   const ProposalViewHeader({
@@ -13,7 +14,7 @@ final class ProposalViewHeader extends Equatable {
     this.authorDisplayName = '',
     this.createdAt,
     this.commentsCount = 0,
-    this.iteration = 0,
+    this.versions = const DocumentVersions(),
     this.isFavourite = false,
   });
 
@@ -23,7 +24,7 @@ final class ProposalViewHeader extends Equatable {
         authorDisplayName,
         createdAt,
         commentsCount,
-        iteration,
+        versions,
         isFavourite,
       ];
 }

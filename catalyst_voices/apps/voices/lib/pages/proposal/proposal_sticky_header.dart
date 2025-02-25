@@ -1,9 +1,11 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalStickyHeader extends StatelessWidget {
   const ProposalStickyHeader({super.key});
@@ -19,24 +21,61 @@ class ProposalStickyHeader extends StatelessWidget {
         color: colors.elevationsOnSurfaceNeutralLv0,
         border: Border(bottom: BorderSide(color: colors.outlineBorder)),
       ),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Spacer(),
-          _ProposalMetadata(
-            title: 'Project Mayhem: Freedom by Chaos',
-            author: 'Tyler Durden',
-            createdAt: DateTime.now(),
-            commentsCount: 6,
-          ),
-          const Spacer(flex: 5),
-          _ProposalControls(
-            current: null,
-            versions: List.generate(3, (index) => const Uuid().v7()),
-          ),
-          const Spacer(),
+          Spacer(),
+          _ProposalMetadataSelector(),
+          Spacer(flex: 5),
+          _ProposalControlsSelector(),
+          Spacer(),
         ],
       ),
+    );
+  }
+}
+
+class _ProposalControls extends StatelessWidget {
+  final DocumentVersions versions;
+  final bool isFavorite;
+
+  const _ProposalControls({
+    required this.versions,
+    required this.isFavorite,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        DocumentVersionSelector(
+          current: versions.current,
+          versions: versions.all,
+        ),
+        FavoriteButton(
+          isFavorite: isFavorite,
+          onChanged: (value) {},
+        ),
+        ShareButton(onTap: () {}),
+      ].separatedBy(const SizedBox(width: 8)).toList(),
+    );
+  }
+}
+
+class _ProposalControlsSelector extends StatelessWidget {
+  const _ProposalControlsSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<ProposalBloc, ProposalState, ProposalViewHeader>(
+      selector: (state) => state.data.header,
+      builder: (context, state) {
+        return _ProposalControls(
+          versions: state.versions,
+          isFavorite: state.isFavourite,
+        );
+      },
     );
   }
 }
@@ -44,7 +83,7 @@ class ProposalStickyHeader extends StatelessWidget {
 class _ProposalMetadata extends StatelessWidget {
   final String title;
   final String author;
-  final DateTime createdAt;
+  final DateTime? createdAt;
   final int commentsCount;
 
   const _ProposalMetadata({
@@ -78,8 +117,8 @@ class _ProposalMetadata extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Text(author),
-              TimestampText(createdAt),
+              if (author.isNotEmpty) Text(author),
+              if (createdAt != null) TimestampText(createdAt!),
               Text(context.l10n.noOfComments(commentsCount)),
             ].separatedBy(const DotSeparator()).toList(),
           ),
@@ -89,26 +128,21 @@ class _ProposalMetadata extends StatelessWidget {
   }
 }
 
-class _ProposalControls extends StatelessWidget {
-  final String? current;
-  final List<String> versions;
-
-  const _ProposalControls({
-    required this.current,
-    required this.versions,
-  });
+class _ProposalMetadataSelector extends StatelessWidget {
+  const _ProposalMetadataSelector();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        DocumentVersionSelector(
-          versions: versions,
-        ),
-        FavoriteButton(onChanged: (value) {}),
-        ShareButton(onTap: () {}),
-      ].separatedBy(const SizedBox(width: 8)).toList(),
+    return BlocSelector<ProposalBloc, ProposalState, ProposalViewHeader>(
+      selector: (state) => state.data.header,
+      builder: (context, state) {
+        return _ProposalMetadata(
+          title: state.title,
+          author: state.authorDisplayName,
+          createdAt: state.createdAt,
+          commentsCount: state.commentsCount,
+        );
+      },
     );
   }
 }

@@ -26,7 +26,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
         authorDisplayName: 'Tyler Durden',
         createdAt: DateTime.timestamp(),
         commentsCount: 6,
-        iteration: 3,
+        versions: const DocumentVersions(),
         isFavourite: false,
       ),
       segments: const [],
