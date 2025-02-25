@@ -40,7 +40,7 @@ def build_signed_doc(
 def test_signed_doc():
     health.is_live()
     health.is_ready()
-    
+
     print(os.listdir())
 
     # comes from the 'templates/data.rs' file
@@ -117,7 +117,7 @@ def templates_doc_check(template_ids: List[str]):
         resp = document.get(document_id=template_id)
         assert (
             resp.status_code == 200
-        ), f"Failed to get document: {resp.status_code} - {resp.text}"
+        ), f"Failed to get document: {resp.status_code} - {resp.text} for id {template_id}"
 
 
 def proposal_doc_check(
