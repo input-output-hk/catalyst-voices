@@ -8,7 +8,7 @@ use std::{
 };
 
 use anyhow::anyhow;
-use cardano_chain_follower::Network;
+use cardano_blockchain_types::{Network, Slot};
 use clap::Args;
 use dotenvy::dotenv;
 use duration_string::DurationString;
@@ -411,8 +411,8 @@ impl Settings {
     }
 
     /// Slot buffer used as overlap when purging Live Index data.
-    pub(crate) fn purge_slot_buffer() -> u64 {
-        ENV_VARS.purge_slot_buffer
+    pub(crate) fn purge_slot_buffer() -> Slot {
+        ENV_VARS.purge_slot_buffer.into()
     }
 }
 

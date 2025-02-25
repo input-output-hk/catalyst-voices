@@ -1,5 +1,5 @@
 SELECT
-    txn,
+    txn_index,
     txo,
     slot_no,
     policy_id,

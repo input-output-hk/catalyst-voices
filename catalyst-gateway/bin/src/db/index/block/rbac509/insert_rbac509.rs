@@ -2,48 +2,52 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use rbac_registration::cardano::cip509::Cip509;
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
+use catalyst_types::{id_uri::IdUri, uuid::UuidV4};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
+    },
     settings::cassandra_db::EnvVars,
 };
 
 /// RBAC Registration Indexing query
-const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
+const QUERY: &str = include_str!("cql/insert_rbac509.cql");
 
 /// Insert RBAC Registration Query Parameters
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// Chain Root Hash. 32 bytes.
-    chain_root: Vec<u8>,
-    /// Transaction ID Hash. 32 bytes.
-    transaction_id: Vec<u8>,
-    /// Purpose.`UUIDv4`. 16 bytes.
-    purpose: Vec<u8>,
-    /// Block Slot Number
-    slot_no: num_bigint::BigInt,
-    /// Transaction Offset inside the block.
-    txn: i16,
+    /// A Catalyst short identifier.
+    catalyst_id: DbCatalystId,
+    /// A transaction hash
+    txn_id: DbTransactionId,
+    /// A block slot number.
+    slot_no: DbSlot,
+    /// A transaction offset inside the block.
+    txn_index: DbTxnIndex,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
-    prv_txn_id: MaybeUnset<Vec<u8>>,
+    prv_txn_id: MaybeUnset<DbTransactionId>,
+    /// Purpose.`UUIDv4`. 16 bytes.
+    purpose: DbUuidV4,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let prv_txn_id = match self.prv_txn_id {
-            MaybeUnset::Unset => "UNSET",
-            MaybeUnset::Set(ref v) => &hex::encode(v),
+            MaybeUnset::Unset => "UNSET".to_owned(),
+            MaybeUnset::Set(ref v) => format!("{v:?}"),
         };
         f.debug_struct("Params")
-            .field("chain_root", &self.chain_root)
-            .field("transaction_id", &self.transaction_id)
-            .field("purpose", &self.purpose)
+            .field("catalyst_id", &self.catalyst_id)
+            .field("txn_id", &self.txn_id)
             .field("slot_no", &self.slot_no)
-            .field("txn", &self.txn)
+            .field("txn_index", &self.txn_index)
             .field("prv_txn_id", &prv_txn_id)
+            .field("purpose", &self.purpose)
             .finish()
     }
 }
@@ -51,19 +55,18 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn: i16, cip509: &Cip509,
+        catalyst_id: IdUri, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
+        purpose: UuidV4, prv_txn_id: Option<TransactionId>,
     ) -> Self {
-        Params {
-            chain_root: chain_root.to_vec(),
-            transaction_id: transaction_id.to_vec(),
-            purpose: cip509.purpose.into(),
-            slot_no: num_bigint::BigInt::from(slot_no),
-            txn,
-            prv_txn_id: if let Some(tx_id) = cip509.prv_tx_id {
-                MaybeUnset::Set(tx_id.to_vec())
-            } else {
-                MaybeUnset::Unset
-            },
+        let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
+
+        Self {
+            catalyst_id: catalyst_id.into(),
+            txn_id: txn_id.into(),
+            purpose: purpose.into(),
+            slot_no: slot_no.into(),
+            txn_index: txn_index.into(),
+            prv_txn_id,
         }
     }
 
@@ -73,7 +76,7 @@ impl Params {
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
-            INSERT_RBAC509_QUERY,
+            QUERY,
             cfg,
             scylla::statement::Consistency::Any,
             true,
@@ -83,6 +86,6 @@ impl Params {
         .inspect_err(
             |error| error!(error=%error,"Failed to prepare Insert RBAC 509 Registration Query."),
         )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{INSERT_RBAC509_QUERY}"))
+        .map_err(|error| anyhow::anyhow!("{error}\n--\n{QUERY}"))
     }
 }

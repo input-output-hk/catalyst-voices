@@ -6,12 +6,14 @@ class CampaignTimeline extends StatefulWidget {
   final List<CampaignTimelineViewModel> timelineItems;
   final CampaignTimelinePlacement placement;
   final ValueChanged<bool>? onExpandedChanged;
+  final SizedBox horizontalPadding;
 
   const CampaignTimeline({
     super.key,
     required this.timelineItems,
     required this.placement,
     this.onExpandedChanged,
+    this.horizontalPadding = const SizedBox.shrink(),
   });
 
   @override
@@ -41,6 +43,7 @@ class CampaignTimelineState extends State<CampaignTimeline> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                widget.horizontalPadding,
                 ...widget.timelineItems.asMap().entries.map(
                       (entry) => CampaignTimelineCard(
                         timelineItem: entry.value,
@@ -50,6 +53,7 @@ class CampaignTimelineState extends State<CampaignTimeline> {
                         },
                       ),
                     ),
+                widget.horizontalPadding,
               ],
             ),
           ),

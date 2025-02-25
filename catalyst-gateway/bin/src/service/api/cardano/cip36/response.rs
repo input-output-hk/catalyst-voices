@@ -1,7 +1,14 @@
 //! Cip36 Registration Query Endpoint Response
-use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 
-use crate::service::common;
+use catalyst_types::problem_report::ProblemReport;
+use derive_more::{From, Into};
+use poem_openapi::{
+    payload::Json,
+    types::{Example, ToJSON},
+    ApiResponse, NewType, Object,
+};
+
+use crate::service::{common, common::types::array_types::impl_array_types};
 
 // ToDo: The examples of this response should be taken from representative data from a
 // response generated on pre-prod.
@@ -35,50 +42,83 @@ pub(crate) struct Cip36RegistrationList {
     /// Earlier errors are never reported.
     pub slot: common::types::cardano::slot_no::SlotNo,
     /// List of registrations associated with the query.
-    #[oai(validator(max_items = "100"))]
-    pub voting_key: Vec<Cip36RegistrationsForVotingPublicKey>,
+    pub voting_key: Cip36RegistrationsForVotingPublicKeyList,
     /// List of latest invalid registrations that were found, for the requested filter.
-    #[oai(skip_serializing_if_is_empty, validator(max_items = "10"))]
-    pub invalid: Vec<Cip36Details>,
+    #[oai(skip_serializing_if_is_empty)]
+    pub invalid: common::types::cardano::registration_list::RegistrationCip36List,
     /// Current Page
     #[oai(skip_serializing_if_is_none)]
-    pub page: Option<common::objects::generic::pagination::CurrentPage>,
+    pub page: Option<Cip36RegistrationListPage>,
 }
 
 impl Example for Cip36RegistrationList {
     fn example() -> Self {
         Self {
-            slot: (common::types::cardano::slot_no::EXAMPLE + 635).into(),
-            voting_key: vec![Cip36RegistrationsForVotingPublicKey::example()],
-            invalid: vec![Cip36Details::invalid_example()],
-            page: Some(common::objects::generic::pagination::CurrentPage::example()),
+            slot: (common::types::cardano::slot_no::EXAMPLE + 635)
+                .try_into()
+                .unwrap_or_default(),
+            voting_key: Example::example(),
+            invalid: vec![Cip36Details::invalid_example()].into(),
+            page: Some(Example::example()),
         }
     }
 }
 
+/// The Page of CIP-36 Registration List.
+#[derive(NewType, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct Cip36RegistrationListPage(common::objects::generic::pagination::CurrentPage);
+
+impl Example for Cip36RegistrationListPage {
+    fn example() -> Self {
+        Self(Example::example())
+    }
+}
+
+// List of CIP-36 Registrations for voting public key
+impl_array_types!(
+    Cip36RegistrationsForVotingPublicKeyList,
+    Cip36RegistrationsForVotingPublicKey,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100),
+        items: Some(Box::new(Cip36RegistrationsForVotingPublicKey::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for Cip36RegistrationsForVotingPublicKeyList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
+    }
+}
+
 /// List of CIP36 Registration Data for a Voting Key.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationsForVotingPublicKey {
     /// Voting Public Key
     pub vote_pub_key: common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
     /// List of Registrations associated with this Voting Key
-    #[oai(validator(max_items = "100"))]
-    pub registrations: Vec<Cip36Details>,
+    pub registrations: common::types::cardano::registration_list::RegistrationCip36List,
 }
 
 impl Example for Cip36RegistrationsForVotingPublicKey {
     fn example() -> Self {
-        Cip36RegistrationsForVotingPublicKey {
-            vote_pub_key:
-                common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
-            registrations: vec![Cip36Details::example()],
+        Self {
+            vote_pub_key: Example::example(),
+            registrations: Example::example(),
         }
     }
 }
 
 /// CIP36 Registration Data as found on-chain.
-#[derive(Object, Clone)]
+#[derive(Object, Debug, Clone)]
 #[oai(example = true)]
 pub(crate) struct Cip36Details {
     /// Blocks Slot Number that the registration certificate is in.
@@ -101,29 +141,15 @@ pub(crate) struct Cip36Details {
     #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
     /// If the payment address is a script, then it can not be payed rewards.
-    #[oai(default = "is_payable_default")]
-    pub is_payable: bool,
+    #[oai(default)]
+    pub is_payable: common::types::cardano::boolean::IsPayable,
     /// If this field is set, then the registration was in CIP15 format.
-    #[oai(default = "cip15_default")]
-    pub cip15: bool,
+    #[oai(default)]
+    pub cip15: common::types::cardano::boolean::IsCip15,
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
-    #[oai(
-        default = "Vec::<common::types::generic::error_msg::ErrorMessage>::new",
-        skip_serializing_if_is_empty,
-        validator(max_items = "10")
-    )]
-    pub errors: Vec<common::types::generic::error_msg::ErrorMessage>,
-}
-
-/// Is the payment address payable by catalyst.
-fn is_payable_default() -> bool {
-    true
-}
-
-/// Is the registration using CIP15 format.
-fn cip15_default() -> bool {
-    false
+    #[oai(skip_serializing_if_is_none)]
+    pub errors: Option<common::types::generic::error_msg::ErrorMessage>,
 }
 
 impl Example for Cip36Details {
@@ -142,9 +168,9 @@ impl Example for Cip36Details {
             payment_address: Some(
                 common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
             ),
-            is_payable: true,
-            cip15: false,
-            errors: Vec::<common::types::generic::error_msg::ErrorMessage>::new(),
+            is_payable: true.into(),
+            cip15: false.into(),
+            errors: None,
         }
     }
 }
@@ -152,8 +178,14 @@ impl Example for Cip36Details {
 impl Cip36Details {
     /// Example of an invalid registration
     fn invalid_example() -> Self {
+        let problem_report = ProblemReport::new("Cip36");
+        problem_report.other("Error occurred", "Cip36 decoding error");
+        let errors = serde_json::to_string(&problem_report).unwrap_or_default();
+
         Self {
-            slot_no: (common::types::cardano::slot_no::EXAMPLE + 135).into(),
+            slot_no: (common::types::cardano::slot_no::EXAMPLE + 135)
+                .try_into()
+                .unwrap_or_default(),
             stake_pub_key: None,
             vote_pub_key: Some(
                 common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
@@ -161,33 +193,34 @@ impl Cip36Details {
             nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
             txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: None,
-            is_payable: false,
-            cip15: true,
-            errors: vec!["Stake Public Key is required".into()],
+            is_payable: false.into(),
+            cip15: true.into(),
+            errors: Some(
+                crate::service::common::types::generic::error_msg::ErrorMessage::from(errors),
+            ),
         }
     }
 }
 
 /// Cip36 Registration Validation Error.
-#[derive(Object, Default)]
+#[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct Cip36RegistrationUnprocessableContent {
     /// Error messages.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    error: String,
+    error: common::types::generic::error_msg::ErrorMessage,
 }
 
 impl Cip36RegistrationUnprocessableContent {
     /// Create a new instance of `Cip36RegistrationUnprocessableContent`.
     pub(crate) fn new(error: &(impl ToString + ?Sized)) -> Self {
         Self {
-            error: error.to_string(),
+            error: error.to_string().into(),
         }
     }
 }
 
 impl Example for Cip36RegistrationUnprocessableContent {
     fn example() -> Self {
-        Cip36RegistrationUnprocessableContent::new("Cip36 Registration in request body")
+        Self::new("Cip36 Registration in request body")
     }
 }

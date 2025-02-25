@@ -13,6 +13,7 @@ use std::{
 };
 
 use anyhow::{bail, Result};
+use cardano_blockchain_types::Slot;
 use chrono::DateTime;
 use const_format::concatcp;
 use poem_openapi::{
@@ -40,7 +41,7 @@ const EXAMPLE_TIME: u64 = 1_730_861_339; // Date and time (UTC): November 6, 202
 static EXAMPLE: LazyLock<String> = LazyLock::new(|| {
     // Note, the SlotNumber here is wrong, but its not used for generating the example, so
     // thats OK.
-    let example = AsAt((EXAMPLE_WHENCE.to_owned(), EXAMPLE_TIME, 0.into()));
+    let example = AsAt((EXAMPLE_WHENCE.to_owned(), EXAMPLE_TIME, SlotNo::default()));
     format!("{example}")
 });
 /// Time Discriminator
@@ -149,7 +150,7 @@ impl ParseFromParameter for AsAt {
             };
             slot
         } else {
-            when
+            Slot::from_saturating(when)
         };
         let slot_no: SlotNo = slot.into();
         Ok(Self((whence, when, slot_no)))

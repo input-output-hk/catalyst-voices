@@ -2,9 +2,8 @@
 
 use std::{fmt::Display, sync::Arc, time::Duration};
 
-use cardano_chain_follower::{
-    ChainFollower, ChainSyncConfig, Network, Point, ORIGIN_POINT, TIP_POINT,
-};
+use cardano_blockchain_types::{Network, Point, Slot};
+use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
@@ -229,7 +228,7 @@ impl SyncParams {
 }
 
 /// Sync a portion of the blockchain.
-/// Set end to `TIP_POINT` to sync the tip continuously.
+/// Set end to `Point::TIP` to sync the tip continuously.
 fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         info!(chain = %params.chain, params=%params, "Indexing Blockchain");
@@ -253,7 +252,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
                     // We only process these on the follower tracking the TIP.
-                    if params.end == TIP_POINT {
+                    if params.end == Point::TIP {
                         // What we need to do here is tell the primary follower to start a new sync
                         // for the new immutable data, and then purge the volatile database of the
                         // old data (after the immutable data has synced).
@@ -287,7 +286,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
                         );
                     }
 
-                    last_immutable = block.immutable();
+                    last_immutable = block.is_immutable();
                     last_indexed_block = Some(block.point());
 
                     if first_indexed_block.is_none() {
@@ -333,13 +332,13 @@ struct SyncTask {
     current_sync_tasks: u16,
 
     /// Start for the next block we would sync.
-    start_slot: u64,
+    start_slot: Slot,
 
     /// The immutable tip slot.
-    immutable_tip_slot: u64,
+    immutable_tip_slot: Slot,
 
     /// The live tip slot.
-    live_tip_slot: u64,
+    live_tip_slot: Slot,
 
     /// Current Sync Status
     sync_status: Vec<SyncStatus>,
@@ -351,10 +350,10 @@ impl SyncTask {
         SyncTask {
             cfg,
             sync_tasks: FuturesUnordered::new(),
-            start_slot: 0,
+            start_slot: 0.into(),
             current_sync_tasks: 0,
-            immutable_tip_slot: 0,
-            live_tip_slot: 0,
+            immutable_tip_slot: 0.into(),
+            live_tip_slot: 0.into(),
             sync_status: Vec::new(),
         }
     }
@@ -365,10 +364,10 @@ impl SyncTask {
     async fn run(&mut self) {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
-        let tips = cardano_chain_follower::ChainFollower::get_tips(self.cfg.chain).await;
+        let tips = ChainFollower::get_tips(self.cfg.chain).await;
         self.immutable_tip_slot = tips.0.slot_or_default();
         self.live_tip_slot = tips.1.slot_or_default();
-        info!(chain=%self.cfg.chain, immutable_tip=self.immutable_tip_slot, live_tip=self.live_tip_slot, "Blockchain ready to sync from.");
+        info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Blockchain ready to sync from.");
 
         // Wait for indexing DB to be ready before continuing.
         // We do this after the above, because other nodes may have finished already, and we don't
@@ -382,8 +381,8 @@ impl SyncTask {
         // So, if it fails, it will automatically be restarted.
         self.sync_tasks.push(sync_subchain(SyncParams::new(
             self.cfg.chain,
-            cardano_chain_follower::Point::fuzzy(self.immutable_tip_slot),
-            TIP_POINT,
+            Point::fuzzy(self.immutable_tip_slot),
+            Point::TIP,
         )));
 
         self.start_immutable_followers();
@@ -403,7 +402,7 @@ impl SyncTask {
                     // or there is an error.  If this is not a roll forward, log an error.
                     // It can fail if the index DB goes down in some way.
                     // Restart it always.
-                    if finished.end == TIP_POINT {
+                    if finished.end == Point::TIP {
                         if let Some(ref roll_forward_point) = finished.follower_roll_forward {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
@@ -478,8 +477,8 @@ impl SyncTask {
             // Will also break if there are no more slots left to sync.
             while self.current_sync_tasks < self.cfg.sync_tasks {
                 let end_slot = self.immutable_tip_slot.min(
-                    self.start_slot
-                        .saturating_add(self.cfg.sync_chunk_max_slots),
+                    (u64::from(self.start_slot).saturating_add(self.cfg.sync_chunk_max_slots))
+                        .into(),
                 );
 
                 if let Some((first_point, last_point)) =
@@ -503,7 +502,7 @@ impl SyncTask {
             }
             // `start_slot` is still used, because it is used to keep syncing chunks as required
             // while each immutable sync task finishes.
-            info!(chain=%self.cfg.chain, tasks=self.current_sync_tasks, until=self.start_slot, "Persistent Indexing DB tasks started");
+            info!(chain=%self.cfg.chain, tasks=self.current_sync_tasks, until=?self.start_slot, "Persistent Indexing DB tasks started");
         }
     }
 
@@ -511,7 +510,7 @@ impl SyncTask {
     /// If it hasn't just return the slots as points.
     /// If it has, return a subset that hasn't been indexed if any, or None if its been
     /// completely indexed already.
-    fn get_syncable_range(&self, start: u64, end: u64) -> Option<(Point, Point)> {
+    fn get_syncable_range(&self, start: Slot, end: Slot) -> Option<(Point, Point)> {
         for sync_block in &self.sync_status {
             // Check if we start within a previously synchronized block.
             if start >= sync_block.start_slot && start <= sync_block.end_slot {
@@ -526,20 +525,17 @@ impl SyncTask {
                 // It is not a problem to sync the same data mutiple times, so for simplicity we do
                 // not account for this, if the requested range goes beyond the sync
                 // block it starts within we assume that the rest is not synced.
-                return Some((
-                    cardano_chain_follower::Point::fuzzy(sync_block.end_slot),
-                    cardano_chain_follower::Point::fuzzy(end),
-                ));
+                return Some((Point::fuzzy(sync_block.end_slot), Point::fuzzy(end)));
             }
         }
 
-        let start_slot = if start == 0 {
-            ORIGIN_POINT
+        let start_slot = if start == 0.into() {
+            Point::ORIGIN
         } else {
-            cardano_chain_follower::Point::fuzzy(start)
+            Point::fuzzy(start)
         };
 
-        Some((start_slot, cardano_chain_follower::Point::fuzzy(end)))
+        Some((start_slot, Point::fuzzy(end)))
     }
 }
 
