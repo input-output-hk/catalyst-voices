@@ -3,6 +3,7 @@ use poem_openapi::{param::Path, OpenApi};
 
 use crate::service::common::{
     auth::none_or_rbac::NoneOrRBAC,
+    objects::cardano::hash::Hash128,
     tags::ApiTags,
     types::{
         cardano::{catalyst_id::CatalystId, cip19_stake_address::Cip19StakeAddress},
@@ -69,14 +70,12 @@ impl Api {
     ///
     /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
     async fn rbac_role0_key_chain_root(
-        &self,
-        /// Role0 key to get the chain root for.
-        #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
-        Path(role0_key): Path<String>,
+        &self, /// Role0 key to get the chain root for.
+        Path(role0_key): Path<Hash128>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> rbac::role0_chain_root_get::AllResponses {
-        rbac::role0_chain_root_get::endpoint(role0_key).await
+        rbac::role0_chain_root_get::endpoint(role0_key.to_string()).await
     }
 }
 
