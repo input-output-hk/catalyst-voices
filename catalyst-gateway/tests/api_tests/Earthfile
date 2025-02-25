@@ -10,6 +10,7 @@ builder:
     COPY --dir ./api .
     COPY --dir ./integration .
     COPY --dir ./utils .
+    COPY --dir ./test_data .
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
