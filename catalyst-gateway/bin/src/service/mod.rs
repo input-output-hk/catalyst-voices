@@ -10,9 +10,7 @@ mod poem_service;
 pub(crate) mod utilities;
 
 use api::mk_api;
-pub(crate) use api::{
-    is_live, live_counter_get, live_counter_inc, live_counter_reset, set_not_live, started,
-};
+pub(crate) use api::{get_live_counter, set_live_counter, set_not_live, started};
 pub(crate) use poem_service::get_app_docs;
 use serde_json::{json, Value};
 use tracing::error;

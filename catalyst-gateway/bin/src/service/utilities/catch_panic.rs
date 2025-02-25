@@ -1,16 +1,17 @@
 //! Handle catching panics created by endpoints, logging them and properly responding.
-use std::{any::Any, backtrace::Backtrace, cell::RefCell};
+use std::{any::Any, backtrace::Backtrace, cell::RefCell, time::SystemTime};
 
 use chrono::prelude::*;
 use panic_message::panic_message;
 use poem::{http::StatusCode, middleware::PanicHandler, IntoResponse};
 use poem_openapi::payload::Json;
 use serde_json::json;
+use tracing::error;
 
 use crate::service::{
     api::is_live_counter_under_threshold,
-    common::responses::code_500_internal_server_error::InternalServerError, live_counter_get,
-    live_counter_inc, set_not_live,
+    common::responses::code_500_internal_server_error::InternalServerError, get_live_counter,
+    set_live_counter, set_not_live,
 };
 
 /// Customized Panic handler.
@@ -54,7 +55,20 @@ impl PanicHandler for ServicePanicHandler {
     /// Log the panic and respond with a 500 with appropriate data.
     fn get_response(&self, err: Box<dyn Any + Send + 'static>) -> Self::Response {
         // Increment the counter used for liveness checks.
-        live_counter_inc();
+        match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+            Ok(timestamp) => {
+                let now = timestamp.as_secs();
+                let previous_ts = get_live_counter();
+                // Set `IS_LIVE` to false
+                if now > previous_ts {
+                    set_not_live();
+                }
+                set_live_counter(now);
+            },
+            Err(_) => {
+                error!("Unable to update LIVE_COUNTER, SystemTime is earlier than UNIX EPOCH!");
+            },
+        }
 
         // Check if the counter is still below the threshold, otherwise, set the
         // live service flag to `false`.
