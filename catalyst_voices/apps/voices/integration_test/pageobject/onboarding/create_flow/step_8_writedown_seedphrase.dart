@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/test_context.dart';
-import '../../utils/translations_utils.dart';
-import '../common_page.dart';
-import 'onboarding_base_page.dart';
+import '../../../utils/test_context.dart';
+import '../../../utils/translations_utils.dart';
+import '../../common_page.dart';
+import '../onboarding_base_page.dart';
 import 'step_7_catalyst_keychain_success.dart';
 
 class WriteDownSeedphrasePanel extends OnboardingPageBase {
