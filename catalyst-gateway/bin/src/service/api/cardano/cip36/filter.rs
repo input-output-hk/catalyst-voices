@@ -200,10 +200,20 @@ async fn get_all_registrations_from_stake_pub_key(
 
         let slot_no: u64 = row.slot_no.into();
 
+        let slot_no = match SlotNo::try_from(slot_no) {
+            Ok(slot_no) => slot_no,
+            Err(err) => {
+                error!("Corrupt valid registration {:?}", err);
+                // This should NOT happen, valid registrations should be infallible.
+                // If it happens, there is an indexing issue.
+                continue;
+            },
+        };
+
         let payment_address = match Cip19ShelleyAddress::try_from(row.payment_address) {
             Ok(payment_addr) => Some(payment_addr),
             Err(err) => {
-                // This SHOULD not happen, valid registrations should be infallible.
+                // This should NOT happen, valid registrations should be infallible.
                 // If it happens, there is an indexing issue.
                 error!(
                     "Corrupt valid registration {:?}\n Stake pub key:{:?}",
@@ -225,7 +235,7 @@ async fn get_all_registrations_from_stake_pub_key(
         };
 
         let cip36 = Cip36Details {
-            slot_no: slot_no.try_into()?,
+            slot_no,
             stake_pub_key: Some(stake_pub_key.clone()),
             vote_pub_key,
             nonce: Some(Nonce::from(nonce)),
@@ -473,12 +483,22 @@ pub async fn get_all_registrations(
             continue;
         };
 
+        let slot_no = match SlotNo::try_from(slot_no) {
+            Ok(slot_no) => slot_no,
+            Err(err) => {
+                error!("Corrupt valid registration {:?}", err);
+                // This should NOT happen, valid registrations should be infallible.
+                // If it happens, there is an indexing issue.
+                continue;
+            },
+        };
+
         let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone())
         {
             Ok(stake_pub_key) => Some(stake_pub_key),
             Err(err) => {
                 error!("Corrupt valid registration {:?}", err);
-                // This SHOULD not happen, valid registrations should be infallible.
+                // This should NOT happen, valid registrations should be infallible.
                 // If it happens, there is an indexing issue.
                 continue;
             },
@@ -507,7 +527,7 @@ pub async fn get_all_registrations(
         };
 
         let cip36 = Cip36Details {
-            slot_no: SlotNo::try_from(slot_no)?,
+            slot_no,
             stake_pub_key,
             vote_pub_key,
             nonce: Some(Nonce::from(nonce)),
@@ -553,6 +573,8 @@ async fn get_all_invalid_registrations(
             continue;
         };
 
+        let slot_no = SlotNo::try_from(slot_no).unwrap_or_default();
+
         let payment_addr = Cip19ShelleyAddress::try_from(row.payment_address).ok();
 
         let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
@@ -560,7 +582,7 @@ async fn get_all_invalid_registrations(
         let stake_pub_key = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
 
         let invalid = Cip36Details {
-            slot_no: SlotNo::try_from(slot_no)?,
+            slot_no,
             stake_pub_key,
             vote_pub_key,
             nonce: None,
