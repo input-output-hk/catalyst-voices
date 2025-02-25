@@ -7,22 +7,17 @@ import 'package:uuid/uuid.dart';
 const mockedDocumentUuid = '0194f567-65f5-7ec6-b4f2-f744c0f74844';
 const mockedTemplateUuid = '0194f567-65f5-7d96-ad12-77762fdef00b';
 
-abstract interface class DocumentDataRemoteSource
-    implements DocumentDataSource {
-  Future<String?> getLatestVersion(String id);
-}
-
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
+  // ignore: unused_field
+  final ApiServices _api;
+
   // ignore: unused_field
   final SignedDocumentManager _signedDocumentManager;
 
   CatGatewayDocumentDataSource(
+    this._api,
     this._signedDocumentManager,
   );
-
-  // TODO(damian-molinski): ask index api
-  @override
-  Future<String?> getLatestVersion(String id) async => const Uuid().v7();
 
   // TODO(damian-molinski): make API call and use _signedDocumentManager.
   @override
@@ -53,4 +48,22 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
       content: content,
     );
   }
+
+  // TODO(damian-molinski): ask index api
+  @override
+  Future<String?> getLatestVersion(String id) async => const Uuid().v7();
+
+  // TODO(damian-molinski): ask index api
+  @override
+  Future<List<SignedDocumentRef>> index() async {
+    return [];
+  }
+}
+
+abstract interface class DocumentDataRemoteSource
+    implements DocumentDataSource {
+  Future<String?> getLatestVersion(String id);
+
+  @override
+  Future<List<SignedDocumentRef>> index();
 }
