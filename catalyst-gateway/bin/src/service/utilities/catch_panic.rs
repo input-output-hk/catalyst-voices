@@ -1,5 +1,5 @@
 //! Handle catching panics created by endpoints, logging them and properly responding.
-use std::{any::Any, backtrace::Backtrace, cell::RefCell, time::SystemTime};
+use std::{any::Any, backtrace::Backtrace, cell::RefCell};
 
 use chrono::prelude::*;
 use panic_message::panic_message;
@@ -8,11 +8,14 @@ use poem_openapi::payload::Json;
 use serde_json::json;
 use tracing::error;
 
-use crate::service::{
-    common::responses::code_500_internal_server_error::InternalServerError,
-    utilities::health::{
-        get_live_counter, is_live_counter_under_threshold, set_live_counter, set_not_live,
+use crate::{
+    service::{
+        common::responses::code_500_internal_server_error::InternalServerError,
+        utilities::health::{
+            get_current_timestamp, get_live_counter, set_live_counter, set_not_live,
+        },
     },
+    settings::Settings,
 };
 
 /// Customized Panic handler.
@@ -56,25 +59,29 @@ impl PanicHandler for ServicePanicHandler {
     /// Log the panic and respond with a 500 with appropriate data.
     fn get_response(&self, err: Box<dyn Any + Send + 'static>) -> Self::Response {
         // Increment the counter used for liveness checks.
-        match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
-            Ok(timestamp) => {
-                let now = timestamp.as_secs();
+        match get_current_timestamp() {
+            Some(now) => {
                 let previous_ts = get_live_counter();
-                // Set `IS_LIVE` to false
-                if now > previous_ts {
-                    set_not_live();
+                // Check if the counter is still below the threshold, otherwise, set the
+                // live service flag to `false`.
+                match now.checked_sub(previous_ts) {
+                    Some(delta) => {
+                        if delta > Settings::service_live_timeout_interval().as_secs() {
+                            // Set `IS_LIVE` to false
+                            set_not_live();
+                        }
+                    },
+                    None => {
+                        error!(
+                            "Unable to check if service is live, {now} cannot be be smaller than {previous_ts}"
+                        );
+                    },
                 }
                 set_live_counter(now);
             },
-            Err(_) => {
+            None => {
                 error!("Unable to update LIVE_COUNTER, SystemTime is earlier than UNIX EPOCH!");
             },
-        }
-
-        // Check if the counter is still below the threshold, otherwise, set the
-        // live service flag to `false`.
-        if !is_live_counter_under_threshold() {
-            set_not_live();
         }
 
         let server_err = InternalServerError::new(None);
