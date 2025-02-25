@@ -6,7 +6,6 @@ use crate::service::{common::responses::WithErrorResponses, utilities::health::i
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## No Content
     ///
