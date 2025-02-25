@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -32,14 +32,17 @@ class ProposalPage extends StatefulWidget {
 class _ProposalPageState extends State<ProposalPage> {
   @override
   Widget build(BuildContext context) {
-    return const SpaceScaffold(
-      left: Center(child: Text('Left')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [],
+    return const Scaffold(
+      appBar: VoicesAppBar(),
+      body: SpaceScaffold(
+        left: Center(child: Text('Left')),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [],
+        ),
+        right: Offstage(),
       ),
-      right: Center(child: Text('Right')),
     );
   }
 
