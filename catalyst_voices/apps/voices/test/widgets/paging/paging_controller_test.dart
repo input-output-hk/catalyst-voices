@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
-import 'package:catalyst_voices/widgets/pagination/paging_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -50,16 +49,16 @@ void main() {
       expect(controller.value.isLoading, true);
     });
 
-    test('state listeners are notified of changes', () {
-      PagingState<String>? capturedState;
-      controller.addStatusListener((state) {
-        capturedState = state;
+    test('state changes are properly notified through ValueNotifier', () {
+      var notifiedValue = controller.value;
+      controller.addListener(() {
+        notifiedValue = controller.value;
       });
 
       final newItems = ['item1'];
       controller.itemList = newItems;
 
-      expect(capturedState?.itemList, equals(newItems));
+      expect(notifiedValue.itemList, equals(newItems));
     });
 
     test('maxResults can be updated', () {

@@ -158,6 +158,7 @@ class _KeychainNotFoundIndicator extends StatelessWidget {
       type: VoicesIndicatorType.error,
       icon: VoicesAssets.icons.exclamation,
       message: Text(
+        key: const Key('KeychainNotFoundMessage'),
         context.l10n.recoverKeychainNonFound,
         style: DefaultTextStyle.of(context).style,
       ),
