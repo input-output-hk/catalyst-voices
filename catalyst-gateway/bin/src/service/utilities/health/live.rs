@@ -1,9 +1,6 @@
 //! Utilities used for `health` functionality.
 
-use std::{
-    sync::atomic::{AtomicBool, AtomicU64, Ordering},
-    time::SystemTime,
-};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// Flag to determine if the service is live.
 ///
@@ -11,7 +8,7 @@ use std::{
 static IS_LIVE: AtomicBool = AtomicBool::new(true);
 
 /// Timestamp in seconds used to determine if the service is live.
-static LIVE_COUNTER: AtomicU64 = AtomicU64::new(0);
+static LIVE_PANIC_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 /// Get the `IS_LIVE` flag.
 pub(crate) fn is_live() -> bool {
@@ -23,20 +20,17 @@ pub(crate) fn set_not_live() {
     IS_LIVE.store(false, Ordering::Release);
 }
 
-/// Get the `LIVE_COUNTER` timestamp value, in seconds.
+/// Get the `LIVE_PANIC_COUNTER` value.
 pub(crate) fn get_live_counter() -> u64 {
-    LIVE_COUNTER.load(Ordering::SeqCst)
+    LIVE_PANIC_COUNTER.load(Ordering::SeqCst)
 }
 
-/// Set the `LIVE_COUNTER` to current timestamp, in seconds.
-pub(crate) fn set_live_counter(now: u64) {
-    LIVE_COUNTER.store(now, Ordering::SeqCst);
+/// Increase `LIVE_PANIC_COUNTER` by one.
+pub(crate) fn inc_live_counter() {
+    LIVE_PANIC_COUNTER.fetch_add(1, Ordering::SeqCst);
 }
 
-/// Returns the timestamp of current system time, in seconds.
-pub(crate) fn get_current_timestamp() -> Option<u64> {
-    SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .ok()
-        .map(|s| s.as_secs())
+/// Reset the `LIVE_PANIC_COUNTER` to zero, returns last count.
+pub(crate) fn live_counter_reset() -> u64 {
+    LIVE_PANIC_COUNTER.swap(0, Ordering::SeqCst)
 }

@@ -8,8 +8,9 @@ use crate::{
     cardano::start_followers,
     db::{self, index::session::CassandraSession},
     service::{
-        self, started,
-        utilities::health::{get_current_timestamp, set_live_counter},
+        self,
+        started,
+        utilities::health::{is_live, live_counter_reset},
     },
     settings::{DocsSettings, ServiceSettings, Settings},
 };
@@ -63,16 +64,14 @@ impl Cli {
                 });
                 tasks.push(handle);
 
-                match get_current_timestamp() {
-                    Some(now) => {
-                        set_live_counter(now);
-                    },
-                    None => {
-                        error!(
-                            "Unable to update LIVE_COUNTER, SystemTime is earlier than UNIX EPOCH!"
-                        );
-                    },
-                }
+                let handle = tokio::spawn(async move {
+                    while is_live() {
+                        tokio::time::sleep(Settings::service_live_timeout_interval()).await;
+                        live_counter_reset();
+                    }
+                });
+                tasks.push(handle);
+
                 started();
 
                 for task in tasks {
