@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
+import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_status_action.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
@@ -74,8 +74,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       appBar: const VoicesAppBar(
         automaticallyImplyLeading: false,
         actions: [
+          ProposalBuilderBackAction(),
           ProposalBuilderStatusAction(),
-          SessionActionHeader(),
           SessionStateHeader(),
         ],
       ),
