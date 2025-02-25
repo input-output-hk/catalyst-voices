@@ -98,19 +98,18 @@ async fn checker_api_catalyst_auth(
     const RBAC_OFF: &str = "RBAC_OFF";
 
     // First check the token can be deserialized.
-    let token = match CatalystRBACTokenV1::decode(&bearer.token) {
-        Ok(token) => token,
-        Err(err) => {
-            // Corrupted Authorisation Token received
-            error!("Corrupt auth token: {:?}", err);
-            Err(AuthTokenError)?
-        },
-    };
+    let token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
+        error!("Corrupt auth token: {e:?}");
+        AuthTokenError
+    })?;
 
     // If env var explicitly set by SRE, switch off full verification
     if env::var(RBAC_OFF).is_ok() {
         return Ok(token);
     };
+
+    // TODO: Verify the role 0 key in the token is in registered on the identified network,
+    // and get the registration details. If this fails, return 401.
 
     // Check if the token is young enough.
     if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
@@ -129,17 +128,15 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     }
 
-    // Ok, so its validly decoded, but we haven't seen it before.
-    // Check that the token is able to be authorized.
-
-    // Get pub key from CERTS state given decoded KID from decoded bearer token
-    // TODO: Look up certs from the Kid based on RBAC Registrations.
-    // let pub_key_bytes = if let Some(cert) = CERTS.get(&token.kid) {
-    //    *cert
-    //} else {
-    // error!(kid = %token.kid, "Invalid KID");
-    // Err(AuthTokenAccessViolation(vec!["UNREGISTERED".to_string()]))?;
-    //};
+    // TODO:
+    // - Get the latest stable signing certificate registered for Role 0.
+    // - Verify the signature against the Role 0 Public Key and Algorithm identified by the
+    //   certificate. Check signature length is correct for the defined algorithm, before
+    //   checking if the signature is valid. If this fails, return 403.
+    // - OPTIONAL IF authorization against latest unstable is supported:
+    //     1. Get the latest unstable signing certificate registered for Role 0.
+    //     2. Verify the signature against the Role 0 Public Key and Algorithm identified by
+    //        the certificate. If this fails, return 403.
 
     // Verify the token signature using the public key.
     let public_key = match VerifyingKey::from_bytes(&DUMMY_PUB_KEY_BYTES) {
