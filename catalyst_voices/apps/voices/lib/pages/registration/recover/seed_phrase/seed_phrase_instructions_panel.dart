@@ -19,8 +19,14 @@ class SeedPhraseInstructionsPanel extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
-              title: Text(l10n.recoverySeedPhraseInstructionsTitle),
-              subtitle: Text(l10n.recoverySeedPhraseInstructionsSubtitle),
+              title: Text(
+                l10n.recoverySeedPhraseInstructionsTitle,
+                key: const Key('SeedPhraseInstructionsTitle'),
+              ),
+              subtitle: Text(
+                l10n.recoverySeedPhraseInstructionsSubtitle,
+                key: const Key('SeedPhraseInstructionsSubtitleKey'),
+              ),
             ),
           ),
         ),
