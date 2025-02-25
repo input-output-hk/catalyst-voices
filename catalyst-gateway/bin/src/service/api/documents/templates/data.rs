@@ -40,7 +40,6 @@ const PROPOSAL_TEMPLATES: [(&str, &str); 12] = [
     ("0194d492-1daa-7fce-84ee-b872a4661075", CATEGORY_DOCUMENTS[9].0),
     ("0194d492-1daa-7878-9bcc-2c79fef0fc13", CATEGORY_DOCUMENTS[10].0),
     ("0194d492-1daa-722f-94f4-687f2c068a5d", CATEGORY_DOCUMENTS[11].0),
-
 ];
 
 /// List of comment templates, 12 comments each of which is uniquely associated with one of the predefined categories.
@@ -61,8 +60,9 @@ const COMMENT_TEMPLATES: [(&str, &str); 12] = [
     ("0194d494-4402-7aa5-9dbc-5fe886e60ebc", CATEGORY_DOCUMENTS[11].0),
 ];
 
-/// List of raw templates, containing information to build signed document.
-pub(crate) static TEMPLATE_DATA: LazyLock<Vec<SignedDocTemplate>> = LazyLock::new(|| {
+/// List of raw proposal and comment templates with the category documents, containing
+/// information to build signed document.
+pub(crate) static DOCUMENTS_DATA: LazyLock<Vec<SignedDocTemplate>> = LazyLock::new(|| {
     let mut templates = Vec::new();
     for tem in CATEGORY_DOCUMENTS {
         templates.push(SignedDocTemplate {

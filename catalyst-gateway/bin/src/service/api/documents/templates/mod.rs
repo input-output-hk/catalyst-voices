@@ -5,7 +5,7 @@ mod data;
 use std::{collections::HashMap, env, sync::LazyLock};
 
 use catalyst_signed_doc::{Builder, CatalystSignedDocument, ContentEncoding, ContentType, IdUri};
-use data::TEMPLATE_DATA;
+use data::DOCUMENTS_DATA;
 use ed25519_dalek::SigningKey;
 use hex::FromHex;
 use tracing::error;
@@ -42,7 +42,10 @@ pub(crate) static TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocumen
             };
             let sk = SigningKey::from_bytes(&byte_array);
 
-            let map = TEMPLATE_DATA.iter().map(|t| t.to_signed_doc(&sk)).collect();
+            let map = DOCUMENTS_DATA
+                .iter()
+                .map(|t| t.to_signed_doc(&sk))
+                .collect();
             Some(map)
         } else {
             error!(
