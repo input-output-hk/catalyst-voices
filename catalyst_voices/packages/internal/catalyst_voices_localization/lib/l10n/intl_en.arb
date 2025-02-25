@@ -1525,47 +1525,40 @@
   "@proposalEditorStatusDropdownViewTitle": {
     "description": "Placeholder for the proposal title in the proposal actions dropdown if the proposal title is empty."
   },
-  "proposalEditorStatusDropdownViewDescriptionLocal": "Private Draft",
-  "@proposalEditorStatusDropdownViewDescriptionLocal": {
-    "description": "Description of a local proposal in t he proposal actions dropdown."
-  },
-  "proposalEditorStatusDropdownViewDescriptionDraft": "Published Draft, Iteration {iteration}",
-  "@proposalEditorStatusDropdownViewDescriptionDraft": {
-    "description": "Description of a local proposal in t he proposal actions dropdown.",
+  "proposalEditorStatusDropdownViewDescription": "Iteration {iteration} · Not published",
+  "@proposalEditorStatusDropdownViewDescription": {
+    "description": "Description of a proposal in the proposal actions dropdown.",
     "placeholders": {
       "iteration": {
         "type": "int"
       }
     }
   },
-  "proposalEditorStatusDropdownViewDescriptionFinal": "Submitted Proposal, Iteration {iteration}",
-  "@proposalEditorStatusDropdownViewDescriptionFinal": {
-    "description": "Description of a local proposal in t he proposal actions dropdown.",
-    "placeholders": {
-      "iteration": {
-        "type": "int"
-      }
-    }
-  },
-  "proposalEditorStatusDropdownPublishTitle": "Publish as new iteration · Draft",
+  "proposalEditorStatusDropdownPublishTitle": "Publish new iteration · Draft Iteration {iteration}",
   "@proposalEditorStatusDropdownPublishTitle": {
-    "description": "Action title to publish a new version of the draft proposal."
+    "description": "Action title to publish a new version of the draft proposal.",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      }
+    }
   },
-  "proposalEditorStatusDropdownPublishDescription": "Update proposal iteration as a public draft",
+  "proposalEditorStatusDropdownPublishDescription": "Share draft for public feedback",
   "@proposalEditorStatusDropdownPublishDescription": {
     "description": "Action description to publish a new version of the draft proposal."
   },
-  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Final",
+  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Iteration {iteration} as Final",
   "@proposalEditorStatusDropdownSubmitTitle": {
-    "description": "Action title to submit the final proposal."
+    "description": "Action title to submit the final proposal.",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      }
+    }
   },
   "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
   "@proposalEditorStatusDropdownSubmitDescription": {
     "description": "Action description to submit the final proposal."
-  },
-  "proposalEditorStatusDropdownShareTitle": "Share Proposal",
-  "@proposalEditorStatusDropdownShareTitle": {
-    "description": "Action title to share a proposal."
   },
   "proposalEditorStatusDropdownExportTitle": "Export Proposal",
   "@proposalEditorStatusDropdownExportTitle": {

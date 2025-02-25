@@ -8,9 +8,6 @@ final class Proposal extends ProposalBase {
   /// by hardcoding it's node ID.
   static final titleNodeId = DocumentNodeId.fromString('setup.title.title');
 
-  /// The first [version] numerical value.
-  static const initialVersion = 1;
-
   final ProposalDocument document;
 
   const Proposal({

@@ -5,19 +5,21 @@ import 'package:equatable/equatable.dart';
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
   final DocumentRef? documentRef;
-  final int? version;
+
+  /// The current iteration version, 0 if not published.
+  final int currentIteration;
 
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
     this.documentRef,
-    this.version,
+    this.currentIteration = 0,
   });
 
   @override
   List<Object?> get props => [
         publish,
         documentRef,
-        version,
+        currentIteration,
       ];
 }
 

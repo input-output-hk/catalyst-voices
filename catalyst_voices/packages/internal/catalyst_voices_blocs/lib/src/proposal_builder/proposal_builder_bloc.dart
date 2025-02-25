@@ -219,7 +219,9 @@ final class ProposalBuilderBloc
 
       return _createState(
         document: documentBuilder.build(),
-        metadata: const ProposalBuilderMetadata(),
+        metadata: const ProposalBuilderMetadata(
+          publish: ProposalPublish.publishedDraft,
+        ),
       );
     });
   }
@@ -238,7 +240,7 @@ final class ProposalBuilderBloc
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
           documentRef: proposal.ref,
-          version: proposal.version,
+          currentIteration: proposal.version,
         ),
       );
     });

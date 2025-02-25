@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/string_ext.dart';
-import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -70,7 +68,12 @@ class _MenuItem extends StatelessWidget {
         metadata: state.metadata,
       ),
       builder: (context, state) {
-        final title = item.title(context, state.proposalTitle);
+        final title = item.title(
+          context,
+          state.proposalTitle,
+          state.metadata.currentIteration,
+        );
+
         final description = item.description(context, state.metadata);
 
         return ListTile(
@@ -98,7 +101,6 @@ enum _MenuItemEnum {
   view(clickable: false),
   publish(clickable: true),
   submit(clickable: true),
-  share(clickable: true),
   export(clickable: true),
   delete(clickable: true);
 
@@ -109,13 +111,11 @@ enum _MenuItemEnum {
   SvgGenImage get icon {
     switch (this) {
       case _MenuItemEnum.view:
-        return VoicesAssets.icons.badgeCheck;
+        return VoicesAssets.icons.documentText;
       case _MenuItemEnum.publish:
         return VoicesAssets.icons.chatAlt2;
       case _MenuItemEnum.submit:
         return VoicesAssets.icons.badgeCheck;
-      case _MenuItemEnum.share:
-        return VoicesAssets.icons.upload;
       case _MenuItemEnum.export:
         return VoicesAssets.icons.folderOpen;
       case _MenuItemEnum.delete:
@@ -130,24 +130,24 @@ enum _MenuItemEnum {
         context.l10n.proposalEditorStatusDropdownPublishDescription,
       _MenuItemEnum.submit =>
         context.l10n.proposalEditorStatusDropdownSubmitDescription,
-      _MenuItemEnum.share ||
-      _MenuItemEnum.export ||
-      _MenuItemEnum.delete =>
-        null,
+      _MenuItemEnum.export || _MenuItemEnum.delete => null,
     };
   }
 
-  String title(BuildContext context, String? proposalTitle) {
+  String title(
+    BuildContext context,
+    String? proposalTitle,
+    int currentIteration,
+  ) {
+    final nextIteration = currentIteration + 1;
     return switch (this) {
       _MenuItemEnum.view => (proposalTitle != null && proposalTitle.isNotBlank)
           ? proposalTitle
           : context.l10n.proposalEditorStatusDropdownViewTitle,
       _MenuItemEnum.publish =>
-        context.l10n.proposalEditorStatusDropdownPublishTitle,
+        context.l10n.proposalEditorStatusDropdownPublishTitle(nextIteration),
       _MenuItemEnum.submit =>
-        context.l10n.proposalEditorStatusDropdownSubmitTitle,
-      _MenuItemEnum.share =>
-        context.l10n.proposalEditorStatusDropdownShareTitle,
+        context.l10n.proposalEditorStatusDropdownSubmitTitle(nextIteration),
       _MenuItemEnum.export =>
         context.l10n.proposalEditorStatusDropdownExportTitle,
       _MenuItemEnum.delete =>
@@ -159,27 +159,19 @@ enum _MenuItemEnum {
     BuildContext context,
     ProposalBuilderMetadata metadata,
   ) {
-    switch (metadata.publish) {
-      case ProposalPublish.localDraft:
-        return context.l10n.proposalEditorStatusDropdownViewDescriptionLocal;
-      case ProposalPublish.publishedDraft:
-        return context.l10n.proposalEditorStatusDropdownViewDescriptionDraft(
-          metadata.version ?? Proposal.initialVersion,
-        );
-      case ProposalPublish.submittedProposal:
-        return context.l10n.proposalEditorStatusDropdownViewDescriptionFinal(
-          metadata.version ?? Proposal.initialVersion,
-        );
-    }
+    final nextIteration = metadata.currentIteration + 1;
+    return context.l10n.proposalEditorStatusDropdownViewDescription(
+      nextIteration,
+    );
   }
 
   static List<_MenuItemEnum> availableOptions(ProposalPublish proposalPublish) {
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
-        return [view, publish, export, delete];
+        return _MenuItemEnum.values;
       case ProposalPublish.publishedDraft:
       case ProposalPublish.submittedProposal:
-        return [view, publish, submit, share, export, delete];
+        return [view, publish, submit, export];
     }
   }
 }
@@ -207,8 +199,10 @@ class _ProposalBuilderStatusActionState
                 PopupMenuItem(
                   value: item.index,
                   enabled: item.clickable,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
                   child: _MenuItem(item: item),
                 ),
             ].separatedBy(const PopupMenuDivider(height: 0)).toList();
@@ -231,8 +225,6 @@ class _ProposalBuilderStatusActionState
         unawaited(_publishIteration(context));
       case _MenuItemEnum.submit:
         unawaited(_submitForReview(context));
-      case _MenuItemEnum.share:
-        unawaited(_shareProposal(context));
       case _MenuItemEnum.export:
         context.read<ProposalBuilderBloc>().add(const ExportProposalEvent());
       case _MenuItemEnum.delete:
@@ -249,28 +241,18 @@ class _ProposalBuilderStatusActionState
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final version = state.metadata.version;
+    final iteration = state.metadata.currentIteration;
 
     final shouldPublish = await PublishProposalIterationDialog.show(
           context: context,
           proposalTitle: proposalTitle,
-          currentVersion: version,
-          nextVersion: (version ?? Proposal.initialVersion) + 1,
+          currentIteration: iteration == 0 ? null : iteration,
+          nextIteration: iteration + 1,
         ) ??
         false;
 
     if (shouldPublish) {
       bloc.add(const PublishProposalEvent());
-    }
-  }
-
-  Future<void> _shareProposal(BuildContext context) async {
-    final state = context.read<ProposalBuilderBloc>().state;
-    final proposalId = state.metadata.documentRef?.id;
-    if (proposalId != null) {
-      // TODO(LynxLynxx): Change to proposal view route when implemented
-      final url = ProposalBuilderRoute(proposalId: proposalId).location;
-      await ShareProposalDialog.show(context, url);
     }
   }
 
@@ -287,13 +269,13 @@ class _ProposalBuilderStatusActionState
     final state = bloc.state;
     final proposalTitle = state.proposalTitle ??
         context.l10n.proposalEditorStatusDropdownViewTitle;
-    final version = state.metadata.version ?? Proposal.initialVersion;
+    final iteration = state.metadata.currentIteration;
 
     final shouldSubmit = await SubmitProposalForReviewDialog.show(
           context: context,
           proposalTitle: proposalTitle,
-          currentVersion: version,
-          nextVersion: version + 1,
+          currentIteration: iteration,
+          nextIteration: iteration + 1,
         ) ??
         false;
 
