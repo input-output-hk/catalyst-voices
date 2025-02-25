@@ -200,13 +200,37 @@ async fn get_all_registrations_from_stake_pub_key(
 
         let slot_no: u64 = row.slot_no.into();
 
+        let payment_address = match Cip19ShelleyAddress::try_from(row.payment_address) {
+            Ok(payment_addr) => Some(payment_addr),
+            Err(err) => {
+                // This SHOULD not happen, valid registrations should be infallible.
+                // If it happens, there is an indexing issue.
+                error!(
+                    "Corrupt valid registration {:?}\n Stake pub key:{:?}",
+                    err, stake_pub_key
+                );
+                continue;
+            },
+        };
+
+        let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
+            Ok(vote_pub_key) => Some(vote_pub_key),
+            Err(err) => {
+                error!(
+                    "Corrupt valid registration {:?}\n Stake pub key:{:?}",
+                    err, stake_pub_key
+                );
+                continue;
+            },
+        };
+
         let cip36 = Cip36Details {
             slot_no: slot_no.try_into()?,
             stake_pub_key: Some(stake_pub_key.clone()),
-            vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
+            vote_pub_key,
             nonce: Some(Nonce::from(nonce)),
             txn: Some(row.txn_index.into()),
-            payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
+            payment_address,
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
             errors: None,
@@ -254,13 +278,19 @@ async fn get_invalid_registrations(
     while let Some(row) = invalid_registrations_iter.next().await {
         let row = row?;
 
+        let payment_address = Cip19ShelleyAddress::try_from(row.payment_address).ok();
+
+        let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
+
+        let stake_pub_key = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
+
         invalid_registrations.push(Cip36Details {
             slot_no,
-            stake_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?),
-            vote_pub_key: Some(Ed25519HexEncodedPublicKey::try_from(row.vote_key)?),
+            stake_pub_key,
+            vote_pub_key,
             nonce: None,
             txn: None,
-            payment_address: Some(Cip19ShelleyAddress::try_from(row.payment_address)?),
+            payment_address,
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
             errors: Some(ErrorMessage::from(row.problem_report)),
@@ -443,11 +473,38 @@ pub async fn get_all_registrations(
             continue;
         };
 
-        let payment_address = Cip19ShelleyAddress::try_from(row.payment_address).ok();
+        let stake_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone())
+        {
+            Ok(stake_pub_key) => Some(stake_pub_key),
+            Err(err) => {
+                error!("Corrupt valid registration {:?}", err);
+                // This SHOULD not happen, valid registrations should be infallible.
+                // If it happens, there is an indexing issue.
+                continue;
+            },
+        };
 
-        let vote_pub_key = Ed25519HexEncodedPublicKey::try_from(row.vote_key).ok();
+        let payment_address = match Cip19ShelleyAddress::try_from(row.payment_address) {
+            Ok(payment_addr) => Some(payment_addr),
+            Err(err) => {
+                error!(
+                    "Corrupt valid registration {:?}\n Stake pub key:{:?}",
+                    err, stake_pub_key
+                );
+                continue;
+            },
+        };
 
-        let stake_pub_key = Ed25519HexEncodedPublicKey::try_from(row.stake_public_key.clone()).ok();
+        let vote_pub_key = match Ed25519HexEncodedPublicKey::try_from(row.vote_key) {
+            Ok(vote_pub_key) => Some(vote_pub_key),
+            Err(err) => {
+                error!(
+                    "Corrupt valid registration {:?}\n Stake pub key:{:?}",
+                    err, stake_pub_key
+                );
+                continue;
+            },
+        };
 
         let cip36 = Cip36Details {
             slot_no: SlotNo::try_from(slot_no)?,
