@@ -30,16 +30,16 @@ class SubmitProposalForReviewDialog extends StatefulWidget {
   static Future<bool?> show({
     required BuildContext context,
     required String proposalTitle,
-    required int currentVersion,
-    required int nextVersion,
+    required int currentIteration,
+    required int nextIteration,
   }) {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(name: '/submit-proposal-for-review'),
       builder: (context) => SubmitProposalForReviewDialog(
         proposalTitle: proposalTitle,
-        currentVersion: currentVersion,
-        nextVersion: nextVersion,
+        currentVersion: currentIteration,
+        nextVersion: nextIteration,
       ),
       barrierDismissible: false,
     );

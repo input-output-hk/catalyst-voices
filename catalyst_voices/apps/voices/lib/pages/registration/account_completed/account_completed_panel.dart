@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
-import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
@@ -74,80 +73,43 @@ class _CatalystKeychainCreatedCard extends StatelessWidget {
   }
 }
 
-class _WalletConnectedCardSelector extends StatelessWidget {
-  const _WalletConnectedCardSelector();
+class _NextStep extends StatelessWidget {
+  const _NextStep();
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<RegistrationCubit, RegistrationState, String>(
-      selector: (state) {
-        final wallet = state.walletLinkStateData.selectedWallet;
-        final name = wallet?.metadata.name ?? '';
-        return name.capitalize();
-      },
-      builder: (context, walletName) {
-        return _WalletConnectedCard(walletName: walletName);
-      },
-    );
+    return const NextStep(null);
   }
 }
 
-class _WalletConnectedCard extends StatelessWidget {
-  final String walletName;
+class _OpenDiscoveryButton extends StatelessWidget {
+  final VoidCallback onTap;
 
-  const _WalletConnectedCard({
-    required this.walletName,
+  const _OpenDiscoveryButton({
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ActionCard(
-      icon: VoicesAssets.icons.wallet.buildIcon(),
-      title: Text(
-        context.l10n.registrationCompletedWalletTitle(walletName),
-      ),
-      desc: Text(
-        context.l10n.registrationCompletedWalletInfo(walletName),
-      ),
-      statusIcon: VoicesAssets.icons.check.buildIcon(),
+    return VoicesFilledButton(
+      onTap: onTap,
+      child: Text(context.l10n.registrationCompletedDiscoveryButton),
     );
   }
 }
 
-class _RolesSelectedCardSelector extends StatelessWidget {
-  const _RolesSelectedCardSelector();
+class _ReviewMyAccountButton extends StatelessWidget {
+  final VoidCallback onTap;
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<RegistrationCubit, RegistrationState,
-        List<AccountRole>>(
-      selector: (state) {
-        return state.walletLinkStateData.selectedRoles?.toList() ??
-            state.walletLinkStateData.defaultRoles.toList();
-      },
-      builder: (context, roles) {
-        return _RolesSelectedCard(roles: roles);
-      },
-    );
-  }
-}
-
-class _RolesSelectedCard extends StatelessWidget {
-  final List<AccountRole> roles;
-
-  const _RolesSelectedCard({
-    required this.roles,
+  const _ReviewMyAccountButton({
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ActionCard(
-      icon: VoicesAssets.icons.summary.buildIcon(),
-      title: Text(context.l10n.registrationCompletedRolesTitle),
-      desc: Text(context.l10n.registrationCompletedRolesInfo),
-      statusIcon: VoicesAssets.icons.check.buildIcon(),
-      isExpanded: true,
-      body: _RolesFooter(roles),
+    return VoicesTextButton(
+      onTap: onTap,
+      child: Text(context.l10n.registrationCompletedAccountButton),
     );
   }
 }
@@ -206,6 +168,44 @@ class _RolesFooter extends StatelessWidget {
   }
 }
 
+class _RolesSelectedCard extends StatelessWidget {
+  final List<AccountRole> roles;
+
+  const _RolesSelectedCard({
+    required this.roles,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionCard(
+      icon: VoicesAssets.icons.summary.buildIcon(),
+      title: Text(context.l10n.registrationCompletedRolesTitle),
+      desc: Text(context.l10n.registrationCompletedRolesInfo),
+      statusIcon: VoicesAssets.icons.check.buildIcon(),
+      isExpanded: true,
+      body: _RolesFooter(roles),
+    );
+  }
+}
+
+class _RolesSelectedCardSelector extends StatelessWidget {
+  const _RolesSelectedCardSelector();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<RegistrationCubit, RegistrationState,
+        List<AccountRole>>(
+      selector: (state) {
+        return state.walletLinkStateData.selectedRoles?.toList() ??
+            state.walletLinkStateData.defaultRoles.toList();
+      },
+      builder: (context, roles) {
+        return _RolesSelectedCard(roles: roles);
+      },
+    );
+  }
+}
+
 class _TitleText extends StatelessWidget {
   const _TitleText();
 
@@ -221,43 +221,42 @@ class _TitleText extends StatelessWidget {
   }
 }
 
-class _NextStep extends StatelessWidget {
-  const _NextStep();
+class _WalletConnectedCard extends StatelessWidget {
+  final String walletName;
 
-  @override
-  Widget build(BuildContext context) {
-    return const NextStep(null);
-  }
-}
-
-class _OpenDiscoveryButton extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _OpenDiscoveryButton({
-    required this.onTap,
+  const _WalletConnectedCard({
+    required this.walletName,
   });
 
   @override
   Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      onTap: onTap,
-      child: Text(context.l10n.registrationCompletedDiscoveryButton),
+    return ActionCard(
+      icon: VoicesAssets.icons.wallet.buildIcon(),
+      title: Text(
+        context.l10n.registrationCompletedWalletTitle(walletName),
+      ),
+      desc: Text(
+        context.l10n.registrationCompletedWalletInfo(walletName),
+      ),
+      statusIcon: VoicesAssets.icons.check.buildIcon(),
     );
   }
 }
 
-class _ReviewMyAccountButton extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _ReviewMyAccountButton({
-    required this.onTap,
-  });
+class _WalletConnectedCardSelector extends StatelessWidget {
+  const _WalletConnectedCardSelector();
 
   @override
   Widget build(BuildContext context) {
-    return VoicesTextButton(
-      onTap: onTap,
-      child: Text(context.l10n.registrationCompletedAccountButton),
+    return BlocSelector<RegistrationCubit, RegistrationState, String>(
+      selector: (state) {
+        final wallet = state.walletLinkStateData.selectedWallet;
+        final name = wallet?.metadata.name ?? '';
+        return name.capitalize();
+      },
+      builder: (context, walletName) {
+        return _WalletConnectedCard(walletName: walletName);
+      },
     );
   }
 }

@@ -69,16 +69,16 @@ class PublishProposalIterationDialog extends StatelessWidget {
   static Future<bool?> show({
     required BuildContext context,
     required String proposalTitle,
-    required int? currentVersion,
-    required int nextVersion,
+    required int? currentIteration,
+    required int nextIteration,
   }) {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(name: '/publish-proposal-iteration'),
       builder: (context) => PublishProposalIterationDialog(
         proposalTitle: proposalTitle,
-        currentVersion: currentVersion,
-        nextVersion: nextVersion,
+        currentVersion: currentIteration,
+        nextVersion: nextIteration,
       ),
       barrierDismissible: false,
     );

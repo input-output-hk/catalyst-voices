@@ -10,7 +10,7 @@ void main() {
         lastId: 'lastId123',
         categoryId: 'category1',
         searchValue: 'search',
-        stage: ProposalPublish.draft,
+        stage: ProposalPublish.publishedDraft,
         usersProposals: true,
         usersFavorite: true,
       );
@@ -20,7 +20,7 @@ void main() {
       expect(request.lastId, equals('lastId123'));
       expect(request.categoryId, equals('category1'));
       expect(request.searchValue, equals('search'));
-      expect(request.stage, equals(ProposalPublish.draft));
+      expect(request.stage, equals(ProposalPublish.publishedDraft));
       expect(request.usersProposals, isTrue);
       expect(request.usersFavorite, isTrue);
     });
@@ -51,7 +51,7 @@ void main() {
         pageKey: 2,
         categoryId: 'category2',
         searchValue: 'newSearch',
-        stage: ProposalPublish.published,
+        stage: ProposalPublish.submittedProposal,
         usersProposals: true,
         usersFavorite: true,
       );
@@ -61,7 +61,7 @@ void main() {
       expect(copied.lastId, equals('lastId123')); // Unchanged
       expect(copied.categoryId, equals('category2'));
       expect(copied.searchValue, equals('newSearch'));
-      expect(copied.stage, equals(ProposalPublish.published));
+      expect(copied.stage, equals(ProposalPublish.submittedProposal));
       expect(copied.usersProposals, isTrue);
       expect(copied.usersFavorite, isTrue);
     });
@@ -73,7 +73,7 @@ void main() {
         lastId: 'lastId123',
         categoryId: 'category1',
         searchValue: 'search',
-        stage: ProposalPublish.draft,
+        stage: ProposalPublish.publishedDraft,
         usersProposals: true,
         usersFavorite: true,
       );

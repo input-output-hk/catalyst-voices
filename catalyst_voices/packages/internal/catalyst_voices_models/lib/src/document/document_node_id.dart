@@ -1,5 +1,12 @@
 import 'package:catalyst_voices_models/src/node_id.dart';
 
+/// The interface that every object in a document should implement,
+/// helps to navigate to a certain segment/section/property of the document.
+abstract interface class DocumentNode {
+  /// The node of the document where an object is located.
+  DocumentNodeId get nodeId;
+}
+
 /// The unique id of an object in a document for segments/sections/properties
 /// in a format of paths from the top-level node down to the nested node.
 final class DocumentNodeId extends NodeId {
@@ -8,6 +15,11 @@ final class DocumentNodeId extends NodeId {
 
   /// The nested paths in a document that lead to an object.
   final List<String> paths;
+
+  /// Creates a [DocumentNodeId] from a formatted string, i.e: "setup.title".
+  factory DocumentNodeId.fromString(String value) {
+    return DocumentNodeId._(value, paths: value.split('.'));
+  }
 
   /// The default constructor for the [DocumentNodeId].
   ///
@@ -34,6 +46,16 @@ final class DocumentNodeId extends NodeId {
   /// Effectively the string after the last dot.
   String get lastPath => paths.isNotEmpty ? paths.last : '';
 
+  /// Returns a child node at given [path].
+  ///
+  /// The [path] is appended to the parent's [path].
+  DocumentNodeId child(String path) {
+    return DocumentNodeId._fromPaths([
+      ...paths,
+      path,
+    ]);
+  }
+
   /// Returns a parent node.
   ///
   /// For [root] node it returns [root] node as it doesn't have any parent.
@@ -46,23 +68,6 @@ final class DocumentNodeId extends NodeId {
     return DocumentNodeId._fromPaths(newPaths);
   }
 
-  /// Returns a child node at given [path].
-  ///
-  /// The [path] is appended to the parent's [path].
-  DocumentNodeId child(String path) {
-    return DocumentNodeId._fromPaths([
-      ...paths,
-      path,
-    ]);
-  }
-
   @override
   String toString() => value;
-}
-
-/// The interface that every object in a document should implement,
-/// helps to navigate to a certain segment/section/property of the document.
-abstract interface class DocumentNode {
-  /// The node of the document where an object is located.
-  DocumentNodeId get nodeId;
 }

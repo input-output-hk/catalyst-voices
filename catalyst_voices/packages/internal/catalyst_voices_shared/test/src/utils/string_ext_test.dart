@@ -1,0 +1,46 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('StringExt', () {
+    test('firstLetter returns first letter or null', () {
+      expect('Hello'.firstLetter, 'H');
+      expect(''.firstLetter, isNull);
+    });
+
+    test('isBlank and isNotBlank correctly identify blank strings', () {
+      expect('   '.isBlank, isTrue);
+      expect('Hello'.isBlank, isFalse);
+      expect('   '.isNotBlank, isFalse);
+      expect('Hello'.isNotBlank, isTrue);
+    });
+
+    test('capitalize converts first letter to uppercase', () {
+      expect('hello'.capitalize(), 'Hello');
+      expect('HELLO'.capitalize(), 'Hello');
+      expect('hELLO'.capitalize(), 'Hello');
+      expect(''.capitalize(), '');
+    });
+
+    test('starred method adds * correctly', () {
+      expect('hello'.starred(), '*hello');
+      expect('hello'.starred(leading: false), 'hello*');
+      expect('hello'.starred(isEnabled: false), 'hello');
+    });
+
+    test('withPrefix adds prefix correctly', () {
+      expect('world'.withPrefix('Hello '), 'Hello world');
+    });
+
+    test('withSuffix adds suffix correctly', () {
+      expect('Hello'.withSuffix(' World'), 'Hello World');
+    });
+  });
+
+  group('UrlParser Tests', () {
+    test('getUri correctly parses URLs', () {
+      expect('https://example.com'.getUri(), isA<Uri>());
+      expect('https://example.com'.getUri().host, 'example.com');
+    });
+  });
+}

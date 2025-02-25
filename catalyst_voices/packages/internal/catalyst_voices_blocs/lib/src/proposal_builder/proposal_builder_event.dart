@@ -75,13 +75,6 @@ final class SectionChangedEvent extends ProposalBuilderEvent {
   List<Object?> get props => [changes];
 }
 
-final class ShareProposalEvent extends ProposalBuilderEvent {
-  const ShareProposalEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
 final class SubmitProposalEvent extends ProposalBuilderEvent {
   const SubmitProposalEvent();
 

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
-import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_result_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';

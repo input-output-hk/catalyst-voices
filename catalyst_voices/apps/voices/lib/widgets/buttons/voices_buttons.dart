@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
