@@ -99,7 +99,6 @@ stats_alloc = "0.1.10"
 memory-stats = "1.0.0"
 derive_more = { version = "2.0.1", default-features = false, features = ["from", "into"] }
 rayon = "1.10"
-atomic-counter = "1.0.1"
 
 # Its a transitive dependency of the "poem-openapi" crate,
 # but its breaks API after version "5.1.8".
