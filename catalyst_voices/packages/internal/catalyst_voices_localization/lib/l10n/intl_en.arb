@@ -1576,6 +1576,14 @@
   "@proposalEditorValidationSnackbar": {
     "description": "Snackbar title shown when user tries to save a proposal with errors."
   },
+  "proposalEditorDeleteDialogTitle": "Delete Proposal",
+  "@proposalEditorDeleteDialogTitle": {
+    "description": "A title for the dialog to confirm proposal deletion."
+  },
+  "proposalEditorDeleteDialogDescription": "Permanently delete your proposal?",
+  "@proposalEditorDeleteDialogDescription": {
+    "description": "A description for the dialog to confirm proposal deletion."
+  },
   "showAll": "Show All",
   "importProposal": "Import Proposal",
   "@importProposal": {

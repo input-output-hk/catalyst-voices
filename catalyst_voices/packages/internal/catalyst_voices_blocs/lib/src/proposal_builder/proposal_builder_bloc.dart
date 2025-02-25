@@ -225,7 +225,7 @@ final class ProposalBuilderBloc
       return _createState(
         document: documentBuilder.build(),
         metadata: const ProposalBuilderMetadata(
-          publish: ProposalPublish.publishedDraft,
+          publish: ProposalPublish.localDraft,
         ),
       );
     });

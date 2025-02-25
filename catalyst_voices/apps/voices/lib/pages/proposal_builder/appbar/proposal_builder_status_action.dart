@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/string_ext.dart';
+import 'package:catalyst_voices/pages/proposal_builder/dialog/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -216,6 +217,20 @@ class _ProposalBuilderStatusActionState
     );
   }
 
+  Future<void> _deleteProposal(BuildContext context) async {
+    final confirmed = await VoicesQuestionDialog.show(
+      context,
+      routeSettings: const RouteSettings(
+        name: '/proposal_builder/delete-confirmation',
+      ),
+      builder: (_) => const ProposalBuilderDeleteConfirmationDialog(),
+    );
+
+    if (confirmed && context.mounted) {
+      context.read<ProposalBuilderBloc>().add(const DeleteProposalEvent());
+    }
+  }
+
   void _onSelected(BuildContext context, _MenuItemEnum item) {
     switch (item) {
       case _MenuItemEnum.view:
@@ -228,7 +243,7 @@ class _ProposalBuilderStatusActionState
       case _MenuItemEnum.export:
         context.read<ProposalBuilderBloc>().add(const ExportProposalEvent());
       case _MenuItemEnum.delete:
-        context.read<ProposalBuilderBloc>().add(const DeleteProposalEvent());
+        unawaited(_deleteProposal(context));
     }
   }
 
