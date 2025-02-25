@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"static":["GLOBAL","GLOBAL_METRICS","IS_INITIALIZED"],"struct":["MemoryMetrics"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["DocumentIndexList","DocumentIndexListDocumented","IndexedDocument","IndexedDocumentDocumented","IndexedDocumentVersion","IndexedDocumentVersionDocumented"]};
