@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/string_ext.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
