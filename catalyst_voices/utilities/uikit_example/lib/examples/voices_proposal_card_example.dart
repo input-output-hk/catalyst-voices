@@ -46,6 +46,7 @@ class VoicesProposalCardExample extends StatelessWidget {
               image: VoicesAssets.images.proposalBackground2,
               proposal: PendingProposal(
                 id: 'f14/2',
+                isDraft: false,
                 campaignName: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
