@@ -88,3 +88,10 @@ final class SubmitProposalEvent extends ProposalBuilderEvent {
   @override
   List<Object?> get props => [];
 }
+
+final class ValidateProposalEvent extends ProposalBuilderEvent {
+  const ValidateProposalEvent();
+
+  @override
+  List<Object?> get props => [];
+}
