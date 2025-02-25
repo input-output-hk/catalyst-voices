@@ -149,6 +149,7 @@ final class Dependencies extends DependencyProvider {
       })
       ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
         return CatGatewayDocumentDataSource(
+          get<ApiServices>(),
           get<SignedDocumentManager>(),
         );
       })

@@ -9,9 +9,13 @@ const mockedTemplateUuid = '0194f567-65f5-7d96-ad12-77762fdef00b';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   // ignore: unused_field
+  final ApiServices _api;
+
+  // ignore: unused_field
   final SignedDocumentManager _signedDocumentManager;
 
   CatGatewayDocumentDataSource(
+    this._api,
     this._signedDocumentManager,
   );
 
