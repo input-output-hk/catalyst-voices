@@ -10,10 +10,7 @@ setup-code:
 
 # Builds generated code
 generate-code: setup-code
-    melos l10n
-    melos build_runner
-    melos build_runner_repository
-    just generate-gateway-services
+    cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
 # Syntax sugar for linking packages and building generated code
 bootstrap: generate-code
@@ -27,10 +24,6 @@ check-code:
 # Runs unit tests
 test-code:
     earthly +test-unit
-
-# Generates gateway services in packages/internal/catalyst_voices_repositories
-generate-gateway-services:
-    cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
 # Pre Push Checks
 pre-push: check-code
