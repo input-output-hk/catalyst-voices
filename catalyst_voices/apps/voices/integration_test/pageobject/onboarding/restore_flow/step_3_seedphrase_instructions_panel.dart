@@ -24,7 +24,7 @@ class SeedPhraseInstructionsPanel extends OnboardingPageBase {
   @override
   Future<void> verifyPageElements() async {}
 
-Future<void> verifyInfoPanel() async {
+  Future<void> verifyInfoPanel() async {
     expect(
       await infoPartHeaderTitleText(),
       T.get('Restore Catalyst keychain'),
@@ -36,7 +36,5 @@ Future<void> verifyInfoPanel() async {
     );
   }
 
-  Future<void> verifyDetailsPanel() async {
-
-  }
+  Future<void> verifyDetailsPanel() async {}
 }

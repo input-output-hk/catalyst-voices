@@ -46,21 +46,19 @@ void main() async {
     TestContext.clearContext();
   });
 
-  group(
-    'Onboarding -',
-    () {
-      patrolWidgetTest('visitor - get started button works',
-          (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await AppBarPage($).getStartedBtnClick();
-        expect($(OnboardingPageBase($).registrationInfoPanel), findsOneWidget);
-        expect(
-          $(
-            OnboardingPageBase($).registrationDetailsPanel,
-          ),
-          findsOneWidget,
-        );
-      });
+  group('Onboarding -', () {
+    patrolWidgetTest('visitor - get started button works',
+        (PatrolTester $) async {
+      await $.pumpWidgetAndSettle(App(routerConfig: router));
+      await AppBarPage($).getStartedBtnClick();
+      expect($(OnboardingPageBase($).registrationInfoPanel), findsOneWidget);
+      expect(
+        $(
+          OnboardingPageBase($).registrationDetailsPanel,
+        ),
+        findsOneWidget,
+      );
+    });
 
     patrolWidgetTest('visitor - get started screen looks OK',
         (PatrolTester $) async {

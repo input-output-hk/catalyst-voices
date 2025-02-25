@@ -25,7 +25,7 @@ class SeedPhraseInstructionsPanel extends StatelessWidget {
               ),
               subtitle: Text(
                 l10n.recoverySeedPhraseInstructionsSubtitle,
-                key: const Key('SeedPhraseInstructionsSubtitleKey'), 
+                key: const Key('SeedPhraseInstructionsSubtitleKey'),
               ),
             ),
           ),

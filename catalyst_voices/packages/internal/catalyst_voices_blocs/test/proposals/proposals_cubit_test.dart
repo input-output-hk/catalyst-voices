@@ -86,12 +86,20 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(
+          userProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           userProposals: ProposalPaginationItems(
             pageKey: 1,
-            maxResults: 10,
+            maxResults: 1,
             items: [proposalViewModel],
-            isEmpty: false,
+            isLoading: false,
           ),
         ),
       ],
@@ -111,12 +119,19 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(
+          favoriteProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           favoriteProposals: ProposalPaginationItems(
             pageKey: 1,
-            maxResults: 10,
+            maxResults: 1,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -147,12 +162,19 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(
+          draftProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           draftProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -172,12 +194,19 @@ void main() {
         );
       },
       expect: () => [
+        const ProposalsState(
+          finalProposals: ProposalPaginationItems(
+            pageKey: 0,
+            maxResults: 0,
+            items: [],
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           finalProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -190,18 +219,22 @@ void main() {
         await cubit.getProposals(
           const ProposalPaginationRequest(
             pageKey: 1,
-            pageSize: 10,
+            pageSize: 1,
             lastId: null,
           ),
         );
       },
       expect: () => [
+        const ProposalsState(
+          allProposals: ProposalPaginationItems(
+            isLoading: true,
+          ),
+        ),
         ProposalsState(
           allProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [proposalViewModel],
-            isEmpty: false,
           ),
         ),
       ],
@@ -227,10 +260,14 @@ void main() {
       expect: () => [
         const ProposalsState(
           allProposals: ProposalPaginationItems(
+            isLoading: true,
+          ),
+        ),
+        const ProposalsState(
+          allProposals: ProposalPaginationItems(
             pageKey: 1,
             maxResults: 10,
             items: [],
-            isEmpty: true,
           ),
         ),
       ],
@@ -286,21 +323,19 @@ class _FakeProposalService extends Fake implements ProposalService {
   _FakeProposalService(this._proposals);
 
   @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    return ['1', '2'];
+  }
+
+  @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   }) async {
     return ProposalPaginationItems(
       pageKey: request.pageKey,
       maxResults: 10,
       items: _proposals,
-      isEmpty: false,
     );
-  }
-
-  @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    return ['1', '2'];
   }
 
   @override
