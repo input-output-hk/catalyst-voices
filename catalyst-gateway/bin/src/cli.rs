@@ -7,7 +7,10 @@ use tracing::{error, info};
 use crate::{
     cardano::start_followers,
     db::{self, index::session::CassandraSession},
-    service::{self, started},
+    service::{
+        self, started,
+        utilities::health::{get_current_timestamp, set_live_counter},
+    },
     settings::{DocsSettings, ServiceSettings, Settings},
 };
 
@@ -60,6 +63,16 @@ impl Cli {
                 });
                 tasks.push(handle);
 
+                match get_current_timestamp() {
+                    Some(now) => {
+                        set_live_counter(now);
+                    },
+                    None => {
+                        error!(
+                            "Unable to update LIVE_COUNTER, SystemTime is earlier than UNIX EPOCH!"
+                        );
+                    },
+                }
                 started();
 
                 for task in tasks {
