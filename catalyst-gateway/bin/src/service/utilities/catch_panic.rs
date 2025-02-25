@@ -9,9 +9,10 @@ use serde_json::json;
 use tracing::error;
 
 use crate::service::{
-    api::is_live_counter_under_threshold,
-    common::responses::code_500_internal_server_error::InternalServerError, get_live_counter,
-    set_live_counter, set_not_live,
+    common::responses::code_500_internal_server_error::InternalServerError,
+    utilities::health::{
+        get_live_counter, is_live_counter_under_threshold, set_live_counter, set_not_live,
+    },
 };
 
 /// Customized Panic handler.

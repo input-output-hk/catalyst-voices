@@ -19,9 +19,7 @@ mod config;
 mod documents;
 mod health;
 
-pub(crate) use health::{
-    get_live_counter, is_live_counter_under_threshold, set_live_counter, set_not_live, started,
-};
+pub(crate) use health::started;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
