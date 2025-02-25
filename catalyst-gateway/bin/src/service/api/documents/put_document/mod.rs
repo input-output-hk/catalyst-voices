@@ -49,7 +49,7 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
     match minicbor::decode(doc_bytes.as_slice()) {
         Ok(doc) => {
             if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
-                // means that something happend inside the `DocProvider`, some db error.
+                // means that something happened inside the `DocProvider`, some db error.
                 return AllResponses::handle_error(&e);
             }
 
