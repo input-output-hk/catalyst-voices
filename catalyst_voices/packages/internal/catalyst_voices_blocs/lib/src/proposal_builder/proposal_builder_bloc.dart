@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
 import 'package:catalyst_voices_blocs/src/proposal_builder/proposal_builder_event.dart';
@@ -39,14 +41,17 @@ final class ProposalBuilderBloc
   }
 
   bool validate() {
-    final documentBuilder = _documentBuilder;
-    assert(documentBuilder != null, 'DocumentBuilder not initialized');
-
-    final document = documentBuilder!.build();
+    final document = _buildDocument();
     final isValid = document.isValid;
     add(const ValidateProposalEvent());
 
     return isValid;
+  }
+
+  Document _buildDocument() {
+    final documentBuilder = _documentBuilder;
+    assert(documentBuilder != null, 'DocumentBuilder not initialized');
+    return documentBuilder!.build();
   }
 
   ProposalBuilderState _createState({
@@ -321,24 +326,37 @@ final class ProposalBuilderBloc
     PublishProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    // TODO(dtscalac): handle event
+    try {
+      _logger.info('Publishing proposal');
+      final document = _buildDocument();
+      await _proposalService.publishProposal(document);
+    } catch (error, stackTrace) {
+      _logger.severe('PublishProposal', error, stackTrace);
+      // TODO(dtscalac): handle the error in the UI
+      emitError(error);
+    }
   }
 
   Future<void> _submitProposal(
     SubmitProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    // TODO(dtscalac): handle event
+    try {
+      _logger.info('Submitting proposal for review');
+      final document = _buildDocument();
+      await _proposalService.submitProposalForReview(document);
+    } catch (error, stackTrace) {
+      _logger.severe('SubmitProposalForReview', error, stackTrace);
+      // TODO(dtscalac): handle the error in the UI
+      emitError(error);
+    }
   }
 
   Future<void> _validateProposal(
     ValidateProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final documentBuilder = _documentBuilder;
-    assert(documentBuilder != null, 'DocumentBuilder not initialized');
-    final document = documentBuilder!.build();
-
+    final document = _buildDocument();
     final showErrors = !document.isValid;
 
     final segments = _mapDocumentToSegments(

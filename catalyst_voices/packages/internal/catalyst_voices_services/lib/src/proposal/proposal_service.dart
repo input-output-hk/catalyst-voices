@@ -13,12 +13,11 @@ abstract interface class ProposalService {
     );
   }
 
+  /// Fetches favorites proposals ids of the user
+  Future<List<String>> getFavoritesProposalsIds();
+
   Future<Proposal> getProposal({
     required String id,
-  });
-
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
   });
 
   /// Fetches proposals for the [campaignId].
@@ -27,12 +26,19 @@ abstract interface class ProposalService {
     required String campaignId,
   });
 
-  /// Fetches favorites proposals ids of the user
-  Future<List<String>> getFavoritesProposalsIds();
+  Future<ProposalTemplate> getProposalTemplate({
+    required DocumentRef ref,
+  });
 
   /// Fetches user's proposals ids  depending on his id that is saved
   /// in metadata of proposal document
   Future<List<String>> getUserProposalsIds(String userId);
+
+  /// Publishes a new draft of the proposal.
+  Future<void> publishProposal(Document document);
+
+  /// Submits the proposal for review.
+  Future<void> submitProposalForReview(Document document);
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -45,6 +51,12 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
+  Future<List<String>> getFavoritesProposalsIds() async {
+    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
+    return proposalsIds;
+  }
+
+  @override
   Future<Proposal> getProposal({
     required String id,
   }) async {
@@ -52,17 +64,6 @@ final class ProposalServiceImpl implements ProposalService {
     final proposal = await _buildProposal(proposalBase);
 
     return proposal;
-  }
-
-  @override
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
-  }) async {
-    final proposalTemplate = await _documentRepository.getProposalTemplate(
-      ref: ref,
-    );
-
-    return proposalTemplate;
   }
 
   @override
@@ -87,15 +88,30 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
-    return proposalsIds;
+  Future<ProposalTemplate> getProposalTemplate({
+    required DocumentRef ref,
+  }) async {
+    final proposalTemplate = await _documentRepository.getProposalTemplate(
+      ref: ref,
+    );
+
+    return proposalTemplate;
   }
 
   @override
   Future<List<String>> getUserProposalsIds(String userId) async {
     final proposalsIds = await _proposalRepository.getUserProposalsIds(userId);
     return proposalsIds;
+  }
+
+  @override
+  Future<void> publishProposal(Document document) async {
+    // TODO(dtscalac): publish proposal
+  }
+
+  @override
+  Future<void> submitProposalForReview(Document document) async {
+    // TODO(dtscalac): submit proposal
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {
