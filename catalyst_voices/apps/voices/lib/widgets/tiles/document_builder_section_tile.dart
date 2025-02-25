@@ -156,9 +156,8 @@ class _DocumentBuilderSectionTileState
         }
 
       case EditableTileChangeSource.save:
-        if (_formKey.currentState!.validate()) {
-          _onSave();
-        }
+        _formKey.currentState!.validate();
+        _onSave();
     }
   }
 

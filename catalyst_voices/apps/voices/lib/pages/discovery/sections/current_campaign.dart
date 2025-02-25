@@ -32,6 +32,7 @@ class CurrentCampaign extends StatelessWidget {
               Skeletonizer(
                 enabled: isLoading,
                 child: FundsDetailCard(
+                  key: const Key('FundsDetailCard'),
                   allFunds: currentCampaignInfo.allFunds,
                   totalAsk: currentCampaignInfo.totalAsk,
                   askRange: currentCampaignInfo.askRange,
@@ -47,6 +48,7 @@ class CurrentCampaign extends StatelessWidget {
           child: CampaignTimeline(
             timelineItems: CampaignTimelineViewModelX.mockData,
             placement: CampaignTimelinePlacement.discovery,
+            horizontalPadding: const SizedBox(width: 120),
           ),
         ),
       ],
@@ -66,6 +68,7 @@ class _SubTitle extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('IdeaSubTitle'),
             context.l10n.ideaJourney,
             style: context.textTheme.headlineMedium,
           ),

@@ -1,6 +1,6 @@
 SELECT
-    txn_hash,
-    txn,
+    txn_id,
+    txn_index,
     txo,
     slot_no,
     value,

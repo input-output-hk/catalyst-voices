@@ -2,13 +2,18 @@
 
 use std::sync::Arc;
 
+use cardano_blockchain_types::{Slot, TransactionId, TxnOutputOffset};
+use catalyst_types::hashes::Blake2b256Hash;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::{
-        queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
-        session::CassandraSession,
+    db::{
+        index::{
+            queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbTransactionId, DbTxnOutputOffset},
     },
     settings::cassandra_db,
 };
@@ -17,20 +22,20 @@ use crate::{
 #[derive(SerializeRow, Debug)]
 pub(crate) struct TxiInsertParams {
     /// Spent Transactions Hash
-    txn_hash: Vec<u8>,
+    txn_id: DbTransactionId,
     /// TXO Index spent.
-    txo: i16,
+    txo: DbTxnOutputOffset,
     /// Block Slot Number when spend occurred.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
 }
 
 impl TxiInsertParams {
     /// Create a new record for this transaction.
-    pub fn new(txn_hash: &[u8], txo: i16, slot_no: u64) -> Self {
+    pub fn new(txn_id: TransactionId, txo: TxnOutputOffset, slot: Slot) -> Self {
         Self {
-            txn_hash: txn_hash.to_vec(),
-            txo,
-            slot_no: slot_no.into(),
+            txn_id: txn_id.into(),
+            txo: txo.into(),
+            slot_no: slot.into(),
         }
     }
 }
@@ -70,14 +75,14 @@ impl TxiInsertQuery {
     }
 
     /// Index the transaction Inputs.
-    pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: u64) {
+    pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: Slot) {
         // Index the TXI's.
         for txi in txs.inputs() {
-            let txn_hash = txi.hash().to_vec();
-            let txo: i16 = txi.index().try_into().unwrap_or(i16::MAX);
+            let txn_id = Blake2b256Hash::from(*txi.hash()).into();
+            let txo = txi.index().try_into().unwrap_or(i16::MAX).into();
 
             self.txi_data
-                .push(TxiInsertParams::new(&txn_hash, txo, slot_no));
+                .push(TxiInsertParams::new(txn_id, txo, slot_no));
         }
     }
 
