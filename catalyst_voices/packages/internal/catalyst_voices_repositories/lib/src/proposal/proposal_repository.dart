@@ -12,121 +12,6 @@ and PRISM, but its potential is only barely exploited.
 """
     .replaceAll('\n', ' ');
 
-final _proposals = [
-  ProposalBase(
-    id: '${Random().nextInt(1000)}1',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.publishedDraft,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 1,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}2',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.publishedDraft,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 2,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}3',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.publishedDraft,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}4',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.submittedProposal,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}5',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.submittedProposal,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}6',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.submittedProposal,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}7',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.submittedProposal,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-  ProposalBase(
-    id: '${Random().nextInt(1000)}8',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    updateDate: DateTime.now().minusDays(2),
-    fundsRequested: Coin.fromAda(100000),
-    status: ProposalStatus.draft,
-    publish: ProposalPublish.submittedProposal,
-    commentsCount: 0,
-    description: _proposalDescription,
-    duration: 6,
-    author: 'Alex Wells',
-    version: 3,
-  ),
-];
-
 // TODO(LynxLynxx): remove after implementing reading db
 int _maxResults(ProposalPublish? stage) {
   if (stage == null) {
@@ -142,6 +27,8 @@ int _maxResults(ProposalPublish? stage) {
 abstract interface class ProposalRepository {
   const factory ProposalRepository() = ProposalRepositoryImpl;
 
+  Future<List<String>> addFavoriteProposal(String proposalId);
+
   Future<List<String>> getFavoritesProposalsIds();
 
   Future<ProposalBase> getProposal({
@@ -151,14 +38,21 @@ abstract interface class ProposalRepository {
   /// Fetches all proposals.
   Future<ProposalsSearchResult> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   });
 
   Future<List<String>> getUserProposalsIds(String userId);
+
+  Future<List<String>> removeFavoriteProposal(String proposalId);
 }
 
 final class ProposalRepositoryImpl implements ProposalRepository {
   const ProposalRepositoryImpl();
+
+  @override
+  Future<List<String>> addFavoriteProposal(String proposalId) async {
+    // TODO(LynxLynxx): add proposal to favorites
+    return getFavoritesProposalsIds();
+  }
 
   @override
   Future<List<String>> getFavoritesProposalsIds() async {
@@ -170,13 +64,25 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalBase> getProposal({
     required String id,
   }) async {
-    return _proposals.first;
+    return ProposalBase(
+      id: id,
+      category: 'Cardano Use Cases / MVP',
+      title: 'Proposal Title that rocks the world',
+      updateDate: DateTime.now().minusDays(2),
+      fundsRequested: Coin.fromAda(100000),
+      status: ProposalStatus.draft,
+      publish: ProposalPublish.localDraft,
+      commentsCount: 0,
+      description: _proposalDescription,
+      duration: 6,
+      author: 'Alex Wells',
+      version: 1,
+    );
   }
 
   @override
   Future<ProposalsSearchResult> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   }) async {
     // optionally filter by status.
     final proposals = <ProposalBase>[];
@@ -184,9 +90,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     // Return users proposals match his account id with proposals metadata from
     // author field.
     if (request.usersProposals) {
-      return const ProposalsSearchResult(maxResults: 0, proposals: []);
+      return _getUserProposalsSearchResult(request);
     } else if (request.usersFavorite) {
-      return const ProposalsSearchResult(maxResults: 0, proposals: []);
+      return _getFavoritesProposalsSearchResult(request);
     }
 
     for (var i = 0; i < request.pageSize; i++) {
@@ -222,5 +128,65 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<List<String>> getUserProposalsIds(String userId) async {
     // TODO(LynxLynxx): read db to get user's proposals
     return <String>[];
+  }
+
+  @override
+  Future<List<String>> removeFavoriteProposal(String proposalId) async {
+    // TODO(LynxLynxx): remove proposal from favorites
+    return getFavoritesProposalsIds();
+  }
+
+  Future<ProposalsSearchResult> _getFavoritesProposalsSearchResult(
+    ProposalPaginationRequest request,
+  ) async {
+    final favoritesIds = await getFavoritesProposalsIds();
+    final proposals = <ProposalBase>[];
+    final range = PagingRange.calculateRange(
+      pageKey: request.pageKey,
+      itemsPerPage: request.pageSize,
+      maxResults: favoritesIds.length,
+    );
+    if (favoritesIds.isEmpty) {
+      return const ProposalsSearchResult(
+        maxResults: 0,
+        proposals: [],
+      );
+    }
+    for (var i = range.from; i <= range.to; i++) {
+      final proposal = await getProposal(id: favoritesIds[i]);
+      proposals.add(proposal);
+    }
+
+    return ProposalsSearchResult(
+      maxResults: favoritesIds.length,
+      proposals: proposals,
+    );
+  }
+
+  Future<ProposalsSearchResult> _getUserProposalsSearchResult(
+    ProposalPaginationRequest request,
+  ) async {
+    final userProposalsIds = await getUserProposalsIds('');
+    final proposals = <ProposalBase>[];
+    final range = PagingRange.calculateRange(
+      pageKey: request.pageKey,
+      itemsPerPage: request.pageSize,
+      maxResults: userProposalsIds.length,
+    );
+    if (userProposalsIds.isEmpty) {
+      return const ProposalsSearchResult(
+        maxResults: 0,
+        proposals: [],
+      );
+    }
+    for (var i = range.from; i <= range.to; i++) {
+      final proposal = await getProposal(id: userProposalsIds[i]);
+      proposals.add(proposal);
+    }
+
+    return ProposalsSearchResult(
+      maxResults: userProposalsIds.length,
+      proposals: proposals,
+    );
   }
 }

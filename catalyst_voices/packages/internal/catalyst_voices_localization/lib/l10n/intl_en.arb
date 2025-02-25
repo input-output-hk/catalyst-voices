@@ -940,6 +940,9 @@
     "description": "When user checks correct seed phrase words order he can upload it too"
   },
   "reset": "Reset",
+  "@reset": {
+    "description": "Action to reset value in text field"
+  },
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
   "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
   "yourNextStep": "Your next step",
@@ -1585,6 +1588,9 @@
     "description": "A description for the dialog to confirm proposal deletion."
   },
   "showAll": "Show All",
+  "@showAll": {
+    "description": "Show all for when using filtering by some criteria"
+  },
   "importProposal": "Import Proposal",
   "@importProposal": {
     "description": "Import a proposal from a file"
@@ -1592,6 +1598,18 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
+  },
+  "searchResult": "Search Result",
+  "@searchResult": {
+    "description": "To show that displayed items comes from search result"
+  },
+  "emptySearchResultTitle": "No search results found",
+  "@emptySearchResultTitle": {
+    "description": "Title of empty search result"
+  },
+  "tryDifferentSearch": "Please try another search.",
+  "@tryDifferentSearch": {
+    "description": "Description of empty search result. Try different search"
   },
   "copyLink": "Copy Link",
   "@copyLink": {

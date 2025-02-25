@@ -58,6 +58,7 @@ final class FundedProposal extends ProposalViewModel {
 
   @override
   FundedProposal copyWith({
+    String? id,
     bool? isFavorite,
     String? campaignName,
     String? category,
@@ -68,7 +69,7 @@ final class FundedProposal extends ProposalViewModel {
     String? description,
   }) {
     return FundedProposal(
-      id: id,
+      id: id ?? this.id,
       isFavorite: isFavorite ?? this.isFavorite,
       campaignName: campaignName ?? this.campaignName,
       category: category ?? this.category,
@@ -174,6 +175,7 @@ and PRISM, but its potential is only barely exploited.
 
   @override
   PendingProposal copyWith({
+    String? id,
     bool? isFavorite,
     String? campaignName,
     String? category,
@@ -188,7 +190,7 @@ and PRISM, but its potential is only barely exploited.
     String? author,
   }) {
     return PendingProposal(
-      id: id,
+      id: id ?? this.id,
       isFavorite: isFavorite ?? this.isFavorite,
       campaignName: campaignName ?? this.campaignName,
       category: category ?? this.category,
@@ -243,23 +245,7 @@ sealed class ProposalViewModel extends Equatable {
   List<Object?> get props => [id, isFavorite];
 
   ProposalViewModel copyWith({
+    String? id,
     bool? isFavorite,
   });
-}
-
-extension ListProposalViewModelExt on List<ProposalViewModel> {
-  List<PendingProposal> get draftProposals => _pendingProposals
-      .where((e) => e.publishStage == ProposalPublish.publishedDraft)
-      .toList();
-
-  List<ProposalViewModel> get favorites {
-    return where((proposal) => proposal.isFavorite).toList();
-  }
-
-  List<PendingProposal> get finalProposals => _pendingProposals
-      .where((e) => e.publishStage == ProposalPublish.submittedProposal)
-      .toList();
-
-  List<PendingProposal> get _pendingProposals =>
-      whereType<PendingProposal>().toList();
 }
