@@ -1,7 +1,9 @@
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
 class ProposalPage extends StatefulWidget {
@@ -21,19 +23,6 @@ class ProposalPage extends StatefulWidget {
 }
 
 class _ProposalPageState extends State<ProposalPage> {
-  @override
-  void didUpdateWidget(covariant ProposalPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.id != oldWidget.id) {
-      print('Changed id from ${oldWidget.id} to ${widget.id}');
-    }
-
-    if (widget.version != oldWidget.version) {
-      print('Changed version from ${oldWidget.version} to ${widget.version}');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SpaceScaffold(
@@ -62,5 +51,24 @@ class _ProposalPageState extends State<ProposalPage> {
       ),
       right: Center(child: Text('Right')),
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant ProposalPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.id != oldWidget.id) {
+      print('Changed id from ${oldWidget.id} to ${widget.id}');
+    }
+
+    if (widget.version != oldWidget.version) {
+      print('Changed version from ${oldWidget.version} to ${widget.version}');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProposalBloc>();
   }
 }
