@@ -162,9 +162,9 @@ def proposal_doc_check(
         resp.status_code == 201
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-    # Put a proposal document corrupted content
+    # Put a proposal document with empty content
     proposal_metadata_json["ver"] = uuid7str()
-    proposal_doc = build_signed_doc(proposal_metadata_json, {"random": "random"})
+    proposal_doc = build_signed_doc(proposal_metadata_json, {})
     resp = document.put(data=proposal_doc)
     assert (
         resp.status_code == 422
@@ -210,9 +210,9 @@ def comment_doc_check(
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
-    # Put a comment document corrupted content
+    # Put a comment document with empty content
     comment_metadata_json["ver"] = uuid7str()
-    comment_doc = build_signed_doc(comment_metadata_json, {"random": "random"})
+    comment_doc = build_signed_doc(comment_metadata_json, {})
     resp = document.put(data=comment_doc)
     assert (
         resp.status_code == 422

@@ -993,6 +993,15 @@
             "x-order": ["mandatory"]
         }
     },
+    "required": [
+        "setup",
+        "summary",
+        "theme",
+        "details",
+        "milestones",
+        "pitch",
+        "agreements"
+    ],
     "x-order": [
         "setup",
         "summary",
