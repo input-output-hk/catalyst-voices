@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../utils/translations_utils.dart';
-import '../common_page.dart';
-import 'onboarding_base_page.dart';
+import '../../../utils/translations_utils.dart';
+import '../../common_page.dart';
+import '../onboarding_base_page.dart';
 import 'step_13_password_input.dart';
 
 class KeychainFinalPanel extends OnboardingPageBase {
