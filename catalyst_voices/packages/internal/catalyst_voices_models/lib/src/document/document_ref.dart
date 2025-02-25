@@ -10,38 +10,25 @@ sealed class DocumentRef extends Equatable {
     this.version,
   });
 
+  factory DocumentRef.build({
+    required String id,
+    String? version,
+    required bool isDraft,
+  }) {
+    return isDraft
+        ? DraftRef(id: id, version: version)
+        : SignedDocumentRef(id: id, version: version);
+  }
+
   bool get isExact => version != null;
+
+  @override
+  List<Object?> get props => [id, version];
 
   DocumentRef copyWith({
     String? id,
     Optional<String>? version,
   });
-
-  @override
-  List<Object?> get props => [id, version];
-}
-
-final class SignedDocumentRef extends DocumentRef {
-  const SignedDocumentRef({
-    required super.id,
-    super.version,
-  });
-
-  @override
-  SignedDocumentRef copyWith({
-    String? id,
-    Optional<String>? version,
-  }) {
-    return SignedDocumentRef(
-      id: id ?? this.id,
-      version: version.dataOr(this.version),
-    );
-  }
-
-  @override
-  String toString() => isExact
-      ? 'ExactSignedDocumentRef($id.v$version)'
-      : 'LooseSignedDocumentRef($id)';
 }
 
 final class DraftRef extends DocumentRef {
@@ -77,4 +64,27 @@ final class SecuredDocumentRef extends Equatable {
 
   @override
   List<Object?> get props => [ref, hash];
+}
+
+final class SignedDocumentRef extends DocumentRef {
+  const SignedDocumentRef({
+    required super.id,
+    super.version,
+  });
+
+  @override
+  SignedDocumentRef copyWith({
+    String? id,
+    Optional<String>? version,
+  }) {
+    return SignedDocumentRef(
+      id: id ?? this.id,
+      version: version.dataOr(this.version),
+    );
+  }
+
+  @override
+  String toString() => isExact
+      ? 'ExactSignedDocumentRef($id.v$version)'
+      : 'LooseSignedDocumentRef($id)';
 }

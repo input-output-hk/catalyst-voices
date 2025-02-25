@@ -3,6 +3,7 @@ import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/routes/routing/transitions/fade_page_transition_mixin.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,6 +23,13 @@ final class ProposalRoute extends GoRouteData
     this.version,
     this.draft = false,
   });
+
+  ProposalRoute.from({required DocumentRef ref})
+      : this(
+          proposalId: ref.id,
+          version: ref.version,
+          draft: ref is DraftRef,
+        );
 
   @override
   List<RouteGuard> get routeGuards => const [

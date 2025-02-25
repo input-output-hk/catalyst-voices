@@ -1,10 +1,9 @@
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
 
 class ProposalPage extends StatefulWidget {
   final String id;
@@ -18,6 +17,14 @@ class ProposalPage extends StatefulWidget {
     required this.isDraft,
   });
 
+  DocumentRef get ref {
+    return DocumentRef.build(
+      id: id,
+      version: version,
+      isDraft: isDraft,
+    );
+  }
+
   @override
   State<ProposalPage> createState() => _ProposalPageState();
 }
@@ -25,29 +32,12 @@ class ProposalPage extends StatefulWidget {
 class _ProposalPageState extends State<ProposalPage> {
   @override
   Widget build(BuildContext context) {
-    return SpaceScaffold(
+    return const SpaceScaffold(
       left: Center(child: Text('Left')),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'id:${widget.id}\nver:${widget.version}',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          VoicesFilledButton(
-            child: Text('Ver'),
-            onTap: () {
-              Router.neglect(context, () {
-                ProposalRoute(
-                  proposalId: widget.id,
-                  version: const Uuid().v7(),
-                  draft: widget.isDraft,
-                ).replace(context);
-              });
-            },
-          ),
-        ],
+        children: [],
       ),
       right: Center(child: Text('Right')),
     );
@@ -57,18 +47,24 @@ class _ProposalPageState extends State<ProposalPage> {
   void didUpdateWidget(covariant ProposalPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.id != oldWidget.id) {
-      print('Changed id from ${oldWidget.id} to ${widget.id}');
-    }
-
-    if (widget.version != oldWidget.version) {
-      print('Changed version from ${oldWidget.version} to ${widget.version}');
+    if (widget.ref != oldWidget.ref) {
+      final event = ShowProposalEvent(ref: widget.ref);
+      context.read<ProposalBloc>().add(event);
     }
   }
 
   @override
   void initState() {
     super.initState();
-    context.read<ProposalBloc>();
+
+    final event = ShowProposalEvent(ref: widget.ref);
+    context.read<ProposalBloc>().add(event);
+  }
+
+  void _changeVersion(String version) {
+    Router.neglect(context, () {
+      final ref = widget.ref.copyWith(version: Optional.of(version));
+      ProposalRoute.from(ref: ref).replace(context);
+    });
   }
 }
