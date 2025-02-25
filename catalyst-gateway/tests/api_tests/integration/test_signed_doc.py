@@ -5,6 +5,7 @@ from api.v1 import document
 from tempfile import NamedTemporaryFile
 import subprocess
 import json
+import os
 from typing import Dict, Any, List
 from uuid_extensions import uuid7str
 
@@ -39,6 +40,8 @@ def build_signed_doc(
 def test_signed_doc():
     health.is_live()
     health.is_ready()
+    
+    print(os.listdir())
 
     # comes from the 'templates/data.rs' file
     proposal_templates = [
