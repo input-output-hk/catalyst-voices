@@ -14,6 +14,7 @@ use put_document::{
 
 use crate::service::{
     common::{
+        auth::none_or_rbac::NoneOrRBAC,
         tags::ApiTags,
         types::{
             generic::{
@@ -47,14 +48,13 @@ impl DocumentApi {
         transform = "schema_version_validation"
     )]
     async fn get_document(
-        &self,
-        /// UUIDv7 Document ID to retrieve
+        &self, /// UUIDv7 Document ID to retrieve
         document_id: Path<UUIDv7>,
         /// UUIDv7 Version of the Document to retrieve, if omitted, returns the latest
         /// version.
         version: Query<Option<UUIDv7>>,
-        // /// No Authorization required, but Token permitted.
-        // _auth: CatalystRBACSecurityScheme,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> get_document::AllResponses {
         let Ok(doc_id) = document_id.0.try_into() else {
             let err = anyhow!("Invalid UUIDv7"); // Should not happen as UUIDv7 is validating.
@@ -113,13 +113,11 @@ impl DocumentApi {
         transform = "schema_version_validation"
     )]
     async fn post_document(
-        &self,
-        /// The Query Filter Specification
+        &self, /// The Query Filter Specification
         query: Json<DocumentIndexQueryFilterBody>,
-        page: Query<Option<Page>>,
-        limit: Query<Option<Limit>>,
-        // /// Authorization required.
-        // _auth: CatalystRBACSecurityScheme,
+        page: Query<Option<Page>>, limit: Query<Option<Limit>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> post_document_index_query::AllResponses {
         post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
     }
