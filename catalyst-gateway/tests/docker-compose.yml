@@ -48,7 +48,6 @@ services:
       - CHAIN_FOLLOWER_SYNC_TASKS="16"
       - MACHINE_ID="UID"
       - RBAC_OFF=true
-    hostname: 127.0.0.1
     ports:
       - 3030:3030
     depends_on:
