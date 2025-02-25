@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
@@ -252,6 +253,79 @@ class XButton extends StatelessWidget {
     return VoicesIconButton(
       onTap: onTap,
       child: VoicesAssets.icons.x.buildIcon(),
+    );
+  }
+}
+
+class ActionIconButton extends StatelessWidget {
+  final VoidCallback? onTap;
+  final Widget child;
+
+  const ActionIconButton({
+    super.key,
+    this.onTap,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton.filled(
+      onTap: onTap,
+      style: IconButton.styleFrom(
+        padding: const EdgeInsets.all(10),
+        backgroundColor: context.colors.onSurfacePrimary08,
+        foregroundColor: context.colorScheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        iconSize: 18,
+      ),
+      child: child,
+    );
+  }
+}
+
+class ShareButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const ShareButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionIconButton(
+      onTap: onTap,
+      child: VoicesAssets.icons.share.buildIcon(
+        color: context.colorScheme.primary,
+      ),
+    );
+  }
+}
+
+class FavoriteButton extends StatelessWidget {
+  final bool isFavorite;
+  final ValueChanged<bool>? onChanged;
+
+  const FavoriteButton({
+    super.key,
+    this.isFavorite = false,
+    this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final onChanged = this.onChanged;
+
+    return ActionIconButton(
+      onTap: onChanged != null ? () => onChanged.call(!isFavorite) : null,
+      child: CatalystSvgIcon.asset(
+        isFavorite
+            ? VoicesAssets.icons.starFilled.path
+            : VoicesAssets.icons.starOutlined.path,
+        color: context.colorScheme.primary,
+      ),
     );
   }
 }
