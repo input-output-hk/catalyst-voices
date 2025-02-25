@@ -11,7 +11,10 @@ final class ProposalViewData extends Equatable {
   });
 
   @override
-  List<Object?> get props => [header, segments];
+  List<Object?> get props => [
+        header,
+        segments,
+      ];
 
   ProposalViewData copyWith({
     ProposalViewHeader? header,

@@ -15,3 +15,16 @@ final class ShowProposalEvent extends ProposalEvent {
   @override
   List<Object?> get props => [ref];
 }
+
+final class UpdateProposalFavoriteEvent extends ProposalEvent {
+  final String id;
+  final bool isFavorite;
+
+  const UpdateProposalFavoriteEvent({
+    required this.id,
+    required this.isFavorite,
+  });
+
+  @override
+  List<Object?> get props => [id, isFavorite];
+}

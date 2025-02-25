@@ -7,8 +7,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProposalStickyHeader extends StatelessWidget {
-  const ProposalStickyHeader({super.key});
+class ProposalHeader extends StatelessWidget {
+  const ProposalHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +36,12 @@ class ProposalStickyHeader extends StatelessWidget {
 }
 
 class _ProposalControls extends StatelessWidget {
+  final String? id;
   final DocumentVersions versions;
   final bool isFavorite;
 
   const _ProposalControls({
+    required this.id,
     required this.versions,
     required this.isFavorite,
   });
@@ -55,7 +57,19 @@ class _ProposalControls extends StatelessWidget {
         ),
         FavoriteButton(
           isFavorite: isFavorite,
-          onChanged: (value) {},
+          onChanged: (value) {
+            final id = this.id;
+            if (id == null) {
+              return;
+            }
+
+            final event = UpdateProposalFavoriteEvent(
+              id: id,
+              isFavorite: value,
+            );
+
+            context.read<ProposalBloc>().add(event);
+          },
         ),
         ShareButton(onTap: () {}),
       ].separatedBy(const SizedBox(width: 8)).toList(),
@@ -72,6 +86,7 @@ class _ProposalControlsSelector extends StatelessWidget {
       selector: (state) => state.data.header,
       builder: (context, state) {
         return _ProposalControls(
+          id: state.id,
           versions: state.versions,
           isFavorite: state.isFavourite,
         );

@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/pages/proposal/proposal_body.dart';
-import 'package:catalyst_voices/pages/proposal/proposal_sticky_header.dart';
+import 'package:catalyst_voices/pages/proposal/proposal_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -36,15 +36,10 @@ class _ProposalPageState extends State<ProposalPage> {
   Widget build(BuildContext context) {
     return const Scaffold(
       appBar: VoicesAppBar(),
-      body: Column(
-        children: [
-          ProposalStickyHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(top: 48),
-              child: ProposalBody(),
-            ),
-          ),
+      body: CustomScrollView(
+        slivers: [
+          SliverFloatingHeader(child: ProposalHeader()),
+          SliverToBoxAdapter(child: ProposalBody()),
         ],
       ),
     );

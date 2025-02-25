@@ -10,6 +10,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
     this._proposalService,
   ) : super(const ProposalState()) {
     on<ShowProposalEvent>(_handleShowProposalEvent);
+    on<UpdateProposalFavoriteEvent>(_handleUpdateProposalFavoriteEvent);
   }
 
   Future<void> _handleShowProposalEvent(
@@ -17,8 +18,6 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
     Emitter<ProposalState> emit,
   ) async {
     emit(const ProposalState(isLoading: true));
-
-    await Future<void>.delayed(const Duration(seconds: 2));
 
     final data = ProposalViewData(
       header: ProposalViewHeader(
@@ -33,5 +32,14 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
     );
 
     emit(ProposalState(data: data));
+  }
+
+  Future<void> _handleUpdateProposalFavoriteEvent(
+    UpdateProposalFavoriteEvent event,
+    Emitter<ProposalState> emit,
+  ) async {
+    // TODO(damian-molinski): not implemented
+
+    emit(state.copyWithFavourite(isFavourite: event.isFavorite));
   }
 }

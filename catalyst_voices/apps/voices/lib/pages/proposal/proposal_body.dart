@@ -8,14 +8,17 @@ class ProposalBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SpaceScaffold(
       left: Center(child: Text('Left')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text('Start'),
-          SizedBox(height: 600),
-          Text('End'),
-        ],
+      body: ColoredBox(
+        color: Colors.orange,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('Start'),
+            SizedBox(height: 1200),
+            Text('End'),
+          ],
+        ),
       ),
       right: Offstage(),
     );

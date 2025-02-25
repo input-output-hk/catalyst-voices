@@ -24,6 +24,14 @@ final class ProposalState extends Equatable {
         error,
       ];
 
+  ProposalState copyWithFavourite({
+    required bool isFavourite,
+  }) {
+    final updatedHeader = data.header.copyWith(isFavourite: isFavourite);
+    final updatedData = data.copyWith(header: updatedHeader);
+    return copyWith(data: updatedData);
+  }
+
   ProposalState copyWith({
     bool? isLoading,
     ProposalViewData? data,
