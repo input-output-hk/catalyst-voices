@@ -3,27 +3,26 @@ from api import cat_gateway_endpoint_url, BEARER_TOKEN
 
 URL = cat_gateway_endpoint_url("api/v1/document")
 
+
 # Signed document GET
 def get(document_id: str):
     document_url = f"{URL}/{document_id}"
-    headers = {
-        "Authorization": f"Bearer {BEARER_TOKEN}"
-    }
-    return requests.get(document_url, headers=headers)
+    return requests.get(document_url)
+
 
 # Signed document PUT
 def put(data: str):
     headers = {
         "Authorization": f"Bearer {BEARER_TOKEN}",
-        "Content-Type": "application/cbor"
+        "Content-Type": "application/cbor",
     }
     data = bytes.fromhex(data)
     return requests.put(URL, headers=headers, data=data)
 
+
 # Signed document POST
 def post(document_url: str, filter: dict):
     headers = {
-        "Authorization": f"Bearer {BEARER_TOKEN}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
     return requests.post(f"{URL}{document_url}", headers=headers, json=filter)
