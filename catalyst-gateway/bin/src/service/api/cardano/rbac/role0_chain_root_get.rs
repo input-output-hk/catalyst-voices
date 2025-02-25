@@ -1,21 +1,22 @@
 //! Implementation of the GET `/rbac/role0_chain_root` endpoint.
 
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 use tracing::error;
 
 use crate::{
     db::index::session::CassandraSession,
     service::common::{
-        responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption,
+        objects::cardano::hash::Hash256, responses::WithErrorResponses,
+        types::headers::retry_after::RetryAfterOption,
     },
 };
 
 /// GET RBAC chain root response.
 #[derive(Object)]
+#[oai(example = true)]
 pub(crate) struct RbacRole0ChainRootResponse {
     /// RBAC certificate chain root.
-    #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
-    chain_root: String,
+    chain_root: Hash256,
 }
 
 /// Endpoint responses.
@@ -43,4 +44,12 @@ pub(crate) async fn endpoint(_role0_key: String) -> AllResponses {
     // TODO: This endpoint needs to be removed or updated because "chain root" was replaced by
     // Catalyst ID.
     AllResponses::forbidden(None)
+}
+
+impl Example for RbacRole0ChainRootResponse {
+    fn example() -> Self {
+        Self {
+            chain_root: Hash256::example(),
+        }
+    }
 }
