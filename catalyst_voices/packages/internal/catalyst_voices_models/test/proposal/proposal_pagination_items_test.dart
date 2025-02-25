@@ -33,7 +33,6 @@ void main() {
       expect(pagination.pageKey, equals(0));
       expect(pagination.maxResults, equals(0));
       expect(pagination.items, isEmpty);
-      expect(pagination.isEmpty, isFalse);
     });
 
     test('creates instance with custom values', () {
@@ -42,13 +41,11 @@ void main() {
         pageKey: 1,
         maxResults: 10,
         items: items,
-        isEmpty: true,
       );
 
       expect(pagination.pageKey, equals(1));
       expect(pagination.maxResults, equals(10));
       expect(pagination.items, equals(items));
-      expect(pagination.isEmpty, isTrue);
     });
 
     test('copyWith creates new instance with updated values', () {
@@ -56,20 +53,17 @@ void main() {
         pageKey: 1,
         maxResults: 10,
         items: [baseProposal],
-        isEmpty: false,
       );
 
       final copied = original.copyWith(
         pageKey: 2,
         maxResults: 20,
         items: [baseProposal, baseProposal],
-        isEmpty: true,
       );
 
       expect(copied.pageKey, equals(2));
       expect(copied.maxResults, equals(20));
       expect(copied.items.length, equals(2));
-      expect(copied.isEmpty, isTrue);
       expect(copied, isNot(same(original)));
     });
 
@@ -78,14 +72,12 @@ void main() {
         pageKey: 1,
         maxResults: 10,
         items: [baseProposal],
-        isEmpty: false,
       );
 
       final pagination2 = ProposalPaginationItems<ProposalBase>(
         pageKey: 1,
         maxResults: 10,
         items: [baseProposal],
-        isEmpty: false,
       );
 
       expect(pagination1, equals(pagination2));
