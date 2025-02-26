@@ -55,6 +55,7 @@ class _ProposalControls extends StatelessWidget {
           current: versions.current,
           versions: versions.all,
         ),
+        ShareButton(onTap: () {}),
         FavoriteButton(
           isFavorite: isFavorite,
           onChanged: (value) {
@@ -71,7 +72,6 @@ class _ProposalControls extends StatelessWidget {
             context.read<ProposalBloc>().add(event);
           },
         ),
-        ShareButton(onTap: () {}),
       ].separatedBy(const SizedBox(width: 8)).toList(),
     );
   }

@@ -436,6 +436,7 @@ class _Topbar extends StatelessWidget {
         const Spacer(),
         ShareButton(
           key: const Key('ShareBtn'),
+          circle: false,
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
             final url =
@@ -450,6 +451,7 @@ class _Topbar extends StatelessWidget {
           const SizedBox(width: 4),
           FavoriteButton(
             key: const Key('FavoriteBtn'),
+            circle: false,
             onChanged: onFavoriteChanged,
           ),
         ],

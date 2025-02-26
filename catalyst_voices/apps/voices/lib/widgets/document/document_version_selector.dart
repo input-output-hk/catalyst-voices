@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -23,8 +24,16 @@ class DocumentVersionSelector extends StatelessWidget {
       offstage: nr == 0,
       child: VoicesOutlinedButton(
         leading: VoicesAssets.icons.documentText.buildIcon(),
-        child: Text(context.l10n.nrOfIteration(nr)),
         onTap: () {},
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(color: context.colors.outlineBorderVariant),
+          ),
+          foregroundColor: context.colors.textOnPrimaryLevel1,
+          iconColor: context.colors.textOnPrimaryLevel1,
+        ),
+        child: Text(context.l10n.nrOfIteration(3)),
       ),
     );
   }

@@ -259,11 +259,13 @@ class XButton extends StatelessWidget {
 
 class ActionIconButton extends StatelessWidget {
   final VoidCallback? onTap;
+  final bool circle;
   final Widget child;
 
   const ActionIconButton({
     super.key,
     this.onTap,
+    this.circle = true,
     required this.child,
   });
 
@@ -271,15 +273,20 @@ class ActionIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton.filled(
       onTap: onTap,
-      style: IconButton.styleFrom(
-        padding: const EdgeInsets.all(10),
-        backgroundColor: context.colors.onSurfacePrimary08,
-        foregroundColor: context.colorScheme.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        iconSize: 18,
-      ),
+      style: circle
+          ? IconButton.styleFrom(
+              backgroundColor: context.colors.onSurfacePrimary08,
+              foregroundColor: context.colorScheme.primary,
+            )
+          : IconButton.styleFrom(
+              padding: const EdgeInsets.all(10),
+              backgroundColor: context.colors.onSurfacePrimary08,
+              foregroundColor: context.colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              iconSize: 18,
+            ),
       child: child,
     );
   }
@@ -287,16 +294,19 @@ class ActionIconButton extends StatelessWidget {
 
 class ShareButton extends StatelessWidget {
   final VoidCallback? onTap;
+  final bool circle;
 
   const ShareButton({
     super.key,
     this.onTap,
+    this.circle = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return ActionIconButton(
       onTap: onTap,
+      circle: circle,
       child: VoicesAssets.icons.share.buildIcon(
         color: context.colorScheme.primary,
       ),
@@ -306,11 +316,13 @@ class ShareButton extends StatelessWidget {
 
 class FavoriteButton extends StatelessWidget {
   final bool isFavorite;
+  final bool circle;
   final ValueChanged<bool>? onChanged;
 
   const FavoriteButton({
     super.key,
     this.isFavorite = false,
+    this.circle = true,
     this.onChanged,
   });
 
@@ -320,6 +332,7 @@ class FavoriteButton extends StatelessWidget {
 
     return ActionIconButton(
       onTap: onChanged != null ? () => onChanged.call(!isFavorite) : null,
+      circle: circle,
       child: CatalystSvgIcon.asset(
         isFavorite
             ? VoicesAssets.icons.starFilled.path

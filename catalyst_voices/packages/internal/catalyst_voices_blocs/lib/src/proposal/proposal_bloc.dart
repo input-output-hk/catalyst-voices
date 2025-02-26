@@ -21,6 +21,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
 
     final data = ProposalViewData(
       header: ProposalViewHeader(
+        id: event.ref.id,
         title: 'Project Mayhem: Freedom by Chaos',
         authorDisplayName: 'Tyler Durden',
         createdAt: DateTime.timestamp(),
