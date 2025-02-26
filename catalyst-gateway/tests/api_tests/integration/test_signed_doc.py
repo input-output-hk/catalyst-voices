@@ -11,7 +11,7 @@ def test_signed_doc():
     # Put a signed document
     resp = document.put(data=signed_doc)
     assert (201 <= resp.status_code <= 204,
-            f"Failed to publish documents: {resp.status_code} - {resp.text}")
+            f"Failed to publish document: {resp.status_code} - {resp.text}")
     # Put a signed document again
     resp = document.put(data=signed_doc)
     assert (resp.status_code == 204,
