@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline_card.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
