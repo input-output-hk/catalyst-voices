@@ -11,7 +11,7 @@ final class AccountCubit extends Cubit<AccountState> {
 
   AccountCubit(
     this._userService,
-  ) : super(_buildState(from: _userService.account)) {
+  ) : super(_buildState(from: _userService.user.activeAccount)) {
     // TODO(damian-molinski): watch active account from _userService
   }
 
@@ -34,7 +34,7 @@ final class AccountCubit extends Cubit<AccountState> {
   }
 
   Future<void> deleteActiveKeychain() async {
-    final account = _userService.account;
+    final account = _userService.user.activeAccount;
     if (account != null) {
       await _userService.removeAccount(account);
     }
