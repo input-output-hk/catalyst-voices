@@ -5,8 +5,7 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
-        "2025-01-14":
-        [
+        "2025-01-14": [
             "Updated schema to include new fields for proposal details.",
             "Fixed validation issues with the URL pattern.",
             "Improved documentation for open source requirements."
@@ -213,26 +212,26 @@
             "title": "Language Code",
             "description": "Two-letter ISO 639-1 language code",
             "enum": [
-                "aa", "ab", "af", "ak", "am", "ar", "as", "ay", "az", "ba", "be", "bg", "bh", "bi", "bn", 
-                "bo", "br", "bs", "ca", "ce", "ch", "co", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz", 
-                "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga", 
-                "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia", 
-                "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj", 
-                "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", 
-                "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", 
-                "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", 
-                "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", 
-                "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", 
-                "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", 
+                "aa", "ab", "af", "ak", "am", "ar", "as", "ay", "az", "ba", "be", "bg", "bh", "bi", "bn",
+                "bo", "br", "bs", "ca", "ce", "ch", "co", "cs", "cu", "cv", "cy", "da", "de", "dv", "dz",
+                "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi", "fj", "fo", "fr", "fy", "ga",
+                "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho", "hr", "ht", "hu", "hy", "hz", "ia",
+                "id", "ie", "ig", "ii", "ik", "io", "is", "it", "iu", "ja", "jv", "ka", "kg", "ki", "kj",
+                "kk", "kl", "km", "kn", "ko", "kr", "ks", "ku", "kv", "kw", "ky", "la", "lb", "lg", "li",
+                "ln", "lo", "lt", "lu", "lv", "mg", "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my",
+                "na", "nb", "nd", "ne", "ng", "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or",
+                "os", "pa", "pi", "pl", "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd",
+                "se", "sg", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw",
+                "ta", "te", "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug",
                 "uk", "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu"
             ],
             "default": "en",
             "x-note": "Select the ISO 639-1 two-letter code for the language. For example: 'en' for English, 'es' for Spanish, 'fr' for French, etc."
         },
         "borderGroup": {
-                    "$comment": "UI - Border Group for better UI rendering",
-                    "type": "object",
-                    "x-border-color": "#ff0000"
+            "$comment": "UI - Border Group for better UI rendering",
+            "type": "object",
+            "x-border-color": "#ff0000"
         }
     },
     "type": "object",
@@ -310,7 +309,7 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "title": "Co-proposer Name", 
+                                        "title": "Co-proposer Name",
                                         "description": "Full name of the co-proposer",
                                         "minLength": 2,
                                         "maxLength": 100
