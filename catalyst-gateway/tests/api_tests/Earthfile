@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.39 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:fix/signed-doc AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250226-00 AS cat-libs-rust
 
 builder:
     FROM python-ci+python-base
