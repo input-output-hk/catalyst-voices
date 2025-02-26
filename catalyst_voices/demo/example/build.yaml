@@ -1,0 +1,31 @@
+targets:
+  $default:
+    sources:
+      - lib/**
+      - swaggers/**
+      - swaggers2/**
+      - source_folder/**
+      - staging_folder/**
+      - swagger_examples/**
+      - $package$
+    builders:
+      openapi_builder:
+        enabled: false
+        options:
+          sourcepath: "source_folder/"
+      chopper_generator:
+        enabled: true
+        options:
+          header: "//Generated code"
+      swagger_dart_code_generator:
+        enabled: true
+        options:
+          # Hard-code the staging folder for input
+          input_folder: "staging_folder/"
+          output_folder: "lib/swagger_generated_code/"
+          separate_models: true          
+          include_if_null: false
+          exclude_paths:
+            - /api/draft/*
+          # turn it off when we can get rid of vit. atm its generating classes incorrectly with it.
+          use_path_for_request_names: true
