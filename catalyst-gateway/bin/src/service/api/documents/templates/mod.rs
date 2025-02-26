@@ -22,38 +22,35 @@ pub(crate) static TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocumen
     LazyLock::new(|| {
         // Load the secret key from the environment
         // Expect hex encoded secret key that start with 0x
-        let value = env::var("SIGNED_DOC_SK");
-
         // If no secret key is found, cannot generate sign documents
-        if let Ok(v) = value {
-            // Strip the prefix and convert to 32 bytes array
-            let byte_array: [u8; 32] = if let Some(bytes) = v
-                .strip_prefix("0x")
-                .and_then(|s| Vec::from_hex(s).ok())
-                .and_then(|bytes| bytes.as_slice().try_into().ok())
-            {
-                bytes
-            } else {
-                error!(
-                    id = "static_template",
-                    "Failed to convert secret key to bytes"
-                );
-                return None;
-            };
-            let sk = SigningKey::from_bytes(&byte_array);
-
-            let map = DOCUMENTS_DATA
-                .iter()
-                .map(|t| t.to_signed_doc(&sk))
-                .collect();
-            Some(map)
-        } else {
+        let Ok(signed_doc_sk_hex) = env::var("SIGNED_DOC_SK") else {
             error!(
                 id = "static_template_env",
                 "Secret key not found in environment"
             );
-            None
-        }
+            return None;
+        };
+        println!("signed_doc_sk_hex: {signed_doc_sk_hex}");
+        // Strip the prefix and convert to 32 bytes array
+        let Some(byte_array) = signed_doc_sk_hex
+            .strip_prefix("0x")
+            .and_then(|s| Vec::from_hex(s).ok())
+            .and_then(|bytes| bytes.as_slice().try_into().ok())
+        else {
+            error!(
+                id = "static_template",
+                "Failed to convert secret key to bytes"
+            );
+            return None;
+        };
+
+        let sk = SigningKey::from_bytes(&byte_array);
+
+        let map = DOCUMENTS_DATA
+            .iter()
+            .map(|t| t.to_signed_doc(&sk))
+            .collect();
+        Some(map)
     });
 
 #[derive(Clone)]
