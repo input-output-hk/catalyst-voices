@@ -55,7 +55,11 @@ class _ProposalControls extends StatelessWidget {
           current: versions.current,
           versions: versions.all,
         ),
-        ShareButton(onTap: () {}),
+        ShareButton(
+          onTap: () {
+            // TODO(LynxLynxx): Implement Share
+          },
+        ),
         FavoriteButton(
           isFavorite: isFavorite,
           onChanged: (value) {

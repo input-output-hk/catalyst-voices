@@ -62,8 +62,7 @@ class _ProposalPageState extends State<ProposalPage> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.ref != oldWidget.ref) {
-      final event = ShowProposalEvent(ref: widget.ref);
-      context.read<ProposalBloc>().add(event);
+      context.read<ProposalBloc>().add(ShowProposalEvent(ref: widget.ref));
     }
   }
 
