@@ -34,7 +34,6 @@ def build_signed_doc(
         )
 
         signed_doc_hex = signed_doc_file.read().hex()
-        print(f"signed_doc_hex: {signed_doc_hex}")
         return signed_doc_hex
 
 
