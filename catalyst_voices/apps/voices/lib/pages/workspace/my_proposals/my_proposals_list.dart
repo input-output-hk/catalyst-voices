@@ -19,7 +19,9 @@ class _MyProposalsList extends StatelessWidget {
           key: ValueKey('WorkspaceProposal${item.id}ListTileKey'),
           item: item,
           onTap: () {
-            ProposalBuilderRoute(proposalId: item.id).go(context);
+            unawaited(
+              ProposalBuilderRoute(proposalId: item.id).push(context),
+            );
           },
         );
       },
