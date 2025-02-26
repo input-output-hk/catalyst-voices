@@ -22,7 +22,7 @@ def build_signed_doc(
         doc_content_file.write(json_str.encode(encoding="utf-8"))
         doc_content_file.flush()
 
-        subprocess.call(
+        subprocess.run(
             f"./mk_signed_doc build {doc_content_file.name} {signed_doc_file.name} {metadata_file.name}",
             shell=True,
         )
@@ -222,7 +222,7 @@ def comment_doc_check(
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    logger.info("Signed document test successful.")
+    logger.info("Comment document test successful.")
 
 
 def pagination_out_of_range_check():
@@ -234,3 +234,5 @@ def pagination_out_of_range_check():
     assert (
         resp.status_code == 412
     ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
+
+    logger.info("Templates test successful.")
