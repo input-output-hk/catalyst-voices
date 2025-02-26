@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_header.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_nav_tile.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space_overview_container.dart';

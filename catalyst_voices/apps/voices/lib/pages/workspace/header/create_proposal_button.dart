@@ -7,7 +7,7 @@ class _CreateProposalButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: () {
-        const ProposalBuilderDraftRoute().go(context);
+        unawaited(const ProposalBuilderDraftRoute().push(context));
       },
       trailing: VoicesAssets.icons.plus.buildIcon(),
       child: Text(context.l10n.createProposal),
