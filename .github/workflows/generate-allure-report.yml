@@ -166,7 +166,6 @@ jobs:
           allow-empty: true
           debug: true
           flag-name: rust-unit-test
-          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
       - name: Coveralls
@@ -178,7 +177,6 @@ jobs:
           allow-empty: true
           debug: true
           flag-name: api-test
-          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
       - name: Coveralls
@@ -190,7 +188,6 @@ jobs:
           allow-empty: true
           debug: true
           flag-name: flutter-test
-          base-path: "${{ env.REPO_BASE_PATH }}"
           parallel: true
 
   upload-coverage-report:
