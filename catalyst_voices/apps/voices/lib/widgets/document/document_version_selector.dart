@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 class DocumentVersionSelector extends StatelessWidget {
   final String? current;
   final List<String> versions;
+  final bool showBorder;
 
   const DocumentVersionSelector({
     super.key,
     this.current,
     required this.versions,
+    this.showBorder = true,
   });
 
   @override
@@ -24,12 +26,13 @@ class DocumentVersionSelector extends StatelessWidget {
       offstage: nr == 0,
       child: VoicesOutlinedButton(
         leading: VoicesAssets.icons.documentText.buildIcon(),
+        trailing: VoicesAssets.icons.chevronDown.buildIcon(),
         onTap: () {},
         style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: context.colors.outlineBorderVariant),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          side: showBorder
+              ? BorderSide(color: context.colors.outlineBorderVariant)
+              : BorderSide.none,
           foregroundColor: context.colors.textOnPrimaryLevel1,
           iconColor: context.colors.textOnPrimaryLevel1,
         ),
