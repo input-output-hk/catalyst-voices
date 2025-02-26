@@ -4,7 +4,7 @@ use poem_openapi::ApiResponse;
 
 use crate::service::{
     common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-    utilities::health::is_started,
+    utilities::health::service_has_started,
 };
 
 /// Endpoint responses.
@@ -39,7 +39,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// startup processing was fully completed.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    if is_started() {
+    if service_has_started() {
         Responses::NoContent.into()
     } else {
         AllResponses::service_unavailable(

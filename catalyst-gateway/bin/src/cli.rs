@@ -9,7 +9,7 @@ use crate::{
     db::{self, index::session::CassandraSession},
     service::{
         self,
-        utilities::health::{is_live, live_counter_reset, started},
+        utilities::health::{is_live, live_counter_reset, set_to_started},
     },
     settings::{DocsSettings, ServiceSettings, Settings},
 };
@@ -71,7 +71,7 @@ impl Cli {
                 });
                 tasks.push(handle);
 
-                started();
+                set_to_started();
 
                 for task in tasks {
                     task.await?;
