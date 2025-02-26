@@ -3,15 +3,10 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 // ignore: one_member_abstracts
 abstract interface class ProposalService {
-  factory ProposalService(
+  const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
-  ) {
-    return ProposalServiceImpl(
-      proposalRepository,
-      documentRepository,
-    );
-  }
+  ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
 
