@@ -75,15 +75,15 @@ final class SectionChangedEvent extends ProposalBuilderEvent {
   List<Object?> get props => [changes];
 }
 
-final class ShareProposalEvent extends ProposalBuilderEvent {
-  const ShareProposalEvent();
+final class SubmitProposalEvent extends ProposalBuilderEvent {
+  const SubmitProposalEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-final class SubmitProposalEvent extends ProposalBuilderEvent {
-  const SubmitProposalEvent();
+final class ValidateProposalEvent extends ProposalBuilderEvent {
+  const ValidateProposalEvent();
 
   @override
   List<Object?> get props => [];
