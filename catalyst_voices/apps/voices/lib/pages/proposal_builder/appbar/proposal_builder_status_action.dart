@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
@@ -13,12 +14,21 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProposalBuilderStatusAction extends StatefulWidget {
+class ProposalBuilderStatusAction extends StatelessWidget {
   const ProposalBuilderStatusAction({super.key});
 
   @override
-  State<ProposalBuilderStatusAction> createState() =>
-      _ProposalBuilderStatusActionState();
+  Widget build(BuildContext context) {
+    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
+        List<_MenuItemEnum>>(
+      selector: (state) {
+        return _MenuItemEnum.availableOptions(state.metadata.publish);
+      },
+      builder: (context, items) {
+        return _PopupMenuButton(items: items);
+      },
+    );
+  }
 }
 
 class _Button extends StatelessWidget {
@@ -37,9 +47,9 @@ class _Button extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             context.l10n.proposalOptions,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
+            style: context.textTheme.labelLarge?.copyWith(
+              color: context.colorScheme.onPrimary,
+            ),
           ),
           const VerticalDivider(width: 22),
           VoicesAssets.icons.chevronDown.buildIcon(size: 16),
@@ -51,62 +61,54 @@ class _Button extends StatelessWidget {
 
 class _MenuItem extends StatelessWidget {
   final _MenuItemEnum item;
+  final String? proposalTitle;
+  final ProposalBuilderMetadata metadata;
 
-  const _MenuItem({required this.item});
+  const _MenuItem({
+    required this.item,
+    required this.proposalTitle,
+    required this.metadata,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<
-        ProposalBuilderBloc,
-        ProposalBuilderState,
-        ({
-          String? proposalTitle,
-          ProposalBuilderMetadata metadata,
-        })>(
-      selector: (state) => (
-        proposalTitle: state.proposalTitle,
-        metadata: state.metadata,
+    final title = item.title(
+      context,
+      proposalTitle,
+      metadata.currentIteration,
+    );
+
+    final description = item.description(context, metadata);
+
+    return ListTile(
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.bodyLarge,
       ),
-      builder: (context, state) {
-        final title = item.title(
-          context,
-          state.proposalTitle,
-          state.metadata.currentIteration,
-        );
-
-        final description = item.description(context, state.metadata);
-
-        return ListTile(
-          title: Text(
-            title,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-          subtitle: description == null
-              ? null
-              : Text(
-                  description,
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).colors.textOnPrimaryLevel1,
-                      ),
-                ),
-          leading: item.icon.buildIcon(),
-          mouseCursor: item.clickable ? SystemMouseCursors.click : null,
-        );
-      },
+      subtitle: description == null
+          ? null
+          : Text(
+              description,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Theme.of(context).colors.textOnPrimaryLevel1,
+                  ),
+            ),
+      leading: item.icon.buildIcon(),
+      mouseCursor: item.clickable ? SystemMouseCursors.click : null,
     );
   }
 }
 
 enum _MenuItemEnum {
   view(clickable: false),
-  publish(clickable: true),
-  submit(clickable: true),
-  export(clickable: true),
-  delete(clickable: true);
+  publish,
+  submit,
+  export,
+  delete;
 
   final bool clickable;
 
-  const _MenuItemEnum({required this.clickable});
+  const _MenuItemEnum({this.clickable = true});
 
   SvgGenImage get icon {
     switch (this) {
@@ -176,77 +178,106 @@ enum _MenuItemEnum {
   }
 }
 
-class _ProposalBuilderStatusActionState
-    extends State<ProposalBuilderStatusAction> {
-  final GlobalKey<PopupMenuButtonState<int>> _buttonKey = GlobalKey();
+class _MenuItemSelector extends StatelessWidget {
+  final _MenuItemEnum item;
+
+  const _MenuItemSelector({required this.item});
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        ProposalBuilderMetadata>(
-      selector: (state) => state.metadata,
-      builder: (context, metadata) {
-        final items = _MenuItemEnum.availableOptions(metadata.publish);
-        return PopupMenuButton<int>(
-          key: _buttonKey,
-          offset: const Offset(0, 48),
-          clipBehavior: Clip.antiAlias,
-          constraints: const BoxConstraints(minWidth: 420),
-          child: _Button(onTap: _showMenu),
-          itemBuilder: (context) {
-            return <PopupMenuEntry<int>>[
-              for (final item in items)
-                PopupMenuItem(
-                  value: item.index,
-                  enabled: item.clickable,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  child: _MenuItem(item: item),
-                ),
-            ].separatedBy(const PopupMenuDivider(height: 0)).toList();
-          },
-          onSelected: (value) {
-            final item = _MenuItemEnum.values[value];
-            _onSelected(context, item);
-          },
+    return BlocSelector<
+        ProposalBuilderBloc,
+        ProposalBuilderState,
+        ({
+          String? proposalTitle,
+          ProposalBuilderMetadata metadata,
+        })>(
+      selector: (state) => (
+        proposalTitle: state.proposalTitle,
+        metadata: state.metadata,
+      ),
+      builder: (context, state) {
+        return _MenuItem(
+          item: item,
+          proposalTitle: state.proposalTitle,
+          metadata: state.metadata,
         );
       },
     );
   }
+}
 
-  Future<void> _deleteProposal(BuildContext context) async {
-    final confirmed = await VoicesQuestionDialog.show(
+class _PopupMenuButton extends StatefulWidget {
+  final List<_MenuItemEnum> items;
+
+  const _PopupMenuButton({required this.items});
+
+  @override
+  State<_PopupMenuButton> createState() => _PopupMenuButtonState();
+}
+
+class _PopupMenuButtonState extends State<_PopupMenuButton> {
+  final GlobalKey<PopupMenuButtonState<int>> _buttonKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<int>(
+      key: _buttonKey,
+      offset: const Offset(0, 48),
+      clipBehavior: Clip.antiAlias,
+      constraints: const BoxConstraints(minWidth: 420),
+      child: _Button(onTap: _showMenu),
+      itemBuilder: (context) {
+        return <PopupMenuEntry<int>>[
+          for (final item in widget.items)
+            PopupMenuItem(
+              value: item.index,
+              enabled: item.clickable,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 4,
+              ),
+              child: _MenuItemSelector(item: item),
+            ),
+        ].separatedBy(const PopupMenuDivider(height: 0)).toList();
+      },
+      onSelected: (value) {
+        final item = _MenuItemEnum.values[value];
+        _onSelected(item);
+      },
+    );
+  }
+
+  Future<void> _deleteProposal() async {
+    final confirmed = await ProposalBuilderDeleteConfirmationDialog.show(
       context,
       routeSettings: const RouteSettings(
         name: '/proposal_builder/delete-confirmation',
       ),
-      builder: (_) => const ProposalBuilderDeleteConfirmationDialog(),
     );
 
-    if (confirmed && context.mounted) {
+    if (confirmed && mounted) {
       context.read<ProposalBuilderBloc>().add(const DeleteProposalEvent());
     }
   }
 
-  void _onSelected(BuildContext context, _MenuItemEnum item) {
+  void _onSelected(_MenuItemEnum item) {
     switch (item) {
       case _MenuItemEnum.view:
         // do nothing
         break;
       case _MenuItemEnum.publish:
-        unawaited(_publishIteration(context));
+        unawaited(_publishIteration());
       case _MenuItemEnum.submit:
-        unawaited(_submitForReview(context));
+        unawaited(_submitForReview());
       case _MenuItemEnum.export:
         context.read<ProposalBuilderBloc>().add(const ExportProposalEvent());
       case _MenuItemEnum.delete:
-        unawaited(_deleteProposal(context));
+        unawaited(_deleteProposal());
     }
   }
 
-  Future<void> _publishIteration(BuildContext context) async {
+  Future<void> _publishIteration() async {
     final bloc = context.read<ProposalBuilderBloc>();
     if (!bloc.validate()) {
       return;
@@ -274,7 +305,7 @@ class _ProposalBuilderStatusActionState
     _buttonKey.currentState?.showButtonMenu();
   }
 
-  Future<void> _submitForReview(BuildContext context) async {
+  Future<void> _submitForReview() async {
     final bloc = context.read<ProposalBuilderBloc>();
     if (!bloc.validate()) {
       return;

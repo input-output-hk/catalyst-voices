@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/modals/details/voices_align_title_header.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';

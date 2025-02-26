@@ -89,7 +89,7 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
         proposals.pageKey,
         proposals.maxResults,
       );
-    } else if (request.stage == ProposalPublish.localDraft) {
+    } else if (request.stage == ProposalPublish.publishedDraft) {
       return _emitDraftProposals(
         proposalViewModelList,
         proposals.pageKey,

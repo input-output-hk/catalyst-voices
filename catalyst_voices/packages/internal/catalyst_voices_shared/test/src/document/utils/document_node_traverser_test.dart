@@ -47,7 +47,7 @@ void main() {
     });
 
     test('getValue returns null for accessing non-map or non-list', () {
-      final nodeId = DocumentNodeId.fromString('user.namefirst');
+      final nodeId = DocumentNodeId.fromString('user.name.first');
       final data = {
         'user': {'name': 'John Doe'},
       };

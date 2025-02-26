@@ -5,7 +5,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class ProposalBuilderDeleteConfirmationDialog extends StatelessWidget {
-  const ProposalBuilderDeleteConfirmationDialog({super.key});
+  const ProposalBuilderDeleteConfirmationDialog._();
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +26,17 @@ class ProposalBuilderDeleteConfirmationDialog extends StatelessWidget {
           type: VoicesQuestionActionType.text,
         ),
       ],
+    );
+  }
+
+  static Future<bool> show(
+    BuildContext context, {
+    required RouteSettings routeSettings,
+  }) {
+    return VoicesQuestionDialog.show(
+      context,
+      routeSettings: routeSettings,
+      builder: (_) => const ProposalBuilderDeleteConfirmationDialog._(),
     );
   }
 }

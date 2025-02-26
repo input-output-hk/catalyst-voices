@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';

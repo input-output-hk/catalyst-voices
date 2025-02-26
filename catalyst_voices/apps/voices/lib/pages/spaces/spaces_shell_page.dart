@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
