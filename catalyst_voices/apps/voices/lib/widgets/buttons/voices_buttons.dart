@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
@@ -233,7 +233,7 @@ class VoicesStartProposalButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
-      onTap: () => const ProposalBuilderDraftRoute().go(context),
+      onTap: () => unawaited(const ProposalBuilderDraftRoute().push(context)),
       child: Text(context.l10n.startProposal),
     );
   }
