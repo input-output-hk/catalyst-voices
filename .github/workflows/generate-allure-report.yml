@@ -74,13 +74,16 @@ jobs:
           name: test-reports
           path: "**/*${{ env.REPORT_EXT }}"
           if-no-files-found: error
-          retention-days: 2
+          retention-days: 1
 
-      - name: Collect and merge test coverage
-        uses: kukkok3/collect-coverage@main
+      - name: Collect and upload test coverage
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          extension: ${{ env.COVERAGE_EXT }}
+          name: coverage-reports
+          path: "**/*${{ env.COVERAGE_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
 
   generate-allure-report:
     name: Generate allure report
