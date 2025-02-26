@@ -5,7 +5,6 @@ from api.v1 import document
 from tempfile import NamedTemporaryFile
 import subprocess
 import json
-import os
 from typing import Dict, Any, List
 from uuid_extensions import uuid7str
 
@@ -29,14 +28,13 @@ def build_signed_doc(
         )
 
         signed_doc_hex = signed_doc_file.read().hex()
+        print(f"signed_doc_hex: {signed_doc_hex}")
         return signed_doc_hex
 
 
 def test_signed_doc():
     health.is_live()
     health.is_ready()
-
-    print(os.listdir())
 
     # comes from the 'templates/data.rs' file
     proposal_templates = [
