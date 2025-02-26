@@ -8,8 +8,8 @@ use crate::{
     cardano::start_followers,
     db::{self, index::session::CassandraSession},
     service::{
-        self, started,
-        utilities::health::{is_live, live_counter_reset},
+        self,
+        utilities::health::{is_live, live_counter_reset, started},
     },
     settings::{DocsSettings, ServiceSettings, Settings},
 };
