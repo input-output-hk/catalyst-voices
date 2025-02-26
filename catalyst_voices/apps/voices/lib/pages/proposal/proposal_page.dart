@@ -50,7 +50,7 @@ class _ProposalPageState extends State<ProposalPage> {
         appBar: const VoicesAppBar(),
         body: SpaceScaffold(
           left: const ProposalNavigationPanel(),
-          body: ProposalContent(controller: _segmentsScrollController),
+          body: ProposalContent(scrollController: _segmentsScrollController),
           right: const Offstage(),
         ),
       ),

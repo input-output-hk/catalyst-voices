@@ -13,20 +13,19 @@ typedef SectionWidgetBuilder<T extends Section> = Widget Function(
   T data,
 );
 
-class SegmentsListView<TSegment extends Segment, TSection extends Section>
-    extends StatelessWidget {
+class BasicSegmentsListView extends StatelessWidget {
   final List<SegmentsListViewItem> items;
-  final SegmentHeaderWidgetBuilder<TSegment> headerBuilder;
-  final SectionWidgetBuilder<TSection> sectionBuilder;
+  final IndexedWidgetBuilder itemBuilder;
+  final IndexedWidgetBuilder separatorBuilder;
   final EdgeInsetsGeometry? padding;
   final ItemScrollController? itemScrollController;
 
-  const SegmentsListView({
+  const BasicSegmentsListView({
     super.key,
     required this.items,
-    this.headerBuilder = _defaultSegmentHeaderBuilder,
-    required this.sectionBuilder,
-    this.padding = const EdgeInsets.symmetric(vertical: 12),
+    required this.itemBuilder,
+    required this.separatorBuilder,
+    this.padding = EdgeInsets.zero,
     this.itemScrollController,
   });
 
@@ -42,42 +41,56 @@ class SegmentsListView<TSegment extends Segment, TSection extends Section>
       child: ScrollablePositionedList.separated(
         padding: padding?.resolve(Directionality.of(context)),
         itemScrollController: itemScrollController,
-        itemBuilder: (context, index) {
-          final item = items[index];
-
-          if (item is TSegment) {
-            return KeyedSubtree(
-              key: ValueKey(item.id),
-              child: headerBuilder(context, item),
-            );
-          }
-
-          if (item is TSection) {
-            return KeyedSubtree(
-              key: ValueKey(item.id),
-              child: sectionBuilder(context, item),
-            );
-          }
-
-          throw ArgumentError('Unknown item type[${item.runtimeType}]');
-        },
-        separatorBuilder: (context, index) {
-          final item = items[index];
-
-          if (item is TSegment) {
-            return const SizedBox(height: 12);
-          }
-
-          if (item is TSection) {
-            return const SizedBox(height: 12);
-          }
-
-          throw ArgumentError('Unknown item type[${item.runtimeType}]');
-        },
+        itemBuilder: itemBuilder,
+        separatorBuilder: separatorBuilder,
         itemCount: items.length,
       ),
     );
   }
+}
+
+class SegmentsListView<T1 extends Segment, T2 extends Section>
+    extends BasicSegmentsListView {
+  SegmentsListView({
+    super.key,
+    required super.items,
+    SegmentHeaderWidgetBuilder<T1> segmentBuilder =
+        _defaultSegmentHeaderBuilder,
+    required SectionWidgetBuilder<T2> sectionBuilder,
+  }) : super(
+          itemBuilder: (context, index) {
+            final item = items[index];
+
+            if (item is T1) {
+              return KeyedSubtree(
+                key: ValueKey(item.id),
+                child: segmentBuilder(context, item),
+              );
+            }
+
+            if (item is T2) {
+              return KeyedSubtree(
+                key: ValueKey(item.id),
+                child: sectionBuilder(context, item),
+              );
+            }
+
+            throw ArgumentError('Unknown item type[${item.runtimeType}]');
+          },
+          separatorBuilder: (context, index) {
+            final item = items[index];
+
+            if (item is T1) {
+              return const SizedBox(height: 12);
+            }
+
+            if (item is T2) {
+              return const SizedBox(height: 12);
+            }
+
+            throw ArgumentError('Unknown item type[${item.runtimeType}]');
+          },
+        );
 }
 
 Widget _defaultSegmentHeaderBuilder(BuildContext context, Segment data) {
