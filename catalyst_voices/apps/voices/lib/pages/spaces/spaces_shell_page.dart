@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
@@ -173,16 +172,13 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
 
   List<Widget> _getActions(Space space) {
     if (space == Space.treasury) {
-      return [
-        const CampaignManagement(),
+      return const [
+        CampaignManagement(),
       ];
     } else {
-      return [
-        // TODO(dtscalac): figure out how to add this action in appbar
-        // only when proposal builder page is shown
-        if (space == Space.workspace) const ProposalBuilderStatusAction(),
-        const SessionActionHeader(),
-        const SessionStateHeader(),
+      return const [
+        SessionActionHeader(),
+        SessionStateHeader(),
       ];
     }
   }

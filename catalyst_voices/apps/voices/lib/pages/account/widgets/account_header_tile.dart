@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/ext/string_ext.dart';
 import 'package:catalyst_voices/widgets/avatars/voices_avatar.dart';
 import 'package:catalyst_voices/widgets/text/catalyst_id_text.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
