@@ -4,6 +4,7 @@ from utils import health
 from api.v1 import document
 from tempfile import NamedTemporaryFile
 import subprocess
+import os
 import json
 from typing import Dict, Any, List
 from uuid_extensions import uuid7str
@@ -22,8 +23,10 @@ def build_signed_doc(
         doc_content_file.write(json_str.encode(encoding="utf-8"))
         doc_content_file.flush()
 
+        mk_signed_doc_absolute_path = os.path.abspath("mk_signed_doc")
+        print(mk_signed_doc_absolute_path)
         subprocess.run(
-            f"./mk_signed_doc build {doc_content_file.name} {signed_doc_file.name} {metadata_file.name}",
+            f"{mk_signed_doc_absolute_path} build {doc_content_file.name} {signed_doc_file.name} {metadata_file.name}",
             shell=True,
         )
 
