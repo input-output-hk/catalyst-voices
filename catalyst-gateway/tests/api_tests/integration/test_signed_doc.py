@@ -24,13 +24,7 @@ def build_signed_doc(
         doc_content_file.flush()
 
         subprocess.call(
-            [
-                "./mk_signed_doc",
-                "build",
-                doc_content_file.name,
-                signed_doc_file.name,
-                metadata_file.name,
-            ],
+            f"./mk_signed_doc build {doc_content_file.name} {signed_doc_file.name} {metadata_file.name}",
             shell=True,
         )
 
