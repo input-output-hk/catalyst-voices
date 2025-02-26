@@ -2,7 +2,10 @@
 
 use poem_openapi::ApiResponse;
 
-use crate::service::{common::responses::WithErrorResponses, utilities::health::is_live};
+use crate::service::{
+    common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
+    utilities::health::is_live,
+};
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -12,9 +15,6 @@ pub(crate) enum Responses {
     /// Service is OK and can keep running.
     #[oai(status = 204)]
     NoContent,
-    /// Service is not running.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
 
 /// All responses.
@@ -31,10 +31,12 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// by an endpoint in a short window.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    // TODO: Needs engineering discussion
     if is_live() {
         Responses::NoContent.into()
     } else {
-        Responses::ServiceUnavailable.into()
+        AllResponses::service_unavailable(
+            &anyhow::anyhow!("Service is not live, do not send other requests."),
+            RetryAfterOption::Default,
+        )
     }
 }
