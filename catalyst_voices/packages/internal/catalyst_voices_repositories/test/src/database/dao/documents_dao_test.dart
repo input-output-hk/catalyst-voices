@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart' show DatabaseConnection;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -186,6 +187,151 @@ void main() {
         final entity = await database.documentsDao.query(ref: ref);
 
         expect(entity, isNull);
+      });
+
+      test('Returns latest document limited by quantity if provided', () async {
+        // Given
+        final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
+          2,
+          (index) => DocumentWithMetadataFactory.build(),
+        );
+
+        final expectedDocuments = documentsWithMetadata
+            .map((e) => e.document)
+            .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
+            .values
+            .map(
+              (versions) => versions.reduce((a, b) {
+                // Compare versions (higher version wins)
+                final compareHi = b.verHi.compareTo(a.verHi);
+                if (compareHi != 0) return compareHi > 0 ? b : a;
+                return b.verLo.compareTo(a.verLo) > 0 ? b : a;
+              }),
+            )
+            .toList()
+          ..sort((a, b) {
+            // Sort by version descending
+            final compareHi = b.verHi.compareTo(a.verHi);
+            if (compareHi != 0) return compareHi;
+            return b.verLo.compareTo(a.verLo);
+          });
+
+        final limitedExpectedDocuments = expectedDocuments.take(7).toList();
+
+        // When
+        final documentsStream =
+            database.documentsDao.watchLatestVersions(limit: 7);
+
+        await database.documentsDao.saveAll(documentsWithMetadata);
+
+        // Then
+        expect(
+          documentsStream,
+          emitsInOrder([
+            equals(limitedExpectedDocuments),
+          ]),
+        );
+
+        expect(
+          limitedExpectedDocuments.length,
+          equals(7),
+          reason: 'should have 7 documents',
+        );
+
+        final uniqueIds =
+            limitedExpectedDocuments.map((d) => '${d.idHi}-${d.idLo}').toSet();
+        expect(
+          uniqueIds.length,
+          equals(limitedExpectedDocuments.length),
+          reason: 'should have unique document IDs',
+        );
+      });
+
+      test('returns latest version when document has more than 1 version',
+          () async {
+        final id = const Uuid().v7();
+        final v1 = const Uuid().v7();
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final v2 = const Uuid().v7();
+
+        final documentsWithMetadata = [v1, v2].map((version) {
+          final metadata = DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id,
+              version: version,
+            ),
+          );
+          return DocumentWithMetadataFactory.build(metadata: metadata);
+        }).toList();
+
+        // When
+        final documentsStream =
+            database.documentsDao.watchLatestVersions(limit: 7);
+
+        await database.documentsDao.saveAll(documentsWithMetadata);
+        // Then
+        expect(
+          documentsStream,
+          emitsInOrder([
+            predicate<List<DocumentEntity>>(
+              (documents) {
+                if (documents.length != 1) return false;
+                final doc = documents.first;
+                return doc.metadata.version == v2;
+              },
+              'should return document with version $v2',
+            ),
+          ]),
+        );
+      });
+
+      test('emits new version of recent document', () async {
+        // Generate base ID
+        final id = const Uuid().v7();
+
+        // Create versions with enforced order (v2 is newer than v1)
+        final v1 = const Uuid().v7();
+        // Wait a moment to ensure second UUID is newer
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final v2 = const Uuid().v7();
+
+        final documentsWithMetadata = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id,
+              version: v1,
+            ),
+          ),
+        );
+
+        final newVersion = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id,
+              version: v2,
+            ),
+          ),
+        );
+
+        // When
+        final documentsStream = database.documentsDao
+            .watchLatestVersions(limit: 7)
+            .asBroadcastStream();
+
+        // Save first version and wait for emission
+        await database.documentsDao.saveAll([documentsWithMetadata]);
+        final firstEmission = await documentsStream.first;
+
+        // Save second version and wait for emission
+        await database.documentsDao.saveAll([newVersion]);
+        final secondEmission = await documentsStream.first;
+
+        // Then verify both emissions
+        expect(firstEmission, equals([documentsWithMetadata.document]));
+        expect(secondEmission, equals([newVersion.document]));
       });
     });
 

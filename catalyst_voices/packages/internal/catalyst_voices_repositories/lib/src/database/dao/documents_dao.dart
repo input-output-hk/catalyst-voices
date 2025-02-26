@@ -10,28 +10,14 @@ import 'package:flutter/foundation.dart';
 
 /// Exposes only public operation on documents, and related, tables.
 abstract interface class DocumentsDao {
-  /// Similar to [queryAll] but emits when new records are inserted or deleted.
-  Stream<List<DocumentEntity>> watchAll();
-
-  /// Returns all entities. If same document have different versions
-  /// all will be returned.
-  Future<List<DocumentEntity>> queryAll();
-
-  /// If version is specified in [ref] returns this version or null.
-  /// Returns newest version with matching id or null of none found.
-  Future<DocumentEntity?> query({required DocumentRef ref});
-
-  /// Same as [query] but emits updates.
-  Stream<DocumentEntity?> watch({required DocumentRef ref});
-
-  /// Counts all documents.
-  Future<int> countAll();
-
   /// Counts documents matching required [ref] id and optional [ref] ver.
   ///
   /// If [ref] ver is not specified it will return count of all version
   /// matching [ref] id.
   Future<int> count({required DocumentRef ref});
+
+  /// Counts all documents.
+  Future<int> countAll();
 
   /// Counts unique documents. All versions of same document are counted as 1.
   Future<int> countDocuments();
@@ -39,13 +25,29 @@ abstract interface class DocumentsDao {
   @visibleForTesting
   Future<int> countDocumentsMetadata();
 
+  /// Deletes all documents. Cascades to metadata.
+  Future<void> deleteAll();
+
+  /// If version is specified in [ref] returns this version or null.
+  /// Returns newest version with matching id or null of none found.
+  Future<DocumentEntity?> query({required DocumentRef ref});
+
+  /// Returns all entities. If same document have different versions
+  /// all will be returned.
+  Future<List<DocumentEntity>> queryAll();
+
   /// Inserts all documents and metadata. On conflicts ignores duplicates.
   Future<void> saveAll(
     Iterable<DocumentEntityWithMetadata> documentsWithMetadata,
   );
 
-  /// Deletes all documents. Cascades to metadata.
-  Future<void> deleteAll();
+  /// Same as [query] but emits updates.
+  Stream<DocumentEntity?> watch({required DocumentRef ref});
+
+  /// Similar to [queryAll] but emits when new records are inserted or deleted.
+  Stream<List<DocumentEntity>> watchAll();
+
+  Stream<List<DocumentEntity>> watchLatestVersions({int? limit});
 }
 
 @DriftAccessor(
@@ -60,36 +62,13 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   DriftDocumentsDao(super.attachedDatabase);
 
   @override
-  Stream<List<DocumentEntity>> watchAll() {
-    return select(documents).watch();
-  }
-
-  @override
-  Future<List<DocumentEntity>> queryAll() {
-    return select(documents).get();
-  }
-
-  @override
-  Future<DocumentEntity?> query({required DocumentRef ref}) {
-    return _selectRef(ref).get().then((value) => value.firstOrNull);
-  }
-
-  @override
-  Stream<DocumentEntity?> watch({required DocumentRef ref}) {
-    return _selectRef(ref)
-        .watch()
-        .map((event) => event.firstOrNull)
-        .distinct(_entitiesEquals);
+  Future<int> count({required DocumentRef ref}) {
+    return documents.count(where: (row) => _filterRef(row, ref)).getSingle();
   }
 
   @override
   Future<int> countAll() {
     return documents.count().getSingle();
-  }
-
-  @override
-  Future<int> count({required DocumentRef ref}) {
-    return documents.count(where: (row) => _filterRef(row, ref)).getSingle();
   }
 
   @override
@@ -127,6 +106,25 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<void> deleteAll() async {
+    final deletedRows = await delete(documents).go();
+
+    if (kDebugMode) {
+      debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
+    }
+  }
+
+  @override
+  Future<DocumentEntity?> query({required DocumentRef ref}) {
+    return _selectRef(ref).get().then((value) => value.firstOrNull);
+  }
+
+  @override
+  Future<List<DocumentEntity>> queryAll() {
+    return select(documents).get();
+  }
+
+  @override
   Future<void> saveAll(
     Iterable<DocumentEntityWithMetadata> documentsWithMetadata,
   ) async {
@@ -149,23 +147,73 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> deleteAll() async {
-    final deletedRows = await delete(documents).go();
-
-    if (kDebugMode) {
-      debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
-    }
+  Stream<DocumentEntity?> watch({required DocumentRef ref}) {
+    return _selectRef(ref)
+        .watch()
+        .map((event) => event.firstOrNull)
+        .distinct(_entitiesEquals);
   }
 
-  SimpleSelectStatement<$DocumentsTable, DocumentEntity> _selectRef(
-    DocumentRef ref,
-  ) {
-    return select(documents)
-      ..where((tbl) => _filterRef(tbl, ref))
+  @override
+  Stream<List<DocumentEntity>> watchAll() {
+    return select(documents).watch();
+  }
+
+  @override
+  Stream<List<DocumentEntity>> watchLatestVersions({int? limit}) {
+    final uniqueIds = selectOnly(documents)
+      ..addColumns([documents.idHi, documents.idLo])
+      ..groupBy([documents.idHi, documents.idLo])
       ..orderBy([
-        (u) => OrderingTerm.desc(u.verHi),
-      ])
-      ..limit(1);
+        OrderingTerm(expression: documents.verHi, mode: OrderingMode.desc),
+        OrderingTerm(expression: documents.verLo, mode: OrderingMode.desc),
+        OrderingTerm(expression: documents.idHi),
+        OrderingTerm(expression: documents.idLo),
+      ]);
+
+    if (limit != null) {
+      uniqueIds.limit(limit);
+    }
+
+    return uniqueIds.watch().asyncMap((ids) async {
+      final latestVersions = await Future.wait(
+        ids.map(
+          (row) {
+            final idHi = row.read(documents.idHi);
+            final idLo = row.read(documents.idLo);
+
+            if (idHi == null || idLo == null) {
+              throw StateError('Document ID cannot be null');
+            }
+            return (select(documents)
+                  ..where(
+                    (tbl) => Expression.and([
+                      tbl.idHi.equals(idHi),
+                      tbl.idLo.equals(idLo),
+                    ]),
+                  )
+                  ..orderBy([
+                    (u) => OrderingTerm.desc(u.verHi),
+                    (u) => OrderingTerm.desc(u.verLo),
+                  ])
+                  ..limit(1))
+                .getSingle();
+          },
+        ),
+      );
+
+      return latestVersions;
+    });
+  }
+
+  bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {
+    final previousId = (previous?.idHi, previous?.idLo);
+    final nextId = (next?.idHi, next?.idLo);
+
+    final previousVer = (previous?.verHi, previous?.verLo);
+    final nextVer = (next?.verHi, next?.verLo);
+
+    return previousId == nextId && previousVer == nextVer;
   }
 
   Expression<bool> _filterRef($DocumentsTable row, DocumentRef ref) {
@@ -182,13 +230,14 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     ]);
   }
 
-  bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {
-    final previousId = (previous?.idHi, previous?.idLo);
-    final nextId = (next?.idHi, next?.idLo);
-
-    final previousVer = (previous?.verHi, previous?.verLo);
-    final nextVer = (next?.verHi, next?.verLo);
-
-    return previousId == nextId && previousVer == nextVer;
+  SimpleSelectStatement<$DocumentsTable, DocumentEntity> _selectRef(
+    DocumentRef ref,
+  ) {
+    return select(documents)
+      ..where((tbl) => _filterRef(tbl, ref))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ])
+      ..limit(1);
   }
 }

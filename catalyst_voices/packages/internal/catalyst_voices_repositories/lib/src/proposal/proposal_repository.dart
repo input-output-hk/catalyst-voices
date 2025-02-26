@@ -23,7 +23,6 @@ int _maxResults(ProposalPublish? stage) {
   return 32;
 }
 
-// ignore: one_member_abstracts
 abstract interface class ProposalRepository {
   const factory ProposalRepository() = ProposalRepositoryImpl;
 
