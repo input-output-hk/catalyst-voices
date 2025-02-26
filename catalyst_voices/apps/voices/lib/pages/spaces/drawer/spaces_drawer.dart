@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/discovery_menu.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/guest_menu.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/individual_private_campaigns.dart';

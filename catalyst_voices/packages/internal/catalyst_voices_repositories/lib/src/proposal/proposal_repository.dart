@@ -17,7 +17,7 @@ int _maxResults(ProposalPublish? stage) {
   if (stage == null) {
     return 64;
   }
-  if (stage == ProposalPublish.published) {
+  if (stage == ProposalPublish.submittedProposal) {
     return 48;
   }
   return 32;
@@ -71,8 +71,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       updateDate: DateTime.now().minusDays(2),
       fundsRequested: Coin.fromAda(100000),
       status: ProposalStatus.draft,
-      publish: ProposalPublish.draft,
-      access: ProposalAccess.private,
+      publish: ProposalPublish.localDraft,
       commentsCount: 0,
       description: _proposalDescription,
       duration: 6,
@@ -99,8 +98,8 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     for (var i = 0; i < request.pageSize; i++) {
       // ignore: lines_longer_than_80_chars
       final stage = Random().nextBool()
-          ? ProposalPublish.published
-          : ProposalPublish.draft;
+          ? ProposalPublish.submittedProposal
+          : ProposalPublish.publishedDraft;
       proposals.add(
         ProposalBase(
           id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
@@ -110,7 +109,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           fundsRequested: Coin.fromAda(100000),
           status: ProposalStatus.draft,
           publish: request.stage ?? stage,
-          access: ProposalAccess.private,
           commentsCount: 0,
           description: _proposalDescription,
           duration: 6,

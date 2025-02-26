@@ -7,7 +7,7 @@ class _ImportProposalButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
       onTap: () {
-        const ProposalBuilderDraftRoute().go(context);
+        unawaited(const ProposalBuilderDraftRoute().push(context));
       },
       child: Text(context.l10n.importProposal),
     );

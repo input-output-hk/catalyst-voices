@@ -128,7 +128,7 @@ Zanzibar is becoming one of the hotspots for DID's through World Mobile
 and PRISM, but its potential is only barely exploited.
 """
           .replaceAll('\n', ' '),
-      publishStage: ProposalPublish.published,
+      publishStage: ProposalPublish.submittedProposal,
       version: 1,
       duration: 6,
       author: 'Alex Wells',
