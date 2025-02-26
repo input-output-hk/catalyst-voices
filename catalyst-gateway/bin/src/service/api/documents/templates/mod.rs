@@ -30,7 +30,6 @@ pub(crate) static TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocumen
             );
             return None;
         };
-        println!("signed_doc_sk_hex: {signed_doc_sk_hex}");
         // Strip the prefix and convert to 32 bytes array
         let Some(byte_array) = signed_doc_sk_hex
             .strip_prefix("0x")
