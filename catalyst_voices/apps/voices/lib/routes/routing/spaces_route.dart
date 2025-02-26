@@ -84,10 +84,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
         ),
       ],
     ),
-    TypedGoRoute<WorkspaceRoute>(
-      path: '/$_prefix/workspace',
-      routes: [],
-    ),
+    TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
     TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
     TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
     TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),
