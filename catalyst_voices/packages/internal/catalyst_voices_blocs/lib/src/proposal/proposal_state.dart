@@ -13,10 +13,6 @@ final class ProposalState extends Equatable {
     this.error,
   });
 
-  bool get showData => !showError;
-
-  bool get showError => !isLoading && error != null;
-
   @override
   List<Object?> get props => [
         isLoading,
@@ -24,13 +20,9 @@ final class ProposalState extends Equatable {
         error,
       ];
 
-  ProposalState copyWithFavourite({
-    required bool isFavourite,
-  }) {
-    final updatedHeader = data.header.copyWith(isFavourite: isFavourite);
-    final updatedData = data.copyWith(header: updatedHeader);
-    return copyWith(data: updatedData);
-  }
+  bool get showData => !showError;
+
+  bool get showError => !isLoading && error != null;
 
   ProposalState copyWith({
     bool? isLoading,
@@ -42,5 +34,13 @@ final class ProposalState extends Equatable {
       data: data ?? this.data,
       error: error.dataOr(this.error),
     );
+  }
+
+  ProposalState copyWithFavourite({
+    required bool isFavourite,
+  }) {
+    final updatedHeader = data.header.copyWith(isFavourite: isFavourite);
+    final updatedData = data.copyWith(header: updatedHeader);
+    return copyWith(data: updatedData);
   }
 }

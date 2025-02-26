@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalViewData extends Equatable {
   final ProposalViewHeader header;
-  final List<ProposalBuilderSegment> segments;
+  final List<Segment> segments;
   final NodeId? activeNodeId;
 
   const ProposalViewData({
@@ -22,7 +22,7 @@ final class ProposalViewData extends Equatable {
 
   ProposalViewData copyWith({
     ProposalViewHeader? header,
-    List<ProposalBuilderSegment>? segments,
+    List<Segment>? segments,
     Optional<NodeId>? activeNodeId,
   }) {
     return ProposalViewData(

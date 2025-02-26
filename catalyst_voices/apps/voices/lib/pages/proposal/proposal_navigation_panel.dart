@@ -2,12 +2,39 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProposalNavigationPanel extends StatelessWidget {
   const ProposalNavigationPanel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: SegmentsControllerScope.of(context),
+      builder: (context, value, _) {
+        return _ProposalNavigationPanel(
+          segments: value.segments,
+          openedSegments: value.openedSegments,
+          selectedSectionId: value.activeSectionId,
+        );
+      },
+    );
+  }
+}
+
+class _ProposalNavigationPanel extends StatelessWidget {
+  final List<Segment> segments;
+  final Set<NodeId> openedSegments;
+  final NodeId? selectedSectionId;
+
+  const _ProposalNavigationPanel({
+    required this.segments,
+    this.openedSegments = const {},
+    this.selectedSectionId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,13 +46,16 @@ class ProposalNavigationPanel extends StatelessWidget {
         }
         index--;
 
+        final segment = segments[index];
+
         return _SegmentMenuTile(
           key: ValueKey('Segment[$index]NodeMenu'),
-          index: index,
+          segment: segment,
+          isExpanded: openedSegments.contains(segment.id),
         );
       },
       separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemCount: 10 + 1,
+      itemCount: segments.length + 1,
     );
   }
 }
@@ -61,28 +91,42 @@ class _ControlsTile extends StatelessWidget {
 }
 
 class _SegmentMenuTile extends StatelessWidget {
-  final int index;
+  final Segment segment;
+  final bool isExpanded;
 
   const _SegmentMenuTile({
     required super.key,
-    required this.index,
+    required this.segment,
+    required this.isExpanded,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesNodeMenu(
-      name: 'Overview - ${index + 1}',
-      icon: VoicesAssets.icons.lightningBolt.buildIcon(),
-      onHeaderTap: () {},
-      onItemTap: (id) {},
+      key: ValueKey('Segment[${segment.id}]NodeMenu'),
+      name: segment.resolveTitle(context),
+      icon: segment.icon.buildIcon(),
+      onHeaderTap: () {
+        SegmentsControllerScope.of(context).toggleSegment(segment.id);
+      },
+      onItemTap: (id) {
+        final sections = segment.sections;
+        final section = sections.firstWhere((e) => e.id.value == id);
+
+        SegmentsControllerScope.of(context).selectSectionStep(section.id);
+      },
       selectedItemId: null,
-      isExpanded: true,
-      items: [
-        VoicesNodeMenuItem(
-          id: '$index.1',
-          label: 'Metadata - ${index + 1}',
-        ),
-      ],
+      isExpanded: isExpanded,
+      items: segment.sections.map(
+        (section) {
+          return VoicesNodeMenuItem(
+            id: section.id.value,
+            label: section.resolveTitle(context),
+            isEnabled: section.isEnabled,
+            hasError: section.hasError,
+          );
+        },
+      ).toList(),
     );
   }
 }

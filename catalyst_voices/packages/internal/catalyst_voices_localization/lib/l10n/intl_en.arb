@@ -1677,5 +1677,25 @@
         "type": "int"
       }
     }
+  },
+  "proposalViewMetadataOverviewSegment": "Overview",
+  "@proposalViewMetadataOverviewSegment": {
+    "description": "Viewing proposal navigation segment"
+  },
+  "proposalViewMetadataSection": "Metadata",
+  "@proposalViewMetadataSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewCommentsSegment": "Comments",
+  "@proposalViewCommentsSegment": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewAddCommentSection": "Add comment",
+  "@proposalViewAddCommentSection": {
+    "description": "Viewing proposal navigation section"
+  },
+  "proposalViewViewCommentsSection": "View comments",
+  "@proposalViewViewCommentsSection": {
+    "description": "Viewing proposal navigation section"
   }
 }
