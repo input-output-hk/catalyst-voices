@@ -34,7 +34,13 @@ abstract interface class ProposalService {
   /// in metadata of proposal document
   Future<List<String>> getUserProposalsIds(String userId);
 
+  /// Publishes a public proposal draft.
+  Future<void> publishProposal(Document document);
+
   Future<List<String>> removeFavoriteProposal(String proposalId);
+
+  /// Submits a proposal draft into review.
+  Future<void> submitProposalForReview(Document document);
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -104,8 +110,20 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
+  Future<void> publishProposal(Document document) {
+    // TODO(dtscalac): implement publishing proposals
+    throw UnimplementedError();
+  }
+
+  @override
   Future<List<String>> removeFavoriteProposal(String proposalId) async {
     return _proposalRepository.removeFavoriteProposal(proposalId);
+  }
+
+  @override
+  Future<void> submitProposalForReview(Document document) {
+    // TODO(dtscalac): implement submitting proposals into review
+    throw UnimplementedError();
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {
