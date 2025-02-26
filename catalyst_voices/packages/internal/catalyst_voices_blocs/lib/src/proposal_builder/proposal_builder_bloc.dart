@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
@@ -18,12 +19,14 @@ final class ProposalBuilderBloc
     with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final DownloaderService _downloaderService;
 
   DocumentBuilder? _documentBuilder;
 
   ProposalBuilderBloc(
     this._campaignService,
     this._proposalService,
+    this._downloaderService,
   ) : super(const ProposalBuilderState()) {
     on<LoadDefaultProposalTemplateEvent>(_loadDefaultProposalTemplate);
     on<LoadProposalTemplateEvent>(_loadProposalTemplate);
@@ -87,7 +90,18 @@ final class ProposalBuilderBloc
     ExportProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    // TODO(dtscalac): handle event
+    try {
+      final document = _buildDocument();
+      final proposalId = state.metadata.documentRef!.id;
+
+      await _downloaderService.download(
+        data: utf8.encode(document.toString()),
+        filename: '$proposalId.json',
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Exporting proposal failed', error, stackTrace);
+      emitError(const LocalizedUnknownException());
+    }
   }
 
   Iterable<ProposalGuidanceItem> _findGuidanceItems(
@@ -224,9 +238,7 @@ final class ProposalBuilderBloc
 
       return _createState(
         document: documentBuilder.build(),
-        metadata: const ProposalBuilderMetadata(
-          publish: ProposalPublish.localDraft,
-        ),
+        metadata: ProposalBuilderMetadata.newDraft(),
       );
     });
   }
@@ -268,7 +280,7 @@ final class ProposalBuilderBloc
 
       return _createState(
         document: documentBuilder.build(),
-        metadata: const ProposalBuilderMetadata(),
+        metadata: ProposalBuilderMetadata.newDraft(),
       );
     });
   }
