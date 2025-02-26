@@ -1,16 +1,22 @@
 //! Defines API schemas of stake amount type.
 
-use poem_openapi::{types::Example, Object};
+use derive_more::{From, Into};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    NewType, Object,
+};
 
-use crate::service::{
-    api::cardano::types::{SlotNumber, StakeAmount},
-    common::types::cardano::{
-        asset_name::AssetName, asset_value::AssetValue, hash28::HexEncodedHash28,
+use crate::service::common::types::{
+    array_types::impl_array_types,
+    cardano::{
+        ada_value::AdaValue, asset_name::AssetName, asset_value::AssetValue,
+        hash28::HexEncodedHash28, slot_no::SlotNo,
     },
 };
 
 /// User's staked native token info.
-#[derive(Object)]
+#[derive(Object, Debug, Clone)]
+#[oai(example)]
 pub(crate) struct StakedNativeTokenInfo {
     /// Token policy hash.
     pub(crate) policy_hash: HexEncodedHash28,
@@ -20,32 +26,87 @@ pub(crate) struct StakedNativeTokenInfo {
     pub(crate) amount: AssetValue,
 }
 
+impl Example for StakedNativeTokenInfo {
+    fn example() -> Self {
+        Self {
+            policy_hash: Example::example(),
+            asset_name: Example::example(),
+            amount: Example::example(),
+        }
+    }
+}
+
+// List of User's Staked Native Token Info
+impl_array_types!(
+    StakedNativeTokenInfoList,
+    StakedNativeTokenInfo,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(1000),
+        items: Some(Box::new(StakedNativeTokenInfo::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for StakedNativeTokenInfoList {
+    fn example() -> Self {
+        Self(vec![Example::example()])
+    }
+}
+
 /// User's cardano stake info.
 #[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Total stake amount.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub(crate) ada_amount: StakeAmount,
+    pub(crate) ada_amount: AdaValue,
 
     /// Block's slot number which contains the latest unspent UTXO.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub(crate) slot_number: SlotNumber,
+    pub(crate) slot_number: SlotNo,
 
     /// Native token infos.
-    #[oai(validator(max_items = "1000"))]
-    pub(crate) native_tokens: Vec<StakedNativeTokenInfo>,
+    pub(crate) native_tokens: StakedNativeTokenInfoList,
 }
 
 impl Example for StakeInfo {
     fn example() -> Self {
         Self {
-            slot_number: 5,
-            ada_amount: 1,
-            native_tokens: Vec::new(),
+            slot_number: SlotNo::example(),
+            ada_amount: AdaValue::example(),
+            native_tokens: Vec::new().into(),
         }
+    }
+}
+
+/// Volatile stake information.
+#[derive(NewType, Default, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct VolatileStakeInfo(StakeInfo);
+
+impl Example for VolatileStakeInfo {
+    fn example() -> Self {
+        Self(Example::example())
+    }
+}
+
+/// Persistent stake information.
+#[derive(NewType, Default, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct PersistentStakeInfo(StakeInfo);
+
+impl Example for PersistentStakeInfo {
+    fn example() -> Self {
+        Self(Example::example())
     }
 }
 
@@ -54,16 +115,16 @@ impl Example for StakeInfo {
 #[oai(example = true)]
 pub(crate) struct FullStakeInfo {
     /// Volatile stake information.
-    pub(crate) volatile: StakeInfo,
+    pub(crate) volatile: VolatileStakeInfo,
     /// Persistent stake information.
-    pub(crate) persistent: StakeInfo,
+    pub(crate) persistent: PersistentStakeInfo,
 }
 
 impl Example for FullStakeInfo {
     fn example() -> Self {
         Self {
-            volatile: StakeInfo::example(),
-            persistent: StakeInfo::example(),
+            volatile: Example::example(),
+            persistent: Example::example(),
         }
     }
 }

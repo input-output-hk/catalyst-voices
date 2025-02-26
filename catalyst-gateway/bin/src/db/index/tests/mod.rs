@@ -1,12 +1,15 @@
 //! Integration tests of the `IndexDB` queries
 //! This module contains utility functions used with different testing modules.
 
+pub mod test_utils;
+
 use std::sync::Arc;
 
 use tokio::sync::OnceCell;
 
 use super::session::CassandraSession;
 
+mod rbac_index;
 mod scylla_purge;
 mod scylla_queries;
 mod scylla_session;

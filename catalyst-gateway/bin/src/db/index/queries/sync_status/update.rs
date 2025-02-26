@@ -2,6 +2,7 @@
 
 use std::{sync::Arc, time::SystemTime};
 
+use cardano_blockchain_types::Slot;
 use row::SyncStatusQueryParams;
 use scylla::{frame::value::CqlTimestamp, prepared_statement::PreparedStatement, Session};
 use tokio::task;
@@ -23,13 +24,15 @@ const INSERT_SYNC_STATUS_QUERY: &str = include_str!("../cql/insert_sync_status.c
 pub(crate) mod row {
     use scylla::{frame::value::CqlTimestamp, DeserializeRow, SerializeRow};
 
+    use crate::db::types::DbSlot;
+
     /// Sync Status Record Row (used for both Insert and Query response)
     #[derive(SerializeRow, DeserializeRow, Debug)]
     pub(crate) struct SyncStatusQueryParams {
         /// End Slot.
-        pub(crate) end_slot: num_bigint::BigInt,
+        pub(crate) end_slot: DbSlot,
         /// Start Slot.
-        pub(crate) start_slot: num_bigint::BigInt,
+        pub(crate) start_slot: DbSlot,
         /// Sync Time.
         pub(crate) sync_time: CqlTimestamp,
         /// Node ID
@@ -39,7 +42,7 @@ pub(crate) mod row {
 
 impl SyncStatusQueryParams {
     /// Create a new instance of [`SyncStatusQueryParams`]
-    pub(crate) fn new(end_slot: u64, start_slot: u64) -> Self {
+    pub(crate) fn new(end_slot: Slot, start_slot: Slot) -> Self {
         let sync_time = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
             Ok(now) => now.as_millis(),
             Err(_) => 0, // Shouldn't actually happen.
@@ -91,12 +94,12 @@ impl SyncStatusInsertQuery {
 /// Failures of this function to record status, fail safely.
 /// This data is only used to recover sync
 /// There fore this function is both fire and forget, and returns no status.
-pub(crate) fn update_sync_status(end_slot: u64, start_slot: u64) {
+pub(crate) fn update_sync_status(end_slot: Slot, start_slot: Slot) {
     task::spawn(async move {
         let Some(session) = CassandraSession::get(true) else {
             warn!(
-                start_slot = start_slot,
-                end_slot = end_slot,
+                start_slot = ?start_slot,
+                end_slot = ?end_slot,
                 "Failed to get Cassandra Session, trying to record indexing status"
             );
             return;
@@ -110,8 +113,8 @@ pub(crate) fn update_sync_status(end_slot: u64, start_slot: u64) {
         {
             warn!(
                 error=%err,
-                start_slot = start_slot,
-                end_slot = end_slot,
+                start_slot = ?start_slot,
+                end_slot = ?end_slot,
                 "Failed to store Sync Status"
             );
         };

@@ -39,7 +39,7 @@ impl Api {
     //    provided).
     // If none of the above provided, return not found.
     #[oai(
-        path = "/draft/cardano/registration/cip36",
+        path = "/v1/cardano/registration/cip36",
         method = "get",
         operation_id = "cardanoRegistrationCip36"
     )]

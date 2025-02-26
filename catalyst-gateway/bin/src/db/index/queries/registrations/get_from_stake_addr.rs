@@ -8,9 +8,12 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::index::{
-    queries::{PreparedQueries, PreparedSelectQuery},
-    session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{PreparedQueries, PreparedSelectQuery},
+        session::CassandraSession,
+    },
+    types::{DbSlot, DbTxnIndex},
 };
 
 /// Get registrations from stake addr query.
@@ -21,13 +24,13 @@ const GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetRegistrationParams {
     /// Stake address.
-    pub stake_address: Vec<u8>,
+    pub stake_public_key: Vec<u8>,
 }
 
 impl From<Vec<u8>> for GetRegistrationParams {
     fn from(value: Vec<u8>) -> Self {
         GetRegistrationParams {
-            stake_address: value,
+            stake_public_key: value,
         }
     }
 }
@@ -35,14 +38,12 @@ impl From<Vec<u8>> for GetRegistrationParams {
 /// Get registration query.
 #[derive(DeserializeRow)]
 pub(crate) struct GetRegistrationQuery {
-    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_address: Vec<u8>,
     /// Nonce value after normalization.
     pub nonce: num_bigint::BigInt,
     /// Slot Number the cert is in.
-    pub slot_no: num_bigint::BigInt,
+    pub slot_no: DbSlot,
     /// Transaction Index.
-    pub txn: i16,
+    pub txn_index: DbTxnIndex,
     /// Voting Public Key
     pub vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).

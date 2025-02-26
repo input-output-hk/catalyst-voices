@@ -2,12 +2,15 @@
 
 use std::sync::Arc;
 
-use cardano_chain_follower::Metadata::cip36::{Cip36, VotingPubKey};
+use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTxnIndex},
+    },
     settings::cassandra_db,
 };
 
@@ -21,11 +24,11 @@ pub(crate) struct Params {
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    stake_address: Vec<u8>,
+    stake_public_key: Vec<u8>,
     /// Slot Number the cert is in.
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Index.
-    txn: i16,
+    txn_index: DbTxnIndex,
     /// Is the registration Valid or not.
     valid: bool,
 }
@@ -33,16 +36,19 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36, valid: bool,
+        vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36, valid: bool,
     ) -> Self {
         Params {
-            vote_key: vote_key.voting_pk.to_bytes().to_vec(),
-            stake_address: cip36
-                .stake_pk
+            vote_key: vote_key
+                .voting_pk()
+                .map(|k| k.to_bytes().to_vec())
+                .unwrap_or_default(),
+            stake_public_key: cip36
+                .stake_pk()
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
             slot_no: slot_no.into(),
-            txn,
+            txn_index: txn_index.into(),
             valid,
         }
     }

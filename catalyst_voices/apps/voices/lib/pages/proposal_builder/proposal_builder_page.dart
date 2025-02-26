@@ -137,13 +137,15 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {
+    VoicesSnackBar.hideCurrent(context);
+
     final formattedFields =
         error.fields.whereNot((e) => e.isEmpty).map((e) => '• $e').join('\n');
 
     VoicesSnackBar(
       behavior: SnackBarBehavior.floating,
       type: VoicesSnackBarType.error,
-      duration: const Duration(seconds: 30),
+      duration: const Duration(seconds: 15),
       title: error.message(context),
       message: formattedFields,
       actions: [

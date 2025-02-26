@@ -14,6 +14,7 @@ class IncorrectSeedPhraseDialog extends StatelessWidget {
   static Future<bool> show(BuildContext context) async {
     final result = await VoicesDialog.show<bool>(
       context: context,
+      routeSettings: const RouteSettings(name: '/incorrect-seed-phrase'),
       builder: (context) => const IncorrectSeedPhraseDialog(),
     );
 

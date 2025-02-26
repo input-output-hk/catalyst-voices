@@ -1,11 +1,11 @@
 //! Queries for purging volatile data.
 
-pub(crate) mod chain_root_for_role0_key;
-pub(crate) mod chain_root_for_stake_address;
-pub(crate) mod chain_root_for_txn_id;
+pub(crate) mod catalyst_id_for_stake_address;
+pub(crate) mod catalyst_id_for_txn_id;
 pub(crate) mod cip36_registration;
 pub(crate) mod cip36_registration_for_vote_key;
 pub(crate) mod cip36_registration_invalid;
+pub(crate) mod rbac509_invalid_registration;
 pub(crate) mod rbac509_registration;
 pub(crate) mod stake_registration;
 pub(crate) mod txi_by_hash;
@@ -50,12 +50,12 @@ pub(crate) enum PreparedDeleteQuery {
     Cip36RegistrationForVoteKey,
     /// RBAC 509 Registration Delete query.
     Rbac509,
-    /// Chain Root For Transaction ID Delete query.
-    ChainRootForTxnId,
-    /// Chain Root For Role0 Key Delete query.
-    ChainRootForRole0Key,
-    /// Chain Root For Stake Address Delete query.
-    ChainRootForStakeAddress,
+    /// Invalid RBAC 509 Registration Delete query.
+    Rbac509Invalid,
+    /// Catalyst ID For Transaction ID Delete query.
+    CatalystIdForTxnId,
+    /// Catalyst ID For Stake Address Delete query.
+    CatalystIdForStakeAddress,
 }
 
 /// All prepared SELECT query statements (primary keys from table).
@@ -81,12 +81,12 @@ pub(crate) enum PreparedSelectQuery {
     Cip36RegistrationForVoteKey,
     /// RBAC 509 Registration Select query.
     Rbac509,
-    /// Chain Root For Transaction ID Select query.
-    ChainRootForTxnId,
-    /// Chain Root For Role0 Key Select query.
-    ChainRootForRole0Key,
-    /// Chain Root For Stake Address Select query.
-    ChainRootForStakeAddress,
+    /// Invalid RBAC 509 Registration Select query.
+    Rbac509Invalid,
+    /// Catalyst ID For Transaction ID Select query.
+    CatalystIdForTxnId,
+    /// Catalyst ID For Stake Address Select query.
+    CatalystIdForStakeAddress,
 }
 
 /// All prepared purge queries for a session.
@@ -131,18 +131,18 @@ pub(crate) struct PreparedQueries {
     select_rbac509_registration: PreparedStatement,
     /// RBAC 509 Registrations Delete Query.
     delete_rbac509_registration: SizedBatch,
-    /// Chain Root for TX ID Primary Key Query..
-    select_chain_root_for_txn_id: PreparedStatement,
-    /// Chain Root for TX ID Delete Query..
-    delete_chain_root_for_txn_id: SizedBatch,
-    /// Chain Root for Role 0 Key Primary Key Query..
-    select_chain_root_for_role0_key: PreparedStatement,
-    /// Chain Root for Role 0 Key Delete Query..
-    delete_chain_root_for_role0_key: SizedBatch,
-    /// Chain Root for Stake Address Primary Key Query..
-    select_chain_root_for_stake_address: PreparedStatement,
-    /// Chain Root for Stake Address Delete Query..
-    delete_chain_root_for_stake_address: SizedBatch,
+    /// RBAC 509 invalid registrations Primary Key Query.
+    select_rbac509_invalid_registration: PreparedStatement,
+    /// RBAC 509 invalid registrations Delete Query.
+    delete_rbac509_invalid_registration: SizedBatch,
+    /// Catalyst ID for TX ID Primary Key Query..
+    select_catalyst_id_for_txn_id: PreparedStatement,
+    /// Catalyst ID for TX ID Delete Query..
+    delete_catalyst_id_for_txn_id: SizedBatch,
+    /// Catalyst ID for Stake Address Primary Key Query..
+    select_catalyst_id_for_stake_address: PreparedStatement,
+    /// Catalyst ID for Stake Address Delete Query..
+    delete_catalyst_id_for_stake_address: SizedBatch,
 }
 
 impl PreparedQueries {
@@ -193,24 +193,22 @@ impl PreparedQueries {
                 &session, cfg,
             )
             .await?,
-            select_chain_root_for_role0_key: chain_root_for_role0_key::PrimaryKeyQuery::prepare(
+            select_rbac509_invalid_registration:
+                rbac509_invalid_registration::PrimaryKeyQuery::prepare(&session).await?,
+            delete_rbac509_invalid_registration:
+                rbac509_invalid_registration::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_catalyst_id_for_txn_id: catalyst_id_for_txn_id::PrimaryKeyQuery::prepare(
                 &session,
             )
             .await?,
-            delete_chain_root_for_role0_key: chain_root_for_role0_key::DeleteQuery::prepare_batch(
+            delete_catalyst_id_for_txn_id: catalyst_id_for_txn_id::DeleteQuery::prepare_batch(
                 &session, cfg,
             )
             .await?,
-            select_chain_root_for_txn_id: chain_root_for_txn_id::PrimaryKeyQuery::prepare(&session)
-                .await?,
-            delete_chain_root_for_txn_id: chain_root_for_txn_id::DeleteQuery::prepare_batch(
-                &session, cfg,
-            )
-            .await?,
-            select_chain_root_for_stake_address:
-                chain_root_for_stake_address::PrimaryKeyQuery::prepare(&session).await?,
-            delete_chain_root_for_stake_address:
-                chain_root_for_stake_address::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_catalyst_id_for_stake_address:
+                catalyst_id_for_stake_address::PrimaryKeyQuery::prepare(&session).await?,
+            delete_catalyst_id_for_stake_address:
+                catalyst_id_for_stake_address::DeleteQuery::prepare_batch(&session, cfg).await?,
         })
     }
 
@@ -255,10 +253,10 @@ impl PreparedQueries {
                 &self.select_cip36_registration_for_vote_key
             },
             PreparedSelectQuery::Rbac509 => &self.select_rbac509_registration,
-            PreparedSelectQuery::ChainRootForTxnId => &self.select_chain_root_for_txn_id,
-            PreparedSelectQuery::ChainRootForRole0Key => &self.select_chain_root_for_role0_key,
-            PreparedSelectQuery::ChainRootForStakeAddress => {
-                &self.select_chain_root_for_stake_address
+            PreparedSelectQuery::Rbac509Invalid => &self.select_rbac509_invalid_registration,
+            PreparedSelectQuery::CatalystIdForTxnId => &self.select_catalyst_id_for_txn_id,
+            PreparedSelectQuery::CatalystIdForStakeAddress => {
+                &self.select_catalyst_id_for_stake_address
             },
         };
 
@@ -285,10 +283,10 @@ impl PreparedQueries {
                 &self.delete_cip36_registration_for_vote_key
             },
             PreparedDeleteQuery::Rbac509 => &self.delete_rbac509_registration,
-            PreparedDeleteQuery::ChainRootForTxnId => &self.delete_chain_root_for_txn_id,
-            PreparedDeleteQuery::ChainRootForRole0Key => &self.delete_chain_root_for_role0_key,
-            PreparedDeleteQuery::ChainRootForStakeAddress => {
-                &self.delete_chain_root_for_stake_address
+            PreparedDeleteQuery::Rbac509Invalid => &self.delete_rbac509_invalid_registration,
+            PreparedDeleteQuery::CatalystIdForTxnId => &self.delete_catalyst_id_for_txn_id,
+            PreparedDeleteQuery::CatalystIdForStakeAddress => {
+                &self.delete_catalyst_id_for_stake_address
             },
         };
 
