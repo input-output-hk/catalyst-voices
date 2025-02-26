@@ -23,7 +23,6 @@ def build_signed_doc(
         doc_content_file.write(json_str.encode(encoding="utf-8"))
         doc_content_file.flush()
 
-        mk_signed_doc_absolute_path = os.path.abspath("mk_signed_doc")
         subprocess.run(
             [
                 "./mk_signed_doc",

@@ -25,9 +25,6 @@ test:
     # cspell: disable-next-line
     ENV BEARER_TOKEN = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
 
-    RUN ls -l mk_signed_doc
-    RUN ./mk_signed_doc --version
-
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(./../../event-db+build) \
