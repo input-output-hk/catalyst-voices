@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://cardano.org/schemas/catalyst/f14/proposal",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
     "title": "F14 Submission Form",
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
@@ -23,6 +23,25 @@
             "$comment": "UI - Logical Document Section Break.",
             "type": "object",
             "additionalProperties": false,
+            "properties": {
+                "title": { "type": "object" },
+                "proposer": { "type": "object" },
+                "budget": { "type": "object" },
+                "time": { "type": "object" },
+                "translation": { "type": "object" },
+                "problem": { "type": "object" },
+                "solution": { "type": "object" },
+                "supportingLinks": { "type": "object" },
+                "dependencies": { "type": "object" },
+                "open_source": { "type": "object" },
+                "theme": { "type": "object" },
+                "impact": { "type": "object" },
+                "feasibility": { "type": "object" },
+                "milestones": { "type": "object" },
+                "team": { "type": "object" },
+                "value": { "type": "object" },
+                "mandatory": { "type": "object" }
+            },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
         },
         "section": {

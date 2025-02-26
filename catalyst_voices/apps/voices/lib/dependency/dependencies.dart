@@ -27,6 +27,7 @@ final class Dependencies extends DependencyProvider {
 
     _registerStorages();
     _registerUtils();
+    _registerNetwork();
     _registerRepositories();
     _registerServices();
     _registerBlocsWithDependencies();
@@ -119,23 +120,49 @@ final class Dependencies extends DependencyProvider {
       });
   }
 
+  void _registerNetwork() {
+    registerLazySingleton<ApiServices>(() {
+      return ApiServices(
+        config: get<AppConfig>().api,
+        userObserver: get<UserObserver>(),
+      );
+    });
+  }
+
   void _registerRepositories() {
     this
-      ..registerLazySingleton<TransactionConfigRepository>(
-        TransactionConfigRepository.new,
-      )
-      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
-      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
-      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<UserRepository>(() {
         return UserRepository(
           get<UserStorage>(),
           get<KeychainProvider>(),
         );
       })
+      ..registerLazySingleton<DatabaseDraftsDataSource>(() {
+        return DatabaseDraftsDataSource(
+          get<CatalystDatabase>(),
+        );
+      })
+      ..registerLazySingleton<DocumentDataLocalSource>(() {
+        return DatabaseDocumentsDataSource(
+          get<CatalystDatabase>(),
+        );
+      })
+      ..registerLazySingleton<CatGatewayDocumentDataSource>(() {
+        return CatGatewayDocumentDataSource(
+          get<SignedDocumentManager>(),
+        );
+      })
+      ..registerLazySingleton<TransactionConfigRepository>(
+        TransactionConfigRepository.new,
+      )
+      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
-          get<SignedDocumentManager>(),
+          get<DatabaseDraftsDataSource>(),
+          get<DocumentDataLocalSource>(),
+          get<CatGatewayDocumentDataSource>(),
         );
       });
   }
@@ -166,7 +193,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<UserService>(
       () {
         return UserService(
-          userRepository: get<UserRepository>(),
+          get<UserRepository>(),
+          get<UserObserver>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
@@ -195,9 +223,26 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<FlutterSecureStorage>(FlutterSecureStorage.new);
     registerLazySingleton<SharedPreferencesAsync>(SharedPreferencesAsync.new);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
+    registerLazySingleton<CatalystDatabase>(() {
+      final config = get<AppConfig>().database;
+
+      return CatalystDatabase.drift(
+        config: CatalystDriftDatabaseConfig(
+          name: config.name,
+          web: CatalystDriftDatabaseWebConfig(
+            sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
+            driftWorker: Uri.parse(config.webDriftWorker),
+          ),
+        ),
+      );
+    });
   }
 
   void _registerUtils() {
     registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<UserObserver>(
+      StreamUserObserver.new,
+      dispose: (observer) async => observer.dispose(),
+    );
   }
 }

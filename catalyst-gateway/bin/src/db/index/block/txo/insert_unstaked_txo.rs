@@ -1,11 +1,15 @@
 //! Insert Unstaked TXOs into the DB.
 use std::sync::Arc;
 
+use cardano_blockchain_types::{Slot, TransactionId, TxnIndex, TxnOutputOffset};
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
-    db::index::queries::{PreparedQueries, SizedBatch},
+    db::{
+        index::queries::{PreparedQueries, SizedBatch},
+        types::{DbSlot, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
+    },
     settings::cassandra_db,
 };
 
@@ -17,13 +21,13 @@ const INSERT_UNSTAKED_TXO_QUERY: &str = include_str!("./cql/insert_unstaked_txo.
 #[derive(SerializeRow, Debug)]
 pub(crate) struct Params {
     /// Transactions hash.
-    txn_hash: Vec<u8>,
+    txn_id: DbTransactionId,
     /// Transaction Output Offset inside the transaction.
-    txo: i16,
+    txo: DbTxnOutputOffset,
     /// Block Slot Number
-    slot_no: num_bigint::BigInt,
+    slot_no: DbSlot,
     /// Transaction Offset inside the block.
-    txn: i16,
+    txn_index: DbTxnIndex,
     /// Actual full TXO Address
     address: String,
     /// Actual TXO Value in lovelace
@@ -33,13 +37,14 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        txn_hash: &[u8], txo: i16, slot_no: u64, txn: i16, address: &str, value: u64,
+        txn_id: TransactionId, txo: TxnOutputOffset, slot_no: Slot, txn_index: TxnIndex,
+        address: &str, value: u64,
     ) -> Self {
         Self {
-            txn_hash: txn_hash.to_vec(),
-            txo,
+            txn_id: txn_id.into(),
+            txo: txo.into(),
             slot_no: slot_no.into(),
-            txn,
+            txn_index: txn_index.into(),
             address: address.to_string(),
             value: value.into(),
         }

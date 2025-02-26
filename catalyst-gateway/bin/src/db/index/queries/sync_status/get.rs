@@ -1,5 +1,6 @@
 //! Get Sync Status query
 
+use cardano_blockchain_types::Slot;
 use futures::stream::StreamExt;
 use tracing::{debug, warn};
 
@@ -13,27 +14,13 @@ const GET_SYNC_STATUS: &str = include_str!("../cql/get_sync_status.cql");
 #[derive(PartialEq, Debug)]
 pub(crate) struct SyncStatus {
     /// End Slot.
-    pub(crate) end_slot: u64,
+    pub(crate) end_slot: Slot,
     /// Start Slot.
-    pub(crate) start_slot: u64,
+    pub(crate) start_slot: Slot,
     /// Sync Time.
     pub(crate) sync_time: u64,
     /// Node ID
     pub(crate) node_id: String,
-}
-
-/// Convert a big uint to a u64, saturating if its out of range.
-fn big_uint_to_u64(value: &num_bigint::BigInt) -> u64 {
-    let (sign, digits) = value.to_u64_digits();
-    if sign == num_bigint::Sign::Minus || digits.is_empty() {
-        return 0;
-    }
-    if digits.len() > 1 {
-        return u64::MAX;
-    }
-    // 100% safe due to the above checks.
-    #[allow(clippy::indexing_slicing)]
-    digits[0]
 }
 
 /// Merge consecutive sync records, to make processing them easier.
@@ -50,7 +37,7 @@ fn merge_consecutive_sync_records(mut synced_chunks: Vec<SyncStatus>) -> Vec<Syn
                 // The new record is contained fully within the previous one.
                 // We will ignore the new record and use the previous one instead.
                 current_status = Some(current);
-            } else if rec.start_slot <= current.end_slot.saturating_add(1) {
+            } else if rec.start_slot <= u64::from(current.end_slot).saturating_add(1).into() {
                 // Either overlaps, or is directly consecutive.
                 // But not fully contained within the previous one.
                 current_status = Some(SyncStatus {
@@ -118,8 +105,8 @@ pub(crate) async fn get_sync_status() -> Vec<SyncStatus> {
             Ok(row) => {
                 debug!("Sync Status:  {:?}", row);
                 synced_chunks.push(SyncStatus {
-                    end_slot: big_uint_to_u64(&row.end_slot),
-                    start_slot: big_uint_to_u64(&row.start_slot),
+                    end_slot: row.end_slot.into(),
+                    start_slot: row.start_slot.into(),
                     sync_time: from_saturating(row.sync_time.0),
                     node_id: row.node_id,
                 });
@@ -141,38 +128,38 @@ mod tests {
         // Two mergeable groups
         let synced_chunks: Vec<SyncStatus> = vec![
             SyncStatus {
-                end_slot: 200_000,
-                start_slot: 112_001,
+                end_slot: 200_000.into(),
+                start_slot: 112_001.into(),
                 sync_time: 1_200_000,
                 node_id: "test-node-1".to_string(),
             },
             SyncStatus {
-                end_slot: 12000,
-                start_slot: 0,
+                end_slot: 12000.into(),
+                start_slot: 0.into(),
                 sync_time: 100_100,
                 node_id: "test-node-1".to_string(),
             },
             SyncStatus {
-                end_slot: 99000,
-                start_slot: 56789,
+                end_slot: 99000.into(),
+                start_slot: 56789.into(),
                 sync_time: 200_000,
                 node_id: "test-node-2".to_string(),
             },
             SyncStatus {
-                end_slot: 112_000,
-                start_slot: 100_000,
+                end_slot: 112_000.into(),
+                start_slot: 100_000.into(),
                 sync_time: 1_100_100,
                 node_id: "test-node-1".to_string(),
             },
             SyncStatus {
-                end_slot: 56789,
-                start_slot: 12300,
+                end_slot: 56789.into(),
+                start_slot: 12300.into(),
                 sync_time: 200_000,
                 node_id: "test-node-2".to_string(),
             },
             SyncStatus {
-                end_slot: 12345,
-                start_slot: 0,
+                end_slot: 12345.into(),
+                start_slot: 0.into(),
                 sync_time: 100_000,
                 node_id: "test-node-1".to_string(),
             },
@@ -183,14 +170,14 @@ mod tests {
         // Expected result
         let expected: &[SyncStatus] = &[
             SyncStatus {
-                end_slot: 99000,
-                start_slot: 0,
+                end_slot: 99000.into(),
+                start_slot: 0.into(),
                 sync_time: 200_000,
                 node_id: "test-node-2".to_string(),
             },
             SyncStatus {
-                end_slot: 200_000,
-                start_slot: 100_000,
+                end_slot: 200_000.into(),
+                start_slot: 100_000.into(),
                 sync_time: 1_200_000,
                 node_id: "test-node-1".to_string(),
             },

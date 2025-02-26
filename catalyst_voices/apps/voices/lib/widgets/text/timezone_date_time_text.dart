@@ -95,6 +95,7 @@ class TimezoneDateTimeText extends StatelessWidget {
       gap: showTimezone ? 6 : 0,
       suffix: showTimezone ? _TimezoneCard(timezone) : null,
       child: Text(
+        key: const Key('TimezoneDateTimeText'),
         string,
         style: effectiveStyle,
       ),

@@ -17,6 +17,7 @@ class CampaignManagementDialog extends StatefulWidget {
   ) async {
     final result = await VoicesDialog.show<CampaignPublish?>(
       context: context,
+      routeSettings: const RouteSettings(name: '/campaign-management'),
       builder: (context) => CampaignManagementDialog._(initialValue),
     );
 

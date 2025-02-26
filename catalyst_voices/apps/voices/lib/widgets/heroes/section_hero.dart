@@ -124,6 +124,7 @@ class _Background extends StatelessWidget {
             child: FittedBox(
               fit: BoxFit.cover,
               child: SizedBox(
+                key: const Key('HeroBackgroundVideo'),
                 width: controller.value.size.width,
                 height: controller.value.size.height,
                 child: VideoPlayer(controller),

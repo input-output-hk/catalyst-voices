@@ -30,7 +30,13 @@ void main() {
           validationResult: listSchema.validate(properties),
         );
 
+        final document = Document(
+          schema: const DocumentSchema.optional(),
+          properties: [listProperty],
+        );
+
         expect(listProperty.isValid, isTrue);
+        expect(document.isValid, isTrue);
       });
 
       test('$DocumentListProperty is invalid when any child is invalid', () {
@@ -69,7 +75,13 @@ void main() {
           validationResult: listSchema.validate(properties),
         );
 
+        final document = Document(
+          schema: const DocumentSchema.optional(),
+          properties: [objectProperty],
+        );
+
         expect(objectProperty.isValid, isFalse);
+        expect(document.isValid, isFalse);
       });
 
       test('$DocumentObjectProperty is valid when all children are valid', () {

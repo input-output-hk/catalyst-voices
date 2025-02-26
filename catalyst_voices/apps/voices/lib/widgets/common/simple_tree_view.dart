@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,84 @@ class SimpleTreeView extends StatelessWidget {
         root,
         if (isExpanded) ...children,
       ],
+    );
+  }
+}
+
+class SimpleTreeViewChildRow extends StatelessWidget {
+  final bool hasNext;
+  final bool isSelected;
+  final bool hasError;
+  final VoidCallback? onTap;
+  final Widget child;
+
+  const SimpleTreeViewChildRow({
+    super.key,
+    this.hasNext = true,
+    this.isSelected = false,
+    this.hasError = false,
+    this.onTap,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    final widgetStates = {
+      if (hasError) WidgetState.error,
+      if (isSelected) WidgetState.selected,
+    };
+
+    final backgroundColor =
+        _BackgroundColor(theme.colors, theme.colorScheme).resolve(widgetStates);
+    final foregroundColor =
+        _ForegroundColor(theme.colors).resolve(widgetStates);
+
+    final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(
+      color: foregroundColor,
+    );
+
+    final dividerTheme = DividerThemeData(
+      color: foregroundColor,
+    );
+
+    return DefaultTextStyle(
+      style: textStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      child: DividerTheme(
+        data: dividerTheme,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints.tightFor(height: 40),
+          child: Material(
+            type: backgroundColor != null
+                ? MaterialType.canvas
+                : MaterialType.transparency,
+            color: backgroundColor,
+            textStyle: textStyle,
+            child: InkWell(
+              onTap: onTap,
+              child: Stack(
+                children: [
+                  if (hasError && isSelected) const _SelectedErrorIndicator(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        _SimpleTreeViewIndent(showBottomJoint: hasNext),
+                        Expanded(child: child),
+                        if (hasError) const _Error(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -85,67 +164,65 @@ class SimpleTreeViewRootRow extends StatelessWidget {
   }
 }
 
-class SimpleTreeViewChildRow extends StatelessWidget {
-  final bool hasNext;
-  final bool isSelected;
-  final VoidCallback? onTap;
-  final Widget child;
+class _BackgroundColor extends WidgetStateProperty<Color?> {
+  final VoicesColorScheme colors;
+  final ColorScheme colorScheme;
 
-  const SimpleTreeViewChildRow({
-    super.key,
-    this.hasNext = true,
-    this.isSelected = false,
-    this.onTap,
-    required this.child,
-  });
+  _BackgroundColor(this.colors, this.colorScheme);
+
+  @override
+  Color? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.error)) {
+      return colors.onSurfaceNeutralOpaqueLv1;
+    } else if (states.contains(WidgetState.selected)) {
+      return colorScheme.primary;
+    } else {
+      return null;
+    }
+  }
+}
+
+class _Error extends StatelessWidget {
+  const _Error();
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    final backgroundColor = isSelected ? theme.colorScheme.primary : null;
-    final foregroundColor = isSelected
-        ? theme.colors.textOnPrimaryWhite
-        : theme.colors.textOnPrimaryLevel0;
-
-    final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(
-      color: foregroundColor,
-    );
-
-    final dividerTheme = DividerThemeData(
-      color: foregroundColor,
-    );
-
-    return DefaultTextStyle(
-      style: textStyle,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      child: DividerTheme(
-        data: dividerTheme,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints.tightFor(height: 40),
-          child: Material(
-            type: backgroundColor != null
-                ? MaterialType.canvas
-                : MaterialType.transparency,
-            color: backgroundColor,
-            textStyle: textStyle,
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    _SimpleTreeViewIndent(showBottomJoint: hasNext),
-                    Flexible(child: child),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: VoicesAssets.icons.exclamationCircle.buildIcon(
+        size: 18,
+        color: Theme.of(context).colors.iconsError,
       ),
+    );
+  }
+}
+
+class _ForegroundColor extends WidgetStateProperty<Color?> {
+  final VoicesColorScheme colors;
+
+  _ForegroundColor(this.colors);
+
+  @override
+  Color? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.error)) {
+      return colors.textOnPrimaryLevel0;
+    } else if (states.contains(WidgetState.selected)) {
+      return colors.textOnPrimaryWhite;
+    } else {
+      return colors.textOnPrimaryLevel0;
+    }
+  }
+}
+
+class _SelectedErrorIndicator extends StatelessWidget {
+  const _SelectedErrorIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 5,
+      height: double.infinity,
+      color: Theme.of(context).colors.iconsError,
     );
   }
 }

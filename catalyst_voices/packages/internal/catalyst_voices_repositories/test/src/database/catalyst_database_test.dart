@@ -3,7 +3,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'test_factories.dart';
+import '../utils/test_factories.dart';
 
 void main() {
   late DriftCatalystDatabase database;

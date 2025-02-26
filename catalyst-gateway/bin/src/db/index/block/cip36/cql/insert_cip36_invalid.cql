@@ -1,8 +1,8 @@
 -- Index CIP-36 Registrations by Vote Key
 INSERT INTO cip36_registration_invalid (
-    stake_address,
+    stake_public_key,
     slot_no,
-    txn,
+    txn_index,
     vote_key,
     payment_address,
     is_payable,
@@ -10,11 +10,11 @@ INSERT INTO cip36_registration_invalid (
     nonce,
     cip36,
     signed,
-    error_report
+    problem_report
 ) VALUES (
-    :stake_address,
+    :stake_public_key,
     :slot_no,
-    :txn,
+    :txn_index,
     :vote_key,
     :payment_address,
     :is_payable,
@@ -22,5 +22,5 @@ INSERT INTO cip36_registration_invalid (
     :nonce,
     :cip36,
     :signed,
-    :error_report
+    :problem_report
 );

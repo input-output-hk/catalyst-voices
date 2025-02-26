@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/common/typedefs.dart';
 import 'package:catalyst_voices/pages/discovery/sections/current_campaign.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -7,14 +8,13 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-typedef _StateData = ({bool show, LocalizedException? error});
-
 class CurrentCampaignSelector extends StatelessWidget {
   const CurrentCampaignSelector({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Column(
+      key: Key('CurrentCampaignRoot'),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -46,11 +46,13 @@ class _Header extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('CurrentCampaignTitle'),
             context.l10n.currentCampaign,
             style: context.textTheme.titleSmall,
           ),
           const SizedBox(height: 4),
           Text(
+            key: const Key('Subtitle'),
             context.l10n.catalystF14,
             style: context.textTheme.displayMedium?.copyWith(
               color: context.colorScheme.primary,
@@ -58,6 +60,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
+            key: const Key('Description'),
             context.l10n.currentCampaignDescription,
             style: context.textTheme.bodyLarge,
           ),
@@ -96,6 +99,7 @@ class CurrentCampaignData extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState,
         CurrentCampaignInfoViewModel>(
+      key: const Key('CurrentCampaignData'),
       selector: (state) {
         return state.currentCampaign.currentCampaign;
       },
@@ -116,7 +120,7 @@ class CurrentCampaignError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, _StateData>(
+    return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
       selector: (state) {
         return (
           show: state.currentCampaign.showError,
@@ -126,6 +130,7 @@ class CurrentCampaignError extends StatelessWidget {
       builder: (context, state) {
         final errorMessage = state.error?.message(context);
         return Offstage(
+          key: const Key('CurrentCampaignError'),
           offstage: !state.show,
           child: Padding(
             padding: const EdgeInsets.all(32),

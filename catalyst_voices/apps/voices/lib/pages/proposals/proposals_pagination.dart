@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
@@ -15,9 +16,11 @@ class ProposalsPagination extends StatefulWidget {
   final int pageKey;
   final int maxResults;
   final ProposalPublish? stage;
-  final bool isEmpty;
   final bool userProposals;
   final bool usersFavorite;
+  final String? categoryId;
+  final String? searchValue;
+  final bool isLoading;
 
   const ProposalsPagination(
     this.proposals,
@@ -25,9 +28,11 @@ class ProposalsPagination extends StatefulWidget {
     this.maxResults, {
     super.key,
     this.stage,
-    this.isEmpty = false,
     this.userProposals = false,
     this.usersFavorite = false,
+    this.categoryId,
+    this.searchValue,
+    required this.isLoading,
   });
 
   @override
@@ -39,47 +44,80 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
   late PagingController<ProposalViewModel> _pagingController;
 
   @override
-  void initState() {
-    super.initState();
-    _proposalBloc = context.read<ProposalsCubit>();
-    _pagingController = PagingController(
-      initialPage: widget.pageKey,
-      initialMaxResults: widget.maxResults,
+  Widget build(BuildContext context) {
+    return PaginatedGridView<ProposalViewModel>(
+      pagingController: _pagingController,
+      builderDelegate: PagedWrapChildBuilder<ProposalViewModel>(
+        builder: (context, item) =>
+            BlocSelector<ProposalsCubit, ProposalsState, bool>(
+          selector: (state) {
+            return state.isFavorite(item.id);
+          },
+          builder: (context, state) {
+            return ProposalCard(
+              key: ValueKey(item.id),
+              proposal: item,
+              isFavorite: widget.usersFavorite ? item.isFavorite : state,
+              onFavoriteChanged: (isFavorite) async {
+                await context.read<ProposalsCubit>().onChangeFavoriteProposal(
+                      item.id,
+                      isFavorite: isFavorite,
+                    );
+              },
+            );
+          },
+        ),
+        emptyIndicatorBuilder: (context) =>
+            BlocSelector<ProposalsCubit, ProposalsState, bool>(
+          selector: (state) {
+            return state.searchValue?.isNotEmpty ?? false;
+          },
+          builder: (context, state) {
+            if (state) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.l10n.searchResult,
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: context.colors.textOnPrimaryLevel1,
+                    ),
+                  ),
+                  _EmptyProposals(
+                    title: context.l10n.emptySearchResultTitle,
+                    description: context.l10n.tryDifferentSearch,
+                  ),
+                ],
+              );
+            }
+            return const _EmptyProposals();
+          },
+        ),
+      ),
     );
-
-    _pagingController.addPageRequestListener((
-      newPageKey,
-      pageSize,
-      lastItem,
-    ) async {
-      final request = ProposalPaginationRequest(
-        pageKey: newPageKey,
-        pageSize: pageSize,
-        lastId: lastItem?.id,
-        stage: widget.stage,
-        usersProposals: widget.userProposals,
-        usersFavorite: widget.usersFavorite,
-      );
-      await _proposalBloc.getProposals(request);
-    });
-    _handleItemListChange();
-    _pagingController.notifyPageRequestListeners(0);
   }
 
   @override
-  void didUpdateWidget(covariant ProposalsPagination oldWidget) {
+  void didUpdateWidget(ProposalsPagination oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.proposals != widget.proposals) {
+      _handleItemListChange();
+    }
     if (oldWidget.pageKey != widget.pageKey) {
       _pagingController.currentPage = widget.pageKey;
     }
     if (oldWidget.maxResults != widget.maxResults) {
       _pagingController.maxResults = widget.maxResults;
     }
-    if (oldWidget.proposals != widget.proposals) {
-      _handleItemListChange();
+
+    if (oldWidget.categoryId != widget.categoryId ||
+        oldWidget.searchValue != widget.searchValue) {
+      _pagingController.notifyPageRequestListeners(0);
     }
-    if (widget.isEmpty != oldWidget.isEmpty && widget.isEmpty) {
-      _pagingController.empty();
+    if (widget.isLoading != widget.isLoading) {
+      _pagingController.isLoading = widget.isLoading;
     }
   }
 
@@ -90,29 +128,32 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return PaginatedGridView<ProposalViewModel>(
-      pagingController: _pagingController,
-      builderDelegate: PagedWrapChildBuilder<ProposalViewModel>(
-        builder: (context, item) => ProposalCard(
-          key: ValueKey(item.id),
-          proposal: item,
-          showStatus: false,
-          showLastUpdate: false,
-          showComments: false,
-          showSegments: false,
-          isFavorite: item.isFavorite,
-          onFavoriteChanged: (isFavorite) async {
-            await context.read<ProposalsCubit>().onChangeFavoriteProposal(
-                  item.id,
-                  isFavorite: isFavorite,
-                );
-          },
-        ),
-        emptyIndicatorBuilder: (context) => const _EmptyProposals(),
-        animateTransition: false,
-      ),
+  void initState() {
+    super.initState();
+    _proposalBloc = context.read<ProposalsCubit>();
+    _pagingController = PagingController(
+      initialPage: widget.pageKey,
+      initialMaxResults: widget.maxResults,
     );
+
+    _pagingController
+      ..addPageRequestListener((
+        newPageKey,
+        pageSize,
+        lastItem,
+      ) async {
+        final request = ProposalPaginationRequest(
+          pageKey: newPageKey,
+          pageSize: pageSize,
+          lastId: lastItem?.id,
+          stage: widget.stage,
+          categoryId: widget.categoryId,
+          usersProposals: widget.userProposals,
+          usersFavorite: widget.usersFavorite,
+        );
+        await _proposalBloc.getProposals(request);
+      })
+      ..notifyPageRequestListeners(0);
   }
 
   void _handleItemListChange() {
@@ -124,13 +165,19 @@ class ProposalsPaginationState extends State<ProposalsPagination> {
 }
 
 class _EmptyProposals extends StatelessWidget {
-  const _EmptyProposals();
+  final String? title;
+  final String? description;
+  const _EmptyProposals({
+    this.title,
+    this.description,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: EmptyState(
-        description: context.l10n.discoverySpaceEmptyProposals,
+        title: title,
+        description: description ?? context.l10n.discoverySpaceEmptyProposals,
       ),
     );
   }

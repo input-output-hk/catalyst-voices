@@ -9,11 +9,13 @@ final class VoicesNodeMenuItem extends Equatable {
   final String id;
   final String label;
   final bool isEnabled;
+  final bool hasError;
 
   const VoicesNodeMenuItem({
     required this.id,
     required this.label,
     this.isEnabled = true,
+    this.hasError = false,
   });
 
   @override
@@ -21,6 +23,7 @@ final class VoicesNodeMenuItem extends Equatable {
         id,
         label,
         isEnabled,
+        hasError,
       ];
 }
 
@@ -67,6 +70,7 @@ class VoicesNodeMenu extends StatelessWidget {
             key: ValueKey('NodeMenu${item.id}RowKey'),
             hasNext: index < items.length - 1,
             isSelected: item.id == selectedItemId,
+            hasError: item.hasError,
             onTap: item.isEnabled ? () => onItemTap(item.id) : null,
             child: Text(item.label),
           );

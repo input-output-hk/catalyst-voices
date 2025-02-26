@@ -8,6 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 bool _alwaysAllowRegistration = kDebugMode;
 
@@ -51,14 +52,19 @@ final class SessionCubit extends Cubit<SessionState>
         .distinct()
         .listen(_handleUserSettings);
 
-    _keychainUnlockedSub = _userService.watchAccount
-        .transform(AccountToKeychainUnlockTransformer())
+    _keychainUnlockedSub = _userService.watchUser
+        .map((user) => user.activeAccount)
+        .switchMap((account) {
+          return account?.keychain.watchIsUnlocked ?? Stream.value(false);
+        })
         .distinct()
         .listen(_onActiveKeychainUnlockChanged);
 
     _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
-    _accountSub = _userService.watchAccount.listen(_onActiveAccountChanged);
+    _accountSub = _userService.watchUser
+        .map((user) => user.activeAccount)
+        .listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
 
@@ -68,7 +74,7 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   Future<bool> unlock(LockFactor lockFactor) async {
-    final keychain = _userService.account?.keychain;
+    final keychain = _userService.user.activeAccount?.keychain;
     if (keychain == null) {
       return false;
     }
@@ -77,18 +83,18 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   Future<void> lock() async {
-    await _userService.account?.keychain.lock();
+    await _userService.user.activeAccount?.keychain.lock();
   }
 
   Future<void> removeKeychain() async {
-    final account = _userService.account;
+    final account = _userService.user.activeAccount;
     if (account != null) {
       await _userService.removeAccount(account);
     }
   }
 
   Future<void> switchToDummyAccount() async {
-    final account = _userService.account;
+    final account = _userService.user.activeAccount;
     if (account?.isDummy ?? false) {
       return;
     }
@@ -255,7 +261,7 @@ final class SessionCubit extends Cubit<SessionState>
 
   Future<Account> _getDummyAccount() async {
     final dummyAccount =
-        _userService.accounts.firstWhereOrNull((e) => e.isDummy);
+        _userService.user.accounts.firstWhereOrNull((e) => e.isDummy);
 
     return dummyAccount ??
         await _registrationService.registerTestAccount(

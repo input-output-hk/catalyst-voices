@@ -8,6 +8,7 @@ final class ProposalBuilderState extends Equatable {
   final List<ProposalBuilderSegment> segments;
   final ProposalGuidance guidance;
   final NodeId? activeNodeId;
+  final bool showValidationErrors;
 
   const ProposalBuilderState({
     this.isLoading = false,
@@ -15,27 +16,8 @@ final class ProposalBuilderState extends Equatable {
     this.segments = const [],
     this.guidance = const ProposalGuidance(),
     this.activeNodeId,
+    this.showValidationErrors = false,
   });
-
-  bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
-
-  bool get showError => !isLoading && error != null;
-
-  ProposalBuilderState copyWith({
-    bool? isLoading,
-    Optional<LocalizedException>? error,
-    List<ProposalBuilderSegment>? segments,
-    ProposalGuidance? guidance,
-    Optional<NodeId>? activeNodeId,
-  }) {
-    return ProposalBuilderState(
-      isLoading: isLoading ?? this.isLoading,
-      error: error.dataOr(this.error),
-      segments: segments ?? this.segments,
-      guidance: guidance ?? this.guidance,
-      activeNodeId: activeNodeId.dataOr(this.activeNodeId),
-    );
-  }
 
   @override
   List<Object?> get props => [
@@ -44,7 +26,30 @@ final class ProposalBuilderState extends Equatable {
         segments,
         guidance,
         activeNodeId,
+        showValidationErrors,
       ];
+
+  bool get showError => !isLoading && error != null;
+
+  bool get showSegments => !isLoading && segments.isNotEmpty && error == null;
+
+  ProposalBuilderState copyWith({
+    bool? isLoading,
+    Optional<LocalizedException>? error,
+    List<ProposalBuilderSegment>? segments,
+    ProposalGuidance? guidance,
+    Optional<NodeId>? activeNodeId,
+    bool? showValidationErrors,
+  }) {
+    return ProposalBuilderState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error.dataOr(this.error),
+      segments: segments ?? this.segments,
+      guidance: guidance ?? this.guidance,
+      activeNodeId: activeNodeId.dataOr(this.activeNodeId),
+      showValidationErrors: showValidationErrors ?? this.showValidationErrors,
+    );
+  }
 }
 
 final class ProposalGuidance extends Equatable {
@@ -56,13 +61,13 @@ final class ProposalGuidance extends Equatable {
     this.guidanceList = const [],
   });
 
-  bool get showEmptyState => !isNoneSelected && guidanceList.isEmpty;
-
   @override
   List<Object?> get props => [
         isNoneSelected,
         guidanceList,
       ];
+
+  bool get showEmptyState => !isNoneSelected && guidanceList.isEmpty;
 }
 
 final class ProposalGuidanceItem extends Equatable {

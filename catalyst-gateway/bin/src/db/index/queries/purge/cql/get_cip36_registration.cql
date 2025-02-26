@@ -1,7 +1,7 @@
 -- Get all primary keys from CIP-36 registration.
 SELECT
-    stake_address,
+    stake_public_key,
     nonce,
     slot_no,
-    txn
+    txn_index
 FROM cip36_registration
