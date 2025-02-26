@@ -233,7 +233,7 @@ class VoicesStartProposalButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
-      onTap: () => const ProposalBuilderDraftRoute().go(context),
+      onTap: () => unawaited(const ProposalBuilderDraftRoute().push(context)),
       child: Text(context.l10n.startProposal),
     );
   }

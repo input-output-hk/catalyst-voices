@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/voices_leading_icon_card.dart';
@@ -52,7 +54,7 @@ class CreateProposalCard extends StatelessWidget {
             ),
             onTap: () {
               // TODO(LynxLynxx): Pass categoryId when implemented
-              const ProposalBuilderDraftRoute().go(context);
+              unawaited(const ProposalBuilderDraftRoute().push(context));
             },
           ),
         ],

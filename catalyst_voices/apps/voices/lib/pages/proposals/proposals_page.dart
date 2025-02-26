@@ -414,7 +414,7 @@ class _Tabs extends StatelessWidget {
                   return ProposalPaginationTabView(
                     key: const Key('draftProposalsPagination'),
                     paginationViewModel: state,
-                    stage: ProposalPublish.localDraft,
+                    stage: ProposalPublish.publishedDraft,
                   );
                 },
               ),
