@@ -24,10 +24,14 @@ def build_signed_doc(
         doc_content_file.flush()
 
         mk_signed_doc_absolute_path = os.path.abspath("mk_signed_doc")
-        print(mk_signed_doc_absolute_path)
         subprocess.run(
-            f"{mk_signed_doc_absolute_path} build {doc_content_file.name} {signed_doc_file.name} {metadata_file.name}",
-            shell=True,
+            [
+                "./mk_signed_doc",
+                "build",
+                doc_content_file.name,
+                signed_doc_file.name,
+                metadata_file.name,
+            ],
         )
 
         signed_doc_hex = signed_doc_file.read().hex()
