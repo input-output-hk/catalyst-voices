@@ -16,12 +16,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.1
-    with:
-      forge_version: 0.11.0
-
   test_reporting:
     if: always()
-    needs: ci
     uses: ./.github/workflows/generate-allure-report.yml
