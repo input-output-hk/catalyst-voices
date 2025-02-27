@@ -14,7 +14,7 @@ use put_document::{
 
 use crate::service::{
     common::{
-        auth::none_or_rbac::NoneOrRBAC,
+        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         tags::ApiTags,
         types::{
             generic::{
@@ -78,11 +78,10 @@ impl DocumentApi {
         transform = "schema_version_validation"
     )]
     async fn put_document(
-        &self,
-        /// The document to PUT
+        &self, /// The document to PUT
         document: Cbor<Body>,
-        // /// Authorization required.
-        // _auth: CatalystRBACSecurityScheme,
+        /// Authorization required.
+        _auth: CatalystRBACSecurityScheme,
     ) -> put_document::AllResponses {
         match document.0.into_bytes_limit(MAXIMUM_DOCUMENT_SIZE).await {
             Ok(doc_bytes) => put_document::endpoint(doc_bytes.to_vec()).await,
