@@ -262,7 +262,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
   }
 
   void _exportProposal() {
-    final prefix = context.l10n.proposal;
+    final prefix = context.l10n.proposal.toLowerCase();
     context
         .read<ProposalBuilderBloc>()
         .add(ExportProposalEvent(filePrefix: prefix));
