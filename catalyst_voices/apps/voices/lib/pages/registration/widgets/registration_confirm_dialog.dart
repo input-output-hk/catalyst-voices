@@ -61,11 +61,11 @@ class RegistrationConfirmDialog extends StatelessWidget {
         child: content,
       ),
       actions: [
-        VoicesQuestionActionItem.negative(
+        VoicesQuestionActionItem.positive(
           positive,
           type: VoicesQuestionActionType.filled,
         ),
-        VoicesQuestionActionItem.positive(
+        VoicesQuestionActionItem.negative(
           negative,
           type: VoicesQuestionActionType.text,
         ),
