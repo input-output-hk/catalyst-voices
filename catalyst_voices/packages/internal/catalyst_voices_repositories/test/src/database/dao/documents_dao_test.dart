@@ -474,7 +474,7 @@ void main() {
           10,
           (index) => DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
-              type: DocumentType.proposalComment,
+              type: DocumentType.commentTemplate,
               selfRef: DocumentRefFactory.buildSigned(),
               ref: proposalRef,
             ),
@@ -484,7 +484,7 @@ void main() {
           5,
           (index) => DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
-              type: DocumentType.proposalComment,
+              type: DocumentType.commentTemplate,
               selfRef: DocumentRefFactory.buildSigned(),
               ref: DocumentRefFactory.buildSigned(),
             ),
@@ -524,6 +524,8 @@ void main() {
             ),
           ),
         );
+
+        await database.documentsDao.saveAll(versions);
       });
     });
 

@@ -31,6 +31,8 @@ abstract interface class DocumentsDao {
   /// Deletes all documents. Cascades to metadata.
   Future<void> deleteAll();
 
+  Future<List<String>> documentVersionIds({required DocumentRef ref});
+
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
   Future<DocumentEntity?> query({required DocumentRef ref});
@@ -79,7 +81,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<int> countComments({required DocumentRef ref}) {
     return (select(documents)
-          ..where((row) => row.type.equals(DocumentType.proposalComment.uuid)))
+          ..where((row) => row.type.equals(DocumentType.commentTemplate.uuid)))
         .get()
         .then(
           (docs) => docs.where((doc) {
@@ -256,5 +258,11 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         (u) => OrderingTerm.desc(u.verHi),
       ])
       ..limit(1);
+  }
+  
+  @override
+  Future<List<String>> documentVersionIds({required DocumentRef ref}) {
+    // TODO: implement documentVersionIds
+    throw UnimplementedError();
   }
 }
