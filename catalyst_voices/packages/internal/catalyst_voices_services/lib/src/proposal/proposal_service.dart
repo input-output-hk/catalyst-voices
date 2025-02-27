@@ -42,7 +42,7 @@ abstract interface class ProposalService {
   Future<List<String>> getUserProposalsIds(String userId);
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
-  /// 
+  ///
   /// The proposal reference will be altered to avoid linking
   /// the imported proposal to the old proposal.
   ///

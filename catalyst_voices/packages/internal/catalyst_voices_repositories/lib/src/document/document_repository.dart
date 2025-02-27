@@ -58,10 +58,10 @@ abstract interface class DocumentRepository {
   });
 
   /// Imports a document [data] previously encoded by [encodeDocumentForExport].
-  /// 
+  ///
   /// The document reference will be altered to avoid linking
   /// the imported document to the old document.
-  /// 
+  ///
   /// Once imported from the version management point of view this becomes
   /// a new standalone document not related to the previous one.
   ///
