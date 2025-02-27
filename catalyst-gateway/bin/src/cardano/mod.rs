@@ -5,6 +5,7 @@ use std::{fmt::Display, sync::Arc, time::Duration};
 use cardano_blockchain_types::{Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
+use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
 use tracing::{debug, error, info, warn};
@@ -17,11 +18,11 @@ use crate::{
             update::update_sync_status,
         },
         session::CassandraSession,
-    },
-    settings::{chain_follower, Settings},
+    }, metrics::chain_indexer::reporter::RUNNING_INDEXER_TASKS_COUNT, settings::{chain_follower, Settings}
 };
 
 // pub(crate) mod cip36_registration_obsolete;
+pub(crate) mod event;
 pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
@@ -328,7 +329,7 @@ struct SyncTask {
     /// The current running sync tasks.
     sync_tasks: FuturesUnordered<tokio::task::JoinHandle<SyncParams>>,
 
-    /// // How many immutable chain follower sync tasks we are running.
+    /// How many immutable chain follower sync tasks we are running.
     current_sync_tasks: u16,
 
     /// Start for the next block we would sync.
@@ -342,6 +343,9 @@ struct SyncTask {
 
     /// Current Sync Status
     sync_status: Vec<SyncStatus>,
+
+    /// Event handlers during the process of sync tasks.
+    event_handlers: Vec<fn(message: &event::ChainIndexerEvent)>,
 }
 
 impl SyncTask {
@@ -355,6 +359,7 @@ impl SyncTask {
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
+            event_handlers: Vec::new(),
         }
     }
 
@@ -426,6 +431,12 @@ impl SyncTask {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
+                                self.dispatch_event(
+                                    event::ChainIndexerEvent::SyncTasksCountUpdated {
+                                        current_sync_tasks: self.current_sync_tasks,
+                                    },
+                                );
+
                                 // If we need more immutable chain followers to sync the block
                                 // chain, we can now start them.
                                 self.start_immutable_followers();
@@ -490,6 +501,10 @@ impl SyncTask {
                         last_point.clone(),
                     )));
                     self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
+
+                    self.dispatch_event(event::ChainIndexerEvent::SyncTasksCountUpdated {
+                        current_sync_tasks: self.current_sync_tasks,
+                    });
                 }
 
                 // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off
@@ -539,6 +554,18 @@ impl SyncTask {
     }
 }
 
+impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
+    fn add_event_listener(&mut self, listener: fn(message: &event::ChainIndexerEvent)) {
+        self.event_handlers.push(listener);
+    }
+
+    fn dispatch_event(&self, message: event::ChainIndexerEvent) {
+        for listener in self.event_handlers.iter() {
+            (listener)(&message)
+        }
+    }
+}
+
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers() -> anyhow::Result<()> {
     let cfg = Settings::follower_cfg();
@@ -551,7 +578,19 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
     info!(chain=%cfg.chain,"Chain Sync is started.");
 
     tokio::spawn(async move {
+        use self::event::ChainIndexerEvent as Event;
+        use crate::metrics::chain_indexer::reporter;
+
         let mut sync_task = SyncTask::new(cfg);
+
+        sync_task.add_event_listener(
+            |Event::SyncTasksCountUpdated { current_sync_tasks }: &Event| {
+                reporter::RUNNING_INDEXER_TASKS_COUNT
+                    .with_label_values(&[])
+                    .set(i64::try_from(*current_sync_tasks).unwrap_or(-1));
+            },
+        );
+
         sync_task.run().await;
     });
 
