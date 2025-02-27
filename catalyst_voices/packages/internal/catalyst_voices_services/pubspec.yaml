@@ -24,6 +24,8 @@ dependencies:
   flutter_driver:
     sdk: flutter
   flutter_secure_storage: ^9.2.2
+  flutter_test:
+    sdk: flutter
   logging: ^1.3.0
   path: ^1.9.1
   rxdart: ^0.27.7

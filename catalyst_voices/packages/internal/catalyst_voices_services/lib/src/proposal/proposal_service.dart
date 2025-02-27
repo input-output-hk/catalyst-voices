@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:rxdart/transformers.dart';
+import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
@@ -70,9 +71,6 @@ final class ProposalServiceImpl implements ProposalService {
   Future<ProposalData> getProposal({
     required String id,
   }) async {
-    // final proposal = await _proposalRepository.getProposal(id: id);
-    // final proposal = await _buildProposal(Proposal);
-
     const proposalTemplate = DocumentSchema(
       parentSchemaUrl: '',
       schemaSelfUrl: '',
@@ -151,27 +149,36 @@ final class ProposalServiceImpl implements ProposalService {
     return _documentRepository
         .watchLatestPublicProposalsDocuments(limit: limit)
         .switchMap((documents) async* {
-      final proposals = await Future.wait(
+      final proposalsStreams = await Future.wait(
         documents.map((doc) async {
           final ref = SignedDocumentRef(id: doc.metadata.id);
-          final versionIds = await _documentRepository.getProposalVersionIds(
-            ref: ref,
-          );
-          final proposalCommentsCount = await _documentRepository
-              .watchProposalCommentsCount(ref: ref)
-              .first;
+          debugPrint('Processing document: ${ref.id}');
+          final versionIds =
+              await _documentRepository.getProposalVersionIds(ref: ref);
 
-          final proposalData = ProposalData(
-            document: doc,
-            // TODO(LynxLynxx): need to get categoryId here
-            categoryId: DocumentType.categoryParametersDocument.uuid,
-            versions: versionIds,
-            commentsCount: proposalCommentsCount,
-          );
-          return Proposal.fromData(proposalData);
+          return _documentRepository
+              .watchProposalCommentsCount(ref: ref)
+              .map((commentsCount) {
+            final proposalData = ProposalData(
+              document: doc,
+              categoryId: DocumentType.categoryParametersDocument.uuid,
+              versions: versionIds,
+              commentsCount: commentsCount,
+            );
+            return Proposal.fromData(proposalData);
+          });
         }),
       );
-      yield proposals;
+
+      await for (final commentsUpdates in Rx.combineLatest(
+        proposalsStreams,
+        (List<Proposal> proposals) => proposals,
+      )) {
+        debugPrint(
+          'Yielding proposals with comments: ${commentsUpdates.map((p) => p.id)}  ${commentsUpdates.map((p) => p.commentsCount)}',
+        );
+        yield commentsUpdates;
+      }
     });
   }
 }

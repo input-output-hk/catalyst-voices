@@ -35,6 +35,22 @@ final class Proposal extends Equatable {
     required this.category,
   });
 
+  factory Proposal.dummy(String id, String version) => Proposal(
+        id: id,
+        version: version,
+        category: 'Cardano Use Cases / MVP',
+        title: 'Dummy Proposal',
+        updateDate: DateTime.now(),
+        fundsRequested: Coin.fromAda(100000),
+        status: ProposalStatus.draft,
+        publish: ProposalPublish.localDraft,
+        commentsCount: 0,
+        description: 'Dummy description',
+        duration: 6,
+        author: 'Alex Wells',
+        versionCount: 1,
+      );
+
   factory Proposal.fromData(ProposalData data) {
     final updateDate = UuidV7.parseTimestamp(data.document.metadata.version);
     return Proposal(
