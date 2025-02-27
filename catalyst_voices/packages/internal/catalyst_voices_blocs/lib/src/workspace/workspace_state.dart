@@ -10,6 +10,7 @@ final class WorkspaceState extends Equatable {
   final String searchQuery;
   final List<WorkspaceProposalListItem> proposals;
   final LocalizedException? error;
+  final DocumentRef? importedProposalRef;
 
   const WorkspaceState({
     this.tab = WorkspaceTabType.draftProposal,
@@ -19,6 +20,7 @@ final class WorkspaceState extends Equatable {
     this.searchQuery = '',
     this.proposals = const [],
     this.error,
+    this.importedProposalRef,
   });
 
   @override
@@ -30,6 +32,7 @@ final class WorkspaceState extends Equatable {
         searchQuery,
         proposals,
         error,
+        importedProposalRef,
       ];
 
   bool get showEmptyState => proposals.isEmpty && error == null && !isLoading;
@@ -45,6 +48,7 @@ final class WorkspaceState extends Equatable {
     String? searchQuery,
     List<WorkspaceProposalListItem>? proposals,
     Optional<LocalizedException>? error,
+    Optional<DocumentRef>? importedProposalRef,
   }) {
     return WorkspaceState(
       tab: tab ?? this.tab,
@@ -54,6 +58,7 @@ final class WorkspaceState extends Equatable {
       searchQuery: searchQuery ?? this.searchQuery,
       proposals: proposals ?? this.proposals,
       error: error.dataOr(this.error),
+      importedProposalRef: importedProposalRef.dataOr(this.importedProposalRef),
     );
   }
 }

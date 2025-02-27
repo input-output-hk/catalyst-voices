@@ -26,6 +26,7 @@ class VoicesModalsExample extends StatelessWidget {
               onTap: () async {
                 final file = await VoicesUploadFileDialog.show(
                   context,
+                  routeSettings: const RouteSettings(name: '/upload-file'),
                   title: context.l10n.uploadKeychainTitle,
                   itemNameToUpload: context.l10n.key,
                   info: context.l10n.uploadKeychainInfo,

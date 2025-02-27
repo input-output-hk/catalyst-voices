@@ -32,8 +32,12 @@ class VoicesUploadFileDialog extends StatefulWidget {
     this.onUpload,
   });
 
+  @override
+  State<VoicesUploadFileDialog> createState() => _VoicesUploadFileDialogState();
+
   static Future<VoicesFile?> show(
     BuildContext context, {
+    required RouteSettings routeSettings,
     required String title,
     String? itemNameToUpload,
     String? info,
@@ -42,7 +46,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
   }) {
     return VoicesDialog.show<VoicesFile?>(
       context: context,
-      routeSettings: const RouteSettings(name: '/upload-file'),
+      routeSettings: routeSettings,
       builder: (context) {
         return VoicesUploadFileDialog(
           title: title,
@@ -52,56 +56,6 @@ class VoicesUploadFileDialog extends StatefulWidget {
           onUpload: onUpload,
         );
       },
-    );
-  }
-
-  @override
-  State<VoicesUploadFileDialog> createState() => _VoicesUploadFileDialogState();
-}
-
-class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
-  VoicesFile? _selectedFile;
-  bool _isUploading = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
-      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 450),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _Title(widget.title),
-            const SizedBox(height: 24),
-            _UploadContainer(
-              itemNameToUpload: widget.itemNameToUpload,
-              info: widget.info,
-              allowedExtensions: widget.allowedExtensions,
-              onFileSelected: (file) {
-                setState(() {
-                  _selectedFile = file;
-                });
-              },
-            ),
-            if (_selectedFile != null)
-              _InfoContainer(
-                selectedFilename: _selectedFile!.name,
-                isUploading: _isUploading,
-              ),
-            const SizedBox(height: 24),
-            _Buttons(
-              selectedFile: _selectedFile,
-              onUpload: (file) async {
-                setState(() {
-                  _isUploading = true;
-                });
-                await widget.onUpload?.call(file);
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -211,6 +165,20 @@ class _InfoContainer extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  final String title;
+
+  const _Title(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title.toUpperCase(),
+      style: Theme.of(context).textTheme.titleLarge,
     );
   }
 }
@@ -350,16 +318,49 @@ class _UploadContainerState extends State<_UploadContainer> {
   }
 }
 
-class _Title extends StatelessWidget {
-  final String title;
-
-  const _Title(this.title);
+class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
+  VoicesFile? _selectedFile;
+  bool _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title.toUpperCase(),
-      style: Theme.of(context).textTheme.titleLarge,
+    return VoicesSinglePaneDialog(
+      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 450),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _Title(widget.title),
+            const SizedBox(height: 24),
+            _UploadContainer(
+              itemNameToUpload: widget.itemNameToUpload,
+              info: widget.info,
+              allowedExtensions: widget.allowedExtensions,
+              onFileSelected: (file) {
+                setState(() {
+                  _selectedFile = file;
+                });
+              },
+            ),
+            if (_selectedFile != null)
+              _InfoContainer(
+                selectedFilename: _selectedFile!.name,
+                isUploading: _isUploading,
+              ),
+            const SizedBox(height: 24),
+            _Buttons(
+              selectedFile: _selectedFile,
+              onUpload: (file) async {
+                setState(() {
+                  _isUploading = true;
+                });
+                await widget.onUpload?.call(file);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

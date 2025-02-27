@@ -106,9 +106,12 @@ final class ProposalBuilderBloc
         document: _buildDocument(),
       );
 
+      final filename = '${event.filePrefix}_$proposalId';
+      const extension = ProposalDocument.exportFileExt;
+
       await _downloaderService.download(
         data: encodedProposal,
-        filename: '${event.filePrefix}_$proposalId.json',
+        filename: '$filename.$extension',
       );
     } catch (error, stackTrace) {
       _logger.severe('Exporting proposal failed', error, stackTrace);

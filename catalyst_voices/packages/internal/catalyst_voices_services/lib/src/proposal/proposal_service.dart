@@ -42,7 +42,13 @@ abstract interface class ProposalService {
   Future<List<String>> getUserProposalsIds(String userId);
 
   /// Imports the proposal from [data] encoded by [encodeProposalForExport].
-  Future<void> importProposal(Uint8List data);
+  ///
+  /// The proposal reference will be altered to avoid linking
+  /// the imported proposal to the old proposal.
+  ///
+  /// Once imported from the version management point of view this becomes
+  /// a new standalone proposal not related to the previous one.
+  Future<DocumentRef> importProposal(Uint8List data);
 
   /// Publishes a public proposal draft.
   Future<void> publishProposal(Document document);
@@ -131,8 +137,8 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> importProposal(Uint8List data) async {
-    await _documentRepository.importDocument(data: data);
+  Future<DocumentRef> importProposal(Uint8List data) {
+    return _documentRepository.importDocument(data: data);
   }
 
   @override
