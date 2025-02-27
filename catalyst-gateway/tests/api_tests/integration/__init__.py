@@ -9,4 +9,3 @@ except KeyError:
    sys.exit(1)
 
 EVENT_DB_TEST_URL = os.environ["EVENT_DB_TEST_URL"]
-
