@@ -14,7 +14,7 @@ use put_document::{
 
 use crate::service::{
     common::{
-        auth::rbac::scheme::CatalystRBACSecurityScheme,
+        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         tags::ApiTags,
         types::{
             generic::{
@@ -54,7 +54,7 @@ impl DocumentApi {
         /// version.
         version: Query<Option<UUIDv7>>,
         /// No Authorization required, but Token permitted.
-        _auth: CatalystRBACSecurityScheme,
+        _auth: NoneOrRBAC,
     ) -> get_document::AllResponses {
         let Ok(doc_id) = document_id.0.try_into() else {
             let err = anyhow!("Invalid UUIDv7"); // Should not happen as UUIDv7 is validating.
@@ -115,8 +115,8 @@ impl DocumentApi {
         &self, /// The Query Filter Specification
         query: Json<DocumentIndexQueryFilterBody>,
         page: Query<Option<Page>>, limit: Query<Option<Limit>>,
-        /// Authorization required.
-        _auth: CatalystRBACSecurityScheme,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> post_document_index_query::AllResponses {
         post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
     }
