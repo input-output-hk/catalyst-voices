@@ -46,7 +46,7 @@ impl CatalystRBACTokenV1 {
         }
     }
 
-    /// Parases a token from the given string.
+    /// Parses a token from the given string.
     ///
     /// The token consists of the following parts:
     /// - "catid" prefix.
