@@ -56,7 +56,9 @@ abstract interface class DocumentRepository {
     required DocumentDataContent content,
   });
 
-  Stream<ProposalDocument> watchLatestPublicProposalsDocuments({int? limit});
+  Stream<List<ProposalDocument>> watchLatestPublicProposalsDocuments({
+    int? limit,
+  });
 
   /// Observes matching [ProposalDocument] and emits updates.
   ///
@@ -187,35 +189,44 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @visibleForTesting
-  Stream<DocumentsDataWithRefData> watchLatestDocumentsWithRef({int? limit}) {
+  Stream<List<DocumentsDataWithRefData>> watchLatestDocumentsWithRef(
+      {int? limit}) {
     return _localDocuments
         .watchLatestVersions(limit: limit)
         .distinct()
-        .switchMap((documents) {
-      return Stream.fromIterable(documents).asyncMap((documentData) async {
-        final templateRef = documentData.metadata.template!;
-        final templateData = await getDocumentData(ref: templateRef);
-
-        return (data: documentData, refData: templateData);
-      });
+        .switchMap((documents) async* {
+      final results = await Future.wait(
+        documents
+            .where((doc) => doc.metadata.template != null)
+            .map((documentData) async {
+          final templateRef = documentData.metadata.template!;
+          final templateData = await getDocumentData(ref: templateRef);
+          return (data: documentData, refData: templateData);
+        }),
+      );
+      yield results;
     });
   }
 
   @override
-  Stream<ProposalDocument> watchLatestPublicProposalsDocuments({int? limit}) {
+  Stream<List<ProposalDocument>> watchLatestPublicProposalsDocuments({
+    int? limit,
+  }) {
     return watchLatestDocumentsWithRef(
       limit: limit,
     ).whereNotNull().map(
-      (event) {
-        final documentData = event.data;
-        final templateData = event.refData;
+          (documents) => documents.map(
+            (doc) {
+              final documentData = doc.data;
+              final templateData = doc.refData;
 
-        return _buildProposalDocument(
-          documentData: documentData,
-          templateData: templateData,
+              return _buildProposalDocument(
+                documentData: documentData,
+                templateData: templateData,
+              );
+            },
+          ).toList(),
         );
-      },
-    );
   }
 
   @override

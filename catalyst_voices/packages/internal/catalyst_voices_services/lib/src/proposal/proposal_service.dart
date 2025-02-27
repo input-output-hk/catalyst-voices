@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:rxdart/rxdart.dart';
 
-// ignore: one_member_abstracts
 abstract interface class ProposalService {
   factory ProposalService(
     ProposalRepository proposalRepository,
@@ -41,6 +41,8 @@ abstract interface class ProposalService {
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview(Document document);
+
+  Stream<List<Proposal>> watchLatestProposals({int? limit});
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -124,6 +126,26 @@ final class ProposalServiceImpl implements ProposalService {
   Future<void> submitProposalForReview(Document document) {
     // TODO(dtscalac): implement submitting proposals into review
     throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<Proposal>> watchLatestProposals({int? limit}) {
+    return _documentRepository
+        .watchLatestPublicProposalsDocuments(limit: limit)
+        .switchMap((documents) async* {
+      final proposals = await Future.wait(
+        documents.map((doc) async {
+          final additionalInfo =
+              await _documentRepository.getAdditionalInfo(doc.id);
+
+          return Proposal(
+            id: doc.id,
+            additionalInfo: additionalInfo,
+          );
+        }),
+      );
+      yield proposals;
+    });
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {

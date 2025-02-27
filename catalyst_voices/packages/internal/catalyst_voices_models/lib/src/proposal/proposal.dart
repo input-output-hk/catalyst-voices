@@ -26,6 +26,8 @@ final class Proposal extends ProposalBase {
     required super.author,
   });
 
+  static final titleNodeId = DocumentNodeId.fromString('setup.title.title');
+
   @override
   List<Object?> get props => [
         ...super.props,

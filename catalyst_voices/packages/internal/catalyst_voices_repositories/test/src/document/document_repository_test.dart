@@ -377,11 +377,12 @@ void main() {
         final publicDraftData = DocumentDataFactory.build(
           type: DocumentType.proposalDocument,
           selfRef: publicDraftRef,
-          template: templateRef,
+          template: templateData.ref,
           content: publicDraftContent,
         );
 
         await localDocuments.save(data: templateData);
+        await Future.delayed(const Duration(seconds: 2), () {});
         await localDocuments.save(data: publicDraftData);
 
         final latestProposals = repository.watchLatestDocumentsWithRef();
@@ -389,9 +390,11 @@ void main() {
         expect(
           latestProposals,
           emitsInOrder([
-            predicate<DocumentsDataWithRefData?>((data) {
-              final isRef = data?.data.ref == publicDraftRef;
-              final isContent = data?.data.content == publicDraftContent;
+            predicate<List<DocumentsDataWithRefData>>((dataList) {
+              if (dataList.isEmpty) return false;
+              final data = dataList.first;
+              final isRef = data.data.ref == publicDraftRef;
+              final isContent = data.data.content == publicDraftContent;
               return isRef && isContent;
             }),
           ]),
