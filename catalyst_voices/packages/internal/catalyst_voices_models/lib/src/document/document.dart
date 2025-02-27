@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/document/builder/document_builder.dart';
+import 'package:catalyst_voices_models/src/document/data/document_data_content.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
@@ -61,6 +62,12 @@ final class Document extends Equatable {
   /// Creates a new [DocumentBuilder] from this document.
   DocumentBuilder toBuilder() {
     return DocumentBuilder.fromDocument(this);
+  }
+
+  /// Converts the document into content object.
+  DocumentDataContent toContent() {
+    // TODO(dtscalac): implement it
+    return const DocumentDataContent({});
   }
 }
 

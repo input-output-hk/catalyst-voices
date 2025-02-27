@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_event_transformers.dart';
@@ -57,6 +56,14 @@ final class ProposalBuilderBloc
     return documentBuilder!.build();
   }
 
+  DocumentDataMetadata _buildDocumentMetadata() {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      selfRef: state.metadata.documentRef!,
+      template: state.metadata.templateRef,
+    );
+  }
+
   ProposalBuilderState _createState({
     required Document document,
     required ProposalBuilderMetadata metadata,
@@ -91,12 +98,17 @@ final class ProposalBuilderBloc
     Emitter<ProposalBuilderState> emit,
   ) async {
     try {
-      final document = _buildDocument();
-      final proposalId = state.metadata.documentRef!.id;
+      final documentRef = state.metadata.documentRef!;
+      final proposalId = documentRef.id;
+
+      final encodedProposal = await _proposalService.encodeProposalForExport(
+        metadata: _buildDocumentMetadata(),
+        document: _buildDocument(),
+      );
 
       await _downloaderService.download(
-        data: utf8.encode(document.toString()),
-        filename: '$proposalId.json',
+        data: encodedProposal,
+        filename: '${event.filePrefix}_$proposalId.json',
       );
     } catch (error, stackTrace) {
       _logger.severe('Exporting proposal failed', error, stackTrace);
@@ -238,7 +250,9 @@ final class ProposalBuilderBloc
 
       return _createState(
         document: documentBuilder.build(),
-        metadata: ProposalBuilderMetadata.newDraft(),
+        metadata: ProposalBuilderMetadata.newDraft(
+          templateRef: proposalTemplateRef,
+        ),
       );
     });
   }
@@ -270,9 +284,9 @@ final class ProposalBuilderBloc
     _logger.info('Loading proposal template[${event.id}]');
 
     await _loadState(emit, () async {
-      final ref = SignedDocumentRef(id: event.id);
+      final proposalTemplateRef = SignedDocumentRef(id: event.id);
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: ref,
+        ref: proposalTemplateRef,
       );
 
       final documentBuilder =
@@ -280,7 +294,9 @@ final class ProposalBuilderBloc
 
       return _createState(
         document: documentBuilder.build(),
-        metadata: ProposalBuilderMetadata.newDraft(),
+        metadata: ProposalBuilderMetadata.newDraft(
+          templateRef: proposalTemplateRef,
+        ),
       );
     });
   }
