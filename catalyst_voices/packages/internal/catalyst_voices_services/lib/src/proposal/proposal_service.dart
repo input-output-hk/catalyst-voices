@@ -13,11 +13,10 @@ abstract interface class ProposalService {
     );
   }
 
-  Future<Proposal> getProposal({
-    required String id,
-  });
+  /// Fetches favorites proposals ids of the user
+  Future<List<String>> getFavoritesProposalsIds();
 
-  Future<ProposalTemplate> getProposalTemplate({
+  Future<Proposal> getProposal({
     required DocumentRef ref,
   });
 
@@ -27,8 +26,9 @@ abstract interface class ProposalService {
     required String campaignId,
   });
 
-  /// Fetches favorites proposals ids of the user
-  Future<List<String>> getFavoritesProposalsIds();
+  Future<ProposalTemplate> getProposalTemplate({
+    required DocumentRef ref,
+  });
 
   /// Fetches user's proposals ids  depending on his id that is saved
   /// in metadata of proposal document
@@ -45,24 +45,19 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
-  Future<Proposal> getProposal({
-    required String id,
-  }) async {
-    final proposalBase = await _proposalRepository.getProposal(id: id);
-    final proposal = await _buildProposal(proposalBase);
-
-    return proposal;
+  Future<List<String>> getFavoritesProposalsIds() async {
+    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
+    return proposalsIds;
   }
 
   @override
-  Future<ProposalTemplate> getProposalTemplate({
+  Future<Proposal> getProposal({
     required DocumentRef ref,
   }) async {
-    final proposalTemplate = await _documentRepository.getProposalTemplate(
-      ref: ref,
-    );
+    final proposalBase = await _proposalRepository.getProposal(id: ref.id);
+    final proposal = await _buildProposal(proposalBase);
 
-    return proposalTemplate;
+    return proposal;
   }
 
   @override
@@ -87,9 +82,14 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<List<String>> getFavoritesProposalsIds() async {
-    final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
-    return proposalsIds;
+  Future<ProposalTemplate> getProposalTemplate({
+    required DocumentRef ref,
+  }) async {
+    final proposalTemplate = await _documentRepository.getProposalTemplate(
+      ref: ref,
+    );
+
+    return proposalTemplate;
   }
 
   @override

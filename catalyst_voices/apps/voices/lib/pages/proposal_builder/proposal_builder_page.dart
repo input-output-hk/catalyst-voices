@@ -181,7 +181,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     final templateId = widget.templateId;
 
     if (proposalId != null) {
-      bloc.add(LoadProposalEvent(id: proposalId));
+      final ref = SignedDocumentRef(id: proposalId);
+      bloc.add(LoadProposalEvent(ref: ref));
       return;
     }
 

@@ -32,14 +32,14 @@ final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {
 }
 
 final class LoadProposalEvent extends ProposalBuilderEvent {
-  final String id;
+  final DocumentRef ref;
 
   const LoadProposalEvent({
-    required this.id,
+    required this.ref,
   });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [ref];
 }
 
 final class LoadProposalTemplateEvent extends ProposalBuilderEvent {

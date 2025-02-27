@@ -233,9 +233,9 @@ final class ProposalBuilderBloc
   ) async {
     await _loadDocument(
       documentBuilderGetter: () async {
-        _logger.info('Loading proposal[${event.id}]');
+        _logger.info('Loading proposal[${event.ref}]');
 
-        final proposal = await _proposalService.getProposal(id: event.id);
+        final proposal = await _proposalService.getProposal(ref: event.ref);
         final document = proposal.document.document;
 
         return DocumentBuilder.fromDocument(document);
