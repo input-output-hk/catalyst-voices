@@ -25,8 +25,6 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
     final proposal = await _proposalService.getProposal(ref: ref);
     final document = proposal.document;
 
-    final current = const Uuid().v7();
-
     final data = ProposalViewData(
       header: ProposalViewHeader(
         id: event.ref.id,
@@ -35,9 +33,9 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
         createdAt: DateTime.timestamp(),
         commentsCount: 6,
         versions: DocumentVersions(
-          current: current,
+          current: document.metadata.selfRef.version,
           all: [
-            current,
+            document.metadata.selfRef.version!,
             ...List.generate(4, (_) => const Uuid().v7()),
           ],
         ),

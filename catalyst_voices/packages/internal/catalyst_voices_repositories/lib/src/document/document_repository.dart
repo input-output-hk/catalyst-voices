@@ -178,8 +178,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final template = _buildProposalTemplate(documentData: templateData);
 
     final metadata = ProposalMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final content = DocumentDataContentDto.fromModel(
@@ -203,8 +202,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     final metadata = ProposalTemplateMetadata(
-      id: documentData.metadata.id,
-      version: documentData.metadata.version,
+      selfRef: documentData.metadata.selfRef,
     );
 
     final contentData = documentData.content.data;
