@@ -768,6 +768,10 @@
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
   },
+  "backToList": "Back to list",
+  "@backToList": {
+    "description": "For example in button that goes to previous screen with a list like proposals"
+  },
   "retry": "Retry",
   "@retry": {
     "description": "Retry action when something goes wrong."

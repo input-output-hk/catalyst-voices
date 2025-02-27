@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/pages/proposal/proposal_back.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -47,11 +48,22 @@ class _ProposalPageState extends State<ProposalPage> {
     return SegmentsControllerScope(
       controller: _segmentsController,
       child: Scaffold(
-        appBar: const VoicesAppBar(),
-        body: SpaceScaffold(
-          left: const ProposalNavigationPanel(),
-          body: ProposalContent(scrollController: _segmentsScrollController),
-          right: const Offstage(),
+        appBar: const VoicesAppBar(
+          automaticallyImplyLeading: false,
+        ),
+        body: Column(
+          children: [
+            const ProposalBack(),
+            Expanded(
+              child: SpaceScaffold(
+                left: const ProposalNavigationPanel(),
+                body: ProposalContent(
+                  scrollController: _segmentsScrollController,
+                ),
+                right: const Offstage(),
+              ),
+            ),
+          ],
         ),
       ),
     );
