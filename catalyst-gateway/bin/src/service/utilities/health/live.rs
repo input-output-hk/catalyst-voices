@@ -1,4 +1,4 @@
-//! Utilities used for `health` functionality.
+//! Utilities used for `Liveness` functionality.
 
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
