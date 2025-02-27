@@ -118,27 +118,6 @@ final class ProposalBuilderBloc
     }
   }
 
-  Iterable<DocumentProperty> _findSectionsAndSubsections(
-    DocumentProperty property,
-  ) sync* {
-    if (property.schema.isSectionOrSubsection) {
-      yield property;
-    }
-
-    switch (property) {
-      case DocumentListProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentObjectProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentValueProperty():
-      // value property doesn't have children
-    }
-  }
-
   ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
     if (nodeId == null) {
       return const ProposalGuidance(isNoneSelected: true);
@@ -298,7 +277,7 @@ final class ProposalBuilderBloc
   }) {
     return document.segments.map((segment) {
       final sections = segment.sections
-          .expand(_findSectionsAndSubsections)
+          .expand(DocumentNodeTraverser.findSectionsAndSubsections)
           .map(
             (section) => ProposalBuilderSection(
               id: section.schema.nodeId,
