@@ -8,12 +8,14 @@ class DocumentVersionSelector extends StatelessWidget {
   final String? current;
   final List<String> versions;
   final bool showBorder;
+  final bool readOnly;
 
   const DocumentVersionSelector({
     super.key,
     this.current,
     required this.versions,
     this.showBorder = true,
+    this.readOnly = false,
   });
 
   @override
@@ -24,19 +26,27 @@ class DocumentVersionSelector extends StatelessWidget {
 
     return Offstage(
       offstage: nr == 0,
-      child: VoicesOutlinedButton(
-        leading: VoicesAssets.icons.documentText.buildIcon(),
-        trailing: VoicesAssets.icons.chevronDown.buildIcon(),
-        onTap: () {},
-        style: OutlinedButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          side: showBorder
-              ? BorderSide(color: context.colors.outlineBorderVariant)
-              : BorderSide.none,
-          foregroundColor: context.colors.textOnPrimaryLevel1,
-          iconColor: context.colors.textOnPrimaryLevel1,
+      child: AbsorbPointer(
+        absorbing: readOnly,
+        child: VoicesOutlinedButton(
+          leading: VoicesAssets.icons.documentText.buildIcon(),
+          trailing: Offstage(
+            offstage: readOnly,
+            child: VoicesAssets.icons.chevronDown.buildIcon(),
+          ),
+          onTap: () {},
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            side: showBorder
+                ? BorderSide(color: context.colors.outlineBorderVariant)
+                : BorderSide.none,
+            foregroundColor: context.colors.textOnPrimaryLevel1,
+            iconColor: context.colors.textOnPrimaryLevel1,
+          ),
+          child: Text(context.l10n.nrOfIteration(3)),
         ),
-        child: Text(context.l10n.nrOfIteration(3)),
       ),
     );
   }
