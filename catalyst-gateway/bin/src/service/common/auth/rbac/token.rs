@@ -127,6 +127,11 @@ impl CatalystRBACTokenV1 {
         };
         (min_time < token_age) && (max_time > token_age)
     }
+
+    /// Returns a Catalyst ID from the token.
+    pub(crate) fn catalyst_id(&self) -> &IdUri {
+        &self.catalyst_id
+    }
 }
 
 impl Display for CatalystRBACTokenV1 {
@@ -180,27 +185,27 @@ mod tests {
         let verifying_key = signing_key.verifying_key();
         let token =
             CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key);
-        assert_eq!(token.catalyst_id.username(), None);
-        assert!(token.catalyst_id.nonce().is_some());
+        assert_eq!(token.catalyst_id().username(), None);
+        assert!(token.catalyst_id().nonce().is_some());
         assert_eq!(
-            token.catalyst_id.network(),
+            token.catalyst_id().network(),
             ("cardano".into(), Some("preprod".into()))
         );
-        assert!(!token.catalyst_id.is_encryption_key());
-        assert!(token.catalyst_id.is_signature_key());
+        assert!(!token.catalyst_id().is_encryption_key());
+        assert!(token.catalyst_id().is_signature_key());
 
         let token_str = token.to_string();
         let parsed = CatalystRBACTokenV1::parse(&token_str).unwrap();
         assert_eq!(token.signature, parsed.signature);
         assert_eq!(token.raw, parsed.raw);
-        assert_eq!(parsed.catalyst_id.username(), Some(String::new()));
-        assert!(parsed.catalyst_id.nonce().is_some());
+        assert_eq!(parsed.catalyst_id().username(), Some(String::new()));
+        assert!(parsed.catalyst_id().nonce().is_some());
         assert_eq!(
-            parsed.catalyst_id.network(),
+            parsed.catalyst_id().network(),
             ("cardano".into(), Some("preprod".into()))
         );
-        assert!(!token.catalyst_id.is_encryption_key());
-        assert!(token.catalyst_id.is_signature_key());
+        assert!(!token.catalyst_id().is_encryption_key());
+        assert!(token.catalyst_id().is_signature_key());
 
         let parsed_str = parsed.to_string();
         assert_eq!(token_str, parsed_str);
@@ -241,5 +246,15 @@ mod tests {
         // Check that the token ISN'T too new if max_skew is three seconds.
         let max_skew = Duration::from_secs(3);
         assert!(token.is_young(max_age, max_skew));
+    }
+
+    #[test]
+    fn verify() {
+        let mut seed = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut seed);
+        let verifying_key = signing_key.verifying_key();
+        let token =
+            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key);
+        token.verify(&verifying_key).unwrap();
     }
 }
