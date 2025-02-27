@@ -19,7 +19,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         title: Some("Catalyst short ID".into()),
         description: Some("Catalyst short identifier in string format"),
         example,
-        pattern: Some(r":[0-9]+@.+\.+/[A-Za-z0-9_-]{43}".into()),
+        pattern: Some(r":[0-9]+@.+\..+\/[A-Za-z0-9_-]{43}".into()),
         ..MetaSchema::ANY
     }
 });
