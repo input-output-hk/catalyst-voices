@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
-  final DocumentRef? documentRef;
+  final ProposalMetadata? documentRef;
 
   /// The current iteration version, 0 if not published.
   final int currentIteration;
@@ -45,7 +45,7 @@ final class ProposalBuilderState extends Equatable {
   });
 
   String? get proposalTitle {
-    final property = document?.getProperty(Proposal.titleNodeId)
+    final property = document?.getProperty(ProposalDocument.titleNodeId)
         as DocumentValueProperty<String>?;
 
     return property?.value;

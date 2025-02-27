@@ -18,6 +18,15 @@ final class Dependencies extends DependencyProvider {
 
   Dependencies._();
 
+  bool get isInitialized => _isInitialized;
+
+  @override
+  Future<void> get reset {
+    return super.reset.whenComplete(() {
+      _isInitialized = false;
+    });
+  }
+
   Future<void> init({
     required AppConfig config,
   }) async {
@@ -33,15 +42,6 @@ final class Dependencies extends DependencyProvider {
     _registerBlocsWithDependencies();
 
     _isInitialized = true;
-  }
-
-  bool get isInitialized => _isInitialized;
-
-  @override
-  Future<void> get reset {
-    return super.reset.whenComplete(() {
-      _isInitialized = false;
-    });
   }
 
   void _registerBlocsWithDependencies() {
@@ -142,7 +142,7 @@ final class Dependencies extends DependencyProvider {
           get<CatalystDatabase>(),
         );
       })
-      ..registerLazySingleton<DocumentDataLocalSource>(() {
+      ..registerLazySingleton<SignedDocumentDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
         );
@@ -161,7 +161,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
-          get<DocumentDataLocalSource>(),
+          get<SignedDocumentDataSource>(),
           get<CatGatewayDocumentDataSource>(),
         );
       });
