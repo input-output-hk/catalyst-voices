@@ -1,10 +1,11 @@
 //! Logic for orchestrating followers
 
-use std::{collections::HashMap, fmt::Display, sync::Arc, time::Duration};
+use std::{fmt::Display, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
+use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
 use tracing::{debug, error, info, warn};
@@ -17,8 +18,7 @@ use crate::{
             update::update_sync_status,
         },
         session::CassandraSession,
-    },
-    settings::{chain_follower, Settings},
+    }, metrics::chain_indexer::reporter::RUNNING_INDEXER_TASKS_COUNT, settings::{chain_follower, Settings}
 };
 
 // pub(crate) mod cip36_registration_obsolete;
@@ -345,7 +345,7 @@ struct SyncTask {
     sync_status: Vec<SyncStatus>,
 
     /// Event handlers during the process of sync tasks.
-    event_handlers: HashMap<String, Vec<fn(message: event::ChainIndexerEvent)>>
+    event_handlers: Vec<fn(message: &event::ChainIndexerEvent)>,
 }
 
 impl SyncTask {
@@ -359,7 +359,7 @@ impl SyncTask {
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
-            event_handlers: HashMap::new()
+            event_handlers: Vec::new(),
         }
     }
 
@@ -431,9 +431,11 @@ impl SyncTask {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
-                                
-
-                                // TODO: add number of running indexer tasks
+                                self.dispatch_event(
+                                    event::ChainIndexerEvent::SyncTasksCountUpdated {
+                                        current_sync_tasks: self.current_sync_tasks,
+                                    },
+                                );
 
                                 // If we need more immutable chain followers to sync the block
                                 // chain, we can now start them.
@@ -500,8 +502,9 @@ impl SyncTask {
                     )));
                     self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
 
-                    // TODO: add number of running indexer tasks
-                    // self.notify_all(event, message);
+                    self.dispatch_event(event::ChainIndexerEvent::SyncTasksCountUpdated {
+                        current_sync_tasks: self.current_sync_tasks,
+                    });
                 }
 
                 // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off
@@ -549,12 +552,16 @@ impl SyncTask {
 
         Some((start_slot, Point::fuzzy(end)))
     }
+}
 
-    fn notify_all(&self, event_type: &str, message: event::ChainIndexerEvent) {
-        if let Some(listeners) = self.event_handlers.get(event_type) {
-            for listener in listeners {
-                (listener)(message.clone())
-            }
+impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
+    fn add_event_listener(&mut self, listener: fn(message: &event::ChainIndexerEvent)) {
+        self.event_handlers.push(listener);
+    }
+
+    fn dispatch_event(&self, message: event::ChainIndexerEvent) {
+        for listener in self.event_handlers.iter() {
+            (listener)(&message)
         }
     }
 }
@@ -571,7 +578,19 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
     info!(chain=%cfg.chain,"Chain Sync is started.");
 
     tokio::spawn(async move {
+        use self::event::ChainIndexerEvent as Event;
+        use crate::metrics::chain_indexer::reporter;
+
         let mut sync_task = SyncTask::new(cfg);
+
+        sync_task.add_event_listener(
+            |Event::SyncTasksCountUpdated { current_sync_tasks }: &Event| {
+                reporter::RUNNING_INDEXER_TASKS_COUNT
+                    .with_label_values(&[])
+                    .set(i64::try_from(*current_sync_tasks).unwrap_or(-1));
+            },
+        );
+
         sync_task.run().await;
     });
 
