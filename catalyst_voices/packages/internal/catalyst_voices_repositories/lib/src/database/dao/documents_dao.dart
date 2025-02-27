@@ -134,6 +134,25 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<List<String>> documentVersionIds({required DocumentRef ref}) {
+    final id = UuidHiLo.from(ref.id);
+
+    return (select(documents)
+          ..where(
+            (tbl) => Expression.and([
+              tbl.idHi.equals(id.high),
+              tbl.idLo.equals(id.low),
+            ]),
+          )
+          ..orderBy([
+            (u) => OrderingTerm.desc(u.verHi),
+            (u) => OrderingTerm.desc(u.verLo),
+          ]))
+        .map((doc) => UuidHiLo(high: doc.verHi, low: doc.verLo).toString())
+        .get();
+  }
+
+  @override
   Future<DocumentEntity?> query({required DocumentRef ref}) {
     return _selectRef(ref).get().then((value) => value.firstOrNull);
   }
@@ -258,11 +277,5 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         (u) => OrderingTerm.desc(u.verHi),
       ])
       ..limit(1);
-  }
-  
-  @override
-  Future<List<String>> documentVersionIds({required DocumentRef ref}) {
-    // TODO: implement documentVersionIds
-    throw UnimplementedError();
   }
 }

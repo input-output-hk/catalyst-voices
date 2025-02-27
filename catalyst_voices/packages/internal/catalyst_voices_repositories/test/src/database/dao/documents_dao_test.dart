@@ -516,16 +516,26 @@ void main() {
 
         final versions = List.generate(
           10,
-          (index) => DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.buildSigned(),
-              ref: proposalRef,
-            ),
-          ),
+          (index) {
+            return DocumentWithMetadataFactory.build(
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: DocumentRefFactory.buildSigned(
+                  id: proposalId,
+                ),
+                ref: proposalRef,
+              ),
+            );
+          },
         );
 
         await database.documentsDao.saveAll(versions);
+
+        final ids = await database.documentsDao.documentVersionIds(
+          ref: proposalRef,
+        );
+
+        expect(ids.length, equals(11));
       });
     });
 
