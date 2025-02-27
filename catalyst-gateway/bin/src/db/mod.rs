@@ -3,4 +3,4 @@
 pub(crate) mod event;
 pub(crate) mod index;
 
-mod types;
+pub(crate) mod types;
