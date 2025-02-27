@@ -4,6 +4,7 @@ project: {
   ci: {
     targets: {
       "test": privileged: true
+      "nightly-test-dev": privileged: true
     }
   }
 }
