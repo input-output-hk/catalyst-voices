@@ -32,14 +32,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   Bip32Ed25519XPrivateKey? _masterKey;
   Transaction? _transaction;
 
-  /// Returns [RegistrationCubit] if found in widget tree. Does not add
-  /// rebuild dependency when called.
-  static RegistrationCubit of(BuildContext context) {
-    return context.read<RegistrationCubit>();
-  }
-
   RegistrationCubit({
-    required Downloader downloader,
+    required DownloaderService downloaderService,
     required UserService userService,
     required RegistrationService registrationService,
     required RegistrationProgressNotifier progressNotifier,
@@ -48,7 +42,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         _progressNotifier = progressNotifier,
         _baseProfileCubit = BaseProfileCubit(),
         _keychainCreationCubit = KeychainCreationCubit(
-          downloader: downloader,
+          downloaderService: downloaderService,
         ),
         _walletLinkCubit = WalletLinkCubit(
           registrationService: registrationService,
@@ -81,15 +75,23 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   BaseProfileManager get baseProfile => _baseProfileCubit;
 
-  KeychainCreationManager get keychainCreation => _keychainCreationCubit;
+  bool get hasProgress => !_progressNotifier.value.isEmpty;
 
-  WalletLinkManager get walletLink => _walletLinkCubit;
+  KeychainCreationManager get keychainCreation => _keychainCreationCubit;
 
   RecoverManager get recover => _recoverCubit;
 
-  bool get hasProgress => !_progressNotifier.value.isEmpty;
+  WalletLinkManager get walletLink => _walletLinkCubit;
 
   RegistrationStateData get _registrationState => state.registrationStateData;
+
+  void changeRoleSetup() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.rolesChooser));
+  }
+
+  void chooseOtherWallet() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.selectWallet));
+  }
 
   @override
   Future<void> close() {
@@ -98,39 +100,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _walletLinkCubit.close();
     _recoverCubit.close();
     return super.close();
-  }
-
-  void goToStep(RegistrationStep step) {
-    _goToStep(step);
-  }
-
-  void recoverProgress() {
-    final progress = _progressNotifier.value;
-    final baseProfileProgress = progress.baseProfileProgress;
-    final keychainProgress = progress.keychainProgress;
-
-    if (baseProfileProgress != null) {
-      _baseProfileCubit
-        ..updateDisplayName(DisplayName.dirty(baseProfileProgress.displayName))
-        ..updateEmail(Email.dirty(baseProfileProgress.email))
-        ..updateToS(isAccepted: true)
-        ..updatePrivacyPolicy(isAccepted: true)
-        ..updateDataUsage(isAccepted: true);
-    }
-
-    if (keychainProgress != null) {
-      _keychainCreationCubit
-        ..recoverSeedPhrase(keychainProgress.seedPhrase)
-        ..recoverPassword(keychainProgress.password);
-    }
-
-    final step = AccountCreateProgressStep(
-      completedSteps: [
-        if (baseProfileProgress != null) AccountCreateStepType.baseProfile,
-        if (keychainProgress != null) AccountCreateStepType.keychain,
-      ],
-    );
-    _goToStep(step);
   }
 
   void createNewAccount() {
@@ -142,27 +111,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     }
   }
 
-  void recoverKeychain() {
-    _progressNotifier.clear();
-
-    unawaited(recover.checkLocalKeychains());
-
-    _goToStep(const RecoverMethodStep());
-  }
-
-  void recoverWithSeedPhrase() {
-    final nextStep = _nextStep(from: const RecoverWithSeedPhraseStep());
-    if (nextStep != null) {
-      _goToStep(nextStep);
-    }
-  }
-
-  void chooseOtherWallet() {
-    _goToStep(const WalletLinkStep(stage: WalletLinkStage.selectWallet));
-  }
-
-  void changeRoleSetup() {
-    _goToStep(const WalletLinkStep(stage: WalletLinkStage.rolesChooser));
+  void goToStep(RegistrationStep step) {
+    _goToStep(step);
   }
 
   void nextStep() {
@@ -174,13 +124,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     }
     if (nextStep != null) {
       _goToStep(nextStep);
-    }
-  }
-
-  void previousStep() {
-    final previousStep = _previousStep();
-    if (previousStep != null) {
-      _goToStep(previousStep);
     }
   }
 
@@ -241,6 +184,57 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     }
   }
 
+  void previousStep() {
+    final previousStep = _previousStep();
+    if (previousStep != null) {
+      _goToStep(previousStep);
+    }
+  }
+
+  void recoverKeychain() {
+    _progressNotifier.clear();
+
+    unawaited(recover.checkLocalKeychains());
+
+    _goToStep(const RecoverMethodStep());
+  }
+
+  void recoverProgress() {
+    final progress = _progressNotifier.value;
+    final baseProfileProgress = progress.baseProfileProgress;
+    final keychainProgress = progress.keychainProgress;
+
+    if (baseProfileProgress != null) {
+      _baseProfileCubit
+        ..updateDisplayName(DisplayName.dirty(baseProfileProgress.displayName))
+        ..updateEmail(Email.dirty(baseProfileProgress.email))
+        ..updateToS(isAccepted: true)
+        ..updatePrivacyPolicy(isAccepted: true)
+        ..updateDataUsage(isAccepted: true);
+    }
+
+    if (keychainProgress != null) {
+      _keychainCreationCubit
+        ..recoverSeedPhrase(keychainProgress.seedPhrase)
+        ..recoverPassword(keychainProgress.password);
+    }
+
+    final step = AccountCreateProgressStep(
+      completedSteps: [
+        if (baseProfileProgress != null) AccountCreateStepType.baseProfile,
+        if (keychainProgress != null) AccountCreateStepType.keychain,
+      ],
+    );
+    _goToStep(step);
+  }
+
+  void recoverWithSeedPhrase() {
+    final nextStep = _nextStep(from: const RecoverWithSeedPhraseStep());
+    if (nextStep != null) {
+      _goToStep(nextStep);
+    }
+  }
+
   Future<void> submitRegistration() async {
     try {
       _onRegistrationStateDataChanged(
@@ -298,22 +292,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     }
   }
 
-  void _saveRegistrationProgress(AccountCreateStepType stepType) {
-    switch (stepType) {
-      case AccountCreateStepType.baseProfile:
-        final data = _baseProfileCubit.createRecoverProgress();
-        _progressNotifier.value = _progressNotifier.value.copyWith(
-          baseProfileProgress: Optional(data),
-          keychainProgress: const Optional.empty(),
-        );
-      case AccountCreateStepType.keychain:
-        final data = _keychainCreationCubit.createRecoverProgress();
-        _progressNotifier.value = _progressNotifier.value.copyWith(
-          keychainProgress: Optional(data),
-        );
-      case AccountCreateStepType.walletLink:
-      // no-op
-    }
+  void _goToStep(RegistrationStep step) {
+    emit(state.copyWith(step: step));
   }
 
   // TODO(damian-molinski): Try refactoring nested function to be generic.
@@ -419,6 +399,26 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     };
   }
 
+  void _onBaseProfileStateDataChanged(BaseProfileStateData data) {
+    emit(state.copyWith(baseProfileStateData: data));
+  }
+
+  void _onKeychainStateDataChanged(KeychainStateData data) {
+    emit(state.copyWith(keychainStateData: data));
+  }
+
+  void _onRecoverStateDataChanged(RecoverStateData data) {
+    emit(state.copyWith(recoverStateData: data));
+  }
+
+  void _onRegistrationStateDataChanged(RegistrationStateData data) {
+    emit(state.copyWith(registrationStateData: data));
+  }
+
+  void _onWalletLinkStateDataChanged(WalletLinkStateData data) {
+    emit(state.copyWith(walletLinkStateData: data));
+  }
+
   RegistrationStep? _previousStep({RegistrationStep? from}) {
     final step = from ?? state.step;
 
@@ -489,27 +489,27 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     };
   }
 
-  void _goToStep(RegistrationStep step) {
-    emit(state.copyWith(step: step));
+  void _saveRegistrationProgress(AccountCreateStepType stepType) {
+    switch (stepType) {
+      case AccountCreateStepType.baseProfile:
+        final data = _baseProfileCubit.createRecoverProgress();
+        _progressNotifier.value = _progressNotifier.value.copyWith(
+          baseProfileProgress: Optional(data),
+          keychainProgress: const Optional.empty(),
+        );
+      case AccountCreateStepType.keychain:
+        final data = _keychainCreationCubit.createRecoverProgress();
+        _progressNotifier.value = _progressNotifier.value.copyWith(
+          keychainProgress: Optional(data),
+        );
+      case AccountCreateStepType.walletLink:
+      // no-op
+    }
   }
 
-  void _onBaseProfileStateDataChanged(BaseProfileStateData data) {
-    emit(state.copyWith(baseProfileStateData: data));
-  }
-
-  void _onKeychainStateDataChanged(KeychainStateData data) {
-    emit(state.copyWith(keychainStateData: data));
-  }
-
-  void _onWalletLinkStateDataChanged(WalletLinkStateData data) {
-    emit(state.copyWith(walletLinkStateData: data));
-  }
-
-  void _onRegistrationStateDataChanged(RegistrationStateData data) {
-    emit(state.copyWith(registrationStateData: data));
-  }
-
-  void _onRecoverStateDataChanged(RecoverStateData data) {
-    emit(state.copyWith(recoverStateData: data));
+  /// Returns [RegistrationCubit] if found in widget tree. Does not add
+  /// rebuild dependency when called.
+  static RegistrationCubit of(BuildContext context) {
+    return context.read<RegistrationCubit>();
   }
 }

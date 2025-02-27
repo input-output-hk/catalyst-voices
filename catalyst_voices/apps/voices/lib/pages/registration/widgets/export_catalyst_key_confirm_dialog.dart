@@ -49,8 +49,8 @@ class _ExportCatalystKeyConfirmDialogState
           };
         },
       ),
-      positive: l10n.exportKey,
-      negative: l10n.cancelAnyways,
+      negativeText: l10n.cancelAnyways,
+      positiveText: l10n.exportKey,
     );
   }
 

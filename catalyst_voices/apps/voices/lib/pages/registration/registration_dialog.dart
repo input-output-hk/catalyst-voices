@@ -18,6 +18,9 @@ class RegistrationDialog extends StatefulWidget {
     required this.step,
   });
 
+  @override
+  State<RegistrationDialog> createState() => _RegistrationDialogState();
+
   static Future<void> show(
     BuildContext context, {
     RegistrationStep? step,
@@ -29,32 +32,11 @@ class RegistrationDialog extends StatefulWidget {
       barrierDismissible: false,
     );
   }
-
-  @override
-  State<RegistrationDialog> createState() => _RegistrationDialogState();
 }
 
 class _RegistrationDialogState extends State<RegistrationDialog>
     with ErrorHandlerStateMixin<RegistrationCubit, RegistrationDialog> {
   late final RegistrationCubit _cubit = Dependencies.instance.get();
-
-  @override
-  void initState() {
-    super.initState();
-
-    final step = widget.step;
-    if (step != null) {
-      _cubit.goToStep(step);
-    } else if (_cubit.hasProgress) {
-      _cubit.recoverProgress();
-    }
-  }
-
-  @override
-  void dispose() {
-    unawaited(_cubit.close());
-    super.dispose();
-  }
 
   @override
   RegistrationCubit get errorEmitter => _cubit;
@@ -88,6 +70,51 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     );
   }
 
+  @override
+  void dispose() {
+    unawaited(_cubit.close());
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final step = widget.step;
+    if (step != null) {
+      _cubit.goToStep(step);
+    } else if (_cubit.hasProgress) {
+      _cubit.recoverProgress();
+    }
+  }
+
+  Future<bool> _confirmExit(
+    BuildContext context, {
+    required RegistrationStep step,
+  }) async {
+    if (step.isRegistrationFlow) {
+      final stayInTheFlow = await VoicesQuestionDialog.show(
+        context,
+        routeSettings: const RouteSettings(name: '/registration-confirm-exit'),
+        builder: (_) => const RegistrationExitConfirmDialog(),
+      );
+
+      return !stayInTheFlow;
+    }
+
+    if (step.isRecoverFlow) {
+      final stayInTheFlow = await VoicesQuestionDialog.show(
+        context,
+        routeSettings: const RouteSettings(name: '/recovery-confirm-exit'),
+        builder: (_) => const RecoveryExitConfirmDialog(),
+      );
+
+      return !stayInTheFlow;
+    }
+
+    return Future.value(true);
+  }
+
   Future<void> _handlePop(
     BuildContext context, {
     required bool didPop,
@@ -108,28 +135,5 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     if (context.mounted && confirmed) {
       Navigator.of(context).pop();
     }
-  }
-
-  Future<bool> _confirmExit(
-    BuildContext context, {
-    required RegistrationStep step,
-  }) {
-    if (step.isRegistrationFlow) {
-      return VoicesQuestionDialog.show(
-        context,
-        routeSettings: const RouteSettings(name: '/registration-confirm-exit'),
-        builder: (_) => const RegistrationExitConfirmDialog(),
-      );
-    }
-
-    if (step.isRecoverFlow) {
-      return VoicesQuestionDialog.show(
-        context,
-        routeSettings: const RouteSettings(name: '/recovery-confirm-exit'),
-        builder: (_) => const RecoveryExitConfirmDialog(),
-      );
-    }
-
-    return Future.value(true);
   }
 }

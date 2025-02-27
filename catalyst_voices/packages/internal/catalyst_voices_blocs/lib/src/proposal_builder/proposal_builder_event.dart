@@ -18,10 +18,13 @@ final class DeleteProposalEvent extends ProposalBuilderEvent {
 }
 
 final class ExportProposalEvent extends ProposalBuilderEvent {
-  const ExportProposalEvent();
+  /// The prefix for the file where the proposal will be exported.
+  final String filePrefix;
+
+  const ExportProposalEvent({required this.filePrefix});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [filePrefix];
 }
 
 final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {

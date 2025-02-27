@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/downloader/utils/downloader.dart';
 
 Downloader getDownloader() {
   throw UnsupportedError('Get Downloader stub');
