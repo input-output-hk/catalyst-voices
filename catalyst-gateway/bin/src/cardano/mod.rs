@@ -18,6 +18,7 @@ use crate::{
         },
         session::CassandraSession,
     },
+    service::utilities::health::{follower_has_first_reached_tip, set_follower_first_reached_tip},
     settings::{chain_follower, Settings},
 };
 
@@ -408,6 +409,11 @@ impl SyncTask {
                             // it.
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
                             self.start_immutable_followers();
+
+                            // Update flag if this is the first time reaching TIP.
+                            if follower_has_first_reached_tip() {
+                                set_follower_first_reached_tip();
+                            }
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished,
                             "The TIP follower failed, restarting it.");

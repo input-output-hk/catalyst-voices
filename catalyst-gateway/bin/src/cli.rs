@@ -9,7 +9,9 @@ use crate::{
     db::{self, index::session::CassandraSession},
     service::{
         self,
-        utilities::health::{is_live, live_counter_reset, set_to_started},
+        utilities::health::{
+            is_live, live_counter_reset, set_event_db_liveness, set_index_db_liveness,
+        },
     },
     settings::{DocsSettings, ServiceSettings, Settings},
 };
@@ -46,13 +48,17 @@ impl Cli {
 
                 info!("Catalyst Gateway - Starting");
 
-                // Start the DB's
+                // Start the DB's.
                 CassandraSession::init();
+                set_index_db_liveness(true);
+
                 db::event::establish_connection();
+                set_event_db_liveness(true);
 
                 // Start the chain indexing follower.
                 start_followers().await?;
 
+                // Start the API service.
                 let handle = tokio::spawn(async move {
                     match service::run().await {
                         Ok(()) => info!("Endpoints started ok"),
@@ -63,6 +69,7 @@ impl Cli {
                 });
                 tasks.push(handle);
 
+                // Start task to reset the service 'live counter' at a regular interval.
                 let handle = tokio::spawn(async move {
                     while is_live() {
                         tokio::time::sleep(Settings::service_live_timeout_interval()).await;
@@ -71,8 +78,7 @@ impl Cli {
                 });
                 tasks.push(handle);
 
-                set_to_started();
-
+                // Run all asynchronous tasks to completion.
                 for task in tasks {
                     task.await?;
                 }
