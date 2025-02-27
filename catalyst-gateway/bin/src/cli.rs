@@ -7,7 +7,10 @@ use tracing::{error, info};
 use crate::{
     cardano::start_followers,
     db::{self, index::session::CassandraSession},
-    service::{self, started},
+    service::{
+        self, started,
+        utilities::health::{is_live, live_counter_reset},
+    },
     settings::{DocsSettings, ServiceSettings, Settings},
 };
 
@@ -56,6 +59,14 @@ impl Cli {
                         Err(err) => {
                             error!("Error starting endpoints {err}");
                         },
+                    }
+                });
+                tasks.push(handle);
+
+                let handle = tokio::spawn(async move {
+                    while is_live() {
+                        tokio::time::sleep(Settings::service_live_timeout_interval()).await;
+                        live_counter_reset();
                     }
                 });
                 tasks.push(handle);

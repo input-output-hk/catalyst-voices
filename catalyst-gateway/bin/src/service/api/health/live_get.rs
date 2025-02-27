@@ -1,28 +1,14 @@
-//! Implementation of the GET /health/live endpoint
-
-use std::sync::atomic::{AtomicBool, Ordering};
+//! Implementation of the `GET /health/live` endpoint.
 
 use poem_openapi::ApiResponse;
 
-use crate::{db::index::session::CassandraSession, service::common::responses::WithErrorResponses};
-
-/// Flag to determine if the service has started
-static IS_LIVE: AtomicBool = AtomicBool::new(true);
-
-/// Set the started flag to `true`
-#[allow(dead_code)]
-pub(crate) fn set_live(flag: bool) {
-    IS_LIVE.store(flag, Ordering::Release);
-}
-/// Get the started flag
-#[allow(dead_code)]
-fn is_live() -> bool {
-    IS_LIVE.load(Ordering::Acquire) && CassandraSession::is_ready()
-}
+use crate::service::{
+    common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
+    utilities::health::is_live,
+};
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## No Content
     ///
@@ -45,11 +31,12 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// by an endpoint in a short window.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    // TODO: Needs engineering discussion
-    // if is_live() {
-    // Responses::NoContent.into()
-    // } else {
-    // Responses::ServiceUnavailable.into()
-    // }
-    Responses::NoContent.into()
+    if is_live() {
+        Responses::NoContent.into()
+    } else {
+        AllResponses::service_unavailable(
+            &anyhow::anyhow!("Service is not live, do not send other requests."),
+            RetryAfterOption::Default,
+        )
+    }
 }
