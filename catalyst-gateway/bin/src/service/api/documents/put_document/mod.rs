@@ -46,7 +46,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>) -> AllResponses {
-    match minicbor::decode(doc_bytes.as_slice()) {
+    match doc_bytes.as_slice().try_into() {
         Ok(doc) => {
             if let Err(e) = catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
                 // means that something happened inside the `DocProvider`, some db error.

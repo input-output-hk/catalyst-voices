@@ -31,7 +31,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
     match get_document(&document_id, version.as_ref()).await {
         Ok(doc) => {
-            match minicbor::to_vec(&doc) {
+            match doc.try_into() {
                 Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
                 Err(err) => AllResponses::handle_error(&err.into()),
             }
@@ -52,8 +52,7 @@ pub(crate) async fn get_document(
 
     // If doesn't exist in the static templates, try to find it in the database
     let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
-    let doc = minicbor::decode(db_doc.raw())?;
-    Ok(doc)
+    db_doc.raw().try_into()
 }
 
 /// A struct which implements a
