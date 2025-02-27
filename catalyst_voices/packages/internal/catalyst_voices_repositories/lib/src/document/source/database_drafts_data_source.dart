@@ -25,13 +25,6 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.draftsDao
-        .watch(ref: ref)
-        .map((entity) => entity?.toModel());
-  }
-
-  @override
   Future<void> save({required DocumentData data}) async {
     final idHiLo = UuidHiLo.from(data.metadata.id);
     final verHiLo = UuidHiLo.from(data.metadata.version);
@@ -56,6 +49,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     required DocumentDataContent content,
   }) async {
     await _database.draftsDao.updateContent(ref: ref, content: content);
+  }
+
+  @override
+  Stream<DocumentData?> watch({required DocumentRef ref}) {
+    return _database.draftsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
   }
 }
 

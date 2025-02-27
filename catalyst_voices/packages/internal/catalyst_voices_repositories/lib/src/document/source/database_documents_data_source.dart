@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
-final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
+final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   final CatalystDatabase _database;
 
   DatabaseDocumentsDataSource(
@@ -21,13 +21,6 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
     }
 
     return entity.toModel();
-  }
-
-  @override
-  Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.documentsDao
-        .watch(ref: ref)
-        .map((entity) => entity?.toModel());
   }
 
   @override
@@ -54,6 +47,20 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
     final documentWithMetadata = (document: document, metadata: metadata);
 
     await _database.documentsDao.saveAll([documentWithMetadata]);
+  }
+
+  @override
+  Stream<DocumentData?> watch({required DocumentRef ref}) {
+    return _database.documentsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
+  }
+
+  @override
+  Stream<List<DocumentData>> watchLatestVersions({int? limit}) {
+    return _database.documentsDao
+        .watchLatestVersions(limit: limit)
+        .map((entities) => entities.map((e) => e.toModel()).toList());
   }
 }
 

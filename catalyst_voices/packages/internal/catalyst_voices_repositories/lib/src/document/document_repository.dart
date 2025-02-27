@@ -18,7 +18,7 @@ typedef DocumentsDataWithRefData = ({DocumentData data, DocumentData refData});
 abstract interface class DocumentRepository {
   factory DocumentRepository(
     DraftDataSource drafts,
-    DocumentDataLocalSource localDocuments,
+    SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
@@ -56,6 +56,8 @@ abstract interface class DocumentRepository {
     required DocumentDataContent content,
   });
 
+  Stream<ProposalDocument> watchLatestPublicProposalsDocuments({int? limit});
+
   /// Observes matching [ProposalDocument] and emits updates.
   ///
   /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
@@ -67,7 +69,7 @@ abstract interface class DocumentRepository {
 final class DocumentRepositoryImpl implements DocumentRepository {
   // ignore: unused_field
   final DraftDataSource _drafts;
-  final DocumentDataLocalSource _localDocuments;
+  final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
 
   final _documentDataLock = Lock();
@@ -182,6 +184,38 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         },
       );
     });
+  }
+
+  @visibleForTesting
+  Stream<DocumentsDataWithRefData> watchLatestDocumentsWithRef({int? limit}) {
+    return _localDocuments
+        .watchLatestVersions(limit: limit)
+        .distinct()
+        .switchMap((documents) {
+      return Stream.fromIterable(documents).asyncMap((documentData) async {
+        final templateRef = documentData.metadata.template!;
+        final templateData = await getDocumentData(ref: templateRef);
+
+        return (data: documentData, refData: templateData);
+      });
+    });
+  }
+
+  @override
+  Stream<ProposalDocument> watchLatestPublicProposalsDocuments({int? limit}) {
+    return watchLatestDocumentsWithRef(
+      limit: limit,
+    ).whereNotNull().map(
+      (event) {
+        final documentData = event.data;
+        final templateData = event.refData;
+
+        return _buildProposalDocument(
+          documentData: documentData,
+          templateData: templateData,
+        );
+      },
+    );
   }
 
   @override

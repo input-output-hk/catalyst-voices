@@ -47,6 +47,8 @@ abstract interface class DocumentsDao {
   /// Similar to [queryAll] but emits when new records are inserted or deleted.
   Stream<List<DocumentEntity>> watchAll();
 
+  /// Emits latest documents limited by quantity if provided
+  /// 
   Stream<List<DocumentEntity>> watchLatestVersions({int? limit});
 }
 

@@ -20,7 +20,7 @@ void main() {
   late DriftCatalystDatabase database;
 
   late DraftDataSource draftsSource;
-  late DocumentDataLocalSource localDocuments;
+  late SignedDocumentDataSource localDocuments;
   late DocumentDataRemoteSource remoteDocuments;
 
   setUp(() {
@@ -362,6 +362,42 @@ void main() {
         ]),
       );
     });
+
+    test(
+      'watchLatestPublicProposalsDocuments returns correct model',
+      () async {
+        final templateRef = DocumentRefFactory.buildSigned();
+        final templateData = DocumentDataFactory.build(
+          selfRef: templateRef,
+          type: DocumentType.proposalTemplate,
+        );
+        const publicDraftContent =
+            DocumentDataContent({'title': 'My proposal'});
+        final publicDraftRef = DocumentRefFactory.buildDraft();
+        final publicDraftData = DocumentDataFactory.build(
+          type: DocumentType.proposalDocument,
+          selfRef: publicDraftRef,
+          template: templateRef,
+          content: publicDraftContent,
+        );
+
+        await localDocuments.save(data: templateData);
+        await localDocuments.save(data: publicDraftData);
+
+        final latestProposals = repository.watchLatestDocumentsWithRef();
+
+        expect(
+          latestProposals,
+          emitsInOrder([
+            predicate<DocumentsDataWithRefData?>((data) {
+              final isRef = data?.data.ref == publicDraftRef;
+              final isContent = data?.data.content == publicDraftContent;
+              return isRef && isContent;
+            }),
+          ]),
+        );
+      },
+    );
   });
 }
 

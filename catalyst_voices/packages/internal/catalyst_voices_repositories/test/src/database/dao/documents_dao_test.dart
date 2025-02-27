@@ -192,7 +192,7 @@ void main() {
       test('Returns latest document limited by quantity if provided', () async {
         // Given
         final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
-          2,
+          20,
           (index) => DocumentWithMetadataFactory.build(),
         );
 
