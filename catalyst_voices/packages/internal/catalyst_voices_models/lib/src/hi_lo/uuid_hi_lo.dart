@@ -1,14 +1,15 @@
 import 'package:catalyst_voices_models/src/hi_lo/hi_lo.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/parsing.dart';
 import 'package:uuid/validation.dart';
 
+// 2^64 - 1 (Unsigned 64-bit max)
+final _mask = BigInt.parse('18446744073709551615');
+final _max64 = BigInt.parse('9223372036854775807');
 // Ensure values are within the signed 64-bit range
 // ignore: unused_element
 final _min64 = BigInt.parse('-9223372036854775808');
-final _max64 = BigInt.parse('9223372036854775807');
-// 2^64 - 1 (Unsigned 64-bit max)
-final _mask = BigInt.parse('18446744073709551615');
 
 /// High and Low representation of uuid as num.
 final class UuidHiLo extends HiLo<BigInt> {
@@ -57,17 +58,7 @@ final class UuidHiLo extends HiLo<BigInt> {
   }
 
   /// supported for v7 only. Otherwise throws exception
-  DateTime get dateTime {
-    if (_version != 7) {
-      throw StateError('uuid version is not v7');
-    }
-
-    // Get the first 48 bits (high >> 16)
-    final timestampMillis = (high.toInt() >> 16) & 0xFFFFFFFFFFFF;
-
-    // Convert milliseconds since Unix epoch (1970-01-01)
-    return DateTime.fromMillisecondsSinceEpoch(timestampMillis);
-  }
+  DateTime get dateTime => uuid.dateTime;
 
   String get uuid {
     // Convert `high` and `low` into 8-byte arrays manually
@@ -89,12 +80,6 @@ final class UuidHiLo extends HiLo<BigInt> {
     final bytes = Uint8List.fromList([...highBytes, ...lowBytes]);
 
     return UuidParsing.unparse(bytes);
-  }
-
-  /// Version is always 13th digit of uuid.
-  int get _version {
-    final hexChar = uuid.replaceAll('-', '')[12]; // 13th hex digit
-    return int.parse(hexChar, radix: 16);
   }
 
   /// Syntax sugar for working with nullable [data].
