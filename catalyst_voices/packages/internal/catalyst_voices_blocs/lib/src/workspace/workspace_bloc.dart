@@ -62,7 +62,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final ref = await _proposalService.importProposal(event.proposalData);
       emit(state.copyWith(importedProposalRef: Optional(ref)));
     } catch (error, stackTrace) {
-      _logger.severe('Exporting proposal failed', error, stackTrace);
+      _logger.severe('Importing proposal failed', error, stackTrace);
       emitError(const LocalizedUnknownException());
     }
   }
