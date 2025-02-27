@@ -24,7 +24,7 @@ pub(crate) enum Responses {
     ///
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
-    Ok(Json<RbacRegistrations>),
+    Ok(Json<Box<RbacRegistrations>>),
 
     /// No valid registration.
     #[oai(status = 404)]
