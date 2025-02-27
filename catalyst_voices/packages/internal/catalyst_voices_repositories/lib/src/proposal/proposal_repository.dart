@@ -30,7 +30,7 @@ abstract interface class ProposalRepository {
 
   Future<List<String>> getFavoritesProposalsIds();
 
-  Future<ProposalBase> getProposal({
+  Future<Proposal> getProposal({
     required String id,
   });
 
@@ -60,11 +60,12 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<ProposalBase> getProposal({
+  Future<Proposal> getProposal({
     required String id,
   }) async {
-    return ProposalBase(
+    return Proposal(
       id: id,
+      version: '1',
       category: 'Cardano Use Cases / MVP',
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
@@ -75,7 +76,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       description: _proposalDescription,
       duration: 6,
       author: 'Alex Wells',
-      version: 1,
+      versionCount: 1,
     );
   }
 
@@ -84,7 +85,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required ProposalPaginationRequest request,
   }) async {
     // optionally filter by status.
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
 
     // Return users proposals match his account id with proposals metadata from
     // author field.
@@ -100,8 +101,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           ? ProposalPublish.submittedProposal
           : ProposalPublish.publishedDraft;
       proposals.add(
-        ProposalBase(
+        Proposal(
           id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
+          version: '1',
           category: 'Cardano Use Cases / MVP',
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),
@@ -112,7 +114,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           description: _proposalDescription,
           duration: 6,
           author: 'Alex Wells',
-          version: 1,
+          versionCount: 1,
         ),
       );
     }
@@ -139,7 +141,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ProposalPaginationRequest request,
   ) async {
     final favoritesIds = await getFavoritesProposalsIds();
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,
@@ -166,7 +168,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     ProposalPaginationRequest request,
   ) async {
     final userProposalsIds = await getUserProposalsIds('');
-    final proposals = <ProposalBase>[];
+    final proposals = <Proposal>[];
     final range = PagingRange.calculateRange(
       pageKey: request.pageKey,
       itemsPerPage: request.pageSize,

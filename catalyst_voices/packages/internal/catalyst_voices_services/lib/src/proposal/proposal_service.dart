@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
   factory ProposalService(
@@ -18,7 +18,7 @@ abstract interface class ProposalService {
   /// Fetches favorites proposals ids of the user
   Future<List<String>> getFavoritesProposalsIds();
 
-  Future<Proposal> getProposal({
+  Future<ProposalData> getProposal({
     required String id,
   });
 
@@ -66,31 +66,48 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<Proposal> getProposal({
+  Future<ProposalData> getProposal({
     required String id,
   }) async {
-    final proposalBase = await _proposalRepository.getProposal(id: id);
-    final proposal = await _buildProposal(proposalBase);
+    // final proposal = await _proposalRepository.getProposal(id: id);
+    // final proposal = await _buildProposal(Proposal);
 
-    return proposal;
+    const proposalTemplate = DocumentSchema(
+      parentSchemaUrl: '',
+      schemaSelfUrl: '',
+      title: '',
+      description: MarkdownData.empty,
+      properties: [],
+      order: [],
+    );
+
+    return ProposalData(
+      document: ProposalDocument(
+        metadata: ProposalMetadata(
+          id: id,
+          version: const Uuid().v7(),
+        ),
+        document: const Document(
+          schema: proposalTemplate,
+          properties: [],
+        ),
+      ),
+      categoryId: '',
+    );
   }
 
   @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
   }) async {
-    final proposalBases = await _proposalRepository.getProposals(
+    final proposals = await _proposalRepository.getProposals(
       request: request,
     );
 
-    final futures = proposalBases.proposals.map(_buildProposal);
-
-    final proposals = await Future.wait(futures);
-
     return ProposalPaginationItems(
-      items: proposals,
+      items: proposals.proposals,
       pageKey: request.pageKey,
-      maxResults: proposalBases.maxResults,
+      maxResults: proposals.maxResults,
     );
   }
 
@@ -130,29 +147,26 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    return _documentRepository
-        .watchLatestPublicProposalsDocuments(limit: limit)
-        .switchMap((documents) async* {
-      final proposals = await Future.wait(
-        documents.map((doc) async {
-          final additionalInfo =
-              await _documentRepository.getAdditionalInfo(doc.id);
-
-          return Proposal(
-            id: doc.id,
-            additionalInfo: additionalInfo,
-          );
-        }),
-      );
-      yield proposals;
-    });
+    throw UnimplementedError();
   }
 
-  Future<Proposal> _buildProposal(ProposalBase base) async {
-    final proposalDocument = await _documentRepository.getProposalDocument(
-      ref: base.ref,
-    );
+  // @override
+  // Stream<List<Proposal>> watchLatestProposals({int? limit}) {
+  //   return _documentRepository
+  //       .watchLatestPublicProposalsDocuments(limit: limit)
+  //       .switchMap((documents) async* {
+  //     final proposals = await Future.wait(
+  //       documents.map((doc) async {
+  //         final additionalInfo =
+  //             await _documentRepository.getAdditionalInfo(doc.id);
 
-    return base.toProposal(document: proposalDocument);
-  }
+  //         return Proposal(
+  //           id: doc.metadata.id,
+  //           additionalInfo: additionalInfo,
+  //         );
+  //       }),
+  //     );
+  //     yield proposals;
+  //   });
+  // }
 }

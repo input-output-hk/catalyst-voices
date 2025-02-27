@@ -189,8 +189,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @visibleForTesting
-  Stream<List<DocumentsDataWithRefData>> watchLatestDocumentsWithRef(
-      {int? limit}) {
+  Stream<List<DocumentsDataWithRefData>> watchLatestDocumentsWithRef({
+    int? limit,
+  }) {
     return _localDocuments
         .watchLatestVersions(limit: limit)
         .distinct()

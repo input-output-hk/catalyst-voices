@@ -19,6 +19,7 @@ void main() {
       order: [],
     );
 
+    // ignore: unused_local_variable
     final proposalDocument = ProposalDocument(
       metadata: ProposalMetadata(
         id: const Uuid().v7(),
@@ -42,6 +43,7 @@ void main() {
 
     final proposal = Proposal(
       id: '1',
+      version: '1',
       title: 'Proposal 1',
       description: 'Description 1',
       category: '',
@@ -50,8 +52,7 @@ void main() {
       status: ProposalStatus.draft,
       publish: ProposalPublish.publishedDraft,
       commentsCount: 0,
-      document: proposalDocument,
-      version: 1,
+      versionCount: 1,
       duration: 6,
       author: 'Alex Wells',
     );
