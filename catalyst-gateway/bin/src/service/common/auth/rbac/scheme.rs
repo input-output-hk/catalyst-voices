@@ -1,6 +1,7 @@
 //! Catalyst RBAC Security Scheme
 use std::{env, error::Error, sync::LazyLock, time::Duration};
 
+use catalyst_types::id_uri::IdUri;
 use futures::{TryFutureExt, TryStreamExt};
 use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
@@ -113,23 +114,14 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     };
 
-    let session = CassandraSession::get(true).ok_or_else(|| {
-        error!("Failed to acquire db session");
-        let error = ServiceUnavailable::new(None);
-        ErrorResponses::ServiceUnavailable(Json(error), Some(RetryAfterHeader::default()))
-    })?;
-    let _registrations: Vec<_> = Query::execute(&session, QueryParams {
-        catalyst_id: token.catalyst_id().clone().into(),
-    })
-    .and_then(|r| r.try_collect().map_err(Into::into))
-    .await
-    .map_err(|e| {
+    let registrations = registrations(token.catalyst_id()).await?;
+    if registrations.is_empty() {
         error!(
-            "Failed to get RBAC registrations for {} Catalyst ID: {e:?}",
+            "Unable to find registrations for {} Catalyst ID",
             token.catalyst_id()
         );
-        AuthTokenError
-    })?;
+        return Err(AuthTokenError.into());
+    }
 
     if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
@@ -178,4 +170,22 @@ async fn checker_api_catalyst_auth(
     // CACHE.insert(bearer.token, token.clone()).await;
 
     Ok(token)
+}
+
+/// Returns a list of all registrations for the given Catalyst ID.
+async fn registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
+    let session = CassandraSession::get(true).ok_or_else(|| {
+        error!("Failed to acquire db session");
+        let error = ServiceUnavailable::new(None);
+        ErrorResponses::ServiceUnavailable(Json(error), Some(RetryAfterHeader::default()))
+    })?;
+    Query::execute(&session, QueryParams {
+        catalyst_id: catalyst_id.clone().into(),
+    })
+    .and_then(|r| r.try_collect().map_err(Into::into))
+    .await
+    .map_err(|e| {
+        error!("Failed to get RBAC registrations for {catalyst_id} Catalyst ID: {e:?}",);
+        AuthTokenError.into()
+    })
 }
