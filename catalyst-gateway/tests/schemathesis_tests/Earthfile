@@ -48,7 +48,8 @@ test-ci-schemathesis:
     ARG max_response_time=5000
     ARG hypothesis_max_examples=1000
     ARG seed
-
+    # cspell: disable-next-line
+    ENV BEARER_TOKEN = "catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
     COPY ./../+docker-compose/docker-compose.yml .
 
     WITH DOCKER \
