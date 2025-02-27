@@ -1,6 +1,6 @@
 //! Catalyst RBAC Token utility functions.
 
-// cspell: words Fftx
+// cspell: words rsplit Fftx
 
 use std::{
     fmt::{Display, Formatter},
