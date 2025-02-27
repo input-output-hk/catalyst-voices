@@ -52,8 +52,9 @@ abstract interface class DocumentsDao {
   /// Similar to [queryAll] but emits when new records are inserted or deleted.
   Stream<List<DocumentEntity>> watchAll();
 
+  Stream<int> watchDocumentCommentsCount({required DocumentRef ref});
+
   /// Emits latest documents limited by quantity if provided
-  ///
   Stream<List<DocumentEntity>> watchLatestVersions({int? limit});
 }
 
@@ -195,6 +196,16 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Stream<List<DocumentEntity>> watchAll() {
     return select(documents).watch();
+  }
+
+  @override
+  Stream<int> watchDocumentCommentsCount({required DocumentRef ref}) {
+    return (select(documents)
+          ..where((row) => row.type.equals(DocumentType.commentTemplate.uuid)))
+        .watch()
+        .map((comments) =>
+            comments.where((doc) => doc.metadata.ref == ref).length)
+        .distinct();
   }
 
   @override

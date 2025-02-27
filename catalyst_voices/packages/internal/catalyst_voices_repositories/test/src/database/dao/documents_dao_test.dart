@@ -537,6 +537,47 @@ void main() {
 
         expect(ids.length, equals(11));
       });
+
+      test('Watches comments count', () async {
+        final proposalId = const Uuid().v7();
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final versionId = const Uuid().v7();
+        final proposalRef = DocumentRefFactory.buildSigned(
+          id: proposalId,
+          version: versionId,
+        );
+        final proposal = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: proposalRef,
+          ),
+        );
+
+        await database.documentsDao.saveAll([proposal]);
+
+        final comments = List.generate(2, (index) {
+          return DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.commentTemplate,
+              selfRef: DocumentRefFactory.buildSigned(),
+              ref: proposalRef,
+            ),
+          );
+        });
+
+        final documentCount = database.documentsDao
+            .watchDocumentCommentsCount(ref: proposalRef)
+            .asBroadcastStream();
+
+        await database.documentsDao.saveAll([comments.first]);
+        final firstEmission = await documentCount.first;
+
+        await database.documentsDao.saveAll([comments.last]);
+        final secondEmission = await documentCount.first;
+
+        expect(firstEmission, equals(1));
+        expect(secondEmission, equals(2));
+      });
     });
 
     group('delete all', () {
