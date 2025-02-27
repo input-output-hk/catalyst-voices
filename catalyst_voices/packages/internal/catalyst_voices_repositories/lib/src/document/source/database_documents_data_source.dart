@@ -9,6 +9,11 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   );
 
   @override
+  Future<List<String>> documentVersionIds({required DocumentRef ref}) {
+    return _database.documentsDao.documentVersionIds(ref: ref);
+  }
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
   }
@@ -54,6 +59,11 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     return _database.documentsDao
         .watch(ref: ref)
         .map((entity) => entity?.toModel());
+  }
+
+  @override
+  Stream<int> watchDocumentCommentsCount({required DocumentRef ref}) {
+    return _database.documentsDao.watchDocumentCommentsCount(ref: ref);
   }
 
   @override

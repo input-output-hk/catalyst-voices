@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:rxdart/transformers.dart';
 import 'package:uuid/uuid.dart';
 
 abstract interface class ProposalService {
@@ -147,26 +148,30 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-    throw UnimplementedError();
+    return _documentRepository
+        .watchLatestPublicProposalsDocuments(limit: limit)
+        .switchMap((documents) async* {
+      final proposals = await Future.wait(
+        documents.map((doc) async {
+          final ref = SignedDocumentRef(id: doc.metadata.id);
+          final versionIds = await _documentRepository.getProposalVersionIds(
+            ref: ref,
+          );
+          final proposalCommentsCount = await _documentRepository
+              .watchProposalCommentsCount(ref: ref)
+              .first;
+
+          final proposalData = ProposalData(
+            document: doc,
+            // TODO(LynxLynxx): need to get categoryId here
+            categoryId: DocumentType.categoryParametersDocument.uuid,
+            versions: versionIds,
+            commentsCount: proposalCommentsCount,
+          );
+          return Proposal.fromData(proposalData);
+        }),
+      );
+      yield proposals;
+    });
   }
-
-  // @override
-  // Stream<List<Proposal>> watchLatestProposals({int? limit}) {
-  //   return _documentRepository
-  //       .watchLatestPublicProposalsDocuments(limit: limit)
-  //       .switchMap((documents) async* {
-  //     final proposals = await Future.wait(
-  //       documents.map((doc) async {
-  //         final additionalInfo =
-  //             await _documentRepository.getAdditionalInfo(doc.id);
-
-  //         return Proposal(
-  //           id: doc.metadata.id,
-  //           additionalInfo: additionalInfo,
-  //         );
-  //       }),
-  //     );
-  //     yield proposals;
-  //   });
-  // }
 }

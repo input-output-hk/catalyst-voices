@@ -31,6 +31,8 @@ abstract interface class DocumentsDao {
   /// Deletes all documents. Cascades to metadata.
   Future<void> deleteAll();
 
+  /// Returns a list of version of ref object.
+  /// Can be used to get versions count.
   Future<List<String>> documentVersionIds({required DocumentRef ref});
 
   /// If version is specified in [ref] returns this version or null.
@@ -52,6 +54,7 @@ abstract interface class DocumentsDao {
   /// Similar to [queryAll] but emits when new records are inserted or deleted.
   Stream<List<DocumentEntity>> watchAll();
 
+  /// Watches for new comments that are reference by ref.
   Stream<int> watchDocumentCommentsCount({required DocumentRef ref});
 
   /// Emits latest documents limited by quantity if provided
@@ -203,8 +206,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     return (select(documents)
           ..where((row) => row.type.equals(DocumentType.commentTemplate.uuid)))
         .watch()
-        .map((comments) =>
-            comments.where((doc) => doc.metadata.ref == ref).length)
+        .map(
+          (comments) => comments.where((doc) => doc.metadata.ref == ref).length,
+        )
         .distinct();
   }
 

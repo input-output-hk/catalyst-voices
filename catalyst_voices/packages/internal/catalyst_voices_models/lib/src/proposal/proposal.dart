@@ -51,7 +51,7 @@ final class Proposal extends Equatable {
       versionCount: data.versions.length,
       duration: data.proposalDuration,
       author: data.proposalAuthor,
-      commentsCount: data.comments.length,
+      commentsCount: data.commentsCount,
       category: data.categoryId,
     );
   }
