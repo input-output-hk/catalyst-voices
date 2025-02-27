@@ -65,6 +65,14 @@ const EVENT_DB_URL_DEFAULT: &str =
 /// Default number of slots used as overlap when purging Live Index data.
 const PURGE_SLOT_BUFFER_DEFAULT: u64 = 100;
 
+/// Default `SERVICE_LIVE_TIMEOUT_INTERVAL`, that is used to determine if the service is
+/// live.
+const SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT: &str = "30s";
+
+/// Default `SERVICE_LIVE_COUNTER_THRESHOLD`, that is used to determine if the service is
+/// live.
+const SERVICE_LIVE_COUNTER_THRESHOLD_DEFAULT: u64 = 100;
+
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
 fn calculate_service_uuid() -> String {
@@ -162,6 +170,12 @@ struct EnvVars {
 
     /// Interval for updating and sending Chain Follower metrics.
     metrics_follower_interval: Duration,
+
+    /// Interval for determining if the service is live.
+    service_live_timeout_interval: Duration,
+
+    /// Threshold for determining if the service is live.
+    service_live_counter_threshold: u64,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -223,6 +237,16 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         metrics_follower_interval: StringEnvVar::new_as_duration(
             "METRICS_FOLLOWER_INTERVAL",
             METRICS_FOLLOWER_INTERVAL_DEFAULT,
+        ),
+        service_live_timeout_interval: StringEnvVar::new_as_duration(
+            "SERVICE_LIVE_TIMEOUT_INTERVAL",
+            SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT,
+        ),
+        service_live_counter_threshold: StringEnvVar::new_as(
+            "SERVICE_LIVE_COUNTER_THRESHOLD",
+            SERVICE_LIVE_COUNTER_THRESHOLD_DEFAULT,
+            0,
+            u64::MAX,
         ),
     }
 });
@@ -414,6 +438,16 @@ impl Settings {
     pub(crate) fn purge_slot_buffer() -> Slot {
         ENV_VARS.purge_slot_buffer.into()
     }
+
+    /// Duration in seconds used to determine if the system is live during checks.
+    pub(crate) fn service_live_timeout_interval() -> Duration {
+        ENV_VARS.service_live_timeout_interval
+    }
+
+    /// Value after which the service is considered NOT live.
+    pub(crate) fn service_live_counter_threshold() -> u64 {
+        ENV_VARS.service_live_counter_threshold
+    }
 }
 
 /// Transform a string list of host names into a vec of host names.
@@ -535,5 +569,18 @@ mod tests {
         let configured_hosts =
             string_to_api_host_names(&SocketAddr::from(([0, 0, 0, 0], 7654)), "");
         assert_eq!(configured_hosts, vec!["http://localhost:7654"]);
+    }
+
+    #[test]
+    fn configured_service_live_timeout_interval_default() {
+        let timeout_secs = Settings::service_live_timeout_interval();
+        let interval_str = format!("{}s", timeout_secs.as_secs());
+        assert_eq!(interval_str.as_str(), SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT);
+    }
+
+    #[test]
+    fn configured_service_live_counter_threshold_default() {
+        let threshold = Settings::service_live_counter_threshold();
+        assert_eq!(threshold, SERVICE_LIVE_COUNTER_THRESHOLD_DEFAULT);
     }
 }
