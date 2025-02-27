@@ -453,6 +453,78 @@ void main() {
 
         expect(count, 1);
       });
+
+      test('Counts comments for specific proposal document version', () async {
+        final proposalId = const Uuid().v7();
+        final versionId = const Uuid().v7();
+        final proposalRef = DocumentRefFactory.buildSigned(
+          id: proposalId,
+          version: versionId,
+        );
+        final proposal = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: proposalRef,
+          ),
+        );
+
+        await database.documentsDao.saveAll([proposal]);
+
+        final comments = List.generate(
+          10,
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalComment,
+              selfRef: DocumentRefFactory.buildSigned(),
+              ref: proposalRef,
+            ),
+          ),
+        );
+        final otherComments = List.generate(
+          5,
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalComment,
+              selfRef: DocumentRefFactory.buildSigned(),
+              ref: DocumentRefFactory.buildSigned(),
+            ),
+          ),
+        );
+        await database.documentsDao.saveAll([...comments, ...otherComments]);
+
+        final count =
+            await database.documentsDao.countComments(ref: proposalRef);
+
+        expect(count, equals(10));
+      });
+
+      test('Count versions of specific document', () async {
+        final proposalId = const Uuid().v7();
+        final versionId = const Uuid().v7();
+        final proposalRef = DocumentRefFactory.buildSigned(
+          id: proposalId,
+          version: versionId,
+        );
+        final proposal = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: proposalRef,
+          ),
+        );
+
+        await database.documentsDao.saveAll([proposal]);
+
+        final versions = List.generate(
+          10,
+          (index) => DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: DocumentRefFactory.buildSigned(),
+              ref: proposalRef,
+            ),
+          ),
+        );
+      });
     });
 
     group('delete all', () {

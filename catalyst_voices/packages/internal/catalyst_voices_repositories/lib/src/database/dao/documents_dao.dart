@@ -19,6 +19,9 @@ abstract interface class DocumentsDao {
   /// Counts all documents.
   Future<int> countAll();
 
+  /// Count how many comments are attached to proposal document version.
+  Future<int> countComments({required DocumentRef ref});
+
   /// Counts unique documents. All versions of same document are counted as 1.
   Future<int> countDocuments();
 
@@ -48,7 +51,7 @@ abstract interface class DocumentsDao {
   Stream<List<DocumentEntity>> watchAll();
 
   /// Emits latest documents limited by quantity if provided
-  /// 
+  ///
   Stream<List<DocumentEntity>> watchLatestVersions({int? limit});
 }
 
@@ -71,6 +74,18 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<int> countAll() {
     return documents.count().getSingle();
+  }
+
+  @override
+  Future<int> countComments({required DocumentRef ref}) {
+    return (select(documents)
+          ..where((row) => row.type.equals(DocumentType.proposalComment.uuid)))
+        .get()
+        .then(
+          (docs) => docs.where((doc) {
+            return doc.metadata.ref == ref;
+          }).length,
+        );
   }
 
   @override
