@@ -13,6 +13,8 @@ abstract interface class ProposalService {
     );
   }
 
+  Future<List<String>> addFavoriteProposal(String proposalId);
+
   /// Fetches favorites proposals ids of the user
   Future<List<String>> getFavoritesProposalsIds();
 
@@ -20,10 +22,8 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  /// Fetches proposals for the [campaignId].
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   });
 
   Future<ProposalTemplate> getProposalTemplate({
@@ -33,6 +33,14 @@ abstract interface class ProposalService {
   /// Fetches user's proposals ids  depending on his id that is saved
   /// in metadata of proposal document
   Future<List<String>> getUserProposalsIds(String userId);
+
+  /// Publishes a public proposal draft.
+  Future<void> publishProposal(Document document);
+
+  Future<List<String>> removeFavoriteProposal(String proposalId);
+
+  /// Submits a proposal draft into review.
+  Future<void> submitProposalForReview(Document document);
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -45,6 +53,11 @@ final class ProposalServiceImpl implements ProposalService {
   );
 
   @override
+  Future<List<String>> addFavoriteProposal(String proposalId) async {
+    return _proposalRepository.addFavoriteProposal(proposalId);
+  }
+
+  @override
   Future<List<String>> getFavoritesProposalsIds() async {
     final proposalsIds = await _proposalRepository.getFavoritesProposalsIds();
     return proposalsIds;
@@ -54,7 +67,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<Proposal> getProposal({
     required DocumentRef ref,
   }) async {
-    final proposalBase = await _proposalRepository.getProposal(id: ref.id);
+    final proposalBase = await _proposalRepository.getProposal(ref: ref);
     final proposal = await _buildProposal(proposalBase);
 
     return proposal;
@@ -63,11 +76,9 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
-    required String campaignId,
   }) async {
     final proposalBases = await _proposalRepository.getProposals(
       request: request,
-      campaignId: campaignId,
     );
 
     final futures = proposalBases.proposals.map(_buildProposal);
@@ -96,6 +107,23 @@ final class ProposalServiceImpl implements ProposalService {
   Future<List<String>> getUserProposalsIds(String userId) async {
     final proposalsIds = await _proposalRepository.getUserProposalsIds(userId);
     return proposalsIds;
+  }
+
+  @override
+  Future<void> publishProposal(Document document) {
+    // TODO(dtscalac): implement publishing proposals
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<String>> removeFavoriteProposal(String proposalId) async {
+    return _proposalRepository.removeFavoriteProposal(proposalId);
+  }
+
+  @override
+  Future<void> submitProposalForReview(Document document) {
+    // TODO(dtscalac): implement submitting proposals into review
+    throw UnimplementedError();
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {

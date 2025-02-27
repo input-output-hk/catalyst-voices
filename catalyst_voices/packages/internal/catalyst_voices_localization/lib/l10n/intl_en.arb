@@ -940,6 +940,9 @@
     "description": "When user checks correct seed phrase words order he can upload it too"
   },
   "reset": "Reset",
+  "@reset": {
+    "description": "Action to reset value in text field"
+  },
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
   "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
   "yourNextStep": "Your next step",
@@ -1517,39 +1520,77 @@
   "@continueText": {
     "description": "Action to move to the next step"
   },
-  "proposalEditorStatusDropdownBackTitle": "Back to Proposal Index",
-  "@proposalEditorStatusDropdownBackTitle": {
+  "proposalEditorBackToProposals": "Back to Proposals",
+  "@proposalEditorBackToProposals": {
     "description": "Action title to navigate back to the proposal index."
   },
-  "proposalEditorStatusDropdownPublishTitle": "Publish as new iteration · Draft",
-  "@proposalEditorStatusDropdownPublishTitle": {
-    "description": "Action title to publish a new version of the draft proposal."
+  "proposalEditorStatusDropdownViewTitle": "Unnamed proposal",
+  "@proposalEditorStatusDropdownViewTitle": {
+    "description": "Placeholder for the proposal title in the proposal actions dropdown if the proposal title is empty."
   },
-  "proposalEditorStatusDropdownPublishDescription": "Update proposal iteration as a public draft",
+  "proposalEditorStatusDropdownViewDescription": "Iteration {iteration} · Not published",
+  "@proposalEditorStatusDropdownViewDescription": {
+    "description": "Description of a proposal in the proposal actions dropdown.",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalEditorStatusDropdownPublishTitle": "Publish new iteration · Draft Iteration {iteration}",
+  "@proposalEditorStatusDropdownPublishTitle": {
+    "description": "Action title to publish a new version of the draft proposal.",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalEditorStatusDropdownPublishDescription": "Share draft for public feedback",
   "@proposalEditorStatusDropdownPublishDescription": {
     "description": "Action description to publish a new version of the draft proposal."
   },
-  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Final",
+  "proposalEditorStatusDropdownSubmitTitle": "Submit to review stage · Iteration {iteration} as Final",
   "@proposalEditorStatusDropdownSubmitTitle": {
-    "description": "Action title to submit the final proposal."
+    "description": "Action title to submit the final proposal.",
+    "placeholders": {
+      "iteration": {
+        "type": "int"
+      }
+    }
   },
   "proposalEditorStatusDropdownSubmitDescription": "Enter proposal into the next governance round",
   "@proposalEditorStatusDropdownSubmitDescription": {
     "description": "Action description to submit the final proposal."
   },
-  "proposalEditorStatusDropdownShareTitle": "Share Proposal",
-  "@proposalEditorStatusDropdownShareTitle": {
-    "description": "Action title to share a proposal."
-  },
   "proposalEditorStatusDropdownExportTitle": "Export Proposal",
   "@proposalEditorStatusDropdownExportTitle": {
     "description": "Action title to export a proposal as a file."
+  },
+  "proposalEditorStatusDropdownDeleteTitle": "Delete Proposal",
+  "@proposalEditorStatusDropdownDeleteTitle": {
+    "description": "Action title to delete a proposal."
+  },
+  "proposalOptions": "Proposal Options",
+  "@proposalOptions": {
+    "description": "Actions related to a proposal like publishing, sharing, exporting, etc."
   },
   "proposalEditorValidationSnackbar": "Fix the following input errors",
   "@proposalEditorValidationSnackbar": {
     "description": "Snackbar title shown when user tries to save a proposal with errors."
   },
+  "proposalEditorDeleteDialogTitle": "Delete Proposal",
+  "@proposalEditorDeleteDialogTitle": {
+    "description": "A title for the dialog to confirm proposal deletion."
+  },
+  "proposalEditorDeleteDialogDescription": "Permanently delete your proposal?",
+  "@proposalEditorDeleteDialogDescription": {
+    "description": "A description for the dialog to confirm proposal deletion."
+  },
   "showAll": "Show All",
+  "@showAll": {
+    "description": "Show all for when using filtering by some criteria"
+  },
   "importProposal": "Import Proposal",
   "@importProposal": {
     "description": "Import a proposal from a file"
@@ -1557,6 +1598,18 @@
   "catalyst": "Catalyst",
   "@catalyst": {
     "description": "Catalyst is a project name"
+  },
+  "searchResult": "Search Result",
+  "@searchResult": {
+    "description": "To show that displayed items comes from search result"
+  },
+  "emptySearchResultTitle": "No search results found",
+  "@emptySearchResultTitle": {
+    "description": "Title of empty search result"
+  },
+  "tryDifferentSearch": "Please try another search.",
+  "@tryDifferentSearch": {
+    "description": "Description of empty search result. Try different search"
   },
   "copyLink": "Copy Link",
   "@copyLink": {

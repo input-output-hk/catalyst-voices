@@ -43,14 +43,14 @@ final class LoadProposalEvent extends ProposalBuilderEvent {
 }
 
 final class LoadProposalTemplateEvent extends ProposalBuilderEvent {
-  final String id;
+  final DocumentRef ref;
 
   const LoadProposalTemplateEvent({
-    required this.id,
+    required this.ref,
   });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [ref];
 }
 
 sealed class ProposalBuilderEvent extends Equatable {
@@ -75,15 +75,15 @@ final class SectionChangedEvent extends ProposalBuilderEvent {
   List<Object?> get props => [changes];
 }
 
-final class ShareProposalEvent extends ProposalBuilderEvent {
-  const ShareProposalEvent();
+final class SubmitProposalEvent extends ProposalBuilderEvent {
+  const SubmitProposalEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-final class SubmitProposalEvent extends ProposalBuilderEvent {
-  const SubmitProposalEvent();
+final class ValidateProposalEvent extends ProposalBuilderEvent {
+  const ValidateProposalEvent();
 
   @override
   List<Object?> get props => [];

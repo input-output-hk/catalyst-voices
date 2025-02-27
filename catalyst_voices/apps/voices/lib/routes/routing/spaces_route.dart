@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/pages/category/category_page.dart';
 import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/funded_projects/funded_projects_page.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder.dart';
 import 'package:catalyst_voices/pages/proposals/proposals_page.dart';
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
@@ -58,46 +57,6 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
-final class ProposalBuilderDraftRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String? templateId;
-
-  const ProposalBuilderDraftRoute({
-    this.templateId,
-  });
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(templateId: templateId);
-  }
-}
-
-final class ProposalBuilderRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  final String proposalId;
-
-  const ProposalBuilderRoute({
-    required this.proposalId,
-  });
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return ProposalBuilderPage(proposalId: proposalId);
-  }
-}
-
 final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
 
@@ -124,17 +83,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
         TypedGoRoute<CategoryDetailRoute>(path: 'category/:categoryId'),
       ],
     ),
-    TypedGoRoute<WorkspaceRoute>(
-      path: '/$_prefix/workspace',
-      routes: [
-        TypedGoRoute<ProposalBuilderDraftRoute>(
-          path: 'proposal_builder/draft',
-        ),
-        TypedGoRoute<ProposalBuilderRoute>(
-          path: 'proposal_builder/:proposalId',
-        ),
-      ],
-    ),
+    TypedGoRoute<WorkspaceRoute>(path: '/$_prefix/workspace'),
     TypedGoRoute<VotingRoute>(path: '/$_prefix/voting'),
     TypedGoRoute<FundedProjectsRoute>(path: '/$_prefix/funded_projects'),
     TypedGoRoute<TreasuryRoute>(path: '/$_prefix/treasury'),

@@ -15,20 +15,20 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 class ProposalPage extends StatefulWidget {
   final String id;
   final String? version;
-  final bool isDraft;
+  final bool isLocal;
 
   const ProposalPage({
     super.key,
     required this.id,
     this.version,
-    required this.isDraft,
+    required this.isLocal,
   });
 
   DocumentRef get ref {
     return DocumentRef.build(
       id: id,
       version: version,
-      isDraft: isDraft,
+      isDraft: isLocal,
     );
   }
 

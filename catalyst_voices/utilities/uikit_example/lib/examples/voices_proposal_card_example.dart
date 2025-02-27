@@ -46,7 +46,6 @@ class VoicesProposalCardExample extends StatelessWidget {
               image: VoicesAssets.images.proposalBackground2,
               proposal: PendingProposal(
                 id: 'f14/2',
-                isDraft: false,
                 campaignName: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
@@ -54,7 +53,7 @@ class VoicesProposalCardExample extends StatelessWidget {
                 fundsRequested: Coin.fromAda(100000),
                 commentsCount: 0,
                 description: _description,
-                publishStage: ProposalPublish.draft,
+                publishStage: ProposalPublish.publishedDraft,
                 version: 1,
                 duration: 6,
                 author: 'Alex Wells',

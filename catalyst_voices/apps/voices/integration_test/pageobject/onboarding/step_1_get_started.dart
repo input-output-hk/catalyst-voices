@@ -12,13 +12,17 @@ class GetStartedPanel extends OnboardingPageBase {
   final createNewKeychain = const Key('CreateAccountType.createNew');
   final recoverKeychain = const Key('CreateAccountType.recover');
 
+  @override
+  Future<void> goto() async {
+    await AppBarPage($).getStartedBtnClick();
+  }
+
   Future<void> clickCreateNewKeychain() async {
     await $(createNewKeychain).tap();
   }
 
-  @override
-  Future<void> goto() async {
-    await AppBarPage($).getStartedBtnClick();
+  Future<void> clickRecoverKeychain() async {
+    await $(recoverKeychain).tap();
   }
 
   @override

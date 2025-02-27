@@ -1,11 +1,14 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
+import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -67,15 +70,25 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   Widget build(BuildContext context) {
-    return SegmentsControllerScope(
-      controller: _segmentsController,
-      child: SpaceScaffold(
-        left: const ProposalBuilderNavigationPanel(),
-        body: _ProposalBuilderContent(
-          controller: _segmentsScrollController,
-          onRetryTap: _updateSource,
+    return Scaffold(
+      appBar: const VoicesAppBar(
+        automaticallyImplyLeading: false,
+        actions: [
+          ProposalBuilderBackAction(),
+          ProposalBuilderStatusAction(),
+          SessionStateHeader(),
+        ],
+      ),
+      body: SegmentsControllerScope(
+        controller: _segmentsController,
+        child: SpaceScaffold(
+          left: const ProposalBuilderNavigationPanel(),
+          body: _ProposalBuilderContent(
+            controller: _segmentsScrollController,
+            onRetryTap: _updateSource,
+          ),
+          right: const ProposalBuilderSetupPanel(),
         ),
-        right: const ProposalBuilderSetupPanel(),
       ),
     );
   }
@@ -183,14 +196,11 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     if (proposalId != null) {
       final ref = SignedDocumentRef(id: proposalId);
       bloc.add(LoadProposalEvent(ref: ref));
-      return;
+    } else if (templateId != null) {
+      final ref = SignedDocumentRef(id: templateId);
+      bloc.add(LoadProposalTemplateEvent(ref: ref));
+    } else {
+      bloc.add(const LoadDefaultProposalTemplateEvent());
     }
-
-    if (templateId != null) {
-      bloc.add(LoadProposalTemplateEvent(id: templateId));
-      return;
-    }
-
-    bloc.add(const LoadDefaultProposalTemplateEvent());
   }
 }

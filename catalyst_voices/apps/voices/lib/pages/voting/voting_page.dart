@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
+
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
 World Mobile and PRISM, but its potential is only barely exploited.
@@ -22,7 +24,6 @@ and PRISM, but its potential is only barely exploited.
 final _proposals = [
   PendingProposal(
     id: const Uuid().v7(),
-    isDraft: false,
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -30,14 +31,13 @@ final _proposals = [
     fundsRequested: Coin.fromAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    publishStage: ProposalPublish.draft,
+    publishStage: ProposalPublish.publishedDraft,
     version: 1,
     duration: 6,
     author: 'Alex Wells',
   ),
   PendingProposal(
     id: const Uuid().v7(),
-    isDraft: false,
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -45,14 +45,13 @@ final _proposals = [
     fundsRequested: Coin.fromAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    publishStage: ProposalPublish.published,
+    publishStage: ProposalPublish.submittedProposal,
     version: 1,
     duration: 6,
     author: 'Alex Wells',
   ),
   PendingProposal(
     id: const Uuid().v7(),
-    isDraft: false,
     campaignName: 'F14',
     category: 'Cardano Use Cases / MVP',
     title: 'Proposal Title that rocks the world',
@@ -60,14 +59,22 @@ final _proposals = [
     fundsRequested: Coin.fromAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    publishStage: ProposalPublish.draft,
+    publishStage: ProposalPublish.publishedDraft,
     version: 1,
     duration: 6,
     author: 'Alex Wells',
   ),
 ];
 
-final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
+void _onFavoriteChanged(PendingProposal proposal, bool isFavorite) {
+  final proposals = Set.of(_favoriteProposals.value);
+  if (isFavorite) {
+    proposals.add(proposal);
+  } else {
+    proposals.remove(proposal);
+  }
+  _favoriteProposals.value = proposals.toList();
+}
 
 class VotingPage extends StatelessWidget {
   const VotingPage({super.key});
@@ -82,111 +89,6 @@ class VotingPage extends StatelessWidget {
         SizedBox(height: 44),
         _Tabs(),
       ],
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<SessionCubit, SessionState>(
-      builder: (context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              context.l10n.activeVotingRound,
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            if (state.isActive) const _UnlockedHeaderActions(),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _UnlockedHeaderActions extends StatelessWidget {
-  const _UnlockedHeaderActions();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 256,
-          child: VoicesTextField(
-            decoration: VoicesTextFieldDecoration(
-              labelText: 'Show',
-              hintText: 'Fund 14',
-              suffixIcon:
-                  VoicesAssets.icons.arrowTriangleDown.buildIcon(size: 16),
-            ),
-            onFieldSubmitted: (value) {},
-          ),
-        ),
-        const SizedBox(width: 16),
-        SizedBox(
-          width: 256,
-          child: VoicesTextField(
-            decoration: VoicesTextFieldDecoration(
-              labelText: 'Field label',
-              hintText: 'Search proposals',
-              prefixIcon: VoicesAssets.icons.search.buildIcon(),
-            ),
-            onFieldSubmitted: (value) {},
-          ),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: VoicesAssets.icons.filter.buildIcon(),
-        ),
-      ],
-    );
-  }
-}
-
-class _Tabs extends StatelessWidget {
-  const _Tabs();
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            tabs: [
-              Tab(
-                text: context.l10n.noOfAll(_proposals.length),
-              ),
-              Tab(
-                child: Row(
-                  children: [
-                    VoicesAssets.icons.starOutlined.buildIcon(),
-                    const SizedBox(width: 8),
-                    Text(context.l10n.favorites),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const TabBarStackView(
-            children: [
-              _AllProposals(),
-              _FavoriteProposals(),
-            ],
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
     );
   }
 }
@@ -243,12 +145,107 @@ class _FavoriteProposals extends StatelessWidget {
   }
 }
 
-void _onFavoriteChanged(PendingProposal proposal, bool isFavorite) {
-  final proposals = Set.of(_favoriteProposals.value);
-  if (isFavorite) {
-    proposals.add(proposal);
-  } else {
-    proposals.remove(proposal);
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SessionCubit, SessionState>(
+      builder: (context, state) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              context.l10n.activeVotingRound,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            if (state.isActive) const _UnlockedHeaderActions(),
+          ],
+        );
+      },
+    );
   }
-  _favoriteProposals.value = proposals.toList();
+}
+
+class _Tabs extends StatelessWidget {
+  const _Tabs();
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            tabs: [
+              Tab(
+                text: context.l10n.noOfAll(_proposals.length),
+              ),
+              Tab(
+                child: Row(
+                  children: [
+                    VoicesAssets.icons.starOutlined.buildIcon(),
+                    const SizedBox(width: 8),
+                    Text(context.l10n.favorites),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          const TabBarStackView(
+            children: [
+              _AllProposals(),
+              _FavoriteProposals(),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+}
+
+class _UnlockedHeaderActions extends StatelessWidget {
+  const _UnlockedHeaderActions();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 256,
+          child: VoicesTextField(
+            decoration: VoicesTextFieldDecoration(
+              labelText: 'Show',
+              hintText: 'Fund 14',
+              suffixIcon:
+                  VoicesAssets.icons.arrowTriangleDown.buildIcon(size: 16),
+            ),
+            onFieldSubmitted: (value) {},
+          ),
+        ),
+        const SizedBox(width: 16),
+        SizedBox(
+          width: 256,
+          child: VoicesTextField(
+            decoration: VoicesTextFieldDecoration(
+              labelText: 'Field label',
+              hintText: 'Search proposals',
+              prefixIcon: VoicesAssets.icons.search.buildIcon(),
+            ),
+            onFieldSubmitted: (value) {},
+          ),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: VoicesAssets.icons.filter.buildIcon(),
+        ),
+      ],
+    );
+  }
 }

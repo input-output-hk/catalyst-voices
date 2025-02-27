@@ -16,19 +16,19 @@ final class ProposalRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String proposalId;
   final String? version;
-  final bool draft;
+  final bool local;
 
   const ProposalRoute({
     required this.proposalId,
     this.version,
-    this.draft = false,
+    this.local = false,
   });
 
   ProposalRoute.from({required DocumentRef ref})
       : this(
           proposalId: ref.id,
           version: ref.version,
-          draft: ref is DraftRef,
+          local: ref is DraftRef,
         );
 
   @override
@@ -42,7 +42,7 @@ final class ProposalRoute extends GoRouteData
     return ProposalPage(
       id: proposalId,
       version: version,
-      isDraft: draft,
+      isLocal: local,
     );
   }
 }
