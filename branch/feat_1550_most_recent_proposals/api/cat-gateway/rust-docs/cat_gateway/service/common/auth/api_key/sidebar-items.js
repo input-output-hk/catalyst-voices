@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["API_KEY_HEADER"],"fn":["api_checker","check_api_key"],"struct":["InternalApiKeyAuthorization"]};
