@@ -1,4 +1,7 @@
 //! Catalyst RBAC Token utility functions.
+
+// cspell: words Fftx
+
 use std::{
     fmt::{Display, Formatter},
     time::Duration,
