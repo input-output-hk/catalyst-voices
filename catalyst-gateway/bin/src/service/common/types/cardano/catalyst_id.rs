@@ -103,6 +103,9 @@ impl Example for CatalystId {
             105, 123, 50, 105, 25, 112, 59, 172, 3, 28, 174, 127, 96,
         ];
         let signing_key = &SigningKey::from_bytes(&secret_key_bytes);
-        IdUri::new("cardano", None, signing_key.into()).into()
+        IdUri::new("cardano", Some("preprod"), signing_key.into())
+            .with_nonce()
+            .as_id()
+            .into()
     }
 }
