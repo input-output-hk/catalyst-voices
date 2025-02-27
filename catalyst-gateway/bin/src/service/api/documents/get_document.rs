@@ -33,7 +33,7 @@ pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid
         Ok(doc) => {
             match doc.try_into() {
                 Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
-                Err(err) => AllResponses::handle_error(&err.into()),
+                Err(err) => AllResponses::handle_error(&err),
             }
         },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
