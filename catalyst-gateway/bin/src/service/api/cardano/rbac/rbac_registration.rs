@@ -3,7 +3,7 @@
 use poem_openapi::{types::Example, Object};
 
 use crate::service::common::types::{
-    cardano::{catalyst_id::CatalystId, slot_no::SlotNo, transaction_id::TxnId},
+    cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
     generic::uuidv4::UUIDv4,
 };
 
@@ -11,19 +11,22 @@ use crate::service::common::types::{
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct RbacRegistrations {
+    /// User's catalyst id
+    catalyst_id: CatalystId,
     /// Latest valid RBAC registration
     #[oai(skip_serializing_if_is_none)]
-    valid: Option<RbacRegistration>,
+    finalised: Option<RbacRegistration>,
     /// Latest invalid RBAC registration
     #[oai(skip_serializing_if_is_none)]
-    invalid: Option<RbacRegistration>,
+    volatile: Option<RbacRegistration>,
 }
 
 impl Example for RbacRegistrations {
     fn example() -> Self {
         Self {
-            valid: Some(RbacRegistration::example()),
-            invalid: Some(RbacRegistration::example()),
+            catalyst_id: CatalystId::example(),
+            finalised: Some(RbacRegistration::example()),
+            volatile: Some(RbacRegistration::example()),
         }
     }
 }
@@ -32,23 +35,21 @@ impl Example for RbacRegistrations {
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct RbacRegistration {
-    /// User's catalyst id
-    catalyst_id: CatalystId,
-    /// Transaction ID, which contains this registration
+    /// Transaction ID of the latest published registration
     txn_id: TxnId,
-    /// Block's slot number, which contains this registration
-    slot: SlotNo,
-    /// Registration purpose
-    purpose: UUIDv4,
+    /// Registration purposes
+    purpose: Vec<UUIDv4>,
+
+    /// All Cip509 registrations
+    #[oai(skip_serializing_if_is_empty)]
+    details: Vec<String>,
 }
 
 impl Example for RbacRegistration {
     fn example() -> Self {
         Self {
-            catalyst_id: CatalystId::example(),
             txn_id: TxnId::example(),
-            slot: SlotNo::example(),
-            purpose: UUIDv4::example(),
+            purpose: vec![UUIDv4::example()],
         }
     }
 }
