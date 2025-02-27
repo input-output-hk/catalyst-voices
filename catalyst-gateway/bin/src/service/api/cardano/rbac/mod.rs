@@ -10,6 +10,7 @@ use crate::service::common::{
 
 mod registrations_get;
 mod unprocessable_content;
+mod rbac_registration;
 
 /// Cardano RBAC API Endpoints
 pub(crate) struct Api;

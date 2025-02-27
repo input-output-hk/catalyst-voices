@@ -3,7 +3,9 @@
 use poem_openapi::{payload::Json, ApiResponse};
 use tracing::error;
 
-use super::unprocessable_content::RbacUnprocessableContent;
+use super::{
+    rbac_registration::RbacRegistrations, unprocessable_content::RbacUnprocessableContent,
+};
 use crate::{
     db::index::session::CassandraSession,
     service::common::{
@@ -22,7 +24,7 @@ pub(crate) enum Responses {
     ///
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
-    Ok(Json<String>),
+    Ok(Json<RbacRegistrations>),
 
     /// No valid registration.
     #[oai(status = 404)]
@@ -43,8 +45,6 @@ pub(crate) async fn endpoint(_lookup: Option<StakeOrVoter>) -> AllResponses {
         let err = anyhow::anyhow!("Failed to acquire db session");
         return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
     };
-
-    
 
     Responses::NotFound.into()
 }
