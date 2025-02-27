@@ -1,5 +1,12 @@
 import 'dart:math';
 
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_add_comment_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_header_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_comments_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_section_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_segment_title.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_metadata_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_overview_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -44,28 +51,33 @@ class _SegmentsListView extends StatelessWidget {
     return BasicSegmentsListView(
       key: const ValueKey('ProposalSegmentsListView'),
       items: items,
+      padding: const EdgeInsets.only(top: 16, bottom: 64),
       itemBuilder: (context, index) {
         final item = items[index];
+        final nextItem = items.elementAtOrNull(index + 1);
+
+        final isFirst = index == 0;
+        final isLast = index == max(items.length - 1, 0);
 
         return ProposalTileDecoration(
           key: ValueKey('Proposal[${item.id.value}]Tile'),
-          position: (
-            isFirst: index == 0,
-            isLast: index == max(items.length - 1, 0),
+          corners: (
+            isFirst: isFirst || item is ProposalCommentsSegment,
+            isLast: isLast || nextItem is ProposalCommentsSegment,
           ),
-          positionInSegment: (
+          verticalPadding: (
             isFirst: item is Segment,
-            isLast: items.elementAtOrNull(index + 1) is! Section,
+            isLast: nextItem is! Section,
           ),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 100),
-            alignment: Alignment.center,
-            child: Text('$index'),
-          ),
+          child: _buildItem(context, item),
         );
       },
       separatorBuilder: (context, index) {
         final nextItem = items.elementAtOrNull(index + 1);
+
+        if (nextItem is ProposalCommentsSegment) {
+          return const SizedBox(height: 32);
+        }
 
         if (nextItem is Segment) {
           return const VoicesDivider.expanded(height: 1);
@@ -75,5 +87,22 @@ class _SegmentsListView extends StatelessWidget {
       },
       itemScrollController: scrollController,
     );
+  }
+
+  Widget _buildItem(BuildContext context, SegmentsListViewItem item) {
+    return switch (item) {
+      ProposalOverviewSegment() => ProposalOverviewTile(),
+      ProposalOverviewSection() => switch (item) {
+          ProposalMetadataSection() => ProposalMetadataTile(),
+        },
+      DocumentSegment() => ProposalDocumentSegmentTitle(),
+      DocumentSection() => ProposalDocumentSectionTile(),
+      ProposalCommentsSegment() => ProposalCommentsHeaderTile(),
+      ProposalCommentsSection() => switch (item) {
+          ViewCommentsSection() => ProposalCommentsTile(),
+          AddCommentSection() => ProposalAddCommentTile(),
+        },
+      _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
+    };
   }
 }
