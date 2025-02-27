@@ -67,7 +67,7 @@ void main() {
 
     test('dateTime is recovered correctly', () {
       // Given
-      final dateTime = DateTime(2025, 2, 3, 15, 34);
+      final dateTime = DateTime.utc(2025, 2, 3, 15, 34);
       final config = V7Options(dateTime.millisecondsSinceEpoch, null);
       final uuid = const Uuid().v7(config: config);
 
@@ -88,7 +88,7 @@ void main() {
       DateTime extract() => hiLo.dateTime;
 
       // Then
-      expect(extract, throwsA(isA<StateError>()));
+      expect(extract, throwsA(isA<ArgumentError>()));
     });
 
     test('high and low does not exceeds 64 bits', () {
