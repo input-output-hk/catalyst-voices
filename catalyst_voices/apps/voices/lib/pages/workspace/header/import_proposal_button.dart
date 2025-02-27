@@ -28,6 +28,7 @@ class _ImportProposalDialog {
   static Future<Uint8List?> show(BuildContext context) async {
     final file = await VoicesUploadFileDialog.show(
       context,
+      routeSettings: const RouteSettings(name: '/import-proposal'),
       title: context.l10n.proposalImportDialogTitle,
       itemNameToUpload: context.l10n.proposal,
       info: context.l10n.proposalImportDialogDescription,
