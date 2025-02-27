@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -45,24 +45,34 @@ class _SegmentsListView extends StatelessWidget {
       key: const ValueKey('ProposalSegmentsListView'),
       items: items,
       itemBuilder: (context, index) {
-        final isFirst = index == 0;
-        final isLast = index == min(items.length - 1, 0);
+        final item = items[index];
 
-        return Container(
-          key: ValueKey('Section${index}Key'),
-          constraints: const BoxConstraints(minHeight: 100),
-          decoration: BoxDecoration(
-            color: context.colors.elevationsOnSurfaceNeutralLv0,
-            borderRadius: BorderRadius.vertical(
-              top: isFirst ? const Radius.circular(16) : Radius.zero,
-              bottom: isLast ? const Radius.circular(16) : Radius.zero,
-            ),
+        return ProposalTileDecoration(
+          key: ValueKey('Proposal[${item.id.value}]Tile'),
+          position: (
+            isFirst: index == 0,
+            isLast: index == max(items.length - 1, 0),
           ),
-          alignment: Alignment.center,
-          child: Text('Segment nr. ${index + 1}'),
+          positionInSegment: (
+            isFirst: item is Segment,
+            isLast: items.elementAtOrNull(index + 1) is! Section,
+          ),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 100),
+            alignment: Alignment.center,
+            child: Text('$index'),
+          ),
         );
       },
-      separatorBuilder: (_, __) => const VoicesDivider.expanded(height: 1),
+      separatorBuilder: (context, index) {
+        final nextItem = items.elementAtOrNull(index + 1);
+
+        if (nextItem is Segment) {
+          return const VoicesDivider.expanded(height: 1);
+        }
+
+        return const SizedBox.shrink();
+      },
       itemScrollController: scrollController,
     );
   }

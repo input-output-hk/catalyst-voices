@@ -3,12 +3,19 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-typedef SegmentHeaderWidgetBuilder<T extends Segment> = Widget Function(
+Widget _defaultSegmentHeaderBuilder(BuildContext context, Segment data) {
+  return SegmentHeaderTile(
+    id: data.id,
+    name: data.resolveTitle(context),
+  );
+}
+
+typedef SectionWidgetBuilder<T extends Section> = Widget Function(
   BuildContext context,
   T data,
 );
 
-typedef SectionWidgetBuilder<T extends Section> = Widget Function(
+typedef SegmentHeaderWidgetBuilder<T extends Segment> = Widget Function(
   BuildContext context,
   T data,
 );
@@ -57,6 +64,8 @@ class SegmentsListView<T1 extends Segment, T2 extends Section>
     SegmentHeaderWidgetBuilder<T1> segmentBuilder =
         _defaultSegmentHeaderBuilder,
     required SectionWidgetBuilder<T2> sectionBuilder,
+    super.padding,
+    super.itemScrollController,
   }) : super(
           itemBuilder: (context, index) {
             final item = items[index];
@@ -91,11 +100,4 @@ class SegmentsListView<T1 extends Segment, T2 extends Section>
             throw ArgumentError('Unknown item type[${item.runtimeType}]');
           },
         );
-}
-
-Widget _defaultSegmentHeaderBuilder(BuildContext context, Segment data) {
-  return SegmentHeaderTile(
-    id: data.id,
-    name: data.resolveTitle(context),
-  );
 }
