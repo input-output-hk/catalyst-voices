@@ -1,6 +1,6 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, sync::Arc, time::Duration};
+use std::{collections::HashMap, fmt::Display, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
@@ -22,6 +22,7 @@ use crate::{
 };
 
 // pub(crate) mod cip36_registration_obsolete;
+pub(crate) mod event;
 pub(crate) mod util;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
@@ -328,7 +329,7 @@ struct SyncTask {
     /// The current running sync tasks.
     sync_tasks: FuturesUnordered<tokio::task::JoinHandle<SyncParams>>,
 
-    /// // How many immutable chain follower sync tasks we are running.
+    /// How many immutable chain follower sync tasks we are running.
     current_sync_tasks: u16,
 
     /// Start for the next block we would sync.
@@ -342,6 +343,9 @@ struct SyncTask {
 
     /// Current Sync Status
     sync_status: Vec<SyncStatus>,
+
+    /// Event handlers during the process of sync tasks.
+    event_handlers: HashMap<String, Vec<fn(message: event::ChainIndexerEvent)>>
 }
 
 impl SyncTask {
@@ -355,6 +359,7 @@ impl SyncTask {
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
+            event_handlers: HashMap::new()
         }
     }
 
@@ -426,6 +431,10 @@ impl SyncTask {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
+                                
+
+                                // TODO: add number of running indexer tasks
+
                                 // If we need more immutable chain followers to sync the block
                                 // chain, we can now start them.
                                 self.start_immutable_followers();
@@ -490,6 +499,9 @@ impl SyncTask {
                         last_point.clone(),
                     )));
                     self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
+
+                    // TODO: add number of running indexer tasks
+                    // self.notify_all(event, message);
                 }
 
                 // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off
@@ -536,6 +548,14 @@ impl SyncTask {
         };
 
         Some((start_slot, Point::fuzzy(end)))
+    }
+
+    fn notify_all(&self, event_type: &str, message: event::ChainIndexerEvent) {
+        if let Some(listeners) = self.event_handlers.get(event_type) {
+            for listener in listeners {
+                (listener)(message.clone())
+            }
+        }
     }
 }
 
