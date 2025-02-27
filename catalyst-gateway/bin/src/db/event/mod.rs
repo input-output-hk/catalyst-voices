@@ -14,7 +14,7 @@ use futures::{Stream, StreamExt, TryStreamExt};
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
-use crate::settings::Settings;
+use crate::{service::utilities::health::set_event_db_liveness, settings::Settings};
 
 pub(crate) mod common;
 pub(crate) mod config;
@@ -239,6 +239,8 @@ impl EventDB {
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
+///
+/// If connection to the poll is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
 pub fn establish_connection() {
     let (url, user, pass) = Settings::event_db_settings();
 
@@ -261,5 +263,7 @@ pub fn establish_connection() {
 
     if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
         error!("Failed to set event db pool. Called Twice?");
+    } else {
+        set_event_db_liveness(true);
     }
 }

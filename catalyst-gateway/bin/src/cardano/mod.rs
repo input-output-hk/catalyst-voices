@@ -18,6 +18,10 @@ use crate::{
         },
         session::CassandraSession,
     },
+    service::utilities::health::{
+        follower_has_first_reached_tip, index_db_is_live, set_follower_first_reached_tip,
+        set_index_db_liveness,
+    },
     settings::{chain_follower, Settings},
 };
 
@@ -361,6 +365,11 @@ impl SyncTask {
     /// Primary Chain Follower task.
     ///
     /// This continuously runs in the background, and never terminates.
+    ///
+    /// Sets the Index DB liveness flag to true if it is not already set.
+    ///
+    /// Sets the Chain Follower Has First Reached Tip flag to true if it is not already
+    /// set.
     async fn run(&mut self) {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
@@ -372,7 +381,16 @@ impl SyncTask {
         // Wait for indexing DB to be ready before continuing.
         // We do this after the above, because other nodes may have finished already, and we don't
         // want to wait do any work they already completed while we were fetching the blockchain.
-        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
+        //
+        // After waiting, we set the liveness flag to true if it is not already set.
+        if CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
+            .await
+            .is_ok()
+            && !index_db_is_live()
+        {
+            set_index_db_liveness(true);
+        }
+
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state");
         self.sync_status = get_sync_status().await;
         debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
@@ -408,6 +426,11 @@ impl SyncTask {
                             // it.
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
                             self.start_immutable_followers();
+
+                            // Update flag if this is the first time reaching TIP.
+                            if follower_has_first_reached_tip() {
+                                set_follower_first_reached_tip();
+                            }
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished,
                             "The TIP follower failed, restarting it.");

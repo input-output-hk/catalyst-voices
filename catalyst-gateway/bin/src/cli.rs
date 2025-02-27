@@ -1,5 +1,5 @@
 //! CLI interpreter for the service
-use std::io::Write;
+use std::{io::Write, time::Duration};
 
 use clap::Parser;
 use tracing::{error, info};
@@ -9,7 +9,9 @@ use crate::{
     db::{self, index::session::CassandraSession},
     service::{
         self,
-        utilities::health::{is_live, live_counter_reset, started},
+        utilities::health::{
+            condition_for_started, is_live, live_counter_reset, service_has_started, set_to_started,
+        },
     },
     settings::{DocsSettings, ServiceSettings, Settings},
 };
@@ -46,13 +48,15 @@ impl Cli {
 
                 info!("Catalyst Gateway - Starting");
 
-                // Start the DB's
+                // Start the DB's.
                 CassandraSession::init();
+
                 db::event::establish_connection();
 
                 // Start the chain indexing follower.
                 start_followers().await?;
 
+                // Start the API service.
                 let handle = tokio::spawn(async move {
                     match service::run().await {
                         Ok(()) => info!("Endpoints started ok"),
@@ -63,6 +67,7 @@ impl Cli {
                 });
                 tasks.push(handle);
 
+                // Start task to reset the service 'live counter' at a regular interval.
                 let handle = tokio::spawn(async move {
                     while is_live() {
                         tokio::time::sleep(Settings::service_live_timeout_interval()).await;
@@ -71,8 +76,18 @@ impl Cli {
                 });
                 tasks.push(handle);
 
-                started();
+                // Start task to wait for the service 'started' flag to be `true`.
+                let handle = tokio::spawn(async move {
+                    while !service_has_started() {
+                        tokio::time::sleep(Duration::from_secs(1)).await;
+                        if condition_for_started() {
+                            set_to_started();
+                        }
+                    }
+                });
+                tasks.push(handle);
 
+                // Run all asynchronous tasks to completion.
                 for task in tasks {
                     task.await?;
                 }
