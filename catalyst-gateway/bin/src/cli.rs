@@ -1,5 +1,5 @@
 //! CLI interpreter for the service
-use std::io::Write;
+use std::{io::Write, time::Duration};
 
 use clap::Parser;
 use tracing::{error, info};
@@ -10,7 +10,7 @@ use crate::{
     service::{
         self,
         utilities::health::{
-            is_live, live_counter_reset, set_event_db_liveness, set_index_db_liveness,
+            condition_for_started, is_live, live_counter_reset, service_has_started, set_to_started,
         },
     },
     settings::{DocsSettings, ServiceSettings, Settings},
@@ -50,10 +50,8 @@ impl Cli {
 
                 // Start the DB's.
                 CassandraSession::init();
-                set_index_db_liveness(true);
 
                 db::event::establish_connection();
-                set_event_db_liveness(true);
 
                 // Start the chain indexing follower.
                 start_followers().await?;
@@ -74,6 +72,17 @@ impl Cli {
                     while is_live() {
                         tokio::time::sleep(Settings::service_live_timeout_interval()).await;
                         live_counter_reset();
+                    }
+                });
+                tasks.push(handle);
+
+                // Start task to wait for the service 'started' flag to be `true`.
+                let handle = tokio::spawn(async move {
+                    while !service_has_started() {
+                        tokio::time::sleep(Duration::from_secs(1)).await;
+                        if condition_for_started() {
+                            set_to_started();
+                        }
                     }
                 });
                 tasks.push(handle);

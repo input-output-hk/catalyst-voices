@@ -5,6 +5,9 @@ use std::sync::atomic::{
     Ordering::{Acquire, Release},
 };
 
+/// Flag to determine if the service has started
+static STARTED: AtomicBool = AtomicBool::new(false);
+
 /// Flag to determine if the service has started.
 static LIVE_INDEX_DB: AtomicBool = AtomicBool::new(false);
 
@@ -17,6 +20,16 @@ static INITIAL_FOLLOWER_TIP_REACHED: AtomicBool = AtomicBool::new(false);
 
 /// Returns whether the service has started or not.
 pub(crate) fn service_has_started() -> bool {
+    STARTED.load(Acquire)
+}
+
+/// Set the `STARTED` flag to `true`
+pub(crate) fn set_to_started() {
+    STARTED.store(true, Release);
+}
+
+/// Returns whether the service has started or not.
+pub(crate) fn condition_for_started() -> bool {
     event_db_is_live() && index_db_is_live() && follower_has_first_reached_tip()
 }
 
