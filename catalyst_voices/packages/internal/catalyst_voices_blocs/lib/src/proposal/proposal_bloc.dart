@@ -20,6 +20,11 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState> {
   ) async {
     emit(const ProposalState(isLoading: true));
 
+    final ref = event.ref;
+
+    final proposal = await _proposalService.getProposal(ref: ref);
+    final document = proposal.document;
+
     final current = const Uuid().v7();
 
     final data = ProposalViewData(
