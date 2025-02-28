@@ -2,10 +2,7 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::service::common::types::{
-    cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
-    generic::uuidv4::UUIDv4,
-};
+use crate::service::common::types::cardano::catalyst_id::CatalystId;
 
 /// RBAC Registrations, contains a latest valid and invalid registration data.
 #[derive(Object)]
@@ -35,21 +32,18 @@ impl Example for RbacRegistrations {
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct RbacRegistration {
-    /// Transaction ID of the latest published registration
-    txn_id: TxnId,
-    /// Registration purposes
-    purpose: Vec<UUIDv4>,
-
-    /// All Cip509 registrations
+    /// Registration chain
+    chain: serde_json::Value,
+    /// All Cip509 registrations which formed a current registration chain
     #[oai(skip_serializing_if_is_empty)]
-    details: Vec<String>,
+    details: Vec<serde_json::Value>,
 }
 
 impl Example for RbacRegistration {
     fn example() -> Self {
         Self {
-            txn_id: TxnId::example(),
-            purpose: vec![UUIDv4::example()],
+            chain: serde_json::Value::Null,
+            details: vec![],
         }
     }
 }

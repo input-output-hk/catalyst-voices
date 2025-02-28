@@ -9,7 +9,7 @@ use poem_openapi::{
 };
 use serde_json::Value;
 
-use crate::service::common::types::string_types::impl_string_types;
+use crate::service::{common::types::string_types::impl_string_types, utilities::as_hex_string};
 
 /// Title.
 const TITLE: &str = "Transaction Id";
@@ -23,8 +23,6 @@ const ENCODED_LENGTH: usize = EXAMPLE.len();
 const HASH_LENGTH: usize = BLAKE_2B256_SIZE;
 /// Validation Regex Pattern
 const PATTERN: &str = "0x[A-Fa-f0-9]{64}";
-/// Invalid Error Msg.
-const INVALID_MSG: &str = "Invalid Transaction Id.";
 
 /// Schema.
 #[allow(clippy::cast_lossless)]
@@ -39,10 +37,6 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         ..poem_openapi::registry::MetaSchema::ANY
     }
 });
-
-/// Transaction Id.
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-pub(crate) struct TxnId(String);
 
 /// Because ALL the constraints are defined above, we do not ever need to define them in
 /// the API. BUT we do need to make a validator.
@@ -64,3 +58,14 @@ impl_string_types!(
     Some(SCHEMA.clone()),
     is_valid
 );
+
+impl TryFrom<Vec<u8>> for TxnId {
+    type Error = anyhow::Error;
+
+    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
+        if value.len() != HASH_LENGTH {
+            anyhow::bail!("Hash Length Invalid.")
+        }
+        Ok(Self(as_hex_string(&value)))
+    }
+}

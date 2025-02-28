@@ -2,11 +2,7 @@
 //!
 //! String Encoded `UUIDv4`
 
-use std::{
-    borrow::Cow,
-    ops::{Deref, DerefMut},
-    sync::LazyLock,
-};
+use std::sync::LazyLock;
 
 use anyhow::bail;
 use poem_openapi::{
