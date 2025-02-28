@@ -6,14 +6,30 @@ import os
 import json
 from typing import Dict, Any, List
 from uuid_extensions import uuid7str
+import copy
 
 
-def test_signed_doc():
-    health.is_live()
-    health.is_ready()
+class SignedDocument:
+    def __init__(self, metadata: Dict[str, Any], content: Dict[str, Any]):
+        self.metadata = metadata
+        self.content = content
 
+    def copy(self):
+        new_copy = SignedDocument(
+            metadata=copy.deepcopy(self.metadata),
+            content=copy.deepcopy(self.content),
+        )
+        return new_copy
+
+    # return hex bytes
+    def hex(self) -> str:
+        return signed_doc.build_signed_doc(self.metadata, self.content)
+
+
+@pytest.fixture
+def proposal_templates() -> List[str]:
     # comes from the 'templates/data.rs' file
-    proposal_templates = [
+    return [
         "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
         "0194d492-1daa-7371-8bd3-c15811b2b063",
         "0194d492-1daa-79c7-a222-2c3b581443a8",
@@ -27,7 +43,12 @@ def test_signed_doc():
         "0194d492-1daa-7878-9bcc-2c79fef0fc13",
         "0194d492-1daa-722f-94f4-687f2c068a5d",
     ]
-    comment_templates = [
+
+
+@pytest.fixture
+def comment_templates() -> List[str]:
+    # comes from the 'templates/data.rs' file
+    return [
         "0194d494-4402-7e0e-b8d6-171f8fea18b0",
         "0194d494-4402-7444-9058-9030815eb029",
         "0194d494-4402-7351-b4f7-24938dc2c12e",
@@ -42,7 +63,10 @@ def test_signed_doc():
         "0194d494-4402-7aa5-9dbc-5fe886e60ebc",
     ]
 
-    # prepare the data
+
+# return a Proposal document which is already published to the cat-gateway
+@pytest.fixture
+def proposal_doc(proposal_templates) -> SignedDocument:
     proposal_doc_id = uuid7str()
     proposal_metadata_json = {
         "alg": "EdDSA",
@@ -60,6 +84,18 @@ def test_signed_doc():
     with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
         proposal_json = json.load(proposal_json_file)
 
+    doc = SignedDocument(proposal_metadata_json, proposal_json)
+    resp = document.put(data=doc.hex())
+    assert (
+        resp.status_code == 201
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    return doc
+
+
+# return a Comment document which is already published to the cat-gateway
+@pytest.fixture
+def comment_doc(proposal_doc, comment_templates) -> SignedDocument:
     comment_doc_id = uuid7str()
     comment_metadata_json = {
         "alg": "EdDSA",
@@ -69,39 +105,35 @@ def test_signed_doc():
         "type": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
         "content-type": "application/json",
         "content-encoding": "br",
-        "ref": {"id": proposal_doc_id},
+        "ref": {"id": proposal_doc.metadata["id"]},
         "template": {"id": comment_templates[0]},
     }
     with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
         comment_json = json.load(comment_json_file)
 
-    templates_doc_check(proposal_templates + comment_templates)
-    proposal_doc_check(proposal_metadata_json, proposal_json)
-    comment_doc_check(comment_metadata_json, comment_json)
-    pagination_out_of_range_check()
+    doc = SignedDocument(comment_metadata_json, comment_json)
+    resp = document.put(data=doc.hex())
+    assert (
+        resp.status_code == 201
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    return doc
 
 
-def templates_doc_check(template_ids: List[str]):
-    for template_id in template_ids:
+def test_templates(proposal_templates, comment_templates):
+    templates = proposal_templates + comment_templates
+    for template_id in templates:
         resp = document.get(document_id=template_id)
         assert (
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text} for id {template_id}"
 
 
-def proposal_doc_check(
-    proposal_metadata_json: Dict[str, Any], proposal_json: Dict[str, Any]
-):
-    proposal_doc_id = proposal_metadata_json["id"]
+def test_proposal_doc(proposal_doc):
+    proposal_doc_id = proposal_doc.metadata["id"]
 
-    # Put a proposal document
-    proposal_doc = signed_doc.build_signed_doc(proposal_metadata_json, proposal_json)
-    resp = document.put(data=proposal_doc)
-    assert (
-        resp.status_code == 201
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
     # Put a proposal document again
-    resp = document.put(data=proposal_doc)
+    resp = document.put(data=proposal_doc.hex())
     assert (
         resp.status_code == 204
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -119,33 +151,35 @@ def proposal_doc_check(
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
     # Put a proposal document with same ID different content
-    proposal_json["setup"]["title"]["title"] = "another title"
-    proposal_doc = signed_doc.build_signed_doc(proposal_metadata_json, proposal_json)
-    resp = document.put(data=proposal_doc)
+    invalid_doc = proposal_doc.copy()
+    invalid_doc.content["setup"]["title"]["title"] = "another title"
+    resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
     # Put a signed document with same ID, but different version and different content
-    proposal_metadata_json["ver"] = uuid7str()
-    proposal_doc = signed_doc.build_signed_doc(proposal_metadata_json, proposal_json)
-    resp = document.put(data=proposal_doc)
+    new_doc = proposal_doc.copy()
+    new_doc.metadata["ver"] = uuid7str()
+    new_doc.content["setup"]["title"]["title"] = "another title"
+    resp = document.put(data=new_doc.hex())
     assert (
         resp.status_code == 201
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-    # Put a proposal document with empty content
-    proposal_metadata_json["ver"] = uuid7str()
-    proposal_doc = signed_doc.build_signed_doc(proposal_metadata_json, {})
-    resp = document.put(data=proposal_doc)
+    # Put a proposal document with the not known template field
+    invalid_doc = proposal_doc.copy()
+    invalid_doc.metadata["template"] = {"id": uuid7str()}
+    resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
-    # Put a proposal document with the not known template field
-    proposal_metadata_json["template"] = {"id": uuid7str()}
-    proposal_doc = signed_doc.build_signed_doc(proposal_metadata_json, proposal_json)
-    resp = document.put(data=proposal_doc)
+    # Put a proposal document with empty content
+    invalid_doc = proposal_doc.copy()
+    invalid_doc.metadata["ver"] = uuid7str()
+    invalid_doc.content = {}
+    resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -153,19 +187,11 @@ def proposal_doc_check(
     logger.info("Proposal document test successful.")
 
 
-def comment_doc_check(
-    comment_metadata_json: Dict[str, Any], comment_json: Dict[str, Any]
-):
-    comment_doc_id = comment_metadata_json["id"]
+def test_comment_doc(comment_doc):
+    comment_doc_id = comment_doc.metadata["id"]
 
-    # Put a comment document
-    comment_doc = signed_doc.build_signed_doc(comment_metadata_json, comment_json)
-    resp = document.put(data=comment_doc)
-    assert (
-        resp.status_code == 201
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
     # Put a comment document again
-    resp = document.put(data=comment_doc)
+    resp = document.put(data=comment_doc.hex())
     assert (
         resp.status_code == 204
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
@@ -183,17 +209,18 @@ def comment_doc_check(
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
     # Put a comment document with empty content
-    comment_metadata_json["ver"] = uuid7str()
-    comment_doc = signed_doc.build_signed_doc(comment_metadata_json, {})
-    resp = document.put(data=comment_doc)
+    invalid_doc = comment_doc.copy()
+    invalid_doc.metadata["ver"] = uuid7str()
+    invalid_doc.content = {}
+    resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
     # Put a comment document referencing to the not known proposal
-    comment_metadata_json["ref"] = {"id": uuid7str()}
-    comment_doc = signed_doc.build_signed_doc(comment_metadata_json, comment_json)
-    resp = document.put(data=comment_doc)
+    invalid_doc = comment_doc.copy()
+    invalid_doc.metadata["ref"] = {"id": uuid7str()}
+    resp = document.put(data=invalid_doc.hex())
     assert (
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
@@ -201,7 +228,7 @@ def comment_doc_check(
     logger.info("Comment document test successful.")
 
 
-def pagination_out_of_range_check():
+def test_pagination_out_of_range():
     # Pagination out of range
     resp = document.post(
         "/index?page=92233720368547759",
