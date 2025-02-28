@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
-import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import 'step_15_link_wallet_info.dart';
 
@@ -34,7 +32,7 @@ class WalletListPanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
-      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      infoPartLearnMoreText(),
       T.get('Learn More'),
     );
   }

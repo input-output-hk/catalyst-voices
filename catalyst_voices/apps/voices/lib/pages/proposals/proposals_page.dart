@@ -73,6 +73,7 @@ class _CampaignDetailsButton extends StatelessWidget {
         return Offstage(
           offstage: campaignId == null,
           child: Padding(
+            key: const Key('CampaignDetailsButton'),
             padding: const EdgeInsets.only(top: 32),
             child: OutlinedButton.icon(
               onPressed: () {
@@ -102,6 +103,7 @@ class _ChangeCategoryButton extends StatefulWidget {
     required this.items,
     required this.selectedName,
     this.onChanged,
+    super.key,
   });
 
   @override
@@ -143,6 +145,7 @@ class _ChangeCategoryButtonSelector extends StatelessWidget {
       },
       builder: (context, state) {
         return _ChangeCategoryButton(
+          key: const Key('ChangeCategoryBtnSelector'),
           items: state.categories,
           selectedName: state.selectedName,
           onChanged: (value) {
@@ -177,6 +180,7 @@ class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
+              key: const Key('CategorySelectorLabel'),
               context.l10n.category,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.colors.textDisabled,
@@ -184,6 +188,7 @@ class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
             ),
             const SizedBox(width: 4),
             Text(
+              key: const Key('CategorySelectorValue'),
               widget.selectedName,
               style: context.textTheme.bodyMedium,
             ),
@@ -210,6 +215,7 @@ class _Controls extends StatelessWidget {
           const _ChangeCategoryButtonSelector(),
           const SizedBox(width: 8),
           SearchTextField(
+            key: const Key('SearchProposalsField'),
             hintText: context.l10n.searchProposals,
             showClearButton: true,
             onSearch: ({
@@ -237,11 +243,13 @@ class _FundInfo extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('CurrentCampaignTitle'),
             context.l10n.catalystF14,
             style: Theme.of(context).textTheme.displayMedium,
           ),
           const SizedBox(height: 16),
           Text(
+            key: const Key('CurrentCampaignDescription'),
             context.l10n.currentCampaignDescription,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
@@ -326,18 +334,23 @@ class _TabBar extends StatelessWidget {
             dividerHeight: 0,
             tabs: [
               Tab(
+                key: const Key('AllProposalsTab'),
                 text: context.l10n.noOfAll(state.total),
               ),
               Tab(
+                key: const Key('DraftProposalsTab'),
                 text: context.l10n.noOfDraft(state.draft),
               ),
               Tab(
+                key: const Key('FinalProposalsTab'),
                 text: context.l10n.noOfFinal(state.finals),
               ),
               Tab(
+                key: const Key('FavoriteProposalsTab'),
                 text: context.l10n.noOfFavorites(state.favorites),
               ),
               Tab(
+                key: const Key('MyProposalsTab'),
                 text: context.l10n.noOfMyProposals(state.my),
               ),
             ],
@@ -382,6 +395,7 @@ class _Tabs extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           TabBarStackView(
+            key: const Key('ProposalsTabBarStackView'),
             children: [
               BlocSelector<ProposalsCubit, ProposalsState,
                   ProposalPaginationViewModel>(
@@ -395,7 +409,6 @@ class _Tabs extends StatelessWidget {
                 },
                 builder: (context, state) {
                   return ProposalPaginationTabView(
-                    key: const Key('allProposalsPagination'),
                     paginationViewModel: state,
                   );
                 },
