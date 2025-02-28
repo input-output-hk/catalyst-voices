@@ -131,7 +131,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     final jsonData = documentDataDto.toJson();
-    return utf8.encode(json.encode(jsonData));
+    return json.fuse(utf8).encode(jsonData) as Uint8List;
   }
 
   @visibleForTesting
@@ -177,8 +177,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<DocumentRef> importDocument({required Uint8List data}) async {
-    final jsonString = utf8.decode(data);
-    final jsonData = json.decode(jsonString) as Map<String, dynamic>;
+    final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
     final document = DocumentDataDto.fromJson(jsonData).toModel();
     await _drafts.save(data: document);
     return document.ref;
