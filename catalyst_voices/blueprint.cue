@@ -6,7 +6,6 @@ project: {
 			merge: {}
 			tag: {}
 		}
-		environment: "dev"
 		modules: main: {
 			name:    "app"
 			version: "0.2.1"

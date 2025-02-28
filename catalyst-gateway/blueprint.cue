@@ -12,7 +12,6 @@ project: {
 			//merge: {}
 			//tag: {}
 		}
-		environment: "dev"
 		modules: main: {
 			name:    "app"
 			version: "0.3.3"
