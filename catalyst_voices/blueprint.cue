@@ -6,10 +6,9 @@ project: {
 			merge: {}
 			tag: {}
 		}
-		environment: "dev"
 		modules: main: {
 			name:    "app"
-			version: "0.2.1"
+			version: "0.4.2"
 			values: {
 				deployment: containers: main: {
 					image: {
