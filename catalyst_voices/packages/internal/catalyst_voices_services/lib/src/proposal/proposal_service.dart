@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 
@@ -152,7 +151,6 @@ final class ProposalServiceImpl implements ProposalService {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
           final ref = SignedDocumentRef(id: doc.metadata.id);
-          debugPrint('Processing document: ${ref.id}');
           final versionIds =
               await _documentRepository.getProposalVersionIds(ref: ref);
 
@@ -174,9 +172,6 @@ final class ProposalServiceImpl implements ProposalService {
         proposalsStreams,
         (List<Proposal> proposals) => proposals,
       )) {
-        debugPrint(
-          'Yielding proposals with comments: ${commentsUpdates.map((p) => p.id)}  ${commentsUpdates.map((p) => p.commentsCount)}',
-        );
         yield commentsUpdates;
       }
     });

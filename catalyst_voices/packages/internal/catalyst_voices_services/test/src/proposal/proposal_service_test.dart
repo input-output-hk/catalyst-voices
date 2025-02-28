@@ -172,9 +172,9 @@ void main() {
                 (proposals) => proposals.map((p) => p.commentsCount).toList(),
               ),
           emitsInOrder([
-            [5, 3], // Initial state
-            [5, 7], // Second proposal updates
-            [10, 7], // First proposal updates
+            [5, 3],
+            [5, 7],
+            [10, 7],
           ]),
         );
       },
