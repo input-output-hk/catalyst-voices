@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_blocs/src/document/document_to_segment_mixin.dart';
 import 'package:catalyst_voices_blocs/src/proposal/proposal.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +31,32 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
 
     final documentSegments = mapDocumentToSegments(proposalDocument.document);
 
+    final overviewSegment = ProposalOverviewSegment.build(
+      categoryName: 'Cardano Partners: Growth & Acceleration',
+      proposalTitle: 'Project Mayhem: Freedom by Chaos',
+      data: ProposalViewMetadata(
+        author: const Profile(catalystId: 'id'),
+        description: 'Project Mayhem is a disruptive initiative to dismantle '
+            'societal hierarchies through acts of controlled chaos. '
+            'By targeting oppressive systems like credit structures and '
+            'consumerist propaganda, we empower individuals to reclaim their '
+            'agency. This decentralised movement fosters self-replication, '
+            'inspiring global action for liberation and a return to human '
+            'authenticity.',
+        status: ProposalStatus.draft,
+        createdAt: DateTime.now(),
+        tag: 'Community Outreach',
+        commentsCount: 6,
+        fundsRequested: 200000,
+        projectDuration: 12,
+        milestoneCount: 3,
+      ),
+    );
+
+    final commentsSegment = ProposalCommentsSegment.build(
+      comments: const [],
+    );
+
     final data = ProposalViewData(
       header: ProposalViewHeader(
         id: event.ref.id,
@@ -47,9 +74,9 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
         isFavourite: false,
       ),
       segments: [
-        ProposalOverviewSegment.build(data: 1),
+        overviewSegment,
         ...documentSegments,
-        ProposalCommentsSegment.build(comments: const []),
+        commentsSegment,
       ],
     );
 

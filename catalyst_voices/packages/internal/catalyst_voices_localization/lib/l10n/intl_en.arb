@@ -1754,5 +1754,26 @@
   "proposalViewViewCommentsSection": "View comments",
   "@proposalViewViewCommentsSection": {
     "description": "Viewing proposal navigation section"
+  },
+  "proposalViewFundingRequested": "Funding Requested",
+  "@proposalViewFundingRequested": {
+    "description": "When viewing proposal"
+  },
+  "proposalViewProjectDuration": "Project Duration",
+  "@proposalViewProjectDuration": {
+    "description": "When viewing proposal"
+  },
+  "proposalViewProjectDelivery": "Project Delivery",
+  "@proposalViewProjectDelivery": {
+    "description": "When viewing proposal"
+  },
+  "valueMilestones": "{count} {count, plural, =0{Milestone} other{Milestones}}",
+  "@valueMilestones": {
+    "description": "In context of proposal. How many milestones there is",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

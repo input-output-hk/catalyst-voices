@@ -91,19 +91,33 @@ class _SegmentsListView extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, SegmentsListViewItem item) {
     return switch (item) {
-      ProposalOverviewSegment() => const ProposalOverviewTile(
-          categoryName: 'Cardano Partners: Growth & Acceleration',
-          proposalTitle: 'Project Mayhem: Freedom by Chaos',
+      ProposalOverviewSegment(
+        :final categoryName,
+        :final proposalTitle,
+      ) =>
+        ProposalOverviewTile(
+          categoryName: categoryName,
+          proposalTitle: proposalTitle,
         ),
       ProposalOverviewSection() => switch (item) {
-          ProposalMetadataSection() => ProposalMetadataTile(),
+          ProposalMetadataSection(:final data) => ProposalMetadataTile(
+              author: data.author,
+              description: data.description,
+              status: data.status,
+              createdAt: data.createdAt,
+              tag: data.tag,
+              commentsCount: data.commentsCount,
+              fundsRequested: data.fundsRequested,
+              projectDuration: data.projectDuration,
+              milestoneCount: data.milestoneCount,
+            ),
         },
-      DocumentSegment() => ProposalDocumentSegmentTitle(),
-      DocumentSection() => ProposalDocumentSectionTile(),
-      ProposalCommentsSegment() => ProposalCommentsHeaderTile(),
+      DocumentSegment() => const ProposalDocumentSegmentTitle(),
+      DocumentSection() => const ProposalDocumentSectionTile(),
+      ProposalCommentsSegment() => const ProposalCommentsHeaderTile(),
       ProposalCommentsSection() => switch (item) {
-          ViewCommentsSection() => ProposalCommentsTile(),
-          AddCommentSection() => ProposalAddCommentTile(),
+          ViewCommentsSection() => const ProposalCommentsTile(),
+          AddCommentSection() => const ProposalAddCommentTile(),
         },
       _ => throw ArgumentError('Not supported type ${item.runtimeType}'),
     };

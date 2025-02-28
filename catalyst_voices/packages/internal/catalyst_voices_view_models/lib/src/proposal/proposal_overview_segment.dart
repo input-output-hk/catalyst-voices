@@ -5,8 +5,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 final class ProposalMetadataSection extends ProposalOverviewSection {
-  // TODO(damian-molinski): define object which contains all necessary data
-  final Object data;
+  final ProposalViewMetadata data;
 
   const ProposalMetadataSection({
     required super.id,
@@ -30,14 +29,21 @@ sealed class ProposalOverviewSection extends BaseSection {
 
 final class ProposalOverviewSegment
     extends BaseSegment<ProposalOverviewSection> {
+  final String categoryName;
+  final String proposalTitle;
+
   const ProposalOverviewSegment({
     required super.id,
+    required this.categoryName,
+    required this.proposalTitle,
     required super.sections,
   });
 
   ProposalOverviewSegment.build({
-    required Object data,
-  }) : this(
+    required this.categoryName,
+    required this.proposalTitle,
+    required ProposalViewMetadata data,
+  }) : super(
           id: const NodeId('overview'),
           sections: [
             ProposalMetadataSection(
