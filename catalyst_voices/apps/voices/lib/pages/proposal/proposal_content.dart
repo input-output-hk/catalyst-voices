@@ -91,7 +91,10 @@ class _SegmentsListView extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, SegmentsListViewItem item) {
     return switch (item) {
-      ProposalOverviewSegment() => ProposalOverviewTile(),
+      ProposalOverviewSegment() => const ProposalOverviewTile(
+          categoryName: 'Cardano Partners: Growth & Acceleration',
+          proposalTitle: 'Project Mayhem: Freedom by Chaos',
+        ),
       ProposalOverviewSection() => switch (item) {
           ProposalMetadataSection() => ProposalMetadataTile(),
         },

@@ -62,6 +62,9 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
   ) async {
     // TODO(damian-molinski): not implemented
 
+    // ignore: unused_local_variable
+    final proposalId = state.data.header.id;
+
     emit(state.copyWithFavourite(isFavourite: event.isFavorite));
   }
 }

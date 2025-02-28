@@ -1,4 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_favorite_button.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_share_button.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -27,7 +30,7 @@ class ProposalHeader extends StatelessWidget {
           Spacer(),
           _ProposalMetadataSelector(),
           Spacer(flex: 5),
-          _ProposalControlsSelector(),
+          _ProposalControls(),
           Spacer(),
         ],
       ),
@@ -36,65 +39,17 @@ class ProposalHeader extends StatelessWidget {
 }
 
 class _ProposalControls extends StatelessWidget {
-  final String? id;
-  final DocumentVersions versions;
-  final bool isFavorite;
-
-  const _ProposalControls({
-    required this.id,
-    required this.versions,
-    required this.isFavorite,
-  });
+  const _ProposalControls();
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        DocumentVersionSelector(
-          current: versions.current,
-          versions: versions.all,
-        ),
-        ShareButton(
-          onTap: () {
-            // TODO(LynxLynxx): Implement Share
-          },
-        ),
-        FavoriteButton(
-          isFavorite: isFavorite,
-          onChanged: (value) {
-            final id = this.id;
-            if (id == null) {
-              return;
-            }
-
-            final event = UpdateProposalFavoriteEvent(
-              id: id,
-              isFavorite: value,
-            );
-
-            context.read<ProposalBloc>().add(event);
-          },
-        ),
+        const ProposalVersion(),
+        const ProposalShareButton(),
+        const ProposalFavoriteButton(),
       ].separatedBy(const SizedBox(width: 8)).toList(),
-    );
-  }
-}
-
-class _ProposalControlsSelector extends StatelessWidget {
-  const _ProposalControlsSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<ProposalBloc, ProposalState, ProposalViewHeader>(
-      selector: (state) => state.data.header,
-      builder: (context, state) {
-        return _ProposalControls(
-          id: state.id,
-          versions: state.versions,
-          isFavorite: state.isFavourite,
-        );
-      },
     );
   }
 }

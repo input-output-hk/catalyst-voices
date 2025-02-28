@@ -5,6 +5,11 @@ class ProposalMetadataTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder(child: Text('Metadata'));
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        //
+      ],
+    );
   }
 }
