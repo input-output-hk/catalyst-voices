@@ -13,23 +13,8 @@ class RecoveryExitConfirmDialog extends StatelessWidget {
       title: context.l10n.warning,
       subtitle: context.l10n.recoveryExitConfirmDialogSubtitle,
       content: Text(context.l10n.recoveryExitConfirmDialogContent),
-      positive: context.l10n.recoveryExitConfirmDialogContinue,
-      negative: context.l10n.cancelAnyways,
-    );
-  }
-}
-
-class RegistrationExitConfirmDialog extends StatelessWidget {
-  const RegistrationExitConfirmDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return RegistrationConfirmDialog(
-      title: context.l10n.warning,
-      subtitle: context.l10n.registrationExitConfirmDialogSubtitle,
-      content: Text(context.l10n.registrationExitConfirmDialogContent),
-      positive: context.l10n.registrationExitConfirmDialogContinue,
-      negative: context.l10n.cancelAnyways,
+      negativeText: context.l10n.cancelAnyways,
+      positiveText: context.l10n.recoveryExitConfirmDialogContinue,
     );
   }
 }
@@ -38,16 +23,16 @@ class RegistrationConfirmDialog extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget content;
-  final String positive;
-  final String negative;
+  final String negativeText;
+  final String positiveText;
 
   const RegistrationConfirmDialog({
     super.key,
     required this.title,
     required this.subtitle,
     required this.content,
-    required this.positive,
-    required this.negative,
+    required this.negativeText,
+    required this.positiveText,
   });
 
   @override
@@ -61,15 +46,30 @@ class RegistrationConfirmDialog extends StatelessWidget {
         child: content,
       ),
       actions: [
-        VoicesQuestionActionItem.negative(
-          positive,
+        VoicesQuestionActionItem.positive(
+          positiveText,
           type: VoicesQuestionActionType.filled,
         ),
-        VoicesQuestionActionItem.positive(
-          negative,
+        VoicesQuestionActionItem.negative(
+          negativeText,
           type: VoicesQuestionActionType.text,
         ),
       ],
+    );
+  }
+}
+
+class RegistrationExitConfirmDialog extends StatelessWidget {
+  const RegistrationExitConfirmDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return RegistrationConfirmDialog(
+      title: context.l10n.warning,
+      subtitle: context.l10n.registrationExitConfirmDialogSubtitle,
+      content: Text(context.l10n.registrationExitConfirmDialogContent),
+      negativeText: context.l10n.cancelAnyways,
+      positiveText: context.l10n.registrationExitConfirmDialogContinue,
     );
   }
 }

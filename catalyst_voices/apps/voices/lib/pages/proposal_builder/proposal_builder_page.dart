@@ -116,6 +116,8 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   void handleError(Object error) {
     if (error is ProposalBuilderValidationException) {
       _showValidationErrorSnackbar(error);
+    } else {
+      super.handleError(error);
     }
   }
 
