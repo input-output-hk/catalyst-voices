@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
 import '../../utils/translations_utils.dart';
 
 class MostRecentSection {
@@ -9,7 +10,7 @@ class MostRecentSection {
   late PatrolTester $;
   final mostRecentProposals = const Key('MostRecentProposals');
   final mostRecentProposalsTitle = const Key('MostRecentProposalsTitle');
-  final pendingProposalCard = const Key('PendingProposalCard');
+  final proposalCard = const Key('ProposalCard');
   final mostRecentOffstage = const Key('MostRecentOffstage');
   final shareButton = const Key('ShareBtn');
   final favoriteButton = const Key('FavoriteBtn');
@@ -36,117 +37,124 @@ class MostRecentSection {
 
   Future<void> recentProposalsAreRenderedCorrectly() async {
     await $(mostRecentProposals)
-        .$(pendingProposalCard)
+        .$(proposalCard)
         .at(0)
         .$(commentsCount)
         .scrollTo(step: 90);
 
     // TODO(oldgreg): there are only 3 cards indexed(rendered) always,need to
     // find a way to check cards past 3rd after horizontal scroll
-    for (var i = 0; i < 3; i++) {
+    for (var cardIndex = 0; cardIndex < 3; cardIndex++) {
       await $(mostRecentProposals)
-          .$(pendingProposalCard)
-          .at(i)
+          .$(proposalCard)
+          .at(cardIndex)
           .$(favoriteButton)
           .scrollTo(scrollDirection: AxisDirection.right);
-      expect(
-        $(mostRecentProposals).$(pendingProposalCard).at(i).$(category).text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals).$(pendingProposalCard).at(i).$(title).first.text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals).$(pendingProposalCard).at(i).$(shareButton),
-        findsOneWidget,
-      );
-      expect(
-        $(mostRecentProposals).$(pendingProposalCard).at(i).$(favoriteButton),
-        findsOneWidget,
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(authorAvatar)
-            .$(Text)
-            .text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals).$(pendingProposalCard).at(i).$(author).text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(fundsRequested)
-            .$(title)
-            .text,
-        T.get('Funds requested'),
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(fundsRequested)
-            .$(value)
-            .text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(duration)
-            .$(title)
-            .text,
-        T.get('Duration'),
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(duration)
-            .$(value)
-            .text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals).$(pendingProposalCard).at(i).$(description).text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(proposalStage)
-            .text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals).$(pendingProposalCard).at(i).$(version).text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(timezoneDateTimeText)
-            .text,
-        isNotEmpty,
-      );
-      expect(
-        $(mostRecentProposals)
-            .$(pendingProposalCard)
-            .at(i)
-            .$(commentsCount)
-            .text,
-        isNotEmpty,
-      );
+      await proposalCardLooksAsExpected(mostRecentProposals, cardIndex);
     }
+    expect(
+      $(mostRecentProposals).$(mostRecentProposalsSlider).visible,
+      true,
+    );
+    expect(
+      $(mostRecentProposals).$(viewAllProposalsButton).text,
+      T.get('View All Proposals'),
+    );
+  }
+
+  Future<void> proposalCardLooksAsExpected(
+    Key parentContainer,
+    int cardIndex,
+  ) async {
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(category).text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(title).first.text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(shareButton),
+      findsOneWidget,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(favoriteButton),
+      findsOneWidget,
+    );
+    expect(
+      $(parentContainer)
+          .$(proposalCard)
+          .at(cardIndex)
+          .$(authorAvatar)
+          .$(Text)
+          .text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(author).text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer)
+          .$(proposalCard)
+          .at(cardIndex)
+          .$(fundsRequested)
+          .$(title)
+          .text,
+      T.get('Funds requested'),
+    );
+    expect(
+      $(parentContainer)
+          .$(proposalCard)
+          .at(cardIndex)
+          .$(fundsRequested)
+          .$(value)
+          .text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer)
+          .$(proposalCard)
+          .at(cardIndex)
+          .$(duration)
+          .$(title)
+          .text,
+      T.get('Duration'),
+    );
+    expect(
+      $(parentContainer)
+          .$(proposalCard)
+          .at(cardIndex)
+          .$(duration)
+          .$(value)
+          .text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(description).text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(proposalStage).text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(version).text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer)
+          .$(proposalCard)
+          .at(cardIndex)
+          .$(timezoneDateTimeText)
+          .text,
+      isNotEmpty,
+    );
+    expect(
+      $(parentContainer).$(proposalCard).at(cardIndex).$(commentsCount).text,
+      isNotEmpty,
+    );
     expect(
       $(mostRecentProposals).$(mostRecentProposalsSlider).visible,
       true,
@@ -169,12 +177,18 @@ class MostRecentSection {
     await $(mostRecentLoadingError).$(#ErrorRetryBtn).tap();
   }
 
-  Future<void> loadRetryOnError() async {
+  Future<void> tryToScrollToRetryError() async {
     try {
       await $(mostRecentLoadingError)
           .$(#ErrorRetryBtn)
           .scrollTo(step: 300, maxScrolls: 5);
-    } finally {}
+    } catch (e) {
+      return;
+    }
+  }
+
+  Future<void> loadRetryOnError() async {
+    await tryToScrollToRetryError();
     if (await loadingErrorIsVisible()) {
       var i = 0;
       for (i = 0; i < 9; i++) {
