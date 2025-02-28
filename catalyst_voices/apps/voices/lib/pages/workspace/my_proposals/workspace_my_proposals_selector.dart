@@ -1,4 +1,6 @@
-import 'package:catalyst_voices/routes/routes.dart';
+import 'dart:async';
+
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/search/search_text_field.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';

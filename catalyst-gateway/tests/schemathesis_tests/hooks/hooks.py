@@ -33,7 +33,10 @@ class MyAuth:
             case.headers.pop("X-API-Key", None)
         if "CatalystRBACSecurityScheme" in choosen_auth:
             case.headers.pop("X-API-Key", None)
-            case.headers["Authorization"] = f"Bearer {os.getenv("BEARER_TOKEN")}"
+            # cspell: disable
+            rbac_token = "catid.:1740660380@preprod.cardano/ycih6xARcuFGiRrtf1ETLWPvXGd_UBheZ4A5kccWNAU.2CB_ByoGhZ8xBjLveK6jcGbKZ7_5TDjCwbTyNtHWFXnyKuvkTp9zo9tmBOVkPRbHjSwzx85kX3lIoGtKF3_dDQ"
+            # cspell: enable
+            case.headers["Authorization"] = f"Bearer {rbac_token}"
             pass
         if "InternalApiKeyAuthorization" in choosen_auth:
             case.headers.pop("Authorization", None)

@@ -83,13 +83,13 @@ final class ProposalsCubit extends Cubit<ProposalsState> {
         proposals.pageKey,
         proposals.maxResults,
       );
-    } else if (request.stage == ProposalPublish.published) {
+    } else if (request.stage == ProposalPublish.submittedProposal) {
       return _emitFinalProposals(
         proposalViewModelList,
         proposals.pageKey,
         proposals.maxResults,
       );
-    } else if (request.stage == ProposalPublish.draft) {
+    } else if (request.stage == ProposalPublish.publishedDraft) {
       return _emitDraftProposals(
         proposalViewModelList,
         proposals.pageKey,

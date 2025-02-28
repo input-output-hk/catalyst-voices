@@ -1,6 +1,6 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
-import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
@@ -300,8 +300,10 @@ final class _ProposalBorderColor extends WidgetStateColor {
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.hovered)) {
       return switch (publishStage) {
-        ProposalPublish.draft => colorScheme.secondary,
-        ProposalPublish.published => colorScheme.primary,
+        ProposalPublish.localDraft ||
+        ProposalPublish.publishedDraft =>
+          colorScheme.secondary,
+        ProposalPublish.submittedProposal => colorScheme.primary,
       };
     }
 
@@ -405,12 +407,8 @@ class _Topbar extends StatelessWidget {
           key: const Key('ShareBtn'),
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
-            final url =
-                ProposalBuilderDraftRoute(templateId: proposalId).location;
-            await ShareProposalDialog.show(
-              context,
-              url,
-            );
+            final url = ProposalBuilderRoute(proposalId: proposalId).location;
+            await ShareProposalDialog.show(context, url);
           },
           style: _buttonStyle(context),
           child: VoicesAssets.icons.share.buildIcon(

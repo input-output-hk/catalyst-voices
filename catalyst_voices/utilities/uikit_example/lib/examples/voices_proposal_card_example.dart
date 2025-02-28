@@ -53,7 +53,7 @@ class VoicesProposalCardExample extends StatelessWidget {
                 fundsRequested: Coin.fromAda(100000),
                 commentsCount: 0,
                 description: _description,
-                publishStage: ProposalPublish.draft,
+                publishStage: ProposalPublish.publishedDraft,
                 version: 1,
                 duration: 6,
                 author: 'Alex Wells',
