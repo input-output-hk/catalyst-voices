@@ -25,6 +25,29 @@ class ProposalsPage {
   final categorySelectorValue = const Key('CategorySelectorValue');
   final searchProposalsField = const Key('SearchProposalsField');
   final proposalsContainer = const Key('ProposalsTabBarStackView');
+  final campaignDetailsCloseButton = const Key('CloseButton');
+  final titleLabelText = const Key('TitleLabelText');
+  final titleText = const Key('TitleText');
+  final campaignDetailsTile = const Key('CampaignDetailsTile');
+  final campaignDetailsTitleLabel = const Key('CampaignDetailsTitleLabel');
+  final animatedExpandChevron = const Key('AnimatedExpandChevron');
+  final descriptionTileKey = const Key('DescriptionTileKey');
+  final descriptionTextKey = const Key('DescriptionTextKey');
+  final startDateTileKey = const Key('StartDateTileKey');
+  final endDateTileKey = const Key('EndDateTileKey');
+  final categoriesTileKey = const Key('CategoriesTileKey');
+  final proposalsTileKey = const Key('ProposalsTileKey');
+  final title = const Key('Title');
+  final subtitle = const Key('Subtitle');
+  final value = const Key('Value');
+  final suffix = const Key('Suffix');
+  final campaignCategoriesTitleLabel =
+      const Key('CampaignCategoriesTitleLabel');
+  final campaignCategoriesMenu = const Key('CampaignCategoriesMenu');
+  final cardanoUseCasesLabel = const Key('CardanoUseCasesLabel');
+  final cardanoUseCasesSectionLabel = const Key('CardanoUseCasesSectionLabel');
+  final cardanoUseCasesSectionTitle = const Key('CardanoUseCasesSectionTitle');
+  final cardanoUseCasesSectionBody = const Key('CardanoUseCasesSectionBody');
 
   Future<void> looksAsExpectedForVisitor() async {
     await AppBarPage($).looksAsExpectedForVisitor();
@@ -118,5 +141,68 @@ class ProposalsPage {
 
     expect($(CommonPage($).prevPageBtn).visible, true);
     expect($(CommonPage($).nextPageBtn).visible, true);
+  }
+
+  Future<void> campaignDetailsButtonWorks() async {
+    await $(campaignDetailsButton).tap();
+    expect($(titleLabelText), findsOneWidget);
+  }
+
+  Future<void> campaignDetailsScreenLooksAsExpected() async {
+    await $(campaignDetailsButton).tap();
+    expect($(titleLabelText).text, T.get('Campaign'));
+    expect($(titleText).text, isNotEmpty);
+    expect($(campaignDetailsTitleLabel).text, T.get('Campaign Details'));
+    expect($(campaignDetailsTile).$(animatedExpandChevron), findsOneWidget);
+    expect($(descriptionTileKey).text, T.get('Description'));
+    expect($(descriptionTextKey).text, isNotEmpty);
+    expect($(startDateTileKey).$(title).text, T.get('Start Date'));
+    expect($(startDateTileKey).$(subtitle).text, isNotEmpty);
+    expect(
+      int.parse($(startDateTileKey).$(value).text!),
+      inInclusiveRange(0, 31),
+    );
+    expect($(startDateTileKey).$(suffix).text, isNotEmpty);
+    expect($(endDateTileKey).$(title).text, T.get('End Date'));
+    expect($(endDateTileKey).$(subtitle).text, isNotEmpty);
+    expect(
+      int.parse($(endDateTileKey).$(value).text!),
+      inInclusiveRange(0, 31),
+    );
+    expect($(endDateTileKey).$(suffix).text, isNotEmpty);
+    expect($(categoriesTileKey).$(title).text, T.get('Categories'));
+    expect($(categoriesTileKey).$(subtitle).text, isNotEmpty);
+    expect(
+      int.parse($(categoriesTileKey).$(value).text!),
+      inInclusiveRange(0, 31),
+    );
+    expect($(proposalsTileKey).$(title).text, T.get('Proposals'));
+    expect($(proposalsTileKey).$(subtitle).text, isNotEmpty);
+    expect(
+      int.parse($(proposalsTileKey).$(value).text!),
+      inInclusiveRange(0, 31),
+    );
+    expect(
+      $(campaignCategoriesTitleLabel).text,
+      T.get('Campaign'
+          ' Categories'),
+    );
+    expect($(cardanoUseCasesLabel).text, T.get('Cardano Use Cases'));
+    final useCasesItemsCount = $.tester
+        .widgetList<InkWell>(
+          $(campaignCategoriesMenu).$(InkWell),
+        )
+        .length;
+    for (var i = 1; i <= useCasesItemsCount; i++) {
+      final item = $(Key('VoicesModalMenu[$i]Key')).$(Text);
+      await $(item).tap();
+      expect(
+        item.text,
+        isNotEmpty,
+      );
+      expect($(cardanoUseCasesSectionLabel).text, item.text);
+      expect($(cardanoUseCasesSectionTitle).text, isNotEmpty);
+      expect($(cardanoUseCasesSectionBody).text, isNotEmpty);
+    }
   }
 }

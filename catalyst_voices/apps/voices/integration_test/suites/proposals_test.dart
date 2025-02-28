@@ -24,16 +24,29 @@ void main() async {
     await restartDependencies();
   });
 
-  group(
-    'Proposals space -',
-    () {
-      patrolWidgetTest(
-        'visitor - page is rendered correctly',
-        (PatrolTester $) async {
-          await $.pumpWidgetAndSettle(App(routerConfig: router));
-          await ProposalsPage($).looksAsExpectedForVisitor();
-        },
-      );
-    },
-  );
+  group('Proposals space -', () {
+    patrolWidgetTest(
+      'visitor - page is rendered correctly',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).looksAsExpectedForVisitor();
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - campaign details button works',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).campaignDetailsButtonWorks();
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - campaign details screen looks as expected',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).campaignDetailsScreenLooksAsExpected();
+      },
+    );
+  });
 }
