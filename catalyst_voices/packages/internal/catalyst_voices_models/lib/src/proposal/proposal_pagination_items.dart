@@ -41,7 +41,7 @@ class ProposalPaginationItems<ProposalType> extends Equatable {
 
 class ProposalsSearchResult extends Equatable {
   final int maxResults;
-  final List<ProposalBase> proposals;
+  final List<Proposal> proposals;
 
   const ProposalsSearchResult({
     required this.maxResults,

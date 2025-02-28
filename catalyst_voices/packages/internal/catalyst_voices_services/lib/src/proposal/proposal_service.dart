@@ -1,7 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
-// ignore: one_member_abstracts
 abstract interface class ProposalService {
   factory ProposalService(
     ProposalRepository proposalRepository,
@@ -18,7 +19,7 @@ abstract interface class ProposalService {
   /// Fetches favorites proposals ids of the user
   Future<List<String>> getFavoritesProposalsIds();
 
-  Future<Proposal> getProposal({
+  Future<ProposalData> getProposal({
     required String id,
   });
 
@@ -41,6 +42,8 @@ abstract interface class ProposalService {
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview(Document document);
+
+  Stream<List<Proposal>> watchLatestProposals({int? limit});
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -64,31 +67,45 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<Proposal> getProposal({
+  Future<ProposalData> getProposal({
     required String id,
   }) async {
-    final proposalBase = await _proposalRepository.getProposal(id: id);
-    final proposal = await _buildProposal(proposalBase);
+    const proposalTemplate = DocumentSchema(
+      parentSchemaUrl: '',
+      schemaSelfUrl: '',
+      title: '',
+      description: MarkdownData.empty,
+      properties: [],
+      order: [],
+    );
 
-    return proposal;
+    return ProposalData(
+      document: ProposalDocument(
+        metadata: ProposalMetadata(
+          id: id,
+          version: const Uuid().v7(),
+        ),
+        document: const Document(
+          schema: proposalTemplate,
+          properties: [],
+        ),
+      ),
+      categoryId: '',
+    );
   }
 
   @override
   Future<ProposalPaginationItems<Proposal>> getProposals({
     required ProposalPaginationRequest request,
   }) async {
-    final proposalBases = await _proposalRepository.getProposals(
+    final proposals = await _proposalRepository.getProposals(
       request: request,
     );
 
-    final futures = proposalBases.proposals.map(_buildProposal);
-
-    final proposals = await Future.wait(futures);
-
     return ProposalPaginationItems(
-      items: proposals,
+      items: proposals.proposals,
       pageKey: request.pageKey,
-      maxResults: proposalBases.maxResults,
+      maxResults: proposals.maxResults,
     );
   }
 
@@ -126,11 +143,37 @@ final class ProposalServiceImpl implements ProposalService {
     throw UnimplementedError();
   }
 
-  Future<Proposal> _buildProposal(ProposalBase base) async {
-    final proposalDocument = await _documentRepository.getProposalDocument(
-      ref: base.ref,
-    );
+  @override
+  Stream<List<Proposal>> watchLatestProposals({int? limit}) {
+    return _documentRepository
+        .watchLatestPublicProposalsDocuments(limit: limit)
+        .switchMap((documents) async* {
+      final proposalsStreams = await Future.wait(
+        documents.map((doc) async {
+          final ref = SignedDocumentRef(id: doc.metadata.id);
+          final versionIds =
+              await _documentRepository.getProposalVersionIds(ref: ref);
 
-    return base.toProposal(document: proposalDocument);
+          return _documentRepository
+              .watchProposalCommentsCount(ref: ref)
+              .map((commentsCount) {
+            final proposalData = ProposalData(
+              document: doc,
+              categoryId: DocumentType.categoryParametersDocument.uuid,
+              versions: versionIds,
+              commentsCount: commentsCount,
+            );
+            return Proposal.fromData(proposalData);
+          });
+        }),
+      );
+
+      await for (final commentsUpdates in Rx.combineLatest(
+        proposalsStreams,
+        (List<Proposal> proposals) => proposals,
+      )) {
+        yield commentsUpdates;
+      }
+    });
   }
 }

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -11,7 +13,18 @@ part 'discovery_state.dart';
 class DiscoveryCubit extends Cubit<DiscoveryState> {
   // ignore: unused_field
   final CampaignService _campaignService;
-  DiscoveryCubit(this._campaignService) : super(const DiscoveryState());
+  final ProposalService _proposalService;
+  late StreamSubscription<List<Proposal>> _proposalsSubscription;
+  DiscoveryCubit(
+    this._campaignService,
+    this._proposalService,
+  ) : super(const DiscoveryState());
+
+  @override
+  Future<void> close() {
+    _proposalsSubscription.cancel();
+    return super.close();
+  }
 
   Future<void> getAllData() async {
     await Future.wait([
@@ -19,36 +32,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       getCampaignCategories(),
       getMostRecentProposals(),
     ]);
-  }
-
-  Future<void> getCurrentCampaign() async {
-    emit(
-      state.copyWith(
-        currentCampaign: const DiscoveryCurrentCampaignState(),
-      ),
-    );
-
-    final isSuccess = await Future.delayed(
-      const Duration(seconds: 2),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    final currentCampaign = isSuccess
-        ? CurrentCampaignInfoViewModel.dummy()
-        : const NullCurrentCampaignInfoViewModel();
-
-    final error = isSuccess ? null : const LocalizedUnknownException();
-
-    emit(
-      state.copyWith(
-        currentCampaign: DiscoveryCurrentCampaignState(
-          currentCampaign: currentCampaign,
-          error: error,
-          isLoading: false,
-        ),
-      ),
-    );
   }
 
   Future<void> getCampaignCategories() async {
@@ -84,6 +67,36 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     );
   }
 
+  Future<void> getCurrentCampaign() async {
+    emit(
+      state.copyWith(
+        currentCampaign: const DiscoveryCurrentCampaignState(),
+      ),
+    );
+
+    final isSuccess = await Future.delayed(
+      const Duration(seconds: 2),
+      () => Random().nextBool(),
+    );
+    if (isClosed) return;
+
+    final currentCampaign = isSuccess
+        ? CurrentCampaignInfoViewModel.dummy()
+        : const NullCurrentCampaignInfoViewModel();
+
+    final error = isSuccess ? null : const LocalizedUnknownException();
+
+    emit(
+      state.copyWith(
+        currentCampaign: DiscoveryCurrentCampaignState(
+          currentCampaign: currentCampaign,
+          error: error,
+          isLoading: false,
+        ),
+      ),
+    );
+  }
+
   Future<void> getMostRecentProposals() async {
     emit(
       state.copyWith(
@@ -91,36 +104,50 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       ),
     );
 
-    final isSuccess = await Future.delayed(
-      const Duration(seconds: 1),
-      () => Random().nextBool(),
-    );
-    if (isClosed) return;
-
-    // isSuccess = false;
-
-    final proposals = isSuccess
-        ? List<PendingProposal>.filled(
-            7,
-            PendingProposal.dummy(),
-          )
-        : const <PendingProposal>[];
-
-    final error = isSuccess ? null : const LocalizedUnknownException();
-
-    final newState = state.copyWith(
-      mostRecentProposals: DiscoveryMostRecentProposalsState(
-        isLoading: false,
-        error: error,
-        proposals: proposals,
-      ),
-    );
-
-    emit(newState);
+    await _proposalsSubscription.cancel();
+    _setupProposalsSubscription();
   }
 
   CampaignCategoryViewModel? localCategory(String id) {
     return state.campaignCategories.categories
         .firstWhereOrNull((e) => e.id == id);
+  }
+
+  void _setupProposalsSubscription() {
+    _proposalsSubscription =
+        _proposalService.watchLatestProposals(limit: 7).listen(
+      (proposals) {
+        if (isClosed) return;
+        final proposalList = proposals
+            .map(
+              (e) => PendingProposal.fromProposal(
+                e,
+                campaignName: 'f14',
+              ),
+            )
+            .toList();
+        emit(
+          state.copyWith(
+            mostRecentProposals: DiscoveryMostRecentProposalsState(
+              isLoading: false,
+              error: null,
+              proposals: proposalList,
+            ),
+          ),
+        );
+      },
+      onError: (error) {
+        if (isClosed) return;
+        emit(
+          state.copyWith(
+            mostRecentProposals: const DiscoveryMostRecentProposalsState(
+              isLoading: false,
+              error: LocalizedUnknownException(),
+              proposals: [],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

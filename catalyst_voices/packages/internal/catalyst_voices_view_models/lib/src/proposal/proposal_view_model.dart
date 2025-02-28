@@ -148,7 +148,7 @@ and PRISM, but its potential is only barely exploited.
           commentsCount: proposal.commentsCount,
           description: proposal.description,
           publishStage: proposal.publish,
-          version: proposal.version,
+          version: proposal.versionCount,
           duration: proposal.duration,
           author: proposal.author,
         );
