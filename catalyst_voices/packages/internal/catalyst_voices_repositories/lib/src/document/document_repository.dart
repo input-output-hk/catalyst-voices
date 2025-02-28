@@ -186,8 +186,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
     final document = DocumentDataDto.fromJson(jsonData).toModel();
 
-    final newMetadata =
-        document.metadata.copyWith(selfRef: DraftRef.generate());
+    final newMetadata = document.metadata.copyWith(
+      selfRef: DraftRef.generateFirstRef(),
+    );
+
     final newDocument = DocumentData(
       metadata: newMetadata,
       content: document.content,

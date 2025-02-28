@@ -20,7 +20,7 @@ final class ProposalBuilderMetadata extends Equatable {
   factory ProposalBuilderMetadata.newDraft({required DocumentRef templateRef}) {
     return ProposalBuilderMetadata(
       publish: ProposalPublish.localDraft,
-      documentRef: DraftRef.generate(),
+      documentRef: DraftRef.generateFirstRef(),
       templateRef: templateRef,
       currentIteration: 0,
     );

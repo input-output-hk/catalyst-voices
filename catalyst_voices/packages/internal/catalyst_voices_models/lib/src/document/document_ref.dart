@@ -28,7 +28,7 @@ final class DraftRef extends DocumentRef {
     super.version,
   });
 
-  factory DraftRef.generate() {
+  factory DraftRef.generateFirstRef() {
     final id = const Uuid().v7();
     return DraftRef(
       id: id,
