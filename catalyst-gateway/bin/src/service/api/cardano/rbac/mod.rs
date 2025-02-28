@@ -30,6 +30,8 @@ impl Api {
         &self,
         /// Stake address to get the RBACE registration for.
         Query(lookup): Query<Option<StakeOrVoter>>,
+        /// A flag which enalbes returning all corresponded Cip509 registrations
+        Query(detailed): Query<Option<bool>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
         /// No Authorization required, but Api Key permitted.
@@ -48,7 +50,7 @@ impl Api {
                 .into();
             }
         }
-
-        registrations_get::endpoint(lookup).await
+        let detailed = detailed.unwrap_or_default();
+        registrations_get::endpoint(lookup, detailed).await
     }
 }

@@ -39,7 +39,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// Get RBAC registration endpoint.
 #[allow(clippy::unused_async)]
-pub(crate) async fn endpoint(_lookup: Option<StakeOrVoter>) -> AllResponses {
+pub(crate) async fn endpoint(_lookup: Option<StakeOrVoter>, _detailed: bool) -> AllResponses {
     let Some(_session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
         let err = anyhow::anyhow!("Failed to acquire db session");
