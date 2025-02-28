@@ -19,21 +19,26 @@ abstract interface class DocumentsDao {
   /// Counts all documents.
   Future<int> countAll();
 
-  /// Count how many comments are attached to proposal document version.
-  Future<int> countComments({required DocumentRef ref});
-
   /// Counts unique documents. All versions of same document are counted as 1.
   Future<int> countDocuments();
 
   @visibleForTesting
   Future<int> countDocumentsMetadata();
 
+  /// Counts documents of specified [type]
+  /// that reference a given document [ref].
+  ///
+  /// [ref] is the reference to the parent document being referenced
+  /// [type] is the type of documents to count (e.g., comments, reactions, etc.)
+  ///
+  /// Returns the count of documents matching both the type and reference.
+  Future<int> countRefDocumentByType({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
+
   /// Deletes all documents. Cascades to metadata.
   Future<void> deleteAll();
-
-  /// Returns a list of version of ref object.
-  /// Can be used to get versions count.
-  Future<List<String>> documentVersionIds({required DocumentRef ref});
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
@@ -42,6 +47,10 @@ abstract interface class DocumentsDao {
   /// Returns all entities. If same document have different versions
   /// all will be returned.
   Future<List<DocumentEntity>> queryAll();
+
+  /// Returns a list of version of ref object.
+  /// Can be used to get versions count.
+  Future<List<String>> queryVersionIds({required String id});
 
   /// Inserts all documents and metadata. On conflicts ignores duplicates.
   Future<void> saveAll(
@@ -52,13 +61,17 @@ abstract interface class DocumentsDao {
   Stream<DocumentEntity?> watch({required DocumentRef ref});
 
   /// Similar to [queryAll] but emits when new records are inserted or deleted.
-  Stream<List<DocumentEntity>> watchAll();
+  /// Returns all entities. If same document have different versions
+  /// all will be returned unless [unique] is true.
+  /// When [unique] is true, only latest versions of each document are returned.
+  /// Optional [limit] parameter limits the number of returned documents.
+  Stream<List<DocumentEntity>> watchAll({bool unique = false, int? limit});
 
   /// Watches for new comments that are reference by ref.
-  Stream<int> watchDocumentCommentsCount({required DocumentRef ref});
-
-  /// Emits latest documents limited by quantity if provided
-  Stream<List<DocumentEntity>> watchLatestVersions({int? limit});
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
 }
 
 @DriftAccessor(
@@ -80,18 +93,6 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<int> countAll() {
     return documents.count().getSingle();
-  }
-
-  @override
-  Future<int> countComments({required DocumentRef ref}) {
-    return (select(documents)
-          ..where((row) => row.type.equals(DocumentType.commentTemplate.uuid)))
-        .get()
-        .then(
-          (docs) => docs.where((doc) {
-            return doc.metadata.ref == ref;
-          }).length,
-        );
   }
 
   @override
@@ -129,31 +130,28 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  @override
+  Future<int> countRefDocumentByType({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          row.type.equals(type.uuid),
+        ]),
+      );
+
+    return query.get().then((docs) => docs.length);
+  }
+
+  @override
   Future<void> deleteAll() async {
     final deletedRows = await delete(documents).go();
 
     if (kDebugMode) {
       debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
     }
-  }
-
-  @override
-  Future<List<String>> documentVersionIds({required DocumentRef ref}) {
-    final id = UuidHiLo.from(ref.id);
-
-    return (select(documents)
-          ..where(
-            (tbl) => Expression.and([
-              tbl.idHi.equals(id.high),
-              tbl.idLo.equals(id.low),
-            ]),
-          )
-          ..orderBy([
-            (u) => OrderingTerm.desc(u.verHi),
-            (u) => OrderingTerm.desc(u.verLo),
-          ]))
-        .map((doc) => UuidHiLo(high: doc.verHi, low: doc.verLo).toString())
-        .get();
   }
 
   @override
@@ -164,6 +162,18 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   @override
   Future<List<DocumentEntity>> queryAll() {
     return select(documents).get();
+  }
+
+  @override
+  Future<List<String>> queryVersionIds({required String id}) {
+    return (select(documents)
+          ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+          ..orderBy([
+            (u) => OrderingTerm.desc(u.verHi),
+            (u) => OrderingTerm.desc(u.verLo),
+          ]))
+        .map((doc) => UuidHiLo(high: doc.verHi, low: doc.verLo).toString())
+        .get();
   }
 
   @override
@@ -197,23 +207,15 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<List<DocumentEntity>> watchAll() {
-    return select(documents).watch();
-  }
+  Stream<List<DocumentEntity>> watchAll({bool unique = false, int? limit}) {
+    if (!unique) {
+      final query = select(documents);
+      if (limit != null) {
+        query.limit(limit);
+      }
+      return query.watch();
+    }
 
-  @override
-  Stream<int> watchDocumentCommentsCount({required DocumentRef ref}) {
-    return (select(documents)
-          ..where((row) => row.type.equals(DocumentType.commentTemplate.uuid)))
-        .watch()
-        .map(
-          (comments) => comments.where((doc) => doc.metadata.ref == ref).length,
-        )
-        .distinct();
-  }
-
-  @override
-  Stream<List<DocumentEntity>> watchLatestVersions({int? limit}) {
     final uniqueIds = selectOnly(documents)
       ..addColumns([documents.idHi, documents.idLo])
       ..groupBy([documents.idHi, documents.idLo])
@@ -257,6 +259,19 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       return latestVersions;
     });
+  }
+
+  @override
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return (select(documents)..where((row) => row.type.equals(type.uuid)))
+        .watch()
+        .map(
+          (comments) => comments.where((doc) => doc.metadata.ref == ref).length,
+        )
+        .distinct();
   }
 
   bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {

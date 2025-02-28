@@ -1,17 +1,18 @@
-import 'dart:math';
-
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   late Proposal baseProposal;
 
   setUpAll(() {
     baseProposal = Proposal(
-      id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
-      version: '1',
+      selfRef: SignedDocumentRef(
+        id: const Uuid().v7(),
+        version: const Uuid().v7(),
+      ),
       category: 'Cardano Use Cases / MVP',
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),

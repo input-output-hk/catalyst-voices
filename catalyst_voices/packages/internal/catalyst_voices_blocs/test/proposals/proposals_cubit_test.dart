@@ -42,8 +42,10 @@ void main() {
     );
 
     final proposal = Proposal(
-      id: '1',
-      version: '1',
+      selfRef: SignedDocumentRef(
+        id: const Uuid().v7(),
+        version: const Uuid().v7(),
+      ),
       title: 'Proposal 1',
       description: 'Description 1',
       category: '',

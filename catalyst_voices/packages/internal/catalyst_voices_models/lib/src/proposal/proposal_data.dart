@@ -4,59 +4,62 @@ import 'package:equatable/equatable.dart';
 
 class ProposalData extends Equatable {
   final ProposalDocument document;
+  final DocumentRef ref;
   final String categoryId;
   final int commentsCount;
   final List<String> versions;
 
   const ProposalData({
     required this.document,
+    required this.ref,
     required this.categoryId,
     this.commentsCount = 0,
     this.versions = const [],
   });
 
-  String get proposalAuthor {
+  String? get proposalAuthor {
     final property =
-        document.document.getProperty(ProposalDocument.authorNodeId)
+        document.document.getProperty(ProposalDocument.authorNameNodeId)
             as DocumentValueProperty<String>?;
 
-    return property?.value ?? '';
+    return property?.value;
   }
 
-  String get proposalDescription {
+  String? get proposalDescription {
     final property =
         document.document.getProperty(ProposalDocument.descriptionNodeId)
             as DocumentValueProperty<String>?;
 
-    return property?.value ?? '';
+    return property?.value;
   }
 
-  int get proposalDuration {
+  int? get proposalDuration {
     final property =
         document.document.getProperty(ProposalDocument.durationNodeId)
             as DocumentValueProperty<int>?;
 
-    return property?.value ?? 0;
+    return property?.value;
   }
 
-  Coin get proposalFundsRequested {
+  Coin? get proposalFundsRequested {
     final property =
         document.document.getProperty(ProposalDocument.requestedFundsNodeId)
             as DocumentValueProperty<int>?;
-
-    return Coin(property?.value ?? 0);
+    if (property == null || property.value == null) return null;
+    return Coin(property.value!);
   }
 
-  String get proposalTitle {
+  String? get proposalTitle {
     final property = document.document.getProperty(ProposalDocument.titleNodeId)
         as DocumentValueProperty<String>?;
 
-    return property?.value ?? '';
+    return property?.value;
   }
 
   @override
   List<Object?> get props => [
         document,
+        ref,
         categoryId,
         commentsCount,
         versions,

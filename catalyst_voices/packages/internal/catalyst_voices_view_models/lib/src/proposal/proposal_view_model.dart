@@ -30,7 +30,7 @@ final class FundedProposal extends ProposalViewModel {
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.id,
+          id: proposal.selfRef.id,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,
@@ -139,7 +139,7 @@ and PRISM, but its potential is only barely exploited.
     Proposal proposal, {
     required String campaignName,
   }) : this(
-          id: proposal.id,
+          id: proposal.selfRef.id,
           campaignName: campaignName,
           category: proposal.category,
           title: proposal.title,

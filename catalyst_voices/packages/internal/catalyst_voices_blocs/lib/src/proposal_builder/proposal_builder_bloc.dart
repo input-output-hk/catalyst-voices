@@ -245,7 +245,7 @@ final class ProposalBuilderBloc
         document: proposalData.document.document,
         metadata: ProposalBuilderMetadata(
           publish: proposal.publish,
-          documentRef: proposal.ref,
+          documentRef: proposal.selfRef,
           currentIteration: proposal.versionCount,
         ),
       );

@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
-  final ProposalMetadata? documentRef;
+  final DocumentRef? documentRef;
 
   /// The current iteration version, 0 if not published.
   final int currentIteration;

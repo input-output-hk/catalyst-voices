@@ -20,7 +20,10 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
 /// See [DatabaseDocumentsDataSource].
 abstract interface class SignedDocumentDataSource
     implements DocumentDataLocalSource {
+  Future<List<String>> queryVersionIds({required String id});
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
   Stream<List<DocumentData>> watchLatestVersions({int? limit});
-  Future<List<String>> documentVersionIds({required DocumentRef ref});
-  Stream<int> watchDocumentCommentsCount({required DocumentRef ref});
 }

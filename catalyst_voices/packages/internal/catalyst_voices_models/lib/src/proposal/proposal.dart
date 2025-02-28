@@ -3,8 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class Proposal extends Equatable {
-  final String id;
-  final String version;
+  final DocumentRef selfRef;
   final String title;
   final String description;
   final DateTime updateDate;
@@ -19,8 +18,7 @@ final class Proposal extends Equatable {
   final String category;
 
   const Proposal({
-    required this.id,
-    required this.version,
+    required this.selfRef,
     required this.title,
     required this.description,
     required this.updateDate,
@@ -35,9 +33,8 @@ final class Proposal extends Equatable {
     required this.category,
   });
 
-  factory Proposal.dummy(String id, String version) => Proposal(
-        id: id,
-        version: version,
+  factory Proposal.dummy(DocumentRef ref) => Proposal(
+        selfRef: ref,
         category: 'Cardano Use Cases / MVP',
         title: 'Dummy Proposal',
         updateDate: DateTime.now(),
@@ -52,21 +49,22 @@ final class Proposal extends Equatable {
       );
 
   factory Proposal.fromData(ProposalData data) {
+    // TODO(LynxLynxx): change it to use this one
+    // https://github.com/input-output-hk/catalyst-voices/pull/1928
     final updateDate = UuidV7.parseTimestamp(data.document.metadata.version);
     return Proposal(
-      id: data.document.metadata.id,
-      version: data.document.metadata.version,
-      title: data.proposalTitle,
-      description: data.proposalDescription,
+      selfRef: data.ref,
+      title: data.proposalTitle ?? '',
+      description: data.proposalDescription ?? '',
       updateDate: updateDate,
-      fundsRequested: data.proposalFundsRequested,
+      fundsRequested: data.proposalFundsRequested ?? Coin.fromAda(0),
       // TODO(LynxLynxx): from here we need to get the real status
       status: ProposalStatus.inProgress,
       // TODO(LynxLynxx): from here we need to get the real publish
       publish: ProposalPublish.publishedDraft,
       versionCount: data.versions.length,
-      duration: data.proposalDuration,
-      author: data.proposalAuthor,
+      duration: data.proposalDuration ?? 0,
+      author: data.proposalAuthor ?? '',
       commentsCount: data.commentsCount,
       category: data.categoryId,
     );
@@ -74,7 +72,7 @@ final class Proposal extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
+        selfRef,
         title,
         description,
         updateDate,
@@ -85,6 +83,4 @@ final class Proposal extends Equatable {
         category,
         commentsCount,
       ];
-
-  ProposalMetadata get ref => ProposalMetadata(id: id, version: version);
 }

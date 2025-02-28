@@ -64,8 +64,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required String id,
   }) async {
     return Proposal(
-      id: id,
-      version: '1',
+      selfRef: SignedDocumentRef(id: id, version: '1'),
       category: 'Cardano Use Cases / MVP',
       title: 'Proposal Title that rocks the world',
       updateDate: DateTime.now().minusDays(2),
@@ -102,8 +101,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           : ProposalPublish.publishedDraft;
       proposals.add(
         Proposal(
-          id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
-          version: '1',
+          selfRef: SignedDocumentRef(
+            id: '${Random().nextInt(1000)}/${Random().nextInt(1000)}',
+            version: '1',
+          ),
           category: 'Cardano Use Cases / MVP',
           title: 'Proposal Title that rocks the world',
           updateDate: DateTime.now().minusDays(2),

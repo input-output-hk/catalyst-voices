@@ -220,7 +220,7 @@ void main() {
 
         // When
         final documentsStream =
-            database.documentsDao.watchLatestVersions(limit: 7);
+            database.documentsDao.watchAll(limit: 7, unique: true);
 
         await database.documentsDao.saveAll(documentsWithMetadata);
 
@@ -267,7 +267,7 @@ void main() {
 
         // When
         final documentsStream =
-            database.documentsDao.watchLatestVersions(limit: 7);
+            database.documentsDao.watchAll(limit: 7, unique: true);
 
         await database.documentsDao.saveAll(documentsWithMetadata);
         // Then
@@ -318,7 +318,7 @@ void main() {
 
         // When
         final documentsStream = database.documentsDao
-            .watchLatestVersions(limit: 7)
+            .watchAll(limit: 7, unique: true)
             .asBroadcastStream();
 
         // Save first version and wait for emission
@@ -367,7 +367,7 @@ void main() {
 
         // When
         final documentsStream = database.documentsDao
-            .watchLatestVersions(limit: 1)
+            .watchAll(limit: 1, unique: true)
             .asBroadcastStream();
 
         await database.documentsDao.saveAll([document1]);
@@ -542,8 +542,10 @@ void main() {
         );
         await database.documentsDao.saveAll([...comments, ...otherComments]);
 
-        final count =
-            await database.documentsDao.countComments(ref: proposalRef);
+        final count = await database.documentsDao.countRefDocumentByType(
+          ref: proposalRef,
+          type: DocumentType.commentTemplate,
+        );
 
         expect(count, equals(10));
       });
@@ -581,8 +583,8 @@ void main() {
 
         await database.documentsDao.saveAll(versions);
 
-        final ids = await database.documentsDao.documentVersionIds(
-          ref: proposalRef,
+        final ids = await database.documentsDao.queryVersionIds(
+          id: proposalId,
         );
 
         expect(ids.length, equals(11));
@@ -616,7 +618,7 @@ void main() {
         });
 
         final documentCount = database.documentsDao
-            .watchDocumentCommentsCount(ref: proposalRef)
+            .watchCount(ref: proposalRef, type: DocumentType.commentTemplate)
             .asBroadcastStream();
 
         await database.documentsDao.saveAll([comments.first]);

@@ -49,7 +49,7 @@ abstract interface class DocumentRepository {
   /// Returns a list of version of ref object.
   ///
   /// Can be used to get versions count.
-  Future<List<String>> getProposalVersionIds({required DocumentRef ref});
+  Future<List<String>> queryVersionIds({required String id});
 
   /// Updates local draft (or drafts if version is not specified)
   /// matching [ref] with given [content].
@@ -61,11 +61,14 @@ abstract interface class DocumentRepository {
     required DocumentDataContent content,
   });
 
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  });
+
   Stream<List<ProposalDocument>> watchLatestPublicProposalsDocuments({
     int? limit,
   });
-
-  Stream<int> watchProposalCommentsCount({required DocumentRef ref});
 
   /// Observes matching [ProposalDocument] and emits updates.
   ///
@@ -157,8 +160,8 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<String>> getProposalVersionIds({required DocumentRef ref}) {
-    return _localDocuments.documentVersionIds(ref: ref);
+  Future<List<String>> queryVersionIds({required String id}) {
+    return _localDocuments.queryVersionIds(id: id);
   }
 
   @override
@@ -167,6 +170,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentDataContent content,
   }) async {
     await _drafts.update(ref: ref, content: content);
+  }
+
+  @override
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return _localDocuments.watchCount(
+      ref: ref,
+      type: type,
+    );
   }
 
   @visibleForTesting
@@ -240,11 +254,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
             },
           ).toList(),
         );
-  }
-
-  @override
-  Stream<int> watchProposalCommentsCount({required DocumentRef ref}) {
-    return _localDocuments.watchDocumentCommentsCount(ref: ref);
   }
 
   @override

@@ -14,7 +14,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   // ignore: unused_field
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  late StreamSubscription<List<Proposal>> _proposalsSubscription;
+  late StreamSubscription<List<Proposal>>? _proposalsSubscription;
   DiscoveryCubit(
     this._campaignService,
     this._proposalService,
@@ -22,7 +22,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
 
   @override
   Future<void> close() {
-    _proposalsSubscription.cancel();
+    _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
     return super.close();
   }
 
@@ -104,7 +105,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       ),
     );
 
-    await _proposalsSubscription.cancel();
+    await _proposalsSubscription?.cancel();
+    _proposalsSubscription = null;
     _setupProposalsSubscription();
   }
 

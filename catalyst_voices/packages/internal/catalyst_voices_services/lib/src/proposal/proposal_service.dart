@@ -78,12 +78,12 @@ final class ProposalServiceImpl implements ProposalService {
       properties: [],
       order: [],
     );
-
+    final version = const Uuid().v7();
     return ProposalData(
       document: ProposalDocument(
         metadata: ProposalMetadata(
           id: id,
-          version: const Uuid().v7(),
+          version: version,
         ),
         document: const Document(
           schema: proposalTemplate,
@@ -91,6 +91,10 @@ final class ProposalServiceImpl implements ProposalService {
         ),
       ),
       categoryId: '',
+      ref: SignedDocumentRef(
+        id: id,
+        version: version,
+      ),
     );
   }
 
@@ -150,18 +154,22 @@ final class ProposalServiceImpl implements ProposalService {
         .switchMap((documents) async* {
       final proposalsStreams = await Future.wait(
         documents.map((doc) async {
-          final ref = SignedDocumentRef(id: doc.metadata.id);
+          final ref = SignedDocumentRef(
+            id: doc.metadata.id,
+            version: doc.metadata.version,
+          );
           final versionIds =
-              await _documentRepository.getProposalVersionIds(ref: ref);
+              await _documentRepository.queryVersionIds(id: doc.metadata.id);
 
           return _documentRepository
-              .watchProposalCommentsCount(ref: ref)
+              .watchCount(ref: ref, type: DocumentType.commentTemplate)
               .map((commentsCount) {
             final proposalData = ProposalData(
               document: doc,
               categoryId: DocumentType.categoryParametersDocument.uuid,
               versions: versionIds,
               commentsCount: commentsCount,
+              ref: ref,
             );
             return Proposal.fromData(proposalData);
           });

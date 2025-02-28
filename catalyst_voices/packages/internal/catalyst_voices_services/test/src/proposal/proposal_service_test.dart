@@ -24,8 +24,9 @@ void main() {
 
     // Add a default response for any watchProposalCommentsCount call
     when(
-      () => mockDocumentRepository.watchProposalCommentsCount(
+      () => mockDocumentRepository.watchCount(
         ref: any(named: 'ref'),
+        type: DocumentType.commentTemplate,
       ),
     ).thenAnswer((_) => Stream.fromIterable([5]));
   });
@@ -69,14 +70,15 @@ void main() {
       ).thenAnswer((_) => Stream.value([proposalData1, proposalData2]));
 
       when(
-        () => mockDocumentRepository.getProposalVersionIds(
-          ref: any(named: 'ref'),
+        () => mockDocumentRepository.queryVersionIds(
+          id: any(named: 'ref'),
         ),
       ).thenAnswer((_) => Future.value([versionId1]));
 
       when(
-        () => mockDocumentRepository.watchProposalCommentsCount(
+        () => mockDocumentRepository.watchCount(
           ref: any(named: 'ref'),
+          type: DocumentType.commentTemplate,
         ),
       ).thenAnswer((_) => Stream.fromIterable([5]));
 
@@ -92,14 +94,15 @@ void main() {
       ).called(1);
 
       verify(
-        () => mockDocumentRepository.getProposalVersionIds(
-          ref: any(named: 'ref'),
+        () => mockDocumentRepository.queryVersionIds(
+          id: any(named: 'ref'),
         ),
       ).called(2);
 
       verify(
-        () => mockDocumentRepository.watchProposalCommentsCount(
+        () => mockDocumentRepository.watchCount(
           ref: any(named: 'ref'),
+          type: DocumentType.commentTemplate,
         ),
       ).called(2);
     });
@@ -146,8 +149,8 @@ void main() {
         ).thenAnswer((_) => proposalsStream);
 
         when(
-          () => mockDocumentRepository.getProposalVersionIds(
-            ref: any(named: 'ref'),
+          () => mockDocumentRepository.queryVersionIds(
+            id: any(named: 'ref'),
           ),
         ).thenAnswer((_) => Future.value([versionId]));
 
@@ -156,14 +159,16 @@ void main() {
         final commentsStream2 = Stream.fromIterable([3, 7]).asBroadcastStream();
 
         when(
-          () => mockDocumentRepository.watchProposalCommentsCount(
+          () => mockDocumentRepository.watchCount(
             ref: SignedDocumentRef(id: proposalId1),
+            type: DocumentType.commentTemplate,
           ),
         ).thenAnswer((_) => commentsStream1);
 
         when(
-          () => mockDocumentRepository.watchProposalCommentsCount(
+          () => mockDocumentRepository.watchCount(
             ref: SignedDocumentRef(id: proposalId2),
+            type: DocumentType.commentTemplate,
           ),
         ).thenAnswer((_) => commentsStream2);
 

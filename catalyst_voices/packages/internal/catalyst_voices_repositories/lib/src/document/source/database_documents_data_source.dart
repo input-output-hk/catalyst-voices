@@ -9,11 +9,6 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   );
 
   @override
-  Future<List<String>> documentVersionIds({required DocumentRef ref}) {
-    return _database.documentsDao.documentVersionIds(ref: ref);
-  }
-
-  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
   }
@@ -26,6 +21,11 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
     }
 
     return entity.toModel();
+  }
+
+  @override
+  Future<List<String>> queryVersionIds({required String id}) {
+    return _database.documentsDao.queryVersionIds(id: id);
   }
 
   @override
@@ -62,14 +62,17 @@ final class DatabaseDocumentsDataSource implements SignedDocumentDataSource {
   }
 
   @override
-  Stream<int> watchDocumentCommentsCount({required DocumentRef ref}) {
-    return _database.documentsDao.watchDocumentCommentsCount(ref: ref);
+  Stream<int> watchCount({
+    required DocumentRef ref,
+    required DocumentType type,
+  }) {
+    return _database.documentsDao.watchCount(ref: ref, type: type);
   }
 
   @override
   Stream<List<DocumentData>> watchLatestVersions({int? limit}) {
     return _database.documentsDao
-        .watchLatestVersions(limit: limit)
+        .watchAll(limit: limit, unique: true)
         .map((entities) => entities.map((e) => e.toModel()).toList());
   }
 }

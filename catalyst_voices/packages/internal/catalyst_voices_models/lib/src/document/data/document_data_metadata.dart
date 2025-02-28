@@ -1,14 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-/// Describes what [DocumentDataContent] is about. It only makes sens in
-/// context of [type].
-final class DocumentDataMetadata extends Equatable {
+/// Base class with common functionality
+abstract class BaseDocumentDataMetadata extends Equatable {
   /// Type of this signed document
   final DocumentType type;
-
-  /// Reference to this document. Have to be exact.
-  final DocumentRef selfRef;
 
   /// Reference to another document. The purpose of the ref will vary depending
   /// on the document type.
@@ -39,9 +35,8 @@ final class DocumentDataMetadata extends Equatable {
   /// "Products & Integrations".
   final String? categoryId;
 
-  DocumentDataMetadata({
+  const BaseDocumentDataMetadata({
     required this.type,
-    required this.selfRef,
     this.ref,
     this.refHash,
     this.template,
@@ -49,19 +44,11 @@ final class DocumentDataMetadata extends Equatable {
     this.campaignId,
     this.electionId,
     this.categoryId,
-  }) : assert(
-          selfRef.isExact,
-          'selfRef have to be exact. Make sure version is not null',
-        );
-
-  String get id => selfRef.id;
-
-  String get version => selfRef.version!;
+  });
 
   @override
   List<Object?> get props => [
         type,
-        selfRef,
         ref,
         refHash,
         template,
@@ -70,4 +57,53 @@ final class DocumentDataMetadata extends Equatable {
         electionId,
         categoryId,
       ];
+}
+
+final class DocumentDataMetadata extends BaseDocumentDataMetadata {
+  /// Reference to this document. Have to be exact.
+  final DocumentRef selfRef;
+
+  DocumentDataMetadata({
+    required super.type,
+    required this.selfRef,
+    super.ref,
+    super.refHash,
+    super.template,
+    super.brandId,
+    super.campaignId,
+    super.electionId,
+    super.categoryId,
+  }) : assert(
+          selfRef.isExact,
+          'selfRef have to be exact. Make sure version is not null',
+        );
+
+  String get id => selfRef.id;
+  @override
+  List<Object?> get props => [...super.props, selfRef];
+
+  String get version => selfRef.version!;
+}
+
+final class DocumentDataMetadataOptional extends BaseDocumentDataMetadata {
+  /// Reference to this document. Can be null.
+  final DocumentRef? selfRef;
+
+  const DocumentDataMetadataOptional({
+    required super.type,
+    this.selfRef,
+    super.ref,
+    super.refHash,
+    super.template,
+    super.brandId,
+    super.campaignId,
+    super.electionId,
+    super.categoryId,
+  });
+
+  String? get id => selfRef?.id;
+  @override
+  List<Object?> get props => [...super.props, selfRef];
+
+  String? get version => selfRef?.version;
 }
