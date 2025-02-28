@@ -261,6 +261,13 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
     }
   }
 
+  void _exportProposal() {
+    final prefix = context.l10n.proposal.toLowerCase();
+    context
+        .read<ProposalBuilderBloc>()
+        .add(ExportProposalEvent(filePrefix: prefix));
+  }
+
   void _onSelected(_MenuItemEnum item) {
     switch (item) {
       case _MenuItemEnum.view:
@@ -271,7 +278,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       case _MenuItemEnum.submit:
         unawaited(_submitForReview());
       case _MenuItemEnum.export:
-        context.read<ProposalBuilderBloc>().add(const ExportProposalEvent());
+        _exportProposal();
       case _MenuItemEnum.delete:
         unawaited(_deleteProposal());
     }

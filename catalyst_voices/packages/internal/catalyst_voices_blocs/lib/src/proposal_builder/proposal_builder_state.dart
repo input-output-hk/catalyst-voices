@@ -1,10 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
 
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
   final DocumentRef? documentRef;
+  final DocumentRef? templateRef;
 
   /// The current iteration version, 0 if not published.
   final int currentIteration;
@@ -12,13 +14,25 @@ final class ProposalBuilderMetadata extends Equatable {
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
     this.documentRef,
+    this.templateRef,
     this.currentIteration = 0,
   });
+
+  factory ProposalBuilderMetadata.newDraft({required DocumentRef templateRef}) {
+    final id = const Uuid().v7();
+    return ProposalBuilderMetadata(
+      publish: ProposalPublish.localDraft,
+      documentRef: DraftRef(id: id, version: id),
+      templateRef: templateRef,
+      currentIteration: 0,
+    );
+  }
 
   @override
   List<Object?> get props => [
         publish,
         documentRef,
+        templateRef,
         currentIteration,
       ];
 }
