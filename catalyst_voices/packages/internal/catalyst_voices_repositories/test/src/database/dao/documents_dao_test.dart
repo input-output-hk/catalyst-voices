@@ -333,6 +333,56 @@ void main() {
         expect(firstEmission, equals([documentsWithMetadata.document]));
         expect(secondEmission, equals([newVersion.document]));
       });
+
+      test('emits new document when is inserted', () async {
+        // Generate base ID
+        final id1 = const Uuid().v7();
+
+        // Create versions with enforced order (v2 is newer than v1)
+        final v1 = const Uuid().v7();
+        // Wait a moment to ensure second UUID is newer
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+        final id2 = const Uuid().v7();
+        final v2 = const Uuid().v7();
+
+        final document1 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id1,
+              version: v1,
+            ),
+          ),
+        );
+
+        final document2 = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.proposalDocument,
+            selfRef: DocumentRefFactory.buildSigned(
+              id: id2,
+              version: v2,
+            ),
+          ),
+        );
+
+        // When
+        final documentsStream = database.documentsDao
+            .watchLatestVersions(limit: 1)
+            .asBroadcastStream();
+
+        await database.documentsDao.saveAll([document1]);
+        final firstEmission = await documentsStream.first;
+
+        await database.documentsDao.saveAll([document2]);
+        final secondEmission = await documentsStream.first;
+
+        // Then verify both emissions
+        expect(firstEmission, equals([document1.document]));
+        expect(
+          secondEmission,
+          equals([document2.document]),
+        );
+      });
     });
 
     group('count', () {
