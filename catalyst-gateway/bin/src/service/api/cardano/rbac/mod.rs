@@ -1,16 +1,16 @@
 //! RBAC endpoints.
 
-use poem::http::HeaderMap;
 use poem_openapi::{param::Query, payload::Json, OpenApi};
 
 use crate::service::common::{
-    auth::none_or_rbac::NoneOrRBAC, tags::ApiTags,
+    auth::{none_or_api_key::NoneOrApiKey, none_or_rbac::NoneOrRBAC},
+    tags::ApiTags,
     types::cardano::query::stake_or_voter::StakeOrVoter,
 };
 
+mod rbac_registration;
 mod registrations_get;
 mod unprocessable_content;
-mod rbac_registration;
 
 /// Cardano RBAC API Endpoints
 pub(crate) struct Api;
@@ -30,19 +30,20 @@ impl Api {
         &self,
         /// Stake address to get the RBACE registration for.
         Query(lookup): Query<Option<StakeOrVoter>>,
-        /// Headers, used if the query is requesting ALL to determine if the secret API
-        /// Key is also defined.
-        headers: &HeaderMap,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
+        /// No Authorization required, but Api Key permitted.
+        api_key: NoneOrApiKey,
     ) -> registrations_get::AllResponses {
         // Special validation for the `lookup` parameter.
         // If the parameter is ALL, BUT we do not have a valid API Key, just report the parameter
         // is invalid.
         if let Some(lookup) = lookup.clone() {
-            if lookup.is_all(headers).is_err() {
+            if lookup.is_all() && matches!(api_key, NoneOrApiKey::None(_)) {
                 return registrations_get::Responses::UnprocessableContent(Json(
-                    unprocessable_content::RbacUnprocessableContent::new("Invalid Stake Address or Voter key"),
+                    unprocessable_content::RbacUnprocessableContent::new(
+                        "Invalid Stake Address or Voter key",
+                    ),
                 ))
                 .into();
             }

@@ -10,7 +10,6 @@ use std::{
 
 use anyhow::{bail, Result};
 use const_format::concatcp;
-use poem::http::HeaderMap;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{ParseFromParameter, ParseResult, Type},
@@ -20,7 +19,6 @@ use serde_json::Value;
 
 use crate::service::common::{
     self,
-    auth::api_key::check_api_key,
     types::{
         cardano::cip19_stake_address::Cip19StakeAddress,
         generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
@@ -36,7 +34,7 @@ pub(crate) enum StakeAddressOrPublicKey {
     /// A Ed25519 Public Key
     PublicKey(common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey),
     /// Special value that means we try to fetch all possible results.  Must be protected
-    /// with an  `APIKey`.
+    /// with an `APIKey`.
     All,
 }
 
@@ -164,14 +162,8 @@ impl ParseFromParameter for StakeOrVoter {
 
 impl StakeOrVoter {
     /// Is this for ALL results?
-    pub(crate) fn is_all(&self, headers: &HeaderMap) -> Result<bool> {
-        match self.0 .1 {
-            StakeAddressOrPublicKey::All => {
-                check_api_key(headers)?;
-                Ok(true)
-            },
-            _ => Ok(false),
-        }
+    pub(crate) fn is_all(&self) -> bool {
+        matches!(self.0 .1, StakeAddressOrPublicKey::All)
     }
 }
 
