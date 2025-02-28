@@ -19,7 +19,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         title: Some("Catalyst short ID".into()),
         description: Some("Catalyst short identifier in string format"),
         example,
-        pattern: Some(".+/[A-Za-z0-9_-]{43}".into()),
+        pattern: Some(r".+\..+\/[A-Za-z0-9_-]{43}".into()),
         ..MetaSchema::ANY
     }
 });
@@ -103,6 +103,8 @@ impl Example for CatalystId {
             105, 123, 50, 105, 25, 112, 59, 172, 3, 28, 174, 127, 96,
         ];
         let signing_key = &SigningKey::from_bytes(&secret_key_bytes);
-        IdUri::new("cardano", None, signing_key.into()).into()
+        IdUri::new("cardano", Some("preprod"), signing_key.into())
+            .as_id()
+            .into()
     }
 }
