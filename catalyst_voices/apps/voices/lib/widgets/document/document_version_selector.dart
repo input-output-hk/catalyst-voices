@@ -30,10 +30,8 @@ class DocumentVersionSelector extends StatelessWidget {
         absorbing: readOnly,
         child: VoicesOutlinedButton(
           leading: VoicesAssets.icons.documentText.buildIcon(),
-          trailing: Offstage(
-            offstage: readOnly,
-            child: VoicesAssets.icons.chevronDown.buildIcon(),
-          ),
+          trailing:
+              !readOnly ? VoicesAssets.icons.chevronDown.buildIcon() : null,
           onTap: () {},
           style: OutlinedButton.styleFrom(
             shape: RoundedRectangleBorder(
