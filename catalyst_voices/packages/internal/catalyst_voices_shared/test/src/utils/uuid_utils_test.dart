@@ -33,7 +33,7 @@ void main() {
 
     test('throws exception for invalid source', () {
       // Given
-      const uuid = '123rsfasfsa';
+      const uuid = '123oneTwo';
 
       // When
       void parse() => UuidUtils.dateTime(uuid);
