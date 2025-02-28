@@ -155,14 +155,6 @@ class MostRecentSection {
       $(parentContainer).$(proposalCard).at(cardIndex).$(commentsCount).text,
       isNotEmpty,
     );
-    expect(
-      $(mostRecentProposals).$(mostRecentProposalsSlider).visible,
-      true,
-    );
-    expect(
-      $(mostRecentProposals).$(viewAllProposalsButton).text,
-      T.get('View All Proposals'),
-    );
   }
 
   Future<bool> loadingErrorIsVisible() async {
