@@ -1,0 +1,7 @@
+typer == 0.15.1
+python-bitcoinlib == 0.12.2
+
+
+# Format and lint
+black == 22.3
+ruff == 0.9.7
