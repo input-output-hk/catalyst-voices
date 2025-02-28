@@ -56,8 +56,6 @@ final class DocumentDataMetadata extends Equatable {
 
   String get id => selfRef.id;
 
-  String get version => selfRef.version!;
-
   @override
   List<Object?> get props => [
         type,
@@ -70,4 +68,30 @@ final class DocumentDataMetadata extends Equatable {
         electionId,
         categoryId,
       ];
+
+  String get version => selfRef.version!;
+
+  DocumentDataMetadata copyWith({
+    DocumentType? type,
+    DocumentRef? selfRef,
+    Optional<DocumentRef>? ref,
+    Optional<SecuredDocumentRef>? refHash,
+    Optional<DocumentRef>? template,
+    Optional<String>? brandId,
+    Optional<String>? campaignId,
+    Optional<String>? electionId,
+    Optional<String>? categoryId,
+  }) {
+    return DocumentDataMetadata(
+      type: type ?? this.type,
+      selfRef: selfRef ?? this.selfRef,
+      ref: ref.dataOr(this.ref),
+      refHash: refHash.dataOr(this.refHash),
+      template: template.dataOr(this.template),
+      brandId: brandId.dataOr(this.brandId),
+      campaignId: campaignId.dataOr(this.campaignId),
+      electionId: electionId.dataOr(this.electionId),
+      categoryId: categoryId.dataOr(this.categoryId),
+    );
+  }
 }

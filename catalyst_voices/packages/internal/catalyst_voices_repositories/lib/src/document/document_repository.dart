@@ -59,6 +59,12 @@ abstract interface class DocumentRepository {
 
   /// Imports a document [data] previously encoded by [encodeDocumentForExport].
   ///
+  /// The document reference will be altered to avoid linking
+  /// the imported document to the old document.
+  ///
+  /// Once imported from the version management point of view this becomes
+  /// a new standalone document not related to the previous one.
+  ///
   /// Returns the reference to the imported document.
   Future<DocumentRef> importDocument({required Uint8List data});
 
@@ -179,8 +185,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   Future<DocumentRef> importDocument({required Uint8List data}) async {
     final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
     final document = DocumentDataDto.fromJson(jsonData).toModel();
-    await _drafts.save(data: document);
-    return document.ref;
+
+    final newMetadata = document.metadata.copyWith(
+      selfRef: DraftRef.generateFirstRef(),
+    );
+
+    final newDocument = DocumentData(
+      metadata: newMetadata,
+      content: document.content,
+    );
+
+    await _drafts.save(data: newDocument);
+    return newDocument.ref;
   }
 
   @override
