@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:uuid/uuid.dart';
 
 sealed class DocumentRef extends Equatable {
   final String id;
@@ -36,6 +37,14 @@ final class DraftRef extends DocumentRef {
     required super.id,
     super.version,
   });
+
+  factory DraftRef.generateFirstRef() {
+    final id = const Uuid().v7();
+    return DraftRef(
+      id: id,
+      version: id,
+    );
+  }
 
   @override
   DraftRef copyWith({

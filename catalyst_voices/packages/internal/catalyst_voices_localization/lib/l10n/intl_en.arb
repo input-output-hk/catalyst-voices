@@ -1726,6 +1726,14 @@
   "@enterPhrase": {
     "description": "Action to enter the seed phrase"
   },
+  "proposalImportDialogTitle": "Import Proposal",
+  "@proposalImportDialogTitle": {
+    "description": "The title of the dialog to import a proposal."
+  },
+  "proposalImportDialogDescription": "Make sure it's a correct Catalyst proposal file.",
+  "@proposalImportDialogDescription": {
+    "description": "The description of the dialog to import a proposal."
+  },
   "nrOfIteration": "Iteration {nr}",
   "@nrOfIteration": {
     "description": "In context of which version of document is presented",

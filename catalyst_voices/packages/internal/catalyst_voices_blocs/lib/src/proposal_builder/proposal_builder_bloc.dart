@@ -18,12 +18,14 @@ final class ProposalBuilderBloc
     with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final DownloaderService _downloaderService;
 
   DocumentBuilder? _documentBuilder;
 
   ProposalBuilderBloc(
     this._campaignService,
     this._proposalService,
+    this._downloaderService,
   ) : super(const ProposalBuilderState()) {
     on<LoadDefaultProposalTemplateEvent>(_loadDefaultProposalTemplate);
     on<LoadProposalTemplateEvent>(_loadProposalTemplate);
@@ -52,6 +54,14 @@ final class ProposalBuilderBloc
     final documentBuilder = _documentBuilder;
     assert(documentBuilder != null, 'DocumentBuilder not initialized');
     return documentBuilder!.build();
+  }
+
+  DocumentDataMetadata _buildDocumentMetadata() {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      selfRef: state.metadata.documentRef!,
+      template: state.metadata.templateRef,
+    );
   }
 
   ProposalBuilderState _createState({
@@ -87,7 +97,26 @@ final class ProposalBuilderBloc
     ExportProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    // TODO(dtscalac): handle event
+    try {
+      final documentRef = state.metadata.documentRef!;
+      final proposalId = documentRef.id;
+
+      final encodedProposal = await _proposalService.encodeProposalForExport(
+        metadata: _buildDocumentMetadata(),
+        document: _buildDocument(),
+      );
+
+      final filename = '${event.filePrefix}_$proposalId';
+      const extension = ProposalDocument.exportFileExt;
+
+      await _downloaderService.download(
+        data: encodedProposal,
+        filename: '$filename.$extension',
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Exporting proposal failed', error, stackTrace);
+      emitError(const LocalizedUnknownException());
+    }
   }
 
   Iterable<ProposalGuidanceItem> _findGuidanceItems(
@@ -203,8 +232,8 @@ final class ProposalBuilderBloc
 
       return _createState(
         document: documentBuilder.build(),
-        metadata: const ProposalBuilderMetadata(
-          publish: ProposalPublish.localDraft,
+        metadata: ProposalBuilderMetadata.newDraft(
+          templateRef: proposalTemplateRef,
         ),
       );
     });
@@ -234,11 +263,13 @@ final class ProposalBuilderBloc
     LoadProposalTemplateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal template[${event.ref}]');
+    final ref = event.ref;
+
+    _logger.info('Loading proposal template[$ref]');
 
     await _loadState(emit, () async {
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: event.ref,
+        ref: ref,
       );
 
       final documentBuilder =
@@ -246,7 +277,9 @@ final class ProposalBuilderBloc
 
       return _createState(
         document: documentBuilder.build(),
-        metadata: const ProposalBuilderMetadata(),
+        metadata: ProposalBuilderMetadata.newDraft(
+          templateRef: ref,
+        ),
       );
     });
   }

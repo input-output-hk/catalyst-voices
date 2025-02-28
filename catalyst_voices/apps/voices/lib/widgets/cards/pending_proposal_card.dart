@@ -155,7 +155,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      key: const Key('PendingProposalCard'),
+      key: const Key('ProposalCard'),
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,

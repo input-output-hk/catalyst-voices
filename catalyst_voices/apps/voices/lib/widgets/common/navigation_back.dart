@@ -23,6 +23,7 @@ class NavigationBack extends StatelessWidget {
       child: Row(
         children: [
           VoicesTextButton(
+            key: const Key('NavigationBackBtn'),
             onTap: () {
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
