@@ -1,19 +1,26 @@
+import 'dart:typed_data';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 // ignore: one_member_abstracts
 abstract interface class ProposalService {
-  factory ProposalService(
+  const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
-  ) {
-    return ProposalServiceImpl(
-      proposalRepository,
-      documentRepository,
-    );
-  }
+  ) = ProposalServiceImpl;
 
   Future<List<String>> addFavoriteProposal(String proposalId);
+
+  /// Encodes the [document] to exportable format.
+  ///
+  /// It does not save the document anywhere on the disk,
+  /// it only encodes a document as [Uint8List]
+  /// so that it can be saved as a file.
+  Future<Uint8List> encodeProposalForExport({
+    required DocumentDataMetadata metadata,
+    required Document document,
+  });
 
   /// Fetches favorites proposals ids of the user
   Future<List<String>> getFavoritesProposalsIds();
@@ -33,6 +40,9 @@ abstract interface class ProposalService {
   /// Fetches user's proposals ids  depending on his id that is saved
   /// in metadata of proposal document
   Future<List<String>> getUserProposalsIds(String userId);
+
+  /// Imports the proposal from [data] encoded by [encodeProposalForExport].
+  Future<void> importProposal(Uint8List data);
 
   /// Publishes a public proposal draft.
   Future<void> publishProposal(Document document);
@@ -55,6 +65,17 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<List<String>> addFavoriteProposal(String proposalId) async {
     return _proposalRepository.addFavoriteProposal(proposalId);
+  }
+
+  @override
+  Future<Uint8List> encodeProposalForExport({
+    required DocumentDataMetadata metadata,
+    required Document document,
+  }) {
+    return _documentRepository.encodeDocumentForExport(
+      metadata: metadata,
+      document: document,
+    );
   }
 
   @override
@@ -107,6 +128,11 @@ final class ProposalServiceImpl implements ProposalService {
   Future<List<String>> getUserProposalsIds(String userId) async {
     final proposalsIds = await _proposalRepository.getUserProposalsIds(userId);
     return proposalsIds;
+  }
+
+  @override
+  Future<void> importProposal(Uint8List data) async {
+    await _documentRepository.importDocument(data: data);
   }
 
   @override
