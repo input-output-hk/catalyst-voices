@@ -19,6 +19,7 @@ jobs:
   ci:
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.1
     with:
+      # test
       forge_version: 0.14.0
 
   test_reporting:
