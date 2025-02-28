@@ -3,11 +3,6 @@ import 'package:test/test.dart';
 import 'package:uuid/data.dart';
 import 'package:uuid/uuid.dart';
 
-final _bigIntMinValue64 = BigInt.parse('-9223372036854775808');
-final _bigIntMaxValue64 = BigInt.parse('9223372036854775807');
-const _bigInt64Reason = 'BigInt value exceeds the range of 64 bits. '
-    'SQLite BigInt has 64 bit limit';
-
 void main() {
   group(UuidHiLo, () {
     test('dashed uuid produces UuidHiLo and reconstructs correctly', () {
@@ -67,7 +62,7 @@ void main() {
 
     test('dateTime is recovered correctly', () {
       // Given
-      final dateTime = DateTime(2025, 2, 3, 15, 34);
+      final dateTime = DateTime.utc(2025, 2, 3, 15, 34);
       final config = V7Options(dateTime.millisecondsSinceEpoch, null);
       final uuid = const Uuid().v7(config: config);
 
@@ -88,7 +83,7 @@ void main() {
       DateTime extract() => hiLo.dateTime;
 
       // Then
-      expect(extract, throwsA(isA<StateError>()));
+      expect(extract, throwsA(isA<ArgumentError>()));
     });
 
     test('high and low does not exceeds 64 bits', () {
@@ -112,3 +107,9 @@ void main() {
     });
   });
 }
+
+const _bigInt64Reason = 'BigInt value exceeds the range of 64 bits. '
+    'SQLite BigInt has 64 bit limit';
+final _bigIntMaxValue64 = BigInt.parse('9223372036854775807');
+
+final _bigIntMinValue64 = BigInt.parse('-9223372036854775808');

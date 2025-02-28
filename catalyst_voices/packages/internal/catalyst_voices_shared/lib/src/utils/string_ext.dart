@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_shared/src/utils/uuid_utils.dart';
+
 extension StringExt on String {
   String? get firstLetter => isEmpty ? null : substring(0, 1);
 
@@ -33,4 +35,10 @@ extension UrlParser on String {
   Uri getUri() {
     return Uri.parse(this);
   }
+}
+
+extension UuidStringUtils on String {
+  DateTime get dateTime => UuidUtils.dateTime(this);
+
+  int get version => UuidUtils.version(this);
 }
