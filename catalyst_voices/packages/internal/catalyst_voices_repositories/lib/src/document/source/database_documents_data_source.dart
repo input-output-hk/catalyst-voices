@@ -24,10 +24,8 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
   }
 
   @override
-  Stream<DocumentData?> watch({required DocumentRef ref}) {
-    return _database.documentsDao
-        .watch(ref: ref)
-        .map((entity) => entity?.toModel());
+  Future<List<DocumentRef>> index() {
+    return _database.documentsDao.queryAllRefs();
   }
 
   @override
@@ -54,6 +52,13 @@ final class DatabaseDocumentsDataSource implements DocumentDataLocalSource {
     final documentWithMetadata = (document: document, metadata: metadata);
 
     await _database.documentsDao.saveAll([documentWithMetadata]);
+  }
+
+  @override
+  Stream<DocumentData?> watch({required DocumentRef ref}) {
+    return _database.documentsDao
+        .watch(ref: ref)
+        .map((entity) => entity?.toModel());
   }
 }
 
