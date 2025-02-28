@@ -18,7 +18,7 @@ pub(crate) struct Api;
 #[OpenApi(tag = "ApiTags::Cardano")]
 impl Api {
     #[oai(
-        path = "/draft/rbac/registrations/:catalyst_id",
+        path = "/draft/rbac/registration",
         method = "get",
         operation_id = "rbacRegistrations"
     )]
