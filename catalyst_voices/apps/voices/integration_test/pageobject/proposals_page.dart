@@ -87,7 +87,8 @@ class ProposalsPage {
   Future<void> proposalCardsLookAsExpected() async {
     final proposalsCount = $.tester
         .widgetList<Material>(
-            $(proposalsContainer).$(MostRecentSection($).proposalCard))
+          $(proposalsContainer).$(MostRecentSection($).proposalCard),
+        )
         .length;
     for (var cardIndex = 0; cardIndex < proposalsCount; cardIndex++) {
       await $(proposalsContainer)
