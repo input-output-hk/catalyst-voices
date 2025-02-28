@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
-import 'package:uuid/uuid.dart';
 
 final class ProposalBuilderMetadata extends Equatable {
   final ProposalPublish publish;
@@ -19,10 +18,9 @@ final class ProposalBuilderMetadata extends Equatable {
   });
 
   factory ProposalBuilderMetadata.newDraft({required DocumentRef templateRef}) {
-    final id = const Uuid().v7();
     return ProposalBuilderMetadata(
       publish: ProposalPublish.localDraft,
-      documentRef: DraftRef(id: id, version: id),
+      documentRef: DraftRef.generateFirstRef(),
       templateRef: templateRef,
       currentIteration: 0,
     );

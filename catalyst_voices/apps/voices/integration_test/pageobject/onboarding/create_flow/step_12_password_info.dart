@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
-import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import 'step_11_seedphrase_success.dart';
 
@@ -44,7 +43,7 @@ class PasswordInfoPanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
-      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      infoPartLearnMoreText(),
       T.get('Learn More'),
     );
     expect(await closeButton(), findsOneWidget);
