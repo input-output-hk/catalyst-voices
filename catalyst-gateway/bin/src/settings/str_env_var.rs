@@ -193,7 +193,7 @@ impl StringEnvVar {
     }
 
     /// Convert an Envvar into an integer in the bounded range.
-    pub(super) fn new_as<T>(var_name: &str, default: T, min: T, max: T) -> T
+    pub(super) fn new_as_int<T>(var_name: &str, default: T, min: T, max: T) -> T
     where
         T: FromStr + Display + PartialOrd + tracing::Value,
         <T as std::str::FromStr>::Err: std::fmt::Display,

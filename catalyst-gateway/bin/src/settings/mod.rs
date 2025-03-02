@@ -184,7 +184,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         }).unwrap_or(ADDRESS_DEFAULT);
 
     let purge_slot_buffer =
-        StringEnvVar::new_as("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
+        StringEnvVar::new_as_int("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
 
     EnvVars {
         github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),
@@ -229,7 +229,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             "SERVICE_LIVE_TIMEOUT_INTERVAL",
             SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT,
         ),
-        service_live_counter_threshold: StringEnvVar::new_as(
+        service_live_counter_threshold: StringEnvVar::new_as_int(
             "SERVICE_LIVE_COUNTER_THRESHOLD",
             SERVICE_LIVE_COUNTER_THRESHOLD_DEFAULT,
             0,

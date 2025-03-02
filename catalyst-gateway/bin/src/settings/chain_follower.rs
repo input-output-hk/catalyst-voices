@@ -61,14 +61,14 @@ impl EnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
     pub(super) fn new() -> Self {
         let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", DEFAULT_NETWORK, false);
-        let sync_tasks: u16 = StringEnvVar::new_as(
+        let sync_tasks: u16 = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_SYNC_TASKS",
             DEFAULT_SYNC_TASKS,
             1,
             MAX_SYNC_TASKS,
         );
 
-        let sync_slots: u64 = StringEnvVar::new_as(
+        let sync_slots: u64 = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_SYNC_MAX_SLOTS",
             DEFAULT_SYNC_MAX_SLOTS,
             MIN_SYNC_MAX_SLOTS,
@@ -78,7 +78,7 @@ impl EnvVars {
         let cfg = ChainSyncConfig::default_for(chain);
         let mut dl_config = cfg.mithril_cfg.dl_config.clone().unwrap_or_default();
 
-        let workers = StringEnvVar::new_as(
+        let workers = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_DL_CONNECTIONS",
             dl_config.workers,
             1,
@@ -88,7 +88,7 @@ impl EnvVars {
 
         let default_dl_chunk_size = min(1, dl_config.chunk_size / ONE_MEGABYTE);
 
-        let chunk_size = StringEnvVar::new_as(
+        let chunk_size = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_DL_CHUNK_SIZE",
             default_dl_chunk_size,
             1,
@@ -101,7 +101,7 @@ impl EnvVars {
         });
         dl_config = dl_config.with_chunk_size(chunk_size);
 
-        let queue_ahead = StringEnvVar::new_as(
+        let queue_ahead = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_DL_QUEUE_AHEAD",
             dl_config.queue_ahead,
             1,
@@ -113,7 +113,7 @@ impl EnvVars {
             Some(timeout) => timeout.as_secs(),
             None => 0,
         };
-        let dl_connect_timeout = StringEnvVar::new_as(
+        let dl_connect_timeout = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_DL_CONNECT_TIMEOUT",
             default_dl_connect_timeout,
             0,
@@ -129,7 +129,7 @@ impl EnvVars {
             Some(timeout) => timeout.as_secs(),
             None => 0,
         };
-        let dl_data_timeout = StringEnvVar::new_as(
+        let dl_data_timeout = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_DL_DATA_TIMEOUT",
             default_dl_data_timeout,
             0,
