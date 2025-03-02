@@ -1,6 +1,6 @@
 # Snapshot tool
 
-## Generate gateway snapshot
+### Generate gateway snapshot
 ```sh
 export BEARER_TOKEN="Bearer catv1.UJm5ZNT1n7l3_h3c3VXp1R9QAZStRmrxdtYwTrdsxKWIF1hAi3mqbz6dPNiICQCkoXWJs8KCpcaPuE7LE5Iu9su0ZweK_0Qr9KhBNNHrDMCh79-fruK7WyNPYNc6FrjwTPaIAQ"
 
@@ -11,7 +11,7 @@ export API_KEY="vtov............"
 python3 snapshot.py snapshot --slot-no 146620747 --bearer-token "$BEARER_TOKEN" --host "$HOST" --api-key "$API_KEY" 
 ```
 
-## Compare legacy snapshot with gateway snapshot
+### Compare legacy snapshot with gateway snapshot
 ```sh
 export GATEWAY_SNAPSHOT=snapshot.json
 
@@ -20,7 +20,7 @@ export LEGACY_SNAPSHOT=../catalyst-core/src/voting-tools-rs/cexplorer-146620747.
 python3 snapshot.py compare --legacy-snapshot $LEGACY_SNAPSHOT --gateway-snapshot $GATEWAY_SNAPSHOT
 ```
 
-## Code quality
+### Code quality
 
 Code should be validated with `ruff`.
 `pyproject.toml` defines the rules that are enforced.
