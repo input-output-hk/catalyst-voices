@@ -116,9 +116,8 @@ def process_chunk(
 
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            snapshot_data_errors.append(
-                str(registration["registrations"][0]) + "stake_addr:" + stake_address
-            )
+            registration["stake_addr"] = stake_address
+            snapshot_data_errors.append(registration)
             continue
 
         json_data = json.loads(response.text)
@@ -214,6 +213,11 @@ def compare(
     with open(gateway_snapshot, "r") as file:
         gateway = json.load(file)
 
+    pprint(f"Number of legacy registrations {len(legacy)}")
+    pprint(f"Number of gateway registrations {len(gateway)}")
+
+    # Iterate through every legacy registration and then look for a corresponding match in
+    # the new gateway registrations snapshot to ensure parity.
     for legacy_registration in legacy:
         for gateway_registration in gateway:
             if (
