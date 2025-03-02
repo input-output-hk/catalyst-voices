@@ -2,6 +2,7 @@
 use std::{env, error::Error, sync::LazyLock, time::Duration};
 
 use catalyst_types::id_uri::IdUri;
+use ed25519_dalek::VerifyingKey;
 use futures::{TryFutureExt, TryStreamExt};
 use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
@@ -15,7 +16,10 @@ use crate::{
         session::CassandraSession,
     },
     service::common::{
-        responses::{code_503_service_unavailable::ServiceUnavailable, ErrorResponses},
+        responses::{
+            code_500_internal_server_error::InternalServerError,
+            code_503_service_unavailable::ServiceUnavailable, ErrorResponses,
+        },
         types::headers::retry_after::RetryAfterHeader,
     },
 };
@@ -27,7 +31,8 @@ pub type EncodedAuthToken = String;
 pub(crate) const AUTHORIZATION_HEADER: &str = "Authorization";
 
 /// Cached auth tokens
-// TODO: Caching is currently disabled because we want to measure the performance without it.
+// TODO: Caching is currently disabled because we want to measure the performance without it. See
+// https://github.com/input-output-hk/catalyst-voices/issues/1940 for more details.
 #[allow(dead_code)]
 static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock::new(|| {
     Cache::builder()
@@ -96,14 +101,16 @@ const MAX_TOKEN_AGE: Duration = Duration::from_secs(60 * 60); // 1 hour.
 const MAX_TOKEN_SKEW: Duration = Duration::from_secs(5 * 60); // 5 minutes
 
 /// When added to an endpoint, this hook is called per request to verify the bearer token
-/// is valid.
+/// is valid. The performed validation is described [here].
+///
+/// [here]: https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/permissionless-auth/auth-header.md#backend-processing-of-the-token
 async fn checker_api_catalyst_auth(
     _req: &Request, bearer: Bearer,
 ) -> poem::Result<CatalystRBACTokenV1> {
     /// Temporary: Conditional RBAC for testing
     const RBAC_OFF: &str = "RBAC_OFF";
 
-    // First check the token can be deserialized.
+    // Deserialize the token: this performs the 1-5 steps of the validation.
     let token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
         error!("Corrupt auth token: {e:?}");
         AuthTokenError
@@ -115,6 +122,7 @@ async fn checker_api_catalyst_auth(
     };
 
     let registrations = registrations(token.catalyst_id()).await?;
+    // Step 6: return 401 if the token isn't known.
     if registrations.is_empty() {
         error!(
             "Unable to find registrations for {} Catalyst ID",
@@ -123,6 +131,7 @@ async fn checker_api_catalyst_auth(
         return Err(AuthTokenError.into());
     }
 
+    // Step 7: Verify that the nonce is in the acceptable range.
     if !token.is_young(MAX_TOKEN_AGE, MAX_TOKEN_SKEW) {
         // Token is too old or too far in the future.
         error!("Auth token expired: {:?}", token);
@@ -141,28 +150,22 @@ async fn checker_api_catalyst_auth(
     //     return Ok(token);
     // }
 
-    // TODO: These steps must be implemented.
-    // - Get the latest stable signing certificate registered for Role 0.
-    // - Verify the signature against the Role 0 Public Key and Algorithm identified by the
-    //   certificate. Check signature length is correct for the defined algorithm, before
-    //   checking if the signature is valid. If this fails, return 403.
-    // - OPTIONAL IF authorization against latest unstable is supported:
-    //     1. Get the latest unstable signing certificate registered for Role 0.
-    //     2. Verify the signature against the Role 0 Public Key and Algorithm identified by
-    //        the certificate. If this fails, return 403.
+    // Step 8: get the latest stable signing certificate registered for Role 0.
+    let public_key = last_signing_key(&token);
 
-    // TODO: The following is incorrect because while a Catalyst ID is strictly identifies the
-    // initial Role 0 public key. However, the token is signed with the latest ACTIVE Role 0
-    // Public Key.
-
-    // Verify the token signature using the public key.
-    let public_key = token.catalyst_id().role0_pk();
+    // Step 9: Verify the signature.
+    // TODO: FIXME: Also check the algorithm identified by the certificate.
     if let Err(error) = token.verify(&public_key) {
         error!(error=%error, "Token Invalidly Signed");
         Err(AuthTokenAccessViolation(vec![
             "INVALID SIGNATURE".to_string()
         ]))?;
     }
+
+    // Step 10 is optional and isn't currently implemented.
+    //   - Get the latest unstable signing certificate registered for Role 0.
+    //   - Verify the signature against the Role 0 Public Key and Algorithm identified by the
+    //     certificate. If this fails, return 403.
 
     // TODO: Caching is currently disabled because we want to measure the performance without
     // it.
@@ -176,8 +179,7 @@ async fn checker_api_catalyst_auth(
 async fn registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
     let session = CassandraSession::get(true).ok_or_else(|| {
         error!("Failed to acquire db session");
-        let error = ServiceUnavailable::new(None);
-        ErrorResponses::ServiceUnavailable(Json(error), Some(RetryAfterHeader::default()))
+        service_unavailable()
     })?;
     Query::execute(&session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
@@ -185,7 +187,27 @@ async fn registrations(catalyst_id: &IdUri) -> poem::Result<Vec<Query>> {
     .and_then(|r| r.try_collect().map_err(Into::into))
     .await
     .map_err(|e| {
-        error!("Failed to get RBAC registrations for {catalyst_id} Catalyst ID: {e:?}",);
-        AuthTokenError.into()
+        error!("Failed to get RBAC registrations for {catalyst_id} Catalyst ID: {e:?}");
+        if e.is::<bb8::RunError<tokio_postgres::Error>>() {
+            service_unavailable()
+        } else {
+            let error = InternalServerError::new(None);
+            error!(id=%error.id(), error=?e);
+            ErrorResponses::ServerError(Json(error)).into()
+        }
     })
+}
+
+/// Returns a 503 error instance.
+fn service_unavailable() -> poem::Error {
+    let error = ServiceUnavailable::new(None);
+    ErrorResponses::ServiceUnavailable(Json(error), Some(RetryAfterHeader::default())).into()
+}
+
+/// Returns the last signing key from the registration chain.
+fn last_signing_key(token: &CatalystRBACTokenV1) -> VerifyingKey {
+    // TODO: The following is incorrect because while a Catalyst ID is strictly identifies the
+    // initial Role 0 public key. However, the token is signed with the latest ACTIVE Role 0
+    // Public Key.
+    token.catalyst_id().role0_pk()
 }
