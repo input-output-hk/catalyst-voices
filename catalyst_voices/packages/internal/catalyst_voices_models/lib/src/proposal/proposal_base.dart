@@ -14,6 +14,7 @@ base class ProposalBase extends Equatable {
   final Coin fundsRequested;
   final ProposalStatus status;
   final ProposalPublish publish;
+
   // Most likely this will be inside the document class and not in this class
   final int version;
   final int duration;
@@ -99,6 +100,7 @@ enum ProposalPublish {
   submittedProposal;
 
   bool get isDraft => this == publishedDraft;
+
   bool get isPublished => this == submittedProposal;
 }
 

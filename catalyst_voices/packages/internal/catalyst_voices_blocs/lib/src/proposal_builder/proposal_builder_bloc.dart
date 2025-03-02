@@ -147,27 +147,6 @@ final class ProposalBuilderBloc
     }
   }
 
-  Iterable<DocumentProperty> _findSectionsAndSubsections(
-    DocumentProperty property,
-  ) sync* {
-    if (property.schema.isSectionOrSubsection) {
-      yield property;
-    }
-
-    switch (property) {
-      case DocumentListProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentObjectProperty():
-        for (final childProperty in property.properties) {
-          yield* _findSectionsAndSubsections(childProperty);
-        }
-      case DocumentValueProperty():
-      // value property doesn't have children
-    }
-  }
-
   ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
     if (nodeId == null) {
       return const ProposalGuidance(isNoneSelected: true);
@@ -264,10 +243,10 @@ final class ProposalBuilderBloc
     LoadProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal[${event.id}]');
+    _logger.info('Loading proposal[${event.ref}]');
 
     await _loadState(emit, () async {
-      final proposal = await _proposalService.getProposal(id: event.id);
+      final proposal = await _proposalService.getProposal(ref: event.ref);
 
       return _createState(
         document: proposal.document.document,
@@ -284,12 +263,13 @@ final class ProposalBuilderBloc
     LoadProposalTemplateEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    _logger.info('Loading proposal template[${event.id}]');
+    final ref = event.ref;
+
+    _logger.info('Loading proposal template[$ref]');
 
     await _loadState(emit, () async {
-      final proposalTemplateRef = SignedDocumentRef(id: event.id);
       final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: proposalTemplateRef,
+        ref: ref,
       );
 
       final documentBuilder =
@@ -298,7 +278,7 @@ final class ProposalBuilderBloc
       return _createState(
         document: documentBuilder.build(),
         metadata: ProposalBuilderMetadata.newDraft(
-          templateRef: proposalTemplateRef,
+          templateRef: ref,
         ),
       );
     });
@@ -330,7 +310,7 @@ final class ProposalBuilderBloc
   }) {
     return document.segments.map((segment) {
       final sections = segment.sections
-          .expand(_findSectionsAndSubsections)
+          .expand(DocumentNodeTraverser.findSectionsAndSubsections)
           .map(
             (section) => ProposalBuilderSection(
               id: section.schema.nodeId,

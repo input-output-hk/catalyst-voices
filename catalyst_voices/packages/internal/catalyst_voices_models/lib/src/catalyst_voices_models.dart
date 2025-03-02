@@ -43,6 +43,7 @@ export 'space.dart';
 export 'user/account.dart';
 export 'user/account_role.dart';
 export 'user/preferences.dart';
+export 'user/profile.dart';
 export 'user/user.dart';
 export 'user/user_settings.dart';
 export 'wallet/cardano_wallet_details.dart';

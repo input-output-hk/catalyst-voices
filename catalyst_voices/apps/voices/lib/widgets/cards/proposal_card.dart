@@ -15,6 +15,7 @@ class ProposalCard extends StatelessWidget {
   final bool showComments;
   final bool showSegments;
   final bool isFavorite;
+  final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const ProposalCard({
@@ -26,6 +27,7 @@ class ProposalCard extends StatelessWidget {
     this.showComments = true,
     this.showSegments = true,
     this.isFavorite = false,
+    this.onTap,
     this.onFavoriteChanged,
   });
 
@@ -39,6 +41,7 @@ class ProposalCard extends StatelessWidget {
           showStatus: showStatus,
           showLastUpdate: showLastUpdate,
           isFavorite: isFavorite,
+          onTap: onTap,
           onFavoriteChanged: onFavoriteChanged,
         ),
       FundedProposal() => FundedProposalCard(

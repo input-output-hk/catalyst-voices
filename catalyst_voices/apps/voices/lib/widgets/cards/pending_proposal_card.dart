@@ -18,6 +18,7 @@ class PendingProposalCard extends StatefulWidget {
   final bool showStatus;
   final bool showLastUpdate;
   final bool isFavorite;
+  final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const PendingProposalCard({
@@ -26,6 +27,7 @@ class PendingProposalCard extends StatefulWidget {
     this.showStatus = true,
     this.showLastUpdate = true,
     this.isFavorite = false,
+    this.onTap,
     this.onFavoriteChanged,
   });
 
@@ -157,7 +159,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,
-        onTap: () {},
+        onTap: widget.onTap,
         child: ValueListenableBuilder(
           valueListenable: _statesController,
           builder: (context, value, child) => Container(
@@ -403,45 +405,24 @@ class _Topbar extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Spacer(),
-        VoicesIconButton.filled(
+        ShareButton(
           key: const Key('ShareBtn'),
+          circle: false,
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
             final url = ProposalBuilderRoute(proposalId: proposalId).location;
             await ShareProposalDialog.show(context, url);
           },
-          style: _buttonStyle(context),
-          child: VoicesAssets.icons.share.buildIcon(
-            color: context.colorScheme.primary,
-          ),
         ),
         if (onFavoriteChanged != null) ...[
           const SizedBox(width: 4),
-          VoicesIconButton.filled(
+          FavoriteButton(
             key: const Key('FavoriteBtn'),
-            onTap: () => onFavoriteChanged?.call(!isFavorite),
-            style: _buttonStyle(context),
-            child: CatalystSvgIcon.asset(
-              isFavorite
-                  ? VoicesAssets.icons.starFilled.path
-                  : VoicesAssets.icons.starOutlined.path,
-              color: context.colorScheme.primary,
-            ),
+            circle: false,
+            onChanged: onFavoriteChanged,
           ),
         ],
       ],
-    );
-  }
-
-  ButtonStyle _buttonStyle(BuildContext context) {
-    return IconButton.styleFrom(
-      padding: const EdgeInsets.all(10),
-      backgroundColor: context.colors.onSurfacePrimary08,
-      foregroundColor: context.colorScheme.primary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      iconSize: 18,
     );
   }
 }

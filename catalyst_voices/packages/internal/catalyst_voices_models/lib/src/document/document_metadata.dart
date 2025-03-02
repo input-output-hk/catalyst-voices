@@ -1,24 +1,17 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 abstract base class DocumentMetadata extends Equatable {
-  final String id;
-  final String version;
+  final DocumentRef selfRef;
 
-  const DocumentMetadata({
-    required this.id,
-    required this.version,
-  });
-
-  /// When building new document version equals id.
-  const DocumentMetadata.newDocument(
-    this.id,
-  ) : version = id;
+  DocumentMetadata({
+    required this.selfRef,
+  }) : assert(selfRef.isExact, 'SelfRef have to be exact!');
 
   @override
   @mustCallSuper
   List<Object?> get props => [
-        id,
-        version,
+        selfRef,
       ];
 }
