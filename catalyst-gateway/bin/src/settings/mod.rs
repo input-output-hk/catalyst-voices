@@ -1,7 +1,6 @@
 //! Command line and environment variable settings for the service
 use std::{
     net::{IpAddr, Ipv4Addr, SocketAddr},
-    path::PathBuf,
     str::FromStr,
     sync::{LazyLock, OnceLock},
     time::Duration,
@@ -27,8 +26,8 @@ pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 mod str_env_var;
 
-/// Default address to start service on.
-const ADDRESS_DEFAULT: &str = "0.0.0.0:3030";
+/// Default address to start service on, '0.0.0.0:3030'.
+const ADDRESS_DEFAULT: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 3030);
 
 /// Default Github repo owner
 const GITHUB_REPO_OWNER_DEFAULT: &str = "input-output-hk";
@@ -93,25 +92,6 @@ pub(crate) struct ServiceSettings {
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
-
-    /// Docs settings.
-    #[clap(flatten)]
-    pub(crate) docs_settings: DocsSettings,
-}
-
-/// Settings specifies `OpenAPI` docs generation.
-#[derive(Args, Clone)]
-pub(crate) struct DocsSettings {
-    /// The output path to the generated docs file, if omitted prints to stdout.
-    pub(crate) output: Option<PathBuf>,
-
-    /// Server binding address
-    #[clap(long, default_value = ADDRESS_DEFAULT, env = "ADDRESS")]
-    pub(crate) address: SocketAddr,
-
-    /// Server name
-    #[clap(long, env = "SERVER_NAME")]
-    pub(crate) server_name: Option<String>,
 }
 
 /// All the `EnvVars` used by the service.
@@ -124,6 +104,12 @@ struct EnvVars {
 
     /// The github issue template to use
     github_issue_template: StringEnvVar,
+
+    /// Server binding address
+    address: SocketAddr,
+
+    /// Server name
+    server_name: Option<StringEnvVar>,
 
     /// The Service ID used to anonymize client connections.
     service_id: StringEnvVar,
@@ -189,6 +175,15 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 
+    let address = StringEnvVar::new("ADDRESS", ADDRESS_DEFAULT.to_string().into());
+    let address = SocketAddr::from_str(address.as_str())
+        .inspect(|err| {
+            error!(
+                "Invalid binding address {}, err: {err}. Using default binding address value {ADDRESS_DEFAULT}.",
+                address.as_str(),
+            );
+        }).unwrap_or(ADDRESS_DEFAULT);
+
     let check_interval = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT.into());
     let check_config_tick = match DurationString::try_from(check_interval.as_string()) {
         Ok(duration) => duration.into(),
@@ -211,6 +206,8 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             "GITHUB_ISSUE_TEMPLATE",
             GITHUB_ISSUE_TEMPLATE_DEFAULT.into(),
         ),
+        address,
+        server_name: StringEnvVar::new_optional("SERVER_NAME", false),
         service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
         api_host_names: StringEnvVar::new("API_HOST_NAMES", API_HOST_NAMES_DEFAULT.into()),
@@ -360,31 +357,17 @@ impl Settings {
     /// Host names are taken from the `API_HOST_NAMES` environment variable.
     /// If that is not set, `addr` is used.
     pub(crate) fn api_host_names() -> Vec<String> {
-        if let Some(settings) = SERVICE_SETTINGS.get() {
-            let addr = settings.docs_settings.address;
-            string_to_api_host_names(&addr, ENV_VARS.api_host_names.as_str())
-        } else {
-            Vec::new()
-        }
+        string_to_api_host_names(&ENV_VARS.address, ENV_VARS.api_host_names.as_str())
     }
 
     /// The socket address we are bound to.
     pub(crate) fn bound_address() -> SocketAddr {
-        if let Some(settings) = SERVICE_SETTINGS.get() {
-            settings.docs_settings.address
-        } else {
-            // This should never happen, needed to satisfy the compiler.
-            SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080)
-        }
+        ENV_VARS.address
     }
 
     /// Get the server name to be used in the `Server` object of the `OpenAPI` Document.
-    pub(crate) fn server_name() -> Option<String> {
-        if let Some(settings) = SERVICE_SETTINGS.get() {
-            settings.docs_settings.server_name.clone()
-        } else {
-            None
-        }
+    pub(crate) fn server_name() -> Option<&'static str> {
+        ENV_VARS.server_name.as_ref().map(StringEnvVar::as_str)
     }
 
     /// Generate a github issue url with a given title
