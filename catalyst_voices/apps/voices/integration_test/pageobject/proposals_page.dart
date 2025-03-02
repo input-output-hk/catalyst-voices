@@ -205,4 +205,34 @@ class ProposalsPage {
       expect($(cardanoUseCasesSectionBody).text, isNotEmpty);
     }
   }
+
+  Future<void> campaignDetailsCloseButtonWorks() async {
+    await $(campaignDetailsButton).tap();
+    expect($(titleLabelText), findsOneWidget);
+    await $(campaignDetailsCloseButton).tap();
+    expect($(titleLabelText), findsNothing);
+  }
+
+  Future<void> clickDraftTab() async {
+    await $(draftProposalsTab).tap();
+  }
+
+  Future<void> clickFinalTab() async {
+    await $(finalProposalsTab).tap();
+  }
+
+  Future<void> checkProposalsStageMatch(String expectedStage) async {
+    final proposalsCount = $.tester
+        .widgetList<Material>(
+          $(proposalsContainer).$(MostRecentSection($).proposalCard),
+        )
+        .length;
+    for (var cardIndex = 0; cardIndex < proposalsCount; cardIndex++) {
+      await $(#ProposalStage).at(cardIndex).scrollTo();
+      expect(
+        $(#ProposalStage).at(cardIndex).text,
+        T.get(expectedStage),
+      );
+    }
+  }
 }

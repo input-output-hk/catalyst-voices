@@ -48,5 +48,31 @@ void main() async {
         await ProposalsPage($).campaignDetailsScreenLooksAsExpected();
       },
     );
+
+    patrolWidgetTest(
+      'visitor - campaign details screen close button works',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).campaignDetailsCloseButtonWorks();
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - draft tab displays only draft proposals',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).clickDraftTab();
+        await ProposalsPage($).checkProposalsStageMatch(T.get('Draft'));
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - final tab displays only final proposals',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).clickFinalTab();
+        await ProposalsPage($).checkProposalsStageMatch(T.get('Final'));
+      },
+    );
   });
 }
