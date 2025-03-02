@@ -10,7 +10,6 @@ use anyhow::anyhow;
 use cardano_blockchain_types::{Network, Slot};
 use clap::Args;
 use dotenvy::dotenv;
-use duration_string::DurationString;
 use str_env_var::StringEnvVar;
 use tracing::error;
 use url::Url;
@@ -48,14 +47,14 @@ const API_HOST_NAMES_DEFAULT: &str = "https://gateway.dev.projectcatalyst.io";
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
-/// Default `CHECK_CONFIG_TICK` used in development.
-const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
+/// Default `CHECK_CONFIG_TICK` used in development, 5 seconds.
+const CHECK_CONFIG_TICK_DEFAULT: Duration = Duration::from_secs(5);
 
-/// Default `METRICS_MEMORY_INTERVAL`.
-const METRICS_MEMORY_INTERVAL_DEFAULT: &str = "1s";
+/// Default `METRICS_MEMORY_INTERVAL`, 1 second.
+const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
-/// Default `METRICS_FOLLOWER_INTERVAL`.
-const METRICS_FOLLOWER_INTERVAL_DEFAULT: &str = "1s";
+/// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
+const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
@@ -65,8 +64,8 @@ const EVENT_DB_URL_DEFAULT: &str =
 const PURGE_SLOT_BUFFER_DEFAULT: u64 = 100;
 
 /// Default `SERVICE_LIVE_TIMEOUT_INTERVAL`, that is used to determine if the service is
-/// live.
-const SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT: &str = "30s";
+/// live, 30 seconds.
+const SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT: Duration = Duration::from_secs(30);
 
 /// Default `SERVICE_LIVE_COUNTER_THRESHOLD`, that is used to determine if the service is
 /// live.
@@ -184,18 +183,6 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             );
         }).unwrap_or(ADDRESS_DEFAULT);
 
-    let check_interval = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT.into());
-    let check_config_tick = match DurationString::try_from(check_interval.as_string()) {
-        Ok(duration) => duration.into(),
-        Err(error) => {
-            error!(
-                "Invalid Check Config Tick Duration: {} : {}. Defaulting to 5 seconds.",
-                check_interval.as_str(),
-                error
-            );
-            Duration::from_secs(5)
-        },
-    };
     let purge_slot_buffer =
         StringEnvVar::new_as("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
 
@@ -225,7 +212,10 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         ),
         chain_follower: chain_follower::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
-        check_config_tick,
+        check_config_tick: StringEnvVar::new_as_duration(
+            "CHECK_CONFIG_TICK",
+            CHECK_CONFIG_TICK_DEFAULT,
+        ),
         purge_slot_buffer,
         metrics_memory_interval: StringEnvVar::new_as_duration(
             "METRICS_MEMORY_INTERVAL",
@@ -557,8 +547,7 @@ mod tests {
     #[test]
     fn configured_service_live_timeout_interval_default() {
         let timeout_secs = Settings::service_live_timeout_interval();
-        let interval_str = format!("{}s", timeout_secs.as_secs());
-        assert_eq!(interval_str.as_str(), SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT);
+        assert_eq!(timeout_secs, SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT);
     }
 
     #[test]
