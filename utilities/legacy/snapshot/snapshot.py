@@ -1,5 +1,5 @@
 import typer
-import logging
+
 from requests.exceptions import HTTPError
 import requests
 import json
@@ -7,45 +7,57 @@ from hashlib import blake2b
 from bitcoin.segwit_addr import bech32_encode, convertbits
 import threading
 import multiprocessing
+from pprint import pprint
 
+
+# Typer is a library for building CLI applications
 app = typer.Typer()
-
-logger = logging.getLogger()
-logger.setLevel("INFO")
-
-new_snap = []
-error_staked_ada = []
 
 
 @app.command()
 def snapshot(
-    slot_no: str = (typer.Option(...)),
     bearer_token: str = (typer.Option(...)),
     api_key: str = (typer.Option(...)),
     host: str = (typer.Option(...)),
+    slot_no: str = (typer.Option(...)),
 ):
     """
     Generate snapshot given slot no.
+    Writes valids to snapshot.json and
+    any unsuccessful attempts to snapshot_errors.json
     """
+
+    snapshot_data = []
+    snapshot_data_errors = []
+
     url = f"{host}/api/v1/cardano/registration/cip36?lookup=ALL&asat=SLOT:{slot_no}"
     headers = {"Authorization": bearer_token, "X-API-Key": api_key}
 
     try:
         response = requests.get(url, headers=headers)
         registrations = json.loads(response.text)["voting_key"]
-        print(f"Registratons to process {len(registrations)}")
+        pprint(f"Registratons to process {len(registrations)}")
 
         # The number of usable CPUs can be obtained with os.process_cpu_count()
-        print(f"You have this many usable cpus {multiprocessing.cpu_count()}")
+        pprint(f"You have this many usable cpus {multiprocessing.cpu_count()}")
 
         thread_list = []
 
+        # chunk and process registrations in parallel
         chunks = split_list(registrations, multiprocessing.cpu_count())
 
         for chunk in chunks:
             thread_list.append(
                 threading.Thread(
-                    target=process_chunk, args=(chunk, bearer_token, api_key, host)
+                    target=process_chunk,
+                    args=(
+                        chunk,
+                        bearer_token,
+                        api_key,
+                        host,
+                        snapshot_data,
+                        snapshot_data_errors,
+                    ),
                 )
             )
 
@@ -56,24 +68,35 @@ def snapshot(
             thread.join()
 
     except HTTPError as e:
-        logger.error(print(e.response.text))
+        pprint(e.response.text)
 
     # Convert and write JSON object to file
-    with open("new_snap3.json", "w") as outfile:
-        json.dump(new_snap, outfile)
+    with open("snapshot.json", "w") as outfile:
+        json.dump(snapshot_data, outfile, indent=2)
 
     # Convert and write JSON object to file
-    with open("new_error_snap3.json", "w") as outfile:
-        json.dump(error_staked_ada, outfile)
+    with open("snapshot_errors.json", "w") as outfile:
+        json.dump(snapshot_data_errors, outfile, indent=2)
 
-    print(f"Number of registrations in snapshot file: {len(new_snap)}")
-    print(f"Number of errors in snapshot file: {len(error_staked_ada)}")
+    pprint(f"Number of registrations in snapshot file: {len(snapshot_data)}")
+    pprint(f"Number of errors in snapshot file: {len(snapshot_data_errors)}")
 
 
-def process_chunk(chunk: list, bearer_token: str, api_key: str, host: str):
-
-    for registration in chunk:
+def process_chunk(
+    chunk_of_registrations: list,
+    bearer_token: str,
+    api_key: str,
+    host: str,
+    snapshot_data: list,
+    snapshot_data_errors: list,
+):
+    """
+    Process chunk of registrations.
+    """
+    for registration in chunk_of_registrations:
         # latest registration
+
+        # TODO: CROSSREFERENCE
         latest_stake_pub_key = registration["registrations"][0]["stake_pub_key"]
 
         # latest regsistration slot no to query staked ada
@@ -93,10 +116,9 @@ def process_chunk(chunk: list, bearer_token: str, api_key: str, host: str):
 
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            error_staked_ada.append(
+            snapshot_data_errors.append(
                 str(registration["registrations"][0]) + "stake_addr:" + stake_address
             )
-
             continue
 
         json_data = json.loads(response.text)
@@ -104,10 +126,10 @@ def process_chunk(chunk: list, bearer_token: str, api_key: str, host: str):
         registration["registrations"][0]["voting_power"] = json_data["persistent"][
             "ada_amount"
         ]
-        new_snap.append(registration["registrations"][0])
+        snapshot_data.append(registration["registrations"][0])
 
-        if len(new_snap) % 500 == 0:
-            print(f"Registrations processed:{len(new_snap)}")
+        if len(snapshot_data) % 500 == 0:
+            pprint(f"Registrations processed:{len(snapshot_data)}")
 
 
 def stake_public_key_to_address(key: str, is_stake: bool, network_type: str):
@@ -165,17 +187,58 @@ def split_list(l: list, parts: int) -> list:
     split_list( [1, 2, 3, 4, 5, 6], 4 )
     will return
     [ [1, 2], [3, 4], [5], [6] ]
-
-    I will also make sure that the list isn't split into more parts than
-    there are elements in the list, so
-    split_list( [a, b], 6 )
-    will return
-    [ [a], [b] ]
     """
     n = min(parts, max(len(l), 1))
     k, m = divmod(len(l), n)
     return [l[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)] for i in range(n)]
 
 
+@app.command()
+def compare(
+    legacy_snapshot: str = (typer.Option(...)),
+    gateway_snapshot: str = (typer.Option(...)),
+):
+
+    matches = []
+    no_match = []
+
+    # Open and read the legacy snapshot JSON file
+    with open(legacy_snapshot, "r") as file:
+        legacy = json.load(file)
+
+    # ...... gateway snapshot ..
+    with open(gateway_snapshot, "r") as file:
+        gateway = json.load(file)
+
+    for legacy_registration in legacy:
+        for gateway_registration in gateway:
+            if (
+                legacy_registration["stake_public_key"]
+                == gateway_registration["stake_pub_key"]
+            ):
+
+                if (
+                    legacy_registration["voting_power"]
+                    == gateway_registration["voting_power"]
+                ):
+                    legacy_registration["legacy"] = True
+                    gateway_registration["gateway"] = True
+                    matches.append((legacy_registration, gateway_registration))
+                else:
+                    legacy_registration["legacy"] = True
+                    gateway_registration["gateway"] = True
+                    no_match.append((legacy_registration, gateway_registration))
+
+    pprint(f"Matches:{len(matches)}")
+    pprint(f"No Matches:{len(no_match)}")
+
+    # Convert and write JSON object to file
+    with open("no_matches.json", "w") as outfile:
+        json.dump(no_match, outfile, indent=2)
+
+    with open("matches.json", "w") as outfile:
+        json.dump(matches, outfile, indent=2)
+
+
 if __name__ == "__main__":
-    typer.run(snapshot)
+    app()
