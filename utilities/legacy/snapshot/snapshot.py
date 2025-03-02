@@ -198,6 +198,10 @@ def compare(
     legacy_snapshot: str = (typer.Option(...)),
     gateway_snapshot: str = (typer.Option(...)),
 ):
+    """
+    Compares legacy and gateway snapshots for parity and writes
+    match and no match files to file for further processing.
+    """
 
     matches = []
     no_match = []
