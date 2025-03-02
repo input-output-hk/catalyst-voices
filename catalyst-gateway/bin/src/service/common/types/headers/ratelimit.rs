@@ -2,11 +2,7 @@
 //!
 //! This is a passive type, produced automatically by the CORS middleware.
 
-use std::{
-    borrow::Cow,
-    ops::{Deref, DerefMut},
-    sync::LazyLock,
-};
+use std::sync::LazyLock;
 
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
