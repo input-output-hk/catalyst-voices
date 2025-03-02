@@ -23,7 +23,7 @@ const DESCRIPTION: &str = "This is an error message.";
 /// Example.
 const EXAMPLE: &str = "An error has occurred, the details of the error are ...";
 /// Max Length
-const MAX_LENGTH: usize = 256;
+const MAX_LENGTH: usize = 1000;
 /// Min Length
 const MIN_LENGTH: usize = 1;
 /// Validation Regex Pattern

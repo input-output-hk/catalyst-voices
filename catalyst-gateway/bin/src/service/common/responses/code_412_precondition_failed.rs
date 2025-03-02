@@ -71,17 +71,10 @@ pub(crate) struct ContentErrorDetail {
     #[oai(skip_serializing_if_is_none)]
     loc: Option<common::types::generic::error_list::ErrorList>,
     /// The error message.
-    #[oai(
-        validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"),
-        skip_serializing_if_is_none
-    )]
+    #[oai(skip_serializing_if_is_none)]
     msg: Option<common::types::generic::error_msg::ErrorMessage>,
     /// The type of error
-    #[oai(
-        rename = "type",
-        validator(max_length = "1000", pattern = "^[0-9a-zA-Z].*$"),
-        skip_serializing_if_is_none
-    )]
+    #[oai(rename = "type", skip_serializing_if_is_none)]
     err_type: Option<common::types::generic::error_msg::ErrorMessage>,
 }
 
