@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/details/campaign_details_dialog.dart';
-import 'package:catalyst_voices/pages/proposals/proposals_pagination.dart';
+import 'package:catalyst_voices/pages/proposals/proposal_pagination_tabview.dart';
 import 'package:catalyst_voices/widgets/dropdown/category_dropdown.dart';
+import 'package:catalyst_voices/widgets/search/search_text_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -25,11 +26,6 @@ typedef _ProposalsCount = ({
   int finals,
   int favorites,
   int my,
-});
-
-typedef _ProposalsTabSelector = ({
-  ProposalPaginationItems<ProposalViewModel> items,
-  String? selectedCategoryId,
 });
 
 class ProposalsPage extends StatefulWidget {
@@ -77,6 +73,7 @@ class _CampaignDetailsButton extends StatelessWidget {
         return Offstage(
           offstage: campaignId == null,
           child: Padding(
+            key: const Key('CampaignDetailsButton'),
             padding: const EdgeInsets.only(top: 32),
             child: OutlinedButton.icon(
               onPressed: () {
@@ -106,6 +103,7 @@ class _ChangeCategoryButton extends StatefulWidget {
     required this.items,
     required this.selectedName,
     this.onChanged,
+    super.key,
   });
 
   @override
@@ -147,6 +145,7 @@ class _ChangeCategoryButtonSelector extends StatelessWidget {
       },
       builder: (context, state) {
         return _ChangeCategoryButton(
+          key: const Key('ChangeCategoryBtnSelector'),
           items: state.categories,
           selectedName: state.selectedName,
           onChanged: (value) {
@@ -181,6 +180,7 @@ class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
+              key: const Key('CategorySelectorLabel'),
               context.l10n.category,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.colors.textDisabled,
@@ -188,6 +188,7 @@ class _ChangeCategoryButtonState extends State<_ChangeCategoryButton> {
             ),
             const SizedBox(width: 4),
             Text(
+              key: const Key('CategorySelectorValue'),
               widget.selectedName,
               style: context.textTheme.bodyMedium,
             ),
@@ -213,24 +214,16 @@ class _Controls extends StatelessWidget {
         children: [
           const _ChangeCategoryButtonSelector(),
           const SizedBox(width: 8),
-          SizedBox(
-            width: 250,
-            child: VoicesTextField(
-              onFieldSubmitted: (_) {},
-              decoration: VoicesTextFieldDecoration(
-                prefixIcon: VoicesAssets.icons.search.buildIcon(),
-                hintText: context.l10n.searchProposals,
-                filled: true,
-                fillColor: context.colors.elevationsOnSurfaceNeutralLv1White,
-                suffixIcon: Offstage(
-                  offstage: false,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text(context.l10n.clear),
-                  ),
-                ),
-              ),
-            ),
+          SearchTextField(
+            key: const Key('SearchProposalsField'),
+            hintText: context.l10n.searchProposals,
+            showClearButton: true,
+            onSearch: ({
+              required searchValue,
+              required isSubmitted,
+            }) {
+              context.read<ProposalsCubit>().changeSearchValue(searchValue);
+            },
           ),
         ],
       ),
@@ -250,11 +243,13 @@ class _FundInfo extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
+            key: const Key('CurrentCampaignTitle'),
             context.l10n.catalystF14,
             style: Theme.of(context).textTheme.displayMedium,
           ),
           const SizedBox(height: 16),
           Text(
+            key: const Key('CurrentCampaignDescription'),
             context.l10n.currentCampaignDescription,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
@@ -339,18 +334,23 @@ class _TabBar extends StatelessWidget {
             dividerHeight: 0,
             tabs: [
               Tab(
+                key: const Key('AllProposalsTab'),
                 text: context.l10n.noOfAll(state.total),
               ),
               Tab(
+                key: const Key('DraftProposalsTab'),
                 text: context.l10n.noOfDraft(state.draft),
               ),
               Tab(
+                key: const Key('FinalProposalsTab'),
                 text: context.l10n.noOfFinal(state.finals),
               ),
               Tab(
+                key: const Key('FavoriteProposalsTab'),
                 text: context.l10n.noOfFavorites(state.favorites),
               ),
               Tab(
+                key: const Key('MyProposalsTab'),
                 text: context.l10n.noOfMyProposals(state.my),
               ),
             ],
@@ -368,6 +368,7 @@ class _Tabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 5,
+      initialIndex: 0,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,97 +395,92 @@ class _Tabs extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           TabBarStackView(
+            key: const Key('ProposalsTabBarStackView'),
             children: [
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginationViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.allProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginationViewModel.fromPaginationItems(
+                    paginItems: state.allProposals,
+                    isLoading: state.allProposals.isLoading,
+                    categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
+                  return ProposalPaginationTabView(
+                    paginationViewModel: state,
                   );
                 },
               ),
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginationViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.draftProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginationViewModel.fromPaginationItems(
+                    paginItems: state.draftProposals,
+                    isLoading: state.draftProposals.isLoading,
+                    categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
-                    stage: ProposalPublish.draft,
+                  return ProposalPaginationTabView(
+                    key: const Key('draftProposalsPagination'),
+                    paginationViewModel: state,
+                    stage: ProposalPublish.publishedDraft,
                   );
                 },
               ),
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginationViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.finalProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginationViewModel.fromPaginationItems(
+                    paginItems: state.finalProposals,
+                    isLoading: state.finalProposals.isLoading,
+                    categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
-                    stage: ProposalPublish.published,
+                  return ProposalPaginationTabView(
+                    key: const Key('finalProposalsPagination'),
+                    paginationViewModel: state,
+                    stage: ProposalPublish.submittedProposal,
                   );
                 },
               ),
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginationViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.favoriteProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginationViewModel.fromPaginationItems(
+                    paginItems: state.favoriteProposals,
+                    isLoading: state.favoriteProposals.isLoading,
+                    categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
+                  return ProposalPaginationTabView(
+                    key: const Key('favoriteProposalsPagination'),
+                    paginationViewModel: state,
                     usersFavorite: true,
                   );
                 },
               ),
               BlocSelector<ProposalsCubit, ProposalsState,
-                  _ProposalsTabSelector>(
+                  ProposalPaginationViewModel>(
                 selector: (state) {
-                  return (
-                    items: state.userProposals,
-                    selectedCategoryId: state.selectedCategoryId,
+                  return ProposalPaginationViewModel.fromPaginationItems(
+                    paginItems: state.userProposals,
+                    isLoading: state.userProposals.isLoading,
+                    categoryId: state.selectedCategoryId,
+                    searchValue: state.searchValue,
                   );
                 },
                 builder: (context, state) {
-                  return ProposalsPagination(
-                    state.items.items,
-                    state.items.pageKey,
-                    state.items.maxResults,
-                    isEmpty: state.items.isEmpty,
-                    categoryId: state.selectedCategoryId,
+                  return ProposalPaginationTabView(
+                    key: const Key('userProposalsPagination'),
+                    paginationViewModel: state,
                     userProposals: true,
                   );
                 },

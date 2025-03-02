@@ -1,6 +1,7 @@
-import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
-import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
+import 'package:catalyst_voices/widgets/cards/proposal_card_widgets.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -152,7 +153,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      key: const Key('PendingProposalCard'),
+      key: const Key('ProposalCard'),
       color: Colors.transparent,
       child: InkWell(
         statesController: _statesController,
@@ -299,8 +300,10 @@ final class _ProposalBorderColor extends WidgetStateColor {
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.hovered)) {
       return switch (publishStage) {
-        ProposalPublish.draft => colorScheme.secondary,
-        ProposalPublish.published => colorScheme.primary,
+        ProposalPublish.localDraft ||
+        ProposalPublish.publishedDraft =>
+          colorScheme.secondary,
+        ProposalPublish.submittedProposal => colorScheme.primary,
       };
     }
 
@@ -328,34 +331,12 @@ class _ProposalInfo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        VoicesChip.rectangular(
-          backgroundColor: proposalStage.isDraft
-              ? context.colorScheme.secondary
-              : context.colorScheme.primary,
-          content: Text(
-            key: const Key('ProposalStage'),
-            _localizedProposalStage(
-              proposalStage,
-              context.l10n,
-            ),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.onWarning,
-            ),
-          ),
-        ),
+        if (proposalStage.isDraft)
+          const DraftProposalChip()
+        else
+          const FinalProposalChip(),
         const SizedBox(width: 4),
-        VoicesChip.rectangular(
-          leading: VoicesAssets.icons.documentText.buildIcon(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-          content: Text(
-            key: const Key('Version'),
-            version.toString(),
-            style: context.textTheme.labelLarge?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
-          ),
-        ),
+        ProposalVersionChip(version: version.toString()),
         if (showLastUpdate) ...[
           const SizedBox(width: 4),
           VoicesPlainTooltip(
@@ -377,16 +358,6 @@ class _ProposalInfo extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _localizedProposalStage(
-    ProposalPublish proposalStage,
-    VoicesLocalizations l10n,
-  ) {
-    return switch (proposalStage) {
-      ProposalPublish.draft => l10n.draft,
-      ProposalPublish.published => l10n.finalProposal,
-    };
   }
 
   String _tooltipMessage(BuildContext context) {
@@ -436,12 +407,8 @@ class _Topbar extends StatelessWidget {
           key: const Key('ShareBtn'),
           onTap: () async {
             // TODO(LynxLynxx): Change to proposal view route when implemented
-            final url =
-                ProposalBuilderDraftRoute(templateId: proposalId).location;
-            await ShareProposalDialog.show(
-              context,
-              url,
-            );
+            final url = ProposalBuilderRoute(proposalId: proposalId).location;
+            await ShareProposalDialog.show(context, url);
           },
           style: _buttonStyle(context),
           child: VoicesAssets.icons.share.buildIcon(

@@ -17,15 +17,13 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
     required this.builderDelegate,
   });
 
-  PagingController<ItemType> get _pagingController => pagingController;
-
-  ItemWidgetBuilder<ItemType> get _itemBuilder => builderDelegate.builder;
-
   WidgetBuilder get _errorIndicatorBuilder =>
       builderDelegate.errorIndicatorBuilder ??
       (context) => VoicesErrorIndicator(
             message: context.l10n.somethingWentWrong,
           );
+
+  ItemWidgetBuilder<ItemType> get _itemBuilder => builderDelegate.builder;
 
   WidgetBuilder get _loadingIndicatorBuilder =>
       builderDelegate.loadingIndicatorBuilder ??
@@ -33,6 +31,8 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
             padding: EdgeInsets.all(16),
             child: Center(child: VoicesCircularProgressIndicator()),
           );
+
+  PagingController<ItemType> get _pagingController => pagingController;
 
   @override
   Widget build(BuildContext context) {
@@ -51,18 +51,19 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
 
           case PagingStatus.ongoing:
           case PagingStatus.completed:
-            child = Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                for (var i = pagingState.currentFrom;
-                    i <= pagingState.currentTo;
-                    i++)
-                  _itemBuilder(
-                    context,
-                    itemList[i],
-                  ),
-              ],
+            child = SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                key: const Key('PaginatedGridView'),
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  for (var i = pagingState.currentFrom;
+                      i <= pagingState.currentTo;
+                      i++)
+                    _itemBuilder(context, itemList[i]),
+                ],
+              ),
             );
             break;
 
@@ -100,10 +101,6 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
     );
   }
 
-  void _onPrevPageTap() {
-    _pagingController.prevPage();
-  }
-
   void _onNextPageTap(PagingState<ItemType> pagingState) {
     if (pagingState.isLoading) return;
     if (pagingState.currentPage < pagingState.currentLastPage) {
@@ -112,6 +109,10 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
       _pagingController
           .notifyPageRequestListeners(_pagingController.nextPageValue);
     }
+  }
+
+  void _onPrevPageTap() {
+    _pagingController.prevPage();
   }
 }
 
@@ -135,13 +136,16 @@ class _Controls extends StatelessWidget {
     return Row(
       children: [
         Text(
+          key: const Key('PaginationText'),
           '$fromNumber-$toNumber of $maxResults proposals',
         ),
         VoicesIconButton(
+          key: const Key('PrevPageBtn'),
           onTap: onPrevPageTap,
           child: VoicesAssets.icons.chevronLeft.buildIcon(),
         ),
         VoicesIconButton(
+          key: const Key('NextPageBtn'),
           onTap: onNextPageTap,
           child: VoicesAssets.icons.chevronRight.buildIcon(),
         ),

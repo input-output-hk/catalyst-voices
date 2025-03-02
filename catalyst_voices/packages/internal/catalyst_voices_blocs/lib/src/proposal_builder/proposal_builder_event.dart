@@ -18,10 +18,13 @@ final class DeleteProposalEvent extends ProposalBuilderEvent {
 }
 
 final class ExportProposalEvent extends ProposalBuilderEvent {
-  const ExportProposalEvent();
+  /// The prefix for the file where the proposal will be exported.
+  final String filePrefix;
+
+  const ExportProposalEvent({required this.filePrefix});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [filePrefix];
 }
 
 final class LoadDefaultProposalTemplateEvent extends ProposalBuilderEvent {
@@ -75,15 +78,15 @@ final class SectionChangedEvent extends ProposalBuilderEvent {
   List<Object?> get props => [changes];
 }
 
-final class ShareProposalEvent extends ProposalBuilderEvent {
-  const ShareProposalEvent();
+final class SubmitProposalEvent extends ProposalBuilderEvent {
+  const SubmitProposalEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-final class SubmitProposalEvent extends ProposalBuilderEvent {
-  const SubmitProposalEvent();
+final class ValidateProposalEvent extends ProposalBuilderEvent {
+  const ValidateProposalEvent();
 
   @override
   List<Object?> get props => [];

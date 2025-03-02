@@ -18,6 +18,15 @@ final class Dependencies extends DependencyProvider {
 
   Dependencies._();
 
+  bool get isInitialized => _isInitialized;
+
+  @override
+  Future<void> get reset {
+    return super.reset.whenComplete(() {
+      _isInitialized = false;
+    });
+  }
+
   Future<void> init({
     required AppConfig config,
   }) async {
@@ -27,20 +36,12 @@ final class Dependencies extends DependencyProvider {
 
     _registerStorages();
     _registerUtils();
+    _registerNetwork();
     _registerRepositories();
     _registerServices();
     _registerBlocsWithDependencies();
 
     _isInitialized = true;
-  }
-
-  bool get isInitialized => _isInitialized;
-
-  @override
-  Future<void> get reset {
-    return super.reset.whenComplete(() {
-      _isInitialized = false;
-    });
   }
 
   void _registerBlocsWithDependencies() {
@@ -66,7 +67,7 @@ final class Dependencies extends DependencyProvider {
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
-          downloader: get<Downloader>(),
+          downloaderService: get<DownloaderService>(),
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
@@ -96,12 +97,14 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<WorkspaceBloc>(() {
         return WorkspaceBloc(
           get<CampaignService>(),
+          get<ProposalService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<DownloaderService>(),
         );
       })
       ..registerFactory<DiscoveryCubit>(() {
@@ -119,14 +122,17 @@ final class Dependencies extends DependencyProvider {
       });
   }
 
+  void _registerNetwork() {
+    registerLazySingleton<ApiServices>(() {
+      return ApiServices(
+        config: get<AppConfig>().api,
+        userObserver: get<UserObserver>(),
+      );
+    });
+  }
+
   void _registerRepositories() {
     this
-      ..registerLazySingleton<TransactionConfigRepository>(
-        TransactionConfigRepository.new,
-      )
-      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
-      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
-      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<UserRepository>(() {
         return UserRepository(
           get<UserStorage>(),
@@ -148,6 +154,12 @@ final class Dependencies extends DependencyProvider {
           get<SignedDocumentManager>(),
         );
       })
+      ..registerLazySingleton<TransactionConfigRepository>(
+        TransactionConfigRepository.new,
+      )
+      ..registerLazySingleton<ProposalRepository>(ProposalRepository.new)
+      ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
+      ..registerLazySingleton<ConfigRepository>(ConfigRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
           get<DatabaseDraftsDataSource>(),
@@ -167,7 +179,7 @@ final class Dependencies extends DependencyProvider {
         cacheConfig: get<AppConfig>().cache,
       );
     });
-    registerLazySingleton<Downloader>(Downloader.new);
+    registerLazySingleton<DownloaderService>(DownloaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,
@@ -183,7 +195,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<UserService>(
       () {
         return UserService(
-          userRepository: get<UserRepository>(),
+          get<UserRepository>(),
+          get<UserObserver>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
@@ -229,5 +242,9 @@ final class Dependencies extends DependencyProvider {
 
   void _registerUtils() {
     registerLazySingleton<SignedDocumentManager>(SignedDocumentManager.new);
+    registerLazySingleton<UserObserver>(
+      StreamUserObserver.new,
+      dispose: (observer) async => observer.dispose(),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 /// Raw document content class. At this level we can't really make sense of
@@ -9,9 +10,9 @@ final class DocumentDataContent extends Equatable {
 
   const DocumentDataContent(this.data);
 
-  // TODO(damian-molinski): should somehow query data
-  String? get title => null;
-
   @override
   List<Object?> get props => [data];
+
+  String? get title =>
+      DocumentNodeTraverser.getValue(Proposal.titleNodeId, data) as String?;
 }
