@@ -57,3 +57,9 @@ impl Example for JSONObject {
         Self(serde_json::json!({}))
     }
 }
+
+impl From<serde_json::Value> for JSONObject {
+    fn from(value: serde_json::Value) -> Self {
+        Self(value)
+    }
+}

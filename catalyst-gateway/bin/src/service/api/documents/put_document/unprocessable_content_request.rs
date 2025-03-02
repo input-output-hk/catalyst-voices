@@ -1,9 +1,6 @@
 //! Bad Document PUT request.
 
-use poem_openapi::{
-    types::{Example, ParseFromJSON},
-    Object,
-};
+use poem_openapi::{types::Example, Object};
 
 use crate::service::common;
 
@@ -23,7 +20,7 @@ impl PutDocumentUnprocessableContent {
     pub(crate) fn new(error: &(impl ToString + ?Sized), report: Option<serde_json::Value>) -> Self {
         Self {
             error: error.to_string().into(),
-            report: ParseFromJSON::parse_from_json(report).ok(),
+            report: report.map(Into::into),
         }
     }
 }
