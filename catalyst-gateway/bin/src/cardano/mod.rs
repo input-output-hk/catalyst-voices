@@ -333,6 +333,9 @@ struct SyncTask {
     /// How many immutable chain follower sync tasks we are running.
     current_sync_tasks: u16,
 
+    /// How may data purges were run.
+    data_purge_count: u64,
+
     /// Start for the next block we would sync.
     start_slot: Slot,
 
@@ -342,7 +345,7 @@ struct SyncTask {
     /// The live tip slot.
     live_tip_slot: Slot,
 
-    /// Current Sync Status
+    /// Current Sync Status.
     sync_status: Vec<SyncStatus>,
 
     /// Event handlers during the process of sync tasks.
@@ -357,6 +360,7 @@ impl SyncTask {
             sync_tasks: FuturesUnordered::new(),
             start_slot: 0.into(),
             current_sync_tasks: 0,
+            data_purge_count: 0,
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
@@ -483,6 +487,12 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 if let Err(error) = roll_forward::purge_live_index(self.immutable_tip_slot).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
+                } else {
+                    self.data_purge_count = self.data_purge_count.checked_add(1).unwrap_or(0);
+
+                    self.dispatch_event(event::ChainIndexerEvent::LiveDataPurged {
+                        count: self.data_purge_count,
+                    });
                 }
             }
         }
@@ -615,6 +625,13 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::CURRENT_IMMUTABLE_TIP_SLOT
                     .with_label_values(&[])
                     .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
+            }
+        });
+        sync_task.add_event_listener(|event: &Event| {
+            if let Event::LiveDataPurged { count } = event {
+                reporter::TRIGGERED_DATA_PURGES_COUNT
+                    .with_label_values(&[])
+                    .set(i64::try_from(*count).unwrap_or(-1));
             }
         });
 

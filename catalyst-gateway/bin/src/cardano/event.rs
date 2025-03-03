@@ -5,7 +5,8 @@ pub(crate) enum ChainIndexerEvent {
     SyncTasksChanged { current_sync_tasks: u16 },
     LiveTipSlotChanged { slot: Slot },
     ImmutableTipSlotChanged { slot: Slot },
-    IndexedSlotChanged { slot_number: u32 }
+    IndexedSlotChanged { slot: Slot },
+    LiveDataPurged { count: u64 },
 }
 
 pub(crate) trait EventTarget<T> {
