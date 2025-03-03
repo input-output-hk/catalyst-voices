@@ -70,7 +70,7 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Docu
     let hosts = Settings::api_host_names();
 
     for host in hosts {
-        service = service.server(ServerObject::new(host).description("API Host"));
+        service = service.server(ServerObject::new(host).description("Server host location."));
     }
 
     // Add server name if it is set
