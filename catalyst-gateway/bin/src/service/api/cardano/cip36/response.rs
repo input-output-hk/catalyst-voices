@@ -136,7 +136,7 @@ pub(crate) struct Cip36Details {
     pub nonce: Option<common::types::cardano::nonce::Nonce>,
     #[allow(clippy::missing_docs_in_private_items)] // Type is pre documented.
     #[oai(skip_serializing_if_is_none)]
-    pub txn: Option<common::types::cardano::txn_index::TxnIndex>,
+    pub txn_index: Option<common::types::cardano::txn_index::TxnIndex>,
     /// Cardano Cip-19 Formatted Shelley Payment Address.
     #[oai(skip_serializing_if_is_none)]
     pub payment_address: Option<common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress>,
@@ -164,7 +164,7 @@ impl Example for Cip36Details {
                 common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
             ),
             nonce: Some(common::types::cardano::nonce::Nonce::example()),
-            txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
+            txn_index: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: Some(
                 common::types::cardano::cip19_shelley_address::Cip19ShelleyAddress::example(),
             ),
@@ -191,7 +191,7 @@ impl Cip36Details {
                 common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey::example(),
             ),
             nonce: Some((common::types::cardano::nonce::EXAMPLE + 97).into()),
-            txn: Some(common::types::cardano::txn_index::TxnIndex::example()),
+            txn_index: Some(common::types::cardano::txn_index::TxnIndex::example()),
             payment_address: None,
             is_payable: false.into(),
             cip15: true.into(),

@@ -39,7 +39,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 });
 
 /// Value of a Nonce.
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, PartialOrd, Ord)]
 pub(crate) struct Nonce(u64);
 
 /// Is the Nonce valid?
@@ -114,5 +114,11 @@ impl From<u64> for Nonce {
 impl Example for Nonce {
     fn example() -> Self {
         Self(EXAMPLE)
+    }
+}
+
+impl Default for Nonce {
+    fn default() -> Self {
+        Nonce(0)
     }
 }
