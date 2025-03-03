@@ -41,3 +41,20 @@ class ProposalTileDecoration extends StatelessWidget {
     );
   }
 }
+
+class ProposalSeparatorBox extends StatelessWidget {
+  final double height;
+
+  const ProposalSeparatorBox({
+    super.key,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: context.colors.elevationsOnSurfaceNeutralLv0,
+      child: SizedBox(height: height),
+    );
+  }
+}

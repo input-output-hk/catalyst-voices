@@ -73,7 +73,12 @@ class _SegmentsListView extends StatelessWidget {
         );
       },
       separatorBuilder: (context, index) {
+        final item = items[index];
         final nextItem = items.elementAtOrNull(index + 1);
+
+        if (item is DocumentSegment && nextItem is DocumentSection) {
+          return const ProposalSeparatorBox(height: 24);
+        }
 
         if (nextItem is ProposalCommentsSegment) {
           return const SizedBox(height: 32);
@@ -112,7 +117,9 @@ class _SegmentsListView extends StatelessWidget {
               milestoneCount: data.milestoneCount,
             ),
         },
-      DocumentSegment() => const ProposalDocumentSegmentTitle(),
+      DocumentSegment() => ProposalDocumentSegmentTitle(
+          title: item.resolveTitle(context),
+        ),
       DocumentSection() => const ProposalDocumentSectionTile(),
       ProposalCommentsSegment() => const ProposalCommentsHeaderTile(),
       ProposalCommentsSection() => switch (item) {
