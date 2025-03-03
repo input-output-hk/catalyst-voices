@@ -1,7 +1,6 @@
 //! Command line and environment variable settings for the service
 use std::{
     net::{IpAddr, Ipv4Addr, SocketAddr},
-    path::PathBuf,
     str::FromStr,
     sync::{LazyLock, OnceLock},
     time::Duration,
@@ -11,7 +10,6 @@ use anyhow::anyhow;
 use cardano_blockchain_types::{Network, Slot};
 use clap::Args;
 use dotenvy::dotenv;
-use duration_string::DurationString;
 use str_env_var::StringEnvVar;
 use tracing::error;
 use url::Url;
@@ -27,8 +25,8 @@ pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 mod str_env_var;
 
-/// Default address to start service on.
-const ADDRESS_DEFAULT: &str = "0.0.0.0:3030";
+/// Default address to start service on, '0.0.0.0:3030'.
+const ADDRESS_DEFAULT: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 3030);
 
 /// Default Github repo owner
 const GITHUB_REPO_OWNER_DEFAULT: &str = "input-output-hk";
@@ -42,21 +40,17 @@ const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.yml";
 /// Default `CLIENT_ID_KEY` used in development.
 const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
 
-/// Default `API_HOST_NAME/S` used in dev. This can be a single hostname, or a
-/// list of them.
-const API_HOST_NAMES_DEFAULT: &str = "https://gateway.dev.projectcatalyst.io";
-
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
-/// Default `CHECK_CONFIG_TICK` used in development.
-const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
+/// Default `CHECK_CONFIG_TICK` used in development, 5 seconds.
+const CHECK_CONFIG_TICK_DEFAULT: Duration = Duration::from_secs(5);
 
-/// Default `METRICS_MEMORY_INTERVAL`.
-const METRICS_MEMORY_INTERVAL_DEFAULT: &str = "1s";
+/// Default `METRICS_MEMORY_INTERVAL`, 1 second.
+const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
-/// Default `METRICS_FOLLOWER_INTERVAL`.
-const METRICS_FOLLOWER_INTERVAL_DEFAULT: &str = "1s";
+/// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
+const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
@@ -66,8 +60,8 @@ const EVENT_DB_URL_DEFAULT: &str =
 const PURGE_SLOT_BUFFER_DEFAULT: u64 = 100;
 
 /// Default `SERVICE_LIVE_TIMEOUT_INTERVAL`, that is used to determine if the service is
-/// live.
-const SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT: &str = "30s";
+/// live, 30 seconds.
+const SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT: Duration = Duration::from_secs(30);
 
 /// Default `SERVICE_LIVE_COUNTER_THRESHOLD`, that is used to determine if the service is
 /// live.
@@ -93,25 +87,6 @@ pub(crate) struct ServiceSettings {
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
-
-    /// Docs settings.
-    #[clap(flatten)]
-    pub(crate) docs_settings: DocsSettings,
-}
-
-/// Settings specifies `OpenAPI` docs generation.
-#[derive(Args, Clone)]
-pub(crate) struct DocsSettings {
-    /// The output path to the generated docs file, if omitted prints to stdout.
-    pub(crate) output: Option<PathBuf>,
-
-    /// Server binding address
-    #[clap(long, default_value = ADDRESS_DEFAULT, env = "ADDRESS")]
-    pub(crate) address: SocketAddr,
-
-    /// Server name
-    #[clap(long, env = "SERVER_NAME")]
-    pub(crate) server_name: Option<String>,
 }
 
 /// All the `EnvVars` used by the service.
@@ -125,6 +100,12 @@ struct EnvVars {
     /// The github issue template to use
     github_issue_template: StringEnvVar,
 
+    /// Server binding address
+    address: SocketAddr,
+
+    /// Server name
+    server_name: Option<StringEnvVar>,
+
     /// The Service ID used to anonymize client connections.
     service_id: StringEnvVar,
 
@@ -132,7 +113,7 @@ struct EnvVars {
     client_id_key: StringEnvVar,
 
     /// A List of servers to provide
-    api_host_names: StringEnvVar,
+    api_host_names: Option<StringEnvVar>,
 
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
@@ -189,20 +170,17 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 
-    let check_interval = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT.into());
-    let check_config_tick = match DurationString::try_from(check_interval.as_string()) {
-        Ok(duration) => duration.into(),
-        Err(error) => {
+    let address = StringEnvVar::new("ADDRESS", ADDRESS_DEFAULT.to_string().into());
+    let address = SocketAddr::from_str(address.as_str())
+        .inspect(|err| {
             error!(
-                "Invalid Check Config Tick Duration: {} : {}. Defaulting to 5 seconds.",
-                check_interval.as_str(),
-                error
+                "Invalid binding address {}, err: {err}. Using default binding address value {ADDRESS_DEFAULT}.",
+                address.as_str(),
             );
-            Duration::from_secs(5)
-        },
-    };
+        }).unwrap_or(ADDRESS_DEFAULT);
+
     let purge_slot_buffer =
-        StringEnvVar::new_as("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
+        StringEnvVar::new_as_int("PURGE_SLOT_BUFFER", PURGE_SLOT_BUFFER_DEFAULT, 0, u64::MAX);
 
     EnvVars {
         github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),
@@ -211,9 +189,11 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             "GITHUB_ISSUE_TEMPLATE",
             GITHUB_ISSUE_TEMPLATE_DEFAULT.into(),
         ),
+        address,
+        server_name: StringEnvVar::new_optional("SERVER_NAME", false),
         service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
-        api_host_names: StringEnvVar::new("API_HOST_NAMES", API_HOST_NAMES_DEFAULT.into()),
+        api_host_names: StringEnvVar::new_optional("API_HOST_NAMES", false),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
         event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT.into()),
         event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME", false),
@@ -228,7 +208,10 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         ),
         chain_follower: chain_follower::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
-        check_config_tick,
+        check_config_tick: StringEnvVar::new_as_duration(
+            "CHECK_CONFIG_TICK",
+            CHECK_CONFIG_TICK_DEFAULT,
+        ),
         purge_slot_buffer,
         metrics_memory_interval: StringEnvVar::new_as_duration(
             "METRICS_MEMORY_INTERVAL",
@@ -242,7 +225,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             "SERVICE_LIVE_TIMEOUT_INTERVAL",
             SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT,
         ),
-        service_live_counter_threshold: StringEnvVar::new_as(
+        service_live_counter_threshold: StringEnvVar::new_as_int(
             "SERVICE_LIVE_COUNTER_THRESHOLD",
             SERVICE_LIVE_COUNTER_THRESHOLD_DEFAULT,
             0,
@@ -358,33 +341,25 @@ impl Settings {
     /// a lits of strings.
     ///
     /// Host names are taken from the `API_HOST_NAMES` environment variable.
-    /// If that is not set, `addr` is used.
+    /// If that is not set, returns an empty list.
     pub(crate) fn api_host_names() -> Vec<String> {
-        if let Some(settings) = SERVICE_SETTINGS.get() {
-            let addr = settings.docs_settings.address;
-            string_to_api_host_names(&addr, ENV_VARS.api_host_names.as_str())
-        } else {
-            Vec::new()
-        }
+        string_to_api_host_names(
+            ENV_VARS
+                .api_host_names
+                .as_ref()
+                .map(StringEnvVar::as_str)
+                .unwrap_or_default(),
+        )
     }
 
     /// The socket address we are bound to.
     pub(crate) fn bound_address() -> SocketAddr {
-        if let Some(settings) = SERVICE_SETTINGS.get() {
-            settings.docs_settings.address
-        } else {
-            // This should never happen, needed to satisfy the compiler.
-            SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 8080)
-        }
+        ENV_VARS.address
     }
 
     /// Get the server name to be used in the `Server` object of the `OpenAPI` Document.
-    pub(crate) fn server_name() -> Option<String> {
-        if let Some(settings) = SERVICE_SETTINGS.get() {
-            settings.docs_settings.server_name.clone()
-        } else {
-            None
-        }
+    pub(crate) fn server_name() -> Option<&'static str> {
+        ENV_VARS.server_name.as_ref().map(StringEnvVar::as_str)
     }
 
     /// Generate a github issue url with a given title
@@ -451,8 +426,7 @@ impl Settings {
 }
 
 /// Transform a string list of host names into a vec of host names.
-/// Default to the service address if none specified.
-fn string_to_api_host_names(addr: &SocketAddr, hosts: &str) -> Vec<String> {
+fn string_to_api_host_names(hosts: &str) -> Vec<String> {
     /// Log an invalid hostname.
     fn invalid_hostname(hostname: &str) -> String {
         error!("Invalid host name for API: {}", hostname);
@@ -498,21 +472,7 @@ fn string_to_api_host_names(addr: &SocketAddr, hosts: &str) -> Vec<String> {
         .filter(|s| !s.is_empty())
         .collect();
 
-    // If there are no host names, just use the address of the service.
-    if configured_hosts.is_empty() {
-        // If the Socket Address is the "catchall" address, then use localhost.
-        if match addr.ip() {
-            IpAddr::V4(ipv4) => ipv4.is_unspecified(),
-            IpAddr::V6(ipv6) => ipv6.is_unspecified(),
-        } {
-            let port = addr.port();
-            vec![format! {"http://localhost:{port}"}]
-        } else {
-            vec![format! {"http://{addr}"}]
-        }
-    } else {
-        configured_hosts
-    }
+    configured_hosts
 }
 
 #[cfg(test)]
@@ -531,13 +491,12 @@ mod tests {
     #[test]
     fn configured_hosts_default() {
         let configured_hosts = Settings::api_host_names();
-        assert_eq!(configured_hosts, Vec::<String>::new());
+        assert!(configured_hosts.is_empty());
     }
 
     #[test]
     fn configured_hosts_set_multiple() {
         let configured_hosts = string_to_api_host_names(
-            &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "http://api.prod.projectcatalyst.io , https://api.dev.projectcatalyst.io:1234",
         );
         assert_eq!(configured_hosts, vec![
@@ -548,10 +507,8 @@ mod tests {
 
     #[test]
     fn configured_hosts_set_multiple_one_invalid() {
-        let configured_hosts = string_to_api_host_names(
-            &SocketAddr::from(([127, 0, 0, 1], 8080)),
-            "not a hostname , https://api.dev.projectcatalyst.io:1234",
-        );
+        let configured_hosts =
+            string_to_api_host_names("not a hostname , https://api.dev.projectcatalyst.io:1234");
         assert_eq!(configured_hosts, vec![
             "https://api.dev.projectcatalyst.io:1234"
         ]);
@@ -559,23 +516,14 @@ mod tests {
 
     #[test]
     fn configured_hosts_set_empty() {
-        let configured_hosts =
-            string_to_api_host_names(&SocketAddr::from(([127, 0, 0, 1], 8080)), "");
-        assert_eq!(configured_hosts, vec!["http://127.0.0.1:8080"]);
-    }
-
-    #[test]
-    fn configured_hosts_set_empty_undefined_address() {
-        let configured_hosts =
-            string_to_api_host_names(&SocketAddr::from(([0, 0, 0, 0], 7654)), "");
-        assert_eq!(configured_hosts, vec!["http://localhost:7654"]);
+        let configured_hosts = string_to_api_host_names("");
+        assert!(configured_hosts.is_empty());
     }
 
     #[test]
     fn configured_service_live_timeout_interval_default() {
         let timeout_secs = Settings::service_live_timeout_interval();
-        let interval_str = format!("{}s", timeout_secs.as_secs());
-        assert_eq!(interval_str.as_str(), SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT);
+        assert_eq!(timeout_secs, SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT);
     }
 
     #[test]
