@@ -9,6 +9,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -67,6 +68,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   late final ItemScrollController _segmentsScrollController;
 
   StreamSubscription<dynamic>? _segmentsSub;
+  StreamSubscription<dynamic>? _isDeletedSub;
 
   @override
   Widget build(BuildContext context) {
@@ -105,10 +107,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
   @override
   void dispose() {
+    _segmentsController.dispose();
+
     unawaited(_segmentsSub?.cancel());
     _segmentsSub = null;
 
-    _segmentsController.dispose();
+    unawaited(_isDeletedSub?.cancel());
+    _isDeletedSub = null;
+
     super.dispose();
   }
 
@@ -141,6 +147,12 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         )
         .listen((record) => _updateSegments(record.segments, record.nodeId));
 
+    _isDeletedSub = bloc.stream
+        .map((e) => e.isDeleted)
+        .distinct()
+        .where((isDeleted) => isDeleted)
+        .listen((_) => _onProposalDeleted());
+
     _updateSource(bloc: bloc);
   }
 
@@ -149,6 +161,12 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final event = ActiveNodeChangedEvent(activeSectionId);
     context.read<ProposalBuilderBloc>().add(event);
+  }
+
+  void _onProposalDeleted() {
+    Router.neglect(context, () {
+      const WorkspaceRoute().replace(context);
+    });
   }
 
   void _showValidationErrorSnackbar(ProposalBuilderValidationException error) {

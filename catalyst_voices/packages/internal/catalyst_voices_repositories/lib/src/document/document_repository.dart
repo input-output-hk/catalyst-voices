@@ -36,6 +36,11 @@ abstract interface class DocumentRepository {
     SignedDocumentRef? of,
   });
 
+  /// Deletes a proposal draft from the local storage.
+  Future<void> deleteDraftProposal({
+    required DraftRef ref,
+  });
+
   /// Encodes the [document] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
@@ -124,6 +129,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _drafts.save(data: data);
 
     return ref;
+  }
+
+  @override
+  Future<void> deleteDraftProposal({required DraftRef ref}) {
+    return _drafts.delete(ref: ref);
   }
 
   @override
@@ -358,7 +368,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }) {
     return _drafts.watch(ref: ref);
   }
-
+  
   Stream<DocumentData?> _watchSignedDocumentData({
     required SignedDocumentRef ref,
     bool synchronizedUpdate = false,

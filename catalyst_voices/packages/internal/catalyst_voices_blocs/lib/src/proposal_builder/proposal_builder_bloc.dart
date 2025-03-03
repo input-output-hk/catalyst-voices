@@ -90,7 +90,22 @@ final class ProposalBuilderBloc
     DeleteProposalEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    // TODO(dtscalac): handle event
+    try {
+      emit(state.copyWith(isLoading: true));
+
+      final ref = state.metadata.documentRef! as DraftRef;
+
+      // removing all versions of this proposal
+      final unversionedRef = ref.copyWith(version: const Optional.empty());
+
+      await _proposalService.deleteDraftProposal(unversionedRef);
+      emit(state.copyWith(isDeleted: true));
+    } catch (error, stackTrace) {
+      _logger.severe('Deleting proposal failed', error, stackTrace);
+      emitError(const LocalizedUnknownException());
+    } finally {
+      emit(state.copyWith(isLoading: false));
+    }
   }
 
   Future<void> _exportProposal(
