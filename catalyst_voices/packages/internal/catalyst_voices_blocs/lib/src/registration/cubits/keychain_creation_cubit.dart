@@ -13,31 +13,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('KeychainCreationCubit');
 
-abstract interface class KeychainCreationManager
-    implements UnlockPasswordManager {
-  void buildSeedPhrase({
-    bool forceRefresh = false,
-  });
-
-  void setSeedPhraseStored(bool value);
-
-  void setUserSeedPhraseWords(List<SeedPhraseWord> words);
-
-  Future<void> exportSeedPhrase();
-
-  bool areWordsMatching(List<SeedPhraseWord> words);
-}
-
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
-  final Downloader _downloader;
+  final DownloaderService _downloaderService;
 
   SeedPhrase? _seedPhrase;
 
   KeychainCreationCubit({
-    required Downloader downloader,
-  })  : _downloader = downloader,
+    required DownloaderService downloaderService,
+  })  : _downloaderService = downloaderService,
         super(const KeychainStateData());
 
   SeedPhrase? get seedPhrase => _seedPhrase;
@@ -52,10 +37,14 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     }
   }
 
-  void recoverSeedPhrase(SeedPhrase value) {
-    _seedPhrase = value;
-    setSeedPhraseStored(true);
-    setUserSeedPhraseWords(value.mnemonicWords);
+  @override
+  bool areWordsMatching(List<SeedPhraseWord> words) {
+    final seedPhrase = _seedPhrase;
+    final seedPhraseWords = seedPhrase?.mnemonicWords;
+
+    final sortedWords = [...words]..sort();
+
+    return listEquals(seedPhraseWords, sortedWords);
   }
 
   @override
@@ -69,21 +58,48 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     }
   }
 
+  KeychainProgress createRecoverProgress() {
+    return KeychainProgress(
+      seedPhrase: _seedPhrase!,
+      password: password.value,
+    );
+  }
+
+  @override
+  Future<void> exportSeedPhrase() async {
+    final mnemonic = _seedPhrase?.mnemonic;
+    if (mnemonic == null) {
+      emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
+      return;
+    }
+
+    try {
+      await _downloaderService.download(
+        data: utf8.encode(mnemonic),
+        filename: 'catalyst_seed_phrase.txt',
+      );
+    } catch (error, stackTrace) {
+      _logger.severe('Downloading keychain failed', error, stackTrace);
+      emitError(const LocalizedUnknownException());
+    }
+  }
+
+  @override
+  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    emit(state.copyWith(unlockPasswordState: data));
+  }
+
+  void recoverSeedPhrase(SeedPhrase value) {
+    _seedPhrase = value;
+    setSeedPhraseStored(true);
+    setUserSeedPhraseWords(value.mnemonicWords);
+  }
+
   @override
   void setSeedPhraseStored(bool value) {
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       isStoredConfirmed: value,
     );
-  }
-
-  @override
-  bool areWordsMatching(List<SeedPhraseWord> words) {
-    final seedPhrase = _seedPhrase;
-    final seedPhraseWords = seedPhrase?.mnemonicWords;
-
-    final sortedWords = [...words]..sort();
-
-    return listEquals(seedPhraseWords, sortedWords);
   }
 
   @override
@@ -96,52 +112,6 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       userWords: words,
       areUserWordsCorrect: matches,
-    );
-  }
-
-  @override
-  Future<void> exportSeedPhrase() async {
-    final mnemonic = _seedPhrase?.mnemonic;
-    if (mnemonic == null) {
-      emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
-      return;
-    }
-
-    FutureOr<Uri> buildWebMnemonicDownloadUri() {
-      return Uri.dataFromString(
-        mnemonic,
-        encoding: utf8,
-        base64: true,
-      );
-    }
-
-    FutureOr<Uri> buildIOMnemonicDownloadUri() {
-      throw UnimplementedError();
-    }
-
-    final uri = CatalystPlatform.isWeb
-        ? await buildWebMnemonicDownloadUri()
-        : await buildIOMnemonicDownloadUri();
-
-    final path = Uri(path: 'catalyst_seed_phrase.txt');
-
-    try {
-      await _downloader.download(uri, path: path);
-    } catch (error, stackTrace) {
-      _logger.severe('Downloading keychain failed', error, stackTrace);
-      emitError(const LocalizedUnknownException());
-    }
-  }
-
-  @override
-  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
-    emit(state.copyWith(unlockPasswordState: data));
-  }
-
-  KeychainProgress createRecoverProgress() {
-    return KeychainProgress(
-      seedPhrase: _seedPhrase!,
-      password: password.value,
     );
   }
 
@@ -164,4 +134,19 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
       _buildSeedPhrase();
     }
   }
+}
+
+abstract interface class KeychainCreationManager
+    implements UnlockPasswordManager {
+  bool areWordsMatching(List<SeedPhraseWord> words);
+
+  void buildSeedPhrase({
+    bool forceRefresh = false,
+  });
+
+  Future<void> exportSeedPhrase();
+
+  void setSeedPhraseStored(bool value);
+
+  void setUserSeedPhraseWords(List<SeedPhraseWord> words);
 }
