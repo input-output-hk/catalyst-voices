@@ -28,7 +28,6 @@ def snapshot(
     """
 
     snapshot_data = []
-    snapshot_data_errors = []
 
     url = f"{host}/api/v1/cardano/registration/cip36?lookup=ALL&asat=SLOT:{slot_no}"
     headers = {"Authorization": bearer_token, "X-API-Key": api_key}
@@ -56,7 +55,6 @@ def snapshot(
                         api_key,
                         host,
                         snapshot_data,
-                        snapshot_data_errors,
                     ),
                 )
             )
@@ -74,12 +72,7 @@ def snapshot(
     with open("snapshot.json", "w") as outfile:
         json.dump(snapshot_data, outfile, indent=2)
 
-    # Convert and write JSON object to file
-    with open("snapshot_errors.json", "w") as outfile:
-        json.dump(snapshot_data_errors, outfile, indent=2)
-
     pprint(f"Number of registrations in snapshot file: {len(snapshot_data)}")
-    pprint(f"Number of errors in snapshot file: {len(snapshot_data_errors)}")
 
 
 def process_chunk(
@@ -88,7 +81,6 @@ def process_chunk(
     api_key: str,
     host: str,
     snapshot_data: list,
-    snapshot_data_errors: list,
 ):
     """
     Process chunk of registrations.
@@ -116,15 +108,19 @@ def process_chunk(
 
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            registration["stake_addr"] = stake_address
-            snapshot_data_errors.append(registration)
-            continue
+            # stake address has no staked ada. Assign 0.
+            registration["registrations"][0]["voting_power"] = 0
 
-        json_data = json.loads(response.text)
+        else:
+            json_data = json.loads(response.text)
+            # Append voting power field
+            registration["registrations"][0]["voting_power"] = json_data["persistent"][
+                "ada_amount"
+            ]
 
-        registration["registrations"][0]["voting_power"] = json_data["persistent"][
-            "ada_amount"
-        ]
+        # Add stake address field
+        registration["registrations"][0]["stake_addr"] = stake_address
+
         snapshot_data.append(registration["registrations"][0])
 
         if len(snapshot_data) % 500 == 0:
