@@ -33,6 +33,18 @@ final class ProposalBuilderMetadata extends Equatable {
         templateRef,
         currentIteration,
       ];
+
+  ProposalBuilderMetadata copyWith({
+    ProposalPublish? publish,
+    Optional<DocumentRef>? documentRef,
+    Optional<DocumentRef>? templateRef,
+  }) {
+    return ProposalBuilderMetadata(
+      publish: publish ?? this.publish,
+      documentRef: documentRef.dataOr(this.documentRef),
+      templateRef: templateRef.dataOr(this.templateRef),
+    );
+  }
 }
 
 final class ProposalBuilderState extends Equatable {

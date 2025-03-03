@@ -41,14 +41,14 @@ abstract interface class DocumentRepository {
     required DraftRef ref,
   });
 
-  /// Encodes the [document] to exportable format.
+  /// Encodes the [content] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeDocumentForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   });
 
   /// Returns matching [ProposalDocument] for matching [ref].
@@ -78,7 +78,7 @@ abstract interface class DocumentRepository {
   ///
   /// If watching same draft with [watchProposalDocument] it will emit
   /// change.
-  Future<void> updateProposalDraftContent({
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
   });
@@ -139,11 +139,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<Uint8List> encodeDocumentForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   }) async {
     final documentDataDto = DocumentDataDto(
       metadata: DocumentDataMetadataDto.fromModel(metadata),
-      content: DocumentDto.fromModel(document).toJson(),
+      content: DocumentDataContentDto.fromModel(content),
     );
 
     final jsonData = documentDataDto.toJson();
@@ -210,11 +210,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> updateProposalDraftContent({
+  Future<void> updateDocumentDraft({
     required DraftRef ref,
     required DocumentDataContent content,
   }) async {
-    await _drafts.update(ref: ref, content: content);
+    await _drafts.update(
+      ref: ref,
+      content: content,
+    );
   }
 
   @visibleForTesting
@@ -368,7 +371,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }) {
     return _drafts.watch(ref: ref);
   }
-  
+
   Stream<DocumentData?> _watchSignedDocumentData({
     required SignedDocumentRef ref,
     bool synchronizedUpdate = false,

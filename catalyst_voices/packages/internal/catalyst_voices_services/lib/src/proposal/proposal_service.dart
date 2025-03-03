@@ -17,14 +17,14 @@ abstract interface class ProposalService {
   /// Published proposals cannot be deleted.
   Future<void> deleteDraftProposal(DraftRef ref);
 
-  /// Encodes the [document] to exportable format.
+  /// Encodes the [content] to exportable format.
   ///
   /// It does not save the document anywhere on the disk,
   /// it only encodes a document as [Uint8List]
   /// so that it can be saved as a file.
   Future<Uint8List> encodeProposalForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   });
 
   /// Fetches favorites proposals ids of the user
@@ -62,6 +62,12 @@ abstract interface class ProposalService {
 
   /// Submits a proposal draft into review.
   Future<void> submitProposalForReview(Document document);
+
+  /// Saves a new proposal draft in the local storage.
+  Future<void> updateDraftProposal({
+    required DraftRef ref,
+    required DocumentDataContent content,
+  });
 }
 
 final class ProposalServiceImpl implements ProposalService {
@@ -86,11 +92,11 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<Uint8List> encodeProposalForExport({
     required DocumentDataMetadata metadata,
-    required Document document,
+    required DocumentDataContent content,
   }) {
     return _documentRepository.encodeDocumentForExport(
       metadata: metadata,
-      document: document,
+      content: content,
     );
   }
 
@@ -166,6 +172,17 @@ final class ProposalServiceImpl implements ProposalService {
   Future<void> submitProposalForReview(Document document) {
     // TODO(dtscalac): implement submitting proposals into review
     throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateDraftProposal({
+    required DraftRef ref,
+    required DocumentDataContent content,
+  }) {
+    return _documentRepository.updateDocumentDraft(
+      ref: ref,
+      content: content,
+    );
   }
 
   Future<Proposal> _buildProposal(ProposalBase base) async {

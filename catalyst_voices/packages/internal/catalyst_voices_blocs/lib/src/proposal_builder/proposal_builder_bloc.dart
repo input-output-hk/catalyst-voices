@@ -19,6 +19,7 @@ final class ProposalBuilderBloc
   final CampaignService _campaignService;
   final ProposalService _proposalService;
   final DownloaderService _downloaderService;
+  final DocumentMapper _documentMapper;
 
   DocumentBuilder? _documentBuilder;
 
@@ -26,6 +27,7 @@ final class ProposalBuilderBloc
     this._campaignService,
     this._proposalService,
     this._downloaderService,
+    this._documentMapper,
   ) : super(const ProposalBuilderState()) {
     on<LoadDefaultProposalTemplateEvent>(_loadDefaultProposalTemplate);
     on<LoadProposalTemplateEvent>(_loadProposalTemplate);
@@ -115,10 +117,11 @@ final class ProposalBuilderBloc
     try {
       final documentRef = state.metadata.documentRef!;
       final proposalId = documentRef.id;
+      final document = _buildDocument();
 
       final encodedProposal = await _proposalService.encodeProposalForExport(
         metadata: _buildDocumentMetadata(),
-        document: _buildDocument(),
+        content: _documentMapper.toContent(document),
       );
 
       final filename = '${event.filePrefix}_$proposalId';
@@ -224,15 +227,16 @@ final class ProposalBuilderBloc
     );
   }
 
-  void _handleSectionChangedEvent(
+  Future<void> _handleSectionChangedEvent(
     SectionChangedEvent event,
     Emitter<ProposalBuilderState> emit,
-  ) {
+  ) async {
     final documentBuilder = _documentBuilder;
     assert(documentBuilder != null, 'DocumentBuilder not initialized');
 
     documentBuilder!.addChanges(event.changes);
     final document = documentBuilder.build();
+
     final segments = _mapDocumentToSegments(
       document,
       showValidationErrors: state.showValidationErrors,
@@ -243,7 +247,22 @@ final class ProposalBuilderBloc
       segments: segments,
     );
 
+    // early emit new state to make the UI responsive
     emit(newState);
+
+    // then proceed slow async operations
+    final ref = state.metadata.documentRef!;
+    final nextRef = await _updateDraftProposal(
+      ref,
+      _documentMapper.toContent(document),
+    );
+
+    if (nextRef != null && ref != nextRef) {
+      final updatedMetadata =
+          state.metadata.copyWith(documentRef: Optional(nextRef));
+      final updatedState = state.copyWith(metadata: updatedMetadata);
+      emit(updatedState);
+    }
   }
 
   Future<void> _loadDefaultProposalTemplate(
@@ -378,7 +397,6 @@ final class ProposalBuilderBloc
       await _proposalService.publishProposal(document);
     } catch (error, stackTrace) {
       _logger.severe('PublishProposal', error, stackTrace);
-      // TODO(dtscalac): handle the error in the UI
       emitError(error);
     }
   }
@@ -393,9 +411,21 @@ final class ProposalBuilderBloc
       await _proposalService.submitProposalForReview(document);
     } catch (error, stackTrace) {
       _logger.severe('SubmitProposalForReview', error, stackTrace);
-      // TODO(dtscalac): handle the error in the UI
       emitError(error);
     }
+  }
+
+  Future<DraftRef?> _updateDraftProposal(
+    DocumentRef currentRef,
+    DocumentDataContent document,
+  ) async {
+    final nextRef = currentRef.nextVersion();
+    await _proposalService.updateDraftProposal(
+      ref: nextRef,
+      content: document,
+    );
+
+    return nextRef;
   }
 
   Future<void> _validateProposal(
