@@ -234,12 +234,12 @@ scripts:
       # cleanup old coverage files and create empty folder where coverage files will be stored
       find . -type d -name coverage -prune -exec rm -rf {} \;
       mkdir $MELOS_ROOT_PATH/coverage
-      
+
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
       ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
         JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
-        flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
+        flutter test --platform=chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
         EXIT_CODE=$? ; \
         cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
         exit $EXIT_CODE'
