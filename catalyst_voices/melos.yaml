@@ -234,7 +234,6 @@ scripts:
       # cleanup old coverage files and create empty folder where coverage files will be stored
       find . -type d -name coverage -prune -exec rm -rf {} \;
       mkdir $MELOS_ROOT_PATH/coverage
-
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
       ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
@@ -263,6 +262,7 @@ scripts:
 
       # merges all coverage reports into a single one and puts it in /coverage/lcov.info
       dart pub global run combine_coverage --repo-path=.
+      mv ./coverage/lcov.info ./coverage/lcov.coverage.info
 
       exit $EXIT_CODE
 
@@ -270,4 +270,4 @@ scripts:
       Run `flutter test` for all packages and generate junit and coverage reports.
       The test reports are saved in /test_reports folder.
       The coverages are saved in coverage/lcov.info file for each tested package.
-      The combined coverage is saved in the /coverage/lcov.info file.
+      The combined coverage is saved in the /coverage/lcov.coverage.info file.
