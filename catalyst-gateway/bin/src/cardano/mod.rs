@@ -594,8 +594,8 @@ impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
     }
 
     fn dispatch_event(&self, message: event::ChainIndexerEvent) {
-        for listener in self.event_handlers.iter() {
-            (listener)(&message)
+        for listener in &self.event_handlers {
+            (listener)(&message);
         }
     }
 }
@@ -627,7 +627,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
             if let Event::SyncTasksChanged { current_sync_tasks } = event {
                 reporter::RUNNING_INDEXER_TASKS_COUNT
                     .with_label_values(&[])
-                    .set(i64::try_from(*current_sync_tasks).unwrap_or(-1));
+                    .set(From::from(*current_sync_tasks));
             }
             if let Event::LiveTipSlotChanged { slot } = event {
                 reporter::CURRENT_LIVE_TIP_SLOT
@@ -640,7 +640,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
             }
             if let Event::IndexedSlotProgressed { slot } = event {
-                reporter::RUNNING_INDEXER_TASKS_COUNT
+                reporter::HIGHEST_COMPLETE_INDEXED_SLOT
                     .with_label_values(&[])
                     .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
             }
