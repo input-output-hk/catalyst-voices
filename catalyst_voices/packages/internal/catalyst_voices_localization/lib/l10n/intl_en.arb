@@ -1729,5 +1729,13 @@
   "proposalImportDialogDescription": "Make sure it's a correct Catalyst proposal file.",
   "@proposalImportDialogDescription": {
     "description": "The description of the dialog to import a proposal."
+  },
+  "spaces": "Spaces",
+  "@spaces": {
+    "description": "The title of the tile that shows the list of spaces."
+  },
+  "opportunities": "Opportunities",
+  "@opportunities": {
+    "description": "The title of the tile that shows the list of opportunities."
   }
 }
