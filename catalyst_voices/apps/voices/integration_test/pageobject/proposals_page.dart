@@ -235,4 +235,52 @@ class ProposalsPage {
       );
     }
   }
+
+  Future<void> paginationWorks() async {
+    await $(CommonPage($).paginationText).scrollTo(step: 500);
+    final paginationText = $(CommonPage($).paginationText).text!;
+    final proposalsFrom = int.parse(paginationText.split(' ')[0].split('-')[0]);
+    final proposalsTo = int.parse(paginationText.split(' ')[0].split('-')[1]);
+    final proposalsTotal = int.parse(paginationText.split(' ')[2]);
+    expect(proposalsFrom, 1);
+    expect(
+      $.tester
+          .widget<IconButton>($(CommonPage($).prevPageBtn).$(IconButton))
+          .onPressed,
+      null,
+    );
+    if (proposalsTotal > proposalsTo) {
+      await $(CommonPage($).nextPageBtn).tap();
+      await $(CommonPage($).paginationText).scrollTo(step: 500);
+      final paginationTextAfter = $(CommonPage($).paginationText).text!;
+      final proposalsFromAfter =
+          int.parse(paginationTextAfter.split(' ')[0].split('-')[0]);
+      final proposalsToAfter =
+          int.parse(paginationTextAfter.split(' ')[0].split('-')[1]);
+      expect(proposalsFromAfter, proposalsTo + 1);
+      expect(
+        $.tester
+            .widget<IconButton>($(CommonPage($).prevPageBtn).$(IconButton))
+            .onPressed,
+        isNotNull,
+      );
+      if (proposalsTotal > proposalsToAfter) {
+        expect(proposalsToAfter, proposalsTo * 2);
+        expect(
+          $.tester
+              .widget<IconButton>($(CommonPage($).nextPageBtn).$(IconButton))
+              .onPressed,
+          isNotNull,
+        );
+      } else {
+        expect(proposalsToAfter, proposalsTotal);
+        expect(
+          $.tester
+              .widget<IconButton>($(CommonPage($).nextPageBtn).$(IconButton))
+              .onPressed,
+          null,
+        );
+      }
+    }
+  }
 }

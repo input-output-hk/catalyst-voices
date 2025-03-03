@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/proposals_page.dart';
+import '../utils/translations_utils.dart';
 
 void main() async {
   late final GoRouter router;
@@ -72,6 +73,23 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProposalsPage($).clickFinalTab();
         await ProposalsPage($).checkProposalsStageMatch(T.get('Final'));
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - pagination works for all proposals',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).paginationWorks();
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - pagination works for draft proposals',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).clickDraftTab();
+        await ProposalsPage($).paginationWorks();
       },
     );
   });
