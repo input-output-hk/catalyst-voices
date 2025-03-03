@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/test_context.dart';
 import '../../../utils/translations_utils.dart';
-import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import 'step_9_writedown_seedphrase_info.dart';
 
@@ -47,7 +46,7 @@ class InputSeedphrasePanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect(
-      $(registrationInfoPanel).$(CommonPage.decorData).$(Text).text,
+      infoPartLearnMoreText(),
       T.get('Learn More'),
     );
     expect(await closeButton(), findsOneWidget);

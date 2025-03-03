@@ -37,9 +37,13 @@ class OnboardingPageBase {
     return $(registrationInfoPanel).$(headerBody).text;
   }
 
+  Future<String?> infoPartLearnMoreText() async {
+    return $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text;
+  }
+
   Future<PatrolFinder> closeButton() async {
     return $(registrationDialog)
-        .$(CommonPage.dialogCloseButton)
+        .$(CommonPage($).dialogCloseButton)
         .waitUntilVisible();
   }
 

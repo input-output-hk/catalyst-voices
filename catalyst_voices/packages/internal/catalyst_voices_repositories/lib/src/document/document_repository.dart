@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:async/async.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -22,24 +23,6 @@ abstract interface class DocumentRepository {
     DocumentDataRemoteSource remoteDocuments,
   ) = DocumentRepositoryImpl;
 
-  /// Observes matching [ProposalDocument] and emits updates.
-  ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Stream<ProposalDocument> watchProposalDocument({
-    required DocumentRef ref,
-  });
-
-  /// Returns matching [ProposalDocument] for matching [ref].
-  ///
-  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
-  Future<ProposalDocument> getProposalDocument({
-    required DocumentRef ref,
-  });
-
-  Future<ProposalTemplate> getProposalTemplate({
-    required DocumentRef ref,
-  });
-
   /// Stores new draft locally and returns ref to it.
   ///
   /// At the moment we do not support drafts of templates that's why
@@ -53,6 +36,38 @@ abstract interface class DocumentRepository {
     SignedDocumentRef? of,
   });
 
+  /// Encodes the [document] to exportable format.
+  ///
+  /// It does not save the document anywhere on the disk,
+  /// it only encodes a document as [Uint8List]
+  /// so that it can be saved as a file.
+  Future<Uint8List> encodeDocumentForExport({
+    required DocumentDataMetadata metadata,
+    required Document document,
+  });
+
+  /// Returns matching [ProposalDocument] for matching [ref].
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
+  Future<ProposalDocument> getProposalDocument({
+    required DocumentRef ref,
+  });
+
+  Future<ProposalTemplate> getProposalTemplate({
+    required DocumentRef ref,
+  });
+
+  /// Imports a document [data] previously encoded by [encodeDocumentForExport].
+  ///
+  /// The document reference will be altered to avoid linking
+  /// the imported document to the old document.
+  ///
+  /// Once imported from the version management point of view this becomes
+  /// a new standalone document not related to the previous one.
+  ///
+  /// Returns the reference to the imported document.
+  Future<DocumentRef> importDocument({required Uint8List data});
+
   /// Updates local draft (or drafts if version is not specified)
   /// matching [ref] with given [content].
   ///
@@ -61,6 +76,13 @@ abstract interface class DocumentRepository {
   Future<void> updateProposalDraftContent({
     required DraftRef ref,
     required DocumentDataContent content,
+  });
+
+  /// Observes matching [ProposalDocument] and emits updates.
+  ///
+  /// Source of data depends whether [ref] is [SignedDocumentRef] or [DraftRef].
+  Stream<ProposalDocument> watchProposalDocument({
+    required DocumentRef ref,
   });
 }
 
@@ -79,26 +101,53 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   );
 
   @override
-  Stream<ProposalDocument> watchProposalDocument({
+  Future<DraftRef> createProposalDraft({
+    required DocumentDataContent content,
+    required SignedDocumentRef template,
+    SignedDocumentRef? of,
+  }) async {
+    final id = of?.id ?? const Uuid().v7();
+    final version = of != null ? const Uuid().v7() : id;
+
+    final ref = DraftRef(id: id, version: version);
+    final metadata = DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      selfRef: ref,
+      template: template,
+    );
+
+    final data = DocumentData(
+      metadata: metadata,
+      content: content,
+    );
+
+    await _drafts.save(data: data);
+
+    return ref;
+  }
+
+  @override
+  Future<Uint8List> encodeDocumentForExport({
+    required DocumentDataMetadata metadata,
+    required Document document,
+  }) async {
+    final documentDataDto = DocumentDataDto(
+      metadata: DocumentDataMetadataDto.fromModel(metadata),
+      content: DocumentDto.fromModel(document).toJson(),
+    );
+
+    final jsonData = documentDataDto.toJson();
+    return json.fuse(utf8).encode(jsonData) as Uint8List;
+  }
+
+  @visibleForTesting
+  Future<DocumentData> getDocumentData({
     required DocumentRef ref,
   }) {
-    // TODO(damian-molinski): remove this override once we have API
-    ref = ref.copyWith(id: mockedDocumentUuid);
-
-    return watchDocumentWithRef(
-      ref: ref,
-      refGetter: (data) => data.metadata.template!,
-    ).whereNotNull().map(
-      (event) {
-        final documentData = event.data;
-        final templateData = event.refData;
-
-        return _buildProposalDocument(
-          documentData: documentData,
-          templateData: templateData,
-        );
-      },
-    );
+    return switch (ref) {
+      SignedDocumentRef() => _getSignedDocumentData(ref: ref),
+      DraftRef() => _getDraftDocumentData(ref: ref),
+    };
   }
 
   @override
@@ -133,29 +182,21 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DraftRef> createProposalDraft({
-    required DocumentDataContent content,
-    required SignedDocumentRef template,
-    SignedDocumentRef? of,
-  }) async {
-    final id = of?.id ?? const Uuid().v7();
-    final version = of != null ? const Uuid().v7() : id;
+  Future<DocumentRef> importDocument({required Uint8List data}) async {
+    final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
+    final document = DocumentDataDto.fromJson(jsonData).toModel();
 
-    final ref = DraftRef(id: id, version: version);
-    final metadata = DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
-      selfRef: ref,
-      template: template,
+    final newMetadata = document.metadata.copyWith(
+      selfRef: DraftRef.generateFirstRef(),
     );
 
-    final data = DocumentData(
-      metadata: metadata,
-      content: content,
+    final newDocument = DocumentData(
+      metadata: newMetadata,
+      content: document.content,
     );
 
-    await _drafts.save(data: data);
-
-    return ref;
+    await _drafts.save(data: newDocument);
+    return newDocument.ref;
   }
 
   @override
@@ -164,6 +205,60 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentDataContent content,
   }) async {
     await _drafts.update(ref: ref, content: content);
+  }
+
+  @visibleForTesting
+  Stream<DocumentsDataWithRefData?> watchDocumentWithRef({
+    required DocumentRef ref,
+    required ValueResolver<DocumentData, DocumentRef> refGetter,
+  }) {
+    return _watchDocumentData(ref: ref)
+        .distinct()
+        .switchMap<DocumentsDataWithRefData?>((document) {
+      if (document == null) {
+        return Stream.value(null);
+      }
+
+      final ref = refGetter(document);
+      final refDocumentStream = _watchDocumentData(
+        ref: ref,
+        // Synchronized because we may have many documents which are referring
+        // to the same template. When loading multiple documents at the same
+        // time we want to fetch only once template.
+        synchronizedUpdate: true,
+      );
+
+      return refDocumentStream.map<DocumentsDataWithRefData?>(
+        (refDocumentData) {
+          return refDocumentData != null
+              ? (data: document, refData: refDocumentData)
+              : null;
+        },
+      );
+    });
+  }
+
+  @override
+  Stream<ProposalDocument> watchProposalDocument({
+    required DocumentRef ref,
+  }) {
+    // TODO(damian-molinski): remove this override once we have API
+    ref = ref.copyWith(id: mockedDocumentUuid);
+
+    return watchDocumentWithRef(
+      ref: ref,
+      refGetter: (data) => data.metadata.template!,
+    ).whereNotNull().map(
+      (event) {
+        final documentData = event.data;
+        final templateData = event.refData;
+
+        return _buildProposalDocument(
+          documentData: documentData,
+          templateData: templateData,
+        );
+      },
+    );
   }
 
   ProposalDocument _buildProposalDocument({
@@ -216,81 +311,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
   }
 
-  @visibleForTesting
-  Stream<DocumentsDataWithRefData?> watchDocumentWithRef({
-    required DocumentRef ref,
-    required ValueResolver<DocumentData, DocumentRef> refGetter,
-  }) {
-    return _watchDocumentData(ref: ref)
-        .distinct()
-        .switchMap<DocumentsDataWithRefData?>((document) {
-      if (document == null) {
-        return Stream.value(null);
-      }
-
-      final ref = refGetter(document);
-      final refDocumentStream = _watchDocumentData(
-        ref: ref,
-        // Synchronized because we may have many documents which are referring
-        // to the same template. When loading multiple documents at the same
-        // time we want to fetch only once template.
-        synchronizedUpdate: true,
-      );
-
-      return refDocumentStream.map<DocumentsDataWithRefData?>(
-        (refDocumentData) {
-          return refDocumentData != null
-              ? (data: document, refData: refDocumentData)
-              : null;
-        },
-      );
-    });
-  }
-
-  Stream<DocumentData?> _watchDocumentData({
-    required DocumentRef ref,
-    bool synchronizedUpdate = false,
-  }) {
-    return switch (ref) {
-      SignedDocumentRef() => _watchSignedDocumentData(
-          ref: ref,
-          synchronizedUpdate: synchronizedUpdate,
-        ),
-      DraftRef() => _watchDraftDocumentData(ref: ref),
-    };
-  }
-
-  @visibleForTesting
-  Future<DocumentData> getDocumentData({
-    required DocumentRef ref,
-  }) {
-    return switch (ref) {
-      SignedDocumentRef() => _getSignedDocumentData(ref: ref),
-      DraftRef() => _getDraftDocumentData(ref: ref),
-    };
-  }
-
-  Stream<DocumentData?> _watchSignedDocumentData({
-    required SignedDocumentRef ref,
-    bool synchronizedUpdate = false,
-  }) {
-    /// Make sure we're up to date with document ref.
-    final documentDataFuture = synchronizedUpdate
-        // ignore: discarded_futures
-        ? _documentDataLock.synchronized(() => getDocumentData(ref: ref))
-        // ignore: discarded_futures
-        : getDocumentData(ref: ref);
-
-    final updateStream = Stream.fromFuture(documentDataFuture);
-    final localStream = _localDocuments.watch(ref: ref);
-
-    return StreamGroup.merge([updateStream, localStream]);
-  }
-
-  Stream<DocumentData?> _watchDraftDocumentData({
+  Future<DocumentData> _getDraftDocumentData({
     required DraftRef ref,
-  }) {
-    return _drafts.watch(ref: ref);
+  }) async {
+    return _drafts.get(ref: ref);
   }
 
   Future<DocumentData> _getSignedDocumentData({
@@ -316,9 +340,39 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return remoteData;
   }
 
-  Future<DocumentData> _getDraftDocumentData({
+  Stream<DocumentData?> _watchDocumentData({
+    required DocumentRef ref,
+    bool synchronizedUpdate = false,
+  }) {
+    return switch (ref) {
+      SignedDocumentRef() => _watchSignedDocumentData(
+          ref: ref,
+          synchronizedUpdate: synchronizedUpdate,
+        ),
+      DraftRef() => _watchDraftDocumentData(ref: ref),
+    };
+  }
+
+  Stream<DocumentData?> _watchDraftDocumentData({
     required DraftRef ref,
-  }) async {
-    return _drafts.get(ref: ref);
+  }) {
+    return _drafts.watch(ref: ref);
+  }
+
+  Stream<DocumentData?> _watchSignedDocumentData({
+    required SignedDocumentRef ref,
+    bool synchronizedUpdate = false,
+  }) {
+    /// Make sure we're up to date with document ref.
+    final documentDataFuture = synchronizedUpdate
+        // ignore: discarded_futures
+        ? _documentDataLock.synchronized(() => getDocumentData(ref: ref))
+        // ignore: discarded_futures
+        : getDocumentData(ref: ref);
+
+    final updateStream = Stream.fromFuture(documentDataFuture);
+    final localStream = _localDocuments.watch(ref: ref);
+
+    return StreamGroup.merge([updateStream, localStream]);
   }
 }
