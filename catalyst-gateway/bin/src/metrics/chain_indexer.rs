@@ -8,7 +8,7 @@ pub(crate) mod reporter {
     use prometheus::{register_int_gauge_vec, IntGaugeVec};
 
     /// Labels for the metrics.
-    const METRIC_LABELS: [&str; 0] = [];
+    const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
     /// Chain Indexer current live tip slot#.
     pub(crate) static CURRENT_LIVE_TIP_SLOT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
