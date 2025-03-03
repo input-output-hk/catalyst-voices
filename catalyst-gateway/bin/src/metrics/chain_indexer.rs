@@ -10,11 +10,21 @@ pub(crate) mod reporter {
     /// Labels for the metrics.
     const METRIC_LABELS: [&str; 0] = [];
 
-    /// Chain Indexer current tip slot#.
-    pub(crate) static CURRENT_TIP_SLOT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    /// Chain Indexer current live tip slot#.
+    pub(crate) static CURRENT_LIVE_TIP_SLOT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "indexer_current_tip_slot",
-            "Chain Indexer current tip slot#",
+            "indexer_current_live_tip_slot",
+            "Chain Indexer current live tip slot#",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// Chain Indexer current immutable tip slot#.
+    pub(crate) static CURRENT_IMMUTABLE_TIP_SLOT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+        register_int_gauge_vec!(
+            "indexer_current_immutable_tip_slot",
+            "Chain Indexer current immutable tip slot#",
             &METRIC_LABELS
         )
         .unwrap()

@@ -1,6 +1,11 @@
+use cardano_blockchain_types::Slot;
+
 #[derive(Debug, Clone)]
 pub(crate) enum ChainIndexerEvent {
-    SyncTasksCountUpdated { current_sync_tasks: u16 },
+    SyncTasksChanged { current_sync_tasks: u16 },
+    LiveTipSlotChanged { slot: Slot },
+    ImmutableTipSlotChanged { slot: Slot },
+    IndexedSlotChanged { slot_number: u32 }
 }
 
 pub(crate) trait EventTarget<T> {

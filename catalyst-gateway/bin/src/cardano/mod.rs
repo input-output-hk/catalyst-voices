@@ -18,7 +18,8 @@ use crate::{
             update::update_sync_status,
         },
         session::CassandraSession,
-    }, metrics::chain_indexer::reporter::RUNNING_INDEXER_TASKS_COUNT, settings::{chain_follower, Settings}
+    },
+    settings::{chain_follower, Settings},
 };
 
 // pub(crate) mod cip36_registration_obsolete;
@@ -374,6 +375,13 @@ impl SyncTask {
         self.live_tip_slot = tips.1.slot_or_default();
         info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Blockchain ready to sync from.");
 
+        self.dispatch_event(event::ChainIndexerEvent::ImmutableTipSlotChanged {
+            slot: self.immutable_tip_slot,
+        });
+        self.dispatch_event(event::ChainIndexerEvent::LiveTipSlotChanged {
+            slot: self.live_tip_slot,
+        });
+
         // Wait for indexing DB to be ready before continuing.
         // We do this after the above, because other nodes may have finished already, and we don't
         // want to wait do any work they already completed while we were fetching the blockchain.
@@ -412,6 +420,13 @@ impl SyncTask {
                             // Advance the known immutable tip, and try and start followers to reach
                             // it.
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
+
+                            self.dispatch_event(
+                                event::ChainIndexerEvent::ImmutableTipSlotChanged {
+                                    slot: self.immutable_tip_slot,
+                                },
+                            );
+
                             self.start_immutable_followers();
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished,
@@ -431,11 +446,9 @@ impl SyncTask {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
-                                self.dispatch_event(
-                                    event::ChainIndexerEvent::SyncTasksCountUpdated {
-                                        current_sync_tasks: self.current_sync_tasks,
-                                    },
-                                );
+                                self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
+                                    current_sync_tasks: self.current_sync_tasks,
+                                });
 
                                 // If we need more immutable chain followers to sync the block
                                 // chain, we can now start them.
@@ -502,7 +515,7 @@ impl SyncTask {
                     )));
                     self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
 
-                    self.dispatch_event(event::ChainIndexerEvent::SyncTasksCountUpdated {
+                    self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
                         current_sync_tasks: self.current_sync_tasks,
                     });
                 }
@@ -583,13 +596,27 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
 
         let mut sync_task = SyncTask::new(cfg);
 
-        sync_task.add_event_listener(
-            |Event::SyncTasksCountUpdated { current_sync_tasks }: &Event| {
+        sync_task.add_event_listener(|event: &Event| {
+            if let Event::SyncTasksChanged { current_sync_tasks } = event {
                 reporter::RUNNING_INDEXER_TASKS_COUNT
                     .with_label_values(&[])
                     .set(i64::try_from(*current_sync_tasks).unwrap_or(-1));
-            },
-        );
+            }
+        });
+        sync_task.add_event_listener(|event: &Event| {
+            if let Event::LiveTipSlotChanged { slot } = event {
+                reporter::CURRENT_LIVE_TIP_SLOT
+                    .with_label_values(&[])
+                    .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
+            }
+        });
+        sync_task.add_event_listener(|event: &Event| {
+            if let Event::ImmutableTipSlotChanged { slot } = event {
+                reporter::CURRENT_IMMUTABLE_TIP_SLOT
+                    .with_label_values(&[])
+                    .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
+            }
+        });
 
         sync_task.run().await;
     });
