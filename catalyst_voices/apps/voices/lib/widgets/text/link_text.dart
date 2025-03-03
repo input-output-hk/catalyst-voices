@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that displays text with an underline that acts as a link.
@@ -7,9 +10,15 @@ import 'package:flutter/material.dart';
 ///  * `style`: An optional TextStyle to customize the appearance of the text.
 ///  * `onTap`: An optional callback function that will be executed when the
 ///  user taps on the text.
-class LinkText extends StatelessWidget {
+class LinkText extends StatelessWidget with LaunchUrlMixin {
   /// The text to be displayed.
   final String data;
+
+  /// Optional open redirect location.
+  final Uri? uri;
+
+  /// If clicking should trigger callback or not.
+  final bool enabled;
 
   /// Displays the text with underline.
   final bool underline;
@@ -19,11 +28,15 @@ class LinkText extends StatelessWidget {
 
   /// An optional callback function that will be executed when the user taps
   /// on the text.
+  ///
+  /// If not provided will try to open [uri] or parse and open [data].
   final VoidCallback? onTap;
 
   const LinkText(
     this.data, {
     super.key,
+    this.uri,
+    this.enabled = true,
     this.underline = true,
     this.style,
     this.onTap,
@@ -42,9 +55,17 @@ class LinkText extends StatelessWidget {
     );
 
     return MouseRegion(
-      cursor: SystemMouseCursors.click,
+      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.none,
       child: GestureDetector(
-        onTap: onTap,
+        onTap: enabled
+            ? onTap ??
+                () {
+                  final uri = this.uri ?? Uri.tryParse(data);
+                  if (uri != null) {
+                    unawaited(launchUri(uri));
+                  }
+                }
+            : null,
         child: DefaultTextStyle.merge(
           style: style,
           child: Text(
