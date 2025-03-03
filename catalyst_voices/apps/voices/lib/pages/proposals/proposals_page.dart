@@ -30,10 +30,12 @@ typedef _ProposalsCount = ({
 
 class ProposalsPage extends StatefulWidget {
   final String? categoryId;
+  final bool selectMyProposalsView;
 
   const ProposalsPage({
     super.key,
     this.categoryId,
+    this.selectMyProposalsView = false,
   });
 
   @override

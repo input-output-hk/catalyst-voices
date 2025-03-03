@@ -1737,5 +1737,17 @@
   "opportunities": "Opportunities",
   "@opportunities": {
     "description": "The title of the tile that shows the list of opportunities."
+  },
+  "discoveryHomepage": "Discovery Homepage",
+  "@discoveryHomepage": {
+    "description": "Title for tile in overall spaces page to go to discovery page"
+  },
+  "feedbackOnProposals": "Feedback on Proposals",
+  "@feedbackOnProposals": {
+    "description": "Title for tile in overall spaces page to go to proposals list page"
+  },
+  "browseMyProposals": "Browse all my proposals",
+  "@browseMyProposals": {
+    "description": "Title for tile in workspace space page to go to proposals page"
   }
 }

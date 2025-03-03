@@ -1,11 +1,15 @@
-import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_header.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_nav_tile.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space_overview_container.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class DiscoveryOverview extends StatelessWidget {
   const DiscoveryOverview({super.key});
@@ -17,11 +21,8 @@ class DiscoveryOverview extends StatelessWidget {
         children: [
           SpaceOverviewHeader(Space.discovery),
           _DiscoveryDashboardTile(),
-          VoicesDivider(indent: 0, endIndent: 0, height: 16),
-          _RolesTile(),
           _FeedbackTile(),
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
-          _DocumentationTile(),
         ],
       ),
     );
@@ -36,22 +37,10 @@ class _DiscoveryDashboardTile extends StatelessWidget {
     return SpaceOverviewNavTile(
       leading: VoicesAssets.icons.home.buildIcon(),
       title: Text(
-        'Discovery Dashboard',
+        context.l10n.discoveryHomepage,
         style: Theme.of(context).textTheme.bodyLarge,
       ),
-      backgroundColor: Space.discovery.backgroundColor(context),
-    );
-  }
-}
-
-class _RolesTile extends StatelessWidget {
-  const _RolesTile();
-
-  @override
-  Widget build(BuildContext context) {
-    return SpaceOverviewNavTile(
-      leading: VoicesAssets.icons.user.buildIcon(),
-      title: const Text('Catalyst Roles'),
+      onTap: () => GoRouter.of(context).go(const DiscoveryRoute().location),
     );
   }
 }
@@ -61,21 +50,25 @@ class _FeedbackTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SpaceOverviewNavTile(
-      leading: VoicesAssets.icons.annotation.buildIcon(),
-      title: const Text('Feedback'),
-    );
-  }
-}
-
-class _DocumentationTile extends StatelessWidget {
-  const _DocumentationTile();
-
-  @override
-  Widget build(BuildContext context) {
-    return SpaceOverviewNavTile(
-      leading: VoicesAssets.icons.arrowRight.buildIcon(),
-      title: const Text('Catalyst Gitbook documentation'),
+    return BlocSelector<SessionCubit, SessionState, bool>(
+      selector: (state) {
+        return state.account?.isProposer ?? false;
+      },
+      builder: (context, state) {
+        return Visibility.maintain(
+          visible: state,
+          child: SpaceOverviewNavTile(
+            leading: VoicesAssets.icons.documentText.buildIcon(),
+            title: Text(
+              context.l10n.feedbackOnProposals,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            onTap: state
+                ? () => GoRouter.of(context).go(const ProposalsRoute().location)
+                : null,
+          ),
+        );
+      },
     );
   }
 }
