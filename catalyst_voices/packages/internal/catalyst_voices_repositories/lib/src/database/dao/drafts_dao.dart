@@ -18,7 +18,7 @@ abstract interface class DraftsDao {
   Future<int> countAll();
 
   /// Deletes a document draft with [ref].
-  Future<void> deleteDraft({required DocumentRef ref});
+  Future<void> deleteDraft({required DraftRef ref});
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
@@ -38,7 +38,7 @@ abstract interface class DraftsDao {
   /// Be aware that if version is not specified all version of [ref] id
   /// will be updated.
   Future<void> updateContent({
-    required DocumentRef ref,
+    required DraftRef ref,
     required DocumentDataContent content,
   });
 

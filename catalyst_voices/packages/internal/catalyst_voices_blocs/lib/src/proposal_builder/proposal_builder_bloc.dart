@@ -93,7 +93,7 @@ final class ProposalBuilderBloc
     try {
       emit(state.copyWith(isLoading: true));
 
-      final ref = state.metadata.documentRef!;
+      final ref = state.metadata.documentRef! as DraftRef;
 
       // removing all versions of this proposal
       final unversionedRef = ref.copyWith(version: const Optional.empty());

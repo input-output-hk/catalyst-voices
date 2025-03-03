@@ -10,7 +10,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   );
 
   @override
-  Future<void> delete({required DocumentRef ref}) async {
+  Future<void> delete({required DraftRef ref}) async {
     await _database.draftsDao.deleteDraft(ref: ref);
   }
 
@@ -50,7 +50,7 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
 
   @override
   Future<void> update({
-    required DocumentRef ref,
+    required DraftRef ref,
     required DocumentDataContent content,
   }) async {
     await _database.draftsDao.updateContent(ref: ref, content: content);
