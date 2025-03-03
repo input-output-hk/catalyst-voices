@@ -214,7 +214,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     });
   }
 
-  @visibleForTesting
   Stream<List<DocumentsDataWithRefData>> watchLatestDocumentsWithRef({
     int? limit,
   }) {
@@ -227,7 +226,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
             .where((doc) => doc.metadata.template != null)
             .map((documentData) async {
           final templateRef = documentData.metadata.template!;
-          final templateData = await getDocumentData(ref: templateRef);
+          final templateData = await _documentDataLock.synchronized(
+            () => getDocumentData(ref: templateRef),
+          );
           return (data: documentData, refData: templateData);
         }),
       );

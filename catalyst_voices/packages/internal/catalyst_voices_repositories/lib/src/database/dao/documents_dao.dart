@@ -166,12 +166,13 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<List<String>> queryVersionIds({required String id}) {
-    return (select(documents)
-          ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
-          ..orderBy([
-            (u) => OrderingTerm.desc(u.verHi),
-            (u) => OrderingTerm.desc(u.verLo),
-          ]))
+    final query = select(documents)
+      ..where((tbl) => _filterRef(tbl, SignedDocumentRef(id: id)))
+      ..orderBy([
+        (u) => OrderingTerm.desc(u.verHi),
+      ]);
+
+    return query
         .map((doc) => UuidHiLo(high: doc.verHi, low: doc.verLo).toString())
         .get();
   }
@@ -221,9 +222,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       ..groupBy([documents.idHi, documents.idLo])
       ..orderBy([
         OrderingTerm(expression: documents.verHi, mode: OrderingMode.desc),
-        OrderingTerm(expression: documents.verLo, mode: OrderingMode.desc),
         OrderingTerm(expression: documents.idHi),
-        OrderingTerm(expression: documents.idLo),
       ]);
 
     if (limit != null) {
@@ -234,25 +233,12 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final latestVersions = await Future.wait(
         ids.map(
           (row) {
-            final idHi = row.read(documents.idHi);
-            final idLo = row.read(documents.idLo);
-
-            if (idHi == null || idLo == null) {
-              throw StateError('Document ID cannot be null');
-            }
-            return (select(documents)
-                  ..where(
-                    (tbl) => Expression.and([
-                      tbl.idHi.equals(idHi),
-                      tbl.idLo.equals(idLo),
-                    ]),
-                  )
-                  ..orderBy([
-                    (u) => OrderingTerm.desc(u.verHi),
-                    (u) => OrderingTerm.desc(u.verLo),
-                  ])
-                  ..limit(1))
-                .getSingle();
+            final id = UuidHiLo(
+              high: row.read(documents.idHi)!,
+              low: row.read(documents.idHi)!,
+            );
+            final ref = SignedDocumentRef(id: id.toString());
+            return _selectRef(ref).getSingle();
           },
         ),
       );
@@ -266,12 +252,15 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     required DocumentRef ref,
     required DocumentType type,
   }) {
-    return (select(documents)..where((row) => row.type.equals(type.uuid)))
-        .watch()
-        .map(
-          (comments) => comments.where((doc) => doc.metadata.ref == ref).length,
-        )
-        .distinct();
+    final query = select(documents)
+      ..where(
+        (row) => Expression.and([
+          row.type.equals(type.uuid),
+          _filterRef(row, ref),
+        ]),
+      );
+
+    return query.watch().map((comments) => comments.length).distinct();
   }
 
   bool _entitiesEquals(DocumentEntity? previous, DocumentEntity? next) {
