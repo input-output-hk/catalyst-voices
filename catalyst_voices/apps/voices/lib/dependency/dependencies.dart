@@ -67,7 +67,7 @@ final class Dependencies extends DependencyProvider {
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
-          downloader: get<Downloader>(),
+          downloaderService: get<DownloaderService>(),
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
           progressNotifier: get<RegistrationProgressNotifier>(),
@@ -97,12 +97,14 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<WorkspaceBloc>(() {
         return WorkspaceBloc(
           get<CampaignService>(),
+          get<ProposalService>(),
         );
       })
       ..registerFactory<ProposalBuilderBloc>(() {
         return ProposalBuilderBloc(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<DownloaderService>(),
         );
       })
       ..registerFactory<DiscoveryCubit>(() {
@@ -178,7 +180,7 @@ final class Dependencies extends DependencyProvider {
         cacheConfig: get<AppConfig>().cache,
       );
     });
-    registerLazySingleton<Downloader>(Downloader.new);
+    registerLazySingleton<DownloaderService>(DownloaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,

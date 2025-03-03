@@ -10,6 +10,7 @@ class UploadSeedPhraseDialog {
   static Future<List<SeedPhraseWord>> show(BuildContext context) async {
     final file = await VoicesUploadFileDialog.show(
       context,
+      routeSettings: const RouteSettings(name: '/upload-seed-phrase'),
       title: context.l10n.uploadKeychainTitle,
       itemNameToUpload: context.l10n.key,
       info: context.l10n.uploadKeychainInfo,

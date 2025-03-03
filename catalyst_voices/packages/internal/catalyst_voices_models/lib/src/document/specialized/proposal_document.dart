@@ -17,6 +17,7 @@ final class ProposalDocument extends Equatable {
       DocumentNodeId.fromString('summary.time.duration');
   static final authorNameNodeId =
       DocumentNodeId.fromString('summary.proposer.applicant');
+  static const String exportFileExt = 'json';
 
   final ProposalMetadata metadata;
   final Document document;
