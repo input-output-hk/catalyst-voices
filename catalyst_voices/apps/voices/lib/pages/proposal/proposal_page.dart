@@ -115,6 +115,7 @@ class _ProposalPageState extends State<ProposalPage> {
     bloc.add(ShowProposalEvent(ref: widget.ref));
   }
 
+  // ignore: unused_element
   void _changeVersion(String version) {
     Router.neglect(context, () {
       final ref = widget.ref.copyWith(version: Optional.of(version));
