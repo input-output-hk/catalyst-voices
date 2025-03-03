@@ -94,7 +94,7 @@ void main() async {
     );
 
     patrolWidgetTest(
-      'visitor - add proposal to favourites',
+      'visitor - add proposal to favorites',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProposalsPage($).proposalsCountIs('Favorite', 0);
@@ -105,7 +105,7 @@ void main() async {
     );
 
     patrolWidgetTest(
-      'visitor - remove proposal from favourites, in favourites tab',
+      'visitor - remove proposal from favorites, in favorites tab',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProposalsPage($).proposalFavoriteBtnTap(0);
@@ -116,7 +116,7 @@ void main() async {
     );
 
     patrolWidgetTest(
-      'visitor - remove proposal from favourites, in all tab',
+      'visitor - remove proposal from favorites, in all tab',
       (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProposalsPage($).proposalFavoriteBtnTap(0);
