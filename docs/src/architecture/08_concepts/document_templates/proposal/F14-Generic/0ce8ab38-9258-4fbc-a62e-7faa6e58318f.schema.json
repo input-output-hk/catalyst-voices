@@ -689,7 +689,7 @@
                     "x-order": ["informational_content", "foundational_rd", "financial_products", "early_stage_product", "developer_tools", "enterprise_partnership", "working_product", "timeline", "matching_funds", "adoption_potential"]
                 }
             },
-            "x-order": ["category_questions"]
+            "x-order": ["category_details", "category_questions"]
         },
         "theme": {
             "$ref": "#/definitions/segment",
