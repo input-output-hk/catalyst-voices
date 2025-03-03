@@ -36,10 +36,10 @@ final class ProposalState extends Equatable {
     );
   }
 
-  ProposalState copyWithFavourite({
-    required bool isFavourite,
+  ProposalState copyWithFavorite({
+    required bool isFavorite,
   }) {
-    final updatedHeader = data.header.copyWith(isFavourite: isFavourite);
+    final updatedHeader = data.header.copyWith(isFavorite: isFavorite);
     final updatedData = data.copyWith(header: updatedHeader);
     return copyWith(data: updatedData);
   }

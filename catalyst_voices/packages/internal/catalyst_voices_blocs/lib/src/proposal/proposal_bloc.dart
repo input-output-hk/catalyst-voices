@@ -31,6 +31,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
 
     final documentSegments = mapDocumentToSegments(proposalDocument.document);
 
+    /* cSpell:disable */
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: 'Cardano Partners: Growth & Acceleration',
       proposalTitle: 'Project Mayhem: Freedom by Chaos',
@@ -40,7 +41,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
             'societal hierarchies through acts of controlled chaos. '
             'By targeting oppressive systems like credit structures and '
             'consumerist propaganda, we empower individuals to reclaim their '
-            'agency. This decentralised movement fosters self-replication, '
+            'agency. This ?decentralised movement fosters self-replication, '
             'inspiring global action for liberation and a return to human '
             'authenticity.',
         status: ProposalStatus.draft,
@@ -71,7 +72,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
             ...List.generate(4, (_) => const Uuid().v7()),
           ],
         ),
-        isFavourite: false,
+        isFavorite: false,
       ),
       segments: [
         overviewSegment,
@@ -79,6 +80,7 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
         commentsSegment,
       ],
     );
+    /* cSpell:enable */
 
     emit(ProposalState(data: data));
   }
@@ -92,6 +94,6 @@ final class ProposalBloc extends Bloc<ProposalEvent, ProposalState>
     // ignore: unused_local_variable
     final proposalId = state.data.header.id;
 
-    emit(state.copyWithFavourite(isFavourite: event.isFavorite));
+    emit(state.copyWithFavorite(isFavorite: event.isFavorite));
   }
 }

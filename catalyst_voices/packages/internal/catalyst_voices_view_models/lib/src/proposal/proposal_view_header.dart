@@ -9,7 +9,7 @@ final class ProposalViewHeader extends Equatable {
   final DateTime? createdAt;
   final int commentsCount;
   final DocumentVersions versions;
-  final bool isFavourite;
+  final bool isFavorite;
 
   const ProposalViewHeader({
     this.id,
@@ -18,7 +18,7 @@ final class ProposalViewHeader extends Equatable {
     this.createdAt,
     this.commentsCount = 0,
     this.versions = const DocumentVersions(),
-    this.isFavourite = false,
+    this.isFavorite = false,
   });
 
   @override
@@ -29,7 +29,7 @@ final class ProposalViewHeader extends Equatable {
         createdAt,
         commentsCount,
         versions,
-        isFavourite,
+        isFavorite,
       ];
 
   ProposalViewHeader copyWith({
@@ -39,7 +39,7 @@ final class ProposalViewHeader extends Equatable {
     Optional<DateTime>? createdAt,
     int? commentsCount,
     DocumentVersions? versions,
-    bool? isFavourite,
+    bool? isFavorite,
   }) {
     return ProposalViewHeader(
       id: id.dataOr(this.id),
@@ -48,7 +48,7 @@ final class ProposalViewHeader extends Equatable {
       createdAt: createdAt.dataOr(this.createdAt),
       commentsCount: commentsCount ?? this.commentsCount,
       versions: versions ?? this.versions,
-      isFavourite: isFavourite ?? this.isFavourite,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 }

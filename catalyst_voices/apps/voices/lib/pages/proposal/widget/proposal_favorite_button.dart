@@ -9,7 +9,7 @@ class ProposalFavoriteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<ProposalBloc, ProposalState, bool>(
-      selector: (state) => state.data.header.isFavourite,
+      selector: (state) => state.data.header.isFavorite,
       builder: (context, state) {
         return _ProposalFavoriteButton(isFavorite: state);
       },
