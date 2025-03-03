@@ -48,6 +48,7 @@ class ProposalsPage {
   final cardanoUseCasesSectionLabel = const Key('CardanoUseCasesSectionLabel');
   final cardanoUseCasesSectionTitle = const Key('CardanoUseCasesSectionTitle');
   final cardanoUseCasesSectionBody = const Key('CardanoUseCasesSectionBody');
+  final emptyProposals = const Key('EmptyProposals');
 
   Future<void> looksAsExpectedForVisitor() async {
     await AppBarPage($).looksAsExpectedForVisitor();
@@ -282,5 +283,40 @@ class ProposalsPage {
         );
       }
     }
+  }
+
+  Future<int> getProposalsCountFromTab(String tab) async {
+    const allowedStrings = ['All', 'Draft', 'Final', 'Favorite', 'My'];
+    if (allowedStrings.contains(tab)) {
+      return int.parse(
+        $(Key('${tab}ProposalsTab')).$(Text).text!.split('(')[1].split(')')[0],
+      );
+    } else {
+      throw ArgumentError('Invalid tab name: $tab');
+    }
+  }
+
+  Future<void> proposalsCountIs(String tab, int count) async {
+    final proposalsCountFromTab = await getProposalsCountFromTab(tab);
+    expect(proposalsCountFromTab, count);
+    await $(Key('${tab}ProposalsTab')).tap();
+    if (count == 0) {
+      expect($(emptyProposals), findsOneWidget);
+    } else {
+      final proposalsCount = $.tester
+          .widgetList<Material>(
+            $(proposalsContainer).$(MostRecentSection($).proposalCard),
+          )
+          .length;
+      expect(proposalsCount, count);
+    }
+  }
+
+  Future<void> proposalFavoriteBtnTap(int proposalNumber) async {
+    await $(proposalsContainer)
+        .$(MostRecentSection($).proposalCard)
+        .at(proposalNumber)
+        .$(MostRecentSection($).favoriteButton)
+        .tap();
   }
 }

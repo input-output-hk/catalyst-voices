@@ -92,5 +92,39 @@ void main() async {
         await ProposalsPage($).paginationWorks();
       },
     );
+
+    patrolWidgetTest(
+      'visitor - add proposal to favourites',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).proposalsCountIs('Favorite', 0);
+        await $(ProposalsPage($).allProposalsTab).tap();
+        await ProposalsPage($).proposalFavoriteBtnTap(0);
+        await ProposalsPage($).proposalsCountIs('Favorite', 1);
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - remove proposal from favourites, in favourites tab',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).proposalFavoriteBtnTap(0);
+        await ProposalsPage($).proposalsCountIs('Favorite', 1);
+        await ProposalsPage($).proposalFavoriteBtnTap(0);
+        await ProposalsPage($).proposalsCountIs('Favorite', 0);
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - remove proposal from favourites, in all tab',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).proposalFavoriteBtnTap(0);
+        await ProposalsPage($).proposalsCountIs('Favorite', 1);
+        await $(ProposalsPage($).allProposalsTab).tap();
+        await ProposalsPage($).proposalFavoriteBtnTap(0);
+        await ProposalsPage($).proposalsCountIs('Favorite', 0);
+      },
+    );
   });
 }
