@@ -73,7 +73,9 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Docu
         service = set_localhost_addresses(service);
     } else {
         for host in &hosts {
-            service = service.server(ServerObject::new(host).description("Server host staging/production location."));
+            service = service.server(
+                ServerObject::new(host).description("Server host staging/production location."),
+            );
         }
     }
 
