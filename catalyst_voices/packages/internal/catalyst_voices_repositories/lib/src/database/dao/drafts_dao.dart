@@ -18,7 +18,7 @@ abstract interface class DraftsDao {
   Future<int> countAll();
 
   /// Deletes a document draft with [ref].
-  Future<void> deleteDraft({required DraftRef ref});
+  Future<void> deleteDraft({required DocumentRef ref});
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
@@ -67,7 +67,7 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> deleteDraft({required DraftRef ref}) async {
+  Future<void> deleteDraft({required DocumentRef ref}) async {
     await drafts.deleteWhere((row) => _filterRef(row, ref));
   }
 

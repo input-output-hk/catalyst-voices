@@ -15,7 +15,7 @@ abstract interface class ProposalService {
   /// Delete a draft proposal from local storage.
   ///
   /// Published proposals cannot be deleted.
-  Future<void> deleteDraftProposal(DraftRef ref);
+  Future<void> deleteDraftProposal(DocumentRef ref);
 
   /// Encodes the [document] to exportable format.
   ///
@@ -79,7 +79,7 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<void> deleteDraftProposal(DraftRef ref) {
+  Future<void> deleteDraftProposal(DocumentRef ref) {
     return _documentRepository.deleteDraftProposal(ref: ref);
   }
 

@@ -38,7 +38,7 @@ abstract interface class DocumentRepository {
 
   /// Deletes a proposal draft from the local storage.
   Future<void> deleteDraftProposal({
-    required DraftRef ref,
+    required DocumentRef ref,
   });
 
   /// Encodes the [document] to exportable format.
@@ -132,7 +132,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> deleteDraftProposal({required DraftRef ref}) {
+  Future<void> deleteDraftProposal({required DocumentRef ref}) {
     return _drafts.delete(ref: ref);
   }
 
