@@ -49,6 +49,12 @@ class ProposalsPage {
   final cardanoUseCasesSectionTitle = const Key('CardanoUseCasesSectionTitle');
   final cardanoUseCasesSectionBody = const Key('CardanoUseCasesSectionBody');
   final emptyProposals = const Key('EmptyProposals');
+  final shareProposalDialog = const Key('ShareProposalDialog');
+  final closeButton = const Key('CloseButton');
+  final shareItem = const Key('ShareItem');
+  final itemIcon = const Key('ItemIcon');
+  final itemTitle = const Key('ItemTitle');
+  final itemDescription = const Key('ItemDescription');
 
   Future<void> looksAsExpectedForVisitor() async {
     await AppBarPage($).looksAsExpectedForVisitor();
@@ -318,5 +324,42 @@ class ProposalsPage {
         .at(proposalNumber)
         .$(MostRecentSection($).favoriteButton)
         .tap();
+  }
+
+  Future<void> proposalLinksAreDisplayedFor(int proposalNumber) async {
+    await $(proposalsContainer)
+        .$(MostRecentSection($).proposalCard)
+        .at(proposalNumber)
+        .$(MostRecentSection($).shareButton)
+        .tap();
+    expect(
+      $(shareProposalDialog).$(title).text,
+      T.get('Share Proposal'),
+    );
+    for (var i = 0; i < 5; i++) {
+      expect(
+        $(shareProposalDialog).$(shareItem).at(i).$(itemIcon),
+        findsOneWidget,
+      );
+      expect(
+        $(shareProposalDialog).$(shareItem).at(i).$(itemTitle).text,
+        isNotEmpty,
+      );
+      expect(
+        $(shareProposalDialog).$(shareItem).at(i).$(itemDescription).text,
+        isNotEmpty,
+      );
+    }
+  }
+
+  Future<void> shareModalCloseButtonWorks() async {
+    await $(proposalsContainer)
+        .$(MostRecentSection($).proposalCard)
+        .at(0)
+        .$(MostRecentSection($).shareButton)
+        .tap();
+    expect($(shareProposalDialog).$(closeButton), findsOneWidget);
+    await $(shareProposalDialog).$(closeButton).tap();
+    expect($(shareProposalDialog).$(closeButton), findsNothing);
   }
 }

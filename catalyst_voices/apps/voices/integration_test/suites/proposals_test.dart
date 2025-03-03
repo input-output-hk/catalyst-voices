@@ -126,5 +126,21 @@ void main() async {
         await ProposalsPage($).proposalsCountIs('Favorite', 0);
       },
     );
+
+    patrolWidgetTest(
+      'visitor - share links are displayed',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).proposalLinksAreDisplayedFor(0);
+      },
+    );
+
+    patrolWidgetTest(
+      'visitor - share modal close button works',
+      (PatrolTester $) async {
+        await $.pumpWidgetAndSettle(App(routerConfig: router));
+        await ProposalsPage($).shareModalCloseButtonWorks();
+      },
+    );
   });
 }
