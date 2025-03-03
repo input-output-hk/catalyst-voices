@@ -80,6 +80,10 @@ class _SegmentsListView extends StatelessWidget {
           return const ProposalSeparatorBox(height: 24);
         }
 
+        if (item is DocumentSection && nextItem is DocumentSection) {
+          return const ProposalSeparatorBox(height: 24);
+        }
+
         if (nextItem is ProposalCommentsSegment) {
           return const SizedBox(height: 32);
         }
@@ -120,7 +124,9 @@ class _SegmentsListView extends StatelessWidget {
       DocumentSegment() => ProposalDocumentSegmentTitle(
           title: item.resolveTitle(context),
         ),
-      DocumentSection() => const ProposalDocumentSectionTile(),
+      DocumentSection(:final property) => ProposalDocumentSectionTile(
+          property: property,
+        ),
       ProposalCommentsSegment() => const ProposalCommentsHeaderTile(),
       ProposalCommentsSection() => switch (item) {
           ViewCommentsSection() => const ProposalCommentsTile(),
