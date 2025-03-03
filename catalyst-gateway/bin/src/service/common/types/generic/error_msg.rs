@@ -22,9 +22,9 @@ const TITLE: &str = "Error Message";
 const DESCRIPTION: &str = "This is an error message.";
 /// Example.
 const EXAMPLE: &str = "An error has occurred, the details of the error are ...";
-/// Max Length
-const MAX_LENGTH: usize = 256;
-/// Min Length
+/// Error message string maximum length
+const MAX_LENGTH: usize = 60000;
+/// Error message string minimum length
 const MIN_LENGTH: usize = 1;
 /// Validation Regex Pattern
 const PATTERN: &str = concatcp!("^(.){", MIN_LENGTH, ",", MAX_LENGTH, "}$");
