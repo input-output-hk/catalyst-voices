@@ -228,18 +228,13 @@ async fn last_signing_key(
     let chain = registration_chain(network, indexed_registrations)
         .await
         .context("Failed to build registration chain")?;
-    let last_role = chain
-        .role_data()
-        .last_key_value()
-        .context("Empty role data")?
-        .1;
     let key_ref = chain
         .role_data()
-        .get(last_role)
-        .context("Missing role 0 data")?
-        .1
-        .signing_key()
-        .context("Missing signing key")?;
+        .iter()
+        // TODO: FIXME: Use BTreeMap to be able to search from the last role.
+        //.rev()
+        .find_map(|(_, (_, r))| r.signing_key())
+        .context("Unable to find signing key")?;
     let key_offset = usize::try_from(key_ref.key_offset).context("Invalid signing key offset")?;
     match key_ref.local_ref {
         LocalRefInt::X509Certs => {
