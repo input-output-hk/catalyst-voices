@@ -491,9 +491,7 @@ mod tests {
     #[test]
     fn configured_hosts_default() {
         let configured_hosts = Settings::api_host_names();
-        assert_eq!(configured_hosts, vec![
-            "https://gateway.dev.projectcatalyst.io"
-        ]);
+        assert!(configured_hosts.is_empty());
     }
 
     #[test]
