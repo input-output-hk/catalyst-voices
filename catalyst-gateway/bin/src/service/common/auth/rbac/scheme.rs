@@ -13,7 +13,7 @@ use oid_registry::{Oid, OID_SIG_ED25519};
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, payload::Json, SecurityScheme};
 use rbac_registration::{
-    cardano::cip509::{Cip509, LocalRefInt, RoleNumber},
+    cardano::cip509::{Cip509, LocalRefInt},
     registration::cardano::RegistrationChain,
 };
 use tracing::{error, warn};
@@ -228,9 +228,14 @@ async fn last_signing_key(
     let chain = registration_chain(network, indexed_registrations)
         .await
         .context("Failed to build registration chain")?;
+    let last_role = chain
+        .role_data()
+        .last_key_value()
+        .context("Empty role data")?
+        .1;
     let key_ref = chain
         .role_data()
-        .get(&RoleNumber::ROLE_0)
+        .get(last_role)
         .context("Missing role 0 data")?
         .1
         .signing_key()
