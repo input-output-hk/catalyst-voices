@@ -130,7 +130,6 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  @override
   Future<int> countRefDocumentByType({
     required DocumentRef ref,
     required DocumentType type,
@@ -142,7 +141,12 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
         ]),
       );
 
-    return query.get().then((docs) => docs.length);
+    return query.get().then(
+          (docs) => docs.where((doc) {
+            // TODO(damian-molinski): JSONB filter
+            return doc.metadata.ref == ref;
+          }).length,
+        );
   }
 
   @override
@@ -235,9 +239,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
           (row) {
             final id = UuidHiLo(
               high: row.read(documents.idHi)!,
-              low: row.read(documents.idHi)!,
+              low: row.read(documents.idLo)!,
             );
-            final ref = SignedDocumentRef(id: id.toString());
+            final ref = SignedDocumentRef(id: id.uuid);
             return _selectRef(ref).getSingle();
           },
         ),
@@ -255,8 +259,13 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final query = select(documents)
       ..where(
         (row) => Expression.and([
-          row.type.equals(type.uuid),
-          _filterRef(row, ref),
+          // TODO(damian-molinski): JSONB filter
+          row.metadata.equalsValue(
+            DocumentDataMetadata(
+              type: type,
+              ref: ref,
+            ),
+          ),
         ]),
       );
 

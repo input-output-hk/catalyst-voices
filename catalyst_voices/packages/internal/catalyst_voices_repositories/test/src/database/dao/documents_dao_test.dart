@@ -594,6 +594,7 @@ void main() {
         final proposalId = const Uuid().v7();
         await Future<void>.delayed(const Duration(milliseconds: 1));
         final versionId = const Uuid().v7();
+        final proposalId2 = const Uuid().v7();
         final proposalRef = DocumentRefFactory.buildSigned(
           id: proposalId,
           version: versionId,
@@ -603,6 +604,11 @@ void main() {
             type: DocumentType.proposalDocument,
             selfRef: proposalRef,
           ),
+        );
+
+        final proposalRef2 = DocumentRefFactory.buildSigned(
+          id: proposalId2,
+          version: versionId,
         );
 
         await database.documentsDao.saveAll([proposal]);
@@ -617,11 +623,19 @@ void main() {
           );
         });
 
+        final otherComment = DocumentWithMetadataFactory.build(
+          metadata: DocumentDataMetadata(
+            type: DocumentType.commentTemplate,
+            selfRef: DocumentRefFactory.buildSigned(),
+            ref: proposalRef2,
+          ),
+        );
+
         final documentCount = database.documentsDao
             .watchCount(ref: proposalRef, type: DocumentType.commentTemplate)
             .asBroadcastStream();
 
-        await database.documentsDao.saveAll([comments.first]);
+        await database.documentsDao.saveAll([comments.first, otherComment]);
         final firstEmission = await documentCount.first;
 
         await database.documentsDao.saveAll([comments.last]);
