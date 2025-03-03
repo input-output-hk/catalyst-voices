@@ -175,7 +175,10 @@ class _ProposalDocumentSectionTileState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: _valueProperties
-                // TODO(damian-molinski): singleLineHttpsURLEntryList
+                .where((property) {
+                  return property.schema.title.isNotEmpty ||
+                      property.value != null;
+                })
                 .map<Widget>((property) {
                   return _DocumentPropertyValueBuilder(
                     key: ObjectKey(property.nodeId),
